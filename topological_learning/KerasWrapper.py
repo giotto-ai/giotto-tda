@@ -14,7 +14,7 @@ import pandas as pd
 from sklearn.model_selection import GridSearchCV
 
 
-class KerasClassifierrWrapper(KerasClassifier):
+class KerasClassifierWrapper(KerasClassifier):
     """ A wrapper for Keras classifiers.
 
     Parameters
@@ -31,7 +31,7 @@ class KerasClassifierrWrapper(KerasClassifier):
     """
     def __call__(self, modelSteps = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
                  numberStepsInPast = 1, numberFeatures = 1, optimizerClass = koptimizers.SGD, optimizer_kwargs = {'lr': 0.01},
-                 loss = 'mean_squared_error', metrics = ['accuracy']):
+                 loss = 'binary_crossentropy', metrics = ['accuracy']):
         # Create model
         model = Sequential()
         persistentStep = modelSteps[0]
