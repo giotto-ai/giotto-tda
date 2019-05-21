@@ -68,9 +68,9 @@ class KerasClassifierrWrapper(KerasClassifier):
 
         # Return the classifier
         if type(XList) is list:
-            return KerasRegressor.fit(self, XList[0], XList[1], **kwargs)
+            return KerasClassifier.fit(self, XList[0], XList[1], **kwargs)
         else:
-            return KerasRegressor.fit(self, XList, y, **kwargs)
+            return KerasClassifier.fit(self, XList, y, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
@@ -92,9 +92,9 @@ class KerasClassifierrWrapper(KerasClassifier):
         # Input validation
         #  X = check_array(X)
         if type(XList) is list:
-            return KerasRegressor.predict(self, XList[0], **kwargs), XList[1]
+            return KerasClassifier.predict(self, XList[0], **kwargs), XList[1]
         else:
-            return KerasRegressor.predict(self, XList, **kwargs)
+            return KerasClassifier.predict(self, XList, **kwargs)
 
     def predict_proba(self, XList, **kwargs):
         """Returns class probability estimates for the given test data.
@@ -119,9 +119,9 @@ class KerasClassifierrWrapper(KerasClassifier):
         """
         kwargs = self.filter_sk_params(Sequential.predict_proba, kwargs)
         if type(XList) is list:
-            probs, _ = KerasRegressor.predict(self, XList[0], **kwargs)
+            probs, _ = KerasClassifier.predict(self, XList[0], **kwargs)
         else:
-            probs = KerasRegressor.predict(self, XList, **kwargs)
+            probs = KerasClassifier.predict(self, XList, **kwargs)
         # check if binary classification
         if probs.shape[1] == 1:
             # first column is probability of class 0 and second is of class 1
@@ -239,38 +239,6 @@ class KerasRegressorWrapper(KerasRegressor):
             return KerasRegressor.predict(self, XList[0], **kwargs), XList[1]
         else:
             return KerasRegressor.predict(self, XList, **kwargs)
-
-    def predict_proba(self, XList, **kwargs):
-        """Returns class probability estimates for the given test data.
-
-        Parameters
-        ----------
-            X: array-like, shape `(n_samples, n_features)`
-                Test samples where `n_samples` is the number of samples
-                and `n_features` is the number of features.
-            **kwargs: dictionary arguments
-                Legal arguments are the arguments
-                of `Sequential.predict_classes`.
-
-        Returns
-        -------
-            proba: array-like, shape `(n_samples, n_outputs)`
-                Class probability estimates.
-                In the case of binary classification,
-                to match the scikit-learn API,
-                will return an array of shape `(n_samples, 2)`
-                (instead of `(n_sample, 1)` as in Keras).
-        """
-        kwargs = self.filter_sk_params(Sequential.predict_proba, kwargs)
-        if type(XList) is list:
-            probs, _ = KerasRegressor.predict(self, XList[0], **kwargs)
-        else:
-            probs = KerasRegressor.predict(self, XList, **kwargs)
-        # check if binary classification
-        if probs.shape[1] == 1:
-            # first column is probability of class 0 and second is of class 1
-            probs = np.hstack([1 - probs, probs])
-        return probs
 
     def score(self, XList, y = None, **kwargs):
         """

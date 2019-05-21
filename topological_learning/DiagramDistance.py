@@ -46,7 +46,6 @@ def kernel_betti_distance(x, y, dimension, sampling=None, order=2):
     return np.linalg.norm(bettiX - bettiY, ord=order)
 
 def bottleneck_distance(x, y, dimension=None):
-    print(x.size, y.size)
     return gd.bottleneck_distance(x, y)
 
 def wasserstein_distance(x, y, dimension=None, order=1):

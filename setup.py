@@ -1,18 +1,17 @@
 from setuptools import setup
 
-
 with open('README.rst') as f:
     long_description =  f.read()
 
-setup(name='topological_ml',
+setup(name='topological_learning',
       version='0.1',
       description='This package structures and makes accessible to all the tools used or developed by the research team to do Topological Data Analysis within a sk-learn+Keras Machine Learning',
       long_description=long_description,
-      url='https://git.l2f.ch/g.tauzin/topological_ml.git',
+      url='https://git.l2f.ch/g.tauzin/topological_learning.git',
       author='Guillaume Tauzin',
       author_email='g.tauzin@l2f.ch',
       license='MIT',
-      packages=['topological_ml'],
+      packages=['topological_learning'],
       include_package_data=True,
       keywords='topology data analysis, persistent homology, persistence diagrams, uniform manifold approximation and projection',
       install_requires=[
