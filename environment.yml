@@ -1,4 +1,4 @@
-name: l2f
+name: research
 channels:
   - anaconda
   - pytorch
@@ -171,5 +171,3 @@ dependencies:
     - tadasets==0.0.4
     - torch==1.0.1.post2
     - umap-learn==0.3.8
-prefix: /Users/guillaumetauzin/anaconda3/envs/py36
-
