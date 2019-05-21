@@ -82,7 +82,10 @@ class LorenzLabeller(BaseEstimator, TransformerMixin):
 
         return XListTransformed
 
-
+def derivation_function(function, X, axis=1, deltaT=1):
+    partialWindowBegin = function(X[:, deltaT:], axis=axis)
+    partialWindowEnd = function(X[:, :-deltaT], axis=axis)
+    return (partialWindowEnd - partialWindowBegin) / partialWindowBegin / deltaT
 
 def variation_function(function, X, axis=1, deltaT=1):
     fullWindow = function(X, axis=axis)
@@ -115,7 +118,8 @@ class Labeller(BaseEstimator, TransformerMixin):
         Whether the transformer has been fitted
     """
 
-    implementedLabellingRecipes = {'apply': apply_function, 'variation': variation_function}
+    implementedLabellingRecipes = {'apply': apply_function, 'variation': variation_function,
+                                   'derivation': derivation_function}
 
     def __init__(self, labellingType='', function = np.std, deltaT = 0, **function_kwargs):
         self.labellingType = labellingType
