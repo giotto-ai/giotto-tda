@@ -1,6 +1,6 @@
-toplogical_ml
+topological_learning
 --------
 
 To use (with caution), simply do::
 
-    >>> import topological_ml as tml
+    >>> import topological_learning as tl
