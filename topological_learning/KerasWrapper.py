@@ -29,20 +29,21 @@ class KerasClassifierWrapper(KerasClassifier):
     classes_ : ndarray, shape (n_classes,)
         The classes seen at :meth:`fit`.
     """
-    def __call__(self, modelSteps = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
-                 numberStepsInPast = 1, numberFeatures = 1, optimizerClass = koptimizers.SGD, optimizer_kwargs = {'lr': 0.01},
+    def __call__(self, modelSteps_kwargs = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
+                 optimizer_kwargs = {'optimizerClass': koptimizers.SGD, 'lr': 0.01},
                  loss = 'binary_crossentropy', metrics = ['accuracy']):
         # Create model
         model = Sequential()
-        persistentStep = modelSteps[0]
-        modelStep = persistentStep.copy()
-        model.add(modelStep.pop('layerClass')(input_shape = (numberStepsInPast, numberFeatures), **modelStep)) #input_shape should be the parameter
-        for persistentStep in modelSteps[1:]:
-            modelStep = persistentStep.copy()
-            model.add(modelStep.pop('layerClass')(**modelStep))
+        tempStep_kwargs = modelSteps_kwargs[0]
+        modelStep_kwargs = tempStep_kwargs.copy()
+        model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
+        for tempStep_kwargs in modelSteps[1:]:
+            modelStep_kwargs = tempStep_kwargs.copy()
+            model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
 
         # Compile model
-        optimizer = optimizerClass(**optimizer_kwargs)
+        tempOptimizer_kwargs = optimizer_kwargs.copy()
+        optimizer = tempOptimizer_kwargs.pop('optimizerClass')(**tempOptimizer_kwargs)
         model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
         return model
 
@@ -68,9 +69,13 @@ class KerasClassifierWrapper(KerasClassifier):
 
         # Return the classifier
         if type(XList) is list:
-            return KerasClassifier.fit(self, XList[0], XList[1], **kwargs)
+            X = XList[0]
+            y = XList[1]
         else:
-            return KerasClassifier.fit(self, XList, y, **kwargs)
+            X = XList
+
+        self.input_shape = X.shape[1:]
+        return KerasRegressor.fit(self, X, y, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
@@ -150,9 +155,13 @@ class KerasClassifierWrapper(KerasClassifier):
         kwargs = self.filter_sk_params(Sequential.evaluate, kwargs)
 
         if type(XList) is list:
-            loss = self.model.evaluate(XList[0], XList[1], **kwargs)
+            X = XList[0]
+            y = XList[1]
         else:
-            loss = self.model.evaluate(XList, y, **kwargs)
+            X = XList
+
+        loss = self.model.evaluate(X, y, **kwargs)
+
         if isinstance(loss, list):
             return -loss[0]
         return -loss
@@ -174,19 +183,20 @@ class KerasRegressorWrapper(KerasRegressor):
         The classes seen at :meth:`fit`.
     """
     def __call__(self, modelSteps = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
-                 numberStepsInPast = 1, numberFeatures = 1, optimizerClass = koptimizers.SGD, optimizer_kwargs = {'lr': 0.01},
+                 optimizer_kwargs = {'optimizerClass': koptimizers.SGD, 'lr': 0.01},
                  loss = 'mean_squared_error', metrics = ['accuracy']):
         # Create model
         model = Sequential()
         persistentStep = modelSteps[0]
         modelStep = persistentStep.copy()
-        model.add(modelStep.pop('layerClass')(input_shape = (numberStepsInPast, numberFeatures), **modelStep)) #input_shape should be the parameter
+        model.add(modelStep.pop('layerClass')(input_shape = self.input_shape, **modelStep))
         for persistentStep in modelSteps[1:]:
             modelStep = persistentStep.copy()
             model.add(modelStep.pop('layerClass')(**modelStep))
 
         # Compile model
-        optimizer = optimizerClass(**optimizer_kwargs)
+        tempOptimizer_kwargs = optimizer_kwargs.copy()
+        optimizer = tempOptimizer_kwargs.pop('optimizerClass')(**tempOptimizer_kwargs)
         model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
         return model
 
@@ -212,9 +222,13 @@ class KerasRegressorWrapper(KerasRegressor):
 
         # Return the classifier
         if type(XList) is list:
-            return KerasRegressor.fit(self, XList[0], XList[1], **kwargs)
+            X = XList[0]
+            y = XList[1]
         else:
-            return KerasRegressor.fit(self, XList, y, **kwargs)
+            X = XList
+
+        self.input_shape = X.shape[1:]
+        return KerasRegressor.fit(self, X, y, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
@@ -262,9 +276,13 @@ class KerasRegressorWrapper(KerasRegressor):
         kwargs = self.filter_sk_params(Sequential.evaluate, kwargs)
 
         if type(XList) is list:
-            loss = self.model.evaluate(XList[0], XList[1], **kwargs)
+            X = XList[0]
+            y = XList[1]
         else:
-            loss = self.model.evaluate(XList, y, **kwargs)
+            X = XList
+
+        loss = self.model.evaluate(X, y, **kwargs)
+
         if isinstance(loss, list):
             return -loss[0]
         return -loss
