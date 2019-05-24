@@ -141,9 +141,10 @@ def get_param_grid(size_grid):
                 {'layerClass': klayers.normalization.BatchNormalization},
                 {'layerClass': klayers.Dropout, 'rate': rateInput},
                 {'layerClass': layerClass, 'units': units, 'activation': 'tanh', 'return_sequences':True},
-                {'layerClass': klayers.Dropout, 'rate': rateLSTM1},
+                {'layerClass': klayers.Dropout, 'rate': rateLSTM},
                 {'layerClass': layerClass, 'units': units, 'activation': 'tanh'},
-                {'layerClass': klayers.Dense, 'units': 1}
+                {'layerClass': klayers.Dropout, 'rate': rateLSTM},
+                {'layerClass': klayers.Dense, 'units': 1, 'use_bias': False}
             ] for layerClass in [klayers.LSTM] for units in [4, 8] for rateInput in [0.01, 0.05] for rateLSTM in [0.01, 0.05]]
 
         regression_param['optimizer_kwargs'] += [ {'optimizerClass': optimizerClass, 'lr': lr}
