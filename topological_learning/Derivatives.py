@@ -83,5 +83,4 @@ class Derivatives(BaseEstimator, TransformerMixin):
         if len(XList) == 2:
             XListTransformed.append(XList[1][maxOrder:, :])
 
-        print(XList[0].shape, XTransformed.shape, XList[1].shape, XListTransformed[1].shape)
         return XListTransformed
