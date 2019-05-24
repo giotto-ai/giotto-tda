@@ -37,7 +37,7 @@ class KerasClassifierWrapper(KerasClassifier):
         tempStep_kwargs = modelSteps_kwargs[0]
         modelStep_kwargs = tempStep_kwargs.copy()
         model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
-        for tempStep_kwargs in modelSteps[1:]:
+        for tempStep_kwargs in modelSteps_kwargs[1:]:
             modelStep_kwargs = tempStep_kwargs.copy()
             model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
 
@@ -182,17 +182,17 @@ class KerasRegressorWrapper(KerasRegressor):
     classes_ : ndarray, shape (n_classes,)
         The classes seen at :meth:`fit`.
     """
-    def __call__(self, modelSteps = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
+    def __call__(self, modelSteps_kwargs = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
                  optimizer_kwargs = {'optimizerClass': koptimizers.SGD, 'lr': 0.01},
                  loss = 'mean_squared_error', metrics = ['accuracy']):
         # Create model
         model = Sequential()
-        persistentStep = modelSteps[0]
-        modelStep = persistentStep.copy()
-        model.add(modelStep.pop('layerClass')(input_shape = self.input_shape, **modelStep))
-        for persistentStep in modelSteps[1:]:
-            modelStep = persistentStep.copy()
-            model.add(modelStep.pop('layerClass')(**modelStep))
+        tempStep_kwargs = modelSteps_kwargs[0]
+        modelStep_kwargs = tempStep_kwargs.copy()
+        model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
+        for tempStep_kwargs in modelSteps_kwargs[1:]:
+            modelStep_kwargs = tempStep_kwargs.copy()
+            model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
 
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()

@@ -107,7 +107,7 @@ def get_param_grid(size_grid):
     formulation_param['numberStepsInPast'] = [ 20 ]
     formulation_param['stepInFuture'] = [ 1 ]
 
-    regression_param['modelSteps'] = [
+    regression_param['modelSteps_kwargs'] = [
         [
             {'layerClass': klayers.normalization.BatchNormalization},
             {'layerClass': layerClass, 'units': units, 'activation': 'tanh'},
@@ -129,7 +129,7 @@ def get_param_grid(size_grid):
         formulation_param['numberStepsInPast'] += [ 40 ]
 
     if size_grid == 'large':
-        regression_param['modelSteps'] += [
+        regression_param['modelSteps_kwargs'] += [
             [
                 {'layerClass': klayers.normalization.BatchNormalization},
                 {'layerClass': klayers.Dropout, 'rate': rateInput},
