@@ -4,6 +4,7 @@ import sklearn as sk
 from pandas.core.resample import Resampler as rsp
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.neighbors import NearestNeighbors
 
 class TakensEmbedder(BaseEstimator, TransformerMixin):
     """
@@ -32,29 +33,71 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         The shape the data passed to :meth:`fit`
     """
 
-    def __init__(self, outerWindowDuration = 20, outerWindowStride = 2,
-                 innerWindowDuration = 5, innerWindowStride = 1):
+    def __init__(self, outerWindowDuration=20, outerWindowStride=2,
+                 embeddingDimension=5, embeddingDelay=1, embeddingStride=1):
         self.outerWindowDuration = outerWindowDuration
         self.outerWindowStride = outerWindowStride
-        self.innerWindowDuration = innerWindowDuration
-        self.innerWindowStride = innerWindowStride
+        self.embeddingDimension = embeddingDimension
+        self.embeddingDelay = embeddingDelay
+        self.embeddingStride = embeddingStride
 
     def get_params(self, deep=True):
         return {'outerWindowDuration': self.outerWindowDuration,
                 'outerWindowStride': self.outerWindowStride,
-                'innerWindowDuration': self.innerWindowDuration,
-                'innerWindowStride': self.innerWindowStride}
-
-    # def set_params(self, **parameters):
-    #     for parameter, value in parameters.items():
-    #         self.setattr(parameter, value)
-    #     return self
+                'embeddingDimension': self.embeddingDimension,
+                'embeddingDelay': self.embeddingDelay,
+                'embeddingStride': self.embeddingStride}
 
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
            of the :meth:'fit' are valid.
         """
+        pass
+
+    @staticmethod
+    def _embed(X, outerWindowDuration, outerWindowStride, embeddingDelay, embeddingDimension, embeddingStride=1):
+        numberOuterWindows = (X.shape[0] - outerWindowDuration) // outerWindowStride + 1
+        numberInnerWindows = (outerWindowDuration - embeddingDimension) // embeddingStride + 1
+
+        XEmbedded = np.stack( [
+            np.stack( [
+                X[i*outerWindowStride + j * embeddingStride
+                  : i*outerWindowStride + j * embeddingStride + embeddingDelay * embeddingDimension : embeddingDelay].flatten()
+                for j in range(0, numberInnerWindows) ] )
+            for i in range(0, numberOuterWindows) ])
+
+        return XEmbedded
+
+    @staticmethod
+    def _mutual_information(X, embeddingDelay, numberBins):
+        """This function calculates the mutual information given the delay
+        """
+        contingency = np.histogram2d(X[:embeddingDelay], X[embeddingDelay:], numberBins)[0]
+        return mutual_info_score(None, None, contingency=contingency)
+
+    @staticmethod
+    def _false_nearest_neighbors(X, embeddingDelay, embeddingDimension, embeddingStride):
+        """Calculates the number of false nearest neighbours of embedding dimension"""
+        XEmbedded = Embedding._embed(X, outerWindowDuration=X.shape[0], outerWindowStride=0, embeddingDelay, embeddingDimension, embeddingStride)
+        XEmbedded = XEmbedded.reshape((XEmbedded.shape[1], XEmbedded.shape[2]))
+
+        neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(XEmbedded)
+        distances, indices = neighbor.kneighbors(XEmbedded)
+        distance = distances[:, 1]
+        XNeighbor = X[indices[:, 1]]
+
+        epsilon = 2.0 * np.std(X)
+        tolerance = 10
+
+        nonZeroDistance = distance > 0
+        falseNeighborCriteria = abs(X[i + embeddingDimension * embeddingDelay] - X[index + embeddingDimension * embeddingDelay]) / distance) > tolerance
+        falseNeighborCriteria = abs(np.roll(X, -embeddingDimension * embeddingDelay)[:-embeddingDimension * embeddingDelay]
+                                    - np.roll(XNeighbor, - embeddingDimension * embeddingDelay)[:-embeddingDimension * embeddingDelay])/ distance) > tolerance
+        limitedDatasetCriteria = distance < epsilon
+        numberFalseNeighbors = np.sum(nonZeroDistance * falseNeighborCriteria * limitedDatasetCriteria)
+
+        return numberFalseNeighbors
 
     def fit(self, XList, y=None):
         """A reference implementation of a fitting function for a transformer.
@@ -75,6 +118,8 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self._validate_params()
 
         self.isFitted = True
+
+
         return self
 
     def transform(self, XList, y = None):
@@ -96,51 +141,24 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
         XListTransformed = []
         if type(XList) is list:
-            XData = XList[0]
+            X = XList[0]
         else:
-            XData = XList
+            X = XList
 
         if XData.shape[0] < self.outerWindowDuration:
             raise ValueError('Not enough data to have a single outer window.')
 
-        numberOuterWindows = (XData.shape[0] - self.outerWindowDuration) // self.outerWindowStride + 1
-        numberInnerWindows = (self.outerWindowDuration - self.innerWindowDuration) // self.innerWindowStride + 1
 
-        XTransformed = np.stack( [
-            np.stack( [
-                XData.values[i*self.outerWindowStride + j*self.innerWindowStride
-                             :i*self.outerWindowStride + j*self.innerWindowStride + self.innerWindowDuration].flatten()
-                for j in range(0, numberInnerWindows) ] )
-            for i in range(0, numberOuterWindows) ])
-
+        XTransformed = self._embed(X, self.outerWindowDuration, self.outerWindowStride, self.embeddingDelay, self.embeddingDimension, self.embeddingStride)
         XListTransformed.append(XTransformed)
 
-        numberInnerWindows = 1
-
-        if type(XList) is list:
-            XData = XList[0]
-        else:
-            XLabel = XList
-
-        XTransformed = np.stack( [
-            np.stack( [
-                XLabel.values[i*self.outerWindowStride + j
-                              :i*self.outerWindowStride + j + self.outerWindowDuration].flatten()
-                for j in range(0, numberInnerWindows) ] )
-            for i in range(0, numberOuterWindows) ])
-
+        XTransformed = self._embed(X, self.outerWindowDuration, self.outerWindowStride, embeddingDelay=1, embeddingDimension=self.outerWindowDuration, embeddingStride=0)
         XListTransformed.append(XTransformed)
 
         if type(XList) is list:
             if len(XList) >= 2:
-                XLabel = XList[1]
-                XTransformed = np.stack( [
-                    np.stack( [
-                        XLabel.values[i*self.outerWindowStride + j
-                                      :i*self.outerWindowStride + j + self.outerWindowDuration].flatten()
-                        for j in range(0, numberInnerWindows) ] )
-                    for i in range(0, numberOuterWindows) ])
-
-                XListTransformed.append(XTransformed)
+                y = XList[1]
+                yTransformed =  self._embed(y, self.outerWindowDuration, self.outerWindowStride, embeddingDelay=1, embeddingDimension=self.outerWindowDuration, embeddingStride=0)
+                XListTransformed.append(yTransformed)
 
         return XListTransformed
