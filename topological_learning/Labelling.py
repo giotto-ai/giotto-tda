@@ -121,10 +121,11 @@ class Labeller(BaseEstimator, TransformerMixin):
     implementedLabellingRecipes = {'apply': apply_function, 'variation': variation_function,
                                    'derivation': derivation_function}
 
-    def __init__(self, labellingType='', function = np.std, deltaT = 0, **function_kwargs):
+    def __init__(self, labellingType='', function=np.std, deltaT=0, percentile=None, **function_kwargs):
         self.labellingType = labellingType
         self.function = function
         self.deltaT = deltaT
+        self.percentile = percentile
         self.function_kwargs = function_kwargs
 
     def get_params(self, deep=True):
@@ -157,6 +158,16 @@ class Labeller(BaseEstimator, TransformerMixin):
         self._validate_params(self.labellingType)
 
         self.isFitted = True
+
+        self._y = XList[1]
+        y = self._y.reshape((self._y.shape[0], -1))
+        self._yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, self._y, axis=1, deltaT=self.deltaT, **self.function_kwargs)
+
+        if self.percentile is not None:
+            self.threshold = np.percentile(np.abs(self._yTransformed.flatten()), self.percentile)
+        else:
+            self.threshold = None
+
         return self
 
     def transform(self, XList):
@@ -176,8 +187,18 @@ class Labeller(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['isFitted'])
 
-        XLabel = XList[1].reshape((XList[1].shape[0], -1))
-        yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, XLabel, axis=1, deltaT=self.deltaT, **self.function_kwargs)
-        XListTransformed = [ XList[0], yTransformed.reshape((XList[1].shape[0], -1)) ]
+        y = XList[1]
+
+        if np.array_equal(y, self._y):
+            yTransformed = self._yTransformed
+        else:
+            y = y.reshape((y.shape[0], -1))
+            yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, y, axis=1, deltaT=self.deltaT, **self.function_kwargs)
+
+        if self.threshold is not None:
+            print(yTransformed)
+            yTransformed = 1 * (np.abs(yTransformed) > self.threshold)
+
+        XListTransformed = [ XList[0], yTransformed.reshape((y.shape[0], -1)) ]
 
         return XListTransformed
