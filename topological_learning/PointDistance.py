@@ -3,38 +3,47 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from scipy.sparse import csr_matrix
 from umap.sparse import make_sparse_nn_descent
+import umap.distance as dist
+from sklearn.metrics.pairwise import paired_distances
+
 from joblib import Parallel, delayed
 import math as m
 import itertools
 
 import numpy as np
 
-class ConsistentPointDistance(BaseEstimator, TransformerMixin):
+
+
+def consistent_homology_distance(X, metric, n_neighbors, **metric_kwargs):
+    """Handle the callable case for pairwise_{distances,kernels}
     """
-    Transformer for consistent persistent homology.
+    X_sparse = csr_matrix(X)
+    metric_nn_descent = make_sparse_nn_descent(metric, tuple(metric_kwargs.values()))
+    rng_state = random_state.randint(INT32_MIN, INT32_MAX, 3).astype(np.int64)
+    _, distances_kNeighbors = metric_nn_descent(X_sparse.indices, X_sparse.indptr, X_sparse.data, X.shape[0], n_neighbors, rng_state)
+    distance_kNeighbor = distances_kNeighbors[:, -1]
 
-    Parameters
-    ----------
-    samplingType : str
-        The type of sampling
+    # Only calculate metric for upper triangle
+    out = np.zeros((len(X), len(X)))
+    iterator = itertools.combinations(range(len(X)), 2)
+    for i, j in iterator:
+        out[i, j] = paired_distances(X[i], X[j], metric=dist.normed_distance[metric], **metric_kwargs) / (m.sqrt(distances_kNeighbor[i]*distances_kNeighbor[j]))
 
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+    return out + out.T
 
-    Attributes
-    ----------
-    isFitted : boolean
-        Whether the transformer has been fitted
-    """
+def permutation_sequence_distance(x, y):
+    pass
 
-    def __init__(self, n_neighbors=3, metric='euclidean', n_jobs=1, **metric_kwargs):
-        self.metric = metric
-        self.metric_kwargs = metric_kwargs
+
+class PointDistance(BaseEstimator, TransformerMixin):
+    implementedDistanceRecipes = {'consistent': consistent_homology_distance, 'permutation': permutation_sequence_distance}
+
+    def __init__(self, distance_kwargs={'distance': 'consistent', 'metric': 'euclidian', 'n_neighbors': 3}, n_jobs=1):
+        self.distance_kwargs = distance_kwargs
         self.n_jobs = n_jobs
+
+    def get_params(self, deep=True):
+        return {'distance_kwargs': self.distance_kwargs, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
@@ -43,24 +52,7 @@ class ConsistentPointDistance(BaseEstimator, TransformerMixin):
         """
         pass
 
-    def consistent_metric(self, x, dist_x_kNeighbor, y, dist_y_kNeighbor):
-        return self.metric(x, y, **self.metric_kwargs) / (m.sqrt(dist_x_kNeighbor*dist_y_kNeighbor))
-
-    def _pairwise_callable(self, X):
-        """Handle the callable case for pairwise_{distances,kernels}
-        """
-        #    X, Y = check_pairwise_arrays(X, Y)
-            X_sparse = csr_matrix(X)
-            _, distances_kNeighbors = metric_nn_descent(X_sparse.indices, X_sparse.indptr, X_sparse.data, X.shape[0], self.n_neighbors, rng_state)
-            distance_kNeighbor = distances_kNeighbors[:, -1]
-
-            # Only calculate metric for upper triangle
-            out = np.zeros((len(X), len(X)), dtype='float')
-            iterator = itertools.combinations(range(len(X)), 2)
-            for i, j in iterator:
-                out[i, j] = self.consistent_metric(X[i], distance_kNeighbor[i], X[j], distance_kNeighbor[j])
-
-        return out + out.T
+    def _pad(self, X):
 
     def fit(self, XList, y=None):
         """A reference implementation of a fitting function for a transformer.
@@ -79,6 +71,9 @@ class ConsistentPointDistance(BaseEstimator, TransformerMixin):
             Returns self.
         """
         self._validate_params()
+
+        self.distanceName = self.distance_kwargs['distance']
+        self.distance = self.implementedDistanceRecipes[self.distanceName]
 
         self.isFitted = True
         return self
@@ -104,15 +99,18 @@ class ConsistentPointDistance(BaseEstimator, TransformerMixin):
         X = XList[0]
         XListTransformed = []
 
-        numberOuterWindows = X.shape[0]
-        numberInnerWindows = X.shape[1]
-        metric_nn_descent = make_sparse_nn_descent(self.metric, self.metric_kwargs)
-        rng_state = random_state.randint(INT32_MIN, INT32_MAX, 3).astype(np.int64)
+        distance_kwargs = self.distance_kwargs.copy()
+        if 'distance' in distance_kwargs:
+            distance_kwargs.pop('distance')
 
-        XTransformed = np.empty((numberOuterWindows, numberInnerWindows, numberInnerWindows)
+        XTransformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.distance)(X[i, :, :], **distance_kwargs)
+                                                              for i in range(X.shape[0]) )
 
-        XTransformed[i, :, :] = Parallel(n_jobs = self.n_jobs) (delayed(self._pairwise_callable)(X[i, :, :])
-                                                                for i in range(numberOuterWindows))
+
+        if self.distanceName == 'permutation':
+            XTransformed = self._pad(XTransformed)
+        else:
+            XTransformed = np.array(XTransformed)
 
         XListTransformed.append(XTransformed)
 
