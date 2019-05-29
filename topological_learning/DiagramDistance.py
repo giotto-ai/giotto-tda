@@ -8,7 +8,7 @@ import itertools
 import math as m
 import numpy as np
 import gudhi as gd
-from sklearn_tda.hera_wasserstein import wasserstein
+from .dependencies.hera_wasserstein import wasserstein
 
 
 def betti(diagram, sampling):
