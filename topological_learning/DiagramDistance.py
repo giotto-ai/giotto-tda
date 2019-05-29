@@ -107,16 +107,14 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return distances
 
     def fit(self, XList, y=None):
+        self._validate_params()
+        self.isFitted = True
+
         self.metricName = self.metric_kwargs['metric']
         self.metric = self.implementedMetricRecipes[self.metricName]
 
         if 'n_samples' in self.metric_kwargs:
             self.n_samples = self.metric_kwargs['n_samples']
-
-        self._validate_params()
-
-        self.isFitted = True
-
 
         if self.separateDimensions:
             self._X = XList[0]
@@ -128,12 +126,14 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             maximumPersistences = { dimension: np.max(self._X[dimension][:,:,1])*m.sqrt(2) if self._X[dimension][:,:,0].size != 0
                                    else -np.inf for dimension in self._X.keys() }
             maximumPersistence = max(list(maximumPersistences.values()))
-            maximumPersistences = { dimension: maximumPersistences[dimension] if maximumPersistences[dimension] != -np.inf else maximumPersistence for dimension in self._X.keys() }
+            maximumPersistences = { dimension: maximumPersistences[dimension] if maximumPersistences[dimension] != -np.inf else maximumPersistence
+                                    for dimension in self._X.keys() }
 
             minimumPersistences = { dimension: np.min(self._X[dimension][:,:,0])*m.sqrt(2) if self._X[dimension][:,:,0].size != 0
                                    else np.inf for dimension in self._X.keys() }
             minimumPersistence = min(list(minimumPersistences.values()))
-            minimumPersistences = { dimension: minimumPersistences[dimension] if minimumPersistences[dimension] != np.inf else minimumPersistence for dimension in self._X.keys() }
+            minimumPersistences = { dimension: minimumPersistences[dimension] if minimumPersistences[dimension] != np.inf else minimumPersistence
+                                    for dimension in self._X.keys() }
 
             stepPersistences = { dimension: (maximumPersistences[dimension]-minimumPersistences[dimension])/self.n_samples for dimension in self._X.keys() }
             self.metric_kwargs['sampling'] = { dimension: np.arange(minimumPersistences[dimension], maximumPersistences[dimension],

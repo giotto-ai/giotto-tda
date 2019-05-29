@@ -13,5 +13,8 @@
 *.pqt
 data/*
 
+# Examples
+/examples/*
+
 # Emacs temporary files
 *~
