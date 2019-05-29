@@ -32,6 +32,7 @@ class KerasClassifierWrapper(KerasClassifier):
     def __call__(self, modelSteps_kwargs = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
                  optimizer_kwargs = {'optimizerClass': koptimizers.SGD, 'lr': 0.01},
                  loss = 'binary_crossentropy', metrics = ['accuracy']):
+
         # Create model
         model = Sequential()
         tempStep_kwargs = modelSteps_kwargs[0]
@@ -75,7 +76,7 @@ class KerasClassifierWrapper(KerasClassifier):
             X = XList
 
         self.input_shape = X.shape[1:]
-        return KerasRegressor.fit(self, X, y, **kwargs)
+        return KerasClassifier.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
@@ -86,7 +87,7 @@ class KerasClassifierWrapper(KerasClassifier):
             The input samples.
 
         Returns
-        -------
+        ------
         y : ndarray, shape (n_samples,)
             The label for each sample is the label of the closest sample
             seen during fit.
@@ -228,7 +229,7 @@ class KerasRegressorWrapper(KerasRegressor):
             X = XList
 
         self.input_shape = X.shape[1:]
-        return KerasRegressor.fit(self, X, y, **kwargs)
+        return KerasRegressor.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
