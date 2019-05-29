@@ -7,8 +7,9 @@ import itertools
 
 import math as m
 import numpy as np
-import gudhi as gd
-from .dependencies.hera_wasserstein import wasserstein
+
+from .dependencies.gudhi import bottleneck_distance as gudhi_bottleneck_distance
+from .dependencies.hera_wasserstein import wasserstein as hera_wasserstein_distance
 
 
 def betti(diagram, sampling):
@@ -46,10 +47,10 @@ def kernel_betti_distance(x, y, dimension, sampling=None, order=2):
     return np.linalg.norm(bettiX - bettiY, ord=order)
 
 def bottleneck_distance(x, y, dimension=None):
-    return gd.bottleneck_distance(x, y)
+    return gudhi_bottleneck_distance(x, y)
 
 def wasserstein_distance(x, y, dimension=None, order=1):
-    return wasserstein(x, y, order)
+    return hera_wasserstein_distance(x, y, order)
 
 class DiagramDistance(BaseEstimator, TransformerMixin):
     implementedMetricRecipes = {'bottleneck': bottleneck_distance, 'wasserstein': wasserstein_distance,

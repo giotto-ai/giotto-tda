@@ -1,17 +1,17 @@
 from setuptools import setup
+from distutils.core import setup, Extension
+from Cython.Build import cythonize
 
 with open('README.rst') as f:
     long_description =  f.read()
 
 hera_wasserstein = Extension(name                = "topological_learning.hera_wasserstein",
-                             sources             = ["./dependencies/hera_wasserstein.pyx"],
-                             language            = "c++",
-                             extra_compile_args  = ["-std=c++14", "-I./dependencies/hera/geom_matching/wasserstein/include/"])
+                             sources             = ["./topological_learning/dependencies/hera_wasserstein.pyx"],
+                             language            = "c++")
 
-# gudhi_bottleneck = Extension(name                = "topological_learning.gudhi_bottleneck",
-#                              sources             = ["./dependencies/gudhi_bottleneck.pyx"],
-#                              language            = "c++",
-#                              extra_compile_args  = ["-std=c++14", "-I./dependencies/gudhi/????"])
+gudhi_bottleneck = Extension(name                = "topological_learning.gudhi_bottleneck",
+                             sources             = ["./topological_learning/dependencies/gudhi_bottleneck.pyx"],
+                             language            = "c++")
 
 try:
     from Cython.Distutils import build_ext
