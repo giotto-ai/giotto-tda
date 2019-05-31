@@ -1,8 +1,6 @@
 import numpy as np
 from random import randint
 import plotly.graph_objs as go
-from plotly.offline import init_notebook_mode, iplot
-init_notebook_mode(connected=True)
 
 class Dataset(object):
     def __init__(self, timeStep = 0.01, maxDuration = 20000, meanNoise = 0, stdDeviationNoise = 0):

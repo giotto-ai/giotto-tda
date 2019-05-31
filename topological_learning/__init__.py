@@ -9,4 +9,4 @@ from .DiagramDistance import DiagramDistance
 from .CentroidsDistance import CentroidsDistance
 from .Derivatives import Derivatives
 from .Formulation import FormulationTransformer
-from .KerasWrapper import KerasRegressorWrapper
+from .KerasWrapper import KerasClassifierWrapper, KerasRegressorWrapper

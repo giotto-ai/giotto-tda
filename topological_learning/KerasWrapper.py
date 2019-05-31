@@ -36,10 +36,13 @@ class KerasClassifierWrapper(KerasClassifier):
         model = Sequential()
         tempStep_kwargs = modelSteps_kwargs[0]
         modelStep_kwargs = tempStep_kwargs.copy()
-        model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
-        for tempStep_kwargs in modelSteps_kwargs[1:]:
+        model.add(modelStep_kwargs.pop('layerClass')(input_shape=self.input_shape, **modelStep_kwargs))
+        for tempStep_kwargs in modelSteps_kwargs[1:-1]:
             modelStep_kwargs = tempStep_kwargs.copy()
             model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
+        tempStep_kwargs = modelSteps_kwargs[-1]
+        modelStep_kwargs = tempStep_kwargs.copy()
+        model.add(modelStep_kwargs.pop('layerClass')(units=self.output_units, **modelStep_kwargs))
 
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()
@@ -75,7 +78,9 @@ class KerasClassifierWrapper(KerasClassifier):
             X = XList
 
         self.input_shape = X.shape[1:]
-        return KerasRegressor.fit(self, X, y, **kwargs)
+        self.output_units = y.shape[1]
+
+        return KerasClassifier.fit(self, X, y, verbose=1, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
@@ -187,12 +192,15 @@ class KerasRegressorWrapper(KerasRegressor):
                  loss = 'mean_squared_error', metrics = ['accuracy']):
         # Create model
         model = Sequential()
-        tempStep_kwargs = modelSteps_kwargs[0]
+        tempStep_kwargs = modelSteps_kwargs[-1]
         modelStep_kwargs = tempStep_kwargs.copy()
         model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
         for tempStep_kwargs in modelSteps_kwargs[1:]:
             modelStep_kwargs = tempStep_kwargs.copy()
             model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
+        tempStep_kwargs = modelSteps_kwargs[-1]
+        modelStep_kwargs = tempStep_kwargs.copy()
+        model.add(modelStep_kwargs.pop('layerClass')(units=self.output_units, **modelStep_kwargs))
 
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()
@@ -228,7 +236,8 @@ class KerasRegressorWrapper(KerasRegressor):
             X = XList
 
         self.input_shape = X.shape[1:]
-        return KerasRegressor.fit(self, X, y, **kwargs)
+        self.output_units = y.shape[1]
+        return KerasRegressor.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.

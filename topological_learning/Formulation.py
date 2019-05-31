@@ -42,7 +42,8 @@ class FormulationTransformer(BaseEstimator, TransformerMixin):
         return X[indexer]
 
     def _transform_target(self, y, stepInFuture = None):
-        return np.mean(y[self.numberStepsInPast - 1:None if stepInFuture is None else -stepInFuture], axis=1).reshape((-1, 1)) #TODO: Put the mean somewhere else...
+        return y[self.numberStepsInPast - 1:None if stepInFuture is None else -stepInFuture]
+        # return np.mean(y[self.numberStepsInPast - 1:None if stepInFuture is None else -stepInFuture], axis=1).reshape((-1, 1)) #TODO: Put the mean somewhere else...
 
     def fit(self, XList, y = None):
         """A reference implementation of a fitting function for a transformer.
@@ -87,8 +88,8 @@ class FormulationTransformer(BaseEstimator, TransformerMixin):
         XListTransformed.append(XTransformed)
 
         if len(XList) == 2:
-            XTransformed = self._transform_target(XList[1], self.stepInFuture)
-            XListTransformed.append(XTransformed)
+            yTransformed = self._transform_target(XList[1], self.stepInFuture)
+            XListTransformed.append(yTransformed)
 
         return XListTransformed
 

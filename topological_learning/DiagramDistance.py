@@ -2,14 +2,14 @@ import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
-from joblib import Parallel, delayed
+from sklearn.utils._joblib import Parallel, delayed
 import itertools
 
 import math as m
 import numpy as np
 
-from .dependencies.gudhi import bottleneck_distance as gudhi_bottleneck_distance
-from .dependencies.hera_wasserstein import wasserstein as hera_wasserstein_distance
+from .dependencies import bottleneck_distance as gudhi_bottleneck_distance
+from .dependencies import wasserstein as hera_wasserstein_distance
 
 
 def betti(diagram, sampling):
