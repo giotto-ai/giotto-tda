@@ -30,8 +30,8 @@ class KerasClassifierWrapper(KerasClassifier):
         The classes seen at :meth:`fit`.
     """
     def __call__(self, modelSteps_kwargs = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
-                 optimizer_kwargs = {'optimizerClass': koptimizers.SGD, 'lr': 0.01},
-                 loss = 'binary_crossentropy', metrics = ['accuracy']):
+                 optimizer_kwargs = {'optimizerClass': koptimizers.RMSprop, 'lr': 0.01},
+                 loss = 'sparse_categorical_crossentropy', metrics = ['sparse_categorical_accuracy']):
         # Create model
         model = Sequential()
         tempStep_kwargs = modelSteps_kwargs[0]
@@ -78,9 +78,9 @@ class KerasClassifierWrapper(KerasClassifier):
             X = XList
 
         self.input_shape = X.shape[1:]
-        self.output_units = y.shape[1]
-
-        return KerasClassifier.fit(self, X, y, verbose=1, **kwargs)
+        self.output_units = 4 #np.max(y) + 1
+        print('Shape in fit', self.output_units)
+        return KerasClassifier.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.

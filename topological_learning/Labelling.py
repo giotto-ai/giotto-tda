@@ -120,7 +120,7 @@ class Labeller(BaseEstimator, TransformerMixin):
     implementedLabellingRecipes = {'apply': apply_function, 'variation': variation_function,
                                    'derivation': derivation_function}
 
-    def __init__(self, labellingType='', function=np.std, deltaT=0, percentiles=None, **function_kwargs):
+    def __init__(self, labellingType='derivation', function=np.std, deltaT=0, percentiles=None, **function_kwargs):
         self.labellingType = labellingType
         self.function = function
         self.deltaT = deltaT
@@ -128,7 +128,8 @@ class Labeller(BaseEstimator, TransformerMixin):
         self.function_kwargs = function_kwargs
 
     def get_params(self, deep=True):
-        return {'labellingType': self.labellingType,'function': self.function, 'deltaT': self.deltaT}
+        return {'labellingType': self.labellingType,'function': self.function, 'deltaT': self.deltaT,
+                'percentiles': self.percentiles}
 
     @staticmethod
     def _validate_params(labellingType):
@@ -190,15 +191,21 @@ class Labeller(BaseEstimator, TransformerMixin):
         y = XList[1]
 
         if np.array_equal(y, self._y):
-            yTransformed = self._yTransformed
+            yTransformed = self._yTransformed.reshape((y.shape[0], -1))
         else:
             y = y.reshape((y.shape[0], -1))
 
-            yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, y, axis=1, deltaT=self.deltaT, **self.function_kwargs)
+            yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, y, axis=1, deltaT=self.deltaT, **self.function_kwargs).reshape((y.shape[0], -1))
 
         if self.thresholds is not None:
-            yTransformed = np.hstack([1 * (np.abs(yTransformed) > threshold) for threshold in self.thresholds])
+            yTransformedAbs = np.abs(yTransformed)
+            yTransformed = np.concatenate([1 * (yTransformedAbs >= 0) * (yTransformedAbs < self.thresholds[0])] +\
+                                          [1 * (yTransformedAbs >= self.thresholds[i])
+                                           * (yTransformedAbs < self.thresholds[i+1])
+                                           for i in range(len(self.thresholds)-1)] +\
+                                          [1 * (yTransformedAbs >= self.thresholds[-1])], axis=1)
+            yTransformed = np.nonzero(yTransformed)[1]
 
-        XListTransformed = [ XList[0], yTransformed.reshape((y.shape[0], -1)) ]
+        XListTransformed = [ XList[0], yTransformed.reshape((y.shape[0], 1)) ]
 
         return XListTransformed
