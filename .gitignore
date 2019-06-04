@@ -19,3 +19,6 @@ data/*
 
 # Emacs temporary files
 *~
+
+# Output files
+*.out
