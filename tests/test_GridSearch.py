@@ -29,8 +29,8 @@ authorizedGridSize = ['small', 'median', 'large']
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
-def init_keras_session(n_cpus, n_gpus):
-    config = tf.ConfigProto( device_count = {'CPU': n_cpus, 'GPU': n_gpus} )
+def init_keras_session(n_cpus_k, n_gpus_k):
+    config = tf.ConfigProto( device_count = {'CPU': n_cpus_k, 'GPU': n_gpus_k} )
 
     sess = tf.Session(config=config)
     keras.backend.set_session(sess)
@@ -55,7 +55,6 @@ def split_train_test(data, size_data):
     X_train = data[:numberTrain]
     y_train = np.empty((X_train.shape[0], 1))
 
-
     numberTest = numberTrain // 3
     X_test = data[numberTrain:numberTrain+numberTest]
     y_test = np.empty((X_test.shape[0], 1))
@@ -64,14 +63,14 @@ def split_train_test(data, size_data):
 def make_pipeline():
     steps = [
         ('embedding', tl.TakensEmbedder()),
-        ('labelling', tl.Labeller(labellingType='variation', function = np.std)),
+        ('labelling', tl.Labeller(labellingType='variation', function = np.std, percentiles=[80,90,95])),
         ('diagram', tl.VietorisRipsDiagram()),
         ('distance', tl.DiagramDistance()),
         ('physical', tl.MDS()),
         ('derivatives', tl.Derivatives()),
         ('scaling', tl.ScalerWrapper(copy=True)),
         ('formulation', tl.FormulationTransformer()),
-        ('regression', tl.KerasRegressorWrapper())
+        ('classification', tl.KerasClassifierWrapper())
     ]
     return Pipeline(steps)
 
@@ -84,10 +83,10 @@ def get_param_grid(size_grid):
     derivatives_param = {}
     scaling_param = {}
     formulation_param = {}
-    regression_param = {}
+    classification_param = {}
 
-    embedding_param['outerWindowDuration'] = [ 100, 200 ]
-    embedding_param['outerWindowStride'] = [ 10, 20 ]
+    embedding_param['outerWindowDuration'] = [ 200, 400 ]
+    embedding_param['outerWindowStride'] = [ 5, 10 ]
     embedding_param['innerWindowDuration'] = [ 10, 40 ]
     embedding_param['innerWindowStride'] = [ 1 ]
 
@@ -96,7 +95,8 @@ def get_param_grid(size_grid):
     diagram_param['homologyDimensions'] = [ [ 0, 1 ], [0, 1 , 2] ]
 
 
-    regression_param['loss'] = [ 'mean_squared_error' ]
+    classification_param['loss'] = [ 'sparse_categorical_crossentropy' ]
+    classification_param['metrics'] = [ ['sparse_categorical_accuracy'] ]
 
     distance_param['metric_kwargs'] = [ {'metric':'bottleneck'} ]
 
@@ -107,17 +107,17 @@ def get_param_grid(size_grid):
     formulation_param['numberStepsInPast'] = [ 20 ]
     formulation_param['stepInFuture'] = [ 1 ]
 
-    regression_param['modelSteps_kwargs'] = [
+    classification_param['modelSteps_kwargs'] = [
         [
             {'layerClass': klayers.normalization.BatchNormalization},
             {'layerClass': layerClass, 'units': units, 'activation': 'tanh'},
-            {'layerClass': klayers.Dense, 'units': 1, 'use_bias': False}
+            {'layerClass': klayers.Dense}
         ] for layerClass in [klayers.LSTM] for units in [4] ]
 
-    regression_param['optimizer_kwargs'] = [ {'optimizerClass': optimizerClass, 'lr': lr} for optimizerClass in [ koptimizers.RMSprop ]
+    classification_param['optimizer_kwargs'] = [ {'optimizerClass': optimizerClass, 'lr': lr} for optimizerClass in [ koptimizers.RMSprop ]
                                              for lr in [0.5] ]
-    regression_param['batch_size'] =  [ 100 ]
-    regression_param['epochs'] =  [ 5000 ]
+    classification_param['batch_size'] =  [ 200 ]
+    classification_param['epochs'] =  [ 5000 ]
 
     if size_grid in ['median', 'large']:
         distance_param['metric_kwargs'] += [ {'metric':'landscape', 'n_layers':1, 'n_samples':1000, 'order':2},
@@ -126,17 +126,17 @@ def get_param_grid(size_grid):
 
         physical_param['n_components'] += [ 15 ]
 
-        formulation_param['numberStepsInPast'] += [ 40 ]
+        formulation_param['numberStepsInPast'] += [ 50 ]
 
     if size_grid == 'large':
-        regression_param['modelSteps_kwargs'] += [
+        classification_param['modelSteps_kwargs'] += [
             [
                 {'layerClass': klayers.normalization.BatchNormalization},
                 {'layerClass': klayers.Dropout, 'rate': rateInput},
                 {'layerClass': layerClass, 'units': units, 'activation': 'tanh'},
                 {'layerClass': klayers.Dropout, 'rate': rateLSTM},
-                {'layerClass': klayers.Dense, 'units': 1, 'use_bias': False}
-            ] for layerClass in [klayers.LSTM] for units in [4, 16] for rateInput in [0.01, 0.05] for rateLSTM in [0.01, 0.05]] +\
+                {'layerClass': klayers.Dense}
+            ] for layerClass in [klayers.LSTM] for units in [4, 16] for rateInput in [0., 0.2] for rateLSTM in [0., 0.2]] +\
             [ [
                 {'layerClass': klayers.normalization.BatchNormalization},
                 {'layerClass': klayers.Dropout, 'rate': rateInput},
@@ -144,14 +144,14 @@ def get_param_grid(size_grid):
                 {'layerClass': klayers.Dropout, 'rate': rateLSTM},
                 {'layerClass': layerClass, 'units': units, 'activation': 'tanh'},
                 {'layerClass': klayers.Dropout, 'rate': rateLSTM},
-                {'layerClass': klayers.Dense, 'units': 1, 'use_bias': False}
-            ] for layerClass in [klayers.LSTM] for units in [4, 8] for rateInput in [0.01, 0.05] for rateLSTM in [0.01, 0.05]]
+                {'layerClass': klayers.Dense}
+            ] for layerClass in [klayers.LSTM] for units in [4, 8] for rateInput in [0., 0.2] for rateLSTM in [0., 0.2]]
 
-        regression_param['optimizer_kwargs'] += [ {'optimizerClass': optimizerClass, 'lr': lr}
+        classification_param['optimizer_kwargs'] += [ {'optimizerClass': optimizerClass, 'lr': lr}
                                              for optimizerClass in [ koptimizers.RMSprop, koptimizers.Adam ]
                                              for lr in [0.001, 0.01] ]
-        regression_param['batch_size'] +=  [ 300 ]
-        regression_param['epochs'] += [ 10000 ]
+        classification_param['batch_size'] +=  [ 500 ]
+        classification_param['epochs'] += [ 8000 ]
 
     embedding_param_grid = {'embedding__' + k: v for k, v in embedding_param.items()}
     labelling_param_grid = {'labelling__' + k: v for k, v in labelling_param.items()}
@@ -161,10 +161,10 @@ def get_param_grid(size_grid):
     derivatives_param_grid = {'derivatives__' + k: v for k, v in derivatives_param.items()}
     scaling_param_grid = {'scaling__' + k: v for k, v in scaling_param.items()}
     formulation_param_grid = {'formulation__' + k: v for k, v in formulation_param.items()}
-    regression_param_grid = {'regression__' + k: v for k, v in regression_param.items()}
+    classification_param_grid = {'classification__' + k: v for k, v in classification_param.items()}
 
     param_grid = {**embedding_param_grid, **labelling_param_grid, **diagram_param_grid, **distance_param_grid,  **physical_param_grid,
-                  **derivatives_param_grid, **scaling_param_grid, **formulation_param_grid, **regression_param_grid}
+                  **derivatives_param_grid, **scaling_param_grid, **formulation_param_grid, **classification_param_grid}
 
     return param_grid
 

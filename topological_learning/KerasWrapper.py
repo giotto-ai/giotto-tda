@@ -80,7 +80,7 @@ class KerasClassifierWrapper(KerasClassifier):
         self.input_shape = X.shape[1:]
         self.output_units = 4 #np.max(y) + 1
         print('Shape in fit', self.output_units)
-        return KerasClassifier.fit(self, X, y, verbose=0, **kwargs)
+        return KerasClassifier.fit(self, X, y, verbose=1, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.

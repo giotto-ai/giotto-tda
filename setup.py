@@ -34,24 +34,24 @@ setup(name='topological_learning',
       packages=['topological_learning'],
       include_package_data=True,
       keywords='topology data analysis, persistent homology, persistence diagrams, uniform manifold approximation and projection',
+      python_requires='>=3.5',
       install_requires=[
         # Common requirements
         'numpy',
         'pandas',
+        'pyarrow',
+        #'fastparquet',
+        #'python-snappy',
         'scipy',
         'scikit-learn',
         'keras',
+        'tensorflow',
+        'umap-learn',
+        'numba',
         # Gudhi
         'gudhi',
         # Ripser
-        'Cython',
         'ripser',
-        # Kepler Mapper
-        'kmapper',
-        # UMAP
-        'umap-learn',
-        # Synthetic datasets for TDA
-        'tadasets'
       ],
       extras_require={
         'docs': [ # `pip install -e ".[docs]"``
@@ -59,7 +59,6 @@ setup(name='topological_learning',
             'pyyaml'
         ]
       },
-      python_requires='>3.5',
       test_suite='nose.collector',
       tests_require=['nose'],
       zip_safe=False)

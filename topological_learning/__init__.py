@@ -1,4 +1,6 @@
-_all__ = ['dependencies']
+__all__ = ['dependencies']
+
+from .dependencies import *
 
 from .Dataset import LorenzDataset
 from .Labelling import Labeller, LorenzLabeller
