@@ -129,7 +129,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
                 for j in range(0, numberInnerWindows) ] )
             for i in range(0, numberOuterWindows) ])
 
-        XListTransformed.append(XTransformed)
+        XListTransformed.append(XTransformed.reshape((XTransformed.shape[0], -1)))
 
         if type(XList) is list:
             if len(XList) >= 2:
