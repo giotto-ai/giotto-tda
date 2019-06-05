@@ -48,11 +48,11 @@ def get_data(input_file):
 
 
 def split_train_test(data):
-    numberTrain = 200
+    numberTrain = 400
     X_train = data[:numberTrain]
     y_train = np.empty((X_train.shape[0], 1))
 
-    numberTest = 100
+    numberTest = 200
     X_test = data[numberTrain:numberTrain+numberTest]
     y_test = np.empty((X_test.shape[0], 1))
     return X_train, y_train, X_test, y_test
@@ -97,11 +97,11 @@ def get_param_grid():
 
     distance_param['metric_kwargs'] = [ {'metric':'bottleneck'} ]
 
-    physical_param['n_components'] = [ 10]
+    physical_param['n_components'] = [ 3]
 
     derivatives_param['orders'] = [ [0, 1, 2] ]
 
-    formulation_param['numberStepsInPast'] = [ 20 ]
+    formulation_param['numberStepsInPast'] = [ 2 ]
     formulation_param['stepInFuture'] = [ 1 ]
 
     classification_param['modelSteps_kwargs'] = [
