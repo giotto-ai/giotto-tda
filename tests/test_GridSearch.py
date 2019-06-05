@@ -146,7 +146,7 @@ def main(input_file):
 
     param_grid = get_param_grid()
 
-    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, cv=2, n_jobs=-1)
+    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=-1)
 
     # Dumping artifacts
     pkl.dump(grid_result, open('grid_result.pkl', 'wb'))
