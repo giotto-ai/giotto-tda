@@ -47,7 +47,7 @@ def get_data(input_file):
     return data[0]
 
 
-def split_train_test(data, size_data):
+def split_train_test(data):
     numberTrain = 200
     X_train = data[:numberTrain]
     y_train = np.empty((X_train.shape[0], 1))
@@ -71,7 +71,7 @@ def make_pipeline():
     ]
     return Pipeline(steps)
 
-def get_param_grid(size_grid):
+def get_param_grid():
     embedding_param = {}
     labelling_param = {}
     distance_param = {}
@@ -138,15 +138,15 @@ def run_grid_search(estimator, param_grid, X_train, y_train, number_splits, n_jo
 
     return grid_result
 
-def main(input_file, size_data, size_grid, number_splits):
+def main(input_file):
 
     data = get_data(input_file)
-    X_train, y_train, X_test, y_test = split_train_test(data, size_data)
+    X_train, y_train, X_test, y_test = split_train_test(data)
     pipeline = make_pipeline()
 
-    param_grid = get_param_grid(size_grid)
+    param_grid = get_param_grid()
 
-    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits, n_jobs=-1)
+    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, cv=2, n_jobs=-1)
 
     # Dumping artifacts
     pkl.dump(grid_result, open('grid_result.pkl', 'wb'))
