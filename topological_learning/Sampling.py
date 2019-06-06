@@ -101,11 +101,11 @@ class Sampler(BaseEstimator, TransformerMixin):
         if self.samplingType == 'periodic':
             XArray = XArray.resample(self.samplingPeriod).first()
         elif self.samplingType == 'fixed':
-            XArray = XArray.iloc[np.isin(XArray.index.time, self.samplingTimeList)]
+            XArray = XArray.iloc[np.isin(XArray.index.time, self.samplingTimeList)].copy()
 
         if 'return' in self.transformationType:
             XArray.iloc[:, 0] = XArray.iloc[:, 0].pct_change(1)
-            XArray = XArray.drop(XArray.index[0])
+            XArray.drop(XArray.index[0], inplace=True)
 
         if 'log' in self.transformationType:
             XArray.iloc[:, 0] = np.log(XArray.iloc[:, 0])

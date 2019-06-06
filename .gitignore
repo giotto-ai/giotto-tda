@@ -7,6 +7,10 @@
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 
+# Python jupyter notebooks
+examples/dask-worker-space
+examples/.ipynb_checkpoints
+
 # Data files
 *.pkl
 *.csv
@@ -18,3 +22,6 @@ data/*
 
 # Emacs temporary files
 *~
+
+# Output files
+*.out

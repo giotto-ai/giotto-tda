@@ -2,7 +2,7 @@ import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from joblib import Parallel, delayed
+from sklearn.utils._joblib import Parallel, delayed
 
 import numpy as np
 import gudhi as gd

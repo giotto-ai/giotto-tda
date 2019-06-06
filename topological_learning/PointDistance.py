@@ -1,16 +1,17 @@
+import numpy as np
 import sklearn as sk
+
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from scipy.sparse import csr_matrix
 from umap.sparse import make_sparse_nn_descent
-import umap.distance as dist
-from sklearn.metrics.pairwise import paired_distances
-
-from joblib import Parallel, delayed
+from sklearn.utils.graph_shortest_path import graph_shortest_path
+from scipy.sparse import csr_matrix
+from sklearn.utils._joblib import Parallel, delayed
 import math as m
 import itertools
+from numba import jit
 
-import numpy as np
 
 
 

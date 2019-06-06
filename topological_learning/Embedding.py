@@ -32,16 +32,15 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    inputShape : tuple
-        The shape the data passed to :meth:`fit`
+    inputShape : tuple The shape the data passed to :meth:`fit`
     """
 
     def __init__(self, outerWindowDuration=20, outerWindowStride=2,
-                 embeddingDimension=5, embeddingDelay=1, embeddingStride=1, n_jobs=1):
+                 embeddingDimension=5, embeddingTimeDelay=1, embeddingStride=1, n_jobs=1):
         self.outerWindowDuration = outerWindowDuration
         self.outerWindowStride = outerWindowStride
         self.embeddingDimension = embeddingDimension
-        self.embeddingDelay = embeddingDelay
+        self.embeddingTimeDelay = embeddingTimeDelay
         self.embeddingStride = embeddingStride
         self.n_jobs = n_jobs
 
@@ -49,7 +48,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         return {'outerWindowDuration': self.outerWindowDuration,
                 'outerWindowStride': self.outerWindowStride,
                 'embeddingDimension': self.embeddingDimension,
-                'embeddingDelay': self.embeddingDelay,
+                'embeddingTimeDelay': self.embeddingTimeDelay,
                 'embeddingStride': self.embeddingStride,
                 'n_jobs': self.n_jobs}
 
@@ -61,30 +60,30 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         pass
 
     @staticmethod
-    def _embed(X, outerWindowDuration, outerWindowStride, embeddingDelay, embeddingDimension, embeddingStride=1):
+    def _embed(X, outerWindowDuration, outerWindowStride, embeddingTimeDelay, embeddingDimension, embeddingStride=1):
         numberOuterWindows = (X.shape[0] - outerWindowDuration) // outerWindowStride + 1
         numberInnerWindows = (outerWindowDuration - embeddingDimension) // embeddingStride + 1
 
         XEmbedded = np.stack( [
             np.stack( [
                 X[i*outerWindowStride + j * embeddingStride
-                  : i*outerWindowStride + j * embeddingStride + embeddingDelay * embeddingDimension : embeddingDelay].flatten()
+                  : i*outerWindowStride + j * embeddingStride + embeddingTimeDelay * embeddingDimension : embeddingTimeDelay].flatten()
                 for j in range(0, numberInnerWindows) ] )
             for i in range(0, numberOuterWindows) ])
 
         return XEmbedded
 
     @staticmethod
-    def _mutual_information(X, embeddingDelay, numberBins):
+    def _mutual_information(X, embeddingTimeDelay, numberBins):
         """This function calculates the mutual information given the delay
         """
-        contingency = np.histogram2d(X[:embeddingDelay], X[embeddingDelay:], numberBins)[0]
+        contingency = np.histogram2d(X[:embeddingTimeDelay], X[embeddingTimeDelay:], numberBins)[0]
         return mutual_info_score(None, None, contingency=contingency)
 
     @staticmethod
-    def _false_nearest_neighbors(X, embeddingDelay, embeddingDimension, embeddingStride=1):
+    def _false_nearest_neighbors(X, embeddingTimeDelay, embeddingDimension, embeddingStride=1):
         """Calculates the number of false nearest neighbours of embedding dimension"""
-        XEmbedded = Embedding._embed(X, outerWindowDuration=X.shape[0], outerWindowStride=0, embeddingDelay, embeddingDimension, embeddingStride)
+        XEmbedded = Embedding._embed(X, outerWindowDuration=X.shape[0], outerWindowStride=0, embeddingTimeDelay, embeddingDimension, embeddingStride)
         XEmbedded = XEmbedded.reshape((XEmbedded.shape[1], XEmbedded.shape[2]))
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(XEmbedded)
@@ -96,9 +95,9 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         tolerance = 10
 
         nonZeroDistance = distance > 0
-        falseNeighborCriteria = abs(X[i + embeddingDimension * embeddingDelay] - X[index + embeddingDimension * embeddingDelay]) / distance) > tolerance
-        falseNeighborCriteria = abs(np.roll(X, -embeddingDimension * embeddingDelay)[:-embeddingDimension * embeddingDelay]
-                                    - np.roll(XNeighbor, - embeddingDimension * embeddingDelay)[:-embeddingDimension * embeddingDelay])/ distance) > tolerance
+        falseNeighborCriteria = abs(X[i + embeddingDimension * embeddingTimeDelay] - X[index + embeddingDimension * embeddingTimeDelay]) / distance) > tolerance
+        falseNeighborCriteria = abs(np.roll(X, -embeddingDimension * embeddingTimeDelay)[:-embeddingDimension * embeddingTimeDelay]
+                                    - np.roll(XNeighbor, - embeddingDimension * embeddingTimeDelay)[:-embeddingDimension * embeddingTimeDelay])/ distance) > tolerance
         limitedDatasetCriteria = distance < epsilon
         numberFalseNeighbors = np.sum(nonZeroDistance * falseNeighborCriteria * limitedDatasetCriteria)
 
@@ -125,16 +124,16 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self.isFitted = True
 
         mutualInformationList = Parallel(n_jobs=self.n_jobs) ( delayed(self._mutual_information(XList[0], delay, numberBins=100))
-                                                               for delay in range(1, self.embeddingDelay) )
-        self.embeddingDelay = mutualInformationList.index(min(mutualInformationList)) + 1
+                                                               for delay in range(1, self.embeddingTimeDelay) )
+        self.embeddingTimeDelay = mutualInformationList.index(min(mutualInformationList)) + 1
 
-        falseNeighborList = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors(XList[0], self.embeddingDelay, dimension, embeddingStride=1))
+        falseNeighborList = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors(XList[0], self.embeddingTimeDelay, dimension, embeddingStride=1))
                                                             for dimension in range(1, self.embeddingDimension) )
         self.embeddingDimension = falseNeighborList.index(min(falseNeighborList)) + 1
 
         return self
 
-    def transform(self, XList, y = None):
+    def transform(self, XList, y=None):
         """ Implementation of the sk-learn transform function that samples the input.
 
         Parameters
@@ -160,16 +159,16 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         if XData.shape[0] < self.outerWindowDuration:
             raise ValueError('Not enough data to have a single outer window.')
 
-        XTransformed = self._embed(X, self.outerWindowDuration, self.outerWindowStride, self.embeddingDelay, self.embeddingDimension, self.embeddingStride)
+        XTransformed = self._embed(X, self.outerWindowDuration, self.outerWindowStride, self.embeddingTimeDelay, self.embeddingDimension, self.embeddingStride)
         XListTransformed.append(XTransformed)
 
-        XTransformed = self._embed(X, self.outerWindowDuration, self.outerWindowStride, embeddingDelay=1, embeddingDimension=self.outerWindowDuration, embeddingStride=0)
+        XTransformed = self._embed(X, self.outerWindowDuration, self.outerWindowStride, embeddingTimeDelay=1, embeddingDimension=self.outerWindowDuration, embeddingStride=0)
         XListTransformed.append(XTransformed)
 
         if type(XList) is list:
             if len(XList) >= 2:
                 y = XList[1]
-                yTransformed =  self._embed(y, self.outerWindowDuration, self.outerWindowStride, embeddingDelay=1, embeddingDimension=self.outerWindowDuration, embeddingStride=0)
+                yTransformed =  self._embed(y, self.outerWindowDuration, self.outerWindowStride, embeddingTimeDelay=1, embeddingDimension=self.outerWindowDuration, embeddingStride=0)
                 XListTransformed.append(yTransformed)
 
         return XListTransformed

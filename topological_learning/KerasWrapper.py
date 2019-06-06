@@ -11,8 +11,6 @@ from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 import numpy as np
 import pandas as pd
 
-from sklearn.model_selection import GridSearchCV
-
 
 class KerasClassifierWrapper(KerasClassifier):
     """ A wrapper for Keras classifiers.
@@ -30,25 +28,27 @@ class KerasClassifierWrapper(KerasClassifier):
         The classes seen at :meth:`fit`.
     """
     def __call__(self, modelSteps_kwargs = [ {'layerClass': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
-                 optimizer_kwargs = {'optimizerClass': koptimizers.SGD, 'lr': 0.01},
-                 loss = 'binary_crossentropy', metrics = ['accuracy']):
-
+                 optimizer_kwargs = {'optimizerClass': koptimizers.RMSprop, 'lr': 0.01},
+                 loss = 'sparse_categorical_crossentropy', metrics = ['sparse_categorical_accuracy']):
         # Create model
         model = Sequential()
         tempStep_kwargs = modelSteps_kwargs[0]
         modelStep_kwargs = tempStep_kwargs.copy()
-        model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
-        for tempStep_kwargs in modelSteps_kwargs[1:]:
+        model.add(modelStep_kwargs.pop('layerClass')(input_shape=self.input_shape, **modelStep_kwargs))
+        for tempStep_kwargs in modelSteps_kwargs[1:-1]:
             modelStep_kwargs = tempStep_kwargs.copy()
             model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
+        tempStep_kwargs = modelSteps_kwargs[-1]
+        modelStep_kwargs = tempStep_kwargs.copy()
+        model.add(modelStep_kwargs.pop('layerClass')(units=self.output_units, **modelStep_kwargs))
 
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()
         optimizer = tempOptimizer_kwargs.pop('optimizerClass')(**tempOptimizer_kwargs)
-        model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
+        model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
         return model
 
-    def fit(self, XList, y = None, **kwargs):
+    def fit(self, XList, y= None, **kwargs):
         """A reference implementation of a fitting function for a classifier.
 
         Parameters
@@ -76,6 +76,7 @@ class KerasClassifierWrapper(KerasClassifier):
             X = XList
 
         self.input_shape = X.shape[1:]
+        self.output_units = np.max(y) + 1
         return KerasClassifier.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
@@ -134,7 +135,7 @@ class KerasClassifierWrapper(KerasClassifier):
             probs = np.hstack([1 - probs, probs])
         return probs
 
-    def score(self, XList, y = None, **kwargs):
+    def score(self, XList, y=None, **kwargs):
         """
         Returns the mean accuracy on the given test data and labels.
 
@@ -188,12 +189,15 @@ class KerasRegressorWrapper(KerasRegressor):
                  loss = 'mean_squared_error', metrics = ['accuracy']):
         # Create model
         model = Sequential()
-        tempStep_kwargs = modelSteps_kwargs[0]
+        tempStep_kwargs = modelSteps_kwargs[-1]
         modelStep_kwargs = tempStep_kwargs.copy()
         model.add(modelStep_kwargs.pop('layerClass')(input_shape = self.input_shape, **modelStep_kwargs))
         for tempStep_kwargs in modelSteps_kwargs[1:]:
             modelStep_kwargs = tempStep_kwargs.copy()
             model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
+        tempStep_kwargs = modelSteps_kwargs[-1]
+        modelStep_kwargs = tempStep_kwargs.copy()
+        model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
 
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()
@@ -201,7 +205,7 @@ class KerasRegressorWrapper(KerasRegressor):
         model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
         return model
 
-    def fit(self, XList, y = None, **kwargs):
+    def fit(self, XList, y=None, **kwargs):
         """A reference implementation of a fitting function for a classifier.
 
         Parameters
@@ -255,7 +259,7 @@ class KerasRegressorWrapper(KerasRegressor):
         else:
             return KerasRegressor.predict(self, XList, **kwargs)
 
-    def score(self, XList, y = None, **kwargs):
+    def score(self, XList, y=None, **kwargs):
         """
         Returns the mean accuracy on the given test data and labels.
 

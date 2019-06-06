@@ -1,8 +1,5 @@
 import numpy as np
 from random import randint
-import plotly.graph_objs as go
-from plotly.offline import init_notebook_mode, iplot
-init_notebook_mode(connected=True)
 
 class Dataset(object):
     def __init__(self, timeStep = 0.01, maxDuration = 20000, meanNoise = 0, stdDeviationNoise = 0):
@@ -87,15 +84,3 @@ class LorenzDataset(Dataset):
         self.x += self.add_noise()
         self.y += self.add_noise()
         self.z += self.add_noise()
-
-    def plot(self, markersize = 4):
-        title = 'Lorenz attractor'
-        trace = go.Scatter3d(x = self.x, y = self.y, z = self.z, mode='markers',
-                             marker=dict(size=markersize, color=list(range(self.maxDuration)),
-                                         colorscale='Viridis', opacity=0.8))
-
-        data = [trace]
-        layout = go.Layout(margin=dict(l = 0, r = 0, b = 0, t = 0))
-
-        figure = go.Figure(data=data, layout=layout)
-        iplot(figure, filename='3d-Lorenz-attractor')

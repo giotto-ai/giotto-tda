@@ -82,19 +82,20 @@ class LorenzLabeller(BaseEstimator, TransformerMixin):
 
         return XListTransformed
 
-def derivation_function(function, X, axis=1, deltaT=1):
-    partialWindowBegin = function(X[:, deltaT:], axis=axis)
-    partialWindowEnd = function(X[:, :-deltaT], axis=axis)
-    return (partialWindowEnd - partialWindowBegin) / partialWindowBegin / deltaT
+def derivation_function(function, X, deltaT=1, **function_kwargs):
+    partialWindowBegin = function(X[:, deltaT:], axis=1, **function_kwargs)
+    partialWindowEnd = function(X[:, :-deltaT], axis=1, **function_kwargs)
+    derivative = (partialWindowEnd - partialWindowBegin) / partialWindowBegin / deltaT
+    return derivative.reshape((-1, 1))
 
-def variation_function(function, X, axis=1, deltaT=1):
-    fullWindow = function(X, axis=axis)
-    partialWindow = function(X[:, :-deltaT], axis=axis)
-    return (fullWindow - partialWindow) / partialWindow / deltaT
+def variation_function(function, X, deltaT=1, **function_kwargs):
+    fullWindow = function(X, axis=1, **function_kwargs)
+    partialWindow = function(X[:, :-deltaT], axis=1, **function_kwargs)
+    variation = (fullWindow - partialWindow) / partialWindow / deltaT
+    return variation.reshape((-1, 1))
 
-def apply_function(function, X, axis=1, deltaT=0):
-    return function(X, axis=axis)
-
+def application_function(function, X, axis=1, deltaT=0, **function_kwargs):
+    return function(X, axis=1, **function_kwargs).reshape((-1, 1))
 
 class Labeller(BaseEstimator, TransformerMixin):
     """
@@ -118,25 +119,23 @@ class Labeller(BaseEstimator, TransformerMixin):
         Whether the transformer has been fitted
     """
 
-    implementedLabellingRecipes = {'apply': apply_function, 'variation': variation_function,
+    implementedLabellingRecipes = {'application': application_function, 'variation': variation_function,
                                    'derivation': derivation_function}
 
-    def __init__(self, labellingType='', function=np.std, deltaT=0, percentile=None, **function_kwargs):
-        self.labellingType = labellingType
-        self.function = function
-        self.deltaT = deltaT
-        self.percentile = percentile
+    def __init__(self, labelling_kwargs={'type': 'derivation', 'deltaT': 1}, function_kwargs= {'function': np.std}, percentiles=None):
+        self.labelling_kwargs = labelling_kwargs
         self.function_kwargs = function_kwargs
+        self.percentiles = percentiles
 
     def get_params(self, deep=True):
-        return {'labellingType': self.labellingType,'function': self.function, 'deltaT': self.deltaT}
+        return {'labelling_kwargs': self.labelling_kwargs, 'function_kwargs': self.function_kwargs, 'percentiles': self.percentiles}
 
     @staticmethod
-    def _validate_params(labellingType):
+    def _validate_params(labelling_kwargs):
         """A class method that checks whether the hyperparameters and the input parameters
            of the :meth:'fit' are valid.
         """
-        if labellingType not in Labeller.implementedLabellingRecipes.keys():
+        if labelling_kwargs['type'] not in Labeller.implementedLabellingRecipes.keys():
             raise ValueError('The labelling type you specified is not implemented')
 
     def fit(self, XList, y = None):
@@ -155,18 +154,20 @@ class Labeller(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        self._validate_params(self.labellingType)
+        self._validate_params(self.labelling_kwargs)
 
         self.isFitted = True
 
         self._y = XList[1]
-        y = self._y.reshape((self._y.shape[0], -1))
-        self._yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, self._y, axis=1, deltaT=self.deltaT, **self.function_kwargs)
 
-        if self.percentile is not None:
-            self.threshold = np.percentile(np.abs(self._yTransformed.flatten()), self.percentile)
+        labelling_kwargs = self.labelling_kwargs.copy()
+        function_kwargs = self.function_kwargs.copy()
+        self._yTransformed = Labeller.implementedLabellingRecipes[labelling_kwargs.pop('type')](function_kwargs.pop('function'), self._y, **labelling_kwargs, **function_kwargs)
+
+        if self.percentiles is not None:
+            self.thresholds = [np.percentile(np.abs(self._yTransformed.flatten()), percentile) for percentile in self.percentiles]
         else:
-            self.threshold = None
+            self.thresholds = None
 
         return self
 
@@ -192,13 +193,19 @@ class Labeller(BaseEstimator, TransformerMixin):
         if np.array_equal(y, self._y):
             yTransformed = self._yTransformed
         else:
-            y = y.reshape((y.shape[0], -1))
-            yTransformed = Labeller.implementedLabellingRecipes[self.labellingType](self.function, y, axis=1, deltaT=self.deltaT, **self.function_kwargs)
+            labelling_kwargs = self.labelling_kwargs.copy()
+            function_kwargs = self.function_kwargs.copy()
+            yTransformed = Labeller.implementedLabellingRecipes[labelling_kwargs.pop('type')](function_kwargs.pop('function'), y, **labelling_kwargs, **function_kwargs)
 
-        if self.threshold is not None:
-            print(yTransformed)
-            yTransformed = 1 * (np.abs(yTransformed) > self.threshold)
+        if self.thresholds is not None:
+            yTransformedAbs = np.abs(yTransformed)
+            yTransformed = np.concatenate([1 * (yTransformedAbs >= 0) * (yTransformedAbs < self.thresholds[0])] +\
+                                          [1 * (yTransformedAbs >= self.thresholds[i])
+                                           * (yTransformedAbs < self.thresholds[i+1])
+                                           for i in range(len(self.thresholds)-1)] +\
+                                          [1 * (yTransformedAbs >= self.thresholds[-1])], axis=1)
+            yTransformed = np.nonzero(yTransformed)[1].reshape((y.shape[0], 1))
 
-        XListTransformed = [ XList[0], yTransformed.reshape((y.shape[0], -1)) ]
+        XListTransformed = [ XList[0], yTransformed ]
 
         return XListTransformed

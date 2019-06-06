@@ -2,13 +2,14 @@ import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
-from joblib import Parallel, delayed
+from sklearn.utils._joblib import Parallel, delayed
 import itertools
 
 import math as m
 import numpy as np
-import gudhi as gd
-from sklearn_tda.hera_wasserstein import wasserstein
+
+from .dependencies import bottleneck_distance as gudhi_bottleneck_distance
+from .dependencies import wasserstein as hera_wasserstein_distance
 
 
 def betti(diagram, sampling):
@@ -46,10 +47,10 @@ def kernel_betti_distance(x, y, dimension, sampling=None, order=2):
     return np.linalg.norm(bettiX - bettiY, ord=order)
 
 def bottleneck_distance(x, y, dimension=None):
-    return gd.bottleneck_distance(x, y)
+    return gudhi_bottleneck_distance(x, y)
 
 def wasserstein_distance(x, y, dimension=None, order=1):
-    return wasserstein(x, y, order)
+    return hera_wasserstein_distance(x, y, order)
 
 class DiagramDistance(BaseEstimator, TransformerMixin):
     implementedMetricRecipes = {'bottleneck': bottleneck_distance, 'wasserstein': wasserstein_distance,
