@@ -11,8 +11,6 @@ from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 import numpy as np
 import pandas as pd
 
-from sklearn.model_selection import GridSearchCV
-
 
 class KerasClassifierWrapper(KerasClassifier):
     """ A wrapper for Keras classifiers.
@@ -47,10 +45,10 @@ class KerasClassifierWrapper(KerasClassifier):
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()
         optimizer = tempOptimizer_kwargs.pop('optimizerClass')(**tempOptimizer_kwargs)
-        model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
+        model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
         return model
 
-    def fit(self, XList, y = None, **kwargs):
+    def fit(self, XList, y= None, **kwargs):
         """A reference implementation of a fitting function for a classifier.
 
         Parameters
@@ -78,9 +76,9 @@ class KerasClassifierWrapper(KerasClassifier):
             X = XList
 
         self.input_shape = X.shape[1:]
-        self.output_units = 4 #np.max(y) + 1
-        print('Shape in fit', self.output_units)
-        return KerasClassifier.fit(self, X, y, verbose=1, **kwargs)
+        self.output_units = np.max(y) + 1
+
+        return KerasClassifier.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
         """ A reference implementation of a prediction for a classifier.
@@ -138,7 +136,7 @@ class KerasClassifierWrapper(KerasClassifier):
             probs = np.hstack([1 - probs, probs])
         return probs
 
-    def score(self, XList, y = None, **kwargs):
+    def score(self, XList, y=None, **kwargs):
         """
         Returns the mean accuracy on the given test data and labels.
 
@@ -208,7 +206,7 @@ class KerasRegressorWrapper(KerasRegressor):
         model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
         return model
 
-    def fit(self, XList, y = None, **kwargs):
+    def fit(self, XList, y=None, **kwargs):
         """A reference implementation of a fitting function for a classifier.
 
         Parameters
@@ -263,7 +261,7 @@ class KerasRegressorWrapper(KerasRegressor):
         else:
             return KerasRegressor.predict(self, XList, **kwargs)
 
-    def score(self, XList, y = None, **kwargs):
+    def score(self, XList, y=None, **kwargs):
         """
         Returns the mean accuracy on the given test data and labels.
 
