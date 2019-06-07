@@ -84,8 +84,8 @@ def get_param_grid():
 
     embedding_param['outerWindowDuration'] = [ 20, 30 ]
     embedding_param['outerWindowStride'] = [ 2, 5 ]
-    embedding_param['innerWindowDuration'] = [ 5, 10 ]
-    embedding_param['innerWindowStride'] = [ 1 ]
+    embedding_param['embeddingDimension'] = [ 10 ]
+    embedding_param['embeddingTimeDelay'] = [ 1 ]
 
     labelling_param['deltaT'] = [ 5, 10 ]
 
