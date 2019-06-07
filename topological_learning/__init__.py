@@ -6,7 +6,7 @@ from .Dataset import LorenzDataset
 from .Labelling import Labeller, LorenzLabeller
 from .Sampling import Sampler
 from .SklearnWrapper import ScalerWrapper, TransformerWrapper
-from .Embedding import TakensEmbedder
+from .Embedding import TakensEmbedding
 from .ModifiedMDS import MDS
 from .PersistenceDiagram import VietorisRipsDiagram
 from .DiagramDistance import DiagramDistance

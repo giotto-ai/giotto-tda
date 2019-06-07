@@ -115,6 +115,6 @@ class Sampler(BaseEstimator, TransformerMixin):
 
         XArray.columns = range(len(XArray.columns))
         if len(XArray.columns) == 1:
-            return [ XArray.iloc[:, 0] ]
+            return [ XArray.iloc[:, 0].values ]
         else:
-            return [ XArray.iloc[:, 0], XArray.iloc[:, 1:] ]
+            return [ XArray.iloc[:, 0].values, XArray.iloc[:, 1:].values ]

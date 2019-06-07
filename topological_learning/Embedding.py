@@ -7,9 +7,11 @@ from joblib import Parallel, delayed
 from pandas.core.resample import Resampler as rsp
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
+import math as m
 
-class TakensEmbedder(BaseEstimator, TransformerMixin):
+class TakensEmbedding(BaseEstimator, TransformerMixin):
     """
     Transformer that return a time serie embedded according to Taken's sliding window.
 
@@ -62,28 +64,32 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     @staticmethod
     def _embed(X, outerWindowDuration, outerWindowStride, embeddingTimeDelay, embeddingDimension, embeddingStride=1):
         numberOuterWindows = (X.shape[0] - outerWindowDuration) // outerWindowStride + 1
-        numberInnerWindows = (outerWindowDuration - embeddingDimension) // embeddingStride + 1
+        numberInnerWindows = (outerWindowDuration - embeddingTimeDelay*embeddingDimension) // embeddingStride + 1
+
+        X = np.flip(X)
 
         XEmbedded = np.stack( [
             np.stack( [
-                X[i*outerWindowStride + j * embeddingStride
-                  : i*outerWindowStride + j * embeddingStride + embeddingTimeDelay * embeddingDimension : embeddingTimeDelay].flatten()
+                X[i*outerWindowStride + j*embeddingStride
+                  : i*outerWindowStride + j*embeddingStride + embeddingTimeDelay*embeddingDimension
+                  : embeddingTimeDelay].flatten()
                 for j in range(0, numberInnerWindows) ] )
             for i in range(0, numberOuterWindows) ])
 
-        return XEmbedded
+        return np.flip(XEmbedded).reshape((1, numberInnerWindows, embeddingDimension))
 
     @staticmethod
     def _mutual_information(X, embeddingTimeDelay, numberBins):
         """This function calculates the mutual information given the delay
         """
-        contingency = np.histogram2d(X[:embeddingTimeDelay], X[embeddingTimeDelay:], numberBins)[0]
-        return mutual_info_score(None, None, contingency=contingency)
+        contingency = np.histogram2d(X[:-embeddingTimeDelay], X[embeddingTimeDelay:], bins=numberBins)[0]
+        mutualInformation = mutual_info_score(None, None, contingency=contingency)
+        return mutualInformation
 
     @staticmethod
     def _false_nearest_neighbors(X, embeddingTimeDelay, embeddingDimension, embeddingStride=1):
         """Calculates the number of false nearest neighbours of embedding dimension"""
-        XEmbedded = Embedding._embed(X, outerWindowDuration=X.shape[0], outerWindowStride=0, embeddingTimeDelay, embeddingDimension, embeddingStride)
+        XEmbedded = TakensEmbedding._embed(X, X.shape[0], 1, embeddingTimeDelay, embeddingDimension, embeddingStride)
         XEmbedded = XEmbedded.reshape((XEmbedded.shape[1], XEmbedded.shape[2]))
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(XEmbedded)
@@ -94,13 +100,12 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         epsilon = 2.0 * np.std(X)
         tolerance = 10
 
-        nonZeroDistance = distance > 0
-        falseNeighborCriteria = abs(X[i + embeddingDimension * embeddingTimeDelay] - X[index + embeddingDimension * embeddingTimeDelay]) / distance) > tolerance
-        falseNeighborCriteria = abs(np.roll(X, -embeddingDimension * embeddingTimeDelay)[:-embeddingDimension * embeddingTimeDelay]
-                                    - np.roll(XNeighbor, - embeddingDimension * embeddingTimeDelay)[:-embeddingDimension * embeddingTimeDelay])/ distance) > tolerance
-        limitedDatasetCriteria = distance < epsilon
+        nonZeroDistance = distance[:-embeddingDimension*embeddingTimeDelay] > 0
+        falseNeighborCriteria = np.abs(np.roll(X, -embeddingDimension*embeddingTimeDelay)[X.shape[0]-XEmbedded.shape[0]:-embeddingDimension*embeddingTimeDelay]
+                                       - np.roll(XNeighbor, -embeddingDimension*embeddingTimeDelay)[:-embeddingDimension*embeddingTimeDelay]) \
+                                       / distance[:-embeddingDimension*embeddingTimeDelay] > tolerance
+        limitedDatasetCriteria = distance[:-embeddingDimension*embeddingTimeDelay] < epsilon
         numberFalseNeighbors = np.sum(nonZeroDistance * falseNeighborCriteria * limitedDatasetCriteria)
-
         return numberFalseNeighbors
 
     def fit(self, XList, y=None):
@@ -121,16 +126,23 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         """
         self._validate_params()
 
-        self.isFitted = True
+        if type(XList) is list:
+            X = XList[0]
+        else:
+            X = XList
 
-        mutualInformationList = Parallel(n_jobs=self.n_jobs) ( delayed(self._mutual_information(XList[0], delay, numberBins=100))
-                                                               for delay in range(1, self.embeddingTimeDelay) )
+        mutualInformationList = Parallel(n_jobs=self.n_jobs) ( delayed(self._mutual_information) (X, embeddingTimeDelay, numberBins=100)
+                                                               for embeddingTimeDelay in range(1, self.embeddingTimeDelay+1) )
         self.embeddingTimeDelay = mutualInformationList.index(min(mutualInformationList)) + 1
 
-        falseNeighborList = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors(XList[0], self.embeddingTimeDelay, dimension, embeddingStride=1))
-                                                            for dimension in range(1, self.embeddingDimension) )
-        self.embeddingDimension = falseNeighborList.index(min(falseNeighborList)) + 1
+        numberFalseNeighborsList = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors) (X, self.embeddingTimeDelay, embeddingDimension, embeddingStride=1)
+                                                                 for embeddingDimension in range(1, self.embeddingDimension+3) )
+        variationList = [ np.abs(numberFalseNeighborsList[embeddingDimension-1]-2*numberFalseNeighborsList[embeddingDimension]+numberFalseNeighborsList[embeddingDimension+1]) \
+                          /(numberFalseNeighborsList[embeddingDimension] + 1)/embeddingDimension for embeddingDimension in range(1, self.embeddingDimension+1) ]
 
+        self.embeddingDimension = variationList.index(min(variationList)) + 1
+
+        self.isFitted = True
         return self
 
     def transform(self, XList, y=None):
