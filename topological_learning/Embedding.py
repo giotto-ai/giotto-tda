@@ -37,10 +37,13 @@ class TakensEmbedding(BaseEstimator, TransformerMixin):
     inputShape : tuple The shape the data passed to :meth:`fit`
     """
 
-    def __init__(self, outerWindowDuration=20, outerWindowStride=2,
+    implementedEmbeddingParametersType = ['fixed', 'search']
+
+    def __init__(self, outerWindowDuration=20, outerWindowStride=2, embeddingParametersType='search',
                  embeddingDimension=5, embeddingTimeDelay=1, embeddingStride=1, n_jobs=1):
         self.outerWindowDuration = outerWindowDuration
         self.outerWindowStride = outerWindowStride
+        self.embeddingParametersType = embeddingParametersType
         self.embeddingDimension = embeddingDimension
         self.embeddingTimeDelay = embeddingTimeDelay
         self.embeddingStride = embeddingStride
@@ -49,17 +52,19 @@ class TakensEmbedding(BaseEstimator, TransformerMixin):
     def get_params(self, deep=True):
         return {'outerWindowDuration': self.outerWindowDuration,
                 'outerWindowStride': self.outerWindowStride,
+                'embeddingParametersType': self.embeddingParametersType,
                 'embeddingDimension': self.embeddingDimension,
                 'embeddingTimeDelay': self.embeddingTimeDelay,
                 'embeddingStride': self.embeddingStride,
                 'n_jobs': self.n_jobs}
 
     @staticmethod
-    def _validate_params():
+    def _validate_params(embeddingParametersType):
         """A class method that checks whether the hyperparameters and the input parameters
            of the :meth:'fit' are valid.
         """
-        pass
+        if embeddingParametersType not in Sampling.implementedEmbeddingParametersTypes:
+            raise ValueError('The embedding parameters type you specified is not implemented')
 
     @staticmethod
     def _embed(X, outerWindowDuration, outerWindowStride, embeddingTimeDelay, embeddingDimension, embeddingStride=1):
@@ -124,23 +129,23 @@ class TakensEmbedding(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        self._validate_params()
+        self._validate_params(self.embeddingParametersType)
 
         if type(XList) is list:
             X = XList[0]
         else:
             X = XList
 
-        mutualInformationList = Parallel(n_jobs=self.n_jobs) ( delayed(self._mutual_information) (X, embeddingTimeDelay, numberBins=100)
+        if self.embeddingParametersType == 'search':
+            mutualInformationList = Parallel(n_jobs=self.n_jobs) ( delayed(self._mutual_information) (X, embeddingTimeDelay, numberBins=100)
                                                                for embeddingTimeDelay in range(1, self.embeddingTimeDelay+1) )
-        self.embeddingTimeDelay = mutualInformationList.index(min(mutualInformationList)) + 1
+            self.embeddingTimeDelay = mutualInformationList.index(min(mutualInformationList)) + 1
 
-        numberFalseNeighborsList = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors) (X, self.embeddingTimeDelay, embeddingDimension, embeddingStride=1)
+            numberFalseNeighborsList = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors) (X, self.embeddingTimeDelay, embeddingDimension, embeddingStride=1)
                                                                  for embeddingDimension in range(1, self.embeddingDimension+3) )
-        variationList = [ np.abs(numberFalseNeighborsList[embeddingDimension-1]-2*numberFalseNeighborsList[embeddingDimension]+numberFalseNeighborsList[embeddingDimension+1]) \
-                          /(numberFalseNeighborsList[embeddingDimension] + 1)/embeddingDimension for embeddingDimension in range(1, self.embeddingDimension+1) ]
-
-        self.embeddingDimension = variationList.index(min(variationList)) + 1
+            variationList = [ np.abs(numberFalseNeighborsList[embeddingDimension-1]-2*numberFalseNeighborsList[embeddingDimension]+numberFalseNeighborsList[embeddingDimension+1]) \
+                              /(numberFalseNeighborsList[embeddingDimension] + 1)/embeddingDimension for embeddingDimension in range(1, self.embeddingDimension+1) ]
+            self.embeddingDimension = variationList.index(min(variationList)) + 1
 
         self.isFitted = True
         return self
