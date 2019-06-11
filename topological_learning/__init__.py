@@ -4,7 +4,7 @@ from .dependencies import *
 
 from .Dataset import LorenzDataset
 from .Labelling import Labeller, LorenzLabeller
-from .Sampling import Sampler
+from .Sampling import Sampling
 from .SklearnWrapper import ScalerWrapper, TransformerWrapper
 from .Embedding import TakensEmbedding
 from .ModifiedMDS import MDS

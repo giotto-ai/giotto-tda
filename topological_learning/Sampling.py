@@ -7,7 +7,7 @@ import pandas as pd
 from pandas.core.resample import Resampler as rsp
 import datetime as dt
 
-class Sampler(BaseEstimator, TransformerMixin):
+class Sampling(BaseEstimator, TransformerMixin):
     """
     data sampling transformer that returns a sampled Pandas dataframe with a datetime index
 
@@ -44,20 +44,15 @@ class Sampler(BaseEstimator, TransformerMixin):
                 'samplingPeriod': self.samplingPeriod,
                 'removeWeekends': self.removeWeekends}
 
-    def set_params(self, **parameters):
-        for parameter, value in parameters.items():
-            self.setattr(parameter, value)
-        return self
-
     @staticmethod
     def _validate_params(transformationType, samplingType):
         """A class method that checks whether the hyperparameters and the input parameters
            of the :meth:'fit' are valid.
         """
-        if transformationType not in Sampler.implementedTransformationTypes:
+        if transformationType not in Sampling.implementedTransformationTypes:
             raise ValueError('The transformation type you specified is not implemented')
 
-        if samplingType not in Sampler.implementedSamplingTypes:
+        if samplingType not in Sampling.implementedSamplingTypes:
             raise ValueError('The sampling type you specified is not implemented')
 
     def fit(self, XArray, y = None):
