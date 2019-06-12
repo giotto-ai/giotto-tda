@@ -26,8 +26,8 @@ def landscape(diagram, n_layers, sampling):
     if diagram.size == 0:
         return np.hstack([np.zeros(sampling.shape)] * n_layers)
 
-    midpoints = (diagram[:, 1] + diagram[:, 0]) / 2
-    heights = (diagram[:, 1] - diagram[:, 0]) / 2
+    midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
+    heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
 
     mountains = [ -np.abs(sampling - midpoints[i]) + heights[i] for i in range(len(diagram)) ]
     fibers = np.vstack([np.where(mountains[i] > 0, mountains[i], 0) for i in range(len(diagram))])
@@ -124,13 +124,13 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         self.sampling = { dimension: None for dimension in self._X.keys() } # As it will be passed to the metrics, it has to be initialized even if the metric is not using sampling
         if self.metricName in ['landscape', 'betti']:
-            maximumPersistences = { dimension: np.max(self._X[dimension][:,:,1])*m.sqrt(2) if self._X[dimension][:,:,0].size != 0
+            maximumPersistences = { dimension: np.max(self._X[dimension][:,:,1]) * m.sqrt(2) if self._X[dimension][:,:,0].size != 0
                                    else -np.inf for dimension in self._X.keys() }
             maximumPersistence = max(list(maximumPersistences.values()))
             maximumPersistences = { dimension: maximumPersistences[dimension] if maximumPersistences[dimension] != -np.inf else maximumPersistence
                                     for dimension in self._X.keys() }
 
-            minimumPersistences = { dimension: np.min(self._X[dimension][:,:,0])*m.sqrt(2) if self._X[dimension][:,:,0].size != 0
+            minimumPersistences = { dimension: np.min(self._X[dimension][:,:,0]) * m.sqrt(2) if self._X[dimension][:,:,0].size != 0
                                    else np.inf for dimension in self._X.keys() }
             minimumPersistence = min(list(minimumPersistences.values()))
             minimumPersistences = { dimension: minimumPersistences[dimension] if minimumPersistences[dimension] != np.inf else minimumPersistence
