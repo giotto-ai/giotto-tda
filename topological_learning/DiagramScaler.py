@@ -35,13 +35,15 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     def get_params(self, deep=True):
         return {'scaler_kwargs': self.scaler_kwargs}
 
+    @staticmethod
     def _rotate_clockwise(X):
         rotationMatrix = m.sqrt(2) / 2. * np.array([[1, -1], [1 , 1]])
-        return np.dot(X, rotationMatrix, axis=2)
+        return np.dot(X, rotationMatrix)
 
+    @staticmethod
     def _rotate_anticlockwise(X):
         rotationMatrix = m.sqrt(2) / 2. * np.array([[1, 1], [-1 , 1]])
-        return np.dot(X, rotationMatrix, axis=2)
+        return np.dot(X, rotationMatrix)
 
     def fit(self, XList, y = None):
         """A reference implementation of a fitting function for a transformer.
@@ -62,8 +64,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         scaler_kwargs = self.scaler_kwargs.copy()
         self.scaler = scaler_kwargs.pop('scaler')(**scaler_kwargs)
 
-        X = self._rotate_anticlockwise(XList[0])
-        self.scaler.fit(X[:, :, 1])
+        X = np.concatenate(list(XList[0].values()), axis=1)
+        X = self._rotate_clockwise(X)
+        self.scaler.fit(X[:, :, 1].reshape((-1, 1)))
 
         self.isFitted = True
         return self
@@ -88,9 +91,11 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         XListScaled = []
 
-        XScaled = self._rotate_anticlockwise(XList[0])
-        XScaled[:, :, 1] = self.scaler.transform(XScaled[:, :, 1])
-        XScaled = self._rotate_clockwise(XScaled)
+        XScaled = {}
+        for dimension, X in XList[0].items():
+            XScaled[dimension] = self._rotate_clockwise(X)
+            XScaled[dimension] = self.scaler.transform(XScaled[dimension].reshape((-1, 1))).reshape(X.shape)
+            XScaled[dimension] = self._rotate_anticlockwise(XScaled[dimension])
 
         XListScaled.append(XScaled)
 
@@ -119,9 +124,11 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         XListScaled = []
 
-        XScaled = self._rotate_anticlockwise(XList[0])
-        XScaled[:, :, 1] = self.scaler.inverse_transform(XScaled[:, :, 1])
-        XScaled = self._rotate_clockwise(XScaled)
+        XScaled = {}
+        for dimension, X in XList[0].items():
+            XScaled[dimension] = self._rotate_clockwise(X)
+            XScaled[dimension] = self.scaler.inverse_transform(XScaled[dimension].reshape((-1, 1))).reshape(X.shape)
+            XScaled[dimension] = self._rotate_anticlockwise(XScaled[dimension])
 
         XListScaled.append(XScaled)
 

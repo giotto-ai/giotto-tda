@@ -10,6 +10,7 @@ from .Embedding import TakensEmbedding
 from .ModifiedMDS import MDS
 from .PersistenceDiagram import VietorisRipsDiagram
 from .DiagramDistance import DiagramDistance
+from .DiagramScaler import DiagramScaler
 from .CentroidsDistance import CentroidsDistance
 from .Derivatives import Derivatives
 from .Formulation import FormulationTransformer
