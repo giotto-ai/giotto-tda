@@ -39,8 +39,8 @@ class TakensEmbedding(BaseEstimator, TransformerMixin):
 
     implementedEmbeddingParametersType = ['fixed', 'search']
 
-    def __init__(self, outerWindowDuration=20, outerWindowStride=2, embeddingParametersType=embeddingDimension,
-                 'search'=5, embeddingTimeDelay=1, embeddingStride=1, n_jobs=1):
+    def __init__(self, outerWindowDuration=20, outerWindowStride=2, embeddingParametersType='search',
+                 embeddingDimension=5, embeddingTimeDelay=1, embeddingStride=1, n_jobs=1):
         self.outerWindowDuration = outerWindowDuration
         self.outerWindowStride = outerWindowStride
         self.embeddingParametersType = embeddingParametersType
