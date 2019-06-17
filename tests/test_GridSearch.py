@@ -59,8 +59,8 @@ def split_train_test(data):
 
 def make_pipeline():
     steps = [
-        ('embedding', tl.TakensEmbedder()),
-        ('labelling', tl.Labeller(labellingType='variation', function = np.std, percentiles=[80,90,95])),
+        ('embedding', tl.TakensEmbedding()),
+        ('labelling', tl.Labeller(labelling_kwargs={'type': 'variation', 'deltaT': 1}, function_kwargs={'function': np.std}, percentiles=[80,90,95])),
         ('diagram', tl.VietorisRipsDiagram()),
         ('distance', tl.DiagramDistance()),
         ('physical', tl.MDS()),
@@ -84,8 +84,8 @@ def get_param_grid():
 
     embedding_param['outerWindowDuration'] = [ 20, 30 ]
     embedding_param['outerWindowStride'] = [ 2, 5 ]
-    embedding_param['innerWindowDuration'] = [ 5, 10 ]
-    embedding_param['innerWindowStride'] = [ 1 ]
+    embedding_param['embeddingDimension'] = [ 10 ]
+    embedding_param['embeddingTimeDelay'] = [ 1 ]
 
     labelling_param['deltaT'] = [ 5, 10 ]
 

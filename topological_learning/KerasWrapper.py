@@ -77,7 +77,6 @@ class KerasClassifierWrapper(KerasClassifier):
 
         self.input_shape = X.shape[1:]
         self.output_units = np.max(y) + 1
-
         return KerasClassifier.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
@@ -89,7 +88,7 @@ class KerasClassifierWrapper(KerasClassifier):
             The input samples.
 
         Returns
-        -------
+        ------
         y : ndarray, shape (n_samples,)
             The label for each sample is the label of the closest sample
             seen during fit.
@@ -198,7 +197,7 @@ class KerasRegressorWrapper(KerasRegressor):
             model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
         tempStep_kwargs = modelSteps_kwargs[-1]
         modelStep_kwargs = tempStep_kwargs.copy()
-        model.add(modelStep_kwargs.pop('layerClass')(units=self.output_units, **modelStep_kwargs))
+        model.add(modelStep_kwargs.pop('layerClass')(**modelStep_kwargs))
 
         # Compile model
         tempOptimizer_kwargs = optimizer_kwargs.copy()
@@ -234,7 +233,6 @@ class KerasRegressorWrapper(KerasRegressor):
             X = XList
 
         self.input_shape = X.shape[1:]
-        self.output_units = y.shape[1]
         return KerasRegressor.fit(self, X, y, verbose=0, **kwargs)
 
     def predict(self, XList, **kwargs):
