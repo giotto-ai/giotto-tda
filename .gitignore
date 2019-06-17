@@ -10,6 +10,7 @@
 # Python jupyter notebooks
 examples/dask-worker-space
 examples/.ipynb_checkpoints
+examples/
 
 # Data files
 *.pkl
@@ -22,3 +23,6 @@ data/*
 
 # Output files
 *.out
+
+# Hera C++ files
+topological_learning/dependencies/hera/
