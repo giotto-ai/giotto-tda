@@ -56,21 +56,27 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     implementedMetricRecipes = {'bottleneck': bottleneck_distance, 'wasserstein': wasserstein_distance,
                                 'landscape': kernel_landscape_distance, 'betti': kernel_betti_distance}
 
-    def __init__(self, metric_kwargs={'metric': 'bottleneck'}, separateDimensions=False, order=np.inf, n_jobs=1):
+    def __init__(self, metric_kwargs={'metric': 'bottleneck'}, order=np.inf, n_jobs=1):
         self.metric_kwargs = metric_kwargs
-        self.separateDimensions = separateDimensions
         self.order = order
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'metric_kwargs': self.metric_kwargs, 'separateDimensions': self.separateDimensions,
-                'order': self.order, 'n_jobs': self.n_jobs}
+        return {'metric_kwargs': self.metric_kwargs, 'order': self.order, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
         pass
 
-    def _parallel_pairwise(self, X, Y, isSame):
+    @staticmethod
+    def _parallel_pairwise(X, Y, iterator, outputShape, n_jobs):
+        distanceList = Parallel(n_jobs = n_jobs) ( delayed(self.metric) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_kwargs)
+                                                        for i, j in iterator for dimension in X.keys())
+        # Make symmetric
+        distanceArray = np.array(distanceList).reshape(shape)
+        return distanceArray
+
+    def _parallel_matrix(self, X, Y, isSame):
         #    X, Y = check_pairwise_arrays(X, Y)
         numberDimensions = len(X)
         numberDiagramsX = next(iter(X.values())).shape[0]
@@ -88,24 +94,19 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             # Only calculate metric for upper triangle
             iterator = list(itertools.combinations(range(numberDiagramsX), 2))
 
-            distanceIterator = Parallel(n_jobs = self.n_jobs) ( delayed(self.metric) (X[dimension][i,:,:], X[dimension][j,:,:], dimension, **metric_kwargs)
-                                                                for i, j in iterator for dimension in X.keys())
-            # Make symmetric
-            distanceIterator = np.array(distanceIterator).reshape((len(iterator), numberDimensions))
-            distanceIterator = np.linalg.norm(distanceIterator, axis=1, ord=self.order)
-            distances[tuple(zip(*iterator))] = distanceIterator
-            distances = distances + distances.T
+            distanceArray = self._parallel_pairwise(X, X, iterator, (len(iterator), numberDimensions), n_jobs)
+            distanceArray = np.linalg.norm(distanceArray, axis=1, ord=self.order)
+            distanceMatrix[tuple(zip(*iterator))] = distanceArray
+            distanceMatrix = distanceMatrix + distanceMatrix.T
 
         else:
             numberDiagramsY = next(iter(Y.values())).shape[0]
             # Calculate all cells
             iterator = tuple(itertools.product(range(numberDiagramsX), range(numberDiagramsY)))
 
-            distanceIterator = Parallel(n_jobs = self.n_jobs) ( delayed(self.metric) (X[dimension][i,:,:], X[dimension][j,:,:], dimension, **metric_kwargs)
-                                                                for i, j in iterator for dimension in X.keys())
-            distances = np.array(distanceIterator).reshape((numberDiagramsX, numberDiagramsY, numberDimensions))
-            distances = np.linalg.norm(distances, axis=2, ord=self.order)
-        return distances
+            distanceMatrix = self._parallel_pairwise(X, X, iterator, (numberDiagramsX, numberDiagramsY, numberDimensions), n_jobs)
+            distanceMatrix = np.linalg.norm(distanceMatrix, axis=2, ord=self.order)
+        return distanceMatrix
 
     def fit(self, XList, y=None):
         self._validate_params()
@@ -117,12 +118,11 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         if 'n_samples' in self.metric_kwargs:
             self.n_samples = self.metric_kwargs['n_samples']
 
-        if self.separateDimensions:
-            self._X = XList[0]
-        else:
-            self._X = { None: np.concatenate(list(XList[0].values()), axis=1)}
+        self._X = XList[0]
 
-        self.sampling = { dimension: None for dimension in self._X.keys() } # As it will be passed to the metrics, it has to be initialized even if the metric is not using sampling
+        # As it will be passed to the metrics, it has to be initialized even if the metric is not using sampling
+        self.sampling = { dimension: None for dimension in self._X.keys() }
+
         if self.metricName in ['landscape', 'betti']:
             maximumPersistences = { dimension: np.max(self._X[dimension][:,:,1]) * m.sqrt(2) if self._X[dimension][:,:,0].size != 0
                                    else -np.inf for dimension in self._X.keys() }
@@ -143,14 +143,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         return self
 
-    #@jit
     def transform(self, XList, y=None):
         # Check is fit had been called
         #check_is_fitted(self, ['isFitted'])
-        if self.separateDimensions:
-            X = XList[0]
-        else:
-            X = { None: np.concatenate(list(XList[0].values()), axis=1) }
+        X = XList[0]
 
         XListTransformed = [ ]
 
@@ -162,7 +158,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
                         for dimension in self._X.keys() }
             X = { dimension: np.pad(X[dimension], ((0, 0), (0, maxBettiNumbers[dimension] - X[dimension].shape[1]), (0, 0)), 'constant')
                   for dimension in self._X.keys() }
-            XTransformed = self._parallel_pairwise({ dimension: np.vstack([self._X[dimension], X[dimension]]) for dimension in self._X.keys()}, X, isSame=False)
+            XTransformed = self._parallel_matrix({ dimension: np.vstack([self._X[dimension], X[dimension]]) for dimension in self._X.keys()}, X, isSame=False)
         XListTransformed.append(XTransformed)
 
         if len(XList) == 2:
