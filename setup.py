@@ -9,7 +9,8 @@ with open('requirements.txt') as f:
 
 hera_wasserstein = Extension(name     = "topological_learning.hera_wasserstein",
                              sources  = ["./topological_learning/dependencies/hera_wasserstein.pyx"],
-                             language = "c++")
+                             language = "c++",
+                             extra_compile_args  = ["-std=c++14", "-I./topological_learning/dependencies/hera/geom_matching/wasserstein/include/"])
 
 gudhi_bottleneck = Extension(name     = "topological_learning.gudhi_bottleneck",
                              sources  = ["./topological_learning/dependencies/gudhi_bottleneck.pyx"],
