@@ -7,10 +7,11 @@ from .Labelling import Labeller, LorenzLabeller
 from .Sampling import Sampling
 from .SklearnWrapper import ScalerWrapper, TransformerWrapper
 from .Embedding import TakensEmbedding
-from .ModifiedMDS import MDS
+from .StatefulMDS import StatefulMDS
 from .PersistenceDiagram import VietorisRipsDiagram
 from .DiagramDistance import DiagramDistance
 from .DiagramScaler import DiagramScaler
+from .DiagramUtils import *
 from .CentroidsDistance import CentroidsDistance
 from .Derivatives import Derivatives
 from .Formulation import FormulationTransformer

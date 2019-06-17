@@ -59,7 +59,7 @@ def split_train_test(data):
 
 def make_pipeline():
     steps = [
-        ('embedding', tl.TakensEmbedder()),
+        ('embedding', tl.TakensEmbedding()),
         ('labelling', tl.Labeller(labelling_kwargs={'type': 'variation', 'deltaT': 1}, function_kwargs={'function': np.std}, percentiles=[80,90,95])),
         ('diagram', tl.VietorisRipsDiagram()),
         ('distance', tl.DiagramDistance()),

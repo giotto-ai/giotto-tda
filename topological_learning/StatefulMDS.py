@@ -277,7 +277,7 @@ def smacof(dissimilarities, X_previous = None, metric=True, n_components=2, init
         return best_pos, best_stress
 
 
-class MDS(BaseEstimator, TransformerMixin):
+class StatefulMDS(BaseEstimator, TransformerMixin):
     """Multidimensional scaling
 
     Read more in the :ref:`User Guide <multidimensional_scaling>`.
