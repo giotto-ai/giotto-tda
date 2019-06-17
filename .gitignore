@@ -25,3 +25,6 @@ data/*
 
 # Output files
 *.out
+
+# Hera C++ files
+topological_learning/dependencies/hera
