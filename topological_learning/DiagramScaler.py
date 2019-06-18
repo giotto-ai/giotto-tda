@@ -30,11 +30,12 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Whether the transformer has been fitted
     """
 
-    def __init__(self, scaler_kwargs={'scaler': skprep.MaxAbsScaler}):
+    def __init__(self, scaler_kwargs={'scaler': skprep.MaxAbsScaler}, sort=False):
         self.scaler_kwargs = scaler_kwargs
+        self.sort = sort
 
     def get_params(self, deep=True):
-        return {'scaler_kwargs': self.scaler_kwargs}
+        return {'scaler_kwargs': self.scaler_kwargs, 'sort': self.sort}
 
     def fit(self, XList, y = None):
         """A reference implementation of a fitting function for a transformer.
@@ -84,6 +85,13 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         XScaled = { dimension: self.scaler.transform(X.reshape((-1, 1))).reshape(X.shape)
                     for dimension, X in XList[0].items() }
+
+        if self.sort:
+            XScaled = { dimension: rotate_clockwise(X) for dimension, X in XScaled.items() }
+            indices = { dimension: np.argsort(X[:, :, 1], axis=1) for dimension, X in XScaled.items() }
+            indices = { dimension: np.stack([indices[dimension], indices[dimension]], axis=2) for dimension in XScaled.keys() }
+            XScaled = { dimension: np.flip(np.take_along_axis(X, indices[dimension], axis=1), axis=1) for dimension, X in XScaled.items() }
+            XScaled = { dimension: rotate_anticlockwise(X) for dimension, X in XScaled.items() }
         XListScaled.append(XScaled)
 
         if len(XList) == 2:
