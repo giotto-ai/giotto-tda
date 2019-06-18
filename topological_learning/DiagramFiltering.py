@@ -11,60 +11,78 @@ import numpy as np
 from .dependencies import bottleneck_distance as gudhi_bottleneck_distance
 from .dependencies import wasserstein as hera_wasserstein_distance
 
+from .DiagramDistance import DiagramDistance
+
 class DiagramFiltering(BaseEstimator, TransformerMixin):
 
-    def __init__(self, diagramDistance=DiagramDistance(), tolerance=1., n_jobs=1):
+    def __init__(self, delta=0., diagramDistance=DiagramDistance(), epsilon=1., tolerance=1e-2, n_jobs=1):
+        self.delta = delta
         self.diagramDistance = diagramDistance
-        self.tolerance = tolerance
+        self.epsilon = epsilon
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'diagramDistance': self.diagramDistance, 'tolerance': self.tolerance,
-                'n_jobs': self.n_jobs}
+        return {'delta': self.delta}
+
+    # {'diagramDistance': self.diagramDistance, 'epsilon': self.epsilon, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
         pass
 
-    def _bisection():
-        pass
+    @staticmethod
+    def _bisection(X, diagramDistance, tolerance):
+        iterator = iter([(i, i) for i in range(len(X))])
+
+        lowerCutoff = 0.
+        upperCutoff = 1.
+
+        delta = 1.
+
+        while distance > tolerance:
+            middleCutoff = (lowerCutoff + upperCutoff) / 2.
+            XFiltered = self._filter(X, middleCutoff)
+            distance = diagramDistance._parallel_pairwise(X, XFiltered, iterator, self.n_jobs)
+
+            if distance == tolerance:
+                return middleCutoff
+            elif (distance - tolerance)*() < 0:
+                upperCutoff = middleCutoff
+            else:
+                lowerCutoff = middleCutoff
+
+        return middleCutoff
 
     @staticmethod
-    def _filter(X, cutoff):
-        mask = m.sqrt(2)/2. * (X[:,:,1] - X[:,:,0]) <= cutoff
-        XFiltered = X.copy()
-        XFiltered[mask, :] = [0, 0]
-        maxPoints = np.max(np.sum(XFiltered[:, :, 1] != 0, axis=1))
-        XFiltered = np.sort(XFiltered, axis=1)
-        return XFiltered[:, -maxPoints:, :]
+    def _filter(XScaled, cutoff):
+        XFiltered = { dimension: X.copy() for dimension, X in XScaled.items() }
+        mask = { dimension: m.sqrt(2)/2. * (X[:, :, 1] - X[:, :, 0]) <= cutoff for dimension, X in XFiltered.items() }
+
+        for dimension, X in XFiltered.items():
+            X[mask[dimension], 1] = 0
+
+        maxPoints = { dimension: np.max(np.sum(X[:, :, 1] != 0, axis=1)) for dimension, X in XFiltered.items() }
+        XFiltered = { dimension: X[:, :maxPoints[dimension], :] for dimension, X in XFiltered.items() }
+        return XFiltered
 
     def fit(self, XList, y=None):
         self._validate_params()
 
+        X = XList[0]
+
         self.isFitted = True
-        diagramDistance.fit(XList)
+        self.diagramDistance.fit(XList)
 
-        iterator = iter([(i, i) for i in range(len(XList[0]))])
-
+        # self.delta = self.delta
 
         return self
 
     def transform(self, XList, y=None):
         # Check is fit had been called
         #check_is_fitted(self, ['isFitted'])
-        X = XList[0]
+        XListTransformed = []
 
-        XListTransformed = [ ]
-
-        if np.sum([ np.array_equal(X[dimension], self._X[dimension]) for dimension in X.keys()]) == len(X):
-            XTransformed = self._parallel_pairwise(X, X, isSame=True)
-        else:
-            maxBettiNumbers = { dimension: max(self._X[dimension].shape[1], X[dimension].shape[1]) for dimension in self._X.keys()}
-            self._X = { dimension: np.pad(self._X[dimension], ((0, 0), (0, maxBettiNumbers[dimension] - self._X[dimension].shape[1]), (0, 0)), 'constant')
-                        for dimension in self._X.keys() }
-            X = { dimension: np.pad(X[dimension], ((0, 0), (0, maxBettiNumbers[dimension] - X[dimension].shape[1]), (0, 0)), 'constant')
-                  for dimension in self._X.keys() }
-            XTransformed = self._parallel_pairwise({ dimension: np.vstack([self._X[dimension], X[dimension]]) for dimension in self._X.keys()}, X, isSame=False)
+        XTransformed = self._filter(XList[0], self.delta)
         XListTransformed.append(XTransformed)
 
         if len(XList) == 2:

@@ -11,6 +11,7 @@ from .StatefulMDS import StatefulMDS
 from .PersistenceDiagram import VietorisRipsDiagram
 from .DiagramDistance import DiagramDistance
 from .DiagramScaler import DiagramScaler
+from .DiagramFiltering import DiagramFiltering
 from .DiagramUtils import *
 from .CentroidsDistance import CentroidsDistance
 from .Derivatives import Derivatives

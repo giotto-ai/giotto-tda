@@ -68,19 +68,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     def _validate_params():
         pass
 
-    @staticmethod
-    def _parallel_pairwise(X, Y, iterator, outputShape, n_jobs):
-        distanceList = Parallel(n_jobs = n_jobs) ( delayed(self.metric) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_kwargs)
-                                                        for i, j in iterator for dimension in X.keys())
-        # Make symmetric
-        distanceArray = np.array(distanceList).reshape(shape)
-        return distanceArray
-
-    def _parallel_matrix(self, X, Y, isSame):
-        #    X, Y = check_pairwise_arrays(X, Y)
-        numberDimensions = len(X)
-        numberDiagramsX = next(iter(X.values())).shape[0]
-
+    def _parallel_pairwise(self, X, Y, iterator, outputShape, n_jobs):
         metric_kwargs = self.metric_kwargs.copy()
 
         if 'metric' in metric_kwargs:
@@ -88,6 +76,16 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         if 'n_samples' in metric_kwargs:
             metric_kwargs.pop('n_samples')
+
+        distanceList = Parallel(n_jobs = n_jobs) ( delayed(self.metric) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_kwargs)
+                                                        for i, j in iterator for dimension in X.keys())
+        distanceArray = np.array(distanceList).reshape(outputShape)
+        return distanceArray
+
+    def _parallel_matrix(self, X, Y, isSame):
+        #    X, Y = check_pairwise_arrays(X, Y)
+        numberDimensions = len(X)
+        numberDiagramsX = next(iter(X.values())).shape[0]
 
         if isSame:
             distances = np.zeros((numberDiagramsX, numberDiagramsX))
