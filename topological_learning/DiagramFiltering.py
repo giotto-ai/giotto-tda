@@ -59,7 +59,7 @@ class DiagramFiltering(BaseEstimator, TransformerMixin):
         mask = { dimension: m.sqrt(2)/2. * (X[:, :, 1] - X[:, :, 0]) <= cutoff for dimension, X in XFiltered.items() }
 
         for dimension, X in XFiltered.items():
-            X[mask[dimension], 1] = 0
+            X[mask[dimension], :] = [0, 0]
 
         maxPoints = { dimension: np.max(np.sum(X[:, :, 1] != 0, axis=1)) for dimension, X in XFiltered.items() }
         XFiltered = { dimension: X[:, :maxPoints[dimension], :] for dimension, X in XFiltered.items() }
