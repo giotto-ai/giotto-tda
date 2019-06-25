@@ -85,7 +85,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        X_transformed = { None: np.concatenate(list(XList[0].values()), axis=1)}
+        X_transformed = { None: np.concatenate(list(X.values()), axis=1)}
         return X_transformed
 
 
@@ -160,7 +160,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, ['is_fitted'])
 
-        X_scaled = { dimension: X / self._scale for dimension, X in XList[0].items() }
+        X_scaled = { dimension: X / self._scale for dimension, X in X.items() }
         return X_scaled
 
     def inverse_transform(self, X, copy=None):
@@ -180,7 +180,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, ['is_fitted'])
 
-        X_scaled = { dimension: X * self._scale for dimension, X in XList[0].items() }
+        X_scaled = { dimension: X * self._scale for dimension, X in X.items() }
         return X_scaled
 
 class DiagramFilter(BaseEstimator, TransformerMixin):
@@ -245,7 +245,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         if not self.homology_dimensions:
-            self.homology_dimensions = set(XList[0].keys())
+            self.homology_dimensions = set(X.keys())
 
         self._validate_params(self.filtering_parameters_type)
 
