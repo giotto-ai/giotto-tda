@@ -1,4 +1,11 @@
 import topological_learning as tl
+import topological_learning.preprocessing as prep
+import topological_learning.diagram as diag
+import topological_learning.homology as hl
+import topological_learning.neural_network as nn
+import topological_learning.manifold as ma
+import topological_learning.compose as cp
+
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -41,93 +48,93 @@ def get_data(input_file):
     data.set_index('time', drop=True, inplace=True)
     data.columns = range(1)
 
-    samplingTimeList = [ dt.time(h, m, 0) for h in range(9, 20, 1) for m in range(0, 1, 30) ]
-    sampling = tl.Sampler(transformationType='return', removeWeekends=True, samplingType = 'fixed', samplingTimeList=samplingTimeList)
+    sampling_times = [ dt.time(h, m, 0) for h in range(9, 20, 1) for m in range(0, 1, 30) ]
+    sampling = prep.Resampler(sampling_type = 'fixed', sampling_times=sampling_times, remove_weekends=True)
     data = sampling.fit(data).transform(data)
-    return data[0]
+    stationarizing = prep.Stationarizer(stationarization_type='return')
+    data = stationarizing.fit(data).transform(data)
 
+    return data
 
 def split_train_test(data):
+    labeller = prep.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
     numberTrain = 400
     X_train = data[:numberTrain]
-    y_train = np.empty((X_train.shape[0], 1))
+    y_train = X_train
+    labeller.fit(y_train)
+    y_train = labeller.transform(y_train)
+    X_train = labeller.cut(X_train)
 
     numberTest = 200
     X_test = data[numberTrain:numberTrain+numberTest]
-    y_test = np.empty((X_test.shape[0], 1))
+    y_test = X_test
+    y_test = labeller.transform(y_test)
+    X_test = labeller.cut(X_test)
+
     return X_train, y_train, X_test, y_test
 
 def make_pipeline():
     steps = [
-        ('embedding', tl.TakensEmbedding()),
-        ('labelling', tl.Labeller(labelling_kwargs={'type': 'variation', 'deltaT': 1}, function_kwargs={'function': np.std}, percentiles=[80,90,95])),
-        ('diagram', tl.VietorisRipsDiagram()),
-        ('distance', tl.DiagramDistance()),
-        ('physical', tl.MDS()),
-        ('derivatives', tl.Derivatives()),
-        ('scaling', tl.ScalerWrapper(copy=True)),
-        ('formulation', tl.FormulationTransformer()),
-        ('classification', tl.KerasClassifierWrapper())
+        ('embedding', prep.TakensEmbedder()),
+        ('diagram', hl.VietorisRipsPersistence()),
+        ('distance', diag.DiagramDistance()),
+        ('physical', ma.StatefulMDS()),
+        ('derivatives', ma.Derivatives()),
+        ('scaling', skprep.MinMaxScaler(copy=True)),
+        ('aggregator', cp.FeatureAggregator()),
+        ('classification', cp.TargetResamplingClassifier(classifier=nn.KerasClassifierWrapper(),
+                                                         resampler=cp.TargetResampler()))
     ]
     return Pipeline(steps)
 
 def get_param_grid():
     embedding_param = {}
-    labelling_param = {}
     distance_param = {}
     diagram_param = {}
     physical_param = {}
     derivatives_param = {}
     scaling_param = {}
-    formulation_param = {}
+    aggregator_param = {}
     classification_param = {}
 
-    embedding_param['outerWindowDuration'] = [ 20, 30 ]
-    embedding_param['outerWindowStride'] = [ 2, 5 ]
-    embedding_param['embeddingDimension'] = [ 10 ]
-    embedding_param['embeddingTimeDelay'] = [ 1 ]
+    embedding_param['outer_window_duration'] = [ 20, 30 ]
 
-    labelling_param['deltaT'] = [ 5, 10 ]
+    diagram_param['homology_dimensions'] = [ [ 0, 1 ] ]
+    distance_param['metric_kwargs'] = [ {'metric':'bottleneck', 'order': np.inf} ]
 
-    diagram_param['homologyDimensions'] = [ [ 0 ] ]
-
-
-    classification_param['loss'] = [ 'sparse_categorical_crossentropy' ]
-    classification_param['metrics'] = [ ['sparse_categorical_accuracy'] ]
-
-    distance_param['metric_kwargs'] = [ {'metric':'bottleneck'} ]
-
-    physical_param['n_components'] = [ 3]
+    physical_param['n_components'] = [ 3 ]
 
     derivatives_param['orders'] = [ [0, 1, 2] ]
 
-    formulation_param['numberStepsInPast'] = [ 2 ]
-    formulation_param['stepInFuture'] = [ 1 ]
+    aggregator_param['n_steps_in_past'] = [ 2 ]
 
-    classification_param['modelSteps_kwargs'] = [
+    classification_param['steps_kwargs'] = [
         [
-            {'layerClass': klayers.normalization.BatchNormalization},
-            {'layerClass': layerClass, 'units': units, 'activation': 'tanh'},
-            {'layerClass': klayers.Dense}
-        ] for layerClass in [klayers.LSTM] for units in [1] ]
+            {'layer': klayers.normalization.BatchNormalization},
+            {'layer': layer, 'units': units, 'activation': 'tanh'},
+            {'layer': klayers.Dense}
+        ] for layer in [klayers.LSTM] for units in [1] ]
 
-    classification_param['optimizer_kwargs'] = [ {'optimizerClass': optimizerClass, 'lr': lr} for optimizerClass in [ koptimizers.RMSprop ]
+    classification_param['optimizer_kwargs'] = [ {'optimizer': optimizer, 'lr': lr} for optimizer in [ koptimizers.RMSprop ]
                                              for lr in [0.5] ]
     classification_param['batch_size'] =  [ 10 ]
     classification_param['epochs'] =  [ 1 ]
+    classification_param['loss'] = [ 'sparse_categorical_crossentropy' ]
+    classification_param['metrics'] = [ ['sparse_categorical_accuracy'] ]
 
     embedding_param_grid = {'embedding__' + k: v for k, v in embedding_param.items()}
-    labelling_param_grid = {'labelling__' + k: v for k, v in labelling_param.items()}
     diagram_param_grid = {'diagram__' + k: v for k, v in diagram_param.items()}
     distance_param_grid = {'distance__' + k: v for k, v in distance_param.items()}
     physical_param_grid = {'physical__' + k: v for k, v in physical_param.items()}
     derivatives_param_grid = {'derivatives__' + k: v for k, v in derivatives_param.items()}
     scaling_param_grid = {'scaling__' + k: v for k, v in scaling_param.items()}
-    formulation_param_grid = {'formulation__' + k: v for k, v in formulation_param.items()}
-    classification_param_grid = {'classification__' + k: v for k, v in classification_param.items()}
+    aggregator_param_grid = {'aggregator__' + k: v for k, v in aggregator_param.items()}
+    classification_param_grid = {'classification__classifier__' + k: v for k, v in classification_param.items()}
 
-    param_grid = {**embedding_param_grid, **labelling_param_grid, **diagram_param_grid, **distance_param_grid,  **physical_param_grid,
-                  **derivatives_param_grid, **scaling_param_grid, **formulation_param_grid, **classification_param_grid}
+    param_grid = [ {**embedding_param_grid, **diagram_param_grid, **distance_param_grid,  **physical_param_grid,
+                    **derivatives_param_grid, **scaling_param_grid, **aggregator_param_grid, **classification_param_grid,
+                    'embedding__outer_window_stride': [ outer_window_stride ], 'classification__resampler__step_size': [outer_window_stride] }
+                    for outer_window_stride in [2, 5] ]
 
     return param_grid
 
@@ -146,7 +153,7 @@ def main(input_file):
 
     param_grid = get_param_grid()
 
-    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=-1)
+    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=1)
 
     # Dumping artifacts
     pkl.dump(grid_result, open('grid_result.pkl', 'wb'))
