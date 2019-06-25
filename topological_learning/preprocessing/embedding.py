@@ -2,11 +2,10 @@ import numpy as np
 import pandas as pd
 import sklearn as sk
 
-from joblib import Parallel, delayed
-
 from pandas.core.resample import Resampler as rsp
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._joblib import Parallel, delayed
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
 import math as m
