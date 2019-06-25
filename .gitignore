@@ -19,8 +19,8 @@ examples/
 data/*
 
 # Examples
-/examples/*
-!/examples/Lorenz_Attractor.ipynb
+examples/*
+!examples/Lorenz_Attractor.ipynb
 
 # Emacs temporary files
 *~
