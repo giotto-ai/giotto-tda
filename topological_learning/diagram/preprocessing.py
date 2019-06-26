@@ -138,7 +138,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         norm_name = self.norm_kwargs['norm']
         norm_kwargs = self.norm_kwargs.copy()
 
-        sampling = { dimension: None for dimension in self._X.keys() }
+        sampling = { dimension: None for dimension in X.keys() }
 
         if norm_name in ['landscape', 'betti']:
             n_samples = norm_kwargs.pop('n_samples')
