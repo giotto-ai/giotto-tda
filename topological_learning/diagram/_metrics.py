@@ -6,7 +6,7 @@ from ..dependencies import bottleneck_distance as gudhi_bottleneck_distance
 from ..dependencies import wasserstein as hera_wasserstein_distance
 
 
-def betti(diagram, sampling):
+def betti_function(diagram, sampling):
     if diagram.size == 0:
         return np.zeros(sampling.shape)
 
@@ -16,7 +16,7 @@ def betti(diagram, sampling):
     betti = np.sum(alive, axis=1).T
     return betti
 
-def landscape(diagram, n_layers, sampling):
+def landscape_function(diagram, n_layers, sampling):
     if diagram.size == 0:
         return np.hstack([np.zeros(sampling.shape)] * n_layers)
 
@@ -31,13 +31,13 @@ def landscape(diagram, n_layers, sampling):
     return landscape
 
 def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None, order=2, n_layers=1):
-    landscape_x = landscape(diagram_x, n_layers, sampling[dimension])
-    landscape_y = landscape(diagram_y, n_layers, sampling[dimension])
+    landscape_x = landscape_function(diagram_x, n_layers, sampling[dimension])
+    landscape_y = landscape_function(diagram_y, n_layers, sampling[dimension])
     return np.linalg.norm(landscape_x - landscape_y, ord=order)
 
 def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None, order=2):
-    betti_x = betti(diagram_x, sampling[dimension])
-    betti_y = betti(diagram_y, sampling[dimension])
+    betti_x = betti_function(diagram_x, sampling[dimension])
+    betti_y = betti_function(diagram_y, sampling[dimension])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
 def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf):
@@ -66,11 +66,11 @@ def _parallel_pairwise(X, Y, metric_kwargs, iterator, n_jobs):
 
 
 def kernel_landscape_norm(diagram, dimension, sampling=None, order=2, n_layers=1):
-    landscape = landscape(diagram, n_layers, sampling[dimension])
+    landscape = landscape_function(diagram, n_layers, sampling[dimension])
     return np.linalg.norm(landscape, ord=order)
 
 def kernel_betti_norm(diagram, dimension, sampling=None, order=2):
-    betti = betti(diagram, sampling[dimension])
+    betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
 
 def bottleneck_norm(diagram, dimension=None, order=np.inf):
