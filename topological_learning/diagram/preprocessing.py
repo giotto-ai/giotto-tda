@@ -7,7 +7,7 @@ from functools import partial
 from sklearn.utils._joblib import Parallel, delayed
 import itertools
 
-from ._utils import _sort, _filter
+from ._utils import _sort, _filter, _sample
 from ._metrics import _parallel_norm
 from .distance import DiagramDistance
 
@@ -135,7 +135,14 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
+        norm_name = self.norm_kwargs['norm']
         norm_kwargs = self.norm_kwargs.copy()
+
+        sampling = { dimension: None for dimension in self._X.keys() }
+
+        if norm_name in ['landscape', 'betti']:
+            n_samples = norm_kwargs.pop('n_samples')
+            norm_kwargs['sampling'] = _sample(X, n_samples)
 
         norm_array = _parallel_norm(X, norm_kwargs, self.n_jobs)
         self._scale = self.function(norm_array)
