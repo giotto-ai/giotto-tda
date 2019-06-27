@@ -54,8 +54,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         if data_type not in implemented_data_types:
             return ValueError('The data type you specified is not implemented')
 
-    def _ripser_diagram(self, X, isDistanceMatrix):
-        diagram = ripser(X, distance_matrix = isDistanceMatrix, maxdim = max(self.homology_dimensions), thresh = self.max_edge_length)['dgms']
+    def _ripser_diagram(self, X, is_distance_matrix):
+        diagram = ripser(X, distance_matrix = is_distance_matrix, maxdim = max(self.homology_dimensions), thresh = self.max_edge_length)['dgms']
 
         if 0 in self.homology_dimensions:
             diagram[0] = diagram[0][:-1, :]

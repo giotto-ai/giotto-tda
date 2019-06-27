@@ -4,43 +4,14 @@ from numpy.random.mtrand import RandomState
 
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
-from scipy.sparse import csr_matrix
-from umap.sparse import make_sparse_nn_descent
-import umap.distances as dist
-from sklearn.utils.graph_shortest_path import graph_shortest_path
-from scipy.sparse import csr_matrix
+from sklearn.metrics import pairwise_distances
 from sklearn.utils._joblib import Parallel, delayed
 import math as m
 import itertools
-from numba import jit
 
 
-
-
-def consistent_homology_distance(X, metric, n_neighbors, **metric_kwargs):
-    """Handle the callable case for pairwise_{distances,kernels}
-    """
-    distanceMatrix = sk.metrics.pairwise.euclidean_distances(X, X)
-    indices_kNeighbors = np.argsort(distanceMatrix)[:, :n_neighbors]
-    distances_kNeighbors = distanceMatrix[np.arange(distanceMatrix.shape[0])[:, None], indices_kNeighbors].copy()
-    distance_kNeighbor = distances_kNeighbors[:, -1]
-
-    # Only calculate metric for upper triangle
-    out = np.zeros((len(X), len(X)))
-    iterator = itertools.combinations(range(len(X)), 2)
-    for i, j in iterator:
-        out[i, j] = distanceMatrix[i, j] / (m.sqrt(distance_kNeighbor[i]*distance_kNeighbor[j]))
-
-    return out + out.T
-
-def permutation_sequence_distance(x, y):
-    pass
-
-
-class PointDistance(BaseEstimator, TransformerMixin):
-    implementedDistanceRecipes = {'consistent': consistent_homology_distance, 'permutation': permutation_sequence_distance}
-
-    def __init__(self, distance_kwargs={'distance': 'consistent', 'metric': 'euclidean', 'n_neighbors': 3}, n_jobs=1):
+class ConsistentRescaling(BaseEstimator, TransformerMixin):
+    def __init__(self, metric_kwargs={'metric': 'euclidean'}, n_neighbors=1, n_jobs=1):
         self.distance_kwargs = distance_kwargs
         self.n_jobs = n_jobs
 
@@ -54,10 +25,18 @@ class PointDistance(BaseEstimator, TransformerMixin):
         """
         pass
 
-    def _pad(self, X):
-        pass
+    @staticmethod
+    def _consistent_homology_distance(X, n_neighbors):
+        indices_k_neighbors = np.argsort(X)[:, n_neighbors]
+        distance_k_neighbor = X[np.arange(X.shape[0]), indices_k_neighbors]
+        # Only calculate metric for upper triangle
+        out = np.zeros(X.shape)
+        iterator = itertools.combinations(range(X.shape[0]), 2)
+        for i, j in iterator:
+            X_consistent[i, j] = X[i, j] / (m.sqrt(distance_k_neighbor[i]*distance_k_neighbor[j]))
+        return X_consistent + X_consistent.T
 
-    def fit(self, XList, y=None):
+    def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
 
         Parameters
@@ -75,14 +54,14 @@ class PointDistance(BaseEstimator, TransformerMixin):
         """
         self._validate_params()
 
-        self.distanceName = self.distance_kwargs['distance']
-        self.distance = self.implementedDistanceRecipes[self.distanceName]
+        self.metrics_name = self.metrics_kwargs['metric']
+        self.metric = self.implemented_distance_recipes[self.distanceName]
 
-        self.isFitted = True
+        self.is_fitted = True
         return self
 
     #@jit
-    def transform(self, XList, y=None):
+    def transform(self, X, y=None):
         """ Implementation of the sk-learn transform function that samples the input.
 
         Parameters
@@ -97,27 +76,14 @@ class PointDistance(BaseEstimator, TransformerMixin):
             in `X`
         """
         # Check is fit had been called
-        #check_is_fitted(self, ['isFitted'])
+        check_is_fitted(self, ['is_fitted'])
 
-        X = XList[0]
-        XListTransformed = []
+        metrics_kwargs = self.metrics_kwargs.copy()
+        metric = distance_kwargs.pop('metric')
 
-        distance_kwargs = self.distance_kwargs.copy()
-        if 'distance' in distance_kwargs:
-            distance_kwargs.pop('distance')
+        X = pairwise_distances(X, metric=metric, self.n_jobs, **metric_kwargs)
 
-        XTransformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.distance)(X[i, :, :], **distance_kwargs)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._consistent_homology_distance)(X[i, :, :], self.n_neighbors)
                                                               for i in range(X.shape[0]) )
 
-
-        if self.distanceName == 'permutation':
-            XTransformed = self._pad(XTransformed)
-        else:
-            XTransformed = np.array(XTransformed)
-
-        XListTransformed.append(XTransformed)
-
-        if len(XList) == 2:
-            XListTransformed.append(XList[1])
-
-        return XListTransformed
+        return X_transformed
