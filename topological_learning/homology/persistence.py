@@ -130,30 +130,25 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 class PersistentEntropy(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
-    
+
     def get_params(self, deep=True):
         return {'n_jobs': self.n_jobs}
-    
+
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
             of the :meth:'fit' are valid.
             """
         pass
-    
+
     @staticmethod
     def persistent_entropy(X):
-        X_entropy = np.zeros((X[next(iter(X.keys()))].shape[0], len(X.keys())))
-        X_lifespan = { dimension: X[dimension][:,:,1]-X[dimension][:,:,0]
-                       for dimension in X.keys() }
-        
-        for i, dimension in enumerate(sorted(list(X.keys()))):
-            X_entropy[:,i] = np.apply_along_axis(entropy,axis=1,arr=X_lifespan[dimension])
-        return X_entropy
-            
+        X_lifespan = X[:, 1] - X[:, 0]
+        return entropy(X_lifespan)
+
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
-            
+
             Parameters
             ----------
             X : array-like or sparse matrix of shape = [n_samples, n_features]
@@ -161,7 +156,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
-            
+
             Returns
             -------
             self : object
@@ -171,16 +166,16 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
 
         self.is_fitted = True
         return self
-    
+
     #@jit
     def transform(self, X, y=None):
         """ Implementation of the sk-learn transform function that samples the input.
-            
+
             Parameters
             ----------
             X : array-like of shape = [n_samples, n_features]
             The input samples.
-            
+
             Returns
             -------
             X_transformed : array of int of shape = [n_samples, n_features]
@@ -190,8 +185,10 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        
-        X_transformed = self.persistent_entropy(X)
-                                                      
-        return X_transformed
+        n_samples = X[next(iter(X.keys()))].shape[0]
+        n_dimensions = len(X.keys())
 
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.persistent_entropy) (X[dimension][i,:,:]) for i in range(n_samples) for dimension in X.keys() )
+        X_transformed = X_transformed.reshape((n_samples, n_dimensions))
+
+        return X_transformed
