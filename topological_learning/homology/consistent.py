@@ -81,7 +81,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         metrics_kwargs = self.metrics_kwargs.copy()
         metric = distance_kwargs.pop('metric')
 
-        X = pairwise_distances(X, metric=metric, self.n_jobs, **metric_kwargs)
+        X = pairwise_distances(X, metric=metric, self.n_jobs, **self.metric_kwargs)
 
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._consistent_homology_distance)(X[i, :, :], self.n_neighbors)
                                                               for i in range(X.shape[0]) )
