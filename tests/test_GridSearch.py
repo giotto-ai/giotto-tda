@@ -120,7 +120,7 @@ def get_param_grid():
     classification_param['batch_size'] =  [ 10 ]
     classification_param['epochs'] =  [ 1 ]
     classification_param['loss'] = [ 'sparse_categorical_crossentropy' ]
-    classification_param['metrics'] = [ ['sparse_categorical_accuracy'] ]
+    classification_param['metrics'] = [ ('sparse_categorical_accuracy') ]
 
     embedding_param_grid = {'embedding__' + k: v for k, v in embedding_param.items()}
     diagram_param_grid = {'diagram__' + k: v for k, v in diagram_param.items()}
