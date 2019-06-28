@@ -33,9 +33,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         self._X = X
 
-        # As it will be passed to the metrics, it has to be initialized even if the metric is not using sampling
-        self.sampling = { dimension: None for dimension in self._X.keys() }
-
         if self.metric_name in ['landscape', 'betti']:
             self.metric_kwargs['sampling'] = _sample(self._X, self.n_samples)
 

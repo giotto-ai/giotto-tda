@@ -57,7 +57,7 @@ def _parallel_pairwise(X, Y, metric_kwargs, iterator, n_jobs):
 
     distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
 
-    distance_array = Parallel(n_jobs = n_jobs) ( delayed(metric) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_kwargs)
+    distance_array = Parallel(n_jobs=n_jobs) ( delayed(metric) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_kwargs)
                                                for i, j in iterator for dimension in X.keys())
     distance_array = np.array(distance_array).reshape((len(iterator), n_dimensions))
     distance_array = np.linalg.norm(distance_array, axis=1, ord=metric_kwargs['order'])
@@ -86,7 +86,7 @@ def _parallel_norm(X, norm_kwargs, n_jobs):
     n_dimensions = len(X.keys())
     norm = implemented_norm_recipes[norm_kwargs.pop('norm')]
 
-    norm_array = Parallel(n_jobs = n_jobs) ( delayed(norm) (X[dimension][i,:,:], dimension, **norm_kwargs)
+    norm_array = Parallel(n_jobs=n_jobs) ( delayed(norm) (X[dimension][i,:,:], dimension, **norm_kwargs)
                                              for i in range(next(iter(X.values())).shape[0]) for dimension in X.keys() )
     norm_array = np.linalg.norm(np.array(norm_array).reshape((-1, n_dimensions)), ord=norm_kwargs['order'], axis=1)
     return norm_array
