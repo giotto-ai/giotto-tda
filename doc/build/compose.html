@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Type something here &mdash; Topological Learning 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Topological Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Type something here</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Type something here</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-topological_learning.compose.target">topological_learning.compose module</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Topological Learning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Type something here</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/compose.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="type-something-here">
+<h1>Type something here<a class="headerlink" href="#type-something-here" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-topological_learning.compose.target">
+<span id="topological-learning-compose-module"></span><h2>topological_learning.compose module<a class="headerlink" href="#module-topological_learning.compose.target" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="topological_learning.compose.target.TargetResampler">
+<em class="property">class </em><code class="sig-prename descclassname">topological_learning.compose.target.</code><code class="sig-name descname">TargetResampler</code><span class="sig-paren">(</span><em class="sig-param">step_size=1</em>, <em class="sig-param">from_right=True</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Simple resampler subsampling data at regular steps, up to a maximum
+number of samples equal to the length of another array. Convenience object
+adapted for use as a resampler inside a TargetResamplingClassifier.
+Parameters
+———-
+step_size : int, default=1</p>
+<blockquote>
+<div><p>The difference between index values of consecutively sampled values.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>from_right<span class="classifier">bool, default=True</span></dt><dd><p>When True, we ensure that the last entry is sampled. When False, we
+ensure that the first entry is sampled.</p>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResampler.fit" title="topological_learning.compose.target.TargetResampler.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self, y[, X])</p></td>
+<td><p>Fit the resampler.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code>(self, X[, y])</p></td>
+<td><p>Fit to data, then transform it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResampler.get_params" title="topological_learning.compose.target.TargetResampler.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[, deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code>(self, \*\*params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResampler.transform" title="topological_learning.compose.target.TargetResampler.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(self, y, X)</p></td>
+<td><p>Resample y according to the length of reference array X, self.step_size and self.from_right.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResampler.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">y</em>, <em class="sig-param">X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResampler.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the resampler.
+Parameters
+———-
+y : array-like</p>
+<blockquote>
+<div><p>Array of target values.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>X<span class="classifier">{array-like, sparse matrix}, default=None</span></dt><dd><p>Reference array, typically a feature array.</p>
+</dd>
+</dl>
+<p>self : object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResampler.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResampler.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">boolean, optional</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResampler.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">y</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResampler.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resample y according to the length of reference array X, self.step_size
+and self.from_right.
+Parameters
+———-
+y : array-like</p>
+<blockquote>
+<div><p>Array of target values.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>X<span class="classifier">{array-like, sparse matrix}</span></dt><dd><p>Reference array, typically a feature array.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>y_res<span class="classifier">array-like</span></dt><dd><p>Resampling of y.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="topological_learning.compose.target.TargetResamplingClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">topological_learning.compose.target.</code><code class="sig-name descname">TargetResamplingClassifier</code><span class="sig-paren">(</span><em class="sig-param">classifier=None</em>, <em class="sig-param">resampler=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClassifierMixin</span></code></p>
+<p>Meta-estimator to classify on a resampled target.
+Useful in classification problems whenever the correct correspondence between
+the feature and target arrays is obtained via resampling of the target array
+(in a way which might depend on the feature array).
+The computation during <code class="docutils literal notranslate"><span class="pre">fit</span></code> is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">resampler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span><span class="o">.</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>The computation during <code class="docutils literal notranslate"><span class="pre">predict</span></code> is::</dt><dd><p>classifier.predict(X)).</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>classifier<span class="classifier">object, default=LogisticRegression()</span></dt><dd><p>Classifier object such as derived from <code class="docutils literal notranslate"><span class="pre">ClassifierMixin</span></code>. This
+classifier will automatically be cloned each time prior to fitting.</p>
+</dd>
+<dt>resampler<span class="classifier">object, default=None</span></dt><dd><p>Estimator object such as derived from <code class="docutils literal notranslate"><span class="pre">TransformerMixin</span></code>. Note that
+this resampler will be cloned during fitting.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt><a href="#id3"><span class="problematic" id="id4">classifier_</span></a><span class="classifier">object</span></dt><dd><p>Fitted classifier.</p>
+</dd>
+<dt><a href="#id5"><span class="problematic" id="id6">resampler_</span></a><span class="classifier">object</span></dt><dd><p>Clone of the resampler used in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">topological_learning</span> <span class="k">as</span> <span class="nn">tl</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LogisticRegression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tl.compose</span> <span class="k">import</span> <span class="n">TargetResampler</span><span class="p">,</span> <span class="n">TargetResamplingClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ss</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">TargetResampler</span><span class="p">(</span><span class="n">step_size</span><span class="o">=</span><span class="n">ss</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span> <span class="o">=</span> <span class="n">TargetResamplingClassifier</span><span class="p">(</span><span class="n">classifier</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">(),</span>
+<span class="gp">... </span>                                  <span class="n">resampler</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">ss</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># doctest: +ELLIPSIS</span>
+<span class="go">TargetResamplingClassifier(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span><span class="o">.</span><span class="n">classifier_</span><span class="o">.</span><span class="n">coef_</span>
+<span class="go">array([[0.45235762, 0.19441371]])</span>
+<span class="go">Notes</span>
+<span class="go">-----</span>
+<span class="go">Internally, the target ``y`` is always converted into a 2-dimensional array</span>
+<span class="go">to be used by scikit-learn transformers. At the time of prediction, the</span>
+<span class="go">output will be reshaped to a have the same number of dimensions as ``y``.</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingClassifier.fit" title="topological_learning.compose.target.TargetResamplingClassifier.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self, X, y[, sample_weight])</p></td>
+<td><p>Fit the model according to the given training data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingClassifier.get_params" title="topological_learning.compose.target.TargetResamplingClassifier.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[, deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingClassifier.predict" title="topological_learning.compose.target.TargetResamplingClassifier.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(self, X)</p></td>
+<td><p>Predict using the base classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingClassifier.predict_proba" title="topological_learning.compose.target.TargetResamplingClassifier.predict_proba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_proba</span></code></a>(self, X, \*\*kwargs)</p></td>
+<td><p>Returns class probability estimates for the given test data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingClassifier.score" title="topological_learning.compose.target.TargetResamplingClassifier.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(self, X[, y])</p></td>
+<td><p>Returns the mean accuracy on the given test data and labels.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code>(self, \*\*params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingClassifier.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the model according to the given training data.
+Parameters
+———-
+X : {array-like, sparse matrix}, shape (n_samples, n_1, …)</p>
+<blockquote>
+<div><p>Training array, where n_samples is the number of samples and
+the total number of features is the product of all n_i’s.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>y<span class="classifier">array-like, shape (n_samples,)</span></dt><dd><p>Target values.</p>
+</dd>
+<dt>sample_weight<span class="classifier">array-like, shape (n_samples,) optional</span></dt><dd><p>Array of weights that are assigned to individual samples.
+If not provided, then each sample is given unit weight.</p>
+</dd>
+</dl>
+<p>self : object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingClassifier.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingClassifier.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">boolean, optional</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingClassifier.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict using the base classifier.
+Parameters
+———-
+X : {array-like, sparse matrix}, shape = (n_samples, n_1, …)</p>
+<blockquote>
+<div><p>Samples.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>y_hat<span class="classifier">array, shape = (n_samples,)</span></dt><dd><p>Predicted values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingClassifier.predict_proba">
+<code class="sig-name descname">predict_proba</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns class probability estimates for the given test data.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>X: array-like, shape `(n_samples, n_1, …)`</strong></dt><dd><blockquote>
+<div><p>Test samples where <cite>n_samples</cite> is the number of samples
+and the total number of features is the product of all n_i’s.</p>
+</div></blockquote>
+<dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: dictionary arguments</dt><dd><p>Legal arguments are the arguments
+of <cite>Sequential.predict_classes</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>proba: array-like, shape <cite>(n_samples, n_outputs)</cite></dt><dd><p>Class probability estimates.
+In the case of binary classification,
+to match the scikit-learn API,
+will return an array of shape <cite>(n_samples, 2)</cite>
+(instead of <cite>(n_sample, 1)</cite> as in Keras).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingClassifier.score">
+<code class="sig-name descname">score</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingClassifier.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean accuracy on the given test data and labels.</p>
+<p>In multi-label classification, this is the subset accuracy
+which is a harsh metric since you require for each sample that
+each label set be correctly predicted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like, shape = (n_samples, n_features)</span></dt><dd><p>Test samples.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like, shape = (n_samples) or (n_samples, n_outputs)</span></dt><dd><p>True labels for X.</p>
+</dd>
+<dt><strong>sample_weight</strong><span class="classifier">array-like, shape = [n_samples], optional</span></dt><dd><p>Sample weights.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>score</strong><span class="classifier">float</span></dt><dd><p>Mean accuracy of self.predict(X) wrt. y.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="topological_learning.compose.target.TargetResamplingRegressor">
+<em class="property">class </em><code class="sig-prename descclassname">topological_learning.compose.target.</code><code class="sig-name descname">TargetResamplingRegressor</code><span class="sig-paren">(</span><em class="sig-param">regressor=None</em>, <em class="sig-param">resampler=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
+<p>Meta-estimator to regress on a resampled target.
+Useful in regression problems whenever the correct correspondence between
+the feature and target arrays is obtained via resampling of the target array
+(in a way which might depend on the feature array).
+The computation during <code class="docutils literal notranslate"><span class="pre">fit</span></code> is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">regressor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">resampler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span><span class="o">.</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>The computation during <code class="docutils literal notranslate"><span class="pre">predict</span></code> is::</dt><dd><p>regressor.predict(X)).</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>regressor<span class="classifier">object, default=LinearRegression()</span></dt><dd><p>Regressor object such as derived from <code class="docutils literal notranslate"><span class="pre">RegressorMixin</span></code>. This
+regressor will automatically be cloned each time prior to fitting.</p>
+</dd>
+<dt>resampler<span class="classifier">object, default=None</span></dt><dd><p>Estimator object such as derived from <code class="docutils literal notranslate"><span class="pre">TransformerMixin</span></code>. Note that
+this resampler will be cloned during fitting.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt><a href="#id7"><span class="problematic" id="id8">regressor_</span></a><span class="classifier">object</span></dt><dd><p>Fitted regressor.</p>
+</dd>
+<dt><a href="#id9"><span class="problematic" id="id10">resampler_</span></a><span class="classifier">object</span></dt><dd><p>Clone of the resampler used in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">topological_learning</span> <span class="k">as</span> <span class="nn">tl</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tl.compose</span> <span class="k">import</span> <span class="n">TargetResampler</span><span class="p">,</span> <span class="n">TargetResamplingRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ss</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">TargetResampler</span><span class="p">(</span><span class="n">step_size</span><span class="o">=</span><span class="n">ss</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span> <span class="o">=</span> <span class="n">TargetResamplingRegressor</span><span class="p">(</span><span class="n">regressor</span><span class="o">=</span><span class="n">LinearRegression</span><span class="p">(),</span>
+<span class="gp">... </span>                                <span class="n">resampler</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">ss</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># doctest: +ELLIPSIS</span>
+<span class="go">TargetResamplingRegressor(...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trc</span><span class="o">.</span><span class="n">regressor_</span><span class="o">.</span><span class="n">coef_</span>
+<span class="go">array([0.25, 0.25])</span>
+<span class="go">Notes</span>
+<span class="go">-----</span>
+<span class="go">Internally, the target ``y`` is always converted into a 2-dimensional array</span>
+<span class="go">to be used by scikit-learn transformers. At the time of prediction, the</span>
+<span class="go">output will be reshaped to a have the same number of dimensions as ``y``.</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingRegressor.fit" title="topological_learning.compose.target.TargetResamplingRegressor.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self, X, y[, sample_weight])</p></td>
+<td><p>Fit the model according to the given training data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingRegressor.get_params" title="topological_learning.compose.target.TargetResamplingRegressor.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[, deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.compose.target.TargetResamplingRegressor.predict" title="topological_learning.compose.target.TargetResamplingRegressor.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(self, X)</p></td>
+<td><p>Predict using the base regressor.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code>(self, X, y[, sample_weight])</p></td>
+<td><p>Returns the coefficient of determination R^2 of the prediction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code>(self, \*\*params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingRegressor.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">sample_weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the model according to the given training data.
+Parameters
+———-
+X : {array-like, sparse matrix}, shape (n_samples, n_1, …)</p>
+<blockquote>
+<div><p>Training array, where n_samples is the number of samples and
+the total number of features is the product of all n_i’s.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>y<span class="classifier">array-like, shape (n_samples,)</span></dt><dd><p>Target values.</p>
+</dd>
+<dt>sample_weight<span class="classifier">array-like, shape (n_samples,) optional</span></dt><dd><p>Array of weights that are assigned to individual samples.
+If not provided, then each sample is given unit weight.</p>
+</dd>
+</dl>
+<p>self : object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingRegressor.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingRegressor.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">boolean, optional</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.compose.target.TargetResamplingRegressor.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.compose.target.TargetResamplingRegressor.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict using the base regressor.
+Parameters
+———-
+X : {array-like, sparse matrix}, shape = (n_samples, n_1, …)</p>
+<blockquote>
+<div><p>Samples.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>y_hat<span class="classifier">array, shape = (n_samples,)</span></dt><dd><p>Predicted values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Guillaume Tauzin
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

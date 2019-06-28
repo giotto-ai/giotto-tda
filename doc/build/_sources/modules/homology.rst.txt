@@ -1,0 +1,15 @@
+Homology
+========
+
+topological_learning.homology module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: topological_learning.homology.persistence
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: topological_learning.homology.consistent
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,10 @@
+Type something here
+===================
+
+topological_learning.preprocessing module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: topological_learning.preprocessing.time_series
+    :members:
+    :undoc-members:
+    :show-inheritance:

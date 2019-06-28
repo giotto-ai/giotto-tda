@@ -308,8 +308,7 @@ class TargetResampler(BaseEstimator, TransformerMixin):
     def get_params(self, deep=True):
         return {'step_size': self.step_size, 'from_right': self.from_right}
 
-    @staticmethod
-    def _validate_params():
+    def _validate_params(self):
         pass
 
     def _get_indices(self, y, max_num):

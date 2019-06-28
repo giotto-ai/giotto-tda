@@ -1,0 +1,15 @@
+Compose
+=======
+
+topological_learning.compose module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: topological_learning.compose.target
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: topological_learning.compose.features
+    :members:
+    :undoc-members:
+    :show-inheritance:
