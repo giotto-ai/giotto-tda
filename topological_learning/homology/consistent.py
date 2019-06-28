@@ -11,13 +11,15 @@ import itertools
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    def __init__(self, metric_kwargs={'metric': 'euclidean'}, n_neighbor=1, n_jobs=1):
-        self.metric_kwargs = metric_kwargs
+    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1, n_jobs=1):
+        self.metric = metric
+        self.metric_params = metric_params
         self.n_neighbor = n_neighbor
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'metric_kwargs': self.metric_kwargs, 'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}
+        return {'metric': self.metric, 'metric_params': self.metric_params,
+                'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
@@ -76,10 +78,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        metric_kwargs = self.metric_kwargs.copy()
-        metric = metric_kwargs.pop('metric')
-
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(pairwise_distances) (X[i], metric=metric, n_jobs=1, **metric_kwargs)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(pairwise_distances) (X[i], metric=self.metric, n_jobs=1, **metric_params)
                                                        for i in range(X.shape[0]) )
 
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._consistent_homology_distance)(X_transformed[i], self.n_neighbor)
