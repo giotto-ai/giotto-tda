@@ -49,18 +49,18 @@ def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1):
 implemented_metric_recipes = {'bottleneck': bottleneck_distance, 'wasserstein': wasserstein_distance,
                               'landscape': kernel_landscape_distance, 'betti': kernel_betti_distance}
 
-def _parallel_pairwise(X, Y, metric_kwargs, iterator, n_jobs):
+def _parallel_pairwise(X, Y, metric, metric_params, iterator, n_jobs):
     n_diagrams_X = list(X.values())[0].shape[0]
     n_diagrams_Y = list(Y.values())[0].shape[0]
     n_dimensions = len(X.keys())
-    metric = implemented_metric_recipes[metric_kwargs.pop('metric')]
+    metric_func = implemented_metric_recipes[metric]
 
     distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
 
-    distance_array = Parallel(n_jobs=n_jobs) ( delayed(metric) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_kwargs)
+    distance_array = Parallel(n_jobs=n_jobs) ( delayed(metric_func) (X[dimension][i,:,:], Y[dimension][j,:,:], dimension, **metric_params)
                                                for i, j in iterator for dimension in X.keys())
     distance_array = np.array(distance_array).reshape((len(iterator), n_dimensions))
-    distance_array = np.linalg.norm(distance_array, axis=1, ord=metric_kwargs['order'])
+    distance_array = np.linalg.norm(distance_array, axis=1, ord=metric_params['order'])
     distance_matrix[tuple(zip(*iterator))] = distance_array
     return distance_matrix
 
@@ -82,11 +82,11 @@ def wasserstein_norm(diagram, dimension=None, order=1):
 implemented_norm_recipes = {'bottleneck': bottleneck_norm, 'wasserstein': wasserstein_norm,
                             'landscape': kernel_landscape_norm, 'betti': kernel_betti_norm}
 
-def _parallel_norm(X, norm_kwargs, n_jobs):
+def _parallel_norm(X, norm, norm_params, n_jobs):
     n_dimensions = len(X.keys())
-    norm = implemented_norm_recipes[norm_kwargs.pop('norm')]
+    norm_func = implemented_norm_recipes[norm]
 
-    norm_array = Parallel(n_jobs=n_jobs) ( delayed(norm) (X[dimension][i,:,:], dimension, **norm_kwargs)
+    norm_array = Parallel(n_jobs=n_jobs) ( delayed(norm_func) (X[dimension][i,:,:], dimension, **norm_params)
                                              for i in range(next(iter(X.values())).shape[0]) for dimension in X.keys() )
-    norm_array = np.linalg.norm(np.array(norm_array).reshape((-1, n_dimensions)), ord=norm_kwargs['order'], axis=1)
+    norm_array = np.linalg.norm(np.array(norm_array).reshape((-1, n_dimensions)), ord=norm_params['order'], axis=1)
     return norm_array
