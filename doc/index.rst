@@ -3,14 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to topological_learning's documentation!
+Welcome to Topological Learning's documentation!
 ================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
+   modules/preprocessing
+   modules/compose
+   modules/homology
+   modules/diagram
+   modules/manifold
+   modules/neural_network
+   modules/model_Selection
 
 Indices and tables
 ==================
