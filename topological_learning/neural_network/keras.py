@@ -29,7 +29,7 @@ class KerasClassifierWrapper(KerasClassifier):
     """
     def __call__(self, steps_kwargs=[ {'layer': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
                  optimizer_kwargs={'optimizer': koptimizers.RMSprop, 'lr': 0.01},
-                 loss='sparse_categorical_crossentropy', metrics=('sparse_categorical_accuracy')):
+                 loss='sparse_categorical_crossentropy', metrics=['sparse_categorical_accuracy']):
         # Create model
         model = Sequential()
         temp_step_kwargs = steps_kwargs[0]
@@ -47,6 +47,10 @@ class KerasClassifierWrapper(KerasClassifier):
         optimizer = temp_optimizer_kwargs.pop('optimizer')(**temp_optimizer_kwargs)
         model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
         return model
+
+    def clone(self):
+        params = self.get_params()
+        return KerasClassifierWrapper(**params)
 
     def fit(self, X, y=None, **kwargs):
         """A reference implementation of a fitting function for a classifier.
@@ -117,7 +121,7 @@ class KerasRegressorWrapper(KerasRegressor):
     """
     def __call__(self, steps_kwargs = [ {'layer': klayers.LSTM, 'units': 4, 'activation': 'tanh'} ],
                  optimizer_kwargs = {'optimizer': koptimizers.SGD, 'lr': 0.01},
-                 loss = 'mean_squared_error', metrics = ('accuracy')):
+                 loss = 'mean_squared_error', metrics = ['accuracy']):
         # Create model
         model = Sequential()
         temp_step_kwargs = steps_kwargs[-1]
@@ -135,6 +139,10 @@ class KerasRegressorWrapper(KerasRegressor):
         optimizer = temp_optimizer_kwargs.pop('optimizer')(**temp_optimizer_kwargs)
         model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
         return model
+
+    def clone(self):
+        params = self.get_params()
+        return KerasRegressorWrapper(**params)
 
     def fit(self, X, y=None, **kwargs):
         """A reference implementation of a fitting function for a classifier.

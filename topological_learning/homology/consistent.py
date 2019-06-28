@@ -11,13 +11,13 @@ import itertools
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    def __init__(self, metric_kwargs={'metric': 'euclidean'}, n_neighbors=1, n_jobs=1):
+    def __init__(self, metric_kwargs={'metric': 'euclidean'}, n_neighbor=1, n_jobs=1):
         self.metric_kwargs = metric_kwargs
-        self.n_neighbors = n_neighbors
+        self.n_neighbor = n_neighbor
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'metric_kwargs': self.metric_kwargs, 'n_neighbors': self.n_neighbors, 'n_jobs': self.n_jobs}
+        return {'metric_kwargs': self.metric_kwargs, 'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
@@ -27,11 +27,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         pass
 
     @staticmethod
-    def _consistent_homology_distance(X, n_neighbors):
-        indices_k_neighbors = np.argsort(X)[:, n_neighbors]
-        distance_k_neighbor = X[np.arange(X.shape[0]), indices_k_neighbors]
+    def _consistent_homology_distance(X, n_neighbor):
+        indices_k_neighbor = np.argsort(X)[:, n_neighbor]
+        distance_k_neighbor = X[np.arange(X.shape[0]), indices_k_neighbor]
         # Only calculate metric for upper triangle
-        out = np.zeros(X.shape)
+        X_consistent = np.zeros(X.shape)
         iterator = itertools.combinations(range(X.shape[0]), 2)
         for i, j in iterator:
             X_consistent[i, j] = X[i, j] / (m.sqrt(distance_k_neighbor[i]*distance_k_neighbor[j]))
@@ -51,7 +51,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
+            Returns self
         """
         self._validate_params()
 
@@ -76,12 +76,13 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        metrics_kwargs = self.metrics_kwargs.copy()
+        metric_kwargs = self.metric_kwargs.copy()
         metric = metric_kwargs.pop('metric')
 
-        X = pairwise_distances(X, metric=metric, n_jobs=self.n_jobs, **metric_kwargs)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(pairwise_distances) (X[i], metric=metric, n_jobs=1, **metric_kwargs)
+                                                       for i in range(X.shape[0]) )
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._consistent_homology_distance)(X[i, :, :], self.n_neighbors)
-                                                              for i in range(X.shape[0]) )
-
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._consistent_homology_distance)(X_transformed[i], self.n_neighbor)
+                                                       for i in range(X.shape[0]) )
+        X_transformed = np.array(X_transformed)
         return X_transformed

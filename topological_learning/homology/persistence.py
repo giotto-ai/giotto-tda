@@ -1,13 +1,13 @@
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
-from scipy.stats import entropy
 
 from sklearn.utils._joblib import Parallel, delayed
 
 import numpy as np
 import gudhi as gd
 from ripser import ripser
+
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """
@@ -128,11 +128,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
-    def __init__(self, n_jobs=1):
+    def __init__(self, len_vector=8, n_jobs=1):
+        self.len_vector = len_vector
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'n_jobs': self.n_jobs}
+        return {'len_vector': self.len_vector, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
@@ -141,10 +142,10 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             """
         pass
 
-    @staticmethod
-    def persistent_entropy(X):
-        X_lifespan = X[:, 1] - X[:, 0]
-        return entropy(X_lifespan)
+    def _persistent_entropy(self, X):
+        X_lifespan = X[:, :, 1] - X[:, :, 0]
+        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape((-1, 1))
+        return - np.sum(np.nan_to_num(X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
 
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
@@ -188,7 +189,12 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         n_samples = X[next(iter(X.keys()))].shape[0]
         n_dimensions = len(X.keys())
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.persistent_entropy) (X[dimension][i,:,:]) for i in range(n_samples) for dimension in X.keys() )
-        X_transformed = X_transformed.reshape((n_samples, n_dimensions))
+        slice_indices = list(range(0, n_samples, self.len_vector)) + [n_samples]
+        n_slices = len(slice_indices) - 1
+
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.persistent_entropy) (X[dimension][slice_indices[i] : slice_indices[i+1]])
+                                                       for dimension in X.keys() for i in range(n_slices) )
+
+        X_transformed = np.hstack( [ np.concatenate([X_transformed[i*n_slices + j] for j in range(n_slices)], axis=0)  for i in range(n_dimensions) ])
 
         return X_transformed

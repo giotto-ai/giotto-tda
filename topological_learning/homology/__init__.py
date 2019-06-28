@@ -2,11 +2,12 @@
 to calculate persistent homology.
 """
 
-from .persistence import VietorisRipsPersistence
+from .persistence import VietorisRipsPersistence, PersistentEntropy
 from .consistent import ConsistentRescaling
 
 
 __all__ = [
     'VietorisRipsPersistence',
-    'ConsistentRescaling'
+    'ConsistentRescaling',
+    'PersistentEntropy'
 ]

@@ -6,7 +6,8 @@ import warnings
 
 import numpy as np
 
-from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin, RegressorMixin, clone
+from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin, RegressorMixin
+from ..base import clone
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import check_array, safe_indexing
 
