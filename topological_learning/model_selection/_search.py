@@ -20,7 +20,8 @@ import warnings
 import numpy as np
 from scipy.stats import rankdata
 
-from slearn.base import BaseEstimator, is_classifier, clone
+from slearn.base import BaseEstimator, is_classifier
+from ..base import clone
 from sklearn.base import MetaEstimatorMixin
 from sklearn.model_selection._split import check_cv
 from sklearn.model_selection._validation import _aggregate_score_dicts
