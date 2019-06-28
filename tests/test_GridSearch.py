@@ -27,7 +27,6 @@ import keras
 import tensorflow as tf
 
 # from dask_ml.model_selection import GridSearchCV
-from sklearn.model_selection import GridSearchCV
 
 # If I don't do this, the GPU is automatically used and gets out of memory
 import os
