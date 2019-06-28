@@ -51,7 +51,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
+            Returns self
         """
         self._validate_params()
 
@@ -76,7 +76,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        metrics_kwargs = self.metrics_kwargs.copy()
+        metric_kwargs = self.metric_kwargs.copy()
         metric = metric_kwargs.pop('metric')
 
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(pairwise_distances) (X[i], metric=metric, n_jobs=1, **metric_kwargs)
