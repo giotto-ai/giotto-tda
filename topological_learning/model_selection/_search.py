@@ -8,6 +8,7 @@ parameters of an estimator.
 #         Andreas Mueller <amueller@ais.uni-bonn.de>
 #         Olivier Grisel <olivier.grisel@ensta.org>
 #         Raghav RV <rvraghav93@gmail.com>
+#         Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: BSD 3 clause
 
 from abc import ABCMeta, abstractmethod
@@ -33,11 +34,11 @@ from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.metrics.scorer import _check_multimetric_scoring
 
 
-def _fit_and_score_keras(estimator, X, y, scorer, train, test, verbose,
-                         parameters, fit_params, return_train_score=False,
-                         return_parameters=False, return_n_test_samples=False,
-                         return_times=False, return_estimator=False,
-                         error_score=np.nan, session=None):
+def _fit_and_score(estimator, X, y, scorer, train, test, verbose,
+                   parameters, fit_params, return_train_score=False,
+                   return_parameters=False, return_n_test_samples=False,
+                   return_times=False, return_estimator=False,
+                   error_score=np.nan, session=None):
     """Fit estimator and compute scores for a given dataset split.
     Parameters
     ----------
@@ -461,12 +462,12 @@ class BaseSearchCV(BaseEstimator, MetaEstimatorMixin, metaclass=ABCMeta):
                           " totalling {2} fits".format(
                               n_splits, n_candidates, n_candidates * n_splits))
 
-                out = parallel(delayed(_fit_and_score_keras)(clone(base_estimator),
-                                                             X, y,
-                                                             train=train, test=test,
-                                                             parameters=parameters,
-                                                             session=session,
-                                                             **fit_and_score_kwargs)
+                out = parallel(delayed(_fit_and_score)(clone(base_estimator),
+                                                       X, y,
+                                                       train=train, test=test,
+                                                       parameters=parameters,
+                                                       session=session,
+                                                       **fit_and_score_kwargs)
                                for parameters, (train, test)
                                in product(candidate_params,
                                           cv.split(X, y, groups)))
@@ -660,7 +661,7 @@ class GridSearchCV(KerasBaseSearchCV):
         evaluate_candidates(ParameterGrid(self.param_grid))
 
 
-class KerasRandomizedSearchCV(KeraBaseSearchCV):
+class RandomizedSearchCV(KeraBaseSearchCV):
     _required_parameters = ["estimator", "param_distributions"]
 
     def __init__(self, estimator, param_distributions, n_iter=10, scoring=None,
