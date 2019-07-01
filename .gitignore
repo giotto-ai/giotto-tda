@@ -30,3 +30,4 @@ examples/*
 
 # Hera C++ files
 topological_learning/dependencies/hera
+.DS_Store

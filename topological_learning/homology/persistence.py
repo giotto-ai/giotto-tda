@@ -192,7 +192,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         slice_indices = list(range(0, n_samples, self.len_vector)) + [n_samples]
         n_slices = len(slice_indices) - 1
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.persistent_entropy) (X[dimension][slice_indices[i] : slice_indices[i+1]])
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._persistent_entropy) (X[dimension][slice_indices[i] : slice_indices[i+1]])
                                                        for dimension in X.keys() for i in range(n_slices) )
 
         X_transformed = np.hstack( [ np.concatenate([X_transformed[i*n_slices + j] for j in range(n_slices)], axis=0)  for i in range(n_dimensions) ])
