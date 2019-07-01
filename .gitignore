@@ -23,6 +23,9 @@ examples/*
 !examples/README.rst
 !examples/Lorenz_Attractor.ipynb
 
+# Built docs
+doc/build
+
 # Emacs temporary files
 *~
 
