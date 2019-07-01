@@ -20,6 +20,7 @@ data/*
 
 # Examples
 examples/*
+!examples/README.rst
 !examples/Lorenz_Attractor.ipynb
 
 # Emacs temporary files

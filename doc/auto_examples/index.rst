@@ -4,13 +4,6 @@
 
 .. _sphx_glr_auto_examples:
 
-Examples
-========
-
-Miscellaneous examples
-----------------------
-
-Miscellaneous and introductory examples for scikit-learn.
 
 
 .. raw:: html
@@ -27,13 +20,13 @@ Miscellaneous and introductory examples for scikit-learn.
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/guillaumetauzin/software/topological_learning/doc/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//topological_learning/doc/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/guillaumetauzin/software/topological_learning/doc/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//topological_learning/doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html
