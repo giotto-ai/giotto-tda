@@ -10,7 +10,6 @@
 # Python jupyter notebooks
 examples/dask-worker-space
 examples/.ipynb_checkpoints
-examples/
 
 # Data files
 *.pkl
