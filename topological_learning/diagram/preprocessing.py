@@ -111,13 +111,14 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Whether the transformer has been fitted
     """
 
-    def __init__(self, norm_kwargs={'norm': 'bottleneck', 'order': np.inf}, function=np.max, n_jobs=1):
-        self.norm_kwargs = norm_kwargs
+    def __init__(self, norm='bottleneck', norm_params={'order': np.inf}, function=np.max, n_jobs=1):
+        self.norm = norm
+        self.norm_params = norm_params
         self.function = function
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'norm_kwargs': self.norm_kwargs, 'function': self.function, 'n_jobs': self.n_jobs}
+        return {'norm': self.norm, 'norm_params': self.norm_params, 'function': self.function, 'n_jobs': self.n_jobs}
 
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
@@ -135,16 +136,15 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        norm_name = self.norm_kwargs['norm']
-        norm_kwargs = self.norm_kwargs.copy()
+        norm_params = self.norm_params.copy()
 
         sampling = { dimension: None for dimension in X.keys() }
 
-        if norm_name in ['landscape', 'betti']:
-            n_samples = norm_kwargs.pop('n_samples')
-            norm_kwargs['sampling'] = _sample(X, n_samples)
+        if self.norm in ['landscape', 'betti']:
+            n_samples = norm_params.pop('n_samples')
+            norm_params['sampling'] = _sample(X, n_samples)
 
-        norm_array = _parallel_norm(X, norm_kwargs, self.n_jobs)
+        norm_array = _parallel_norm(X, self.norm, norm_params, self.n_jobs)
         self._scale = self.function(norm_array)
 
         self.is_fitted = True
@@ -194,12 +194,13 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
     implemented_filtering_parameters_types = ['fixed', 'search']
 
     def __init__(self, homology_dimensions=None, filtering_parameters_type='search', delta=0.,
-                 metric_kwargs={'metric': 'bottleneck', 'order': np.inf}, epsilon=1.,
+                 metric='bottleneck', metric_params={'order': np.inf}, epsilon=1.,
                  tolerance=1e-2, max_iteration=20, n_jobs=1):
         self.homology_dimensions = homology_dimensions
         self.filtering_parameters_type = filtering_parameters_type
         self.delta = delta
-        self.metric_kwargs = metric_kwargs
+        self.metric = metric
+        self.metric_params = metric_params
         self.epsilon = epsilon
         self.tolerance = tolerance
         self.max_iteration = max_iteration
@@ -209,7 +210,8 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         return {'homology_dimensions': self.homology_dimensions,
                 'filtering_parameters_type': self.filtering_parameters_type,
                 'delta': self.delta,
-                'metric_kwargs': self.metric_kwargs,
+                'metric': self.metric,
+                'metric_params': self.metric_params,
                 'epsilon': self.epsilon,
                 'tolerance': self.tolerance,
                 'max_iteration': self.max_iteration,

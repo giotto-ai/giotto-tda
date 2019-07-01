@@ -1,13 +1,13 @@
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
-from scipy.stats import entropy
 
 from sklearn.utils._joblib import Parallel, delayed
 
 import numpy as np
 import gudhi as gd
 from ripser import ripser
+
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """
@@ -128,32 +128,28 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
-    def __init__(self, n_jobs=1):
+    def __init__(self, len_vector=8, n_jobs=1):
+        self.len_vector = len_vector
         self.n_jobs = n_jobs
-    
+
     def get_params(self, deep=True):
-        return {'n_jobs': self.n_jobs}
-    
+        return {'len_vector': self.len_vector, 'n_jobs': self.n_jobs}
+
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
             of the :meth:'fit' are valid.
             """
         pass
-    
-    @staticmethod
-    def persistent_entropy(X):
-        X_entropy = np.zeros((X[next(iter(X.keys()))].shape[0], len(X.keys())))
-        X_lifespan = { dimension: X[dimension][:,:,1]-X[dimension][:,:,0]
-                       for dimension in X.keys() }
-        
-        for i, dimension in enumerate(sorted(list(X.keys()))):
-            X_entropy[:,i] = np.apply_along_axis(entropy,axis=1,arr=X_lifespan[dimension])
-        return X_entropy
-            
+
+    def _persistent_entropy(self, X):
+        X_lifespan = X[:, :, 1] - X[:, :, 0]
+        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape((-1, 1))
+        return - np.sum(np.nan_to_num(X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
+
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
-            
+
             Parameters
             ----------
             X : array-like or sparse matrix of shape = [n_samples, n_features]
@@ -161,7 +157,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
-            
+
             Returns
             -------
             self : object
@@ -171,16 +167,16 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
 
         self.is_fitted = True
         return self
-    
+
     #@jit
     def transform(self, X, y=None):
         """ Implementation of the sk-learn transform function that samples the input.
-            
+
             Parameters
             ----------
             X : array-like of shape = [n_samples, n_features]
             The input samples.
-            
+
             Returns
             -------
             X_transformed : array of int of shape = [n_samples, n_features]
@@ -190,8 +186,15 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        
-        X_transformed = self.persistent_entropy(X)
-                                                      
-        return X_transformed
+        n_samples = X[next(iter(X.keys()))].shape[0]
+        n_dimensions = len(X.keys())
 
+        slice_indices = list(range(0, n_samples, self.len_vector)) + [n_samples]
+        n_slices = len(slice_indices) - 1
+
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self.persistent_entropy) (X[dimension][slice_indices[i] : slice_indices[i+1]])
+                                                       for dimension in X.keys() for i in range(n_slices) )
+
+        X_transformed = np.hstack( [ np.concatenate([X_transformed[i*n_slices + j] for j in range(n_slices)], axis=0)  for i in range(n_dimensions) ])
+
+        return X_transformed

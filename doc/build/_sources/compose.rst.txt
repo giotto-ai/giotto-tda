@@ -1,0 +1,10 @@
+Type something here
+===================
+
+topological_learning.compose module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: topological_learning.compose.target
+    :members:
+    :undoc-members:
+    :show-inheritance:

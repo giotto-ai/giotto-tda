@@ -1,0 +1,544 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Manifold &mdash; Topological Learning 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Topological Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homology.html">Homology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="diagram.html">Diagram</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Manifold</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#topological-learning-manifold-module">topological_learning.manifold module</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="neural_network.html">Neural network</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Topological Learning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Manifold</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/manifold.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="manifold">
+<h1>Manifold<a class="headerlink" href="#manifold" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="topological-learning-manifold-module">
+<h2>topological_learning.manifold module<a class="headerlink" href="#topological-learning-manifold-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-topological_learning.manifold.mds"></span><p>Multi-dimensional Scaling (MDS)</p>
+<dl class="class">
+<dt id="topological_learning.manifold.mds.StatefulMDS">
+<em class="property">class </em><code class="sig-prename descclassname">topological_learning.manifold.mds.</code><code class="sig-name descname">StatefulMDS</code><span class="sig-paren">(</span><em class="sig-param">n_components=2</em>, <em class="sig-param">metric=True</em>, <em class="sig-param">n_init=4</em>, <em class="sig-param">max_iter=300</em>, <em class="sig-param">verbose=0</em>, <em class="sig-param">eps=0.001</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">dissimilarity='precomputed'</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.mds.StatefulMDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<p>Multidimensional scaling</p>
+<p>Read more in the <span class="xref std std-ref">User Guide</span>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>n_components</strong><span class="classifier">int, optional, default: 2</span></dt><dd><p>Number of dimensions in which to immerse the dissimilarities.</p>
+</dd>
+<dt><strong>metric</strong><span class="classifier">boolean, optional, default: True</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, perform metric MDS; otherwise, perform nonmetric MDS.</p>
+</dd>
+<dt><strong>n_init</strong><span class="classifier">int, optional, default: 4</span></dt><dd><p>Number of times the SMACOF algorithm will be run with different
+initializations. The final results will be the best output of the runs,
+determined by the run with the smallest final stress.</p>
+</dd>
+<dt><strong>max_iter</strong><span class="classifier">int, optional, default: 300</span></dt><dd><p>Maximum number of iterations of the SMACOF algorithm for a single run.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">int, optional, default: 0</span></dt><dd><p>Level of verbosity.</p>
+</dd>
+<dt><strong>eps</strong><span class="classifier">float, optional, default: 1e-3</span></dt><dd><p>Relative tolerance with respect to stress at which to declare
+convergence.</p>
+</dd>
+<dt><strong>n_jobs</strong><span class="classifier">int or None, optional (default=None)</span></dt><dd><p>The number of jobs to use for the computation. If multiple
+initializations are used (<code class="docutils literal notranslate"><span class="pre">n_init</span></code>), each run of the algorithm is
+computed in parallel.</p>
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code> means 1 unless in a <code class="xref py py-obj docutils literal notranslate"><span class="pre">joblib.parallel_backend</span></code> context.
+<code class="docutils literal notranslate"><span class="pre">-1</span></code> means using all processors. See <span class="xref std std-term">Glossary</span>
+for more details.</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier">int, RandomState instance or None, optional, default: None</span></dt><dd><p>The generator used to initialize the centers.  If int, random_state is
+the seed used by the random number generator; If RandomState instance,
+random_state is the random number generator; If None, the random number
+generator is the RandomState instance used by <cite>np.random</cite>.</p>
+</dd>
+<dt><strong>dissimilarity</strong><span class="classifier">‘euclidean’ | ‘precomputed’, optional, default: ‘euclidean’</span></dt><dd><p>Dissimilarity measure to use:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>‘euclidean’:</dt><dd><p>Pairwise Euclidean distances between points in the dataset.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘precomputed’:</dt><dd><p>Pre-computed dissimilarities are passed directly to <code class="docutils literal notranslate"><span class="pre">fit</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fit_transform</span></code>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>“Modern Multidimensional Scaling - Theory and Applications” Borg, I.;
+Groenen P. Springer Series in Statistics (1997)</p>
+<p>“Nonmetric multidimensional scaling: a numerical method” Kruskal, J.
+Psychometrika, 29 (1964)</p>
+<p>“Multidimensional scaling by optimizing goodness of fit to a nonmetric
+hypothesis” Kruskal, J. Psychometrika, 29, (1964)</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_digits</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="k">import</span> <span class="n">MDS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1797, 64)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">embedding</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_transformed</span> <span class="o">=</span> <span class="n">embedding</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_transformed</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(100, 2)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>embedding_</strong><span class="classifier">array-like, shape (n_samples, n_components)</span></dt><dd><p>Stores the position of the dataset in the embedding space.</p>
+</dd>
+<dt><strong>stress_</strong><span class="classifier">float</span></dt><dd><p>The final value of the stress (sum of squared distance of the
+disparities and the distances for all constrained points).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.manifold.mds.StatefulMDS.fit" title="topological_learning.manifold.mds.StatefulMDS.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self, X[, y, init])</p></td>
+<td><p>Computes the position of the points in the embedding space</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code>(self, X[, y])</p></td>
+<td><p>Fit to data, then transform it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code>(self[, deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code>(self, \*\*params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.manifold.mds.StatefulMDS.transform" title="topological_learning.manifold.mds.StatefulMDS.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(self, X[, y, init])</p></td>
+<td><p>Fit the data from X, and returns the embedded coordinates</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="topological_learning.manifold.mds.StatefulMDS.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y=None</em>, <em class="sig-param">init=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.mds.StatefulMDS.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the position of the points in the embedding space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array, shape (n_samples, n_features) or (n_samples, n_samples)</span></dt><dd><p>Input data. If <code class="docutils literal notranslate"><span class="pre">dissimilarity=='precomputed'</span></code>, the input should
+be the dissimilarity matrix.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">Ignored</span></dt><dd></dd>
+<dt><strong>init</strong><span class="classifier">ndarray, shape (n_samples,), optional, default: None</span></dt><dd><p>Starting configuration of the embedding to initialize the SMACOF
+algorithm. By default, the algorithm is initialized with a randomly
+chosen array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.manifold.mds.StatefulMDS.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y=None</em>, <em class="sig-param">init=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.mds.StatefulMDS.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the data from X, and returns the embedded coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array, shape (n_samples, n_features) or (n_samples, n_samples)</span></dt><dd><p>Input data. If <code class="docutils literal notranslate"><span class="pre">dissimilarity=='precomputed'</span></code>, the input should
+be the dissimilarity matrix.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">Ignored</span></dt><dd></dd>
+<dt><strong>init</strong><span class="classifier">ndarray, shape (n_samples,), optional, default: None</span></dt><dd><p>Starting configuration of the embedding to initialize the SMACOF
+algorithm. By default, the algorithm is initialized with a randomly
+chosen array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="topological_learning.manifold.mds.smacof">
+<code class="sig-prename descclassname">topological_learning.manifold.mds.</code><code class="sig-name descname">smacof</code><span class="sig-paren">(</span><em class="sig-param">dissimilarities</em>, <em class="sig-param">X_previous=None</em>, <em class="sig-param">metric=True</em>, <em class="sig-param">n_components=2</em>, <em class="sig-param">init=None</em>, <em class="sig-param">n_init=8</em>, <em class="sig-param">n_jobs=None</em>, <em class="sig-param">max_iter=300</em>, <em class="sig-param">verbose=0</em>, <em class="sig-param">eps=0.001</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">return_n_iter=False</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.mds.smacof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes multidimensional scaling using the SMACOF algorithm.</p>
+<p>The SMACOF (Scaling by MAjorizing a COmplicated Function) algorithm is a
+multidimensional scaling algorithm which minimizes an objective function
+(the <em>stress</em>) using a majorization technique. Stress majorization, also
+known as the Guttman Transform, guarantees a monotone convergence of
+stress, and is more powerful than traditional techniques such as gradient
+descent.</p>
+<p>The SMACOF algorithm for metric MDS can summarized by the following steps:</p>
+<ol class="arabic simple">
+<li><p>Set an initial start configuration, randomly or not.</p></li>
+<li><p>Compute the stress</p></li>
+<li><p>Compute the Guttman Transform</p></li>
+<li><p>Iterate 2 and 3 until convergence.</p></li>
+</ol>
+<p>The nonmetric algorithm adds a monotonic regression step before computing
+the stress.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dissimilarities</strong><span class="classifier">ndarray, shape (n_samples, n_samples)</span></dt><dd><p>Pairwise dissimilarities between the points. Must be symmetric.</p>
+</dd>
+<dt><strong>metric</strong><span class="classifier">boolean, optional, default: True</span></dt><dd><p>Compute metric or nonmetric SMACOF algorithm.</p>
+</dd>
+<dt><strong>n_components</strong><span class="classifier">int, optional, default: 2</span></dt><dd><p>Number of dimensions in which to immerse the dissimilarities. If an
+<code class="docutils literal notranslate"><span class="pre">init</span></code> array is provided, this option is overridden and the shape of
+<code class="docutils literal notranslate"><span class="pre">init</span></code> is used to determine the dimensionality of the embedding
+space.</p>
+</dd>
+<dt><strong>init</strong><span class="classifier">ndarray, shape (n_samples, n_components), optional, default: None</span></dt><dd><p>Starting configuration of the embedding to initialize the algorithm. By
+default, the algorithm is initialized with a randomly chosen array.</p>
+</dd>
+<dt><strong>n_init</strong><span class="classifier">int, optional, default: 8</span></dt><dd><p>Number of times the SMACOF algorithm will be run with different
+initializations. The final results will be the best output of the runs,
+determined by the run with the smallest final stress. If <code class="docutils literal notranslate"><span class="pre">init</span></code> is
+provided, this option is overridden and a single run is performed.</p>
+</dd>
+<dt><strong>n_jobs</strong><span class="classifier">int or None, optional (default=None)</span></dt><dd><p>The number of jobs to use for the computation. If multiple
+initializations are used (<code class="docutils literal notranslate"><span class="pre">n_init</span></code>), each run of the algorithm is
+computed in parallel.</p>
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code> means 1 unless in a <code class="xref py py-obj docutils literal notranslate"><span class="pre">joblib.parallel_backend</span></code> context.
+<code class="docutils literal notranslate"><span class="pre">-1</span></code> means using all processors. See <span class="xref std std-term">Glossary</span>
+for more details.</p>
+</dd>
+<dt><strong>max_iter</strong><span class="classifier">int, optional, default: 300</span></dt><dd><p>Maximum number of iterations of the SMACOF algorithm for a single run.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">int, optional, default: 0</span></dt><dd><p>Level of verbosity.</p>
+</dd>
+<dt><strong>eps</strong><span class="classifier">float, optional, default: 1e-3</span></dt><dd><p>Relative tolerance with respect to stress at which to declare
+convergence.</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier">int, RandomState instance or None, optional, default: None</span></dt><dd><p>The generator used to initialize the centers.  If int, random_state is
+the seed used by the random number generator; If RandomState instance,
+random_state is the random number generator; If None, the random number
+generator is the RandomState instance used by <cite>np.random</cite>.</p>
+</dd>
+<dt><strong>return_n_iter</strong><span class="classifier">bool, optional, default: False</span></dt><dd><p>Whether or not to return the number of iterations.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">ndarray, shape (n_samples, n_components)</span></dt><dd><p>Coordinates of the points in a <code class="docutils literal notranslate"><span class="pre">n_components</span></code>-space.</p>
+</dd>
+<dt><strong>stress</strong><span class="classifier">float</span></dt><dd><p>The final value of the stress (sum of squared distance of the
+disparities and the distances for all constrained points).</p>
+</dd>
+<dt><strong>n_iter</strong><span class="classifier">int</span></dt><dd><p>The number of iterations corresponding to the best stress. Returned
+only if <code class="docutils literal notranslate"><span class="pre">return_n_iter</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>“Modern Multidimensional Scaling - Theory and Applications” Borg, I.;
+Groenen P. Springer Series in Statistics (1997)</p>
+<p>“Nonmetric multidimensional scaling: a numerical method” Kruskal, J.
+Psychometrika, 29 (1964)</p>
+<p>“Multidimensional scaling by optimizing goodness of fit to a nonmetric
+hypothesis” Kruskal, J. Psychometrika, 29, (1964)</p>
+</dd></dl>
+
+<span class="target" id="module-topological_learning.manifold.derivatives"></span><dl class="class">
+<dt id="topological_learning.manifold.derivatives.Derivatives">
+<em class="property">class </em><code class="sig-prename descclassname">topological_learning.manifold.derivatives.</code><code class="sig-name descname">Derivatives</code><span class="sig-paren">(</span><em class="sig-param">orders=[0, 1, 2]</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.derivatives.Derivatives" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>isFitted</strong><span class="classifier">boolean</span></dt><dd><p>Whether the transformer has been fitted</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.manifold.derivatives.Derivatives.fit" title="topological_learning.manifold.derivatives.Derivatives.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self, X[, y])</p></td>
+<td><p>A reference implementation of a fitting function for a transformer.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code>(self, X[, y])</p></td>
+<td><p>Fit to data, then transform it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.manifold.derivatives.Derivatives.get_params" title="topological_learning.manifold.derivatives.Derivatives.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[, deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code>(self, \*\*params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#topological_learning.manifold.derivatives.Derivatives.transform" title="topological_learning.manifold.derivatives.Derivatives.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(self, X)</p></td>
+<td><p>Implementation of the sk-learn transform function that samples the input.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="topological_learning.manifold.derivatives.Derivatives.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y=None</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.derivatives.Derivatives.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>A reference implementation of a fitting function for a transformer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like or sparse matrix of shape = [n_samples, n_features]</span></dt><dd><p>The training input samples.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.manifold.derivatives.Derivatives.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.derivatives.Derivatives.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">boolean, optional</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="topological_learning.manifold.derivatives.Derivatives.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#topological_learning.manifold.derivatives.Derivatives.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the sk-learn transform function that samples the input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like of shape = [n_samples, n_features]</span></dt><dd><p>The input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>X_transformed</strong><span class="classifier">array of int of shape = [n_samples, n_features]</span></dt><dd><p>The array containing the element-wise square roots of the values
+in <cite>X</cite></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Guillaume Tauzin
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
