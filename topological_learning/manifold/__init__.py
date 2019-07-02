@@ -3,7 +3,7 @@ transformers.
 """
 
 from .mds import StatefulMDS
-from .derivatives import Derivatives
+from .kinematics import Derivatives
 
 
 __all__ = [

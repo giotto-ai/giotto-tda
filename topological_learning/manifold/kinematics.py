@@ -7,7 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 import numpy as np
 
-class Derivatives(BaseEstimator, TransformerMixin):
+class Kinematics(BaseEstimator, TransformerMixin):
     """
     Transform a time series of points in an embedded space into a time
     series of derivatives of those points.
