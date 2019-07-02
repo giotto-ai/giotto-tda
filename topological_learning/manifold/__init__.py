@@ -3,10 +3,10 @@ transformers.
 """
 
 from .mds import StatefulMDS
-from .kinematics import Derivatives
+from .kinematics import Kinematics
 
 
 __all__ = [
     'StatefulMDS',
-    'Derivatives'
+    'Kinematics'
 ]
