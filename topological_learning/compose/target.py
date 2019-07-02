@@ -20,7 +20,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
     The computation during ``fit`` is::
         classifier.fit(X, resampler.transform(y, X)).
     The computation during ``predict`` is::
-        classifier.predict(X)).
+        classifier.predict(X).
     Parameters
     ----------
     classifier : object, default=LogisticRegression()
@@ -174,7 +174,7 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
     The computation during ``fit`` is::
         regressor.fit(X, resampler.transform(y, X)).
     The computation during ``predict`` is::
-        regressor.predict(X)).
+        regressor.predict(X).
     Parameters
     ----------
     regressor : object, default=LinearRegression()

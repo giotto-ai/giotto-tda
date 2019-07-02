@@ -15,7 +15,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     filtrations. Given a point cloud in Euclidean space or an abstract metric space
     encoded by a distance matrix, information about the appearance and disappearance
     of ``topological holes'' (technically, homology classes) of various dimensions and
-    at different distance scales is summarised in the persistence diagram.
+    at different distance scales is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
@@ -270,7 +270,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples, n_X_keys, 1) CHECK!!!!!!!!!!
+        X_transformed : ndarray, shape (n_samples, n_X_keys)
             Array of persistent entropies (one value per sample and per key in X).
 
         """
