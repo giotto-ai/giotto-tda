@@ -38,8 +38,9 @@ class Derivatives(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params():
-        """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+        """
+        A class method that checks whether the hyperparameters and the input parameters
+        of the :meth:'fit' are valid.
         """
         pass
 
@@ -75,23 +76,18 @@ class Derivatives(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
-            Input data. If ``dissimilarity=='precomputed'``, the input should
-            be the dissimilarity matrix.
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
 
-        init : ndarray, shape (n_samples,), optional, default: None
-            Starting configuration of the embedding to initialize the SMACOF
-            algorithm. By default, the algorithm is initialized with a randomly
-            chosen array.
-
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples - max_order, n_features, n_orders)
-            Points and their derivative at the required orders
+        X_transformed : ndarray, shape (n_samples - max_order, n_features*n_orders)
+            Points and their derivative at the required orders where max_order is the
+            maximum values of orders and n_orders is the length of orders.
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])

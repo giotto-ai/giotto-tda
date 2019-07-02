@@ -131,7 +131,7 @@ def _smacof_single(dissimilarities, X_previous = None, metric=True, n_components
     return X, stress, it + 1
 
 
-def smacof(dissimilarities, X_previous = None, metric=True, n_components=2, init=None, n_init=8,
+def _smacof(dissimilarities, X_previous = None, metric=True, n_components=2, init=None, n_init=8,
            n_jobs=None, max_iter=300, verbose=0, eps=1e-3, random_state=None,
            return_n_iter=False):
     """
@@ -421,7 +421,7 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
             raise ValueError("Proximity must be 'precomputed' or 'euclidean'."
                              " Got %s instead" % str(self.dissimilarity))
 
-        self.embedding_fit_, self.stress_fit_, self.n_iter_fit_ = smacof(
+        self.embedding_fit_, self.stress_fit_, self.n_iter_fit_ = _smacof(
             self.dissimilarity_matrix_fit_, metric=self.metric,
             n_components=self.n_components, init=init, n_init=self.n_init,
             n_jobs=self.n_jobs, max_iter=self.max_iter, verbose=self.verbose,
@@ -475,7 +475,7 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
                 raise ValueError("Proximity must be 'precomputed' or 'euclidean'."
                                  " Got %s instead" % str(self.dissimilarity))
 
-            self.embedding_, self.stress_, self.n_iter_ = smacof(
+            self.embedding_, self.stress_, self.n_iter_ = _smacof(
                 self.dissimilarity_matrix_, self.embedding_fit_, metric=self.metric,
                 n_components=self.n_components, init=init, n_init=self.n_init,
                 n_jobs=self.n_jobs, max_iter=self.max_iter, verbose=self.verbose,
