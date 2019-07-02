@@ -80,7 +80,7 @@ def make_pipeline():
         ('physical', ma.StatefulMDS()),
         ('derivatives', ma.Derivatives()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
-        ('aggregator', cp.FeatureAggregator()),
+        ('aggregator', cp.FeatureAggregator(is_keras=True)),
         ('classification', cp.TargetResamplingClassifier(classifier=nn.KerasClassifierWrapper(),
                                                          resampler=cp.TargetResampler()))
     ]

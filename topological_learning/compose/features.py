@@ -6,39 +6,44 @@ import numpy as np
 
 class FeatureAggregator(BaseEstimator, TransformerMixin):
     """
-    Transformer that prepares the features and targets for the estimator.
+    Transformer that rearanges the features in sequences of features for the
+    final estimator.
 
     Parameters
     ----------
-    samplingType : str
-        The type of sampling
+    n_steps_in_past : int
+        Number of previous time steps to be used for sequence-based predictions.
 
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
-
-    Attributes
-    ----------
-    isFitted : boolean
-        Whether the transformer has been fitted
+    is_keras : boolean
+        Whether the final estimator is a neural_network.
     """
 
-    def __init__(self, n_steps_in_past=10):
+    def __init__(self, n_steps_in_past=10, is_keras=False):
         self.n_steps_in_past = n_steps_in_past
+        self.is_keras = is_keras
 
     def get_params(self, deep=True):
-        return {'n_steps_in_past': self.n_steps_in_past}
+        return {'n_steps_in_past': self.n_steps_in_past, 'is_keras': self.is_keras}
+
+    @staticmethod
+    def _validate_params():
+        """
+        A class method that checks whether the hyperparameters and the input parameters
+        of the :meth:'fit' are valid.
+        """
+        pass
 
     def fit(self, X, y = None):
-        """A reference implementation of a fitting function for a transformer.
+        """
+        Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_featurers)
+            Input data.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -48,27 +53,39 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
+        self._validate_params()
 
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None, copy=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """
+        Rearange input features X into a sequence of n_steps_in_past features.
+        If is_keras = False, the sequence of features is unrolled.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : ndarray, shape (n_samples-n_steps_in_past+1, n_steps_in_past)
+        if is_keras=True or (n_samples-n_steps_in_past+1, n_features*n_steps_in_past) else
+            Rearanged features array by sequences of n_steps_in_past.
         """
         # Check is fit had been called
-        #check_is_fitted(self, ['isFitted'])
+        check_is_fitted(self, ['_is_itted'])
 
         n_samples = X.shape[0] - self.n_steps_in_past + 1
         indexer = np.arange(n_samples)[:, None] + np.arange(self.n_steps_in_past)[None, :]
         X_transformed = X[indexer]
+
+        if not self.is_keras:
+            X_transformed = X_transformed.reshape((n_samples, -1))
+
         return X_transformed
