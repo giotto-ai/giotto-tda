@@ -11,6 +11,9 @@ from ._utils import _sample, _pad
 
 
 class DiagramDistance(BaseEstimator, TransformerMixin):
+    """
+    Transformer for calculating distances between persistence diagrams.
+    """
     def __init__(self, metric='bottleneck', metric_params={'order': np.inf}, n_jobs=1):
         self.metric = metric
         self.metric_params = metric_params

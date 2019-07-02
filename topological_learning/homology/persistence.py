@@ -11,27 +11,40 @@ from ripser import ripser
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """
-    Transformer for the calculation of persistence diagrams from Vietoris-Rips filtration.
+    Transformer for the calculation of persistence diagrams resulting from Vietoris-Rips
+    filtrations. Given a point cloud in Euclidean space or an abstract metric space
+    encoded by a distance matrix, information about the appearance and disappearance
+    of ``topological holes'' (technically, homology classes) of various dimensions and
+    at different distance scales is summarised in the persistence diagram.
 
     Parameters
     ----------
-    samplingType : str
-        The type of sampling
+    data_type : 'points' | 'distance_matrix', optional, default: 'points'
+        Whether input data is to be interpreted as a collection of point clouds
+        in a Euclidean space, or as a collection of distance matrices.
 
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+    max_edge_length : float, optional, default: np.inf
+        Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
+        Points whose distance is greater than this value will never be connected by an
+        edge, and topological features at scales larger than this value will not be
+        detected.
 
-    Attributes
-    ----------
-    isFitted : boolean
-        Whether the transformer has been fitted
+    homology_dimensions : list, optional, default: [0, 1]
+        List of dimensions (non-negative integers). Topological holes of each of
+        these dimensions will be detected.
+
+    pad : boolean, optional, default: True
+        Whether or not some of the resulting persistence diagrams
+        should be padded with zeros so that the final collection of persistence
+        diagrams can be cast as a single numpy array.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
     """
 
-    def __init__(self, data_type='points', max_edge_length=np.inf, homology_dimensions=[0, 1], pad=True, n_jobs=1):
+    def __init__(self, data_type='points', max_edge_length=np.inf, homology_dimensions=[0, 1], pad=True, n_jobs=None):
         self.data_type = data_type
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -39,6 +52,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'data_type': self.data_type,
                 'max_edge_length': self.max_edge_length,
                 'homology_dimensions': self.homology_dimensions,
@@ -76,12 +101,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return stacked_diagrams
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
+            Input data. If ``data_type=='distance_matrix'``, the input should be
+            an ndarray whose each entry along axis 0 is a distance matrix of shape
+            (n_points, n_points). Otherwise, each such entry will be interpreted as
+            an ndarray of n_points in Euclidean space of dimension n_features.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -90,28 +121,47 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
+
         self._validate_params(self.data_type)
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Computes, for each dimension in ``homology_dimensions`` and for each
+        point cloud or distance matrix in X, the relevant persistence diagram as
+        an array of pairs (b, d) -- one per persistent topological hole -- where
+        b is the scale at which the topological hole first appears, and d the scale
+        at which the same hole disappears.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
+            Input data. If ``data_type=='distance_matrix'``, the input should be
+            an ndarray whose each entry along axis 0 is a distance matrix of shape
+            (n_points, n_points). Otherwise, each such entry will be interpreted as
+            an ndarray of n_points in Euclidean space of dimension n_features.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : dict of int: ndarray or dict of int: list
+            Dictionary whose keys are the integers in ``self.homology_dimensions``,
+            and whose values are ndarrays if ``pad==True``, and lists otherwise.
+            In the former case, the ndarrays have shape (n_samples, M, 2) where,
+            if m_i is the number of persistent topological features (in the relevant
+            dimension) found in sample i, then M = max {m_i: i = 1, ..., n_samples}.
+            If ``pad==False``, then each list has length n_samples and its i-th entry
+            is an ndarrays of shape (m_i, 2).
+
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         is_distance_matrix = (self.data_type == 'distance_matrix')
 
@@ -119,16 +169,37 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                                         for i in range(X.shape[0]) )
 
         if self.pad:
-            max_length_list = [ np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]) for dimension in self.homology_dimensions ]
+            max_length_list = [np.max([
+                    X_transformed[i][dimension].shape[0]
+                    for i in range(len(X_transformed)) ])
+                for dimension in self.homology_dimensions ]
             X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
                                                             for i in range(len(X_transformed)) )
             X_transformed = self._stack_padded_diagrams(X_transformed)
+        else:
+            X_transformed = { dimension: [diag[dimension] for diag in X_transformed] for dimension in self.homology_dimensions }
 
         return X_transformed
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
-    def __init__(self, len_vector=8, n_jobs=1):
+    """
+    Transformer for the calculation of persistent entropy from collections of persistence
+    diagrams. Given a generic persistent diagram consisting of birth-death pairs (b, d),
+    its persistent entropy is simply the entropy (in base e) of the collection of
+    differences d-b, normalized by the sum of all such differences.
+
+    Parameters
+    ----------
+    len_vector : int, optional, default: 8
+        Used for performance optimization by exploiting numpy's vectorization capabilities.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
+    """
+    def __init__(self, len_vector=8, n_jobs=None):
         self.len_vector = len_vector
         self.n_jobs = n_jobs
 
@@ -148,43 +219,63 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         return - np.sum(np.nan_to_num(X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
-            Parameters
-            ----------
-            X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
-            y : None
+        Parameters
+        ----------
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers representing
+            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
+            whose each entries along axis 0 are persistence diagrams. For example, X
+            could be the result of applying the ``transform`` method of a ``VietorisRipsPersistence``
+            transformer to a collection of point clouds/distance matrices, but only if
+            the transformer is instantiated with ``pad=True``.
+
+        y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
 
-            Returns
-            -------
-            self : object
+        Returns
+        -------
+        self : object
             Returns self.
-            """
+
+        """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     #@jit
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """For each key in the dictionary X and for each persistence diagram in the
+        corresponding ndarray, computes that diagram's persistent entropy. All results
+        are arranged into an ndarray of appropriate shape.
 
-            Parameters
-            ----------
-            X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        Parameters
+        ----------
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers representing
+            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
+            whose each entries along axis 0 are persistence diagrams. For example, X
+            could be the result of applying the ``transform`` method of a ``VietorisRipsPersistence``
+            transformer to a collection of point clouds/distance matrices, but only if
+            the transformer is instantiated with ``pad=True``.
 
-            Returns
-            -------
-            X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
-            """
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        X_transformed : ndarray, shape (n_samples, n_X_keys, 1) CHECK!!!!!!!!!!
+            Array of persistent entropies (one value per sample and per key in X).
+
+        """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X[next(iter(X.keys()))].shape[0]
         n_dimensions = len(X.keys())
