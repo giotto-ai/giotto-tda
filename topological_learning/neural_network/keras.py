@@ -207,7 +207,7 @@ class KerasRegressorWrapper(KerasRegressor):
         return KerasRegressorWrapper(**params)
 
     def fit(self, X, y=None, **kwargs):
-                """
+        """
         Fit the Keras neural network on the training set (X, y).
 
         Parameters
@@ -230,7 +230,6 @@ class KerasRegressorWrapper(KerasRegressor):
         #  X, y = check_X_y(X, y)
         # Store the classes seen during fit
         #  self.classes_ = unique_labels(y)
-
         self._input_shape = X.shape[1:]
         return KerasRegressor.fit(self, X, y, verbose=0, **kwargs)
 
