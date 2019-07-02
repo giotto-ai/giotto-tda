@@ -1,3 +1,6 @@
+# author: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: BSD
+
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -6,16 +9,27 @@ import numpy as np
 
 class Derivatives(BaseEstimator, TransformerMixin):
     """
+    Transform a time series of points in an embedded space into a time
+    series of derivatives of those points.
 
     Parameters
     ----------
+    orders : list of ints, default: [0, 1, 2]
+        List of derivative orders to return.
 
-    Attributes
-    ----------
-    isFitted : boolean
-        Whether the transformer has been fitted
+    Examples
+    --------
+    >>> from topological_learning.manifold import StatefulMDS, Derivatives
+    >>> X, _ = load_digits(return_X_y=True)
+    >>> X.shape
+    (1797, 64)
+    >>> embedding = MDS(n_components=2)
+    >>> X_embedded = embedding.fit(X[:100]).transform(X[:100])
+    >>> derivatives = Derivatives(orders=[0, 1, 2])
+    >>> X_derived = derivatives.fit(X_embedded).transform(X_embedded)
+    >>> X_derived.shape
+    (98, 2)
     """
-
     def __init__(self, orders=[0, 1, 2]):
         self.orders = orders
 
@@ -30,12 +44,16 @@ class Derivatives(BaseEstimator, TransformerMixin):
         pass
 
     def fit(self, X, y = None):
-        """A reference implementation of a fitting function for a transformer.
+        """
+        Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_featurers)
+            Input data.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -47,25 +65,36 @@ class Derivatives(BaseEstimator, TransformerMixin):
         """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """
+        Computes the position of the points X in the same embedding space calculated
+        in fit and returns the embedded coordinates
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
+            Input data. If ``dissimilarity=='precomputed'``, the input should
+            be the dissimilarity matrix.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        init : ndarray, shape (n_samples,), optional, default: None
+            Starting configuration of the embedding to initialize the SMACOF
+            algorithm. By default, the algorithm is initialized with a randomly
+            chosen array.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : ndarray, shape (n_samples - max_order, n_features, n_orders)
+            Points and their derivative at the required orders
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         max_order = max(self.orders)
         n_orders = len(self.orders)
