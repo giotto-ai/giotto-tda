@@ -103,8 +103,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         if self.metric in ['landscape', 'betti']:
             self.metric_params['sampling'] = _sample(self._X, self._n_samples)
-        else:
-            self.metric_params.pop('n_samples')
 
         self._is_fitted = True
         return self
