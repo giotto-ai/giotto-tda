@@ -20,7 +20,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
     The computation during ``fit`` is::
         classifier.fit(X, resampler.transform(y, X)).
     The computation during ``predict`` is::
-        classifier.predict(X)).
+        classifier.predict(X).
     Parameters
     ----------
     classifier : object, default=LogisticRegression()
@@ -44,7 +44,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
     >>> ss = 2
     >>> res = TargetResampler(step_size=ss)
     >>> trc = TargetResamplingClassifier(classifier=LogisticRegression(),
-    ...                                   resampler=res)
+    ...                                  resampler=res)
     >>> X = np.arange(4).reshape(-1,ss)
     >>> y = np.asarray([0,1,0])
     >>> trc.fit(X, y) # doctest: +ELLIPSIS
@@ -174,7 +174,7 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
     The computation during ``fit`` is::
         regressor.fit(X, resampler.transform(y, X)).
     The computation during ``predict`` is::
-        regressor.predict(X)).
+        regressor.predict(X).
     Parameters
     ----------
     regressor : object, default=LinearRegression()

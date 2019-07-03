@@ -11,13 +11,61 @@ import itertools
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1, n_jobs=1):
+    """Transformer rescaling pairwise distances in data according to the ideas in
+    `arXiv:1606.02353 <https://arxiv.org/abs/1606.02353>`_.
+    The computation during ``transform``, for each entry in X, is:
+        :math:`d_{\\mathrm{consistent}}(\\star_i, \\star_j) = \\frac{d(\\star_i, \\star_j)}{\\sqrt{d(\\star_i, \\star_{k_i}) \\cdot \\sqrt{d(\\star_j, \\star_{k_j})}}`
+    (MASSIVE LULZ AS THIS WILL FAIL TO COMPILE IN SPHINXTER) where :math:`\\star_i, \\star_j`
+    are the i-th and j-th data instances in that entry, :math:`d` is the original
+    distance function, and :math:`k_i` is the index of the k-th nearest neighbor
+    to :math:`\\star_i` according to :math:`d`.
+
+    Parameters
+    ----------
+    metric : string or callable, optional, default: 'euclidean'
+        If set to ``'precomputed'``, each entry in X along axis 0 is interpreted to
+        be a distance matrix. Otherwise, entries are interpreted as feature arrays,
+        and ``metric`` determines a rule with which to calculate distances between
+        pairs of instances (i.e. rows) in these arrays.
+        If ``metric`` is a string, it must be one of the options allowed by
+        scipy.spatial.distance.pdist for its metric parameter, or a metric listed
+        in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean", "manhattan",
+        or "cosine"
+        If ``metric`` is a callable function, it is called on each pair of instances
+        and the resulting value recorded. The callable should take two arrays from
+        the entry in X as input, and return a value indicating the distance between them.
+
+    metric_params : dict, optional, default: {}
+        Additional keyword arguments for the metric function.
+
+    n_neighbor : int, optional, default: 1
+        Rank of the neighbors to be used to modify the metric structure according
+        to the consistent rescaling procedure.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
+    """
+    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.n_neighbor = n_neighbor
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'metric': self.metric, 'metric_params': self.metric_params,
                 'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}
 
@@ -40,12 +88,18 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         return X_consistent + X_consistent.T
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
+            Input data. If ``metric=='precomputed'``, the input should be an ndarray
+            whose each entry along axis 0 is a distance matrix of shape
+            (n_points, n_points). Otherwise, each such entry will be interpreted as
+            an ndarray of n_points in Euclidean space of dimension n_features.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -53,7 +107,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self
+            Returns self.
+
         """
         self._validate_params()
 
@@ -62,18 +117,28 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     #@jit
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """For each entry in the input data array X, finds the metric structure
+        after consistent rescaling and encodes it as a distance matrix. Then,
+        arranges all results in a single ndarray of appropriate shape.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
+            Input data. If ``metric=='precomputed'``, the input should be an ndarray
+            whose each entry along axis 0 is a distance matrix of shape
+            (n_points, n_points). Otherwise, each such entry will be interpreted as
+            an ndarray of n_points in Euclidean space of dimension n_features.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : ndarray, shape (n_samples, n_points, n_points)
+            Array containing (as entries along axis 0) the distance matrices after
+            consistent rescaling.
+
         """
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
