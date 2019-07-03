@@ -14,11 +14,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     """Transformer rescaling pairwise distances in data according to the ideas in
     `arXiv:1606.02353 <https://arxiv.org/abs/1606.02353>`_.
     The computation during ``transform``, for each entry in X, is:
-        :math:`d_{\\mathrm{consistent}}(\\star_i, \\star_j) = \\frac{d(\\star_i, \\star_j)}{\\sqrt{d(\\star_i, \\star_{k_i}) \\cdot \\sqrt{d(\\star_j, \\star_{k_j})}}`
-    (MASSIVE LULZ AS THIS WILL FAIL TO COMPILE IN SPHINXTER) where :math:`\\star_i, \\star_j`
-    are the i-th and j-th data instances in that entry, :math:`d` is the original
-    distance function, and :math:`k_i` is the index of the k-th nearest neighbor
-    to :math:`\\star_i` according to :math:`d`.
+        :math:`d_{\mathrm{consistent}}(\star_i, \star_j) = [d(\star_i, \star_{k_i}) d(\star_j, \star_{k_j})]^{-1/2}d(\star_i, \star_j)`
+    where :math:`\\star_i, \\star_j` are the :math:`i`-th and :math:`j`-th data
+    instances in that entry, :math:`d` is the original distance function, and
+    :math:`k_i` is the index of the :math:`k`-th nearest neighbor to :math:`\\star_i`
+    according to :math:`d`.
 
     Parameters
     ----------
@@ -65,6 +65,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+            
         """
         return {'metric': self.metric, 'metric_params': self.metric_params,
                 'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}
