@@ -1,6 +1,7 @@
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.neighbors.base import VALID_METRICS
 
 from sklearn.utils._joblib import Parallel, delayed
 
@@ -14,14 +15,23 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     Transformer for the calculation of persistence diagrams resulting from Vietoris-Rips
     filtrations. Given a point cloud in Euclidean space or an abstract metric space
     encoded by a distance matrix, information about the appearance and disappearance
-    of ``topological holes'' (technically, homology classes) of various dimensions and
+    of "topological holes" (technically, homology classes) of various dimensions and
     at different distance scales is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
-    data_type : 'points' | 'distance_matrix', optional, default: 'points'
-        Whether input data is to be interpreted as a collection of point clouds
-        in a Euclidean space, or as a collection of distance matrices.
+    metric : string or callable, optional, default: 'euclidean'
+        If set to ``'precomputed'``, input data is to be interpreted as a collection
+        of distance matrices. Otherwise, input data is to be interpreted as a collection
+        of point clouds (i.e. feature arrays), and ``metric`` determines a rule with which
+        to calculate distances between pairs of instances (i.e. rows) in these arrays.
+        If ``metric`` is a string, it must be one of the options allowed by
+        scipy.spatial.distance.pdist for its metric parameter, or a metric listed
+        in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean", "manhattan",
+        or "cosine".
+        If ``metric`` is a callable function, it is called on each pair of instances
+        and the resulting value recorded. The callable should take two arrays from
+        the entry in X as input, and return a value indicating the distance between them.
 
     max_edge_length : float, optional, default: np.inf
         Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
@@ -44,8 +54,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, data_type='points', max_edge_length=np.inf, homology_dimensions=[0, 1], pad=True, n_jobs=None):
-        self.data_type = data_type
+    def __init__(self, metric='euclidean', max_edge_length=np.inf, homology_dimensions=[0, 1], pad=True, n_jobs=None):
+        self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
         self.pad = pad
@@ -64,24 +74,24 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         params : mapping of string to any
             Parameter names mapped to their values.
         """
-        return {'data_type': self.data_type,
+        return {'metric': self.metric,
                 'max_edge_length': self.max_edge_length,
                 'homology_dimensions': self.homology_dimensions,
                 'pad': self.pad,
                 'n_jobs': self.n_jobs}
 
     @staticmethod
-    def _validate_params(data_type):
+    def _validate_params(metric):
         """A class method that checks whether the hyperparameters and the input parameters
            of the :meth:'fit' are valid.
         """
-        implemented_data_types = ['points', 'distance_matrix']
+        implemented_metric_types = set(['precomputed'] + [met for i in VALID_METRICS.values() for met in i])
 
-        if data_type not in implemented_data_types:
-            return ValueError('The data type you specified is not implemented')
+        if metric not in implemented_metric_types:
+            return ValueError('The metric you specified is not implemented.')
 
-    def _ripser_diagram(self, X, is_distance_matrix):
-        diagram = ripser(X, distance_matrix = is_distance_matrix, maxdim = max(self.homology_dimensions), thresh = self.max_edge_length)['dgms']
+    def _ripser_diagram(self, X, is_distance_matrix, metric):
+        diagram = ripser(X, distance_matrix=is_distance_matrix, metric=metric, maxdim=max(self.homology_dimensions), thresh=self.max_edge_length)['dgms']
 
         if 0 in self.homology_dimensions:
             diagram[0] = diagram[0][:-1, :]
@@ -108,8 +118,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``data_type=='distance_matrix'``, the input should be
-            an ndarray whose each entry along axis 0 is a distance matrix of shape
+            Input data. If ``metric=='precomputed'``, the input should be an ndarray
+            whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be interpreted as
             an ndarray of n_points in Euclidean space of dimension n_features.
 
@@ -124,7 +134,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
 
-        self._validate_params(self.data_type)
+        self._validate_params(self.metric)
 
         self._is_fitted = True
         return self
@@ -139,7 +149,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``data_type=='distance_matrix'``, the input should be
+            Input data. If ``metric=='precomputed'``, the input should be
             an ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be interpreted as
             an ndarray of n_points in Euclidean space of dimension n_features.
@@ -163,9 +173,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-        is_distance_matrix = (self.data_type == 'distance_matrix')
+        is_distance_matrix = (self.metric == 'precomputed')
 
-        X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, metric)
                                                         for i in range(X.shape[0]) )
 
         if self.pad:

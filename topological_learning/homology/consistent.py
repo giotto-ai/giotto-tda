@@ -29,7 +29,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         pairs of instances (i.e. rows) in these arrays.
         If ``metric`` is a string, it must be one of the options allowed by
         scipy.spatial.distance.pdist for its metric parameter, or a metric listed
-        in pairwise.PAIRWISE_DISTANCE_FUNCTIONS.
+        in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean", "manhattan",
+        or "cosine"
         If ``metric`` is a callable function, it is called on each pair of instances
         and the resulting value recorded. The callable should take two arrays from
         the entry in X as input, and return a value indicating the distance between them.
@@ -45,15 +46,26 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless in
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
-
     """
-    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1, n_jobs=1):
+    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.n_neighbor = n_neighbor
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'metric': self.metric, 'metric_params': self.metric_params,
                 'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}
 
