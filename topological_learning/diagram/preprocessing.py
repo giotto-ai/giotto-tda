@@ -246,18 +246,20 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         return X_scaled
 
     def inverse_transform(self, X, copy=None):
-        """Scale back the data to the original representation
+        """Scale back the data to the original representation. Multiplies by the
+        scale found in ``fit``.
 
         Parameters
         ----------
-        X : array-like, shape [n_samples, n_features]
-            The data used to scale along the features axis.
+        X : dict of int: ndarray
+            Data to apply the inverse transform to.
+
         copy : bool, optional (default: None)
             Copy the input X or not.
 
         Returns
         -------
-        X_tr : array-like, shape [n_samples, n_features]
+        X_scaled : dict of int: ndarray
             Transformed array.
         """
         check_is_fitted(self, ['_is_fitted'])
@@ -266,9 +268,54 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         return X_scaled
 
 class DiagramFilter(BaseEstimator, TransformerMixin):
+    """Transformer filtering collections of persistence diagrams in which each
+    diagram is partitioned into one or more subdiagrams (e.g. according to
+    homology dimension).
+
+    Filtering a persistence (sub)diagram means removing
+    all points whose distance from the diagonal is less than or equal to a
+    certain cutoff value: that is, the cutoff value can be interpreted as the
+    "minimum amount of persistence" required from points in the filtered diagram.
+
+    Parameters
+    ----------
+    homology_dimensions : list or None, optional, default: None
+        When set to ``None``, all available (sub)diagrams will be filtered. When
+        set to a list, it is interpreted as the list of those homology dimensions
+        for which (sub)diagrams should be filtered.
+
+    filtering_parameters_type : str, optional, default: 'fixed'
+        When set to ``'fixed'``, ``'epsilon'`` is ignored and filtering consists
+        simply in removing from all persistent (sub)diagrams all points an absolute
+        distance ``delta`` from the diagonal.
+
+    delta : float, optional, default: 0.
+        The cutoff value controlling the amount of filtering.
+
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+        Behaviour not implemented. This variable is currently ignored.
+
+    metric_params : dict, optional, default: {'n_samples': 200}
+        Behaviour not implemented. This variable is currently ignored.
+
+    epsilon : float, optional, default: 1.
+        Behaviour not implemented. This variable is currently ignored.
+
+    tolerance : float, optional, default: 1e-2
+        Behaviour not implemented. This variable is currently ignored.
+
+    max_iteration : int, optional, default: 20
+        Behaviour not implemented. This variable is currently ignored.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
+    """
+
     implemented_filtering_parameters_types = ['fixed', 'search']
 
-    def __init__(self, homology_dimensions=None, filtering_parameters_type='search', delta=0.,
+    def __init__(self, homology_dimensions=None, filtering_parameters_type='fixed', delta=0.,
                  metric='bottleneck', metric_params={'order': np.inf}, epsilon=1.,
                  tolerance=1e-2, max_iteration=20, n_jobs=None):
         self.homology_dimensions = homology_dimensions
@@ -282,6 +329,20 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+    """Get parameters for this estimator.
+
+    Parameters
+    ----------
+    deep : boolean, optional, default: True
+        Behaviour not yet implemented.
+
+    Returns
+    -------
+    params : mapping of string to any
+        Parameter names mapped to their values.
+
+    """
+
         return {'homology_dimensions': self.homology_dimensions,
                 'filtering_parameters_type': self.filtering_parameters_type,
                 'delta': self.delta,
@@ -328,18 +389,71 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         return middleCutoff
 
     def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+
         if not self.homology_dimensions:
             self.homology_dimensions = set(X.keys())
 
         self._validate_params(self.filtering_parameters_type)
 
-        # self.delta = self.delta
-
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        # Check is fit had been called
+        """Filters all relevant persistence (sub)diagrams, and returns them.
+
+        Parameters
+        ----------
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        X_filtered : dict of int: ndarray
+            Dictionary of filtered persistence (sub)diagrams. The value
+            corresponding to key d has shape (n_samples, F_d, 2), where
+            :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to filtering.
+            If ``homology_dimensions`` was set to be a list not containing all
+            keys in X, only the corresponding (sub)diagrams are filtered and returned.
+
+        """
+
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         X = _sort(X, self.homology_dimensions)
