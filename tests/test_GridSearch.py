@@ -108,7 +108,7 @@ def get_param_grid():
 
     aggregator_param['n_steps_in_past'] = [ 2 ]
 
-    classification_param['steps_kwargs'] = [
+    classification_param['layers_kwargs'] = [
         [
             {'layer': klayers.normalization.BatchNormalization},
             {'layer': layer, 'units': units, 'activation': 'tanh'},
