@@ -65,6 +65,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+            
         """
         return {'metric': self.metric, 'metric_params': self.metric_params,
                 'n_neighbor': self.n_neighbor, 'n_jobs': self.n_jobs}

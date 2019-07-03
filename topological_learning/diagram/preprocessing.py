@@ -13,19 +13,10 @@ from .distance import DiagramDistance
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of persistence diagrams from Vietoris-Rips filtration.
-
-    Parameters
-    ----------
-    samplingType : str
-        The type of sampling
-
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+    """Transformer for stacking persistence subdiagrams. Useful when topological
+    persistence information per sample has been previously separated according
+    to some criterion (e.g. by homology dimension if produced by an instance of
+    ```VietorisRipsPersistence``).
 
     """
 
@@ -33,6 +24,19 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         pass
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+
+        """
         return {}
 
     @staticmethod
@@ -43,12 +47,22 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         pass
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -57,6 +71,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
         self._validate_params()
 
@@ -64,18 +79,31 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Stacks all available persistence subdiagrams corresponding to each sample
+        into one persistence diagram.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : dict of None: ndarray
+            Dictionary with a single ``None`` key, and corresponding value an
+            ndarray of shape (n_samples, :math:`\\sum_{\\mathrm{d}}` M_d, 2).
+
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])

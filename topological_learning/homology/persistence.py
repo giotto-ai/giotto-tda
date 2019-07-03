@@ -163,11 +163,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         X_transformed : dict of int: ndarray or dict of int: list
             Dictionary whose keys are the integers in ``self.homology_dimensions``,
             and whose values are ndarrays if ``pad == True``, and lists otherwise.
-            In the former case, the ndarrays have shape (n_samples, M, 2) where,
-            if m_i is the number of persistent topological features (in the relevant
-            dimension) found in sample i, then M = max {m_i: i = 1, ..., n_samples}.
+            In the former case, the ndarrays have shape (n_samples, M_d, 2) where,
+            if m_{d,i} is the number of persistent topological features in the relevant
+            dimension d found in sample i, then M_d = max {m_{d,i}: i = 1, ..., n_samples}.
             If ``pad == False``, then each list has length n_samples and its i-th entry
-            is an ndarrays of shape (m_i, 2).
+            is an ndarrays of shape (m_{d,i}, 2).
 
         """
         # Check is fit had been called
@@ -193,10 +193,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of persistent entropy from collections of persistence
-    diagrams. Given a generic persistence diagram consisting of birth-death pairs (b, d),
-    its persistent entropy is simply the entropy (in base e) of the collection of
-    differences d-b, normalized by the sum of all such differences.
+    """Transformer for the calculation of persistent entropy from collections of
+    persistence diagrams. Given a generic persistence diagram consisting of
+    birth-death pairs (b, d), its persistent entropy is simply the (base e) entropy
+    of the collection of differences d - b, normalized by the sum of all such differences.
 
     Parameters
     ----------
@@ -235,12 +235,14 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers representing
-            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
-            whose each entries along axis 0 are persistence diagrams. For example, X
-            could be the result of applying the ``transform`` method of a ``VietorisRipsPersistence``
-            transformer to a collection of point clouds/distance matrices, but only if
-            that transformer was instantiated with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -266,12 +268,14 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers representing
-            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
-            whose each entries along axis 0 are persistence diagrams. For example, X
-            could be the result of applying the ``transform`` method of a ``VietorisRipsPersistence``
-            transformer to a collection of point clouds/distance matrices, but only if
-            that transformer was instantiated with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
