@@ -5,19 +5,19 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 
 
-def derivation_function(function, X, delta_t=1, **function_kwargs):
+def _derivation_function(function, X, delta_t=1, **function_kwargs):
     partialWindowBegin = function(X[:, delta_t:], axis=1, **function_kwargs)
     partialWindowEnd = function(X[:, :-delta_t], axis=1, **function_kwargs)
     derivative = (partialWindowEnd - partialWindowBegin) / partialWindowBegin / delta_t
     return derivative.reshape((-1, 1))
 
-def variation_function(function, X, delta_t=1, **function_kwargs):
+def _variation_function(function, X, delta_t=1, **function_kwargs):
     fullWindow = function(X, axis=1, **function_kwargs)
     partialWindow = function(X[:, :-delta_t], axis=1, **function_kwargs)
     variation = (fullWindow - partialWindow) / partialWindow / delta_t
     return variation.reshape((-1, 1))
 
-def application_function(function, X, axis=1, delta_t=0, **function_kwargs):
+def _application_function(function, X, axis=1, delta_t=0, **function_kwargs):
     return function(X, axis=1, **function_kwargs).reshape((-1, 1))
 
 class Labeller(BaseEstimator, TransformerMixin):
@@ -41,8 +41,8 @@ class Labeller(BaseEstimator, TransformerMixin):
     isFitted : boolean
         Whether the transformer has been fitted
     """
-    implementedLabellingRecipes = {'application': application_function, 'variation': variation_function,
-                                   'derivation': derivation_function}
+    implementedLabellingRecipes = {'application': _application_function, 'variation': _variation_function,
+                                   'derivation': _derivation_function}
 
     def __init__(self, labelling_kwargs={'type': 'derivation', 'delta_t': 1}, function_kwargs={'function': np.std},
                  window_size=2, percentiles=None, n_steps_future=1):
