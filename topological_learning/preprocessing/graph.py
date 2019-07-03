@@ -22,7 +22,7 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
     ----------
     isFitted : boolean
         Whether the transformer has been fitted
-        
+
     Examples
     --------
     >>> graphEmbedder = prep.UniqueGraphEmbedder(n_jobs=1)
@@ -272,7 +272,7 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
 
 
 class GeodesicDistance(BaseEstimator, TransformerMixin):
-    def __init__(self, n_jobs=1):
+    def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):

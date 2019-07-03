@@ -21,20 +21,25 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
         classifier.fit(X, resampler.transform(y, X)).
     The computation during ``predict`` is::
         classifier.predict(X).
+
     Parameters
     ----------
     classifier : object, default=LogisticRegression()
         Classifier object such as derived from ``ClassifierMixin``. This
         classifier will automatically be cloned each time prior to fitting.
+
     resampler : object, default=None
         Estimator object such as derived from ``TransformerMixin``. Note that
         this resampler will be cloned during fitting.
+
     Attributes
     ----------
     classifier_ : object
         Fitted classifier.
+
     resampler_ : object
         Clone of the resampler used in ``fit``.
+
     Examples
     --------
     >>> import numpy as np
@@ -53,11 +58,13 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
     1.0
     >>> trc.classifier_.coef_
     array([[0.45235762, 0.19441371]])
+
     Notes
     -----
     Internally, the target ``y`` is always converted into a 2-dimensional array
     to be used by scikit-learn transformers. At the time of prediction, the
     output will be reshaped to a have the same number of dimensions as ``y``.
+
     """
     def __init__(self, classifier=None, resampler=None):
         self.classifier = classifier
@@ -68,19 +75,22 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y, sample_weight=None):
         """Fit the model according to the given training data.
+
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape (n_samples, n_1, ...)
             Training array, where n_samples is the number of samples and
             the total number of features is the product of all n_i's.
+
         y : array-like, shape (n_samples,)
-            Target values.
-        sample_weight : array-like, shape (n_samples,) optional
+            Target values.pe (n_samples,) optional
             Array of weights that are assigned to individual samples.
             If not provided, then each sample is given unit weight.
+
         Returns
         -------
         self : object
+
         """
         y = check_array(y, accept_sparse=False, force_all_finite=True,
                         ensure_2d=False, dtype='numeric')
@@ -120,18 +130,21 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
 
     def predict(self, X):
         """Predict using the base classifier.
+
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape = (n_samples, n_1, ...)
             Samples.
+
         Returns
         -------
         y_hat : array, shape = (n_samples,)
             Predicted values.
+
         """
         check_is_fitted(self, "classifier_")
-        yhat = self.classifier_.predict(X)
-        return yhat
+        y_hat = self.classifier_.predict(X)
+        return y_hat
 
     def predict_proba(self, X, **kwargs):
         """Returns class probability estimates for the given test data.
@@ -141,6 +154,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
             X: array-like, shape `(n_samples, n_1, ...)`
                 Test samples where `n_samples` is the number of samples
                 and the total number of features is the product of all n_i's.
+
             **kwargs: dictionary arguments
                 Legal arguments are the arguments
                 of `Sequential.predict_classes`.
@@ -153,6 +167,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
                 to match the scikit-learn API,
                 will return an array of shape `(n_samples, 2)`
                 (instead of `(n_sample, 1)` as in Keras).
+
         """
         check_is_fitted(self, "classifier_")
         return self.classifier_.predict_proba(X)
@@ -175,20 +190,25 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
         regressor.fit(X, resampler.transform(y, X)).
     The computation during ``predict`` is::
         regressor.predict(X).
+
     Parameters
     ----------
     regressor : object, default=LinearRegression()
         Regressor object such as derived from ``RegressorMixin``. This
         regressor will automatically be cloned each time prior to fitting.
+
     resampler : object, default=None
         Estimator object such as derived from ``TransformerMixin``. Note that
         this resampler will be cloned during fitting.
+
     Attributes
     ----------
     regressor_ : object
         Fitted regressor.
+
     resampler_ : object
         Clone of the resampler used in ``fit``.
+
     Examples
     --------
     >>> import numpy as np
@@ -207,11 +227,13 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
     1.0
     >>> trc.regressor_.coef_
     array([0.25, 0.25])
+
     Notes
     -----
     Internally, the target ``y`` is always converted into a 2-dimensional array
     to be used by scikit-learn transformers. At the time of prediction, the
     output will be reshaped to a have the same number of dimensions as ``y``.
+
     """
     def __init__(self, regressor=None, resampler=None):
         self.regressor = regressor
@@ -222,19 +244,24 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y, sample_weight=None):
         """Fit the model according to the given training data.
+
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape (n_samples, n_1, ...)
             Training array, where n_samples is the number of samples and
             the total number of features is the product of all n_i's.
+
         y : array-like, shape (n_samples,)
             Target values.
+
         sample_weight : array-like, shape (n_samples,) optional
             Array of weights that are assigned to individual samples.
             If not provided, then each sample is given unit weight.
+
         Returns
         -------
         self : object
+
         """
         y = check_array(y, accept_sparse=False, force_all_finite=True,
                         ensure_2d=False, dtype='numeric')
@@ -275,31 +302,37 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
 
     def predict(self, X):
         """Predict using the base regressor.
+
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape = (n_samples, n_1, ...)
             Samples.
+
         Returns
         -------
         y_hat : array, shape = (n_samples,)
             Predicted values.
+
         """
         check_is_fitted(self, "regressor_")
-        yhat = self.regressor_.predict(X)
-        return yhat
+        y_hat = self.regressor_.predict(X)
+        return y_hat
 
 
 class TargetResampler(BaseEstimator, TransformerMixin):
     """Simple resampler subsampling data at regular steps, up to a maximum
     number of samples equal to the length of another array. Convenience object
     adapted for use as a resampler inside a TargetResamplingClassifier.
+
     Parameters
     ----------
     step_size : int, default=1
         The difference between index values of consecutively sampled values.
+
     from_right : bool, default=True
         When True, we ensure that the last entry is sampled. When False, we
         ensure that the first entry is sampled.
+
     """
     def __init__(self, step_size=1, from_right=True):
         self.step_size = step_size
@@ -314,17 +347,21 @@ class TargetResampler(BaseEstimator, TransformerMixin):
     def _get_indices(self, y, max_num):
         """Obtain indices for resampling of y, up to a maximum number max_num
         of samples. Called by self.transform().
+
         Parameters
         ----------
         y : array-like
             Array of target values.
+
         max_num : int
             Maximum number of indices to be returned
+
         Returns
         -------
         indices : list
             List of index values. Will be modified in self.transform() if
             self.from_right is True
+
         """
         all_indices = list(range(0, len(y), self.step_size))
         indices = all_indices[:max_num]
@@ -332,15 +369,19 @@ class TargetResampler(BaseEstimator, TransformerMixin):
 
     def fit(self, y, X=None):
         """Fit the resampler.
+
         Parameters
         ----------
         y : array-like
             Array of target values.
+
         X : {array-like, sparse matrix}, default=None
             Reference array, typically a feature array.
+
         Returns
         -------
         self : object
+
         """
         self._validate_params()
 
@@ -350,16 +391,20 @@ class TargetResampler(BaseEstimator, TransformerMixin):
     def transform(self, y, X):
         """Resample y according to the length of reference array X, self.step_size
         and self.from_right.
+
         Parameters
         ----------
         y : array-like
             Array of target values.
+
         X : {array-like, sparse matrix}
             Reference array, typically a feature array.
+
         Returns
         -------
         y_res : array-like
             Resampling of y.
+
         """
         check_is_fitted(self, "_is_fitted")
 

@@ -28,7 +28,7 @@ class PermutationEmbedder(BaseEstimator, TransformerMixin):
         Whether the transformer has been fitted
     """
 
-    def __init__(self, len_vector=8, n_jobs=1):
+    def __init__(self, len_vector=8, n_jobs=None):
         self.len_vector = len_vector
         self.n_jobs = n_jobs
 
@@ -93,7 +93,7 @@ class PermutationEmbedder(BaseEstimator, TransformerMixin):
 
 
 class PermutationEntropy(BaseEstimator, TransformerMixin):
-    def __init__(self, len_vector=8, n_jobs=1):
+    def __init__(self, len_vector=8, n_jobs=None):
         self.len_vector = len_vector
         self.n_jobs = n_jobs
 
