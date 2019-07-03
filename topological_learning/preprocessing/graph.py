@@ -15,20 +15,19 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    samplingType : str
-        The type of sampling
-
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+    n_jobs : int or None, optional, default: None
+        This varible defines the number of parallel jobs to run.
 
     Attributes
     ----------
     isFitted : boolean
         Whether the transformer has been fitted
+        
+    Examples
+    --------
+    >>> graphEmbedder = prep.UniqueGraphEmbedder(n_jobs=1)
+    >>> graphEmbedder.fit(zPermEmbedded)
+    >>> zPermGraph = graphEmbedder.transform(zPermEmbedded)
     """
 
     def __init__(self, n_jobs=None):
