@@ -13,7 +13,7 @@ from ._utils import _sample, _pad
 class DiagramDistance(BaseEstimator, TransformerMixin):
     """Transformer for calculating distances between collections of persistence diagrams.
     In the case in which diagrams in the collection have been consistently partitioned
-    into multiple subdiagrams (e.g. according to homology dimension), the distance
+    into one or more subdiagrams (e.g. according to homology dimension), the distance
     between any two diagrams is a *p*-norm of a vector of distances between
     respective subdiagrams of the same kind.
 
