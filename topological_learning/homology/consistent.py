@@ -143,7 +143,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(pairwise_distances) (X[i], metric=self.metric, n_jobs=1, **metric_params)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(pairwise_distances) (X[i], metric=self.metric, n_jobs=1, **self.metric_params)
                                                        for i in range(X.shape[0]) )
 
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._consistent_homology_distance)(X_transformed[i], self.n_neighbor)

@@ -1,8 +1,5 @@
-"""
-Multi-dimensional Scaling (MDS)
-"""
-
 # author: Nelle Varoquaux <nelle.varoquaux@gmail.com>
+#         Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: BSD
 
 import numpy as np
@@ -20,7 +17,8 @@ from sklearn.isotonic import IsotonicRegression
 
 def _smacof_single(dissimilarities, X_previous = None, metric=True, n_components=2, init=None,
                    max_iter=300, verbose=0, eps=1e-3, random_state=None):
-    """Computes multidimensional scaling using SMACOF algorithm
+    """
+    Computes multidimensional scaling using SMACOF algorithm
 
     Parameters
     ----------
@@ -133,10 +131,11 @@ def _smacof_single(dissimilarities, X_previous = None, metric=True, n_components
     return X, stress, it + 1
 
 
-def smacof(dissimilarities, X_previous = None, metric=True, n_components=2, init=None, n_init=8,
+def _smacof(dissimilarities, X_previous = None, metric=True, n_components=2, init=None, n_init=8,
            n_jobs=None, max_iter=300, verbose=0, eps=1e-3, random_state=None,
            return_n_iter=False):
-    """Computes multidimensional scaling using the SMACOF algorithm.
+    """
+    Computes multidimensional scaling using the SMACOF algorithm.
 
     The SMACOF (Scaling by MAjorizing a COmplicated Function) algorithm is a
     multidimensional scaling algorithm which minimizes an objective function
@@ -278,9 +277,10 @@ def smacof(dissimilarities, X_previous = None, metric=True, n_components=2, init
 
 
 class StatefulMDS(BaseEstimator, TransformerMixin):
-    """Multidimensional scaling
-
-    Read more in the :ref:`User Guide <multidimensional_scaling>`.
+    """
+    Stateful Multidimensional scaling is a Multidimensional scaling technique
+    that fixes the embedding space during fitting and embed new points at the
+    transform step. It extends sk-learn's MDS transformer with statefulness.
 
     Parameters
     ----------
@@ -342,12 +342,12 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> from sklearn.datasets import load_digits
-    >>> from sklearn.manifold import MDS
+    >>> from topological_learning.manifold import StatefulMDS
     >>> X, _ = load_digits(return_X_y=True)
     >>> X.shape
     (1797, 64)
-    >>> embedding = MDS(n_components=2)
-    >>> X_transformed = embedding.fit_transform(X[:100])
+    >>> embedding = StatefulMDS(n_components=2)
+    >>> X_transformed = embedding.fit(X[:100]).transform(X[:100])
     >>> X_transformed.shape
     (100, 2)
 
@@ -382,20 +382,26 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None, init=None):
         """
-        Computes the position of the points in the embedding space
+        Computes the position of the points X in the embedding space
 
         Parameters
         ----------
-        X : array, shape (n_samples, n_features) or (n_samples, n_samples)
+        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
             Input data. If ``dissimilarity=='precomputed'``, the input should
             be the dissimilarity matrix.
 
-        y : Ignored
+        y : None
+            Ignored.
 
         init : ndarray, shape (n_samples,), optional, default: None
             Starting configuration of the embedding to initialize the SMACOF
             algorithm. By default, the algorithm is initialized with a randomly
             chosen array.
+
+        Returns
+        -------
+        self : object
+            Returns self.
         """
         X = check_array(X)
         if X.shape[0] == X.shape[1] and self.dissimilarity != 'precomputed':
@@ -415,7 +421,7 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
             raise ValueError("Proximity must be 'precomputed' or 'euclidean'."
                              " Got %s instead" % str(self.dissimilarity))
 
-        self.embedding_fit_, self.stress_fit_, self.n_iter_fit_ = smacof(
+        self.embedding_fit_, self.stress_fit_, self.n_iter_fit_ = _smacof(
             self.dissimilarity_matrix_fit_, metric=self.metric,
             n_components=self.n_components, init=init, n_init=self.n_init,
             n_jobs=self.n_jobs, max_iter=self.max_iter, verbose=self.verbose,
@@ -426,15 +432,17 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None, init=None):
         """
-        Fit the data from X, and returns the embedded coordinates
+        Computes the position of the points X in the same embedding space calculated
+        in fit and returns the embedded coordinates
 
         Parameters
         ----------
-        X : array, shape (n_samples, n_features) or (n_samples, n_samples)
+        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
             Input data. If ``dissimilarity=='precomputed'``, the input should
             be the dissimilarity matrix.
 
-        y : Ignored
+        y : None
+            Ignored.
 
         init : ndarray, shape (n_samples,), optional, default: None
             Starting configuration of the embedding to initialize the SMACOF
@@ -467,7 +475,7 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
                 raise ValueError("Proximity must be 'precomputed' or 'euclidean'."
                                  " Got %s instead" % str(self.dissimilarity))
 
-            self.embedding_, self.stress_, self.n_iter_ = smacof(
+            self.embedding_, self.stress_, self.n_iter_ = _smacof(
                 self.dissimilarity_matrix_, self.embedding_fit_, metric=self.metric,
                 n_components=self.n_components, init=init, n_init=self.n_init,
                 n_jobs=self.n_jobs, max_iter=self.max_iter, verbose=self.verbose,

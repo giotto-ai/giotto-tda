@@ -37,7 +37,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
-    'sphinx_gallery.gen_gallery',
+    # 'sphinx_gallery.gen_gallery',
     'sphinx_issues',
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
