@@ -13,31 +13,30 @@ from .distance import DiagramDistance
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):
-    """
-    Transformer for the calculation of persistence diagrams from Vietoris-Rips filtration.
+    """Transformer for stacking persistence subdiagrams. Useful when topological
+    persistence information per sample has been previously separated according
+    to some criterion (e.g. by homology dimension if produced by an instance of
+    ```VietorisRipsPersistence``).
 
-    Parameters
-    ----------
-    samplingType : str
-        The type of sampling
-
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
-
-    Attributes
-    ----------
-    is_fitted : boolean
-        Whether the transformer has been fitted
     """
 
     def __init__(self):
         pass
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+
+        """
         return {}
 
     @staticmethod
@@ -48,12 +47,22 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         pass
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -62,71 +71,125 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Stacks all available persistence subdiagrams corresponding to each sample
+        into one persistence diagram.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : dict of None: ndarray
+            Dictionary with a single ``None`` key, and corresponding value an
+            ndarray of shape (n_samples, :math:`\\sum_{\\mathrm{d}}` M_d, 2).
+
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_transformed = { None: np.concatenate(list(X.values()), axis=1)}
         return X_transformed
 
 
 class DiagramScaler(BaseEstimator, TransformerMixin):
-    """
-    data sampling transformer that returns a sampled Pandas dataframe with a datetime index
+    """Transformer scaling collections of persistence diagrams in which each
+    diagram is partitioned into one or more subdiagrams (e.g. according to
+    homology dimension).
+
+    A scale factor is calculated during ``fit`` which depends on the entire
+    collection, and it is applied during ``transform``. The value of the scale
+    factor depends on a chosen norm function which is internally evaluated on
+    each persistent diagram separately, and on a function (e.g. np.max) which
+    is applied to the resulting collection of norms to extract a single scale factor.
 
     Parameters
     ----------
-    samplingType : str
-        The type of sampling
+    norm : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+        The type of norm on persistence diagrams to be used. Defined in terms of
+        identically named distance functions between pairs of diagrams (see
+        :mod:'topological_learning.diagram.distance'), as the distance between
+        a diagram (or curve) and the trivial diagram (or curve).
 
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+    norm_params : dict, optional, default: {'n_samples': 200}
+        Additional keyword arguments for the norm function:
 
-    Attributes
-    ----------
-    is_fitted : boolean
-        Whether the transformer has been fitted
+        - If ``norm == 'bottleneck'`` the only argument is ``order`` (default = ``np.inf``).
+        - If ``norm == 'wasserstein'`` the only argument is ``order`` (default = ``1``).
+        - If ``norm == 'landscape'`` the available arguments are ``order``
+          (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
+          (default = ``1``).
+        - If ``norm == 'betti'`` the available arguments are ``order`` (default = ``2``)
+           and ``n_samples`` (default = ``200``).
+
+    function : callable, optional, default: numpy.max
+        Function used to extract a single positive scalar from the collection of
+        norms of diagrams.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
     """
 
-    def __init__(self, norm='bottleneck', norm_params={'order': np.inf}, function=np.max, n_jobs=1):
+    def __init__(self, norm='bottleneck', norm_params={'n_samples': 200}, function=np.max, n_jobs=None):
         self.norm = norm
         self.norm_params = norm_params
         self.function = function
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
-        return {'norm': self.norm, 'norm_params': self.norm_params, 'function': self.function, 'n_jobs': self.n_jobs}
-
-    def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Get parameters for this estimator.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+
+        """
+        return {'norm': self.norm, 'norm_params': self.norm_params, 'function': self.function, 'n_jobs': self.n_jobs}
+
+    def fit(self, X, y=None):
+        """Fits the transformer by finding the scale factor according to the
+        chosen parameters.
+
+        Parameters
+        ----------
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -147,25 +210,37 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         norm_array = _parallel_norm(X, self.norm, norm_params, self.n_jobs)
         self._scale = self.function(norm_array)
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     #@jit
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Rescales all persistence diagrams in the collection according to the
+        factor computed during ``fit``.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : dict of int: ndarray
+            Input data. Dictionary whose keys are typically non-negative integers
+            d representing homology dimensions, and whose values are ndarrays of
+            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
+            diagrams with M_d persistent topological features. For example, X
+            could be the result of applying the ``transform`` method of a
+            ``VietorisRipsPersistence`` transformer to a collection of point
+            clouds/distance matrices, but only if that transformer was instantiated
+            with ``pad=True``.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_scaled : dict of int: ndarray
+            Dictionary of rescaled persistence (sub)diagrams, each with the same
+            shape as the corresponding (sub)diagram in X.
         """
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_scaled = { dimension: X / self._scale for dimension, X in X.items() }
         return X_scaled
@@ -185,7 +260,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X_tr : array-like, shape [n_samples, n_features]
             Transformed array.
         """
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_scaled = { dimension: X * self._scale for dimension, X in X.items() }
         return X_scaled
@@ -195,7 +270,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     def __init__(self, homology_dimensions=None, filtering_parameters_type='search', delta=0.,
                  metric='bottleneck', metric_params={'order': np.inf}, epsilon=1.,
-                 tolerance=1e-2, max_iteration=20, n_jobs=1):
+                 tolerance=1e-2, max_iteration=20, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.filtering_parameters_type = filtering_parameters_type
         self.delta = delta
@@ -260,12 +335,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         # self.delta = self.delta
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X = _sort(X, self.homology_dimensions)
 
