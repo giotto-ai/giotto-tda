@@ -78,7 +78,7 @@ def make_pipeline():
         ('diagram', hl.VietorisRipsPersistence()),
         ('distance', diag.DiagramDistance()),
         ('physical', ma.StatefulMDS()),
-        ('derivatives', ma.Derivatives()),
+        ('kinematics', ma.Kinematics()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
         ('aggregator', cp.FeatureAggregator(is_keras=True)),
         ('classification', cp.TargetResamplingClassifier(classifier=nn.KerasClassifierWrapper(),
@@ -91,7 +91,7 @@ def get_param_grid():
     distance_param = {}
     diagram_param = {}
     physical_param = {}
-    derivatives_param = {}
+    kinematics_param = {}
     scaling_param = {}
     aggregator_param = {}
     classification_param = {}
@@ -104,7 +104,7 @@ def get_param_grid():
 
     physical_param['n_components'] = [ 3 ]
 
-    derivatives_param['orders'] = [ [0, 1, 2] ]
+    kinematics_param['orders'] = [ [0, 1, 2] ]
 
     aggregator_param['n_steps_in_past'] = [ 2 ]
 
@@ -126,13 +126,13 @@ def get_param_grid():
     diagram_param_grid = {'diagram__' + k: v for k, v in diagram_param.items()}
     distance_param_grid = {'distance__' + k: v for k, v in distance_param.items()}
     physical_param_grid = {'physical__' + k: v for k, v in physical_param.items()}
-    derivatives_param_grid = {'derivatives__' + k: v for k, v in derivatives_param.items()}
+    kinematics_param_grid = {'kinematics__' + k: v for k, v in kinematics_param.items()}
     scaling_param_grid = {'scaling__' + k: v for k, v in scaling_param.items()}
     aggregator_param_grid = {'aggregator__' + k: v for k, v in aggregator_param.items()}
     classification_param_grid = {'classification__classifier__' + k: v for k, v in classification_param.items()}
 
     param_grid = [ {**embedding_param_grid, **diagram_param_grid, **distance_param_grid,  **physical_param_grid,
-                    **derivatives_param_grid, **scaling_param_grid, **aggregator_param_grid, **classification_param_grid,
+                    **kinematics_param_grid, **scaling_param_grid, **aggregator_param_grid, **classification_param_grid,
                     'embedding__outer_window_stride': [ outer_window_stride ], 'classification__resampler__step_size': [outer_window_stride] }
                     for outer_window_stride in [2, 5] ]
 
