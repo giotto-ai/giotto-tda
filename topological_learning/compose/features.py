@@ -79,7 +79,7 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
             Rearanged features array by sequences of n_steps_in_past.
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_is_itted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0] - self.n_steps_in_past + 1
         indexer = np.arange(n_samples)[:, None] + np.arange(self.n_steps_in_past)[None, :]

@@ -17,8 +17,8 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'Topological Learning'
-copyright = '2019, Guillaume Tauzin'
-author = 'Guillaume Tauzin'
+copyright = '2019, Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina'
+author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
