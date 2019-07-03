@@ -5,8 +5,7 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 import numpy as np
 
 class FeatureAggregator(BaseEstimator, TransformerMixin):
-    """
-    Transformer that rearanges the features in sequences of features for the
+    """Transformer that rearanges the features in sequences of features for the
     final estimator.
 
     Parameters
@@ -16,6 +15,7 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
 
     is_keras : boolean
         Whether the final estimator is a neural_network.
+
     """
 
     def __init__(self, n_steps_in_past=10, is_keras=False):
@@ -27,15 +27,14 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params():
-        """
-        A class method that checks whether the hyperparameters and the input parameters
+        """A class method that checks whether the hyperparameters and the input parameters
         of the :meth:'fit' are valid.
+
         """
         pass
 
     def fit(self, X, y = None):
-        """
-        Do nothing and return the estimator unchanged.
+        """Do nothing and return the estimator unchanged.
         This method is just there to implement the usual API and hence
         work in pipelines.
 
@@ -52,6 +51,7 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
         self._validate_params()
 
@@ -59,8 +59,7 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None, copy=None):
-        """
-        Rearange input features X into a sequence of n_steps_in_past features.
+        """Rearange input features X into a sequence of n_steps_in_past features.
         If is_keras = False, the sequence of features is unrolled.
 
         Parameters
@@ -77,6 +76,7 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
         X_transformed : ndarray, shape (n_samples-n_steps_in_past+1, n_steps_in_past)
         if is_keras=True or (n_samples-n_steps_in_past+1, n_features*n_steps_in_past) else
             Rearanged features array by sequences of n_steps_in_past.
+
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])

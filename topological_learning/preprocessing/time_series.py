@@ -15,27 +15,22 @@ class Resampler(BaseEstimator, TransformerMixin):
     ----------
     sampling_type : str, optional, default: 'periodic'
         The type of sampling. Its value can be either 'periodic' or 'fixed':
-        
+
         - 'periodic':
             It means sampling with a constant ``sampling_period``.
         - 'fixed':
             It entails that the list of sampling times has to be provided via the parameter
             ``sampling_times``.
-            
+
     sampling_period : str, optional, default: '2h'
         The sampling period for periodic sampling. Used only if samplingType is 'periodic'.
-        
+
     sampling_times : list of datetime, optional, default: ``dt.time(0,0,0)``
         Datetime at which the samples should be taken. Used only if samplingType is 'fixed'.
-        
+
     remove_weekends : boolean, optional, default: True
         Option to remove week-ends from the time-series DataFrame.
 
-    Attributes
-    ----------
-    isFitted : boolean
-        Whether the transformer has been fitted.
-        
     Examples
     --------
     >>> import pandas as pd
@@ -57,8 +52,8 @@ class Resampler(BaseEstimator, TransformerMixin):
     >>> zDataFrameSampled = periodicSampler.transform(zDataFrame)
     >>> plt.plot(zDataFrameSampled)
     >>> plt.plot(zDataFrame)
-    
-    
+
+
     """
     implemented_sampling_types = ['periodic', 'fixed']
 
@@ -101,7 +96,7 @@ class Resampler(BaseEstimator, TransformerMixin):
         """
         self._validate_params(self.sampling_type)
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -119,7 +114,7 @@ class Resampler(BaseEstimator, TransformerMixin):
             in `X`
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         if self.sampling_type == 'periodic':
             X = X.resample(self.sampling_period).first()
@@ -143,14 +138,14 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     sationarization_type : str, default: 'none'
         The type of stationarization technique with whcih to stationarize the time-series. It can
         have three values:
-        
+
         - 'none':
             No stationarization applied to the time-series.
-            
+
         - 'return':
             This option transforms the time series {X_t}_t into the time-series of relative
             returns, i.e. the ratio (X_t-X_{t-1})/X_t * 100.
-            
+
         - 'log-return':
             This option transforms the time-series series {X_t}_t into the time-series of relative
             log-returns, i.e. log(X_t/X_{t-1}).
@@ -159,7 +154,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     ----------
     isFitted : boolean
         Whether the transformer has been fitted
-        
+
     Examples
     --------
     >>> import topological_learning.preprocessing as prep
