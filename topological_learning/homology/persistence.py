@@ -175,7 +175,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         is_distance_matrix = (self.metric == 'precomputed')
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, metric)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, self.metric)
                                                         for i in range(X.shape[0]) )
 
         if self.pad:
