@@ -402,6 +402,7 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
         X = check_array(X)
         if X.shape[0] == X.shape[1] and self.dissimilarity != 'precomputed':
@@ -448,6 +449,11 @@ class StatefulMDS(BaseEstimator, TransformerMixin):
             Starting configuration of the embedding to initialize the SMACOF
             algorithm. By default, the algorithm is initialized with a randomly
             chosen array.
+
+        Returns
+        -------
+        X_transformed : object
+            Returns self.
         """
         n_samples = X.shape[0]
 

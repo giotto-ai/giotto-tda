@@ -17,51 +17,61 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     In order to obtain meaningful topological features from a time series, we use a
     delayed-time embedding technique, invented by F. Takens in the late sixties. The
     idea is simple: given a time series X(t), one can extract a sequence of vectors
-    of the form X_i := [(X(t_i)), X(t_i + 2 tau), ..., X(t_i + M tau)]. The difference
-    between t_i and t_i-1 is called stride; the numbers M and tau are optimized authomatically
-    in this example (they can be set by the user if needed).
+    of the form :math:`X_i := [(X(t_i)), X(t_i + 2 \tau), ..., X(t_i + (d-1) \tau)]`.
+    :math:'\tau` is the embedding time delay and :math:'d' is the embedding dimension.
+    The difference between t_i and t_{i-1} is called stride; the numbers M and tau are
+    optimized authomatically in this example (they can be set by the user if needed).
     The outer window allows us to apply Takens embedding locally on a certain interval
     rather than over the whole time series. The result of this procedure is therefore a
     time series of point clouds with possibly interesting topologies.
 
     Parameters
     ----------
-
     outer_window_duration: int, default: 20
-        Duration of the outer sliding window
+        Duration of the outer sliding window.
 
     outer_window_stride: int, default: 2
-        Stride of the outer sliding window
+        Stride of the outer sliding window.
 
-    embedding_dimension: int, default: 5
-        Duration of the inner sliding window
-
-    embedding_stride: int, default: 1
-        Stride of the inner sliding window
-        
-    embedding_time_delay: int, default: 1
-        The resampling time interval. The time-series will be resampled at
-        t_n = t + n * embedding_time_delay for n in N.
-    
     embedding_parameters_type: str, default: 'search'
         This parameter allow the user to choose the parameters ``embedding_tyme_delay``
         and ``embedding_stride`` manually or to optimize automatically optimize their values. It
         accepts two possible values:
-    
+
         - 'search':
             It automatically optimize the parameters ``embedding_tyme_delay``
             and ``embedding_stride`` using mutual information and false nearest neightbors criteria.
         - 'fixed':
             It allows the user to choose the value for the parameters ``embedding_tyme_delay``
             and ``embedding_stride``.
-            
-    n_jobs: int or None, default: None
-        Number of cores to be used in the computation.
-            
+
+    embedding_time_delay: int, default: 1
+        Time delay between two consecutive values for constructing one embedded point.
+        If ``embedding_parameters_type`` is 'search', it corresponds to the maximal embedding time delay
+        that will be considered.
+
+    embedding_dimension: int, default: 5
+        Dimension of the embedding space. If ``embedding_parameters_type`` is 'search', it corresponds
+        the maximum embedding dimension that will be considered.
+
+    embedding_stride: int, default: 1
+        Stride duration between two consecutive embedded points. It defaults to 1 as this value corresponds
+        to the one implied by the Takens embedding theorem.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
     Attributes
     ----------
-    inputShape : tuple The shape the data passed to :meth:`fit`
-    
+    embedding_time_delay_: int
+        Actual embedding time delay used to embed. If ``embedding_parameters_type`` is 'search', it is the
+        calculated optimal embedding time delay. Otherwise it has the same value as ``embedding_time_delay``.
+
+    embedding_dimension_: int
+        Actual embedding dimension used to embed. If ``embedding_parameters_type`` is 'search', it is the
+        calculated optimal embedding dimension. Otherwise it has the same value as ``embedding_dimension``.
+
     Examples
     --------
     >>> import pandas as pd
@@ -71,40 +81,41 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random() for x in range(0,1000)])
     >>> # Set up the Takens Embedder
-    >>> outerWindowDuration = 50
-    >>> outerWindowStride = 5
-    >>> embedder = prep.TakensEmbedder(outer_window_duration=outerWindowDuration,
-    ... outer_window_stride=outerWindowStride,
-    ... embedding_parameters_type='search', embedding_dimension=5, embedding_time_delay=1,
-    ... n_jobs=-1)
+    >>> outer_window_duration = 50
+    >>> outer_window_stride = 5
+    >>> embedder = prep.TakensEmbedder(outer_window_duration=outer_window_duration,
+    ...                                outer_window_stride=outer_window_stride,
+    ...                                embedding_parameters_type='search', embedding_dimension=5,
+    ...                                embedding_time_delay=1, n_jobs=-1)
     >>> # Fit and transform the DataFrame
     >>> embedder.fit(signal_noise)
-    >>> zEmbedded = embedder.transform(signal_noise)
-    >>> print('Optimal embedding time delay based on mutual information: ', embedder.embedding_time_delay)
+    >>> embedded_noise = embedder.transform(signal_noise)
+    >>> print('Optimal embedding time delay based on mutual information: ',
+    ...       embedder.embedding_time_delay_)
     Optimal embedding time delay based on mutual information:  1
     >>> print('Optimal embedding dimension based on false nearest neighbors: ',
-    ... embedder.embedding_dimension)
+    ...       embedder.embedding_dimension_)
     Optimal embedding dimension based on false nearest neighbors:  3
-    
+
     """
 
     implemented_embedding_parameters_types = ['fixed', 'search']
 
     def __init__(self, outer_window_duration=20, outer_window_stride=2, embedding_parameters_type='search',
-                 embedding_dimension=5, embedding_time_delay=1, embedding_stride=1, n_jobs=None):
+                 embedding_time_delay=1, embedding_dimension=5, embedding_stride=1, n_jobs=None):
         self.outer_window_duration = outer_window_duration
         self.outer_window_stride = outer_window_stride
         self.embedding_parameters_type = embedding_parameters_type
-        self.embedding_dimension = embedding_dimension
         self.embedding_time_delay = embedding_time_delay
+        self.embedding_dimension = embedding_dimension
         self.embedding_stride = embedding_stride
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
         return {'outer_window_duration': self.outer_window_duration, 'outer_window_stride': self.outer_window_stride,
                 'embedding_parameters_type': self.embedding_parameters_type,
-                'embedding_dimension': self.embedding_dimension,
                 'embedding_time_delay': self.embedding_time_delay,
+                'embedding_dimension': self.embedding_dimension,
                 'embedding_stride': self.embedding_stride,
                 'n_jobs': self.n_jobs}
 
@@ -119,7 +130,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     @staticmethod
     def _embed(X, outer_window_duration, outer_window_stride, embedding_time_delay, embedding_dimension, embedding_stride=1):
         n_outer_windows = (X.shape[0] - outer_window_duration) // outer_window_stride + 1
-        n_inner_windows = (outer_window_duration - embedding_time_delay*embedding_dimension) // embedding_stride + 1
+        n_points = (outer_window_duration - embedding_time_delay*embedding_dimension) // embedding_stride + 1
 
         X = np.flip(X)
 
@@ -128,10 +139,10 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
                 X[i*outer_window_stride + j*embedding_stride
                   : i*outer_window_stride + j*embedding_stride + embedding_time_delay*embedding_dimension
                   : embedding_time_delay].flatten()
-                for j in range(0, n_inner_windows) ] )
+                for j in range(0, n_points) ] )
             for i in range(0, n_outer_windows) ])
 
-        return np.flip(XEmbedded).reshape((n_outer_windows, n_inner_windows, embedding_dimension))
+        return np.flip(XEmbedded).reshape((n_outer_windows, n_points, embedding_dimension))
 
     @staticmethod
     def _mutual_information(X, embedding_time_delay, numberBins):
@@ -164,12 +175,15 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         return n_false_neighbors
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, 1)
+            Input data.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -184,31 +198,39 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         if self.embedding_parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs) ( delayed(self._mutual_information) (X, embedding_time_delay, numberBins=100)
                                                                for embedding_time_delay in range(1, self.embedding_time_delay+1) )
-            self.embedding_time_delay = mutual_information_list.index(min(mutual_information_list)) + 1
+            self.embedding_time_delay_ = mutual_information_list.index(min(mutual_information_list)) + 1
 
             n_false_neighbors_list = Parallel(n_jobs=self.n_jobs) ( delayed(self._false_nearest_neighbors) (X, self.embedding_time_delay, embedding_dimension, embedding_stride=1)
                                                                  for embedding_dimension in range(1, self.embedding_dimension+3) )
             variation_list = [ np.abs(n_false_neighbors_list[embedding_dimension-1]-2*n_false_neighbors_list[embedding_dimension]+n_false_neighbors_list[embedding_dimension+1]) \
                               /(n_false_neighbors_list[embedding_dimension] + 1)/embedding_dimension for embedding_dimension in range(1, self.embedding_dimension+1) ]
-            self.embedding_dimension = variation_list.index(min(variation_list)) + 1
+            self.embedding_dimension_ = variation_list.index(min(variation_list)) + 1
+
+        else:
+            self.embedding_time_delay_ = self.embedding_time_delay
+            self.embedding_dimension_ = self.embedding_dimension
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Computes the embedding of X.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, 1)
+            Input data.
+
+        y : None
+            Ignored.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : ndarray, shape (n_outer_windows, n_points, embedding_dimension_)
+            Array of embedded point cloud per outer window. ``n_outer_windows`` is :math:`(n_samples - outer_window_duration) // outer_window_stride + 1`
+            and ``n_points`` is :math:`(outer_window_duration - embedding_time_delay*embedding_dimension) // embedding_stride + 1`
         """
+
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
@@ -216,5 +238,5 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
             raise ValueError('Not enough data to have a single outer window.')
 
         X_transformed = self._embed(X, self.outer_window_duration, self.outer_window_stride,
-                                   self.embedding_time_delay, self.embedding_dimension, self.embedding_stride)
+                                   self.embedding_time_delay_, self.embedding_dimension_, self.embedding_stride)
         return X_transformed

@@ -38,15 +38,13 @@ class Kinematics(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params():
-        """
-        A class method that checks whether the hyperparameters and the input parameters
+        """A class method that checks whether the hyperparameters and the input parameters
         of the :meth:'fit' are valid.
         """
         pass
 
     def fit(self, X, y = None):
-        """
-        Do nothing and return the estimator unchanged.
+        """Do nothing and return the estimator unchanged.
         This method is just there to implement the usual API and hence
         work in pipelines.
 
@@ -70,8 +68,7 @@ class Kinematics(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        """
-        Computes the position of the points X in the same embedding space calculated
+        """Computes the position of the points X in the same embedding space calculated
         in fit and returns the embedded coordinates
 
         Parameters

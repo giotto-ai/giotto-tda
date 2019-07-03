@@ -23,13 +23,13 @@ class Resampler(BaseEstimator, TransformerMixin):
             ``sampling_times``.
 
     sampling_period : str, optional, default: '2h'
-        The sampling period for periodic sampling. Used only if samplingType is 'periodic'.
+        The sampling period for periodic sampling. Used only if sampling_type is 'periodic'.
 
-    sampling_times : list of datetime, optional, default: ``dt.time(0,0,0)``
-        Datetime at which the samples should be taken. Used only if samplingType is 'fixed'.
+    sampling_times : list of datetime, optional, default: [dt.time(0,0,0)]
+        dt.Datetime at which the samples should be taken. Used only if ``sampling_type`` is 'fixed'.
 
     remove_weekends : boolean, optional, default: True
-        Option to remove week-ends from the time-series DataFrame.
+        Option to remove week-ends from the time series pd.DataFrame.
 
     Examples
     --------
@@ -38,20 +38,21 @@ class Resampler(BaseEstimator, TransformerMixin):
     >>> import topological_learning.preprocessing as prep
     >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
-    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random() for x in range(0,300)])
+    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
+    ... for x in range(0,300)])
     >>> # Set up the dataframe of the z-projection of the simulated solution
-    >>> zDataFrame = pd.DataFrame(signal_noise)
-    >>> index = pd.to_datetime(zDataFrame.index, utc=True, unit='h')
-    >>> zDataFrame.index = index
+    >>> df_noise = pd.DataFrame(signal_noise)
+    >>> index = pd.to_datetime(df_noise.index, utc=True, unit='h')
+    >>> df_noise.index = index
     >>> # Set up the Sampler
-    >>> samplingPeriod = '10h'
-    >>> periodicSampler = prep.Resampler(sampling_type='periodic', sampling_period=samplingPeriod,
-    ... remove_weekends=False)
+    >>> sampling_period = '10h'
+    >>> periodic_sampler = prep.Resampler(sampling_type='periodic', sampling_period=sampling_period,
+    ...                                   remove_weekends=False)
     >>> # Fit and transform the DataFrame
-    >>> periodicSampler.fit(zDataFrame)
-    >>> zDataFrameSampled = periodicSampler.transform(zDataFrame)
-    >>> plt.plot(zDataFrameSampled)
-    >>> plt.plot(zDataFrame)
+    >>> periodicSampler.fit(df_noise)
+    >>> df_noise_sampled = periodicSampler.transform(df_noise)
+    >>> plt.plot(df_noise_sampled)
+    >>> plt.plot(df_noise)
 
 
     """
@@ -79,20 +80,23 @@ class Resampler(BaseEstimator, TransformerMixin):
             raise ValueError('The sampling type you specified is not implemented')
 
     def fit(self, X, y = None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            Ignored.
 
         Returns
         -------
         self : object
             Returns self.
+
         """
         self._validate_params(self.sampling_type)
 
@@ -100,18 +104,23 @@ class Resampler(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Resample X according to the 'sampling_type'.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : ndarray, shape (n_samples_new, n_features)
+            The resampled array. ``n_samples_new`` depends on ``sampling_period`` if ``sampling_type``
+            is 'periodic' or on the number of ``sampling_times`` if ``sampling_type`` is 'fixed'.
+
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
@@ -131,29 +140,21 @@ class Resampler(BaseEstimator, TransformerMixin):
 
 class Stationarizer(BaseEstimator, TransformerMixin):
     """
-    Data sampling transformer that returns a a stationarized Pandas dataframe with a datetime index
+    Data sampling transformer that returns a stationarized Pandas dataframe with a datetime index
 
     Parameters
     ----------
-    sationarization_type : str, default: 'none'
+    sationarization_type : str, default: 'return'
         The type of stationarization technique with whcih to stationarize the time-series. It can
-        have three values:
-
-        - 'none':
-            No stationarization applied to the time-series.
+        have two values:
 
         - 'return':
             This option transforms the time series {X_t}_t into the time-series of relative
-            returns, i.e. the ratio (X_t-X_{t-1})/X_t * 100.
+            returns, i.e. the ratio :math:`(X_t-X_{t-1})/X_t * 100`.
 
         - 'log-return':
             This option transforms the time-series series {X_t}_t into the time-series of relative
-            log-returns, i.e. log(X_t/X_{t-1}).
-
-    Attributes
-    ----------
-    isFitted : boolean
-        Whether the transformer has been fitted
+            log-returns, i.e. :math:`log(X_t/X_{t-1})`.
 
     Examples
     --------
@@ -163,15 +164,15 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random() for x in range(0,300)])
     >>> # Initzialize the stationarizer
-    >>> returnStationarizer = prep.Stationarizer(stationarization_type='return')
-    >>> returnStationarizer.fit(signal_noise)
-    >>> zDataFrameStationarized = returnStationarizer.transform(signal_noise)
-    >>> plt.plot(zDataFrameStationarized)
+    >>> return_stationarizer = prep.Stationarizer(stationarization_type='return')
+    >>> return_stationarizer.fit(signal_noise)
+    >>> signal_noise_stationarized = return_stationarizer.transform(signal_noise)
+    >>> plt.plot(signal_noise_stationarized)
+
     """
+    implemented_stationarization_types = ['return', 'log-return']
 
-    implemented_stationarization_types = ['none', 'return', 'log-return']
-
-    def __init__(self, stationarization_type = 'none'):
+    def __init__(self, stationarization_type='return'):
         self.stationarization_type = stationarization_type
 
     def get_params(self, deep=True):
@@ -186,46 +187,53 @@ class Stationarizer(BaseEstimator, TransformerMixin):
             raise ValueError('The transformation type you specified is not implemented')
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        """
+        self._validate_params(self.stationarization_type)
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X, y=None):
+        """Stationarize X according to the 'stationarization_type'.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
         -------
-        self : object
-            Returns self.
-        """
-        self._validate_params(self.stationarization_type)
+        X_transformed : ndarray, shape (n_samples-1, n_features)
+            The array containing the stationarized inputs.
 
-        self.is_fitted = True
-        return self
-
-    def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
-
-        Parameters
-        ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
-
-        Returns
-        -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_transformed = X
         if 'return' in self.stationarization_type:
-            X_transformed =np.diff(X_transformed)/ X_transformed[1:] * 100.
+            X_transformed = np.diff(X_transformed)/ X_transformed[1:] * 100.
 
         if 'log' in self.stationarization_type:
             X_transformed = np.log(X_transformed)
