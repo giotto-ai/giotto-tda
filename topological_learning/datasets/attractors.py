@@ -1,15 +1,16 @@
 import numpy as np
 from random import randint
 
+
 class Dataset(object):
-    def __init__(self, timeStep = 0.01, maxDuration = 20000, meanNoise = 0, stdDeviationNoise = 0):
-        self.timeStep = timeStep
-        self.maxDuration = maxDuration
-        self.meanNoise = meanNoise
-        self.stdDeviationNoise = stdDeviationNoise
+    def __init__(self, time_step=0.01, max_duration=20000, mean_noise=0, std_deviation_noise=0):
+        self.time_step = time_step
+        self.max_duration = max_duration
+        self.mean_noise = mean_noise
+        self.std_deviation_noise = std_deviation_noise
 
     def add_noise(self):
-        return np.random.normal(self.meanNoise, self.stdDeviationNoise, size=self.maxDuration)
+        return np.random.normal(self.mean_noise, self.std_deviation_noise, size=self.max_duration)
 
 class LorenzDataset(Dataset):
     """
@@ -27,66 +28,66 @@ class LorenzDataset(Dataset):
 
     Attributes
     ----------
-    isFitted : boolean
-        Whether the transformer has been fitted
+    rho_ : ndarray
+
     """
 
-    def __init__(self, initialConditions = (1, -10, 10), sigma = 10., beta = 8./3.,
-                 rhoMin = 5, rhoMax = 20, transitionList = None, numberTransitions = 25,
-                 transitionDuration = 100, timeStep = 0.01, maxDuration = 20000,
-                 meanNoise = 0, stdDeviationNoise = 0):
-        super(LorenzDataset, self).__init__(timeStep, maxDuration, meanNoise, stdDeviationNoise)
-        self.initialConditions = initialConditions
+    def __init__(self, initial_conditions=(1, -10, 10), sigma=10., beta=8./3.,
+                 rho_min=5, rho_max=20, transition_list=None, number_transitions=25,
+                 transition_duration=100, time_step=0.01, max_duration=20000,
+                 mean_noise = 0, std_deviation_noise=0):
+        super(LorenzDataset, self).__init__(time_step, max_duration, mean_noise, std_deviation_noise)
+        self.initial_conditions = initial_conditions
         self.sigma = sigma
-        self.beta  = beta
-        self.transitionList = transitionList
-        self.generate_rho(rhoMin, rhoMax, transitionList, numberTransitions, transitionDuration)
+        self.beta = beta
+        self.transition_list = transition_list
+        self.generate_rho(rho_min, rho_max, transition_list, number_transitions, transition_duration)
 
-    def generate_rho(self, rhoMin, rhoMax, transitionList, numberTransitions, transitionDuration):
-        self.rho = rhoMin * np.ones(self.maxDuration)
-        self.regime = np.zeros((self.maxDuration, 2), dtype=np.int8)
+    def generate_rho(self, rho_min, rho_max, transition_list, number_transitions, transition_duration):
+        self.rho_ = rho_min * np.ones(self.max_duration)
+        self.regime_ = np.zeros((self.max_duration, 2), dtype=np.int8)
 
-        if self.transitionList == None:
-            self.transitionList = [i/(2*numberTransitions) + randint(0,100)/2000. for i in range(2*numberTransitions)]
-            self.transitionList.sort()
-            # print(len(self.transitionList), self.transitionList)
+        if self.transition_list == None:
+            self.transition_list = [i/(2*number_transitions) + randint(0,100)/2000. for i in range(2*number_transitions)]
+            self.transition_list.sort()
+            # print(len(self.transition_list), self.transition_list)
 
-        for i in range(0, len(self.transitionList), 2):
-            peakBegin = int(self.transitionList[i] * self.maxDuration)
-            peakEnd = int(self.transitionList[i+1] * self.maxDuration)
+        for i in range(0, len(self.transition_list), 2):
+            peak_begin = int(self.transition_list[i] * self.max_duration)
+            peak_end = int(self.transition_list[i+1] * self.max_duration)
 
-            for n in range(peakBegin - transitionDuration, min(peakBegin, self.maxDuration)):
-                self.rho[n] = rhoMin + (n - (peakBegin - transitionDuration)) * (rhoMax - rhoMin) / transitionDuration
-                if self.rho[n] > 10:
-                    self.regime[n, :] = np.array([1, 1])
+            for n in range(peak_begin - transition_duration, min(peak_begin, self.max_duration)):
+                self.rho_[n] = rho_min + (n - (peak_begin - transition_duration)) * (rho_max - rho_min) / transition_duration
+                if self.rho_[n] > 10:
+                    self.regime_[n, :] = np.array([1, 1])
                 else:
-                    self.regime[n, :] = np.array([0, 1])
+                    self.regime_[n, :] = np.array([0, 1])
 
-            for n in range(peakBegin, min(peakEnd, self.maxDuration)):
-                self.rho[n] = rhoMax
-                self.regime[n, :] = np.array([1, 1])
+            for n in range(peak_begin, min(peak_end, self.max_duration)):
+                self.rho_[n] = rho_max
+                self.regime_[n, :] = np.array([1, 1])
 
-            for n in range(peakEnd, min(peakEnd + transitionDuration, self.maxDuration)):
-                self.rho[n] = rhoMax + (n - peakEnd)*(rhoMin - rhoMax) / transitionDuration
-                if self.rho[n] > 10:
-                    self.regime[n, :] = np.array([1, 1])
+            for n in range(peak_end, min(peak_end + transition_duration, self.max_duration)):
+                self.rho_[n] = rho_max + (n - peak_end)*(rho_min - rho_max) / transition_duration
+                if self.rho_[n] > 10:
+                    self.regime_[n, :] = np.array([1, 1])
                 else:
-                    self.regime[n, :] = np.array([1, 0])
+                    self.regime_[n, :] = np.array([1, 0])
 
     def run(self):
-        self.x, self.y, self.z = (np.zeros((self.maxDuration)) for _ in range(3))
-        self.x[0], self.y[0], self.z[0] = self.initialConditions
+        self.x_, self.y_, self.z_ = (np.zeros((self.max_duration)) for _ in range(3))
+        self.x_[0], self.y_[0], self.z_[0] = self.initial_conditions
 
-        for n in range(1, self.maxDuration):
-            self.x[n] = self.x[n-1] + (self.sigma * (self.y[n-1] - self.x[n-1])) * self.timeStep
-            self.y[n] = self.y[n-1] + (self.rho[n-1] * self.x[n-1] - self.x[n-1] * self.z[n-1] - self.y[n-1]) * self.timeStep
-            self.z[n] = self.z[n-1] + (self.x[n-1] * self.y[n-1] - self.beta * self.z[n-1]) * self.timeStep
+        for n in range(1, self.max_duration):
+            self.x_[n] = self.x_[n-1] + (self.sigma * (self.y_[n-1] - self.x_[n-1])) * self.time_step
+            self.y_[n] = self.y_[n-1] + (self.rho_[n-1] * self.x_[n-1] - self.x_[n-1] * self.z_[n-1] - self.y_[n-1]) * self.time_step
+            self.z_[n] = self.z_[n-1] + (self.x_[n-1] * self.y_[n-1] - self.beta * self.z_[n-1]) * self.time_step
 
-        self.x += self.add_noise()
-        self.y += self.add_noise()
-        self.z += self.add_noise()
+        self.x_ += self.add_noise()
+        self.y_ += self.add_noise()
+        self.z_ += self.add_noise()
 
-class LorenzLabeller():
+class _LorenzLabeller():
     """
     Target transformer for the Lorenz attractor.
 
