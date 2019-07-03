@@ -9,23 +9,56 @@ import datetime as dt
 
 class Resampler(BaseEstimator, TransformerMixin):
     """
-    data sampling transformer that returns a sampled Pandas dataframe with a datetime index
+    Data sampling transformer that returns a sampled Pandas dataframe with a datetime index.
 
     Parameters
     ----------
-    samplingType : str
-        The type of sampling
-
-    samplingPeriod : str
-        Time anchors giving the period of the sampling. Used only if samplingType is 'periodic'
-
-    samplingTimeList : list of datetime
-        Datetime at which the samples should be taken. Used only if samplingType is 'fixed'
+    sampling_type : str, optional, default: 'periodic'
+        The type of sampling. Its value can be either 'periodic' or 'fixed':
+        
+        - 'periodic':
+            It means sampling with a constant ``sampling_period``.
+        - 'fixed':
+            It entails that the list of sampling times has to be provided via the parameter
+            ``sampling_times``.
+            
+    sampling_period : str, optional, default: '2h'
+        The sampling period for periodic sampling. Used only if samplingType is 'periodic'.
+        
+    sampling_times : list of datetime, optional, default: ``dt.time(0,0,0)``
+        Datetime at which the samples should be taken. Used only if samplingType is 'fixed'.
+        
+    remove_weekends : boolean, optional, default: True
+        Option to remove week-ends from the time-series DataFrame.
 
     Attributes
     ----------
     isFitted : boolean
-        Whether the transformer has been fitted
+        Whether the transformer has been fitted.
+        
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import topological_learning.preprocessing as prep
+    >>> import matplotlib.pyplot as plt
+    >>> # Create a noisy signal sampled
+    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random() for x in range(0,300)])
+    >>> # Set up the dataframe of the z-projection of the simulated solution
+    >>> zDataFrame = pd.DataFrame(signal_noise)
+    >>> index = pd.to_datetime(zDataFrame.index, utc=True, unit='h')
+    >>> zDataFrame.index = index
+    >>> # Set up the Sampler
+    >>> samplingPeriod = '10h'
+    >>> periodicSampler = prep.Resampler(sampling_type='periodic', sampling_period=samplingPeriod,
+    ... remove_weekends=False)
+    >>> # Fit and transform the DataFrame
+    >>> periodicSampler.fit(zDataFrame)
+    >>> zDataFrameSampled = periodicSampler.transform(zDataFrame)
+    >>> plt.plot(zDataFrameSampled)
+    >>> plt.plot(zDataFrame)
+    
+    
     """
     implemented_sampling_types = ['periodic', 'fixed']
 
@@ -45,7 +78,7 @@ class Resampler(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(sampling_type):
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+           of the :meth:``fit`` are valid.
         """
         if sampling_type not in Resampler.implemented_sampling_types:
             raise ValueError('The sampling type you specified is not implemented')
@@ -103,23 +136,42 @@ class Resampler(BaseEstimator, TransformerMixin):
 
 class Stationarizer(BaseEstimator, TransformerMixin):
     """
-    data sampling transformer that returns a sampled Pandas dataframe with a datetime index
+    Data sampling transformer that returns a a stationarized Pandas dataframe with a datetime index
 
     Parameters
     ----------
-    samplingType : str
-        The type of sampling
-
-    samplingPeriod : str
-        Time anchors giving the period of the sampling. Used only if samplingType is 'periodic'
-
-    samplingTimeList : list of datetime
-        Datetime at which the samples should be taken. Used only if samplingType is 'fixed'
+    sationarization_type : str, default: 'none'
+        The type of stationarization technique with whcih to stationarize the time-series. It can
+        have three values:
+        
+        - 'none':
+            No stationarization applied to the time-series.
+            
+        - 'return':
+            This option transforms the time series {X_t}_t into the time-series of relative
+            returns, i.e. the ratio (X_t-X_{t-1})/X_t * 100.
+            
+        - 'log-return':
+            This option transforms the time-series series {X_t}_t into the time-series of relative
+            log-returns, i.e. log(X_t/X_{t-1}).
 
     Attributes
     ----------
     isFitted : boolean
         Whether the transformer has been fitted
+        
+    Examples
+    --------
+    >>> import topological_learning.preprocessing as prep
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> # Create a noisy signal sampled
+    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random() for x in range(0,300)])
+    >>> # Initzialize the stationarizer
+    >>> returnStationarizer = prep.Stationarizer(stationarization_type='return')
+    >>> returnStationarizer.fit(signal_noise)
+    >>> zDataFrameStationarized = returnStationarizer.transform(signal_noise)
+    >>> plt.plot(zDataFrameStationarized)
     """
 
     implemented_stationarization_types = ['none', 'return', 'log-return']
