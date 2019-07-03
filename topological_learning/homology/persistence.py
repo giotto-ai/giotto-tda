@@ -118,7 +118,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``metric=='precomputed'``, the input should be an ndarray
+            Input data. If ``metric == 'precomputed'``, the input should be an ndarray
             whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be interpreted as
             an ndarray of n_points in Euclidean space of dimension n_features.
@@ -149,7 +149,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``metric=='precomputed'``, the input should be
+            Input data. If ``metric == 'precomputed'``, the input should be
             an ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be interpreted as
             an ndarray of n_points in Euclidean space of dimension n_features.
@@ -162,11 +162,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         X_transformed : dict of int: ndarray or dict of int: list
             Dictionary whose keys are the integers in ``self.homology_dimensions``,
-            and whose values are ndarrays if ``pad==True``, and lists otherwise.
+            and whose values are ndarrays if ``pad == True``, and lists otherwise.
             In the former case, the ndarrays have shape (n_samples, M, 2) where,
             if m_i is the number of persistent topological features (in the relevant
             dimension) found in sample i, then M = max {m_i: i = 1, ..., n_samples}.
-            If ``pad==False``, then each list has length n_samples and its i-th entry
+            If ``pad == False``, then each list has length n_samples and its i-th entry
             is an ndarrays of shape (m_i, 2).
 
         """
@@ -193,9 +193,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
-    """
-    Transformer for the calculation of persistent entropy from collections of persistence
-    diagrams. Given a generic persistent diagram consisting of birth-death pairs (b, d),
+    """Transformer for the calculation of persistent entropy from collections of persistence
+    diagrams. Given a generic persistence diagram consisting of birth-death pairs (b, d),
     its persistent entropy is simply the entropy (in base e) of the collection of
     differences d-b, normalized by the sum of all such differences.
 
@@ -241,7 +240,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             whose each entries along axis 0 are persistence diagrams. For example, X
             could be the result of applying the ``transform`` method of a ``VietorisRipsPersistence``
             transformer to a collection of point clouds/distance matrices, but only if
-            the transformer is instantiated with ``pad=True``.
+            that transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -272,7 +271,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             whose each entries along axis 0 are persistence diagrams. For example, X
             could be the result of applying the ``transform`` method of a ``VietorisRipsPersistence``
             transformer to a collection of point clouds/distance matrices, but only if
-            the transformer is instantiated with ``pad=True``.
+            that transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API

@@ -13,8 +13,7 @@ from .distance import DiagramDistance
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):
-    """
-    Transformer for the calculation of persistence diagrams from Vietoris-Rips filtration.
+    """Transformer for the calculation of persistence diagrams from Vietoris-Rips filtration.
 
     Parameters
     ----------
@@ -28,10 +27,6 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
           object in the iterator should be a full (symmetric) square matrix (numpy array)
           of shape (number of points, number of points), __or a sparse distance matrix
 
-    Attributes
-    ----------
-    is_fitted : boolean
-        Whether the transformer has been fitted
     """
 
     def __init__(self):
@@ -65,7 +60,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -83,7 +78,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
             in `X`
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_transformed = { None: np.concatenate(list(X.values()), axis=1)}
         return X_transformed
@@ -105,13 +100,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
           object in the iterator should be a full (symmetric) square matrix (numpy array)
           of shape (number of points, number of points), __or a sparse distance matrix
 
-    Attributes
-    ----------
-    is_fitted : boolean
-        Whether the transformer has been fitted
     """
 
-    def __init__(self, norm='bottleneck', norm_params={'order': np.inf}, function=np.max, n_jobs=1):
+    def __init__(self, norm='bottleneck', norm_params={'order': np.inf}, function=np.max, n_jobs=None):
         self.norm = norm
         self.norm_params = norm_params
         self.function = function
@@ -147,7 +138,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         norm_array = _parallel_norm(X, self.norm, norm_params, self.n_jobs)
         self._scale = self.function(norm_array)
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     #@jit
@@ -165,7 +156,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
             The array containing the element-wise square roots of the values
             in `X`
         """
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_scaled = { dimension: X / self._scale for dimension, X in X.items() }
         return X_scaled
@@ -185,7 +176,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X_tr : array-like, shape [n_samples, n_features]
             Transformed array.
         """
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_scaled = { dimension: X * self._scale for dimension, X in X.items() }
         return X_scaled
@@ -195,7 +186,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     def __init__(self, homology_dimensions=None, filtering_parameters_type='search', delta=0.,
                  metric='bottleneck', metric_params={'order': np.inf}, epsilon=1.,
-                 tolerance=1e-2, max_iteration=20, n_jobs=1):
+                 tolerance=1e-2, max_iteration=20, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.filtering_parameters_type = filtering_parameters_type
         self.delta = delta
@@ -260,12 +251,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         # self.delta = self.delta
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X = _sort(X, self.homology_dimensions)
 
