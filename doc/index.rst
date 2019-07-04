@@ -25,6 +25,8 @@ Welcome to Topological Learning's API reference!
 
    preprocessing.TakensEmbedder
 
+   preprocessing.PermutationEmbedder
+
 
 :mod:`topological_learning.homology`: Persistent homology
 =========================================================
