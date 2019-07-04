@@ -58,9 +58,9 @@ Welcome to Topological Learning's API reference!
    :toctree: generated/
    :template: class.rst
 
-   diagram.DiagramStacking
-   diagram.DiagramScaling
-   diagram.DiagramFiltering
+   diagram.DiagramStacker
+   diagram.DiagramScaler
+   diagram.DiagramFilter
 
    diagram.DiagramDistance
 
