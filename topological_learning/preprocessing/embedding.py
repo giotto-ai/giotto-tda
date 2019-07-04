@@ -13,7 +13,9 @@ import math as m
 
 class TakensEmbedder(BaseEstimator, TransformerMixin):
     """Transformer returning a representation of a scalar-valued time series as
-    a time series of point clouds. Based on the following time-delay embedding
+    a time series of point clouds.
+
+    Based on the following time-delay embedding
     technique named after `F. Takens <https://doi.org/10.1007/BFb0091924>`_:
     given a time series :math:`X(t)`, one extracts a set of vectors in
     :math:`\\mathbb{R}^d`, each of the form
@@ -235,7 +237,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
             Array of embedded point cloud per outer window. ``n_outer_windows`` is
             ``(n_samples - outer_window_duration) // outer_window_stride + 1``,
             and ``n_points`` is ``(outer_window_duration - embedding_time_delay * embedding_dimension) // embedding_stride + 1`.
-            
+
         """
 
         # Check is fit had been called
