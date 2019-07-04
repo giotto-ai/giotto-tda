@@ -12,18 +12,23 @@ import math as m
 
 
 class TakensEmbedder(BaseEstimator, TransformerMixin):
-    """
-    Transformer that return a time serie embedded according to Taken's sliding window.
-    In order to obtain meaningful topological features from a time series, we use a
-    delayed-time embedding technique, named after F. Takens because of his 1981 paper. The
-    idea is simple: given a time series X(t), one can extract a sequence of vectors
-    of the form :math:`X_i := [(X(t_i)), X(t_i + 2 \\tau), ..., X(t_i + (d-1) \\tau)]`.
-    :math:`\\tau` is the embedding time delay and :math:`d` is the embedding dimension.
-    The difference between t_i and t_{i-1} is called stride; the numbers M and tau are
-    optimized authomatically in this example (they can be set by the user if needed).
-    The outer window allows us to apply Takens embedding locally on a certain interval
-    rather than over the whole time series. The result of this procedure is therefore a
-    time series of point clouds with possibly interesting topologies.
+    """Transformer returning a representation of a scalar-valued time series as
+    a time series of point clouds. Based on the following time-delay embedding
+    technique named after `F. Takens <https://doi.org/10.1007/BFb0091924>`_:
+    given a time series :math:`X(t)`, one extracts a set of vectors in
+    :math:`\\mathbb{R}^d`, each of the form
+        :math:`\Xi_i := (X(t_i), X(t_i + 2 \tau), ..., X(t_i + (d-1)) \tau)`.
+    The set :math:`\\{\Xi_i\\}` is called the Takens embedding of the time series,
+    :math:`\tau` is called the embedding time delay, :math:`d` is called the
+    embedding dimension, and the difference between :math:`t_i` and :math:`t_{i-1}`
+    is called the embedding stride.
+
+    If :math:`d` and :math:`\tau` are not explicitly set by the user, suitable
+    values are calculated during ``fit()``.
+
+    During ``transform()``, a Takens embedding procedure is applied on intervals
+    of the input time series called "outer windows", in a sliding-windxow fashion.
+    This allows to track the evolution of the dynamics underlying the time series.
 
     Parameters
     ----------
@@ -34,15 +39,15 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         Stride of the outer sliding window.
 
     embedding_parameters_type: str, default: 'search'
-        This parameter allow the user to choose the parameters ``embedding_tyme_delay``
+        This parameter allow the user to choose the parameters ``embedding_time_delay``
         and ``embedding_stride`` manually or to optimize automatically optimize their values. It
         accepts two possible values:
 
         - 'search':
-            It automatically optimize the parameters ``embedding_tyme_delay``
+            It automatically optimize the parameters ``embedding_time_delay``
             and ``embedding_stride`` using mutual information and false nearest neightbors criteria.
         - 'fixed':
-            It allows the user to choose the value for the parameters ``embedding_tyme_delay``
+            It allows the user to choose the value for the parameters ``embedding_time_delay``
             and ``embedding_stride``.
 
     embedding_time_delay: int, default: 1
@@ -96,9 +101,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> print('Optimal embedding dimension based on false nearest neighbors: ',
     ...       embedder.embedding_dimension_)
     Optimal embedding dimension based on false nearest neighbors:  3
-
-    References
-    ----------
 
     """
     def __init__(self, outer_window_duration=20, outer_window_stride=2, embedding_parameters_type='search',
