@@ -233,7 +233,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
         X_transformed = X
         if 'return' in self.stationarization_type:
-            X_transformed = np.diff(X_transformed)/ X_transformed[1:].
+            X_transformed = np.diff(X_transformed)/ X_transformed[1:]
 
         if 'log' in self.stationarization_type:
             X_transformed = np.log(X_transformed)
