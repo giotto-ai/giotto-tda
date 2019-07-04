@@ -6,17 +6,30 @@
 Welcome to Topological Learning's API reference!
 ================================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-   modules/preprocessing
-   modules/compose
-   modules/homology
-   modules/diagram
-   modules/manifold
-   modules/neural_network
-   modules/model_Selection
+:mod:`sklearn.calibration`: Preprocessing
+=========================================
+
+.. automodule:: topological_learning.preprocessing
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: topological_learning
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   preprocessing.Resampler
+
+   ..
+      modules/preprocessing
+      modules/compose
+      modules/homology
+      modules/diagram
+      modules/manifold
+      modules/neural_network
+      modules/model_Selection
 
 Indices and tables
 ==================
