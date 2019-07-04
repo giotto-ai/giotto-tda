@@ -342,7 +342,6 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             Parameter names mapped to their values.
 
         """
-
         return {'homology_dimensions': self.homology_dimensions,
                 'filtering_parameters_type': self.filtering_parameters_type,
                 'delta': self.delta,
