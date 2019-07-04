@@ -120,7 +120,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     A scale factor is calculated during ``fit`` which depends on the entire
     collection, and it is applied during ``transform``. The value of the scale
     factor depends on a chosen norm function which is internally evaluated on
-    each persistent diagram separately, and on a function (e.g. np.max) which
+    each persistent diagram separately, and on a function (e.g. ``np.max``) which
     is applied to the resulting collection of norms to extract a single scale factor.
 
     Parameters

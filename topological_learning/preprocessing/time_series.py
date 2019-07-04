@@ -23,7 +23,7 @@ class Resampler(BaseEstimator, TransformerMixin):
             ``sampling_times``.
 
     sampling_period : str, optional, default: '2h'
-        The sampling period for periodic sampling. Used only if sampling_type is 'periodic'.
+        The sampling period for periodic sampling. Used only if ``sampling_type`` is 'periodic'.
 
     sampling_times : list of datetime, optional, default: [dt.time(0,0,0)]
         dt.Datetime at which the samples should be taken. Used only if ``sampling_type`` is 'fixed'.
@@ -49,8 +49,8 @@ class Resampler(BaseEstimator, TransformerMixin):
     >>> periodic_sampler = prep.Resampler(sampling_type='periodic', sampling_period=sampling_period,
     ...                                   remove_weekends=False)
     >>> # Fit and transform the DataFrame
-    >>> periodicSampler.fit(df_noise)
-    >>> df_noise_sampled = periodicSampler.transform(df_noise)
+    >>> periodic_sampler.fit(df_noise)
+    >>> df_noise_sampled = periodic_sampler.transform(df_noise)
     >>> plt.plot(df_noise_sampled)
     >>> plt.plot(df_noise)
 
@@ -140,21 +140,21 @@ class Resampler(BaseEstimator, TransformerMixin):
 
 class Stationarizer(BaseEstimator, TransformerMixin):
     """
-    Data sampling transformer that returns a stationarized Pandas dataframe with a datetime index
+    Data sampling transformer that returns a stationarized Pandas dataframe with a datetime index.
 
     Parameters
     ----------
     sationarization_type : str, default: 'return'
-        The type of stationarization technique with whcih to stationarize the time-series. It can
+        The type of stationarization technique with which to stationarize the time series. It can
         have two values:
 
         - 'return':
-            This option transforms the time series {X_t}_t into the time-series of relative
-            returns, i.e. the ratio :math:`(X_t-X_{t-1})/X_t * 100`.
+            This option transforms the time series :math:`{X_t}_t` into the time series of relative
+            returns, i.e. the ratio :math:`(X_t-X_{t-1})/X_t`.
 
         - 'log-return':
-            This option transforms the time-series series {X_t}_t into the time-series of relative
-            log-returns, i.e. :math:`log(X_t/X_{t-1})`.
+            This option transforms the time series :math:`{X_t}_t` into the time series of relative
+            log-returns, i.e. :math:`\\log(X_t/X_{t-1})`.
 
     Examples
     --------
@@ -211,7 +211,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Stationarize X according to the 'stationarization_type'.
+        """Stationarize X according to ``stationarization_type``.
 
         Parameters
         ----------
@@ -224,7 +224,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples-1, n_features)
+        X_transformed : ndarray, shape (n_samples - 1, n_features)
             The array containing the stationarized inputs.
 
         """
@@ -233,7 +233,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
         X_transformed = X
         if 'return' in self.stationarization_type:
-            X_transformed = np.diff(X_transformed)/ X_transformed[1:] * 100.
+            X_transformed = np.diff(X_transformed)/ X_transformed[1:].
 
         if 'log' in self.stationarization_type:
             X_transformed = np.log(X_transformed)
