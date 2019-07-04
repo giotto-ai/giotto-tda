@@ -38,30 +38,29 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     outer_window_stride: int, default: 2
         Stride of the outer sliding window.
 
-    embedding_parameters_type: str, default: 'search'
-        This parameter allow the user to choose the parameters ``embedding_time_delay``
-        and ``embedding_stride`` manually or to optimize automatically optimize their values. It
-        accepts two possible values:
-
-        - 'search':
-            It automatically optimize the parameters ``embedding_time_delay``
-            and ``embedding_stride`` using mutual information and false nearest neightbors criteria.
-        - 'fixed':
-            It allows the user to choose the value for the parameters ``embedding_time_delay``
-            and ``embedding_stride``.
+    embedding_parameters_type: 'search' | 'fixed', default: 'search'
+        If set to 'fixed' and if values for ``embedding_time_delay`` and
+        ``embedding_dimension`` are provided, these values are used in ``transform()``.
+        If set to 'search' and if ``embedding_time_delay`` and ``embedding_dimension``
+        are not set, optimal values are automatically found for those parameters
+        using mutual information (``embedding_time_delay``) and false nearest
+        neighbors (``embedding_dimension``) criteria.
+        If set to 'search' and if ``embedding_time_delay`` and ``embedding_dimension``
+        are set, a similar optimization is carried out, but the final values are
+        constrained to be not greater than the values initially set.
 
     embedding_time_delay: int, default: 1
         Time delay between two consecutive values for constructing one embedded point.
-        If ``embedding_parameters_type`` is 'search', it corresponds to the maximal embedding time delay
-        that will be considered.
+        If ``embedding_parameters_type`` is 'search', it corresponds to the maximal
+        embedding time delay that will be considered.
 
     embedding_dimension: int, default: 5
-        Dimension of the embedding space. If ``embedding_parameters_type`` is 'search', it corresponds
-        the maximum embedding dimension that will be considered.
+        Dimension of the embedding space. If ``embedding_parameters_type`` is 'search',
+        it corresponds to the maximum embedding dimension that will be considered.
 
     embedding_stride: int, default: 1
-        Stride duration between two consecutive embedded points. It defaults to 1 as this value corresponds
-        to the one implied by the Takens embedding theorem.
+        Stride duration between two consecutive embedded points. It defaults to 1
+        as this is the usual value in the statement of Takens's embedding theorem.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless in
@@ -70,12 +69,14 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     embedding_time_delay_: int
-        Actual embedding time delay used to embed. If ``embedding_parameters_type`` is 'search', it is the
-        calculated optimal embedding time delay. Otherwise it has the same value as ``embedding_time_delay``.
+        Actual embedding time delay used to embed. If ``embedding_parameters_type``
+        is 'search', it is the calculated optimal embedding time delay.
+        Otherwise it has the same value as ``embedding_time_delay``.
 
     embedding_dimension_: int
-        Actual embedding dimension used to embed. If ``embedding_parameters_type`` is 'search', it is the
-        calculated optimal embedding dimension. Otherwise it has the same value as ``embedding_dimension``.
+        Actual embedding dimension used to embed. If ``embedding_parameters_type``
+        is 'search', it is the calculated optimal embedding dimension. Otherwise
+        it has the same value as ``embedding_dimension``.
 
     Examples
     --------
@@ -231,8 +232,10 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         Returns
         -------
         X_transformed : ndarray, shape (n_outer_windows, n_points, embedding_dimension_)
-            Array of embedded point cloud per outer window. ``n_outer_windows`` is :math:`(n_samples - outer_window_duration) // outer_window_stride + 1`
-            and ``n_points`` is :math:`(outer_window_duration - embedding_time_delay*embedding_dimension) // embedding_stride + 1`
+            Array of embedded point cloud per outer window. ``n_outer_windows`` is
+            ``(n_samples - outer_window_duration) // outer_window_stride + 1``,
+            and ``n_points`` is ``(outer_window_duration - embedding_time_delay * embedding_dimension) // embedding_stride + 1`.
+            
         """
 
         # Check is fit had been called
