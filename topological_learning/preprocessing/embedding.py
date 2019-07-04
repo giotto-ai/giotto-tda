@@ -15,10 +15,10 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     """
     Transformer that return a time serie embedded according to Taken's sliding window.
     In order to obtain meaningful topological features from a time series, we use a
-    delayed-time embedding technique, invented by F. Takens in the late sixties. The
+    delayed-time embedding technique, named after F. Takens because of his 1981 paper. The
     idea is simple: given a time series X(t), one can extract a sequence of vectors
-    of the form :math:`X_i := [(X(t_i)), X(t_i + 2 \tau), ..., X(t_i + (d-1) \tau)]`.
-    :math:'\tau` is the embedding time delay and :math:'d' is the embedding dimension.
+    of the form :math:`X_i := [(X(t_i)), X(t_i + 2 \\tau), ..., X(t_i + (d-1) \\tau)]`.
+    :math:`\\tau` is the embedding time delay and :math:`d` is the embedding dimension.
     The difference between t_i and t_{i-1} is called stride; the numbers M and tau are
     optimized authomatically in this example (they can be set by the user if needed).
     The outer window allows us to apply Takens embedding locally on a certain interval
@@ -97,10 +97,10 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     ...       embedder.embedding_dimension_)
     Optimal embedding dimension based on false nearest neighbors:  3
 
+    References
+    ----------
+
     """
-
-    implemented_embedding_parameters_types = ['fixed', 'search']
-
     def __init__(self, outer_window_duration=20, outer_window_stride=2, embedding_parameters_type='search',
                  embedding_time_delay=1, embedding_dimension=5, embedding_stride=1, n_jobs=None):
         self.outer_window_duration = outer_window_duration
@@ -124,7 +124,9 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         """A class method that checks whether the hyperparameters and the input parameters
            of the :meth:'fit' are valid.
         """
-        if embedding_parameters_type not in TakensEmbedder.implemented_embedding_parameters_types:
+        implemented_embedding_parameters_types = ['fixed', 'search']
+
+        if embedding_parameters_type not in implemented_embedding_parameters_types:
             raise ValueError('The embedding parameters type you specified is not implemented')
 
     @staticmethod
