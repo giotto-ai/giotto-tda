@@ -25,7 +25,7 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> graphEmbedder = prep.UniqueGraphEmbedder(n_jobs=1)
+    >>> graphEmbedder = prep.UniqueGraphEmbedder(n_jobs=None)
     >>> graphEmbedder.fit(zPermEmbedded)
     >>> zPermGraph = graphEmbedder.transform(zPermEmbedded)
     """
@@ -69,7 +69,7 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
         """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -87,7 +87,7 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
             in `X`
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
 
         n_samples = X.shape[0]
@@ -243,7 +243,7 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         nearest_neighbors_params.pop('mode')
         self.nearest_neighbors = NearestNeighbors(**nearest_neighbors_params)
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -261,7 +261,7 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
             in `X`
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
 
         n_samples = X.shape[0]
@@ -309,7 +309,7 @@ class GeodesicDistance(BaseEstimator, TransformerMixin):
             """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     #@jit
@@ -328,7 +328,7 @@ class GeodesicDistance(BaseEstimator, TransformerMixin):
             in `X`
             """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0]
 
