@@ -152,7 +152,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, norm='bottleneck', norm_params={'n_samples': 200}, function=np.max, n_jobs=None):
+    def __init__(self, norm='bottleneck', norm_params={'order': np.inf, 'n_samples': 200}, function=np.max, n_jobs=None):
         self.norm = norm
         self.norm_params = norm_params
         self.function = function
@@ -203,7 +203,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         sampling = { dimension: None for dimension in X.keys() }
 
-        n_samples = norm_params.pop('n_samples')
+        if 'n_samples' in norm_params.keys():
+            n_samples = norm_params.pop('n_samples')
 
         if self.norm in ['landscape', 'betti']:
             norm_params['sampling'] = _sample(X, n_samples)
