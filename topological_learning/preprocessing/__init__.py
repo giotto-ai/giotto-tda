@@ -1,5 +1,6 @@
 """The :mod:`topological_learning.preprocessing` module is an extension of sk-learn's
-and implements .
+and implements preprocessing techniques useful to apply TOpological Data Analysis techinques
+to time series.
 """
 
 from .time_series import Resampler, Stationarizer

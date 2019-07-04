@@ -1,5 +1,5 @@
 """The :mod:`topological_learning.homology` module implements transformers
-to calculate persistent homology.
+to generate features from persistent homology.
 """
 
 from .persistence import VietorisRipsPersistence, PersistentEntropy

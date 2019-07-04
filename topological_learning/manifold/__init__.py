@@ -1,5 +1,5 @@
 """The :mod:`topological_learning.manifold` extends sk-learn's manifold learning
-transformers.
+and kinematics transformers.
 """
 
 from .mds import StatefulMDS
