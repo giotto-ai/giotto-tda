@@ -203,8 +203,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         sampling = { dimension: None for dimension in X.keys() }
 
+        n_samples = norm_params.pop('n_samples')
+
         if self.norm in ['landscape', 'betti']:
-            n_samples = norm_params.pop('n_samples')
             norm_params['sampling'] = _sample(X, n_samples)
 
         norm_array = _parallel_norm(X, self.norm, norm_params, self.n_jobs)
