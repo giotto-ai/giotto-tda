@@ -40,7 +40,7 @@ class FeatureAggregator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_featurers)
+        X : ndarray, shape (n_samples, n_features)
             Input data.
 
         y : None

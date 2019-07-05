@@ -38,7 +38,7 @@ class Labeller(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    isFitted : boolean
+    is_fitted : boolean
         Whether the transformer has been fitted
     """
     implementedLabellingRecipes = {'application': _application_function, 'variation': _variation_function,
