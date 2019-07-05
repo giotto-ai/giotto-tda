@@ -29,7 +29,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     values are calculated during ``fit()``.
 
     During ``transform()``, a Takens embedding procedure is applied on intervals
-    of the input time series called "outer windows", in a sliding-windxow fashion.
+    of the input time series called "outer windows", in a sliding-window fashion.
     This allows to track the evolution of the dynamics underlying the time series.
 
     Parameters
