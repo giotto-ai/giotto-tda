@@ -99,7 +99,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return { dimension: diagram[dimension] for dimension in self.homology_dimensions }
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
+        padList = [ ((0, max(1, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
         return { dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions) }
 
     def _stack_padded_diagrams(self, diagrams):
