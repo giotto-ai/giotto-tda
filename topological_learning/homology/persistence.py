@@ -99,7 +99,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return { dimension: diagram[dimension] for dimension in self.homology_dimensions }
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [ ((0, max(1, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
+        padList = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
         return { dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions) }
 
     def _stack_padded_diagrams(self, diagrams):
@@ -179,10 +179,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                                         for i in range(X.shape[0]) )
 
         if self.pad:
-            max_length_list = [np.max([
-                    X_transformed[i][dimension].shape[0]
-                    for i in range(len(X_transformed)) ])
-                for dimension in self.homology_dimensions ]
+            max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
+                                for dimension in self.homology_dimensions ]
             X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
                                                             for i in range(len(X_transformed)) )
             X_transformed = self._stack_padded_diagrams(X_transformed)
