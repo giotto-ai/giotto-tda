@@ -19,17 +19,17 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     technique named after `F. Takens <https://doi.org/10.1007/BFb0091924>`_:
     given a time series :math:`X(t)`, one extracts a set of vectors in
     :math:`\\mathbb{R}^d`, each of the form
-        :math:`\Xi_i := (X(t_i), X(t_i + 2 \tau), ..., X(t_i + (d-1)) \tau)`.
+        :math:`\Xi_i := [X(t_i), X(t_i + \\tau), ..., X(t_i + (d-1)\\tau)]`.
     The set :math:`\\{\Xi_i\\}` is called the Takens embedding of the time series,
-    :math:`\tau` is called the embedding time delay, :math:`d` is called the
+    :math:`\\tau` is called the embedding time delay, :math:`d` is called the
     embedding dimension, and the difference between :math:`t_i` and :math:`t_{i-1}`
     is called the embedding stride.
 
-    If :math:`d` and :math:`\tau` are not explicitly set by the user, suitable
+    If :math:`d` and :math:`\\tau` are not explicitly set by the user, suitable
     values are calculated during ``fit()``.
 
     During ``transform()``, a Takens embedding procedure is applied on intervals
-    of the input time series called "outer windows", in a sliding-windxow fashion.
+    of the input time series called "outer windows", in a sliding-window fashion.
     This allows to track the evolution of the dynamics underlying the time series.
 
     Parameters
@@ -236,7 +236,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         X_transformed : ndarray, shape (n_outer_windows, n_points, embedding_dimension_)
             Array of embedded point cloud per outer window. ``n_outer_windows`` is
             ``(n_samples - outer_window_duration) // outer_window_stride + 1``,
-            and ``n_points`` is ``(outer_window_duration - embedding_time_delay * embedding_dimension) // embedding_stride + 1`.
+            and ``n_points`` is ``(outer_window_duration - embedding_time_delay * embedding_dimension) // embedding_stride + 1``.
 
         """
 
