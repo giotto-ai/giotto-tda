@@ -1,5 +1,4 @@
-"""
-The :mod:`topological_learning.diagram` module implements persistence diagrams transformers.
+"""The :mod:`topological_learning.diagram` module implements persistence diagrams transformers.
 It offers the possibility to stack across homology dimensions, scale, and filter diagrams.
 It also makes it possible to calculate distance matrices.
 """
