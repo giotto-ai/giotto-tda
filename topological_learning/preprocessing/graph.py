@@ -20,7 +20,7 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    isFitted : boolean
+    _is_fitted : boolean
         Whether the transformer has been fitted
 
     Examples
