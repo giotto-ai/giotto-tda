@@ -1,5 +1,5 @@
 """The :mod:`topological_learning.preprocessing` module is an extension of sk-learn's
-and implements preprocessing techniques useful to apply TOpological Data Analysis techinques
+and implements preprocessing techniques useful to apply Topological Data Analysis techniques
 to time series.
 """
 
