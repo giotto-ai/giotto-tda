@@ -26,8 +26,6 @@ import keras.optimizers as koptimizers
 import keras
 import tensorflow as tf
 
-# from dask_ml.model_selection import GridSearchCV
-
 # If I don't do this, the GPU is automatically used and gets out of memory
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="-1"
@@ -38,34 +36,22 @@ def init_keras_session(n_cpus_k, n_gpus_k):
     sess = tf.Session(config=config)
     keras.backend.set_session(sess)
 
-def get_data(input_file):
-    data = pd.read_parquet(input_file)
-
-    data.time = pd.to_datetime(data.time, utc=True)
-    data.time = data.time.dt.tz_convert(tz='America/New_York')
-    data.time = data.time.dt.tz_localize(None)
-    data.set_index('time', drop=True, inplace=True)
-    data.columns = range(1)
-
-    sampling_times = [ dt.time(h, m, 0) for h in range(9, 20, 1) for m in range(0, 1, 30) ]
-    sampling = prep.Resampler(sampling_type = 'fixed', sampling_times=sampling_times, remove_weekends=True)
-    data = sampling.fit(data).transform(data)
+def get_data(n_train, n_test):
+    data = np.random.rand(n_train+n_test, 1)
     stationarizing = prep.Stationarizer(stationarization_type='return')
     data = stationarizing.fit(data).transform(data)
 
     return data
 
-def split_train_test(data):
+def split_train_test(data, n_train, n_test):
     labeller = prep.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
-    numberTrain = 400
-    X_train = data[:numberTrain]
+    X_train = data[:n_train]
     y_train = X_train
     labeller.fit(y_train)
     y_train = labeller.transform(y_train)
     X_train = labeller.cut(X_train)
 
-    numberTest = 200
-    X_test = data[numberTrain:numberTrain+numberTest]
+    X_test = data[n_train:n_train+n_test]
     y_test = X_test
     y_test = labeller.transform(y_test)
     X_test = labeller.cut(X_test)
@@ -145,26 +131,22 @@ def run_grid_search(estimator, param_grid, X_train, y_train, number_splits, n_jo
 
     return grid_result
 
-def main(input_file):
-
-    data = get_data(input_file)
-    X_train, y_train, X_test, y_test = split_train_test(data)
+def main(n_jobs):
+    n_train, n_test = 400, 200
+    data = get_data(n_train, n_test)
+    X_train, y_train, X_test, y_test = split_train_test(data, n_train, n_test)
     pipeline = make_pipeline()
 
     param_grid = get_param_grid()
 
-    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=1)
-
-    # Dumping artifacts
-    # pkl.dump(grid_result, open('grid_result.pkl', 'wb'))
+    grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=n_jobs)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test script for typical use of the Topological Learning library")
-    parser.add_argument('-i', '--input_file', help="Path to the input file containing the time series to process.", required=True)
-    parser.add_argument('-n_cpus_k', '--number_cpus_keras', help="Number of CPUs used to initialize keras session. Warning: This might lead to an explosion of thread allocations.", type=int, required=True)
+    parser.add_argument('-n_jobs', help="Number of processes", type=int, required=True)
+    parser.add_argument('-n_cpus_k', '--number_cpus_keras', help="Number of CPUs used to initialize keras session. Warning: This might lead to an explosion of thread allocations.", type=int, default=1)
     parser.add_argument('-n_gpus_k', '--number_gpus_keras', help="Number of GPUs used to initialize keras session. Warning: In the case of a grid search, this has lead to crashes as GPU memory got full.", type=int, default=0)
     args = vars(parser.parse_args())
-
 
     init_keras_session(args.pop('number_cpus_keras'), args.pop('number_gpus_keras'))
     main(**args)

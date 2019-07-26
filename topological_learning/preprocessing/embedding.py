@@ -155,7 +155,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     def _mutual_information(X, embedding_time_delay, numberBins):
         """This function calculates the mutual information given the delay
         """
-        contingency = np.histogram2d(X[:-embedding_time_delay], X[embedding_time_delay:], bins=numberBins)[0]
+        contingency = np.histogram2d(X.reshape((-1,))[:-embedding_time_delay], X.reshape((-1,))[embedding_time_delay:], bins=numberBins)[0]
         mutual_information = mutual_info_score(None, None, contingency=contingency)
         return mutual_information
 
