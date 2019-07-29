@@ -31,6 +31,11 @@ class Resampler(BaseEstimator, TransformerMixin):
     remove_weekends : boolean, optional, default: True
         Option to remove week-ends from the time series pd.DataFrame.
 
+    Attributes
+    ----------
+    _n_features : int
+        Number of features (i.e. number fo time series) passed as an input of the resampler.
+
     Examples
     --------
     >>> import pandas as pd
@@ -100,6 +105,7 @@ class Resampler(BaseEstimator, TransformerMixin):
         """
         self._validate_params(self.sampling_type)
 
+        self._n_features = len(X.columns)
         self._is_fitted = True
         return self
 
@@ -133,8 +139,7 @@ class Resampler(BaseEstimator, TransformerMixin):
         if self.remove_weekends:
             X = X[:][X.index.dayofweek < 5]
 
-        X.columns = range(len(X.columns))
-        X_transformed = X.iloc[:, 0].values
+        X_transformed = X.iloc[:, 0].values.reshape((-1, self._n_features))
         return X_transformed
 
 
