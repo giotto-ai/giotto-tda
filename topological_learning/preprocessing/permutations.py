@@ -7,8 +7,8 @@ from sklearn.utils._joblib import Parallel, delayed
 import numpy as np
 
 
-class PermutationEmbedder(BaseEstimator, TransformerMixin):
-    """Transformer returning a representation of a collection (typically, a time series)
+class OrdinalRepresentation(BaseEstimator, TransformerMixin):
+    """ Transformer returning a representation of a collection (typically, a time series)
     of point clouds in :math:`\\mathbb{R}^d` -- where each point cloud is an array
     of size (n_points, d) -- as a collection of arrays of the same shape, whose
     each row is the result of applying ``np.argsort`` to the corresponding row

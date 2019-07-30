@@ -4,8 +4,8 @@ to time series.
 """
 
 from .time_series import Resampler, Stationarizer
-from .permutations import PermutationEmbedder, PermutationEntropy
-from .graph import UniqueGraphEmbedder, NearestNeighborGraphEmbedder, GeodesicDistance
+from .permutations import OrdinalRepresentation, PermutationEntropy
+from .graph import TransitionGraph, NearestNeighborGraphEmbedder, GeodesicDistance
 from .embedding import TakensEmbedder
 from .target import Labeller
 
@@ -13,9 +13,9 @@ from .target import Labeller
 __all__ = [
     'Resampler',
     'Stationarizer',
-    'PermutationEmbedder',
+    'OrdinalRepresentation',
     'PermutationEntropy',
-    'UniqueGraphEmbedder',
+    'TransitionGraph',
     'NearestNeighborGraphEmbedder',
     'GeodesicDistance',
     'TakensEmbedder',
