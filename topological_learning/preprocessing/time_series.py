@@ -8,8 +8,7 @@ from pandas.core.resample import Resampler as rsp
 import datetime as dt
 
 class Resampler(BaseEstimator, TransformerMixin):
-    """
-    Data sampling transformer that returns a sampled Pandas dataframe with a datetime index.
+    """Data sampling transformer that returns a sampled Pandas dataframe with a datetime index.
 
     Parameters
     ----------
@@ -54,7 +53,6 @@ class Resampler(BaseEstimator, TransformerMixin):
     >>> plt.plot(df_noise_sampled)
     >>> plt.plot(df_noise)
 
-
     """
     implemented_sampling_types = ['periodic', 'fixed']
 
@@ -74,7 +72,7 @@ class Resampler(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(sampling_type):
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:``fit`` are valid.
+        of the :meth:``fit`` are valid.
         """
         if sampling_type not in Resampler.implemented_sampling_types:
             raise ValueError('The sampling type you specified is not implemented')
@@ -139,8 +137,7 @@ class Resampler(BaseEstimator, TransformerMixin):
 
 
 class Stationarizer(BaseEstimator, TransformerMixin):
-    """
-    Data sampling transformer that returns a stationarized Pandas dataframe with a datetime index.
+    """Data sampling transformer that returns a stationarized Pandas dataframe with a datetime index.
 
     Parameters
     ----------
@@ -181,7 +178,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(stationarization_type):
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+        of the :meth:'fit' are valid.
         """
         if stationarization_type not in Stationarizer.implemented_stationarization_types:
             raise ValueError('The transformation type you specified is not implemented')

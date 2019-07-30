@@ -11,7 +11,7 @@ import scipy.sparse as sp
 
 
 class TransitionGraph(BaseEstimator, TransformerMixin):
-    """ Given a collection of two-dimensional arrays, with row :math:`i` in array
+    """Given a collection of two-dimensional arrays, with row :math:`i` in array
     :math:`A` encoding the "state" of a system at "time" :math:`i`, this transformer
     returns a corresponding collection of so-called *transition graphs*.
     The vertex set of graph :math:`G` corresponding to :math:`A` is the set of all
@@ -31,6 +31,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     ...                 [['c'], ['a'], ['b']])
     >>> tg = prep.TransitionGraph()
     >>> tg.fit_transform(dyn)
+
     """
 
     def __init__(self, n_jobs=None):
@@ -82,7 +83,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """ Create transition graphs from the input data and return their adjacency
+        """Create transition graphs from the input data and return their adjacency
         matrices. The graphs are simple, undirected and unweighted, and the adjacency
         matrices are sparse matrices of type bool.
 
@@ -112,7 +113,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
 
 class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
-    """ A graph embedder based on the k-Nearest Neighbors algorithm.
+    """A graph embedder based on the k-Nearest Neighbors algorithm.
 
     Parameters
     ----------
@@ -223,7 +224,7 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+        of the :meth:'fit' are valid.
         """
         pass
 
@@ -262,7 +263,7 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Implementation of the sk-learn transform function that samples the input.
 
         Parameters
         ----------
@@ -286,7 +287,19 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class GeodesicDistance(BaseEstimator, TransformerMixin):
+class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
+    """Given a collection of graphs presented as adjacency matrices, this transformer
+    calculates for each graph the length of the shortest path between any of its
+    two vertices. The result is a collection of dense distance matrices of variable
+    size.
+
+    Parameters
+    ----------
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+    """
+
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
@@ -296,32 +309,38 @@ class GeodesicDistance(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-            of the :meth:'fit' are valid.
-            """
+        of the :meth:'fit' are valid.
+        """
         pass
 
     def _geodesic_distance(self, X):
         X_distance = graph_shortest_path(X)
-        X_distance[X_distance == 0] = np.inf
+        X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a float64 array,
+        # so inserting np.inf does not change the type. Ideally however, graph_shortest_path
+        # would return an int array!
         np.fill_diagonal(X_distance, 0)
         return X_distance
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
-            Parameters
-            ----------
-            X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
-            y : None
+        Parameters
+        ----------
+        X : ndarray of sparse or dense arrays, shape (n_samples, )
+            Input data, i.e. a collection of adjacency matrices of graphs.
+
+        y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
 
-            Returns
-            -------
-            self : object
+        Returns
+        -------
+        self : object
             Returns self.
-            """
+
+        """
         self._validate_params()
 
         self._is_fitted = True
@@ -329,19 +348,26 @@ class GeodesicDistance(BaseEstimator, TransformerMixin):
 
     #@jit
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """For each adjancency matrix in X, compute the lenghts of the graph shortest
+        path between any two vertices, and arrange them in a distance matrix.
+        The method :meth:'sklearn.utils.graph_shortest_path.graph_shortest_path'
+        is used.
 
-            Parameters
-            ----------
-            X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        Parameters
+        ----------
+        X : ndarray of sparse or dense arrays, shape (n_samples, )
+            Input data, i.e. a collection of adjacency matrices of graphs.
 
-            Returns
-            -------
-            X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
-            """
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray of float, shape (n_samples, ) or (n_samples, n_vertices, n_vertices)
+            Resulting array of distance matrices. If the distance matrices have variable
+            size across samples, X is one-dimensional.
+
+        """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 

@@ -5,7 +5,7 @@ to time series.
 
 from .time_series import Resampler, Stationarizer
 from .permutations import OrdinalRepresentation, PermutationEntropy
-from .graph import TransitionGraph, NearestNeighborGraphEmbedder, GeodesicDistance
+from .graph import TransitionGraph, NearestNeighborGraphEmbedder, GraphGeodesicDistance
 from .embedding import TakensEmbedder
 from .target import Labeller
 
@@ -17,7 +17,7 @@ __all__ = [
     'PermutationEntropy',
     'TransitionGraph',
     'NearestNeighborGraphEmbedder',
-    'GeodesicDistance',
+    'GraphGeodesicDistance',
     'TakensEmbedder',
     'Labeller'
 ]
