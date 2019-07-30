@@ -11,26 +11,18 @@ import scipy.sparse as sp
 
 
 class TransitionGraph(BaseEstimator, TransformerMixin):
-    """ Given a multi-dimensional array in which each sample  whose each row encodes the state of a system
-    at the "time" given by its index, this transformer returns a collection of graphs
-    -- one per array -- each of which has as vertex set all states which are
-    present in the corresponding array, and and edge between two vertices if and only if
-    one of the two states ever immediately follows the other.
+    """ Given a collection of two-dimensional arrays, with row :math:`i` in array
+    :math:`A` encoding the "state" of a system at "time" :math:`i`, this transformer
+    returns a corresponding collection of so-called *transition graphs*.
+    The vertex set of graph :math:`G` corresponding to :math:`A` is the set of all
+    unique rows (states) in :math:`A`, and there is an edge between two vertices
+    if and only if one of the two rows immediately follows the other anywhere in :math:`A`.
 
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-<<<<<<< Updated upstream
-        This varible defines the number of parallel jobs to run.
-
-    Attributes
-    ----------
-    _is_fitted : boolean
-        Whether the transformer has been fitted
-=======
         The number of jobs to use for the computation. ``None`` means 1 unless in
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
->>>>>>> Stashed changes
 
     Examples
     --------
@@ -57,9 +49,12 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     def _embed(self, X):
         indices = np.unique(X, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
-        X_embedded = sp.csr_matrix( (np.full(n_indices, True), (np.concatenate([indices[:-1], indices[1:]]),
-                                                                np.concatenate([indices[1:], indices[:-1]]))),
-                                    dtype=bool)
+        first = indices[:-1]
+        second = indices[1:]
+        X_embedded = sp.csr_matrix((np.full(n_indices, True),
+                                    (np.concatenate([first, second]),
+                                     np.concatenate([second, first]))),
+                                   dtype=bool)
         return X_embedded
 
     def fit(self, X, y=None):
@@ -87,10 +82,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Create transition graphs from the input data. The resulting undirected,
-        unweighted graphs are stored as square numpy arrays of type bool, with each
-        row/column indices corresponding to a state, and True at position (i, j)
-        if state i follows state j, or vice-versa.
+        """ Create transition graphs from the input data and return their adjacency
+        matrices. The graphs are simple, undirected and unweighted, and the adjacency
+        matrices are sparse matrices of type bool.
 
         Parameters
         ----------
@@ -103,10 +97,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : array of bool, shape (n_samples, n_states, n_states)
-            The collection of n_samples transition graphs. Each transition graph
-            is encoded by a (n_states, n_states) array of type bool. The mapping
-            between
+        X_transformed : array of sparse boolean matrices, shape (n_samples, )
+            The collection of ``n_samples`` transition graphs. Each transition graph
+            is encoded by a sparse matrix of boolean type.
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
@@ -119,7 +112,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
 
 class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
-    """A graph embedder based on k-Nearest Neighbors algorithm.
+    """ A graph embedder based on the k-Nearest Neighbors algorithm.
 
     Parameters
     ----------
