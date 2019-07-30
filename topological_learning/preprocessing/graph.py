@@ -10,24 +10,27 @@ import numpy as np
 import scipy.sparse as sp
 
 
-class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
-    """
+class TransitionGraph(BaseEstimator, TransformerMixin):
+    """ Given a collection of two-dimensional arrays, with row :math:`i` in array
+    :math:`A` encoding the "state" of a system at "time" :math:`i`, this transformer
+    returns a corresponding collection of so-called *transition graphs*.
+    The vertex set of graph :math:`G` corresponding to :math:`A` is the set of all
+    unique rows (states) in :math:`A`, and there is an edge between two vertices
+    if and only if one of the two rows immediately follows the other anywhere in :math:`A`.
 
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        This varible defines the number of parallel jobs to run.
-
-    Attributes
-    ----------
-    _is_fitted : boolean
-        Whether the transformer has been fitted
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     Examples
     --------
-    >>> graphEmbedder = prep.UniqueGraphEmbedder(n_jobs=None)
-    >>> graphEmbedder.fit(zPermEmbedded)
-    >>> zPermGraph = graphEmbedder.transform(zPermEmbedded)
+    >>> import topological_learning.preprocessing as prep
+    >>> dyn = np.array([[['a'], ['b'], ['c']],
+    ...                 [['c'], ['a'], ['b']])
+    >>> tg = prep.TransitionGraph()
+    >>> tg.fit_transform(dyn)
     """
 
     def __init__(self, n_jobs=None):
@@ -46,18 +49,24 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
     def _embed(self, X):
         indices = np.unique(X, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
-        X_embedded = sp.csr_matrix( (np.full(n_indices, True), (np.concatenate([indices[:-1], indices[1:]]),
-                                                                np.concatenate([indices[1:], indices[:-1]]))),
-                                    dtype=bool)
+        first = indices[:-1]
+        second = indices[1:]
+        X_embedded = sp.csr_matrix((np.full(n_indices, True),
+                                    (np.concatenate([first, second]),
+                                     np.concatenate([second, first]))),
+                                   dtype=bool)
         return X_embedded
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_time_steps, n_features)
+            Input data.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -73,22 +82,27 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """ Create transition graphs from the input data and return their adjacency
+        matrices. The graphs are simple, undirected and unweighted, and the adjacency
+        matrices are sparse matrices of type bool.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_time_steps, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : array of sparse boolean matrices, shape (n_samples, )
+            The collection of ``n_samples`` transition graphs. Each transition graph
+            is encoded by a sparse matrix of boolean type.
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
 
         n_samples = X.shape[0]
 
@@ -96,8 +110,9 @@ class UniqueGraphEmbedder(BaseEstimator, TransformerMixin):
         X_transformed = np.array(X_transformed)
         return X_transformed
 
+
 class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
-    """A graph embedder based on k-Nearest Neighbors algorithm.
+    """ A graph embedder based on the k-Nearest Neighbors algorithm.
 
     Parameters
     ----------
