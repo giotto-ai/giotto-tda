@@ -6,15 +6,17 @@ import numpy as np
 
 
 def _derivation_function(function, X, delta_t=1, **function_kwargs):
-    partialWindowBegin = function(X[:, delta_t:], axis=1, **function_kwargs)
-    partialWindowEnd = function(X[:, :-delta_t], axis=1, **function_kwargs)
-    derivative = (partialWindowEnd - partialWindowBegin) / partialWindowBegin / delta_t
+    partial_window_begin = function(X[:, delta_t:], axis=1, **function_kwargs)
+    partial_window_end = function(X[:, :-delta_t], axis=1, **function_kwargs)
+    derivative = (partial_window_end - partial_window_begin) / partial_window_begin / delta_t
+    derivative[partial_window_begin == 0] = 0
     return derivative.reshape((-1, 1))
 
 def _variation_function(function, X, delta_t=1, **function_kwargs):
-    fullWindow = function(X, axis=1, **function_kwargs)
-    partialWindow = function(X[:, :-delta_t], axis=1, **function_kwargs)
-    variation = (fullWindow - partialWindow) / partialWindow / delta_t
+    full_window = function(X, axis=1, **function_kwargs)
+    partial_window = function(X[:, :-delta_t], axis=1, **function_kwargs)
+    variation = (full_window - partial_window) / partial_window / delta_t
+    variation[partial_window == 0] = 0
     return variation.reshape((-1, 1))
 
 def _application_function(function, X, axis=1, delta_t=0, **function_kwargs):
