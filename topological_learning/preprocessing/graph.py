@@ -47,16 +47,17 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         """
         pass
 
-    def _embed(self, X):
+    def _make_adjacency_matrix(self, X):
         indices = np.unique(X, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
         second = indices[1:]
-        X_embedded = sp.csr_matrix((np.full(n_indices, True),
+        A = sp.csr_matrix((np.full(n_indices, True),
                                     (np.concatenate([first, second]),
                                      np.concatenate([second, first]))),
                                    dtype=bool)
-        return X_embedded
+        sp.csr_matrix.setdiag(A, 0)
+        return A
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -107,13 +108,19 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         n_samples = X.shape[0]
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._embed) (X[i]) for i in range(n_samples) )
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._make_adjacency_matrix) (X[i]) for i in range(n_samples) )
         X_transformed = np.array(X_transformed)
         return X_transformed
 
 
-class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
-    """A graph embedder based on the k-Nearest Neighbors algorithm.
+class kNNGraph(BaseEstimator, TransformerMixin):
+    """Transformer for the calculation of the adjacency matrices of :math:`k`-nearest
+    neighbor graphs. Let :math:`k` be a positive integer, and :math:`X` be a collection
+    of point clouds in Euclidean space, each encoded by a two-dimensional array.
+    For each entry in :math:`X`, the corresponding kNN graph is a simple, undirected
+    and unweighted graph with an edge between any two data instances :math:`\\star_i, \\star_j`
+    in that entry whenever :math:`\\star_i` (resp. :math:`\\star_j`) is among the
+    :math:`k`-th nearest neighbors of :math:`\\star_j` (resp. :math:`\\star_i`).
 
     Parameters
     ----------
@@ -175,33 +182,6 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
         for more details.
 
-    Examples
-    --------
-      >>> import numpy as np
-      >>> from sklearn.neighbors import NearestNeighbors
-      >>> samples = [[0, 0, 2], [1, 0, 0], [0, 0, 1]]
-      >>> neigh = NearestNeighbors(2, 0.4)
-      >>> neigh.fit(samples)  #doctest: +ELLIPSIS
-      NearestNeighbors(...)
-      >>> neigh.kneighbors([[0, 0, 1.3]], 2, return_distance=False)
-      ... #doctest: +ELLIPSIS
-      array([[2, 0]]...)
-      >>> nbrs = neigh.radius_neighbors([[0, 0, 1.3]], 0.4, return_distance=False)
-      >>> np.asarray(nbrs[0][0])
-      array(2)
-
-    See also
-    --------
-    KNeighborsClassifier
-    RadiusNeighborsClassifier
-    KNeighborsRegressor
-    RadiusNeighborsRegressor
-    BallTree
-    Notes
-    -----
-    See :ref:`Nearest Neighbors <neighbors>` in the online documentation
-    for a discussion of the choice of ``algorithm`` and ``leaf_size``.
-    https://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm
     """
     def __init__(self, n_neighbors=5, radius=1.0,
                  algorithm='auto', leaf_size=30, metric='euclidean',
@@ -217,6 +197,18 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         self.metric_params = metric_params
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'n_neighbors': self.n_neighbors, 'radius': self.radius, 'algorithm': self.algorithm,
                 'leaf_size': self.leaf_size, 'metric': self.metric, 'p': self.p, 'mode': self.mode,
                 'n_jobs': self.n_jobs, 'metric_params': self.metric_params}
@@ -228,22 +220,25 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         """
         pass
 
-    def _embed(self, X):
-        self.nearest_neighbors.fit(X)
-        X_embedded = self.nearest_neighbors.kneighbors_graph(X, n_neighbors=self.n_neighbors, mode=self.mode)
-        sp.csr_matrix.setdiag(X_embedded, 0)
-        rows, cols = X_embedded.nonzero()
-        X_embedded[cols, rows] = X_embedded[rows, cols]
-        return X_embedded
-
+    def _make_adjacency_matrix(self, X):
+        self._nearest_neighbors.fit(X)
+        A = self._nearest_neighbors.kneighbors_graph(X, n_neighbors=self.n_neighbors, mode=self.mode)
+        sp.csr_matrix.setdiag(A, 0)
+        rows, cols = A.nonzero()
+        A[cols, rows] = A[rows, cols]
+        return A
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
+        X : ndarray, shape (n_samples, n_points, n_features)
+            Input data. Each entry of X along axis 0 is interpreted as an ndarray
+            of n_points in Euclidean space of dimension n_features.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
@@ -252,37 +247,42 @@ class NearestNeighborGraphEmbedder(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
         self._validate_params()
 
         nearest_neighbors_params = self.get_params()
         nearest_neighbors_params.pop('mode')
-        self.nearest_neighbors = NearestNeighbors(**nearest_neighbors_params)
+        self._nearest_neighbors = NearestNeighbors(**nearest_neighbors_params)
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """Implementation of the sk-learn transform function that samples the input.
+        """Compute the adjacency matrix of the kNN graph of each entry in the
+        input array along axis 0. The method :meth:'sklearn.neighbors.kneighbors_graph' is used.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_points, n_features)
+            Input data. Each entry of X along axis 0 is interpreted as an ndarray
+            of n_points in Euclidean space of dimension n_features.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        X_transformed : ndarray of sparse matrices in CSR format, shape (n_samples, )
+            The transformed array.
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
 
         n_samples = X.shape[0]
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._embed) (X[i]) for i in range(n_samples) )
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._make_adjacency_matrix) (X[i]) for i in range(n_samples) )
         X_transformed = np.array(X_transformed)
         return X_transformed
 
