@@ -11,8 +11,7 @@ from ripser import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """
-    Transformer for the calculation of persistence diagrams resulting from Vietoris-Rips
+    """Transformer for the calculation of persistence diagrams resulting from Vietoris-Rips
     filtrations. Given a point cloud in Euclidean space or an abstract metric space
     encoded by a distance matrix, information about the appearance and disappearance
     of "topological holes" (technically, homology classes) of various dimensions and
@@ -83,7 +82,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(metric):
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+        of the :meth:'fit' are valid.
         """
         implemented_metric_types = set(['precomputed'] + [met for i in VALID_METRICS.values() for met in i])
 
@@ -216,8 +215,8 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-            of the :meth:'fit' are valid.
-            """
+        of the :meth:'fit' are valid.
+        """
         pass
 
     def _persistent_entropy(self, X):

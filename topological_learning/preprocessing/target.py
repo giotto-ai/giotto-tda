@@ -113,7 +113,7 @@ class Labeller(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, y):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Implementation of the sk-learn transform function that samples the input.
 
         Parameters
         ----------

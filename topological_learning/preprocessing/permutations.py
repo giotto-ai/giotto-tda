@@ -8,7 +8,7 @@ import numpy as np
 
 
 class OrdinalRepresentation(BaseEstimator, TransformerMixin):
-    """ Transformer returning a representation of a collection (typically, a time series)
+    """Transformer returning a representation of a collection (typically, a time series)
     of point clouds in :math:`\\mathbb{R}^d` -- where each point cloud is an array
     of size (n_points, d) -- as a collection of arrays of the same shape, whose
     each row is the result of applying ``np.argsort`` to the corresponding row
@@ -47,7 +47,7 @@ class OrdinalRepresentation(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+        of the :meth:'fit' are valid.
         """
         pass
 
@@ -124,8 +124,8 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-            of the :meth:'fit' are valid.
-            """
+        of the :meth:'fit' are valid.
+        """
         pass
 
     def _permutation_entropy(self, X):
@@ -136,19 +136,19 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
 
-            Parameters
-            ----------
-            X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
-            y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+        Parameters
+        ----------
+        X : array-like or sparse matrix of shape = [n_samples, n_features]
+        The training input samples.
+        y : None
+        There is no need of a target in a transformer, yet the pipeline API
+        requires this parameter.
 
-            Returns
-            -------
-            self : object
-            Returns self.
-            """
+        Returns
+        -------
+        self : object
+        Returns self.
+        """
         self._validate_params()
 
         self._is_fitted = True
@@ -156,19 +156,19 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     #@jit
     def transform(self, X, y=None):
-        """ Implementation of the sk-learn transform function that samples the input.
+        """Implementation of the sk-learn transform function that samples the input.
 
-            Parameters
-            ----------
-            X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        Parameters
+        ----------
+        X : array-like of shape = [n_samples, n_features]
+        The input samples.
 
-            Returns
-            -------
-            X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
-            """
+        Returns
+        -------
+        X_transformed : array of int of shape = [n_samples, n_features]
+        The array containing the element-wise square roots of the values
+        in `X`
+        """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 

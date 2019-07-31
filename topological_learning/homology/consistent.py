@@ -73,7 +73,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:'fit' are valid.
+        of the :meth:'fit' are valid.
         """
         pass
 
