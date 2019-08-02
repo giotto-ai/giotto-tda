@@ -198,9 +198,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     max_edge_length : float, optional, default: np.inf
-        Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
-        Points whose distance is greater than this value will never be connected by an
-        edge, and topological features at scales larger than this value will not be
+        Upper bound on the maximum value of the Cubical filtration parameter.
+        Points whose manhattan distance is greater than this value will never be connected
+        by an edge, and topological features at scales larger than this value will not be
         detected.
 
     homology_dimensions : list, optional, default: [0, 1]
@@ -277,11 +277,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``metric == 'precomputed'``, the input should be an ndarray
-            whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be interpreted as
-            an ndarray of n_points in Euclidean space of dimension n_features.
+        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y) or (n_samples, n_pixels_x, n_pixels_y, n_pixels_z)
+            Input data. Array of 2D or 3D images.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
