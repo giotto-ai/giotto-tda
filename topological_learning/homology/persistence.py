@@ -249,11 +249,12 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         """
         try:
             assert set(homology_dimensions).issubset(set(range(n_dimensions)))
-        except:
+        except AssertionError:
             raise ValueError('The homology_dimensions specified contains element(s) that are not within the range 0 to the dimension of the images.')
 
-    def _gudhi_diagram(self, X, is_distance_matrix, metric):
-        diagram = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
+    def _gudhi_diagram(self, X):
+        cubical_complex = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
+        diagram = cubical_complex.persistence(homology_coeff_field=2, min_persistence=0)
 
         return { dimension : np.array([diagram[i][1] for i in range(len(diagram)) if diagram[i][0] == dimension ])
                             for dimension in self.homology_dimensions }
@@ -290,7 +291,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-
         self._validate_params(self.homology_dimensions, len(X.shape)-1)
 
         self._is_fitted = True
@@ -327,9 +327,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-        is_distance_matrix = (self.metric == 'precomputed')
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._gudhi_diagram)(X[i, :, :], is_distance_matrix, self.metric)
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._gudhi_diagram)(X[i, :, :])
                                                         for i in range(X.shape[0]) )
 
         if self.pad:
