@@ -77,7 +77,7 @@ def main(n_jobs):
     # Running the pipeline step by step
     X_temp = X_train
     for _, transformer in steps:
-        temp = transformer.fit(X_temp, y_train).transform(X_temp)
+        X_temp = transformer.fit(X_temp, y_train).transform(X_temp)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test script for typical use of the Topological Learning library")
