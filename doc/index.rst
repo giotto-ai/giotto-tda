@@ -25,7 +25,12 @@ Welcome to Topological Learning's API reference!
 
    preprocessing.TakensEmbedder
 
-   preprocessing.PermutationEmbedder
+   preprocessing.TransitionGraph
+   preprocessing.kNNGraph
+   preprocessing.GraphGeodesicDistance
+
+   preprocessing.OrdinalRepresentation
+   preprocessing.PermutationEntropy
 
 
 :mod:`topological_learning.homology`: Persistent homology
