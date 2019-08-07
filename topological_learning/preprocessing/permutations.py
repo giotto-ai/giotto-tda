@@ -93,7 +93,7 @@ class OrdinalRepresentation(BaseEstimator, TransformerMixin):
 
         """
 
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0]
@@ -196,13 +196,12 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_entropies : ndarray of int, shape (n_samples, n_points)
-            Array of entropies, one per array in X.
+        X_transformed : ndarray of int, shape (n_samples, n_points)
+            Array of entropies (one per array in X).
 
         """
 
-        """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0]
