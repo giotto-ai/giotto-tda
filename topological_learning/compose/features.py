@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 import numpy as np
 
 class FeatureAggregator(BaseEstimator, TransformerMixin):
-    """Transformer that rearanges the features in sequences of features for the
+    """Transformer that rearranges the features in sequences of features for the
     final estimator.
 
     Parameters

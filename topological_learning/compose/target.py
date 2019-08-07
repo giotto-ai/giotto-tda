@@ -2,14 +2,12 @@
 #          Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: BSD 3 clause
 
-import warnings
-
 import numpy as np
-
 from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin, RegressorMixin
-from ..base import clone
+from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
-from sklearn.utils import check_array, safe_indexing
+
+from ..base import clone
 
 
 class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
@@ -43,9 +41,8 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> import topological_learning as tl
     >>> from sklearn.linear_model import LogisticRegression
-    >>> from tl.compose import TargetResampler, TargetResamplingClassifier
+    >>> from topological_learning.compose import TargetResampler, TargetResamplingClassifier
     >>> ss = 2
     >>> res = TargetResampler(step_size=ss)
     >>> trc = TargetResamplingClassifier(classifier=LogisticRegression(),
@@ -66,6 +63,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
     output will be reshaped to a have the same number of dimensions as ``y``.
 
     """
+
     def __init__(self, classifier=None, resampler=None):
         self.classifier = classifier
         self.resampler = resampler
@@ -89,7 +87,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
 
         Returns
         -------
-        self : object
+        self : TargetResamplingClassifier
 
         """
         y = check_array(y, accept_sparse=False, force_all_finite=True,
@@ -120,7 +118,6 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
         else:
             self.classifier_ = clone(self.classifier)
 
-        print(X.shape, y_transformed.shape)
         if sample_weight is None:
             self.classifier_.fit(X, y_transformed)
         else:
@@ -212,9 +209,8 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> import topological_learning as tl
     >>> from sklearn.linear_model import LinearRegression
-    >>> from tl.compose import TargetResampler, TargetResamplingRegressor
+    >>> from topological_learning.compose import TargetResampler, TargetResamplingRegressor
     >>> ss = 2
     >>> res = TargetResampler(step_size=ss)
     >>> trc = TargetResamplingRegressor(regressor=LinearRegression(),
@@ -235,6 +231,7 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
     output will be reshaped to a have the same number of dimensions as ``y``.
 
     """
+
     def __init__(self, regressor=None, resampler=None):
         self.regressor = regressor
         self.resampler = resampler
@@ -260,7 +257,7 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
 
         Returns
         -------
-        self : object
+        self : TargetResamplingRegressor
 
         """
         y = check_array(y, accept_sparse=False, force_all_finite=True,
@@ -334,6 +331,7 @@ class TargetResampler(BaseEstimator, TransformerMixin):
         ensure that the first entry is sampled.
 
     """
+
     def __init__(self, step_size=1, from_right=True):
         self.step_size = step_size
         self.from_right = from_right
@@ -358,7 +356,7 @@ class TargetResampler(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        indices : list
+        indices : list[int]
             List of index values. Will be modified in self.transform() if
             self.from_right is True
 
@@ -366,6 +364,9 @@ class TargetResampler(BaseEstimator, TransformerMixin):
         all_indices = list(range(0, len(y), self.step_size))
         indices = all_indices[:max_num]
         return indices
+
+    def fit_transform(self, y, X=None):
+        return self.fit(y, X).transform(y, X)
 
     def fit(self, y, X=None):
         """Fit the resampler.
@@ -380,7 +381,7 @@ class TargetResampler(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : object
+        self : TargetResampler
 
         """
         self._validate_params()
@@ -408,11 +409,11 @@ class TargetResampler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, "_is_fitted")
 
-        indices = self._get_indices(y, len(X))
-        if len(X) > len(indices):
-            raise ValueError('Target array cannot be resampled to have the same\
-                              length as reference array')
-        offset = int(self.from_right)*(len(y) - 1 - indices[-1])
+        indices = self._get_indices(y, X.shape[0])
+        if X.shape[0] > len(indices):
+            raise ValueError('Target array cannot be resampled to have the same '
+                             'length as reference array')
+        offset = int(self.from_right) * (len(y) - 1 - indices[-1])
         indices = np.asarray(indices) + offset
         y_res = y[indices]
         return y_res
