@@ -14,7 +14,7 @@ __all__ = [
     'Resampler',
     'Stationarizer',
     'OrdinalRepresentation',
-    'PermutationEntropy',
+    'Entropy',
     'TransitionGraph',
     'kNNGraph',
     'GraphGeodesicDistance',

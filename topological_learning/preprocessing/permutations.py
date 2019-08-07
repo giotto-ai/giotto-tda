@@ -8,11 +8,8 @@ import numpy as np
 
 
 class OrdinalRepresentation(BaseEstimator, TransformerMixin):
-    """Transformer returning a representation of a collection (typically, a time series)
-    of point clouds in :math:`\\mathbb{R}^d` -- where each point cloud is an array
-    of size (n_points, d) -- as a collection of arrays of the same shape, whose
-    each row is the result of applying ``np.argsort`` to the corresponding row
-    in the point cloud array. Based on ideas in `arXiv:1904.07403 <https://arxiv.org/abs/1904.07403>`_.
+    """Transformer performing an argsort of each row in each array in a collection.
+    Based on ideas in `arXiv:1904.07403 <https://arxiv.org/abs/1904.07403>`_.
 
     Parameters
     ----------
@@ -59,8 +56,7 @@ class OrdinalRepresentation(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, d)
-            Input data. Each entry along axis 0 is interpreted as a point cloud
-            in d-dimensional Euclidean space.
+            Input data.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -79,13 +75,12 @@ class OrdinalRepresentation(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each point cloud in X, argsort each row, in ascending order.
+        """For each array in X, argsort each row in ascending order.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, d)
-            Input data. Each entry along axis 0 is interpreted as a point cloud
-            in d-dimensional Euclidean space.
+            Input data.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -113,12 +108,40 @@ class OrdinalRepresentation(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class PermutationEntropy(BaseEstimator, TransformerMixin):
+class Entropy(BaseEstimator, TransformerMixin):
+    """Transformer calculating a Shannon entropy from each array in a collection.
+    In each array, the set of distinct rows is regarded as a set of states, and
+    the probability of each state is proportional to the number of instances of that
+    state in the array.
+
+    Parameters
+    ----------
+    len_vector : int, optional, default: 8
+        Used for performance optimization by exploiting numpy's vectorization capabilities.
+
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless in
+        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+
+    """
+
     def __init__(self, len_vector=8, n_jobs=None):
         self.len_vector = len_vector
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'len_vector': self.len_vector, 'n_jobs': self.n_jobs}
 
     @staticmethod
@@ -128,26 +151,30 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         """
         pass
 
-    def _permutation_entropy(self, X):
+    def _entropy(self, X):
         X_counts = np.unique(X, axis=0, return_counts=True)[1].reshape((-1, 1))
         X_normalized = X_counts / np.sum(X_counts, axis=0).reshape((-1, 1))
         return - np.sum(np.nan_to_num(X_normalized * np.log(X_normalized)), axis=0).reshape((-1, 1))
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-        The training input samples.
+        X : ndarray, shape (n_samples, n_points, d)
+            Input data.
+
         y : None
-        There is no need of a target in a transformer, yet the pipeline API
-        requires this parameter.
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
         self : object
-        Returns self.
+            Returns self.
+
         """
         self._validate_params()
 
@@ -156,24 +183,30 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     #@jit
     def transform(self, X, y=None):
-        """Implementation of the sk-learn transform function that samples the input.
+        """Calculate the entropy of each array in X.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-        The input samples.
+        X : ndarray, shape (n_samples, n_points, d)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-        The array containing the element-wise square roots of the values
-        in `X`
+        X_entropies : ndarray of int, shape (n_samples, n_points)
+            Array of entropies, one per array in X.
+
+        """
+
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0]
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._permutation_entropy) (X[i]) for i in range(n_samples) )
+        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._entropy) (X[i]) for i in range(n_samples) )
         X_transformed = np.concatenate(X_transformed)
         return X_transformed
