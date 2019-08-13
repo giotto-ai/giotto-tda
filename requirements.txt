@@ -8,5 +8,5 @@ keras-metrics
 tensorflow
 umap-learn
 numba
-gudhi
+dionysus
 ripser

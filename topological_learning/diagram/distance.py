@@ -35,8 +35,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the only argument is ``order`` (default = ``np.inf``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order`` (default = ``1``).
+        - If ``metric == 'bottleneck'`` the available arguments are ``order`` (default = ``np.inf``)
+          and ``delta`` (default = ``0.0``).
+        - If ``metric == 'wasserstein'`` the only argument is ``order`` (default = ``1``)
+          and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
           (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
           (default = ``1``).
@@ -48,7 +50,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params={'n_samples': 200}, n_jobs=None):
+    def __init__(self, metric='bottleneck', metric_params={'n_samples': 200, 'delta': 0.0}, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.n_jobs = n_jobs

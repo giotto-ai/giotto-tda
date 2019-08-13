@@ -2,9 +2,7 @@ import numpy as np
 import math as m
 from sklearn.utils._joblib import Parallel, delayed
 
-from ..dependencies import bottleneck_distance as gudhi_bottleneck_distance
-from ..dependencies import wasserstein as hera_wasserstein_distance
-
+import dionysus as dy
 
 def betti_function(diagram, sampling):
     if diagram.size == 0:
@@ -40,11 +38,16 @@ def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None, order=
     betti_y = betti_function(diagram_y, sampling[dimension])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
-def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf):
-    return gudhi_bottleneck_distance(diagram_x, diagram_y)
+def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf, delta=0.0):
+    return dy.bottleneck_distance(dy.Diagram(diagram_x[diagram_x[:,1] != 0]),
+                                  dy.Diagram(diagram_y[diagram_y[:,1] != 0]),
+                                  delta)
 
-def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1):
-    return hera_wasserstein_distance(diagram_x, diagram_y, order)
+
+def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1, delta=0.0):
+    return dy.wasserstein_distance(dy.Diagram(diagram_x[diagram_x[:,1] != 0]),
+                                   dy.Diagram(diagram_y[diagram_y[:,1] != 0]),
+                                   order, delta)
 
 implemented_metric_recipes = {'bottleneck': bottleneck_distance, 'wasserstein': wasserstein_distance,
                               'landscape': kernel_landscape_distance, 'betti': kernel_betti_distance}
