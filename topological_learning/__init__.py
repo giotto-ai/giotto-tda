@@ -1,4 +1,3 @@
-__all__ = ['compose', 'dependencies', 'homology', 'model_selection', 'preprocessing',
-           'datasets', 'diagram', 'manifold', 'neural_network']
-
-from .dependencies import *
+__all__ = ['compose', 'homology', 'model_selection', 'time_series',
+           'graphs', 'images', 'datasets', 'diagram', 'manifold',
+           'neural_network']
