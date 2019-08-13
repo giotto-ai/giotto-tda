@@ -1,6 +1,6 @@
-# author: Nelle Varoquaux <nelle.varoquaux@gmail.com>
-#         Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-# License: BSD
+# Authors: Nelle Varoquaux <nelle.varoquaux@gmail.com>
+#          Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
 
 import numpy as np
 

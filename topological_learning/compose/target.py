@@ -1,6 +1,6 @@
 # Authors: Umberto Lupo <u.lupo@l2f.ch>
 #          Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-# License: BSD 3 clause
+# License: TBD
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin, RegressorMixin
