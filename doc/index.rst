@@ -26,7 +26,7 @@ Welcome to Topological Learning's API reference!
    time_series.TakensEmbedder
 
    time_series.OrdinalRepresentation
-   time_series.PermutationEntropy
+   time_series.Entropy
 
 :mod:`topological_learning.graphs`: Preprocessing for graphs
 ============================================================

@@ -3,7 +3,7 @@
 """
 
 from .preprocessing import Resampler, Stationarizer
-from .permutations import OrdinalRepresentation, PermutationEntropy
+from .permutations import OrdinalRepresentation, Entropy
 from .embedding import TakensEmbedder
 from .target import Labeller
 
@@ -12,7 +12,7 @@ __all__ = [
     'Resampler',
     'Stationarizer',
     'OrdinalRepresentation',
-    'PermutationEntropy',
+    'Entropy',
     'TakensEmbedder',
     'Labeller'
 ]
