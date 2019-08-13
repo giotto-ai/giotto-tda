@@ -108,7 +108,7 @@ class TargetResamplingClassifier(BaseEstimator, ClassifierMixin):
 
         # Transform y and convert back to 1d array if needed
         y_transformed = self.resampler_.transform(y_2d, X)
-        # TODO Check if next if statement is necessary
+
         if y_transformed.ndim == 2 and y_transformed.shape[1] == 1:
             y_transformed = y_transformed.squeeze(axis=1)
 
@@ -278,9 +278,7 @@ class TargetResamplingRegressor(BaseEstimator, RegressorMixin):
 
         # transform y and convert back to 1d array if needed
         y_transformed = self.resampler_.transform(y_2d, X)
-        # FIXME: a FunctionTransformer can return a 1D array even when validate
-        # is set to True. Therefore, we need to check the number of dimension
-        # first.
+
         if y_transformed.ndim == 2 and y_transformed.shape[1] == 1:
             y_transformed = y_transformed.squeeze(axis=1)
 
