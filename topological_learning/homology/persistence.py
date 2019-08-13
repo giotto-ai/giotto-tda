@@ -42,22 +42,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         List of dimensions (non-negative integers). Topological holes of each of
         these dimensions will be detected.
 
-    pad : boolean, optional, default: True
-        Whether or not some of the resulting persistence diagrams
-        should be padded with zeros so that the final collection of persistence
-        diagrams can be cast as a single numpy array.
-
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless in
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf, homology_dimensions=[0, 1], pad=True, n_jobs=None):
+    def __init__(self, metric='euclidean', max_edge_length=np.inf, homology_dimensions=[0, 1], n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
-        self.pad = pad
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
@@ -73,11 +67,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         params : mapping of string to any
             Parameter names mapped to their values.
         """
-        return {'metric': self.metric,
-                'max_edge_length': self.max_edge_length,
-                'homology_dimensions': self.homology_dimensions,
-                'pad': self.pad,
-                'n_jobs': self.n_jobs}
+        return {'metric': self.metric, 'max_edge_length': self.max_edge_length,
+                'homology_dimensions': self.homology_dimensions, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params(metric):
@@ -177,14 +168,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, self.metric)
                                                         for i in range(X.shape[0]) )
 
-        if self.pad:
-            max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
-                                for dimension in self.homology_dimensions ]
-            X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
-                                                            for i in range(len(X_transformed)) )
-            X_transformed = self._stack_padded_diagrams(X_transformed)
-        else:
-            X_transformed = { dimension: [diag[dimension] for diag in X_transformed] for dimension in self.homology_dimensions }
+        max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
+                            for dimension in self.homology_dimensions ]
+        X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
+                                                         for i in range(len(X_transformed)) )
+        X_transformed = self._stack_padded_diagrams(X_transformed)
 
         return X_transformed
 
@@ -218,10 +206,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, max_edge_length=np.inf, homology_dimensions=[0, 1], pad=True, n_jobs=None):
+    def __init__(self, max_edge_length=np.inf, homology_dimensions=[0, 1], n_jobs=None):
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
-        self.pad = pad
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
@@ -237,9 +224,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         params : mapping of string to any
             Parameter names mapped to their values.
         """
-        return {'max_edge_length': self.max_edge_length,
-                'homology_dimensions': self.homology_dimensions,
-                'pad': self.pad,
+        return {'max_edge_length': self.max_edge_length, 'homology_dimensions': self.homology_dimensions,
                 'n_jobs': self.n_jobs}
 
     @staticmethod
@@ -331,14 +316,11 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._gudhi_diagram)(X[i, :, :])
                                                         for i in range(X.shape[0]) )
 
-        if self.pad:
-            max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
-                                for dimension in self.homology_dimensions ]
-            X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
-                                                            for i in range(len(X_transformed)) )
-            X_transformed = self._stack_padded_diagrams(X_transformed)
-        else:
-            X_transformed = { dimension: [diag[dimension] for diag in X_transformed] for dimension in self.homology_dimensions }
+        max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
+                            for dimension in self.homology_dimensions ]
+        X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
+                                                         for i in range(len(X_transformed)) )
+        X_transformed = self._stack_padded_diagrams(X_transformed)
 
         return X_transformed
 
