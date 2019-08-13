@@ -2,14 +2,14 @@
     useful to apply Topological Data Analysis techniques to images.
 """
 
-from .filtrations import ImageInverter, HeightFiltration, ThickeningFiltration, RadialFiltration, DensityFiltration, SignedDistanceFiltration
+from .filtrations import ImageInverter, HeightFiltration, DilationFiltration, RadialFiltration, ErosionFiltration, SignedDistanceFiltration
 
 
 __all__ = [
     'ImageInverter',
     'HeightFiltration',
-    'ThickeningFiltration',
+    'DilationFiltration',
     'RadialFiltration',
-    'DensityFiltration',
+    'ErosionFiltration',
     'SignedDistanceFiltration'
 ]

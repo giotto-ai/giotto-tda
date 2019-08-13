@@ -1,5 +1,6 @@
-# authors: Adelie Garin <adelie.garin@epfl.ch>
+# Authors: Adelie Garin <adelie.garin@epfl.ch>
 #          Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
 
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
@@ -256,7 +257,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class ThickeningFiltration(BaseEstimator, TransformerMixin):
+class DilationFiltration(BaseEstimator, TransformerMixin):
     """Transformer returning a representation of a collection (typically, a time series)
     of point clouds in :math:`\\mathbb{R}^d` -- where each point cloud is an array
     of size (n_points, d) -- as a collection of arrays of the same shape, whose
@@ -550,7 +551,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class DensityFiltration(BaseEstimator, TransformerMixin):
+class ErosionFiltration(BaseEstimator, TransformerMixin):
     """Transformer returning a representation of a collection (typically, a time series)
     of point clouds in :math:`\\mathbb{R}^d` -- where each point cloud is an array
     of size (n_points, d) -- as a collection of arrays of the same shape, whose

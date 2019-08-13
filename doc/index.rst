@@ -28,6 +28,7 @@ Welcome to Topological Learning's API reference!
    time_series.OrdinalRepresentation
    time_series.Entropy
 
+
 :mod:`topological_learning.graphs`: Preprocessing for graphs
 ============================================================
 
@@ -45,6 +46,7 @@ Welcome to Topological Learning's API reference!
    graphs.kNNGraph
    graphs.GraphGeodesicDistance
 
+
 :mod:`topological_learning.time_series`: Preprocessing for images
 =================================================================
 
@@ -60,11 +62,11 @@ Welcome to Topological Learning's API reference!
 
     images.ImageInverter
     images.HeightFiltration
-    images.ThickeningFiltration
     images.RadialFiltration
-    images.DensityFiltration
+    images.DilationFiltration
+    images.ErosionFiltration
     images.SignedDistanceFiltration
-
+    images.DensityFiltration
 
 
 :mod:`topological_learning.homology`: Persistent homology
