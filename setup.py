@@ -7,25 +7,6 @@ with open('README.rst') as f:
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-hera_wasserstein = Extension(name     = "topological_learning.hera_wasserstein",
-                             sources  = ["./topological_learning/dependencies/hera_wasserstein.pyx"],
-                             language = "c++",
-                             extra_compile_args  = ["-std=c++14", "-I./topological_learning/dependencies/hera/geom_matching/wasserstein/include/"])
-
-gudhi_bottleneck = Extension(name     = "topological_learning.gudhi_bottleneck",
-                             sources  = ["./topological_learning/dependencies/gudhi_bottleneck.pyx"],
-                             language = "c++")
-
-try:
-    from Cython.Distutils import build_ext
-    from Cython.Build     import cythonize
-    modules, cmds = cythonize([hera_wasserstein]), {"build_ext": build_ext}
-    print("Cython found")
-
-except ImportError:
-    modules, cmds = [], {}
-    print("Cython not found")
-
 setup(name='topological_learning',
       version='0.0.1',
       description='This package structures and makes accessible to all the tools used or developed by the research team to do Topological Data Analysis within a sk-learn+Keras Machine Learning framework.',
