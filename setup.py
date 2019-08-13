@@ -1,5 +1,4 @@
 from setuptools import setup
-from distutils.core import setup, Extension
 
 with open('README.rst') as f:
     long_description =  f.read()
