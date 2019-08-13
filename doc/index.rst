@@ -7,10 +7,10 @@ Welcome to Topological Learning's API reference!
 ================================================
 
 
-:mod:`topological_learning.preprocessing`: Preprocessing for time series
-========================================================================
+:mod:`topological_learning.time_series`: Preprocessing for time series
+======================================================================
 
-.. automodule:: topological_learning.preprocessing
+.. automodule:: topological_learning.time_series
    :no-members:
    :no-inherited-members:
 
@@ -20,17 +20,51 @@ Welcome to Topological Learning's API reference!
    :toctree: generated/
    :template: class.rst
 
-   preprocessing.Resampler
-   preprocessing.Stationarizer
+   time_series.Resampler
+   time_series.Stationarizer
 
-   preprocessing.TakensEmbedder
+   time_series.TakensEmbedder
 
-   preprocessing.TransitionGraph
-   preprocessing.kNNGraph
-   preprocessing.GraphGeodesicDistance
+   time_series.OrdinalRepresentation
+   time_series.PermutationEntropy
 
-   preprocessing.OrdinalRepresentation
-   preprocessing.PermutationEntropy
+:mod:`topological_learning.graphs`: Preprocessing for graphs
+============================================================
+
+.. automodule:: topological_learning.graphs
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: topological_learning
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   graphs.TransitionGraph
+   graphs.kNNGraph
+   graphs.GraphGeodesicDistance
+
+:mod:`topological_learning.time_series`: Preprocessing for images
+=================================================================
+
+.. automodule:: topological_learning.images
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: topological_learning
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+    images.ImageInverter
+    images.HeightFiltration
+    images.ThickeningFiltration
+    images.RadialFiltration
+    images.DensityFiltration
+    images.SignedDistanceFiltration
+
 
 
 :mod:`topological_learning.homology`: Persistent homology
