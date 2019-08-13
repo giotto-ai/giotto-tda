@@ -1,13 +1,9 @@
-Cython
 numpy
 pandas
-pyarrow
 scipy
 scikit-learn
 keras
 keras-metrics
 tensorflow
-umap-learn
-numba
 dionysus
 ripser
