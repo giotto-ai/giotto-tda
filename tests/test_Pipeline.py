@@ -1,5 +1,5 @@
 import topological_learning as tl
-import topological_learning.preprocessing as prep
+import topological_learning.time_series as ts
 import topological_learning.diagram as diag
 import topological_learning.homology as hl
 import topological_learning.neural_network as nn
@@ -40,7 +40,7 @@ def get_data(n_train, n_test):
     return data
 
 def split_train_test(data, n_train, n_test):
-    labeller = prep.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
+    labeller = ts.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
     labeller.fit(y_train)
@@ -60,8 +60,8 @@ def main(n_jobs):
     X_train, y_train, X_test, y_test = split_train_test(data, n_train, n_test)
 
     steps = [
-        ('stationarizing', prep.Stationarizer(stationarization_type='return')),
-        ('embedding', prep.TakensEmbedder(outer_window_duration=20)),
+        ('stationarizing', ts.Stationarizer(stationarization_type='return')),
+        ('embedding', ts.TakensEmbedder(outer_window_duration=20)),
         ('diagram', hl.VietorisRipsPersistence(homology_dimensions=[ 0, 1 ], n_jobs=n_jobs)),
         ('distance', diag.DiagramDistance(metric='bottleneck', metric_params={'order': np.inf}, n_jobs=n_jobs)),
         ('physical', ma.StatefulMDS(n_components=3, n_jobs=n_jobs)),

@@ -1,5 +1,5 @@
 import topological_learning as tl
-import topological_learning.preprocessing as prep
+import topological_learning.time_series as ts
 import topological_learning.diagram as diag
 import topological_learning.homology as hl
 import topological_learning.neural_network as nn
@@ -38,13 +38,13 @@ def init_keras_session(n_cpus_k, n_gpus_k):
 
 def get_data(n_train, n_test):
     data = np.random.rand(n_train+n_test, 1)
-    stationarizing = prep.Stationarizer(stationarization_type='return')
+    stationarizing = ts.Stationarizer(stationarization_type='return')
     data = stationarizing.fit(data).transform(data)
 
     return data
 
 def split_train_test(data, n_train, n_test):
-    labeller = prep.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
+    labeller = ts.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
     labeller.fit(y_train)
@@ -60,7 +60,7 @@ def split_train_test(data, n_train, n_test):
 
 def make_pipeline():
     steps = [
-        ('embedding', prep.TakensEmbedder()),
+        ('embedding', ts.TakensEmbedder()),
         ('diagram', hl.VietorisRipsPersistence()),
         ('distance', diag.DiagramDistance()),
         ('physical', ma.StatefulMDS()),
