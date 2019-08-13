@@ -1,3 +1,6 @@
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
+
 import math as m
 import numpy as np
 import sklearn as sk

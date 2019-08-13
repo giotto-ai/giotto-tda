@@ -1,3 +1,8 @@
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+#          Umberto Lupo <u.lupo@l2f.ch>
+#          Matteo Caorsi <m.caorsi@l2f.ch>
+# License: TBD
+
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin

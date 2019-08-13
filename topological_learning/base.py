@@ -1,3 +1,6 @@
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
+
 from .neural_network.keras import KerasClassifierWrapper, KerasRegressorWrapper
 
 def clone(estimator, safe=True):

@@ -1,3 +1,8 @@
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+#          Umberto Lupo <u.lupo@l2f.ch>
+#          Matteo Caorsi <m.caorsi@l2f.ch>
+# License: TBD
+
 import numpy as np
 import math as m
 from sklearn.utils._joblib import Parallel, delayed

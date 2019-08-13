@@ -1,15 +1,10 @@
-"""
-The :mod:`sklearn.model_selection._search` includes utilities to fine-tune the
-parameters of an estimator.
-"""
-
-# Author: Alexandre Gramfort <alexandre.gramfort@inria.fr>,
-#         Gael Varoquaux <gael.varoquaux@normalesup.org>
-#         Andreas Mueller <amueller@ais.uni-bonn.de>
-#         Olivier Grisel <olivier.grisel@ensta.org>
-#         Raghav RV <rvraghav93@gmail.com>
-#         Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-# License: BSD 3 clause
+# Authors: Alexandre Gramfort <alexandre.gramfort@inria.fr>,
+#          Gael Varoquaux <gael.varoquaux@normalesup.org>
+#          Andreas Mueller <amueller@ais.uni-bonn.de>
+#          Olivier Grisel <olivier.grisel@ensta.org>
+#          Raghav RV <rvraghav93@gmail.com>
+#          Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
 
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict

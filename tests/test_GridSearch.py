@@ -1,3 +1,6 @@
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
+
 import topological_learning as tl
 import topological_learning.time_series as ts
 import topological_learning.diagram as diag

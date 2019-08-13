@@ -1,3 +1,7 @@
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+#          Umberto Lupo <u.lupo@l2f.ch>
+# License: TBD
+
 import numpy as np
 import sklearn as sk
 from numpy.random.mtrand import RandomState

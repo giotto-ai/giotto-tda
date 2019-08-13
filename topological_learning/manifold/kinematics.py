@@ -1,5 +1,5 @@
-# author: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-# License: BSD
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# License: TBD
 
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
