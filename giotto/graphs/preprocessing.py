@@ -31,10 +31,10 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> import giotto.preprocessing as prep
+    >>> from giotto.graphs import TransitionGraph
     >>> dyn = np.array([[['a'], ['b'], ['c']],
     ...                 [['c'], ['a'], ['b']])
-    >>> tg = prep.TransitionGraph()
+    >>> tg = TransitionGraph()
     >>> tg.fit_transform(dyn)
 
     """

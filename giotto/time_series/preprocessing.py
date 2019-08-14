@@ -39,7 +39,7 @@ class Resampler(BaseEstimator, TransformerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> import giotto.preprocessing as prep
+    >>> from giotto.time_series import Resampler
     >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
@@ -50,8 +50,8 @@ class Resampler(BaseEstimator, TransformerMixin):
     >>> df_noise.index = index
     >>> # Set up the Sampler
     >>> sampling_period = '10h'
-    >>> periodic_sampler = prep.Resampler(sampling_type='periodic', sampling_period=sampling_period,
-    ...                                   remove_weekends=False)
+    >>> periodic_sampler = Resampler(sampling_type='periodic', sampling_period=sampling_period,
+    ...                              remove_weekends=False)
     >>> # Fit and transform the DataFrame
     >>> periodic_sampler.fit(df_noise)
     >>> df_noise_sampled = periodic_sampler.transform(df_noise)
@@ -160,13 +160,13 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> import giotto.preprocessing as prep
+    >>> from giotto.time_series import Stationarizer
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random() for x in range(0,300)])
     >>> # Initzialize the stationarizer
-    >>> return_stationarizer = prep.Stationarizer(stationarization_type='return')
+    >>> return_stationarizer = Stationarizer(stationarization_type='return')
     >>> return_stationarizer.fit(signal_noise)
     >>> signal_noise_stationarized = return_stationarizer.transform(signal_noise)
     >>> plt.plot(signal_noise_stationarized)

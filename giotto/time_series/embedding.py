@@ -94,7 +94,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> import giotto.preprocessing as prep
+    >>> from giotto.time_series import TakensEmbedder
     >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
@@ -102,7 +102,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> # Set up the Takens Embedder
     >>> outer_window_duration = 50
     >>> outer_window_stride = 5
-    >>> embedder = prep.TakensEmbedder(
+    >>> embedder = TakensEmbedder(
     >>>     outer_window_duration=outer_window_duration,
     ...     outer_window_stride=outer_window_stride,
     ...     embedding_parameters_type='search',
