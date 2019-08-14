@@ -43,7 +43,7 @@ Welcome to giotto's API reference!
    :template: class.rst
 
    graphs.TransitionGraph
-   graphs.kNeightborsGraph
+   graphs.KNeightborsGraph
    graphs.GraphGeodesicDistance
 
 

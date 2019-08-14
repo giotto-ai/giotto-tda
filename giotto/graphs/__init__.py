@@ -2,11 +2,11 @@
    useful to apply Topological Data Analysis techniques to graphs.
 """
 
-from .preprocessing import TransitionGraph, kNNGraph, GraphGeodesicDistance
+from .preprocessing import TransitionGraph, KNeighborsGraph, GraphGeodesicDistance
 
 
 __all__ = [
     'TransitionGraph',
-    'kNNGraph',
+    'KNeighborsGraph',
     'GraphGeodesicDistance'
 ]

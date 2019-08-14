@@ -215,6 +215,6 @@ class Entropy(BaseEstimator, TransformerMixin):
         n_samples = X.shape[0]
 
         X_transformed = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._permutation_entropy)(X[i]) for i in range(n_samples))
+            delayed(self._entropy)(X[i]) for i in range(n_samples))
         X_transformed = np.concatenate(X_transformed)
         return X_transformed
