@@ -47,8 +47,8 @@ Welcome to giotto's API reference!
    graphs.GraphGeodesicDistance
 
 
-:mod:`giotto.time_series`: Preprocessing for images
-===================================================
+:mod:`giotto.images`: Preprocessing for images
+==============================================
 
 .. automodule:: giotto.images
    :no-members:
@@ -67,6 +67,23 @@ Welcome to giotto's API reference!
     images.ErosionFiltration
     images.SignedDistanceFiltration
     images.DensityFiltration
+
+
+:mod:`giotto.pipeline`: Pipeline
+================================
+
+.. automodule:: giotto.pipeline
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   pipeline.TransformerConvolution
+   pipeline.make_convolution
 
 
 :mod:`giotto.homology`: Persistent homology
@@ -143,6 +160,7 @@ Welcome to giotto's API reference!
 
    compose.TargetResamplingClassifier
    compose.TargetResamplingRegressor
+
 
 
 :mod:`giotto.neural_network`: Neural network with Keras
