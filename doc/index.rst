@@ -1,20 +1,20 @@
-.. topological_learning documentation master file, created by
+.. giotto documentation master file, created by
    sphinx-quickstart on Mon Jun  3 11:56:46 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Topological Learning's API reference!
-================================================
+Welcome to giotto's API reference!
+==================================
 
 
-:mod:`topological_learning.time_series`: Preprocessing for time series
-======================================================================
+:mod:`giotto.time_series`: Preprocessing for time series
+========================================================
 
-.. automodule:: topological_learning.time_series
+.. automodule:: giotto.time_series
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -29,14 +29,14 @@ Welcome to Topological Learning's API reference!
    time_series.Entropy
 
 
-:mod:`topological_learning.graphs`: Preprocessing for graphs
-============================================================
+:mod:`giotto.graphs`: Preprocessing for graphs
+==============================================
 
-.. automodule:: topological_learning.graphs
+.. automodule:: giotto.graphs
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -47,14 +47,14 @@ Welcome to Topological Learning's API reference!
    graphs.GraphGeodesicDistance
 
 
-:mod:`topological_learning.time_series`: Preprocessing for images
-=================================================================
+:mod:`giotto.time_series`: Preprocessing for images
+===================================================
 
-.. automodule:: topological_learning.images
+.. automodule:: giotto.images
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -69,14 +69,14 @@ Welcome to Topological Learning's API reference!
     images.DensityFiltration
 
 
-:mod:`topological_learning.homology`: Persistent homology
-=========================================================
+:mod:`giotto.homology`: Persistent homology
+===========================================
 
-.. automodule:: topological_learning.homology
+.. automodule:: giotto.homology
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -88,14 +88,14 @@ Welcome to Topological Learning's API reference!
    homology.ConsistentRescaling
 
 
-:mod:`topological_learning.diagram`: Persistent diagrams
-========================================================
+:mod:`giotto.diagram`: Persistent diagrams
+==========================================
 
-.. automodule:: topological_learning.diagram
+.. automodule:: giotto.diagram
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -107,14 +107,14 @@ Welcome to Topological Learning's API reference!
 
    diagram.DiagramDistance
 
-:mod:`topological_learning.manifold`: Manifold learning
-=======================================================
+:mod:`giotto.manifold`: Manifold learning
+=========================================
 
-.. automodule:: topological_learning.manifold
+.. automodule:: giotto.manifold
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -125,14 +125,14 @@ Welcome to Topological Learning's API reference!
    manifold.Kinematics
 
 
-:mod:`topological_learning.compose`: Features and targets composition
-=====================================================================
+:mod:`giotto.compose`: Features and targets composition
+=======================================================
 
-.. automodule:: topological_learning.compose
+.. automodule:: giotto.compose
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -145,14 +145,14 @@ Welcome to Topological Learning's API reference!
    compose.TargetResamplingRegressor
 
 
-:mod:`topological_learning.neural_network`: Neural network with Keras
-=====================================================================
+:mod:`giotto.neural_network`: Neural network with Keras
+=======================================================
 
-.. automodule:: topological_learning.neural_network
+.. automodule:: giotto.neural_network
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
@@ -162,14 +162,14 @@ Welcome to Topological Learning's API reference!
    neural_network.KerasRegressorWrapper
 
 
-:mod:`topological_learning.model_selection`: Hyper-parameter search extension
-=============================================================================
+:mod:`giotto.model_selection`: Hyper-parameter search extension
+===============================================================
 
-.. automodule:: topological_learning.model_selection
+.. automodule:: giotto.model_selection
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: topological_learning
+.. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
