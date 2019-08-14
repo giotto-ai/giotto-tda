@@ -243,7 +243,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         if self.embedding_parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._mutual_information)(X, embedding_time_delay,
-                                                  numberBins=100)
+                                                  bins=100)
                 for embedding_time_delay in
                 range(1, self.embedding_time_delay + 1))
             self.embedding_time_delay_ = mutual_information_list.index(
