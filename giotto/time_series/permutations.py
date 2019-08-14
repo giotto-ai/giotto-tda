@@ -117,10 +117,10 @@ class OrdinalRepresentation(BaseEstimator, TransformerMixin):
 
 
 class Entropy(BaseEstimator, TransformerMixin):
-    """Transformer calculating a Shannon entropy from each array in a collection.
-    In each array, the set of distinct rows is regarded as a set of states, and
-    the probability of each state is proportional to the number of instances of that
-    state in the array.
+    """Transformer calculating the Shannon entropy of each array in a
+    collection, in the following sense: in each array, the set of distinct rows
+    is regarded as a set of possible states, and the probability of each state
+    is the relative frequency of that state within the array.
 
     Parameters
     ----------
