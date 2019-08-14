@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
 
-from topological_learning.preprocessing import GraphGeodesicDistance
+from giotto.preprocessing import GraphGeodesicDistance
 import pytest
 
 X = np.array([

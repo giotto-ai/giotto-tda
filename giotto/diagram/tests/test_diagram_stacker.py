@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 
-from topological_learning.diagram import DiagramStacker, DiagramScaler
+from giotto.diagram import DiagramStacker, DiagramScaler
 
 
 @pytest.mark.parametrize("num_samples", [0, 1, 10])
