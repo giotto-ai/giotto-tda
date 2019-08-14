@@ -26,7 +26,7 @@ Welcome to Topological Learning's API reference!
    preprocessing.TakensEmbedder
 
    preprocessing.TransitionGraph
-   preprocessing.kNNGraph
+   preprocessing.KNeighborsGraph
    preprocessing.GraphGeodesicDistance
 
    preprocessing.OrdinalRepresentation

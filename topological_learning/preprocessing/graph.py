@@ -113,14 +113,16 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class kNNGraph(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the adjacency matrices of :math:`k`-nearest
-    neighbor graphs. Let :math:`k` be a positive integer, and :math:`X` be a collection
-    of point clouds in Euclidean space, each encoded by a two-dimensional array.
-    For each entry in :math:`X`, the corresponding kNN graph is a simple, undirected
-    and unweighted graph with an edge between any two data instances :math:`\\star_i, \\star_j`
-    in that entry whenever :math:`\\star_i` (resp. :math:`\\star_j`) is among the
-    :math:`k`-th nearest neighbors of :math:`\\star_j` (resp. :math:`\\star_i`).
+class KNeighborsGraph(BaseEstimator, TransformerMixin):
+    """Transformer for the calculation of the adjacency matrices of
+    :math:`k`-nearest neighbor graphs. Let :math:`k` be a positive integer,
+    and :math:`X` be a collection of point clouds in Euclidean space,
+    each encoded by a two-dimensional array. For each entry in :math:`X`,
+    the corresponding kNN graph is a simple, undirected and unweighted graph
+    with an edge between any two data instances :math:`\\star_i, \\star_j`
+    in that entry whenever :math:`\\star_i` (resp. :math:`\\star_j`) is
+    among the :math:`k`-th nearest neighbors of :math:`\\star_j` (resp.
+    :math:`\\star_i`).
 
     Parameters
     ----------
