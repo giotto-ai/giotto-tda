@@ -43,7 +43,7 @@ Welcome to Topological Learning's API reference!
    :template: class.rst
 
    graphs.TransitionGraph
-   graphs.kNNGraph
+   graphs.kNeightborsGraph
    graphs.GraphGeodesicDistance
 
 
