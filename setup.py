@@ -6,42 +6,32 @@ with open('README.rst') as f:
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-setup(name='topological_learning',
+setup(name='giotto',
       version='0.0.1',
-      description='This package structures and makes accessible to all the tools used or developed by the research team to do Topological Data Analysis within a sk-learn+Keras Machine Learning framework.',
+      description='giotto is a scikit-learn-based machine learning library that brings Topological Data Analysis to data scientists.',
       long_description=long_description,
       url='https://git.l2f.ch/g.tauzin/topological_learning.git',
       project_urls={
-        "Issue Tracker": "https://git.l2f.ch/topological_learning/issues",
-        "Documentation": "https://git.l2f.ch/topological_learning/",
-        "Source Code": "https://git.l2f.ch/topological_learning/tree/master"
+          "Issue Tracker": "TBA",
+          "Documentation": "TBA",
+          "Source Code": "TBA"
       },
-      author='Guillaume Tauzin',
-      author_email='g.tauzin@l2f.ch',
-      license='MIT',
+      maintainer='Guillaume Tauzin',
+      maintainer_email='guillaume.tauzin@epfl.ch',
+      license='TBA',
       classifiers=[
-        # How mature is this project? Common values are
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
         'Development Status :: 3 - Alpha',
-
-        # Indicate who your project is intended for
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
-
-        # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: MIT License',
-
-        # Specify the Python versions you support here.
+        'License :: OSI Approved :: TBA',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8'
       ],
-      packages=['topological_learning'],
+      packages=['giotto'],
       include_package_data=True,
-      keywords='topological data analysis, persistent homology, persistence diagrams',
+      keywords='machine learning, topological data analysis, persistent homology, persistence diagrams',
       python_requires='>=3.5',
       install_requires=requirements,
       extras_require={

@@ -1,13 +1,13 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: TBD
 
-import topological_learning as tl
-import topological_learning.time_series as ts
-import topological_learning.diagram as diag
-import topological_learning.homology as hl
-import topological_learning.neural_network as nn
-import topological_learning.manifold as ma
-import topological_learning.compose as cp
+import giotto as go
+import giotto.time_series as ts
+import giotto.diagram as diag
+import giotto.homology as hl
+import giotto.neural_network as nn
+import giotto.manifold as ma
+import giotto.compose as cp
 
 import numpy as np
 import pandas as pd
@@ -88,7 +88,7 @@ def get_param_grid():
     embedding_param['outer_window_duration'] = [ 20, 30 ]
 
     diagram_param['homology_dimensions'] = [ [ 0, 1 ] ]
-    distance_param['metric'] = [ 'bottleneck' ]
+    distance_param['metric'] = [ 'botgoeneck' ]
     distance_param['metric_params'] = [ {'order': np.inf} ]
 
     physical_param['n_components'] = [ 3 ]

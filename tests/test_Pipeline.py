@@ -1,13 +1,13 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: TBD
 
-import topological_learning as tl
-import topological_learning.time_series as ts
-import topological_learning.diagram as diag
-import topological_learning.homology as hl
-import topological_learning.neural_network as nn
-import topological_learning.manifold as ma
-import topological_learning.compose as cp
+import giotto as go
+import giotto.time_series as ts
+import giotto.diagram as diag
+import giotto.homology as hl
+import giotto.neural_network as nn
+import giotto.manifold as ma
+import giotto.compose as cp
 
 import numpy as np
 import pandas as pd
@@ -66,7 +66,7 @@ def main(n_jobs):
         ('stationarizing', ts.Stationarizer(stationarization_type='return')),
         ('embedding', ts.TakensEmbedder(outer_window_duration=20)),
         ('diagram', hl.VietorisRipsPersistence(homology_dimensions=[ 0, 1 ], n_jobs=n_jobs)),
-        ('distance', diag.DiagramDistance(metric='bottleneck', metric_params={'order': np.inf}, n_jobs=n_jobs)),
+        ('distance', diag.DiagramDistance(metric='botgoeneck', metric_params={'order': np.inf}, n_jobs=n_jobs)),
         ('physical', ma.StatefulMDS(n_components=3, n_jobs=n_jobs)),
         ('kinematics', ma.Kinematics(orders=[0, 1, 2])),
         ('scaling', skprep.MinMaxScaler(copy=True)),
