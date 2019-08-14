@@ -199,11 +199,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         List of dimensions (non-negative integers). Topological holes of each of
         these dimensions will be detected.
 
-    pad : boolean, optional, default: True
-        Whether or not some of the resulting persistence diagrams
-        should be padded with zeros so that the final collection of persistence
-        diagrams can be cast as a single numpy array.
-
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless in
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
@@ -245,19 +240,24 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         cubical_complex = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
         diagram = cubical_complex.persistence(homology_coeff_field=2, min_persistence=0)
 
-        return { dimension : np.array([diagram[i][1] for i in range(len(diagram)) if diagram[i][0] == dimension ])
+        if (0, (0, np.inf)) in diagram:
+            diagram.remove((0, (0, np.inf)))
+
+        if (1, (0, np.inf)) in diagram:
+            diagram.remove((1, (0, np.inf)))
+
+        return { dimension : np.array([diagram[i][1] for i in range(len(diagram))
+                                       if diagram[i][0] == dimension ]).reshape((-1, 2))
                             for dimension in self.homology_dimensions }
 
     def _pad_diagram(self, diagram, max_length_list):
         padList = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
-        return { dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions) }
+
+        return { dimension: np.pad(diagram[dimension], padList[i], 'constant')
+                 for i, dimension in enumerate(self.homology_dimensions) }
 
     def _stack_padded_diagrams(self, diagrams):
         stacked_diagrams = { dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions }
-
-        # for dimension in self.homology_dimensions:
-        #     if stackedDiagrams[dimension].size == 0:
-        #         del stackedDiagrams[dimension]
         return stacked_diagrams
 
     def fit(self, X, y=None):
@@ -319,7 +319,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
         X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._gudhi_diagram)(X[i, :, :])
                                                         for i in range(X.shape[0]) )
-
         max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
                             for dimension in self.homology_dimensions ]
         X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
