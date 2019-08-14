@@ -1,4 +1,4 @@
-"""The :mod:`topological_learning.graphs` implements preprocessing techniques
+"""The :mod:`giotto.graphs` implements preprocessing techniques
    useful to apply Topological Data Analysis techniques to graphs.
 """
 

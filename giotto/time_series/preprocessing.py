@@ -39,7 +39,7 @@ class Resampler(BaseEstimator, TransformerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> import topological_learning.preprocessing as prep
+    >>> import giotto.preprocessing as prep
     >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
@@ -160,7 +160,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> import topological_learning.preprocessing as prep
+    >>> import giotto.preprocessing as prep
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled

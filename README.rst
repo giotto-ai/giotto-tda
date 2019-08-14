@@ -1,8 +1,8 @@
-topological_learning
---------
+giotto
+-------
 
-To use (with caution), simply do::
+To use simply do::
 
-    >>> import topological_learning as tl
+    >>> import giotto as go
 
-See the `project docs <https://pages.l2f.ch/topological-learning/>`_ for more details.
+See the `project docs <https://pages.l2f.ch/giotto/>`_ for more details.

@@ -1,4 +1,4 @@
-"""The :mod:`topological_learning.homology` module implements transformers
+"""The :mod:`giotto.homology` module implements transformers
 to generate features from persistent homology.
 """
 

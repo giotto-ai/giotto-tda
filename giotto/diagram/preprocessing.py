@@ -133,7 +133,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     norm : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
         The type of norm on persistence diagrams to be used. Defined in terms of
         identically named distance functions between pairs of diagrams (see
-        :mod:'topological_learning.diagram.distance'), as the distance between
+        :mod:'giotto.diagram.distance'), as the distance between
         a diagram (or curve) and the trivial diagram (or curve).
 
     norm_params : dict, optional, default: {'n_samples': 200}

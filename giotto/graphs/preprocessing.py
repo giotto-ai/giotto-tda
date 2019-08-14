@@ -31,7 +31,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> import topological_learning.preprocessing as prep
+    >>> import giotto.preprocessing as prep
     >>> dyn = np.array([[['a'], ['b'], ['c']],
     ...                 [['c'], ['a'], ['b']])
     >>> tg = prep.TransitionGraph()

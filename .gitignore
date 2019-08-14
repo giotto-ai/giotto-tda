@@ -30,7 +30,3 @@ doc/build
 
 # Output files
 *.out
-
-# Hera C++ files
-topological_learning/dependencies/hera
-.DS_Store

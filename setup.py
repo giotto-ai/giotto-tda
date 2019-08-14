@@ -10,7 +10,7 @@ setup(name='giotto',
       version='0.0.1',
       description='giotto is a scikit-learn-based machine learning library that brings Topological Data Analysis to data scientists.',
       long_description=long_description,
-      url='https://git.l2f.ch/g.tauzin/topological_learning.git',
+      url='https://git.l2f.ch/g.tauzin/giotto.git',
       project_urls={
           "Issue Tracker": "TBA",
           "Documentation": "TBA",
