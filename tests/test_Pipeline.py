@@ -66,7 +66,7 @@ def main(n_jobs):
         ('stationarizing', ts.Stationarizer(stationarization_type='return')),
         ('embedding', ts.TakensEmbedder(outer_window_duration=20)),
         ('diagram', hl.VietorisRipsPersistence(homology_dimensions=[ 0, 1 ], n_jobs=n_jobs)),
-        ('distance', diag.DiagramDistance(metric='botgoeneck', metric_params={'order': np.inf}, n_jobs=n_jobs)),
+        ('distance', diag.DiagramDistance(metric='bottleneck', metric_params={'order': np.inf}, n_jobs=n_jobs)),
         ('physical', ma.StatefulMDS(n_components=3, n_jobs=n_jobs)),
         ('kinematics', ma.Kinematics(orders=[0, 1, 2])),
         ('scaling', skprep.MinMaxScaler(copy=True)),

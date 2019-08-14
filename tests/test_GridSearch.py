@@ -88,7 +88,7 @@ def get_param_grid():
     embedding_param['outer_window_duration'] = [ 20, 30 ]
 
     diagram_param['homology_dimensions'] = [ [ 0, 1 ] ]
-    distance_param['metric'] = [ 'botgoeneck' ]
+    distance_param['metric'] = [ 'bottleneck' ]
     distance_param['metric_params'] = [ {'order': np.inf} ]
 
     physical_param['n_components'] = [ 3 ]
