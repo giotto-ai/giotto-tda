@@ -189,7 +189,7 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         self._is_fitted = True
         return self
-        """
+
     def transform(self, X, y=None):
         """Calculate the entropy of each array in X.
 
