@@ -145,7 +145,7 @@ def main(n_jobs):
     grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=n_jobs)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Test script for typical use of the Topological Learning library")
+    parser = argparse.ArgumentParser(description="Test script for typical use of the giotto library")
     parser.add_argument('-n_jobs', help="Number of processes", type=int, required=True)
     parser.add_argument('-n_cpus_k', '--number_cpus_keras', help="Number of CPUs used to initialize keras session. Warning: This might lead to an explosion of thread allocations.", type=int, default=1)
     parser.add_argument('-n_gpus_k', '--number_gpus_keras', help="Number of GPUs used to initialize keras session. Warning: In the case of a grid search, this has lead to crashes as GPU memory got full.", type=int, default=0)
