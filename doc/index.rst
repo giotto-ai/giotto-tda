@@ -82,8 +82,7 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-   pipeline.TransformerConvolution
-   pipeline.make_convolution
+   pipeline.SlidingWindowFeatureUnion
 
 
 :mod:`giotto.homology`: Persistent homology
