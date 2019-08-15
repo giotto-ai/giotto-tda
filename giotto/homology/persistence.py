@@ -349,6 +349,18 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'len_vector': self.len_vector, 'n_jobs': self.n_jobs}
 
     @staticmethod

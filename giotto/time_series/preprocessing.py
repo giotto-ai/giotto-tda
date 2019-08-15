@@ -69,6 +69,18 @@ class Resampler(BaseEstimator, TransformerMixin):
         self.remove_weekends = remove_weekends
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'sampling_type': self.sampling_type,
                 'sampling_period': self.sampling_period,
                 'sampling_times': self.sampling_times,
@@ -178,6 +190,18 @@ class Stationarizer(BaseEstimator, TransformerMixin):
         self.stationarization_type = stationarization_type
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'stationarization_type': self.stationarization_type}
 
     @staticmethod

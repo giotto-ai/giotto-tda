@@ -133,6 +133,18 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'outer_window_duration': self.outer_window_duration,
                 'outer_window_stride': self.outer_window_stride,
                 'embedding_parameters_type': self.embedding_parameters_type,

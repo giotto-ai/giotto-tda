@@ -61,6 +61,18 @@ class Labeller(BaseEstimator, TransformerMixin):
         self.n_steps_future = n_steps_future
 
     def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
         return {'labelling_kwargs': self.labelling_kwargs,
                 'function_kwargs': self.function_kwargs,
                 'window_size': self.window_size,
