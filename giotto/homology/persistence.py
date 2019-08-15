@@ -156,8 +156,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         X_transformed : dict of int: ndarray or dict of int: list
             Dictionary whose keys are the integers in ``self.homology_dimensions``,
-            and whose values are ndarrays if ``pad == True``, and lists otherwise.
-            In the former case, the ndarrays have shape (n_samples, M_d, 2) where,
+            and whose values are ndarrays of shape (n_samples, M_d, 2) where,
             if m_{d,i} is the number of persistent topological features in the relevant
             dimension d found in sample i, then M_d = max {m_{d,i}: i = 1, ..., n_samples}.
             If ``pad == False``, then each list has length n_samples and its i-th entry
@@ -251,9 +250,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
                             for dimension in self.homology_dimensions }
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
+        pad_list = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
 
-        return { dimension: np.pad(diagram[dimension], padList[i], 'constant')
+        return { dimension: np.pad(diagram[dimension], pad_list[i], 'constant')
                  for i, dimension in enumerate(self.homology_dimensions) }
 
     def _stack_padded_diagrams(self, diagrams):
@@ -422,8 +421,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             diagrams with M_d persistent topological features. For example, X
             could be the result of applying the ``transform`` method of a
             ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            clouds/distance matrices.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
