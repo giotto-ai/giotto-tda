@@ -135,14 +135,15 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of the adjacency matrices of
-    :math:`k`-nearest neighbor graphs. Let :math:`k` be a positive integer,
-    and :math:`X` be a collection of point clouds in Euclidean space,
-    each encoded by a two-dimensional array. For each entry in :math:`X`,
-    the corresponding kNN graph is a simple, undirected and unweighted graph
-    with an edge between any two data instances :math:`\\star_i, \\star_j`
-    in that entry whenever :math:`\\star_i` (resp. :math:`\\star_j`) is
-    among the :math:`k`-th nearest neighbors of :math:`\\star_j` (resp.
-    :math:`\\star_i`).
+    :math:`k`-nearest neighbor graphs. Let :math:`k` be a positive integer, and
+    :math:`X` be a collection of point clouds in Euclidean space, each encoded
+    as a two-dimensional array. For each point cloud :math:`\\mathcal{P}` in
+    :math:`X`, the corresponding kNN graph is an undirected and unweighted graph
+    with an edge between any two points :math:`p_i, p_j` in :math:`\\mathcal{P}`
+    whenever either :math:`p_i` is among the :math:`k`-th nearest neighbors of
+    :math:`p_j`, or :math:`p_j` is among the :math:`k`-th nearest neighbors of
+    resp. :math:`p_i`. A point is not regarded as a neighbor of itself, i.e. the
+    resulting graph is simple.
 
     Parameters
     ----------
@@ -249,9 +250,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self._nearest_neighbors.fit(X)
         A = self._nearest_neighbors.kneighbors_graph(
             X,
-            n_neighbors=self.n_neighbors,
-            mode=self.mode)
-        sp.csr_matrix.setdiag(A, 0)
+            n_neighbors=self.n_neighbors+1,
+            mode=self.mode,
+            include_self=False)
         rows, cols = A.nonzero()
         A[cols, rows] = A[rows, cols]
         return A
@@ -287,9 +288,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute the adjacency matrix of the kNN graph of each entry in
-        the input array along axis 0. The method
-        :meth:'sklearn.neighbors.kneighbors_graph' is used.
+        """Compute the adjacency matrix of the kNN graph of each entry in the
+        input array along axis 0. Note: the method
+        :meth:`sklearn.neighbors.kneighbors_graph` is used, but the set of
+        :math:`k`-nearest neighbors of a point here corresponds to the set of
+        :math:(`k+1`)-nearest neighbors according to the convention used there.
 
         Parameters
         ----------
