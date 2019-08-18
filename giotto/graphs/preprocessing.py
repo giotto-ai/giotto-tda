@@ -250,7 +250,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self._nearest_neighbors.fit(X)
         A = self._nearest_neighbors.kneighbors_graph(
             X,
-            n_neighbors=self.n_neighbors+1,
+            n_neighbors=self.n_neighbors + 1,
             mode=self.mode,
             include_self=False)
         rows, cols = A.nonzero()

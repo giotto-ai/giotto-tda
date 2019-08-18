@@ -90,14 +90,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         if 0 in self.homology_dimensions:
             diagram[0] = diagram[0][:-1, :]
 
-        return { dimension: diagram[dimension] for dimension in self.homology_dimensions }
+        return {dimension: diagram[dimension] for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
-        return { dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions) }
+        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
+        return {dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions)}
 
     def _stack_padded_diagrams(self, diagrams):
-        stacked_diagrams = { dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions }
+        stacked_diagrams = {dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions}
 
         # for dimension in self.homology_dimensions:
         #     if stackedDiagrams[dimension].size == 0:
@@ -168,13 +168,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         is_distance_matrix = (self.metric == 'precomputed')
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, self.metric)
-                                                        for i in range(X.shape[0]) )
+        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, self.metric)
+                                                     for i in range(X.shape[0]))
 
-        max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
-                            for dimension in self.homology_dimensions ]
-        X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
-                                                         for i in range(len(X_transformed)) )
+        max_length_list = [max(1, np.max([X_transformed[i][dimension].shape[0] for i in range(len(X_transformed))]))
+                           for dimension in self.homology_dimensions]
+        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._pad_diagram)(X_transformed[i], max_length_list)
+                                                     for i in range(len(X_transformed)))
         X_transformed = self._stack_padded_diagrams(X_transformed)
 
         return X_transformed
@@ -245,18 +245,18 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         if (1, (0, np.inf)) in diagram:
             diagram.remove((1, (0, np.inf)))
 
-        return { dimension : np.array([diagram[i][1] for i in range(len(diagram))
-                                       if diagram[i][0] == dimension ]).reshape((-1, 2))
-                            for dimension in self.homology_dimensions }
+        return {dimension: np.array([diagram[i][1] for i in range(len(diagram))
+                                     if diagram[i][0] == dimension]).reshape((-1, 2))
+                for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
-        pad_list = [ ((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0,0)) for i, dimension in enumerate(self.homology_dimensions) ]
+        pad_list = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
 
-        return { dimension: np.pad(diagram[dimension], pad_list[i], 'constant')
-                 for i, dimension in enumerate(self.homology_dimensions) }
+        return {dimension: np.pad(diagram[dimension], pad_list[i], 'constant')
+                for i, dimension in enumerate(self.homology_dimensions)}
 
     def _stack_padded_diagrams(self, diagrams):
-        stacked_diagrams = { dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions }
+        stacked_diagrams = {dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions}
         return stacked_diagrams
 
     def fit(self, X, y=None):
@@ -279,7 +279,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params(self.homology_dimensions, len(X.shape)-1)
+        self._validate_params(self.homology_dimensions, len(X.shape) - 1)
 
         self._is_fitted = True
         return self
@@ -315,13 +315,12 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._gudhi_diagram)(X[i, :, :])
-                                                        for i in range(X.shape[0]) )
-        max_length_list = [ max(1, np.max([ X_transformed[i][dimension].shape[0] for i in range(len(X_transformed)) ]))
-                            for dimension in self.homology_dimensions ]
-        X_transformed = Parallel(n_jobs = self.n_jobs) ( delayed(self._pad_diagram)(X_transformed[i], max_length_list)
-                                                         for i in range(len(X_transformed)) )
+        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(X[i, :, :])
+                                                     for i in range(X.shape[0]))
+        max_length_list = [max(1, np.max([X_transformed[i][dimension].shape[0] for i in range(len(X_transformed))]))
+                           for dimension in self.homology_dimensions]
+        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._pad_diagram)(X_transformed[i], max_length_list)
+                                                     for i in range(len(X_transformed)))
         X_transformed = self._stack_padded_diagrams(X_transformed)
 
         return X_transformed
@@ -442,9 +441,9 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         slice_indices = list(range(0, n_samples, self.len_vector)) + [n_samples]
         n_slices = len(slice_indices) - 1
 
-        X_transformed = Parallel(n_jobs=self.n_jobs) ( delayed(self._persistent_entropy) (X[dimension][slice_indices[i] : slice_indices[i+1]])
-                                                       for dimension in X.keys() for i in range(n_slices) )
+        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._persistent_entropy)(X[dimension][slice_indices[i]: slice_indices[i + 1]])
+                                                     for dimension in X.keys() for i in range(n_slices))
 
-        X_transformed = np.hstack( [ np.concatenate([X_transformed[i*n_slices + j] for j in range(n_slices)], axis=0)  for i in range(n_dimensions) ])
+        X_transformed = np.hstack([np.concatenate([X_transformed[i * n_slices + j] for j in range(n_slices)], axis=0) for i in range(n_dimensions)])
 
         return X_transformed
