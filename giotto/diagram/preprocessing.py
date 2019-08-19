@@ -113,7 +113,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-        X_transformed = { None: np.concatenate(list(X.values()), axis=1)}
+        X_transformed = {None: np.concatenate(list(X.values()), axis=1)}
         return X_transformed
 
 
@@ -206,7 +206,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         """
         norm_params = self.norm_params.copy()
 
-        sampling = { dimension: None for dimension in X.keys() }
+        sampling = {dimension: None for dimension in X.keys()}
 
         if 'n_samples' in norm_params.keys():
             n_samples = norm_params.pop('n_samples')
@@ -249,7 +249,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, ['_is_fitted'])
 
-        X_scaled = { dimension: X / self._scale for dimension, X in X.items() }
+        X_scaled = {dimension: X / self._scale for dimension, X in X.items()}
         return X_scaled
 
     def inverse_transform(self, X, copy=None):
@@ -271,8 +271,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, ['_is_fitted'])
 
-        X_scaled = { dimension: X * self._scale for dimension, X in X.items() }
+        X_scaled = {dimension: X * self._scale for dimension, X in X.items()}
         return X_scaled
+
 
 class DiagramFilter(BaseEstimator, TransformerMixin):
     """Transformer filtering collections of persistence diagrams in which each
@@ -367,7 +368,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
     def _bisection(self, X):
         iterator = iter([(i, i) for i in range(len(X))])
 
-        numberPoints = [ X[dimension].shape for dimension in self.homologyDimensions ]
+        numberPoints = [X[dimension].shape for dimension in self.homologyDimensions]
         XConcatenated = np.concatenate([X[dimension] for dimension in self.homologyDimensions])
 
         lowerCutoff = 0.
@@ -387,7 +388,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
             if distance == tolerance:
                 return middleCutoff
-            elif (distance - tolerance)*() < 0:
+            elif (distance - tolerance) * () < 0:
                 upperCutoff = middleCutoff
             else:
                 lowerCutoff = middleCutoff

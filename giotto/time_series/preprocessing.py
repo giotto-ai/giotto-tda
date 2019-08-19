@@ -7,6 +7,7 @@ import pandas as pd
 from pandas.core.resample import Resampler as rsp
 import datetime as dt
 
+
 class Resampler(BaseEstimator, TransformerMixin):
     """Data sampling transformer that returns a sampled Pandas dataframe with a datetime index.
 
@@ -61,8 +62,8 @@ class Resampler(BaseEstimator, TransformerMixin):
     """
     implemented_sampling_types = ['periodic', 'fixed']
 
-    def __init__(self, sampling_type = 'periodic', sampling_period = '2h',
-                 sampling_times=[dt.time(0,0,0)], remove_weekends = True):
+    def __init__(self, sampling_type='periodic', sampling_period='2h',
+                 sampling_times=[dt.time(0, 0, 0)], remove_weekends=True):
         self.sampling_type = sampling_type
         self.sampling_period = sampling_period
         self.sampling_times = sampling_times
@@ -94,7 +95,7 @@ class Resampler(BaseEstimator, TransformerMixin):
         if sampling_type not in Resampler.implemented_sampling_types:
             raise ValueError('The sampling type you specified is not implemented')
 
-    def fit(self, X, y = None):
+    def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
         This method is just there to implement the usual API and hence
         work in pipelines.
@@ -259,7 +260,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
         X_transformed = X
         if 'return' in self.stationarization_type:
-            X_transformed = np.diff(X_transformed, n=1, axis=0)/ X_transformed[1:, :]
+            X_transformed = np.diff(X_transformed, n=1, axis=0) / X_transformed[1:, :]
 
         if 'log' in self.stationarization_type:
             X_transformed = np.log(X_transformed)

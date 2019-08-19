@@ -3,6 +3,7 @@
 
 from .neural_network.keras import KerasClassifierWrapper, KerasRegressorWrapper
 
+
 def clone(estimator, safe=True):
     if isinstance(estimator, KerasClassifierWrapper) or isinstance(estimator, KerasRegressorWrapper):
         return estimator.clone()
