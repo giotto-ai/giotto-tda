@@ -70,10 +70,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
         second = indices[1:]
-        A = sp.csr_matrix((np.full(n_indices, True),
+        A = sp.csr_matrix((np.full(n_indices, 1),
                            (np.concatenate([first, second]),
-                            np.concatenate([second, first]))),
-                          dtype=bool)
+                            np.concatenate([second, first]))))
         sp.csr_matrix.setdiag(A, 0)
         return A
 
@@ -365,8 +364,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
     def _geodesic_distance(self, X):
         X_distance = graph_shortest_path(X)
-        X_distance[
-            X_distance == 0] = np.inf  # graph_shortest_path returns a
+        X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a
         # float64 array, so inserting np.inf does not change the type.
         # Ideally however, graph_shortest_path would return an int array!
         np.fill_diagonal(X_distance, 0)
@@ -374,6 +372,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
+
         This method is just there to implement the usual API and hence
         work in pipelines.
 
@@ -402,7 +401,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         """For each adjancency matrix in X, compute the lenghts of the graph
         shortest path between any two vertices, and arrange them in a
         distance matrix. The method
-        :meth:'sklearn.utils.graph_shortest_path.graph_shortest_path' is used.
+        :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path` is used.
 
         Parameters
         ----------
