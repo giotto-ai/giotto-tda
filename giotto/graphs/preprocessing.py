@@ -54,13 +54,14 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:'fit' are valid.
+        input parameters of the :meth:`fit` are valid.
         """
         pass
 
@@ -134,16 +135,17 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the adjacency matrices of
-    :math:`k`-nearest neighbor graphs. Let :math:`k` be a positive integer, and
-    :math:`X` be a collection of point clouds in Euclidean space, each encoded
-    as a two-dimensional array. For each point cloud :math:`\\mathcal{P}` in
-    :math:`X`, the corresponding kNN graph is an undirected and unweighted graph
-    with an edge between any two points :math:`p_i, p_j` in :math:`\\mathcal{P}`
-    whenever either :math:`p_i` is among the :math:`k`-th nearest neighbors of
-    :math:`p_j`, or :math:`p_j` is among the :math:`k`-th nearest neighbors of
-    resp. :math:`p_i`. A point is not regarded as a neighbor of itself, i.e. the
-    resulting graph is simple.
+    r"""Calculates adjacency matrices of :math:`k`-nearest neighbor graphs.
+
+    Let :math:`k` be a positive integer, and :math:`X` be a collection of point
+    clouds in Euclidean space, each encoded as a two-dimensional array. For
+    each point cloud :math:`\mathcal{P}` in :math:`X`, the corresponding kNN
+    graph is an undirected and unweighted graph with an edge between any two
+    points :math:`p_i, p_j` in :math:`\mathcal{P}` whenever either :math:`p_i`
+    is among the :math:`k`-th nearest neighbors of :math:`p_j`, or :math:`p_j`
+    is among the :math:`k`-th nearest neighbors of resp. :math:`p_i`. A point
+    is not regarded as a neighbor of itself, i.e. the resulting graph is
+    simple.
 
     Parameters
     ----------
@@ -209,14 +211,13 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     def __init__(self, n_neighbors=5, radius=1.0,
                  algorithm='auto', leaf_size=30, metric='euclidean',
-                 p=2, mode='connectivity', n_jobs=None, metric_params={}):
+                 p=2, n_jobs=None, metric_params={}):
         self.n_neighbors = n_neighbors
         self.radius = radius
         self.algorithm = algorithm
         self.leaf_size = leaf_size
         self.metric = metric
         self.p = p
-        self.mode = mode
         self.n_jobs = n_jobs
         self.metric_params = metric_params
 
@@ -232,17 +233,18 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'n_neighbors': self.n_neighbors, 'radius': self.radius,
                 'algorithm': self.algorithm,
                 'leaf_size': self.leaf_size, 'metric': self.metric,
-                'p': self.p, 'mode': self.mode,
-                'n_jobs': self.n_jobs, 'metric_params': self.metric_params}
+                'p': self.p, 'n_jobs': self.n_jobs,
+                'metric_params': self.metric_params}
 
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:'fit' are valid.
+        input parameters of the :meth:`fit` are valid.
         """
         pass
 
@@ -251,14 +253,15 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         A = self._nearest_neighbors.kneighbors_graph(
             X,
             n_neighbors=self.n_neighbors+1,
-            mode=self.mode,
+            mode='connectivity',
             include_self=False)
         rows, cols = A.nonzero()
-        A[cols, rows] = A[rows, cols]
+        A[cols, rows] = 1
         return A
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
+
         This method is just there to implement the usual API and hence
         work in pipelines.
 
@@ -281,7 +284,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self._validate_params()
 
         nearest_neighbors_params = self.get_params()
-        nearest_neighbors_params.pop('mode')
         self._nearest_neighbors = NearestNeighbors(**nearest_neighbors_params)
 
         self._is_fitted = True
