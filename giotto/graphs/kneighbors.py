@@ -1,12 +1,14 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 #          Umberto Lupo <u.lupo@l2f.ch>
+#          Philippe Nguyen <p.nguyen@l2f.ch>
 # License: TBD
+from functools import partial
 
 from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from sklearn.utils._joblib import Parallel, delayed
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import kneighbors_graph
 
 import numpy as np
 
@@ -28,26 +30,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     ----------
     n_neighbors : int, optional (default = 5)
         Number of neighbors to use by default for :meth:`kneighbors` queries.
-
-    radius : float, optional (default = 1.0)
-        Range of parameter space to use by default for :meth:`radius_neighbors`
-        queries.
-
-    algorithm : {'auto', 'ball_tree', 'kd_tree', 'brute'}, optional
-        Algorithm used to compute the nearest neighbors:
-        - 'ball_tree' will use :class:`BallTree`
-        - 'kd_tree' will use :class:`KDTree`
-        - 'brute' will use a brute-force search.
-        - 'auto' will attempt to decide the most appropriate algorithm
-          based on the values passed to :meth:`fit` method.
-        Note: fitting on sparse input will override the setting of
-        this parameter, using brute force.
-
-    leaf_size : int, optional (default = 30)
-        Leaf size passed to BallTree or KDTree.  This can affect the
-        speed of the construction and query, as well as the memory
-        required to store the tree.  The optimal value depends on the
-        nature of the problem.
 
     metric : string or callable, default 'minkowski'
         metric to use for distance computation. Any metric from scikit-learn
@@ -86,13 +68,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, n_neighbors=5, radius=1.0,
-                 algorithm='auto', leaf_size=30, metric='euclidean',
+    def __init__(self, n_neighbors=5, metric='euclidean',
                  p=2, n_jobs=None, metric_params={}):
         self.n_neighbors = n_neighbors
-        self.radius = radius
-        self.algorithm = algorithm
-        self.leaf_size = leaf_size
         self.metric = metric
         self.p = p
         self.n_jobs = n_jobs
@@ -112,9 +90,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             Parameter names mapped to their values.
 
         """
-        return {'n_neighbors': self.n_neighbors, 'radius': self.radius,
-                'algorithm': self.algorithm,
-                'leaf_size': self.leaf_size, 'metric': self.metric,
+        return {'n_neighbors': self.n_neighbors, 'metric': self.metric,
                 'p': self.p, 'n_jobs': self.n_jobs,
                 'metric_params': self.metric_params}
 
@@ -125,13 +101,12 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         """
         pass
 
+    def _knn_graph(self, nearest_neighbors_params):
+        return partial(kneighbors_graph, **nearest_neighbors_params,
+                       mode='connectivity', include_self=False)
+
     def _make_adjacency_matrix(self, X):
-        self._nearest_neighbors.fit(X)
-        A = self._nearest_neighbors.kneighbors_graph(
-            X,
-            n_neighbors=self.n_neighbors+1,
-            mode='connectivity',
-            include_self=False)
+        A = self._nearest_neighbors(X)
         rows, cols = A.nonzero()
         A[cols, rows] = 1
         return A
@@ -161,7 +136,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self._validate_params()
 
         nearest_neighbors_params = self.get_params()
-        self._nearest_neighbors = NearestNeighbors(**nearest_neighbors_params)
+        self._nearest_neighbors = self._knn_graph(nearest_neighbors_params)
 
         self._is_fitted = True
         return self
