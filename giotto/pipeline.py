@@ -2,7 +2,7 @@
 The :mod:`sklearn.pipeline` module is an extension of sklearn's
 and implements utilities to build a composite transformer by applying
 a transformer pipeline to sliding subwindows of the input data in the
-spiring of a pooling layer in a convolutional neural network.
+spirit of a pooling layer in a convolutional neural network.
 """
 
 # Author: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
@@ -10,6 +10,9 @@ spiring of a pooling layer in a convolutional neural network.
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.pipeline import Pipeline
+
+import functools
 
 
 class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
@@ -77,6 +80,7 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'width': self.width, 'stride': self.stride,
                 'padding': self.padding, 'transformer': self.transformer,
@@ -84,15 +88,15 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params(shape_input, shape_width, shape_stride, shape_padding):
-        """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:`fit` are valid.
+        """A class method that checks whether the hyperparameters and the input
+        parameters of the :meth:`fit` are valid.
 
         """
         try:
             assert dimension_image == dimension_direction
-        except:
-            raise ValueError("The dimension of the direction vector does not correspond to"
-                             "the dimension of the image.")
+        except AssertionError:
+            raise ValueError("The dimension of the direction vector does not"
+                             "correspond to the dimension of the image.")
 
     def fit(self, X, y=None):
         """Fit all transformers using X.
@@ -108,6 +112,7 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         Returns
         -------
         self
+
         """
         self._dimension = len(X.shape) - 1
         self._validate_params(self._dimension, len(self.direction))
@@ -134,6 +139,7 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         X_t : array-like or sparse matrix, shape (n_samples, sum_n_components)
             hstack of results of transformers. sum_n_components is the
             sum of n_components (output dimension) over transformers.
+
         """
         results = self._parallel_func(X, y, fit_params, _fit_transform_one)
         if not results:
@@ -171,6 +177,7 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         X_t : array-like or sparse matrix, shape (n_samples, sum_n_components)
             hstack of results of transformers. sum_n_components is the
             sum of n_components (output dimension) over transformers.
+
         """
         n_samples = X.shape[0]
         Xs = Parallel(n_jobs=self.n_jobs)(
@@ -182,3 +189,32 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         else:
             Xs = np.hstack(Xs).reshape((n_samples, *))
         return Xs
+
+
+class PipelinePlus(Pipeline):
+    def __init__(self):
+        super(PipelinePlus, self).__init__()
+
+    def _fit(self, X, y=None, **fit_params):
+        if (isinstance(self._final_estimator, TargetResamplingClassifier)
+           or isinstance(self._final_estimator, TargetResamplingRegressor)):
+            fit_params[self.steps[-1][0] + '__store_y_resampled'] = True
+        super(PipelinePlus, self)._fit(X, y=y, **fit_params)
+
+    def fit(self, X, y=None, **fit_params):
+        if (isinstance(self._final_estimator, TargetResamplingClassifier)
+           or isinstance(self._final_estimator, TargetResamplingRegressor)):
+            fit_params[self.steps[-1][0] + '__store_y_resampled'] = True
+        super(PipelinePlus, self).fit(X, y=y, **fit_params)
+
+    def fit_transform(self, X, y=None, **fit_params):
+        if (isinstance(self._final_estimator, TargetResamplingClassifier)
+           or isinstance(self._final_estimator, TargetResamplingRegressor)):
+            fit_params[self.steps[-1][0] + '__store_y_resampled'] = True
+        super(PipelinePlus, self).fit_transform(X, y=y, **fit_params)
+
+    def fit_predict(self, X, y=None, **fit_params):
+        if (isinstance(self._final_estimator, TargetResamplingClassifier)
+           or isinstance(self._final_estimator, TargetResamplingRegressor)):
+            fit_params[self.steps[-1][0] + '__store_y_resampled'] = True
+        super(PipelinePlus, self).fit_predict(X, y=y, **fit_params)
