@@ -244,6 +244,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
+
         """
         pass
 
@@ -310,6 +311,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         X_transformed : ndarray of sparse matrices in CSR format, shape
         (n_samples, )
             The transformed array.
+
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
@@ -335,6 +337,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
     """
 
     def __init__(self, n_jobs=None):
@@ -352,6 +355,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'n_jobs': self.n_jobs}
 
@@ -359,6 +363,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
+
         """
         pass
 

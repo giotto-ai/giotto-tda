@@ -279,8 +279,8 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
                 / embedding_dimension for embedding_dimension in
                 range(1, self.embedding_dimension + 1)]
 
-            self.embedding_dimension_ = \
-                variation_list.index(min(variation_list)) + 1
+            e_d_temp = variation_list.index(min(variation_list))
+            self.embedding_dimension_ = e_d_temp + 1 if e_d_temp else 2
 
         else:
             self.embedding_time_delay_ = self.embedding_time_delay
