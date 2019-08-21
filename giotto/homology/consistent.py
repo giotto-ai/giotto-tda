@@ -15,13 +15,13 @@ import itertools
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    """Transformer rescaling pairwise distances in data according to the ideas in
+    r"""Transformer rescaling pairwise distances in data according to the ideas in
     `arXiv:1606.02353 <https://arxiv.org/abs/1606.02353>`_.
     The computation during ``transform``, for each entry in X, is:
         :math:`d_{\mathrm{consistent}}(\star_i, \star_j) = [d(\star_i, \star_{k_i}) d(\star_j, \star_{k_j})]^{-1/2}d(\star_i, \star_j)`
-    where :math:`\\star_i, \\star_j` are the :math:`i`-th and :math:`j`-th data
+    where :math:`\star_i, \star_j` are the :math:`i`-th and :math:`j`-th data
     instances in that entry, :math:`d` is the original distance function, and
-    :math:`k_i` is the index of the :math:`k`-th nearest neighbor to :math:`\\star_i`
+    :math:`k_i` is the index of the :math:`k`-th nearest neighbor to :math:`\star_i`
     according to :math:`d`.
 
     Parameters
@@ -77,7 +77,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:'fit' are valid.
+        of the :meth:`fit` are valid.
+
         """
         pass
 
