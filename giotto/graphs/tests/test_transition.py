@@ -27,6 +27,11 @@ def transition_graph():
     return TransitionGraph(n_jobs=1)
 
 
+@pytest.fixture
+def transition_graph_parallel():
+    return TransitionGraph(n_jobs=2)
+
+
 def test_transition_graph_init():
     transition_graph = TransitionGraph(n_jobs=1)
     assert transition_graph.n_jobs == 1
@@ -46,8 +51,9 @@ def test_transition_graph_transform(transition_graph):
     assert (transition_graph.fit_transform(X_tg)[1] != X_tg_res[1]).nnz == 0
 
 
-def test_parallel_transition_graph_transform():
-    # FIXME: BrokenProcessPool when fit_transform with n_jobs > 1
-    # transition_graph_parallel = TransitionGraph(n_jobs=2)
-
-    pass
+def test_parallel_transition_graph_transform(transition_graph,
+                                             transition_graph_parallel):
+    warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
+    for i in range(len(X_tg)):
+        assert (transition_graph.fit_transform(X_tg)[i] !=
+                transition_graph_parallel.fit_transform(X_tg)[i]).nnz == 0

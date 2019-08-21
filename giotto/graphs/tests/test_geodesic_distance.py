@@ -41,6 +41,11 @@ def graph_geodesic_distance():
     return GraphGeodesicDistance(n_jobs=1)
 
 
+@pytest.fixture
+def graph_geodesic_distance_parallel():
+    return GraphGeodesicDistance(n_jobs=2)
+
+
 def test_graph_geodesic_distance_init():
     graph_geodesic_distance = GraphGeodesicDistance(n_jobs=1)
     assert graph_geodesic_distance.n_jobs == 1
@@ -59,8 +64,7 @@ def test_graph_geodesic_distance_transform(graph_geodesic_distance):
         X_ggd).all() == X_ggd_res.all()
 
 
-def test_parallel_graph_geodesic_distance_transform():
-    # FIXME: BrokenProcessPool when fit_transform with n_jobs > 1
-    # graph_geodesic_distance = GraphGeodesicDistance(n_jobs=2)
-
-    pass
+def test_parallel_ggd_transform(graph_geodesic_distance,
+                                graph_geodesic_distance_parallel):
+    assert graph_geodesic_distance.fit_transform(X_ggd).all() == \
+           graph_geodesic_distance_parallel.fit_transform(X_ggd).all()

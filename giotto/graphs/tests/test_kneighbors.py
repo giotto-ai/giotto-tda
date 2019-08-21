@@ -71,19 +71,19 @@ def test_kneighbors_graph_not_fitted(kn_graph):
                          kn_graph.transform, X_kng)
 
 
-def test_kneighbors_graph_transform(kn_graph, kneighbors_graph_k2):
+def test_kneighbors_graph_transform(kn_graph, kn_graph_k2):
     warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     for i in range(len(X_kng)):
         assert (kn_graph.fit_transform(X_kng)[i] != X_kng_res[i]).nnz == 0
-        assert (kneighbors_graph_k2.fit_transform(X_kng)[i] !=
+        assert (kn_graph_k2.fit_transform(X_kng)[i] !=
                 X_kng_res_k2[i]).nnz == 0
 
 
-def test_parallel_kneighbors_graph_transform(kneighbors_graph_k2,
+def test_parallel_kneighbors_graph_transform(kn_graph_k2,
                                              kn_graph_parallel):
     warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     for i in range(len(X_kng)):
-        assert (kneighbors_graph_k2.fit_transform(X_kng)[i] !=
+        assert (kn_graph_k2.fit_transform(X_kng)[i] !=
                 kn_graph_parallel.fit_transform(X_kng)[i]).nnz == 0
 
 
