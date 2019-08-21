@@ -1,8 +1,9 @@
 """Testing for TransitionGraph"""
+import warnings
 
 import numpy as np
 import pytest
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, SparseEfficiencyWarning
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
 
@@ -40,6 +41,7 @@ def test_transition_graph_not_fitted(transition_graph):
 
 
 def test_transition_graph_transform(transition_graph):
+    warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     assert (transition_graph.fit_transform(X_tg)[0] != X_tg_res[0]).nnz == 0
     assert (transition_graph.fit_transform(X_tg)[1] != X_tg_res[1]).nnz == 0
 
