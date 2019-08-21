@@ -142,17 +142,17 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         if 'n_samples' in metric_params:
             metric_params.pop('n_samples')
 
-        is_same = np.all([ np.array_equal(X[dimension], self._X[dimension]) for dimension in X.keys()])
+        is_same = np.all([np.array_equal(X[dimension], self._X[dimension]) for dimension in X.keys()])
         if is_same:
             # Only calculate metric for upper triangle
             iterator = list(itertools.combinations(range(n_diagrams_X), 2))
             X_transformed = _parallel_pairwise(X, X, self.metric, metric_params, iterator, self.n_jobs)
             X_transformed = X_transformed + X_transformed.T
         else:
-            max_betti_numbers = { dimension: max(self._X[dimension].shape[1], X[dimension].shape[1]) for dimension in self._X.keys()}
+            max_betti_numbers = {dimension: max(self._X[dimension].shape[1], X[dimension].shape[1]) for dimension in self._X.keys()}
             self._X = _pad(self._X, max_betti_numbers)
             X = _pad(X, max_betti_numbers)
-            Y = { dimension: np.vstack([self._X[dimension], X[dimension]]) for dimension in self._X.keys() }
+            Y = {dimension: np.vstack([self._X[dimension], X[dimension]]) for dimension in self._X.keys()}
             n_diagrams_Y = next(iter(Y.values())).shape[0]
 
             # Calculate all cells

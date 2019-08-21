@@ -9,7 +9,7 @@ def _derivation_function(function, X, delta_t=1, **function_kwargs):
     partial_window_begin = function(X[:, delta_t:], axis=1, **function_kwargs)
     partial_window_end = function(X[:, :-delta_t], axis=1, **function_kwargs)
     derivative = (partial_window_end - partial_window_begin) / \
-                 partial_window_begin / delta_t
+        partial_window_begin / delta_t
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
     return derivative.reshape((-1, 1))
 

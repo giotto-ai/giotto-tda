@@ -31,35 +31,39 @@ import tensorflow as tf
 
 # If I don't do this, the GPU is automatically used and gets out of memory
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 
 def init_keras_session(n_cpus_k, n_gpus_k):
-    config = tf.ConfigProto( device_count = {'CPU': n_cpus_k, 'GPU': n_gpus_k} )
+    config = tf.ConfigProto(device_count={'CPU': n_cpus_k, 'GPU': n_gpus_k})
 
     sess = tf.Session(config=config)
     keras.backend.set_session(sess)
 
+
 def get_data(n_train, n_test):
-    data = np.random.rand(n_train+n_test, 1)
+    data = np.random.rand(n_train + n_test, 1)
     stationarizing = ts.Stationarizer(stationarization_type='return')
     data = stationarizing.fit(data).transform(data)
 
     return data
 
+
 def split_train_test(data, n_train, n_test):
-    labeller = ts.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t':3}, window_size=5, percentiles=[80], n_steps_future=1)
+    labeller = ts.Labeller(labelling_kwargs={'type': 'derivation', 'delta_t': 3}, window_size=5, percentiles=[80], n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
     labeller.fit(y_train)
     y_train = labeller.transform(y_train)
     X_train = labeller.cut(X_train)
 
-    X_test = data[n_train:n_train+n_test]
+    X_test = data[n_train:n_train + n_test]
     y_test = X_test
     y_test = labeller.transform(y_test)
     X_test = labeller.cut(X_test)
 
     return X_train, y_train, X_test, y_test
+
 
 def make_pipeline():
     steps = [
@@ -75,6 +79,7 @@ def make_pipeline():
     ]
     return Pipeline(steps)
 
+
 def get_param_grid():
     embedding_param = {}
     distance_param = {}
@@ -85,31 +90,31 @@ def get_param_grid():
     aggregator_param = {}
     classification_param = {}
 
-    embedding_param['outer_window_duration'] = [ 20, 30 ]
+    embedding_param['outer_window_duration'] = [20, 30]
 
-    diagram_param['homology_dimensions'] = [ [ 0, 1 ] ]
-    distance_param['metric'] = [ 'bottleneck' ]
-    distance_param['metric_params'] = [ {'order': np.inf} ]
+    diagram_param['homology_dimensions'] = [[0, 1]]
+    distance_param['metric'] = ['bottleneck']
+    distance_param['metric_params'] = [{'order': np.inf}]
 
-    physical_param['n_components'] = [ 3 ]
+    physical_param['n_components'] = [3]
 
-    kinematics_param['orders'] = [ [0, 1, 2] ]
+    kinematics_param['orders'] = [[0, 1, 2]]
 
-    aggregator_param['n_steps_in_past'] = [ 2 ]
+    aggregator_param['n_steps_in_past'] = [2]
 
     classification_param['layers_kwargs'] = [
         [
             {'layer': klayers.normalization.BatchNormalization},
             {'layer': layer, 'units': units, 'activation': 'tanh'},
             {'layer': klayers.Dense}
-        ] for layer in [klayers.LSTM] for units in [1] ]
+        ] for layer in [klayers.LSTM] for units in [1]]
 
-    classification_param['optimizer_kwargs'] = [ {'optimizer': optimizer, 'lr': lr} for optimizer in [ koptimizers.RMSprop ]
-                                             for lr in [0.5] ]
-    classification_param['batch_size'] =  [ 10 ]
-    classification_param['epochs'] =  [ 1 ]
-    classification_param['loss'] = [ 'sparse_categorical_crossentropy' ]
-    classification_param['metrics'] = [ ['sparse_categorical_accuracy'] ]
+    classification_param['optimizer_kwargs'] = [{'optimizer': optimizer, 'lr': lr} for optimizer in [koptimizers.RMSprop]
+                                                for lr in [0.5]]
+    classification_param['batch_size'] = [10]
+    classification_param['epochs'] = [1]
+    classification_param['loss'] = ['sparse_categorical_crossentropy']
+    classification_param['metrics'] = [['sparse_categorical_accuracy']]
 
     embedding_param_grid = {'embedding__' + k: v for k, v in embedding_param.items()}
     diagram_param_grid = {'diagram__' + k: v for k, v in diagram_param.items()}
@@ -120,12 +125,13 @@ def get_param_grid():
     aggregator_param_grid = {'aggregator__' + k: v for k, v in aggregator_param.items()}
     classification_param_grid = {'classification__classifier__' + k: v for k, v in classification_param.items()}
 
-    param_grid = [ {**embedding_param_grid, **diagram_param_grid, **distance_param_grid,  **physical_param_grid,
-                    **kinematics_param_grid, **scaling_param_grid, **aggregator_param_grid, **classification_param_grid,
-                    'embedding__outer_window_stride': [ outer_window_stride ], 'classification__resampler__step_size': [outer_window_stride] }
-                    for outer_window_stride in [2, 5] ]
+    param_grid = [{**embedding_param_grid, **diagram_param_grid, **distance_param_grid, **physical_param_grid,
+                   **kinematics_param_grid, **scaling_param_grid, **aggregator_param_grid, **classification_param_grid,
+                   'embedding__outer_window_stride': [outer_window_stride], 'classification__resampler__step_size': [outer_window_stride]}
+                  for outer_window_stride in [2, 5]]
 
     return param_grid
+
 
 def run_grid_search(estimator, param_grid, X_train, y_train, number_splits, n_jobs):
     cv = TimeSeriesSplit(n_splits=number_splits)
@@ -133,6 +139,7 @@ def run_grid_search(estimator, param_grid, X_train, y_train, number_splits, n_jo
     grid_result = grid.fit(X_train, y_train)
 
     return grid_result
+
 
 def main(n_jobs):
     n_train, n_test = 400, 200
@@ -143,6 +150,7 @@ def main(n_jobs):
     param_grid = get_param_grid()
 
     grid_result = run_grid_search(pipeline, param_grid, X_train, y_train, number_splits=2, n_jobs=n_jobs)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test script for typical use of the giotto library")

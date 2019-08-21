@@ -1,7 +1,7 @@
 from setuptools import setup
 
 with open('README.rst') as f:
-    long_description =  f.read()
+    long_description = f.read()
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -20,14 +20,14 @@ setup(name='giotto',
       maintainer_email='guillaume.tauzin@epfl.ch',
       license='TBA',
       classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-        'License :: OSI Approved :: TBA',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8'
+          'Development Status :: 3 - Alpha',
+          'Intended Audience :: Developers',
+          'Topic :: Software Development :: Build Tools',
+          'License :: OSI Approved :: TBA',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8'
       ],
       packages=['giotto'],
       include_package_data=True,
@@ -35,9 +35,9 @@ setup(name='giotto',
       python_requires='>=3.5',
       install_requires=requirements,
       extras_require={
-        'docs': [ # `pip install -e ".[docs]"``
-            'sphinx',
-        ]
+          'docs': [  # `pip install -e ".[docs]"``
+              'sphinx',
+              ]
       },
       test_suite='tests',
       tests_require=['pytest'],
