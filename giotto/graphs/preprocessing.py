@@ -293,7 +293,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         input array along axis 0. Note: the method
         :meth:`sklearn.neighbors.kneighbors_graph` is used, but the set of
         :math:`k`-nearest neighbors of a point here corresponds to the set of
-        :math:(`k+1`)-nearest neighbors according to the convention used there.
+        (:math:`k+1`)-nearest neighbors according to the convention used there.
 
         Parameters
         ----------
