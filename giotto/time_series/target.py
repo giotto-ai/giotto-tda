@@ -96,7 +96,7 @@ class Labeller(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(labelling_kwargs):
         """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:'fit' are valid.
+        input parameters of the :meth:`fit` are valid.
         """
         if labelling_kwargs['type'] not in \
                 Labeller.implementedLabellingRecipes.keys():

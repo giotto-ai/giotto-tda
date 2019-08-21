@@ -77,7 +77,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(metric):
         """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:'fit' are valid.
+        of the :meth:`fit` are valid.
         """
         implemented_metric_types = set(['precomputed'] + [met for i in VALID_METRICS.values() for met in i])
 
@@ -228,7 +228,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(homology_dimensions, n_dimensions):
         """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:'fit' are valid.
+        of the :meth:`fit` are valid.
         """
         try:
             assert set(homology_dimensions).issubset(set(range(n_dimensions)))
@@ -364,7 +364,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:'fit' are valid.
+        of the :meth:`fit` are valid.
         """
         pass
 
@@ -375,6 +375,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
+
         This method is just there to implement the usual API and hence
         work in pipelines.
 
