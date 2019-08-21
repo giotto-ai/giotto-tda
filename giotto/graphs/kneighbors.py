@@ -9,19 +9,141 @@ from sklearn.utils._joblib import Parallel, delayed
 from sklearn.neighbors import NearestNeighbors
 
 import numpy as np
+import scipy.sparse as sp
+
+
+class TransitionGraph(BaseEstimator, TransformerMixin):
+    """Given a collection of two-dimensional arrays, with row :math:`i` in
+    array :math:`A` encoding the "state" of a system at "time" :math:`i`,
+    this transformer returns a corresponding collection of so-called
+    *transition graphs*. The vertex set of graph :math:`G` corresponding to
+    :math:`A` is the set of all unique rows (states) in :math:`A`, and there
+    is an edge between two vertices if and only if one of the two rows
+    immediately follows the other anywhere in :math:`A`.
+
+    Parameters
+    ----------
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Examples
+    --------
+    >>> from giotto.graphs import TransitionGraph
+    >>> dyn = np.array([[['a'], ['b'], ['c']],
+    ...                 [['c'], ['a'], ['b']])
+    >>> tg = TransitionGraph()
+    >>> tg.fit_transform(dyn)
+
+    """
+
+    def __init__(self, n_jobs=None):
+        self.n_jobs = n_jobs
+
+    def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+
+        """
+        return {'n_jobs': self.n_jobs}
+
+    @staticmethod
+    def _validate_params():
+        """A class method that checks whether the hyperparameters and the
+        input parameters of the :meth:`fit` are valid.
+        """
+        pass
+
+    def _make_adjacency_matrix(self, X):
+        indices = np.unique(X, axis=0, return_inverse=True)[1]
+        n_indices = 2 * (len(indices) - 1)
+        first = indices[:-1]
+        second = indices[1:]
+        A = sp.csr_matrix((np.full(n_indices, 1),
+                           (np.concatenate([first, second]),
+                            np.concatenate([second, first]))))
+        sp.csr_matrix.setdiag(A, 0)
+        return A
+
+    def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+        This method is just there to implement the usual API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_time_steps, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self._validate_params()
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X, y=None):
+        """Create transition graphs from the input data and return their
+        adjacency matrices. The graphs are simple, undirected and
+        unweighted, and the adjacency matrices are sparse matrices of type
+        bool.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_time_steps, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        X_transformed : array of sparse boolean matrices, shape (n_samples, )
+            The collection of ``n_samples`` transition graphs. Each transition
+            graph is encoded by a sparse matrix of boolean type.
+        """
+        # Check is fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        n_samples = X.shape[0]
+
+        X_transformed = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._make_adjacency_matrix)(X[i]) for i in
+            range(n_samples))
+        X_transformed = np.array(X_transformed)
+        return X_transformed
 
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the adjacency matrices of
-    :math:`k`-nearest neighbor graphs. Let :math:`k` be a positive integer, and
-    :math:`X` be a collection of point clouds in Euclidean space, each encoded
-    as a two-dimensional array. For each point cloud :math:`\\mathcal{P}` in
-    :math:`X`, the corresponding kNN graph is an undirected and unweighted graph
-    with an edge between any two points :math:`p_i, p_j` in :math:`\\mathcal{P}`
-    whenever either :math:`p_i` is among the :math:`k`-th nearest neighbors of
-    :math:`p_j`, or :math:`p_j` is among the :math:`k`-th nearest neighbors of
-    resp. :math:`p_i`. A point is not regarded as a neighbor of itself, i.e. the
-    resulting graph is simple.
+    r"""Calculates adjacency matrices of :math:`k`-nearest neighbor graphs.
+
+    Let :math:`k` be a positive integer, and :math:`X` be a collection of point
+    clouds in Euclidean space, each encoded as a two-dimensional array. For
+    each point cloud :math:`\mathcal{P}` in :math:`X`, the corresponding kNN
+    graph is an undirected and unweighted graph with an edge between any two
+    points :math:`p_i, p_j` in :math:`\mathcal{P}` whenever either :math:`p_i`
+    is among the :math:`k`-th nearest neighbors of :math:`p_j`, or :math:`p_j`
+    is among the :math:`k`-th nearest neighbors of resp. :math:`p_i`. A point
+    is not regarded as a neighbor of itself, i.e. the resulting graph is
+    simple.
 
     Parameters
     ----------
@@ -87,14 +209,13 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     def __init__(self, n_neighbors=5, radius=1.0,
                  algorithm='auto', leaf_size=30, metric='euclidean',
-                 p=2, mode='connectivity', n_jobs=None, metric_params={}):
+                 p=2, n_jobs=None, metric_params={}):
         self.n_neighbors = n_neighbors
         self.radius = radius
         self.algorithm = algorithm
         self.leaf_size = leaf_size
         self.metric = metric
         self.p = p
-        self.mode = mode
         self.n_jobs = n_jobs
         self.metric_params = metric_params
 
@@ -110,17 +231,18 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'n_neighbors': self.n_neighbors, 'radius': self.radius,
                 'algorithm': self.algorithm,
                 'leaf_size': self.leaf_size, 'metric': self.metric,
-                'p': self.p, 'mode': self.mode,
-                'n_jobs': self.n_jobs, 'metric_params': self.metric_params}
+                'p': self.p, 'n_jobs': self.n_jobs,
+                'metric_params': self.metric_params}
 
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:'fit' are valid.
+        input parameters of the :meth:`fit` are valid.
         """
         pass
 
@@ -128,15 +250,16 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self._nearest_neighbors.fit(X)
         A = self._nearest_neighbors.kneighbors_graph(
             X,
-            n_neighbors=self.n_neighbors + 1,
-            mode=self.mode,
+            n_neighbors=self.n_neighbors+1,
+            mode='connectivity',
             include_self=False)
         rows, cols = A.nonzero()
-        A[cols, rows] = A[rows, cols]
+        A[cols, rows] = 1
         return A
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
+
         This method is just there to implement the usual API and hence
         work in pipelines.
 
@@ -159,7 +282,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self._validate_params()
 
         nearest_neighbors_params = self.get_params()
-        nearest_neighbors_params.pop('mode')
         self._nearest_neighbors = NearestNeighbors(**nearest_neighbors_params)
 
         self._is_fitted = True
@@ -196,5 +318,112 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         X_transformed = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
             range(n_samples))
+        X_transformed = np.array(X_transformed)
+        return X_transformed
+
+
+class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
+    """Given a collection of graphs presented as adjacency matrices,
+    this transformer calculates for each graph the length of the shortest
+    path between any of its two vertices. The result is a collection of
+    dense distance matrices of variable size.
+
+    Parameters
+    ----------
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+    """
+
+    def __init__(self, n_jobs=None):
+        self.n_jobs = n_jobs
+
+    def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep : boolean, optional, default: True
+            Behaviour not yet implemented.
+
+        Returns
+        -------
+        params : mapping of string to any
+            Parameter names mapped to their values.
+        """
+        return {'n_jobs': self.n_jobs}
+
+    @staticmethod
+    def _validate_params():
+        """A class method that checks whether the hyperparameters and the
+        input parameters of the :meth:'fit' are valid.
+        """
+        pass
+
+    def _geodesic_distance(self, X):
+        X_distance = graph_shortest_path(X)
+        X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a
+        # float64 array, so inserting np.inf does not change the type.
+        # Ideally however, graph_shortest_path would return an int array!
+        np.fill_diagonal(X_distance, 0)
+        return X_distance
+
+    def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+
+        This method is just there to implement the usual API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of sparse or dense arrays, shape (n_samples, )
+            Input data, i.e. a collection of adjacency matrices of graphs.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        """
+        self._validate_params()
+
+        self._is_fitted = True
+        return self
+
+    # @jit
+    def transform(self, X, y=None):
+        """For each adjancency matrix in X, compute the lenghts of the graph
+        shortest path between any two vertices, and arrange them in a
+        distance matrix. The method
+        :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path` is used.
+
+        Parameters
+        ----------
+        X : ndarray of sparse or dense arrays, shape (n_samples, )
+            Input data, i.e. a collection of adjacency matrices of graphs.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray of float, shape (n_samples, ) or
+        (n_samples, n_vertices, n_vertices)
+            Resulting array of distance matrices. If the distance matrices
+            have variable size across samples, X is one-dimensional.
+
+        """
+        # Check is fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        n_samples = X.shape[0]
+
+        X_transformed = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._geodesic_distance)(X[i]) for i in range(n_samples))
         X_transformed = np.array(X_transformed)
         return X_transformed
