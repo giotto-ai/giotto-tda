@@ -21,8 +21,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     each point cloud :math:`\mathcal{P}` in :math:`X`, the corresponding kNN
     graph is an undirected and unweighted graph with an edge between any two
     points :math:`p_i, p_j` in :math:`\mathcal{P}` whenever either :math:`p_i`
-    is among the :math:`k`-th nearest neighbors of :math:`p_j`, or :math:`p_j`
-    is among the :math:`k`-th nearest neighbors of resp. :math:`p_i`. A point
+    is among the :math:`k` nearest neighbors of :math:`p_j`, or :math:`p_j`
+    is among the :math:`k` nearest neighbors of resp. :math:`p_i`. A point
     is not regarded as a neighbor of itself, i.e. the resulting graph is
     simple.
 
@@ -143,10 +143,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Compute the adjacency matrix of the kNN graph of each entry in the
-        input array along axis 0. Note: the method
-        :meth:`sklearn.neighbors.kneighbors_graph` is used, but the set of
-        :math:`k`-nearest neighbors of a point here corresponds to the set of
-        :math:(`k+1`)-nearest neighbors according to the convention used there.
+        input array along axis 0. The method
+        :meth:`sklearn.neighbors.kneighbors_graph` is used.
 
         Parameters
         ----------
@@ -163,6 +161,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         X_transformed : ndarray of sparse matrices in CSR format, shape
         (n_samples, )
             The transformed array.
+
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
