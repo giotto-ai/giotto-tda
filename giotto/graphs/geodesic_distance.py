@@ -51,8 +51,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
     def _geodesic_distance(self, X):
         X_distance = graph_shortest_path(X)
-        X_distance[
-            X_distance == 0] = np.inf  # graph_shortest_path returns a
+        X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a
         # float64 array, so inserting np.inf does not change the type.
         # Ideally however, graph_shortest_path would return an int array!
         np.fill_diagonal(X_distance, 0)
@@ -60,6 +59,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
+
         This method is just there to implement the usual API and hence
         work in pipelines.
 
@@ -88,7 +88,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         """For each adjancency matrix in X, compute the lenghts of the graph
         shortest path between any two vertices, and arrange them in a
         distance matrix. The method
-        :meth:'sklearn.utils.graph_shortest_path.graph_shortest_path' is used.
+        :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path` is used.
 
         Parameters
         ----------
@@ -115,4 +115,3 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
             delayed(self._geodesic_distance)(X[i]) for i in range(n_samples))
         X_transformed = np.array(X_transformed)
         return X_transformed
-

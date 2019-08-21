@@ -50,13 +50,14 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:'fit' are valid.
+        input parameters of the :meth:`fit` are valid.
         """
         pass
 
@@ -65,10 +66,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
         second = indices[1:]
-        A = sp.csr_matrix((np.full(n_indices, True),
+        A = sp.csr_matrix((np.full(n_indices, 1),
                            (np.concatenate([first, second]),
-                            np.concatenate([second, first]))),
-                          dtype=bool)
+                            np.concatenate([second, first]))))
         sp.csr_matrix.setdiag(A, 0)
         return A
 
