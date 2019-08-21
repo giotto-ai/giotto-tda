@@ -85,7 +85,8 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(shape_input, shape_width, shape_stride, shape_padding):
         """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:'fit' are valid.
+        of the :meth:`fit` are valid.
+
         """
         try:
             assert dimension_image == dimension_direction

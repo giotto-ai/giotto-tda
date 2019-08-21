@@ -12,20 +12,20 @@ from sklearn.neighbors import NearestNeighbors
 
 
 class TakensEmbedder(BaseEstimator, TransformerMixin):
-    """Transformer returning a representation of a scalar-valued time series as
+    r"""Transformer returning a representation of a scalar-valued time series as
     a time series of point clouds.
 
     Based on the following time-delay embedding
     technique named after `F. Takens <https://doi.org/10.1007/BFb0091924>`_:
     given a time series :math:`X(t)`, one extracts a set of vectors in
-    :math:`\\mathbb{R}^d`, each of the form
-        :math:`\Xi_i := [X(t_i), X(t_i + \\tau), ..., X(t_i + (d-1)\\tau)]`.
-    The set :math:`\\{\Xi_i\\}` is called the Takens embedding of the time
-    series, :math:`\\tau` is called the embedding time delay, :math:`d` is
+    :math:`\mathbb{R}^d`, each of the form
+        :math:`\Xi_i := [X(t_i), X(t_i + \tau), ..., X(t_i + (d-1)\tau)]`.
+    The set :math:`\{\Xi_i\}` is called the Takens embedding of the time
+    series, :math:`\tau` is called the embedding time delay, :math:`d` is
     called the embedding dimension, and the difference between :math:`t_i` and
     :math:`t_{i-1}` is called the embedding stride.
 
-    If :math:`d` and :math:`\\tau` are not explicitly set by the user, suitable
+    If :math:`d` and :math:`\tau` are not explicitly set by the user, suitable
     values are calculated during ``fit()``.
 
     During ``transform()``, a Takens embedding procedure is applied on
@@ -156,7 +156,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(embedding_parameters_type):
         """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:'fit' are valid.
+        input parameters of the :meth:`fit` are valid.
         """
         # FIXME: shorter name
         implemented_embedding_parameters_types = ['fixed', 'search']

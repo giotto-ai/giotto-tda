@@ -208,13 +208,15 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     @staticmethod
     def _validate_params(stationarization_type):
         """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:'fit' are valid.
+        of the :meth:`fit` are valid.
+
         """
         if stationarization_type not in Stationarizer.implemented_stationarization_types:
             raise ValueError('The transformation type you specified is not implemented')
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
+
         This method is just there to implement the usual API and hence
         work in pipelines.
 
