@@ -2,8 +2,9 @@
    useful to apply Topological Data Analysis techniques to graphs.
 """
 
-from .preprocessing import TransitionGraph, KNeighborsGraph, GraphGeodesicDistance
-
+from giotto.graphs.geodesic_distance import GraphGeodesicDistance
+from giotto.graphs.kneighbors import KNeighborsGraph
+from giotto.graphs.transition import TransitionGraph
 
 __all__ = [
     'TransitionGraph',
