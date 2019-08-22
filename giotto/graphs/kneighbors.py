@@ -2,15 +2,13 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 #          Philippe Nguyen <p.nguyen@l2f.ch>
 # License: TBD
-from functools import partial
-
-from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
-
-from sklearn.utils._joblib import Parallel, delayed
-from sklearn.neighbors import kneighbors_graph
 
 import numpy as np
+from functools import partial
+from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._joblib import Parallel, delayed
+from sklearn.neighbors import kneighbors_graph
 
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
@@ -65,6 +63,29 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
         ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
         for more details.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from giotto.graphs import KNeighborsGraph
+    >>> X = np.array([
+    ...         np.array([
+    ...             [0, 1, 3, 0, 0],
+    ...             [1, 0, 5, 0, 0],
+    ...             [3, 5, 0, 4, 0],
+    ...             [0, 0, 4, 0, 0],
+    ...             [0, 0, 0, 0, 0]])])
+    >>> kng = KNeighborsGraph(n_neighbors=2)
+    >>> kng = kng.fit(X)
+    >>> print(kng.transform(X)[0].toarray())
+    [[0. 1. 1.]
+     [1. 0. 1.]
+     [1. 1. 0.]]
+    >>> print(kng.transform(X)[1].toarray())
+    [[0. 1. 1. 0.]
+     [1. 0. 1. 1.]
+     [1. 1. 0. 1.]
+     [0. 1. 1. 0.]]
 
     """
 
