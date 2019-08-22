@@ -12,6 +12,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.pipeline import Pipeline
 
+from .compose.target import TargetResamplingClassifier, TargetResamplingRegressor
+
 import functools
 
 
@@ -192,8 +194,8 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
 
 
 class PipelinePlus(Pipeline):
-    def __init__(self):
-        super(PipelinePlus, self).__init__()
+    def __init__(self, steps, memory=None, verbose=False):
+        super(PipelinePlus, self).__init__(steps, memory=memory, verbose=verbose)
 
     def _fit(self, X, y=None, **fit_params):
         if (isinstance(self._final_estimator, TargetResamplingClassifier)
