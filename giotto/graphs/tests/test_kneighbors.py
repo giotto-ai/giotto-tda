@@ -1,11 +1,12 @@
 """Testing for KNeighborsGraph"""
 
-import numpy as np
+import warnings
 import pytest
+
+import numpy as np
 from scipy.sparse import csr_matrix, SparseEfficiencyWarning
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
-import warnings
 
 from giotto.graphs import KNeighborsGraph
 

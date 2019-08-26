@@ -1,8 +1,9 @@
 """Testing for TransitionGraph"""
+
 import warnings
+import pytest
 
 import numpy as np
-import pytest
 from scipy.sparse import csr_matrix, SparseEfficiencyWarning
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message

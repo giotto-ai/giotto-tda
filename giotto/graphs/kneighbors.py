@@ -90,7 +90,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, n_neighbors=5, metric='euclidean',
-                 p=2, n_jobs=None, metric_params={}):
+                 p=2, n_jobs=None, metric_params=None):
+        if metric_params is None:
+            metric_params = {}
         self.n_neighbors = n_neighbors
         self.metric = metric
         self.p = p
