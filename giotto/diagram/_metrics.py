@@ -90,12 +90,14 @@ def _parallel_pairwise(X, Y, metric, metric_params, iterator, n_jobs):
         for i, j in iterator for dimension in X.keys())
     distance_array = np.array(distance_array). \
         reshape((len(iterator), n_dimensions))
-    distance_array = np.linalg.norm(distance_array, axis=1, ord=metric_params['order'])
+    distance_array = np.linalg.norm(distance_array, axis=1,
+                                    ord=metric_params['order'])
     distance_matrix[tuple(zip(*iterator))] = distance_array
     return distance_matrix
 
 
-def kernel_landscape_norm(diagram, dimension, sampling=None, order=2, n_layers=1):
+def kernel_landscape_norm(diagram, dimension, sampling=None,
+                          order=2, n_layers=1):
     landscape = landscape_function(diagram, n_layers, sampling[dimension])
     return np.linalg.norm(landscape, ord=order)
 
@@ -106,22 +108,30 @@ def kernel_betti_norm(diagram, dimension, sampling=None, order=2):
 
 
 def bottleneck_norm(diagram, dimension=None, order=np.inf):
-    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]), ord=order)
+    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+                          ord=order)
 
 
 def wasserstein_norm(diagram, dimension=None, order=1):
-    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]), ord=order)
+    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+                          ord=order)
 
 
-implemented_norm_recipes = {'bottleneck': bottleneck_norm, 'wasserstein': wasserstein_norm,
-                            'landscape': kernel_landscape_norm, 'betti': kernel_betti_norm}
+implemented_norm_recipes = {'bottleneck': bottleneck_norm,
+                            'wasserstein': wasserstein_norm,
+                            'landscape': kernel_landscape_norm,
+                            'betti': kernel_betti_norm}
 
 
 def _parallel_norm(X, norm, norm_params, n_jobs):
     n_dimensions = len(X.keys())
     norm_func = implemented_norm_recipes[norm]
 
-    norm_array = Parallel(n_jobs=n_jobs)(delayed(norm_func)(X[dimension][i, :, :], dimension, **norm_params)
-                                         for i in range(next(iter(X.values())).shape[0]) for dimension in X.keys())
-    norm_array = np.linalg.norm(np.array(norm_array).reshape((-1, n_dimensions)), ord=norm_params['order'], axis=1)
+    norm_array = Parallel(n_jobs=n_jobs)(delayed(norm_func)(
+        X[dimension][i, :, :], dimension, **norm_params)
+        for i in range(next(iter(X.values())).shape[0])
+        for dimension in X.keys())
+    norm_array = np.linalg.norm(np.array(norm_array).
+                                reshape((-1, n_dimensions)),
+                                ord=norm_params['order'], axis=1)
     return norm_array
