@@ -28,40 +28,52 @@ def landscape_function(diagram, n_layers, sampling):
     midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
     heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
 
-    mountains = [-np.abs(sampling - midpoints[i]) + heights[i] for i in range(len(diagram))]
-    fibers = np.vstack([np.where(mountains[i] > 0, mountains[i], 0) for i in range(len(diagram))])
+    mountains = [-np.abs(sampling - midpoints[i])
+                 + heights[i] for i in range(len(diagram))]
+    fibers = np.vstack([np.where(mountains[i] > 0,
+                                 mountains[i],
+                                 0) for i in range(len(diagram))])
 
     last_layer = fibers.shape[0] - 1
-    landscape = np.flip(np.partition(fibers, range(last_layer - n_layers, last_layer, 1), axis=0)[-n_layers:, :], axis=0)
+    landscape = np.flip(np.partition(
+        fibers,
+        range(last_layer - n_layers, last_layer, 1),
+        axis=0)[-n_layers:, :], axis=0)
     return landscape
 
 
-def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None, order=2, n_layers=1):
+def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
+                              order=2, n_layers=1):
     landscape_x = landscape_function(diagram_x, n_layers, sampling[dimension])
     landscape_y = landscape_function(diagram_y, n_layers, sampling[dimension])
     return np.linalg.norm(landscape_x - landscape_y, ord=order)
 
 
-def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None, order=2):
+def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
+                          order=2):
     betti_x = betti_function(diagram_x, sampling[dimension])
     betti_y = betti_function(diagram_y, sampling[dimension])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
 
-def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf, delta=0.0):
+def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf,
+                        delta=0.0):
     return dy.bottleneck_distance(dy.Diagram(diagram_x[diagram_x[:, 1] != 0]),
                                   dy.Diagram(diagram_y[diagram_y[:, 1] != 0]),
                                   delta)
 
 
-def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1, delta=0.0):
+def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
+                         delta=0.0):
     return dy.wasserstein_distance(dy.Diagram(diagram_x[diagram_x[:, 1] != 0]),
                                    dy.Diagram(diagram_y[diagram_y[:, 1] != 0]),
                                    order, delta)
 
 
-implemented_metric_recipes = {'bottleneck': bottleneck_distance, 'wasserstein': wasserstein_distance,
-                              'landscape': kernel_landscape_distance, 'betti': kernel_betti_distance}
+implemented_metric_recipes = {'bottleneck': bottleneck_distance,
+                              'wasserstein': wasserstein_distance,
+                              'landscape': kernel_landscape_distance,
+                              'betti': kernel_betti_distance}
 
 
 def _parallel_pairwise(X, Y, metric, metric_params, iterator, n_jobs):
@@ -72,9 +84,12 @@ def _parallel_pairwise(X, Y, metric, metric_params, iterator, n_jobs):
 
     distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
 
-    distance_array = Parallel(n_jobs=n_jobs)(delayed(metric_func)(X[dimension][i, :, :], Y[dimension][j, :, :], dimension, **metric_params)
-                                             for i, j in iterator for dimension in X.keys())
-    distance_array = np.array(distance_array).reshape((len(iterator), n_dimensions))
+    distance_array = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
+        X[dimension][i, :, :], Y[dimension][j, :, :],
+        dimension, **metric_params)
+        for i, j in iterator for dimension in X.keys())
+    distance_array = np.array(distance_array). \
+        reshape((len(iterator), n_dimensions))
     distance_array = np.linalg.norm(distance_array, axis=1, ord=metric_params['order'])
     distance_matrix[tuple(zip(*iterator))] = distance_array
     return distance_matrix
