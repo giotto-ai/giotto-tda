@@ -28,8 +28,8 @@ def landscape_function(diagram, n_layers, sampling):
     midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
     heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
 
-    mountains = [-np.abs(sampling - midpoints[i])
-                 + heights[i] for i in range(len(diagram))]
+    mountains = [-np.abs(sampling - midpoints[i]) +
+                 heights[i] for i in range(len(diagram))]
     fibers = np.vstack([np.where(mountains[i] > 0,
                                  mountains[i],
                                  0) for i in range(len(diagram))])

@@ -15,46 +15,53 @@ from ._utils import _sample, _pad
 
 
 class DiagramDistance(BaseEstimator, TransformerMixin):
-    """Transformer for calculating distances between collections of persistence diagrams.
-    In the case in which diagrams in the collection have been consistently partitioned
-    into one or more subdiagrams (e.g. according to homology dimension), the distance
-    between any two diagrams is a *p*-norm of a vector of distances between
-    respective subdiagrams of the same kind.
+    """Transformer for calculating distances between collections of
+    persistence diagrams.
+    In the case in which diagrams in the collection have been
+    consistently partitioned
+    into one or more subdiagrams (e.g. according to homology dimension),
+    the distance between any two diagrams is a *p*-norm of a vector of
+    distances between respective subdiagrams of the same kind.
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+    default: 'bottleneck'
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "persistence landscapes" obtained from persistence (sub)diagrams.
-        - ``'betti'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "Betti curves" obtained from persistence (sub)diagrams. A Betti
-           curve simply records the evolution in the number of independent topological
-           holes (technically, the number of linearly independent homology classes)
-           as can be read from a persistence (sub)diagram.
+        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "persistence landscapes" obtained from persistence
+           (sub)diagrams.
+        - ``'betti'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "Betti curves" obtained from persistence
+           (sub)diagrams. A Betti curve simply records the evolution in the
+           number of independent topological holes (technically, the number
+           of linearly independent homology classes) as can be read from a
+           persistence (sub)diagram.
 
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the available arguments are ``order`` (default = ``np.inf``)
-          and ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order`` (default = ``1``)
-          and ``delta`` (default = ``0.0``).
+        - If ``metric == 'bottleneck'`` the available arguments are ``order``
+          (default = ``np.inf``) and ``delta`` (default = ``0.0``).
+        - If ``metric == 'wasserstein'`` the only argument is ``order``
+          (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
           (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
           (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``order`` (default = ``2``)
-           and ``n_samples`` (default = ``200``).
+        - If ``metric == 'betti'`` the available arguments are ``order``
+           (default = ``2``) and ``n_samples`` (default = ``200``).
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params={'n_samples': 200, 'delta': 0.0}, n_jobs=None):
+    def __init__(self, metric='bottleneck',
+                 metric_params={'n_samples': 200, 'delta': 0.0}, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.n_jobs = n_jobs
@@ -72,7 +79,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         params : mapping of string to any
             Parameter names mapped to their values.
         """
-        return {'metric': self.metric, 'metric_params': self.metric_params, 'n_jobs': self.n_jobs}
+        return {'metric': self.metric, 'metric_params': self.metric_params,
+                'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():
@@ -84,9 +92,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers representing
-            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
-            whose each entries along axis 0 are persistence diagrams.
+            Input data. Dictionary whose keys are typically non-negative
+            integers representing homology dimensions, and whose values are
+            ndarrays of shape (n_samples, M, 2) whose each entries along axis
+            0 are persistence diagrams.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -120,9 +129,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers representing
-            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
-            whose each entries along axis 0 are persistence diagrams.
+            Input data. Dictionary whose keys are typically non-negative
+            integers representing homology dimensions, and whose values are
+            ndarrays of shape (n_samples, M, 2) whose each entries along axis
+            0 are persistence diagrams.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -142,21 +152,35 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         if 'n_samples' in metric_params:
             metric_params.pop('n_samples')
 
-        is_same = np.all([np.array_equal(X[dimension], self._X[dimension]) for dimension in X.keys()])
+        is_same = np.all(
+            [np.array_equal(X[dimension],
+                            self._X[dimension]) for dimension in X.keys()])
         if is_same:
             # Only calculate metric for upper triangle
             iterator = list(itertools.combinations(range(n_diagrams_X), 2))
-            X_transformed = _parallel_pairwise(X, X, self.metric, metric_params, iterator, self.n_jobs)
+            X_transformed = _parallel_pairwise(X, X, self.metric,
+                                               metric_params,
+                                               iterator, self.n_jobs)
             X_transformed = X_transformed + X_transformed.T
         else:
-            max_betti_numbers = {dimension: max(self._X[dimension].shape[1], X[dimension].shape[1]) for dimension in self._X.keys()}
+            max_betti_numbers = {
+                dimension: max(self._X[dimension].shape[1],
+                               X[dimension].shape[1])
+                for dimension in self._X.keys()}
             self._X = _pad(self._X, max_betti_numbers)
             X = _pad(X, max_betti_numbers)
-            Y = {dimension: np.vstack([self._X[dimension], X[dimension]]) for dimension in self._X.keys()}
+            Y = {
+                dimension: np.vstack([self._X[dimension],
+                                      X[dimension]])
+                for dimension in self._X.keys()}
             n_diagrams_Y = next(iter(Y.values())).shape[0]
 
             # Calculate all cells
-            iterator = tuple(itertools.product(range(n_diagrams_Y), range(n_diagrams_X)))
-            X_transformed = _parallel_pairwise(Y, X, self.metric, metric_params, iterator, self.n_jobs)
+            iterator = tuple(itertools.product(range(n_diagrams_Y),
+                                               range(n_diagrams_X)))
+            X_transformed = _parallel_pairwise(Y, X,
+                                               self.metric,
+                                               metric_params,
+                                               iterator, self.n_jobs)
 
         return X_transformed
