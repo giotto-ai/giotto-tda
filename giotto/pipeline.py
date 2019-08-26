@@ -83,16 +83,17 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
                 'n_jobs': self.n_jobs}
 
     @staticmethod
-    def _validate_params(shape_input, shape_width, shape_stride, shape_padding):
-        """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:`fit` are valid.
+    def _validate_params(shape_input, shape_width, shape_stride,
+                         shape_padding):
+        """A class method that checks whether the hyperparameters and the
+        input parameters of the :meth:`fit` are valid.
 
         """
         try:
             assert dimension_image == dimension_direction
         except:
-            raise ValueError("The dimension of the direction vector does not correspond to"
-                             "the dimension of the image.")
+            raise ValueError("""The dimension of the direction vector does not
+                correspond to the dimension of the image.""")
 
     def fit(self, X, y=None):
         """Fit all transformers using X.
