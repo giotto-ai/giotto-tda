@@ -7,6 +7,7 @@ import datetime as dt
 
 
 class Resampler(BaseEstimator, TransformerMixin):
+    # FIXME: (doc) transformer output type
     """Data sampling transformer that returns a sampled Pandas dataframe
     with a datetime index.
 
@@ -42,25 +43,24 @@ class Resampler(BaseEstimator, TransformerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> from giotto.time_series import Resampler
     >>> import matplotlib.pyplot as plt
+    >>> from giotto.time_series import Resampler
     >>> # Create a noisy signal sampled
-    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
-    ... for x in range(0,300)])
-    >>> plt.plot(signal_noise)
+    >>> signal = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
+    ... for x in range(0, 300)])
+    >>> plt.plot(signal)
     >>> plt.show()
-    >>> # Set up the dataframe of the z-projection of the simulated solution
-    >>> df_noise = pd.DataFrame(signal_noise)
-    >>> index = pd.to_datetime(df_noise.index, utc=True, unit='h')
-    >>> df_noise.index = index
-    >>> # Set up the Sampler
+    >>> # Set up the DataFrame of the z-projection of the simulated solution
+    >>> df = pd.DataFrame(signal)
+    >>> df.index = pd.to_datetime(df.index, utc=True, unit='h')
+    >>> # Set up the Resampler
     >>> sampling_period = '10h'
     >>> periodic_sampler = Resampler(sampling_type='periodic',
     >>> sampling_period=sampling_period, remove_weekends=False)
     >>> # Fit and transform the DataFrame
-    >>> periodic_sampler.fit(df_noise)
-    >>> noise_sampled = periodic_sampler.transform(df_noise)
-    >>> plt.plot(noise_sampled)
+    >>> periodic_sampler.fit(df)
+    >>> signal_resampled = periodic_sampler.transform(df)
+    >>> plt.plot(signal_resampled)
 
     """
     valid_sampling_types = ['periodic', 'fixed']
@@ -68,7 +68,7 @@ class Resampler(BaseEstimator, TransformerMixin):
     def __init__(self, sampling_type='periodic', sampling_period='2h',
                  sampling_times=None, remove_weekends=True):
         if sampling_times is None:
-            self.sampling_times = [dt.time(0, 0, 0)]
+            sampling_times = [dt.time(0, 0, 0)]
         self.sampling_type = sampling_type
         self.sampling_period = sampling_period
         self.sampling_times = sampling_times
@@ -86,6 +86,7 @@ class Resampler(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'sampling_type': self.sampling_type,
                 'sampling_period': self.sampling_period,
@@ -108,7 +109,7 @@ class Resampler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : DataFrame, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -131,7 +132,7 @@ class Resampler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : DataFrame, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -162,6 +163,7 @@ class Resampler(BaseEstimator, TransformerMixin):
 
 
 class Stationarizer(BaseEstimator, TransformerMixin):
+    # FIXME: (doc) transformer output type
     """Data sampling transformer that returns a stationarized Pandas
     dataframe with a datetime index.
 
@@ -183,17 +185,17 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
     Examples
     --------
-    >>> from giotto.time_series import Stationarizer
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
+    >>> from giotto.time_series import Stationarizer
     >>> # Create a noisy signal sampled
-    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
-    >>> for x in range(0,300)])
+    >>> signal = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
+    >>> for x in range(0, 300)]).reshape(-1, 1)
     >>> # Initialize the stationarizer
-    >>> return_stationarizer = Stationarizer(stationarization_type='return')
-    >>> return_stationarizer.fit(signal_noise)
-    >>> signal_noise_stationarized = return_stationarizer.transform(signal_noise)
-    >>> plt.plot(signal_noise_stationarized)
+    >>> stationarizer = Stationarizer(stationarization_type='return')
+    >>> stationarizer.fit(signal)
+    >>> signal_stationarized = stationarizer.transform(signal)
+    >>> plt.plot(signal_stationarized)
 
     """
     valid_stationarization_types = ['return', 'log-return']
@@ -225,7 +227,7 @@ class Stationarizer(BaseEstimator, TransformerMixin):
         if stationarization_type not in \
                 Stationarizer.valid_stationarization_types:
             raise ValueError(
-                'The transformation type %s is not implemented' %
+                'The transformation type %s is not supported' %
                 stationarization_type)
 
     def fit(self, X, y=None):
