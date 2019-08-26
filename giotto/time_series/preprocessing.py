@@ -277,11 +277,11 @@ class Stationarizer(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
 
         X_transformed = X
-        if 'return' in self.stationarization_type:
+        if self.stationarization_type == 'return':
             X_transformed = np.diff(X_transformed, n=1,
                                     axis=0) / X_transformed[1:, :]
-
-        if 'log' in self.stationarization_type:
+        else:  # 'log-return' stationarization type
             X_transformed = np.log(X_transformed)
+            X_transformed = np.diff(X_transformed, n=1, axis=0)
 
         return X_transformed
