@@ -1,12 +1,11 @@
 """Testing for KNeighborsGraph"""
 
-import warnings
 import pytest
 
 import numpy as np
 from scipy.sparse import csr_matrix, SparseEfficiencyWarning
 from sklearn.exceptions import NotFittedError
-from sklearn.utils.testing import assert_raise_message
+from sklearn.utils.testing import assert_raise_message, ignore_warnings
 
 from giotto.graphs import KNeighborsGraph
 
@@ -72,25 +71,25 @@ def test_kneighbors_graph_not_fitted(kn_graph):
                          kn_graph.transform, X_kng)
 
 
+@ignore_warnings(category=SparseEfficiencyWarning)
 def test_kneighbors_graph_transform(kn_graph, kn_graph_k2):
-    warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     for i in range(len(X_kng)):
         assert (kn_graph.fit_transform(X_kng)[i] != X_kng_res[i]).nnz == 0
         assert (kn_graph_k2.fit_transform(X_kng)[i] !=
                 X_kng_res_k2[i]).nnz == 0
 
 
+@ignore_warnings(category=SparseEfficiencyWarning)
 def test_parallel_kneighbors_graph_transform(kn_graph_k2,
                                              kn_graph_parallel):
-    warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     for i in range(len(X_kng)):
         assert (kn_graph_k2.fit_transform(X_kng)[i] !=
                 kn_graph_parallel.fit_transform(X_kng)[i]).nnz == 0
 
 
+@ignore_warnings(category=SparseEfficiencyWarning)
 def test_symmetric(kn_graph, kn_graph_k2,
                    kn_graph_parallel):
-    warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     for i in range(len(X_kng)):
         assert (kn_graph.fit_transform(X_kng)[i] !=
                 kn_graph.fit_transform(X_kng)[i].transpose()).nnz == 0
