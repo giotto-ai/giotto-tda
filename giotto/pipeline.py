@@ -175,7 +175,8 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         """
         n_samples = X.shape[0]
         Xs = Parallel(n_jobs=self.n_jobs)(
-            delayed(self.transformer_list_[i].transform)(X[:, unzip(self.slice_list_[i])], y)
+            delayed(self.transformer_list_[i].
+                    transform)(X[:, unzip(self.slice_list_[i])], y)
             for i in range(self.n_windows_))
 
         if any(sparse.issparse(f) for f in Xs):
