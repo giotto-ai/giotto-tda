@@ -2,7 +2,6 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
-
 import numpy as np
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -22,6 +21,27 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from giotto.graphs import GraphGeodesicDistance
+    >>> X = np.array([
+    ...         np.array([
+    ...             [0, 1, 3, 0, 0],
+    ...             [1, 0, 5, 0, 0],
+    ...             [3, 5, 0, 4, 0],
+    ...             [0, 0, 4, 0, 0],
+    ...             [0, 0, 0, 0, 0]])])
+    >>> ggd = GraphGeodesicDistance()
+    >>> ggd = ggd.fit(X)
+    >>> print(ggd.transform(X)[0])
+    [[ 0.  1.  3.  7. inf]
+     [ 1.  0.  4.  8. inf]
+     [ 3.  4.  0.  4. inf]
+     [ 7.  8.  4.  0. inf]
+     [inf inf inf inf  0.]]
+
     """
 
     def __init__(self, n_jobs=None):
@@ -39,6 +59,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         -------
         params : mapping of string to any
             Parameter names mapped to their values.
+
         """
         return {'n_jobs': self.n_jobs}
 
@@ -106,7 +127,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
             have variable size across samples, X is one-dimensional.
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0]
