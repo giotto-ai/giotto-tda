@@ -1,7 +1,8 @@
 """Testing for GraphGeodesicDistance"""
 
-import numpy as np
 import pytest
+
+import numpy as np
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
 
