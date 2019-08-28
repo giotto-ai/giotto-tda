@@ -395,8 +395,8 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         currentMeanDistance = 0.
         previousMeanDistance = 1.
 
-        while m.abs(currentMeanDistance - previousMeanDistance) >
-        self.tolerance and iteration <= self.max_iteration:
+        while m.abs((currentMeanDistance - previousMeanDistance) >
+        self.tolerance and iteration <= self.max_iteration):
             middlePoint = (lowerPoint + upperPoint) // 2.
             middlePointIndex = indices[:, middlePoint]
             # cutoff = m.sqrt(2.)/2. * (XConcatenated[indices[middlePoint][0],
