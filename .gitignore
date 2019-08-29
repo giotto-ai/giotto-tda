@@ -24,6 +24,7 @@ examples/*
 
 # Built docs
 doc/build
+doc/generated
 
 # Emacs temporary files
 *~
