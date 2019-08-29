@@ -8,7 +8,8 @@ with open('requirements.txt') as f:
 
 setup(name='giotto',
       version='0.0.1',
-      description='giotto is a scikit-learn-based machine learning library that brings Topological Data Analysis to data scientists.',
+      description="""giotto is a scikit-learn-based machine learning library
+      that brings Topological Data Analysis to data scientists.""",
       long_description=long_description,
       url='https://git.l2f.ch/g.tauzin/giotto.git',
       project_urls={
@@ -31,7 +32,8 @@ setup(name='giotto',
       ],
       packages=['giotto'],
       include_package_data=True,
-      keywords='machine learning, topological data analysis, persistent homology, persistence diagrams',
+      keywords="""machine learning, topological data analysis, persistent
+      homology, persistence diagrams""",
       python_requires='>=3.5',
       install_requires=requirements,
       extras_require={
