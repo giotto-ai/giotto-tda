@@ -27,11 +27,20 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     Examples
     --------
+    >>> import numpy as np
     >>> from giotto.graphs import TransitionGraph
-    >>> dyn = np.array([[['a'], ['b'], ['c']],
-    ...                 [['c'], ['a'], ['b']])
+    >>> X = np.array([[['a'], ['b'], ['c']],
+    ...               [['c'], ['a'], ['b']]])
     >>> tg = TransitionGraph()
-    >>> tg.fit_transform(dyn)
+    >>> tg = tg.fit(X)
+    >>> print(tg.transform(X)[0].toarray())
+    [[0 1 0]
+     [1 0 1]
+     [0 1 0]]
+    >>> print(tg.transform(X)[1].toarray())
+    [[0 1 1]
+     [1 0 0]
+     [1 0 0]]
 
     """
 
@@ -90,6 +99,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         -------
         self : object
             Returns self.
+
         """
         self._validate_params()
 
@@ -116,8 +126,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         X_transformed : array of sparse boolean matrices, shape (n_samples, )
             The collection of ``n_samples`` transition graphs. Each transition
             graph is encoded by a sparse matrix of boolean type.
+
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X.shape[0]

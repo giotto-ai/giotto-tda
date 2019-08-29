@@ -2,15 +2,13 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 #          Philippe Nguyen <p.nguyen@l2f.ch>
 # License: TBD
-from functools import partial
-
-from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
-
-from sklearn.utils._joblib import Parallel, delayed
-from sklearn.neighbors import kneighbors_graph
 
 import numpy as np
+from functools import partial
+from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._joblib import Parallel, delayed
+from sklearn.neighbors import kneighbors_graph
 
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
@@ -66,10 +64,35 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
         for more details.
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from giotto.graphs import KNeighborsGraph
+    >>> X = np.array([
+    ...         np.array([
+    ...             [0, 1, 3, 0, 0],
+    ...             [1, 0, 5, 0, 0],
+    ...             [3, 5, 0, 4, 0],
+    ...             [0, 0, 4, 0, 0],
+    ...             [0, 0, 0, 0, 0]])])
+    >>> kng = KNeighborsGraph(n_neighbors=2)
+    >>> kng = kng.fit(X)
+    >>> print(kng.transform(X)[0].toarray())
+    [[0. 1. 1.]
+     [1. 0. 1.]
+     [1. 1. 0.]]
+    >>> print(kng.transform(X)[1].toarray())
+    [[0. 1. 1. 0.]
+     [1. 0. 1. 1.]
+     [1. 1. 0. 1.]
+     [0. 1. 1. 0.]]
+
     """
 
     def __init__(self, n_neighbors=5, metric='euclidean',
-                 p=2, n_jobs=None, metric_params={}):
+                 p=2, n_jobs=None, metric_params=None):
+        if metric_params is None:
+            metric_params = {}
         self.n_neighbors = n_neighbors
         self.metric = metric
         self.p = p
