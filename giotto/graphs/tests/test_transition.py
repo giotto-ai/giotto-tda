@@ -1,11 +1,11 @@
 """Testing for TransitionGraph"""
 
 import pytest
-
 import numpy as np
-from scipy.sparse import csr_matrix, SparseEfficiencyWarning
+
+from scipy.sparse import csr_matrix
 from sklearn.exceptions import NotFittedError
-from sklearn.utils.testing import assert_raise_message, ignore_warnings
+from sklearn.utils.testing import assert_raise_message
 
 from giotto.graphs import TransitionGraph
 
