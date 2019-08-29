@@ -78,14 +78,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     >>> kng = KNeighborsGraph(n_neighbors=2)
     >>> kng = kng.fit(X)
     >>> print(kng.transform(X)[0].toarray())
-    [[0. 1. 1.]
-     [1. 0. 1.]
-     [1. 1. 0.]]
-    >>> print(kng.transform(X)[1].toarray())
-    [[0. 1. 1. 0.]
-     [1. 0. 1. 1.]
-     [1. 1. 0. 1.]
-     [0. 1. 1. 0.]]
+    [[0. 1. 1. 1. 1.]
+     [1. 0. 0. 1. 0.]
+     [1. 0. 0. 0. 1.]
+     [1. 1. 0. 0. 1.]
+     [1. 0. 1. 1. 0.]]
 
     """
 
