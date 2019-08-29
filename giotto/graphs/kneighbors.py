@@ -128,7 +128,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     def _make_adjacency_matrix(self, X):
         A = self._nearest_neighbors(X)
         rows, cols = A.nonzero()
-        A[cols, rows] = 1
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', SparseEfficiencyWarning)
+            A[cols, rows] = 1
         return A
 
     def fit(self, X, y=None):
