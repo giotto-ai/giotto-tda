@@ -43,17 +43,19 @@ def _filter(XScaled, homology_dimensions, cutoff):
 
 
 def _sample(X, n_samples):
-    maximum_persistences = {dimension: np.max(X[dimension][:, :, 1]) * m.sqrt(2) if X[dimension][:, :, 0].size != 0
-                            else -np.inf for dimension in X.keys()}
-    maximum_persistence = max(list(maximum_persistences.values()))
-    maximum_persistences = {dimension: maximum_persistences[dimension] if maximum_persistences[dimension] != -np.inf else maximum_persistence
-                            for dimension in X.keys()}
-
     minimum_persistences = {dimension: np.min(X[dimension][:, :, 0]) * m.sqrt(2) if X[dimension][:, :, 0].size != 0
                             else np.inf for dimension in X.keys()}
     minimum_persistence = min(list(minimum_persistences.values()))
     minimum_persistences = {dimension: minimum_persistences[dimension] if minimum_persistences[dimension] != np.inf else minimum_persistence
                             for dimension in X.keys()}
+
+    maximum_persistences = {dimension: np.max(X[dimension][:, :, 1]) * m.sqrt(2) if X[dimension][:, :, 0].size != 0
+                            else -np.inf for dimension in X.keys()}
+    maximum_persistence = max(list(maximum_persistences.values()))
+    maximum_persistences = {dimension: maximum_persistences[dimension] if maximum_persistences[dimension] != minimum_persistences[dimension]
+                            else maximum_persistence for dimension in X.keys()}
+    maximum_persistences = {dimension: maximum_persistences[dimension] if maximum_persistences[dimension] != -np.inf
+                            else maximum_persistence for dimension in X.keys()}
 
     step_persistences = {dimension: (maximum_persistences[dimension] - minimum_persistences[dimension]) / n_samples for dimension in X.keys()}
     sampling = {dimension: np.arange(minimum_persistences[dimension], maximum_persistences[dimension],
