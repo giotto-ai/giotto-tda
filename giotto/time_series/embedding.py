@@ -275,8 +275,8 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
                 np.abs(n_false_neighbors_list[embedding_dimension - 1] - 2 *
                        n_false_neighbors_list[embedding_dimension] +
                        n_false_neighbors_list[embedding_dimension + 1]
-                       ) / (n_false_neighbors_list[embedding_dimension] + 1)
-                / embedding_dimension for embedding_dimension in
+                       ) / (n_false_neighbors_list[embedding_dimension] + 1) /
+                embedding_dimension for embedding_dimension in
                 range(1, self.embedding_dimension + 1)]
 
             e_d_temp = variation_list.index(min(variation_list))
