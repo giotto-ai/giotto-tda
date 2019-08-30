@@ -239,14 +239,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         cubical_complex = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
         diagram = cubical_complex.persistence(homology_coeff_field=2, min_persistence=0)
 
-        if (0, (0, np.inf)) in diagram:
-            diagram.remove((0, (0, np.inf)))
-
-        if (1, (0, np.inf)) in diagram:
-            diagram.remove((1, (0, np.inf)))
-
         return {dimension: np.array([diagram[i][1] for i in range(len(diagram))
-                                     if diagram[i][0] == dimension]).reshape((-1, 2))
+                                     if diagram[i][0] == dimension and diagram[i][1][1] != np.inf]).reshape((-1, 2))
                 for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
