@@ -31,3 +31,7 @@ doc/generated
 
 # Output files
 *.out
+
+# External
+build
+external/hera_bindings/wasserstein.cpp

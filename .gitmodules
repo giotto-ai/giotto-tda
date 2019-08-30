@@ -1,0 +1,6 @@
+[submodule "giotto/external/pybind11"]
+	path = giotto/external/pybind11
+	url = https://github.com/pybind/pybind11
+[submodule "giotto/external/hera"]
+	path = giotto/external/hera
+	url = https://bitbucket.org/grey_narn/hera/

@@ -1,0 +1,98 @@
+Accompanying paper: M. Kerber, D. Morozov, A. Nigmetov. Geometry Helps To Compare Persistence Diagrams (ALENEX 2016, http://www.geometrie.tugraz.at/nigmetov/geom_dist.pdf)
+
+Bug reports can be sent to "nigmetov EMAIL SIGN tugraz DOT at".
+
+# Dependencies
+
+Your compiler must support C++11.
+
+# Usage:
+
+1. To use a standalone command-line utility bottleneck_dist:
+
+bottleneck_dist file1 file2  [relative_error]. 
+
+If relative error is not supplied, the exact distance is computed and printed.
+If two diagrams are equal, then the exact distance 0.0 is printed (the order
+of points in file1 and file2 need not be the same).
+Otherwise the output is an approximation of the exact distance. Precisely:
+if d_exact is the true distance and d_approx is the output, then 
+
+    | d_exact - d_approx | / d_exact < relative_error.
+
+file1 and file2 must contain persistence diagrams in plain text format 
+(one point per line, empty lines are ignored, comments can be made with #):
+
+# this is how your input can look like
+x_1 y_1 # two real numbers per line
+...
+# empty lines or comments are ignored
+x_n y_n 
+
+2. To use from your code:
+
+#include "bottleneck.h"
+
+// the functions hera::bottleneckDistExact, hera::bottleneckDistApprox
+// return the exact and approximate bottleneck distance.
+
+// function hera::readDiagramPointSet reads diagram from a plain-text file.
+
+std::vector<std::pair<double, double>> diagram1, diagram2;
+// any container class that supports range-for loops will do.
+// A pair represents a single point, 
+// first component = x-coordinate,
+// second component = y-coordinate.
+// ...
+// load your diagrams into diagram1, diagram2 (off-diagonal points).
+// If you data is in plain text format, you can use readDiagramPointSet function:
+
+if (!hera::readDiagramPointSet("diagram1.txt", diagram1)) {
+    // something went wrong: function returns true if it successfully read the file
+    }
+
+// OK: diagram1.txt was read.
+// ...
+// to get exact distance:
+double btDist = hera::bottleneckDistExact(diagram1, diagram2);
+// to get 1% approximation
+double btDistApprox = hera::bottleneckDistApprox(diagram1, diagram2, 0.01);
+// ..............................................................................
+// if diagrams will be used many times, you may want to avoid copying them
+// to hera::bt::DiagramPointSet (which is done internally in each call to 
+bottleneckDistExact/bottleneckDistApprox) and do it yourself once. 
+// Constructor takes two iterators:
+hera::bt::DiagramPointSet ds1(diagram1.begin(), diagram1.end());
+hera::bt::DiagramPointSet ds2(diagram2.begin(), diagram2.end());
+btDist = hera::bt::bottleneckDistExact(ds1, ds2);
+btDistApprox = hera::bt::bottleneckDistApprox(ds1, ds2, 0.01);
+
+Necessary projections (diagonal points) will be added in the bottleneckDistApprox
+function.
+
+See also code in example/bottleneck_dist.cpp.
+
+# Remarks:
+
+1) If bottleneckDistApprox is called with epsilon = 0.0, it will never return.
+2) Empty diagrams are not considered as error.
+
+# License
+
+See licence.txt
+
+# Building
+
+CMakeLists.txt in the root directory can be used to build
+the command-line utility (in example/ directory).
+The library itself is header-only and does not require separate compilation.
+
+On Linux/Mac:
+
+mkdir build
+cd build
+cmake ..
+make
+
+On Windows:
+use cmake-gui to create the solution in build directory and build it with VS.
