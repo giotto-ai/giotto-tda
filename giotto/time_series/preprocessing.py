@@ -7,9 +7,7 @@ import datetime as dt
 
 
 class Resampler(BaseEstimator, TransformerMixin):
-    # FIXME: (doc) transformer output type
-    """Data sampling transformer that returns a sampled Pandas dataframe
-    with a datetime index.
+    """Data sampling transformer that returns a sampled numpy.ndarray.
 
     Parameters
     ----------
@@ -46,7 +44,7 @@ class Resampler(BaseEstimator, TransformerMixin):
     >>> import matplotlib.pyplot as plt
     >>> from giotto.time_series import Resampler
     >>> # Create a noisy signal sampled
-    >>> signal = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
+    >>> signal = np.asarray([np.sin(x /40) + np.random.random()
     ... for x in range(0, 300)])
     >>> plt.plot(signal)
     >>> plt.show()
@@ -163,9 +161,7 @@ class Resampler(BaseEstimator, TransformerMixin):
 
 
 class Stationarizer(BaseEstimator, TransformerMixin):
-    # FIXME: (doc) transformer output type
-    """Data sampling transformer that returns a stationarized Pandas
-    dataframe with a datetime index.
+    """Data sampling transformer that returns numpy.ndarray.
 
     Parameters
     ----------
@@ -189,8 +185,10 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     >>> import matplotlib.pyplot as plt
     >>> from giotto.time_series import Stationarizer
     >>> # Create a noisy signal sampled
-    >>> signal = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
+    >>> signal = np.asarray([np.sin(x /40) + 5 + np.random.random()
     >>> for x in range(0, 300)]).reshape(-1, 1)
+    >>> plt.plot(signal)
+    >>> plt.show()
     >>> # Initialize the stationarizer
     >>> stationarizer = Stationarizer(stationarization_type='return')
     >>> stationarizer.fit(signal)

@@ -158,7 +158,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
         """
-        # FIXME: shorter name
         implemented_embedding_parameters_types = ['fixed', 'search']
 
         if embedding_parameters_type not in implemented_embedding_parameters_types:
@@ -218,7 +217,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         epsilon = 2.0 * np.std(X)
         tolerance = 10
 
-        # TODO: rename + simplify
         dim_by_delay = -embedding_dimension * embedding_time_delay
         non_zero_distance = distance[:dim_by_delay] > 0
 
