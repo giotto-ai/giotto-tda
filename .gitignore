@@ -24,9 +24,14 @@ examples/*
 
 # Built docs
 doc/build
+doc/generated
 
 # Emacs temporary files
 *~
 
 # Output files
 *.out
+
+# External
+build
+external/hera_bindings/wasserstein.cpp

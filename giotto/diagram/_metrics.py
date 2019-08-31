@@ -7,7 +7,8 @@ import numpy as np
 import math as m
 from sklearn.utils._joblib import Parallel, delayed
 
-import dionysus as dy
+from gudhi import bottleneck_distance as gudhi_bottleneck_distance
+from ..external.bindings import wasserstein as hera_wasserstein_distance
 
 
 def betti_function(diagram, sampling):
@@ -58,16 +59,11 @@ def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
 
 def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf,
                         delta=0.0):
-    return dy.bottleneck_distance(dy.Diagram(diagram_x[diagram_x[:, 1] != 0]),
-                                  dy.Diagram(diagram_y[diagram_y[:, 1] != 0]),
-                                  delta)
-
+    return gudhi_bottleneck_distance(diagram_x, diagram_y, delta)
 
 def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
                          delta=0.0):
-    return dy.wasserstein_distance(dy.Diagram(diagram_x[diagram_x[:, 1] != 0]),
-                                   dy.Diagram(diagram_y[diagram_y[:, 1] != 0]),
-                                   order, delta)
+    return hera_wasserstein_distance(diagram_x, diagram_y, order, delta)
 
 
 implemented_metric_recipes = {'bottleneck': bottleneck_distance,
@@ -83,7 +79,6 @@ def _parallel_pairwise(X, Y, metric, metric_params, iterator, n_jobs):
     metric_func = implemented_metric_recipes[metric]
 
     distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
-
     distance_array = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
         X[dimension][i, :, :], Y[dimension][j, :, :],
         dimension, **metric_params)
@@ -123,15 +118,15 @@ implemented_norm_recipes = {'bottleneck': bottleneck_norm,
                             'betti': kernel_betti_norm}
 
 
-def _parallel_norm(X, norm, norm_params, n_jobs):
+def _parallel_norm(X, metric, metric_params, n_jobs):
     n_dimensions = len(X.keys())
-    norm_func = implemented_norm_recipes[norm]
+    norm_func = implemented_norm_recipes[metric]
 
     norm_array = Parallel(n_jobs=n_jobs)(delayed(norm_func)(
-        X[dimension][i, :, :], dimension, **norm_params)
+        X[dimension][i, :, :], dimension, **metric_params)
         for i in range(next(iter(X.values())).shape[0])
         for dimension in X.keys())
     norm_array = np.linalg.norm(np.array(norm_array).
                                 reshape((-1, n_dimensions)),
-                                ord=norm_params['order'], axis=1)
+                                ord=metric_params['order'], axis=1)
     return norm_array

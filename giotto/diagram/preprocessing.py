@@ -135,11 +135,11 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     norm : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
     default: 'bottleneck'
         The type of norm on persistence diagrams to be used. Defined in terms
-        ofvidentically named distance functions between pairs of diagrams (see
+        of identically named distance functions between pairs of diagrams (see
         :mod:'giotto.diagram.distance'), as the distance between
         a diagram (or curve) and the trivial diagram (or curve).
 
-    norm_params : dict, optional, default: {'n_samples': 200}
+    metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the norm function:
 
         - If ``norm == 'bottleneck'`` the only argument is ``order``
@@ -213,17 +213,17 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        norm_params = self.norm_params.copy()
+        metric_params = self.metric_params.copy()
 
         sampling = {dimension: None for dimension in X.keys()}
 
-        if 'n_samples' in norm_params.keys():
-            n_samples = norm_params.pop('n_samples')
+        if 'n_samples' in metric_params.keys():
+            n_samples = metric_params.pop('n_samples')
 
-        if self.norm in ['landscape', 'betti']:
-            norm_params['sampling'] = _sample(X, n_samples)
+        if self.metric in ['landscape', 'betti']:
+            metric_params['sampling'] = _sample(X, n_samples)
 
-        norm_array = _parallel_norm(X, self.norm, norm_params, self.n_jobs)
+        norm_array = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
         self._scale = self.function(norm_array)
 
         self._is_fitted = True
