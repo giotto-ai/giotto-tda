@@ -2,7 +2,6 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
 import numpy as np
-import pandas as pd
 import datetime as dt
 
 
