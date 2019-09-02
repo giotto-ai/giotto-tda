@@ -84,7 +84,7 @@ def _sample(X, n_samples):
         for dimension in X.keys()}
 
     maximum_persistences = {dimension: maximum_persistences[dimension]
-                            if maximum_persistences[dimension] != -np.inf
+                            if maximum_persistences[dimension] != minimum_persistences[dimension]
                             else maximum_persistence for dimension in X.keys()}
 
     step_persistences = {
