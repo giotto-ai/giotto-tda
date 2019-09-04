@@ -92,16 +92,21 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             raise ValueError('The metric you specified is not implemented.')
 
     def _ripser_diagram(self, X, is_distance_matrix, metric):
-        diagram = ripser(X, distance_matrix=is_distance_matrix, metric=metric, maxdim=max(self.homology_dimensions), thresh=self.max_edge_length)['dgms']
+        X_diagram = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
+                           metric=metric, maxdim=max(self.homology_dimensions),
+                           thresh=self.max_edge_length)['dgms']
 
         if 0 in self.homology_dimensions:
-            diagram[0] = diagram[0][:-1, :]
+            X_diagram[0] = X_diagram[0][:-1, :]
 
-        return {dimension: diagram[dimension] for dimension in self.homology_dimensions}
+        return {dimension: X_diagram[dimension]
+                for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
-        return {dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions)}
+        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])),
+                    (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
+        return {dimension: np.pad(diagram[dimension], padList[i], 'constant')
+                for i, dimension in enumerate(self.homology_dimensions)}
 
     def _stack_padded_diagrams(self, diagrams):
         stacked_diagrams = {dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions}

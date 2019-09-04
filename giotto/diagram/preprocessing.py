@@ -132,7 +132,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    norm : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
     default: 'bottleneck'
         The type of norm on persistence diagrams to be used. Defined in terms
         of identically named distance functions between pairs of diagrams (see
@@ -163,11 +163,11 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, norm='bottleneck',
-                 norm_params={'order': np.inf, 'n_samples': 200},
+    def __init__(self, metric='bottleneck',
+                 metric_params={'order': np.inf, 'n_samples': 200},
                  function=np.max, n_jobs=None):
-        self.norm = norm
-        self.norm_params = norm_params
+        self.metric = metric
+        self.metric_params = metric_params
         self.function = function
         self.n_jobs = n_jobs
 
@@ -185,7 +185,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
             Parameter names mapped to their values.
 
         """
-        return {'norm': self.norm, 'norm_params': self.norm_params,
+        return {'metric': self.metric, 'metric_params': self.metric_params,
                 'function': self.function, 'n_jobs': self.n_jobs}
 
     def fit(self, X, y=None):
