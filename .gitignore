@@ -24,9 +24,15 @@ examples/*
 
 # Built docs
 doc/build
+doc/generated
 
 # Emacs temporary files
 *~
 
 # Output files
 *.out
+
+# External
+build
+giotto/external/bindings/hera_wasserstein.cpp
+giotto/external/bindings/*.so

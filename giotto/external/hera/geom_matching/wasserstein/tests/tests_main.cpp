@@ -1,0 +1,3 @@
+#define LOG_AUCTION
+#define CATCH_CONFIG_MAIN
+#include "catch/catch.hpp"

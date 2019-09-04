@@ -15,44 +15,50 @@ from ripser import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of persistence diagrams resulting from Vietoris-Rips
-    filtrations. Given a point cloud in Euclidean space or an abstract metric space
-    encoded by a distance matrix, information about the appearance and disappearance
-    of "topological holes" (technically, homology classes) of various dimensions and
-    at different distance scales is summarised in the corresponding persistence diagram.
+    """Transformer for the calculation of persistence diagrams resulting
+    from Vietoris-Rips filtrations. Given a point cloud in Euclidean space
+    or an abstract metric space encoded by a distance matrix, information
+    about the appearance and disappearance of "topological holes"
+    (technically, homology classes) of various dimensions and at different
+    distance scales is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
     metric : string or callable, optional, default: 'euclidean'
-        If set to ``'precomputed'``, input data is to be interpreted as a collection
-        of distance matrices. Otherwise, input data is to be interpreted as a collection
-        of point clouds (i.e. feature arrays), and ``metric`` determines a rule with which
-        to calculate distances between pairs of instances (i.e. rows) in these arrays.
+        If set to ``'precomputed'``, input data is to be interpreted as a
+        collection of distance matrices. Otherwise, input data is to be
+        interpreted as a collection of point clouds (i.e. feature arrays),
+        and ``metric`` determines a rule with which to calculate distances
+        between pairs of instances (i.e. rows) in these arrays.
         If ``metric`` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric listed
-        in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean", "manhattan",
-        or "cosine".
-        If ``metric`` is a callable function, it is called on each pair of instances
-        and the resulting value recorded. The callable should take two arrays from
-        the entry in X as input, and return a value indicating the distance between them.
+        scipy.spatial.distance.pdist for its metric parameter, or a metric
+        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
+        "manhattan", or "cosine".
+        If ``metric`` is a callable function, it is called on each pair of
+        instances and the resulting value recorded. The callable should take
+        two arrays from the entry in X as input, and return a value indicating
+        the distance between them.
 
     max_edge_length : float, optional, default: np.inf
-        Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
-        Points whose distance is greater than this value will never be connected by an
-        edge, and topological features at scales larger than this value will not be
-        detected.
+        Upper bound on the maximum value of the Vietoris-Rips filtration
+        parameter.
+        Points whose distance is greater than this value will never be
+        connected by an edge, and topological features at scales larger than
+        this value will not be detected.
 
     homology_dimensions : list, optional, default: [0, 1]
-        List of dimensions (non-negative integers). Topological holes of each of
-        these dimensions will be detected.
+        List of dimensions (non-negative integers). Topological holes of each
+        of these dimensions will be detected.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     """
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf, homology_dimensions=[0, 1], n_jobs=None):
+    def __init__(self, metric='euclidean', max_edge_length=np.inf,
+                 homology_dimensions=[0, 1], n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -72,12 +78,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             Parameter names mapped to their values.
         """
         return {'metric': self.metric, 'max_edge_length': self.max_edge_length,
-                'homology_dimensions': self.homology_dimensions, 'n_jobs': self.n_jobs}
+                'homology_dimensions': self.homology_dimensions,
+                'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params(metric):
-        """A class method that checks whether the hyperparameters and the input parameters
-        of the :meth:`fit` are valid.
+        """A class method that checks whether the hyperparameters and the input
+        parameters of the :meth:`fit` are valid.
         """
         implemented_metric_types = set(['precomputed'] + [met for i in VALID_METRICS.values() for met in i])
 
@@ -85,16 +92,21 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             raise ValueError('The metric you specified is not implemented.')
 
     def _ripser_diagram(self, X, is_distance_matrix, metric):
-        diagram = ripser(X, distance_matrix=is_distance_matrix, metric=metric, maxdim=max(self.homology_dimensions), thresh=self.max_edge_length)['dgms']
+        X_diagram = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
+                           metric=metric, maxdim=max(self.homology_dimensions),
+                           thresh=self.max_edge_length)['dgms']
 
         if 0 in self.homology_dimensions:
-            diagram[0] = diagram[0][:-1, :]
+            X_diagram[0] = X_diagram[0][:-1, :]
 
-        return {dimension: diagram[dimension] for dimension in self.homology_dimensions}
+        return {dimension: X_diagram[dimension]
+                for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
-        return {dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions)}
+        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])),
+                    (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
+        return {dimension: np.pad(diagram[dimension], padList[i], 'constant')
+                for i, dimension in enumerate(self.homology_dimensions)}
 
     def _stack_padded_diagrams(self, diagrams):
         stacked_diagrams = {dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions}
@@ -239,14 +251,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         cubical_complex = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
         diagram = cubical_complex.persistence(homology_coeff_field=2, min_persistence=0)
 
-        if (0, (0, np.inf)) in diagram:
-            diagram.remove((0, (0, np.inf)))
-
-        if (1, (0, np.inf)) in diagram:
-            diagram.remove((1, (0, np.inf)))
-
         return {dimension: np.array([diagram[i][1] for i in range(len(diagram))
-                                     if diagram[i][0] == dimension]).reshape((-1, 2))
+                                     if diagram[i][0] == dimension and diagram[i][1][1] != np.inf]).reshape((-1, 2))
                 for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
