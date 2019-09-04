@@ -46,8 +46,8 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params():
-        """A class method that checks whether the hyperparameters and the input parameters
-           of the :meth:`fit` are valid.
+        """A class method that checks whether the hyperparameters and the
+        input parameters of the :meth:`fit` are valid.
 
         """
         pass
@@ -60,14 +60,14 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers
-            d representing homology dimensions, and whose values are ndarrays of
-            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
-            diagrams with M_d persistent topological features. For example, X
-            could be the result of applying the ``transform`` method of a
-            ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative
+            integers d representing homology dimensions, and whose values
+            are ndarrays of shape (n_samples, M_d, 2) whose each entries along
+            axis 0 are persistence diagrams with M_d persistent topological
+            features. For example, X could be the result of applying the
+            ``transform`` method of a ``VietorisRipsPersistence`` transformer
+            to a collection of point clouds/distance matrices, but only if
+            that transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -85,20 +85,20 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Stacks all available persistence subdiagrams corresponding to each sample
-        into one persistence diagram.
+        """Stacks all available persistence subdiagrams corresponding
+        to each sample into one persistence diagram.
 
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers
-            d representing homology dimensions, and whose values are ndarrays of
-            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
-            diagrams with M_d persistent topological features. For example, X
-            could be the result of applying the ``transform`` method of a
-            ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative
+            integers d representing homology dimensions, and whose values
+            are ndarrays of shape (n_samples, M_d, 2) whose each entries
+            along axis 0 are persistence diagrams with M_d persistent
+            topological features. For example, X could be the result of
+            applying the ``transform`` method of a ``VietorisRipsPersistence``
+            transformer to a collection of point clouds/distance matrices,
+            but only if that transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -126,41 +126,48 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     A scale factor is calculated during ``fit`` which depends on the entire
     collection, and it is applied during ``transform``. The value of the scale
     factor depends on a chosen norm function which is internally evaluated on
-    each persistent diagram separately, and on a function (e.g. ``np.max``) which
-    is applied to the resulting collection of norms to extract a single scale factor.
+    each persistent diagram separately, and on a function (e.g. ``np.max``)
+    which is applied to the resulting collection of norms to extract a single
+    scale factor.
 
     Parameters
     ----------
-    norm : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
-        The type of norm on persistence diagrams to be used. Defined in terms of
-        identically named distance functions between pairs of diagrams (see
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+    default: 'bottleneck'
+        The type of norm on persistence diagrams to be used. Defined in terms
+        of identically named distance functions between pairs of diagrams (see
         :mod:'giotto.diagram.distance'), as the distance between
         a diagram (or curve) and the trivial diagram (or curve).
 
-    norm_params : dict, optional, default: {'n_samples': 200}
+    metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the norm function:
 
-        - If ``norm == 'bottleneck'`` the only argument is ``order`` (default = ``np.inf``).
-        - If ``norm == 'wasserstein'`` the only argument is ``order`` (default = ``1``).
+        - If ``norm == 'bottleneck'`` the only argument is ``order``
+          (default = ``np.inf``).
+        - If ``norm == 'wasserstein'`` the only argument is ``order``
+          (default = ``1``).
         - If ``norm == 'landscape'`` the available arguments are ``order``
           (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
           (default = ``1``).
-        - If ``norm == 'betti'`` the available arguments are ``order`` (default = ``2``)
-           and ``n_samples`` (default = ``200``).
+        - If ``norm == 'betti'`` the available arguments are ``order``
+          (default = ``2``) and ``n_samples`` (default = ``200``).
 
     function : callable, optional, default: numpy.max
-        Function used to extract a single positive scalar from the collection of
-        norms of diagrams.
+        Function used to extract a single positive scalar from the collection
+        of norms of diagrams.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
 
     """
 
-    def __init__(self, norm='bottleneck', norm_params={'order': np.inf, 'n_samples': 200}, function=np.max, n_jobs=None):
-        self.norm = norm
-        self.norm_params = norm_params
+    def __init__(self, metric='bottleneck',
+                 metric_params={'order': np.inf, 'n_samples': 200},
+                 function=np.max, n_jobs=None):
+        self.metric = metric
+        self.metric_params = metric_params
         self.function = function
         self.n_jobs = n_jobs
 
@@ -178,7 +185,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
             Parameter names mapped to their values.
 
         """
-        return {'norm': self.norm, 'norm_params': self.norm_params, 'function': self.function, 'n_jobs': self.n_jobs}
+        return {'metric': self.metric, 'metric_params': self.metric_params,
+                'function': self.function, 'n_jobs': self.n_jobs}
 
     def fit(self, X, y=None):
         """Fits the transformer by finding the scale factor according to the
@@ -187,14 +195,14 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers
-            d representing homology dimensions, and whose values are ndarrays of
-            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
-            diagrams with M_d persistent topological features. For example, X
-            could be the result of applying the ``transform`` method of a
-            ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative
+            integers d representing homology dimensions, and whose values
+            are ndarrays of shape (n_samples, M_d, 2) whose each entries
+            along axis 0 are persistence diagrams with M_d persistent
+            topological features. For example, X could be the result of
+            applying the ``transform`` method of a ``VietorisRipsPersistence``
+            transformer to a collection of point clouds/distance matrices,
+            but only if that transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -205,23 +213,23 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        norm_params = self.norm_params.copy()
+        metric_params = self.metric_params.copy()
 
         sampling = {dimension: None for dimension in X.keys()}
 
-        if 'n_samples' in norm_params.keys():
-            n_samples = norm_params.pop('n_samples')
+        if 'n_samples' in metric_params.keys():
+            n_samples = metric_params.pop('n_samples')
 
-        if self.norm in ['landscape', 'betti']:
-            norm_params['sampling'] = _sample(X, n_samples)
+        if self.metric in ['landscape', 'betti']:
+            metric_params['sampling'] = _sample(X, n_samples)
 
-        norm_array = _parallel_norm(X, self.norm, norm_params, self.n_jobs)
+        norm_array = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
         self._scale = self.function(norm_array)
 
         self._is_fitted = True
         return self
 
-    #@jit
+    # @jit
     def transform(self, X, y=None):
         """Rescales all persistence diagrams in the collection according to the
         factor computed during ``fit``.
@@ -229,14 +237,14 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers
-            d representing homology dimensions, and whose values are ndarrays of
-            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
-            diagrams with M_d persistent topological features. For example, X
-            could be the result of applying the ``transform`` method of a
-            ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative
+            integers d representing homology dimensions, and whose values are
+            ndarrays of shape (n_samples, M_d, 2) whose each entries along axis
+            0 are persistence diagrams with M_d persistent topological
+            features. For example, X could be the result of applying the
+            ``transform`` method of a ``VietorisRipsPersistence`` transformer
+            to a collection of point clouds/distance matrices, but only if
+            that transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -245,8 +253,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Returns
         -------
         X_scaled : dict of int: ndarray
-            Dictionary of rescaled persistence (sub)diagrams, each with the same
-            shape as the corresponding (sub)diagram in X.
+            Dictionary of rescaled persistence (sub)diagrams, each with the
+            same shape as the corresponding (sub)diagram in X.
         """
         check_is_fitted(self, ['_is_fitted'])
 
@@ -254,8 +262,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         return X_scaled
 
     def inverse_transform(self, X, copy=None):
-        """Scale back the data to the original representation. Multiplies by the
-        scale found in ``fit``.
+        """Scale back the data to the original representation. Multiplies
+        by the scale found in ``fit``.
 
         Parameters
         ----------
@@ -284,24 +292,26 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
     Filtering a persistence (sub)diagram means removing
     all points whose distance from the diagonal is less than or equal to a
     certain cutoff value: that is, the cutoff value can be interpreted as the
-    "minimum amount of persistence" required from points in the filtered diagram.
+    "minimum amount of persistence" required from points in the filtered
+    diagram.
 
     Parameters
     ----------
     homology_dimensions : list or None, optional, default: None
-        When set to ``None``, all available (sub)diagrams will be filtered. When
-        set to a list, it is interpreted as the list of those homology dimensions
-        for which (sub)diagrams should be filtered.
+        When set to ``None``, all available (sub)diagrams will be filtered.
+        When set to a list, it is interpreted as the list of those homology
+        dimensions for which (sub)diagrams should be filtered.
 
     filtering_parameters_type : str, optional, default: 'fixed'
-        When set to ``'fixed'``, ``'epsilon'`` is ignored and filtering consists
-        simply in removing from all persistent (sub)diagrams all points an absolute
-        distance ``delta`` from the diagonal.
+        When set to ``'fixed'``, ``'epsilon'`` is ignored and filtering
+        consists simply in removing from all persistent (sub)diagrams all
+        points an absolute distance ``delta`` from the diagonal.
 
     delta : float, optional, default: 0.
         The cutoff value controlling the amount of filtering.
 
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti',
+    optional, default: 'bottleneck'
         Behaviour not implemented. This variable is currently ignored.
 
     metric_params : dict, optional, default: {'n_samples': 200}
@@ -317,15 +327,18 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         Behaviour not implemented. This variable is currently ignored.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means using
+        all processors.
 
     """
 
     implemented_filtering_parameters_types = ['fixed', 'search']
 
-    def __init__(self, homology_dimensions=None, filtering_parameters_type='fixed', delta=0.,
-                 metric='bottleneck', metric_params={'order': np.inf}, epsilon=1.,
+    def __init__(self, homology_dimensions=None,
+                 filtering_parameters_type='fixed', delta=0.,
+                 metric='bottleneck', metric_params={'order': np.inf},
+                 epsilon=1.,
                  tolerance=1e-2, max_iteration=20, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.filtering_parameters_type = filtering_parameters_type
@@ -363,14 +376,18 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params(filtering_parameters_type):
-        if filtering_parameters_type not in DiagramFilter.implemented_filtering_parameters_types:
-            raise ValueError('The filtering parameters type you specified is not implemented')
+        if (filtering_parameters_type not in
+                DiagramFilter.implemented_filtering_parameters_types):
+            raise ValueError("""The filtering parameters type you specified
+                is not implemented""")
 
     def _bisection(self, X):
         iterator = iter([(i, i) for i in range(len(X))])
 
-        numberPoints = [X[dimension].shape for dimension in self.homologyDimensions]
-        XConcatenated = np.concatenate([X[dimension] for dimension in self.homologyDimensions])
+        numberPoints = [X[dimension].shape
+                        for dimension in self.homologyDimensions]
+        XConcatenated = np.concatenate(
+            [X[dimension] for dimension in self.homologyDimensions])
 
         lowerCutoff = 0.
         upperCutoff = 1.
@@ -378,14 +395,19 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         currentMeanDistance = 0.
         previousMeanDistance = 1.
 
-        while m.abs(currentMeanDistance - previousMeanDistance) > self.tolerance and iteration <= self.max_iteration:
+        while m.abs((currentMeanDistance - previousMeanDistance) >
+        self.tolerance and iteration <= self.max_iteration):
             middlePoint = (lowerPoint + upperPoint) // 2.
             middlePointIndex = indices[:, middlePoint]
-            # cutoff = m.sqrt(2.)/2. * (XConcatenated[indices[middlePoint][0], indices[middlePoint][0], 1] - XConcatenated[, , 0])
-            # XFiltered = _filter(XConcatenated, self.homologyDimensions, middleCutoff)
+            # cutoff = m.sqrt(2.)/2. * (XConcatenated[indices[middlePoint][0],
+            # indices[middlePoint][0], 1] - XConcatenated[, , 0])
+            # XFiltered = _filter(XConcatenated, self.homologyDimensions,
+            # middleCutoff)
 
-            # XCOncatenated and XFIltered need to have the same homology dimensions!!!!!
-            # distance = _parallel_pairwise(XConcatenated, XFiltered, iterator, self.n_jobs)
+            # XCOncatenated and XFIltered need to have the same homology
+            # dimensions!!!!!
+            # distance = _parallel_pairwise(XConcatenated, XFiltered, iterator,
+            # self.n_jobs)
 
             if distance == tolerance:
                 return middleCutoff
@@ -404,14 +426,14 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers
-            d representing homology dimensions, and whose values are ndarrays of
-            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
-            diagrams with M_d persistent topological features. For example, X
-            could be the result of applying the ``transform`` method of a
-            ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative
+            integers d representing homology dimensions, and whose values are
+            ndarrays of shape (n_samples, M_d, 2) whose each entries along axis
+            0 are persistence diagrams with M_d persistent topological
+            features. For example, X could be the result of applying the
+            ``transform`` method of a ``VietorisRipsPersistence`` transformer
+            to a collection of point clouds/distance matrices, but only if that
+            transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -437,14 +459,14 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers
-            d representing homology dimensions, and whose values are ndarrays of
-            shape (n_samples, M_d, 2) whose each entries along axis 0 are persistence
-            diagrams with M_d persistent topological features. For example, X
-            could be the result of applying the ``transform`` method of a
-            ``VietorisRipsPersistence`` transformer to a collection of point
-            clouds/distance matrices, but only if that transformer was instantiated
-            with ``pad=True``.
+            Input data. Dictionary whose keys are typically non-negative
+            integers d representing homology dimensions, and whose values are
+            ndarrays of shape (n_samples, M_d, 2) whose each entries along axis
+            0 are persistence diagrams with M_d persistent topological
+            features. For example, X could be the result of applying the
+            ``transform`` method of a ``VietorisRipsPersistence`` transformer
+            to a collection of point clouds/distance matrices, but only if that
+            transformer was instantiated with ``pad=True``.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -455,9 +477,11 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         X_filtered : dict of int: ndarray
             Dictionary of filtered persistence (sub)diagrams. The value
             corresponding to key d has shape (n_samples, F_d, 2), where
-            :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to filtering.
+            :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to
+            filtering.
             If ``homology_dimensions`` was set to be a list not containing all
-            keys in X, only the corresponding (sub)diagrams are filtered and returned.
+            keys in X, only the corresponding (sub)diagrams are filtered and
+            returned.
 
         """
 

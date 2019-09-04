@@ -16,7 +16,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     r"""Transformer rescaling pairwise distances in data according to the
     ideas in `arXiv:1606.02353 <https://arxiv.org/abs/1606.02353>`_.
     The computation during ``transform``, for each entry in X, is:
-        :math:`d_{\mathrm{consistent}}(\star_i, \star_j) = [d(\star_i, \star_{k_i}) d(\star_j, \star_{k_j})]^{-1/2}d(\star_i, \star_j)`
+    :math:`d_{\mathrm{consistent}}(\star_i, \star_j) = [d(\star_i,
+    \star_{k_i}) d(\star_j, \star_{k_j})]^{-1/2}d(\star_i, \star_j)`
     where :math:`\star_i, \star_j` are the :math:`i`-th and :math:`j`-th data
     instances in that entry, :math:`d` is the original distance function, and
     :math:`k_i` is the index of the :math:`k`-th nearest neighbor to
@@ -104,7 +105,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         X_consistent = np.zeros(X.shape)
         iterator = itertools.combinations(range(X.shape[0]), 2)
         for i, j in iterator:
-            X_consistent[i, j] = X[i, j] / (m.sqrt(distance_k_neighbor[i] * distance_k_neighbor[j]))
+            X_consistent[i, j] = X[i, j] / (m.sqrt(distance_k_neighbor[i] *
+                                                   distance_k_neighbor[j]))
         return X_consistent + X_consistent.T
 
     def fit(self, X, y=None):
@@ -167,10 +169,14 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         # Check if fit had been called
         check_is_fitted(self, ['is_fitted'])
 
-        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(pairwise_distances)(X[i], metric=self.metric, n_jobs=1, **self.metric_params)
-                                                     for i in range(X.shape[0]))
+        X_transformed = Parallel(n_jobs=self.n_jobs)(
+            delayed(pairwise_distances)(X[i], metric=self.metric, n_jobs=1,
+                                        **self.metric_params)
+            for i in range(X.shape[0]))
 
-        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._consistent_homology_distance)(X_transformed[i], self.n_neighbor)
-                                                     for i in range(X.shape[0]))
+        X_transformed = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._consistent_homology_distance)(X_transformed[i],
+                                                        self.n_neighbor)
+            for i in range(X.shape[0]))
         X_transformed = np.array(X_transformed)
         return X_transformed

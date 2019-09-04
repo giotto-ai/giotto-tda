@@ -1,0 +1,100 @@
+This is a program for computing Wasserstein distances between persistence 
+diagrams using the geometric version of auction algorithm.
+
+Accompanying paper: M. Kerber, D. Morozov, A. Nigmetov. Geometry Helps To Compare
+Persistence Diagrams (ALENEX 2016, http://www.geometrie.tugraz.at/nigmetov/geom_dist.pdf)
+Bug reports can be sent to "nigmetov EMAIL SIGN tugraz DOT at".
+
+Wasserstein distance $W_{q, p}(X, Y)$ between two persistent diagrams is
+the minimum over all perfect matchings between $X$ and $Y$ ( $y(x)$ is the point of $Y$
+matched to $x \in X$ ) of the following expression:
+$ ( \sum \| x - y(x) \|_p ^ { q } ) ^ { 1 / q} $
+
+# Dependencies
+
+Requires boost 1.58 or higher.
+Your compiler must support C++11.
+
+# Usage:
+
+To use a standalone command-line utility wasserstein_dist:
+
+wasserstein_dist file1 file2  [wasserstein degree] [relative error] [internal norm]. 
+
+Parameter wasserstein degree corresponds to $q$, when it tends to infinity,
+Wasserstein distance tends to the bottleneck distance.
+
+If two diagrams are equal, then the exact distance 0.0 is printed (the order
+of points in file1 and file2 need not be the same).
+Otherwise the output is an approximation of the exact distance. Precisely:
+if d_exact is the true distance and d_approx is the output, then 
+
+    | d_exact - d_approx | / d_exact < relative_error.
+
+Parameter internal_p corresponds to p.
+
+Default values: 
+wasserstein_degree  = 1.0, 
+relative_error = 0.01, 
+internal_p = infinity.
+
+Valid values: 
+wasserstein_degree must be in $[1.0, \infinity)$, 
+relative_error must be positive,
+internal_p must be in $[1.0, \infinity]$ (to explicitly set internal_p to $\infinity$, supply inf).By default wasserstein degree is 1.0, relative error is 0.01, internal norm is l_infinity.
+
+file1 and file2 must contain persistence diagrams in plain text format 
+(one point per line, empty lines are ignored, comments can be made with #):
+
+# this is how your input can look like
+x_1 y_1 # two real numbers per line
+...
+# empty lines or comments are ignored
+x_n y_n 
+
+To use from your code:
+
+#include "wasserstein.h"
+
+// All classes and functions are in geom_ws namespace
+
+std::vector<std::pair<double, double>> diagram1, diagram2;
+// any container class that supports range-for loops will do.
+// A pair represents a single point, 
+// first component = x-coordinate,
+// second component = y-coordinate.
+// ...
+// load your diagrams into diagram1, diagram2 (off-diagonal points).
+// You can use function readDiagramPointSet:
+geom_ws::readDiagramPointSet("diagram1.txt", diagram1);
+geom_ws::readDiagramPointSet("diagram2.txt", diagram1);
+// ...
+// to get the distance:
+double wsDist = geom_ws::wassersteinDist(diagram1, diagram2, q, delta, p);
+// q is wasserstein degree, delta is relative error,
+// p is the internal norm in Wasserstein distance, defaults to infinity
+
+Necessary projections (diagonal points) will be added in the wassersteinDist
+function.
+
+See also code in wasserstein/example/wasserstein_dist.cpp.
+
+# License
+
+See wasserstein/license.txt
+
+# Building
+
+CMakeLists.txt in the root directory can be used to make the library (contained 
+in wasserstein/src/ directory) and the command-line utility (in wasserstein/example/ directory)
+to compute the distance between two diagrams in txt files.
+
+On Linux/Mac:
+
+mkdir build
+cd build
+cmake ..
+make
+
+On Windows (checked with Visual Studio 2015, Community version)
+use cmake-gui to create the solution in build directory and build it with VS.
