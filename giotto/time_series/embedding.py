@@ -152,16 +152,20 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
                 'embedding_stride': self.embedding_stride,
                 'n_jobs': self.n_jobs}
 
-    @staticmethod
-    def _validate_params(embedding_parameters_type):
+    def _validate_params(self, X):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
         """
         implemented_embedding_parameters_types = ['fixed', 'search']
 
-        if embedding_parameters_type not in implemented_embedding_parameters_types:
-            raise ValueError('The embedding parameters type you specified is '
-                             'not implemented')
+        if self.embedding_parameters_type not in \
+                implemented_embedding_parameters_types:
+            raise ValueError(
+                'The embedding parameters type %s is not supported' %
+                self.embedding_parameters_type)
+
+        if X.shape[0] < self.outer_window_duration:
+            raise ValueError('Not enough data to have a single outer window.')
 
     @staticmethod
     def _embed(X, outer_window_duration, outer_window_stride,
@@ -251,7 +255,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        self._validate_params(self.embedding_parameters_type)
+        self._validate_params(X)
 
         if self.embedding_parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -309,11 +313,8 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
         """
 
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
-        if X.shape[0] < self.outer_window_duration:
-            raise ValueError('Not enough data to have a single outer window.')
 
         X_transformed = self._embed(X, self.outer_window_duration,
                                     self.outer_window_stride,
