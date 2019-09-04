@@ -55,21 +55,15 @@ def test_resampler_init():
     sampling_type = 'periodic'
     sampling_period = '2d'
     remove_weekends = False
+    sampling_times = [dt.time(0, 0, 0)]
     resampler = Resampler(sampling_type=sampling_type,
                           sampling_period=sampling_period,
-                          sampling_times=None,
+                          sampling_times=sampling_times,
                           remove_weekends=remove_weekends)
     assert resampler.get_params()['sampling_type'] == sampling_type
     assert resampler.get_params()['sampling_period'] == sampling_period
-    assert resampler.get_params()['sampling_times'] == [dt.time(0, 0, 0)]
+    assert resampler.get_params()['sampling_times'] == sampling_times
     assert resampler.get_params()['remove_weekends'] == remove_weekends
-
-    resampler = Resampler(sampling_type=sampling_type,
-                          sampling_period=sampling_period,
-                          sampling_times=[dt.time(0, 0, 0)],
-                          remove_weekends=remove_weekends)
-
-    assert resampler.get_params()['sampling_times'] == [dt.time(0, 0, 0)]
 
 
 def test_resampler_not_fitted(resampler):
