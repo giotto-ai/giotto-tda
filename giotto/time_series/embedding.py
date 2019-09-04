@@ -95,7 +95,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from giotto.time_series import TakensEmbedder
-    >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
     ...     for x in range(0,1000)])
@@ -111,12 +110,12 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> # Fit and transform the DataFrame
     >>> embedder.fit(signal_noise)
     >>> embedded_noise = embedder.transform(signal_noise)
-    >>> print('Optimal embedding time delay based on mutual information: ',
+    >>> print('Optimal embedding time delay based on mutual information:',
     ...       embedder.embedding_time_delay_)
-    Optimal embedding time delay based on mutual information:  1
-    >>> print('Optimal embedding dimension based on false nearest neighbors: ',
+    Optimal embedding time delay based on mutual information: 1
+    >>> print('Optimal embedding dimension based on false nearest neighbors:',
     ...       embedder.embedding_dimension_)
-    Optimal embedding dimension based on false nearest neighbors:  3
+    Optimal embedding dimension based on false nearest neighbors: 3
 
     """
 
