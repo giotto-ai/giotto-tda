@@ -36,3 +36,12 @@ doc/generated
 build
 giotto/external/bindings/hera_wasserstein.cpp
 giotto/external/bindings/*.so
+.DS_Store
+.idea/codeStyles/codeStyleConfig.xml
+.idea/giotto.iml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+Tests_Umberto/MDS_tests.ipynb
+Tests_Umberto/.ipynb_checkpoints/MDS_tests-checkpoint.ipynb
