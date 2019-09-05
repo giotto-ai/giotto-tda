@@ -630,7 +630,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #define __PYX_HAVE__giotto__external__bindings__hera_wasserstein
 #define __PYX_HAVE_API__giotto__external__bindings__hera_wasserstein
 /* Early includes */
-#include <ios>
+#include "ios"
 #include "new"
 #include "stdexcept"
 #include "typeinfo"
