@@ -43,3 +43,5 @@ giotto/external/bindings/*.so
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+Tests_Umberto/MDS_tests.ipynb
+Tests_Umberto/.ipynb_checkpoints/MDS_tests-checkpoint.ipynb
