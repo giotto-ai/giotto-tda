@@ -1,11 +1,11 @@
 """Testing for TransitionGraph"""
 
 import pytest
-
 import numpy as np
-from scipy.sparse import csr_matrix, SparseEfficiencyWarning
+
+from scipy.sparse import csr_matrix
 from sklearn.exceptions import NotFittedError
-from sklearn.utils.testing import assert_raise_message, ignore_warnings
+from sklearn.utils.testing import assert_raise_message
 
 from giotto.graphs import TransitionGraph
 
@@ -45,13 +45,11 @@ def test_transition_graph_not_fitted(transition_graph):
                          transition_graph.transform, X_tg)
 
 
-@ignore_warnings(category=SparseEfficiencyWarning)
 def test_transition_graph_transform(transition_graph):
     assert (transition_graph.fit_transform(X_tg)[0] != X_tg_res[0]).nnz == 0
     assert (transition_graph.fit_transform(X_tg)[1] != X_tg_res[1]).nnz == 0
 
 
-@ignore_warnings(category=SparseEfficiencyWarning)
 def test_parallel_transition_graph_transform(transition_graph,
                                              transition_graph_parallel):
     for i in range(len(X_tg)):

@@ -3,8 +3,12 @@
 #          Philippe Nguyen <p.nguyen@l2f.ch>
 # License: TBD
 
+import warnings
 import numpy as np
+
 from functools import partial
+
+from scipy.sparse import SparseEfficiencyWarning
 from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils._joblib import Parallel, delayed
@@ -78,14 +82,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     >>> kng = KNeighborsGraph(n_neighbors=2)
     >>> kng = kng.fit(X)
     >>> print(kng.transform(X)[0].toarray())
-    [[0. 1. 1.]
-     [1. 0. 1.]
-     [1. 1. 0.]]
-    >>> print(kng.transform(X)[1].toarray())
-    [[0. 1. 1. 0.]
-     [1. 0. 1. 1.]
-     [1. 1. 0. 1.]
-     [0. 1. 1. 0.]]
+    [[0. 1. 1. 1. 1.]
+     [1. 0. 0. 1. 0.]
+     [1. 0. 0. 0. 1.]
+     [1. 1. 0. 0. 1.]
+     [1. 0. 1. 1. 0.]]
 
     """
 
@@ -131,7 +132,10 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     def _make_adjacency_matrix(self, X):
         A = self._nearest_neighbors(X)
         rows, cols = A.nonzero()
-        A[cols, rows] = 1
+        # See issue #36
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', SparseEfficiencyWarning)
+            A[cols, rows] = 1
         return A
 
     def fit(self, X, y=None):
