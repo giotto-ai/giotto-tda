@@ -12,7 +12,7 @@ from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
 __all__ = [
     'DiagramStacker',
     'DiagramScaler',
-    'DiagramFilter'
+    'DiagramFilter',
     'DiagramDistance',
     'DiagramNorm'
 ]

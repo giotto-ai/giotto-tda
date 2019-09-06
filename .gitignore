@@ -45,3 +45,5 @@ giotto/external/bindings/*.so
 .idea/vcs.xml
 Tests_Umberto/MDS_tests.ipynb
 Tests_Umberto/.ipynb_checkpoints/MDS_tests-checkpoint.ipynb
+Tests_Umberto/H2_on_R2.ipynb
+Tests_Umberto/FeatureAgg test.ipynb
