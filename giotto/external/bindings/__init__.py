@@ -1,5 +1,6 @@
 import pyximport
-pyximport.install()
+
+pyximport.install(language_level=3)
 
 try:
     from .hera_wasserstein import wasserstein
