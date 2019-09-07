@@ -123,6 +123,7 @@ Welcome to giotto's API reference!
    diagram.DiagramFilter
 
    diagram.DiagramDistance
+   diagram.DiagramNorm
 
 :mod:`giotto.manifold`: Manifold learning
 =========================================
