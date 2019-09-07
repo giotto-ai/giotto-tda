@@ -1,4 +1,4 @@
-"""The :mod:`giotto.preprocessing` module implements preprocessing techniques
+"""The module :mod:`giotto.time_series` implements preprocessing techniques
    useful to apply Topological Data Analysis techniques to time series.
 """
 
