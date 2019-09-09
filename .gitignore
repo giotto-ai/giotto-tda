@@ -36,3 +36,5 @@ doc/generated
 build
 giotto/external/bindings/hera_wasserstein.cpp
 giotto/external/bindings/*.so
+.DS_Store
+.idea/*
