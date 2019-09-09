@@ -88,22 +88,6 @@ class Test_DiagramDistance:
                             "integer." % type(dd.metric_params['delta']),
                             dd.fit, X)
 
-    # Test for the wrong n_jobs value
-    def test_n_jobs_V(self):
-        X ={
-            0: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]]),
-            2: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]]),
-            3: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]])
-            }
-        dd = distance.DiagramDistance('bottleneck',
-                                      metric_params={'n_samples': 200,
-                                                     'delta': 0.0},
-                                      n_jobs=-3)
-        skt.assert_raise_message(ValueError, "n_jobs has the wrong value: {}."
-                             " n_jobs must be equal to 'None' "
-                             "or -1, or it must be an integer greater "
-                             "than 0".format(dd.n_jobs), dd.fit, X)
-
 # Testing inputs
     # Test for the wrong array key value
     def test_inputs_keys_V(self):
@@ -181,32 +165,15 @@ class Test_DiagramDistance:
         X ={
             0: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]]),
             1: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]]),
-            3: np.array([[[1,1],[2,2],[3,-1]],[[4,4],[5,5],[6,6]]]) # Wrong array element value
+            3: np.array([[[1,1],[2,2],['b',3]],[[4,4],[5,5],[6,6]]]) # Wrong array element value
             }
         dd = distance.DiagramDistance('bottleneck',
                                       metric_params={'n_samples': 200,
                                                      'delta': 0.0},
                                       n_jobs=None)
-        skt.assert_raise_message(ValueError, "Coordinates must be "
-                                 "non-negative integers "
-                                 "and the 2nd must be greater than or equal "
-                                 "to the 1st one.", dd.fit, X)
-
-    # Test for the wrong type of the 3rd array dimension
-    def test_inputs_dim3_coord_T(self):
-        X ={
-            0: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]]),
-            1: np.array([[[1,1],[2,2],[3,3]],[[4,4],[5,5],[6,6]]]),
-            3: np.array([[[1,1],[2,2],[3,'a']],[[4,4],[5,5],[6,6]]]) # Wrong dimension type
-            }
-        dd = distance.DiagramDistance('bottleneck',
-                                      metric_params={'n_samples': 200,
-                                                     'delta': 0.0},
-                                      n_jobs=None)
-        skt.assert_raise_message(TypeError, "Coordinates must be "
-                                 "non-negative integers "
-                                 "and the 2nd must be greater than or equal "
-                                 "to the 1st one.", dd.fit, X)
+        skt.assert_raise_message(ValueError, "They must be "
+                             "integers and the 2nd must be greater than "
+                             "or equal to the 1st one.", dd.fit, X)
 
 # Test no exception is raised with correct values of parameters and inputs
     def test_DiagramDistance_ENR(self):

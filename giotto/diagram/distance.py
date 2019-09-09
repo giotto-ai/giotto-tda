@@ -10,6 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
 import itertools
 import numbers
+from giotto.utils.validation import check_diagram
 
 from ._metrics import _parallel_pairwise, _parallel_norm
 from ._utils import _sample, _pad
@@ -82,45 +83,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         """
         return {'metric': self.metric, 'metric_params': self.metric_params,
                 'n_jobs': self.n_jobs}
-    
-    def _structure_control(self, X, z, _n_outer_window):
-        if isinstance(z, numbers.Number):
-            if (z < 0):
-                raise ValueError("X key has the wrong value: {}. "
-                                "X keys must be non-negative "
-                                "integers.".format(z))
-        else:
-            raise TypeError("X key has the wrong type: %s. "
-                            "X keys must be non-negative "
-                            "integers." % type(z))
-        if (_n_outer_window != X[z].shape[0]):
-            raise ValueError("Diagram first dimension has the wrong value: {}."
-                             " Diagram first dimension must be equal "
-                             "for all subarrays.".format(X[z].shape[0]))
-        if (len(X[z].shape) != 3):
-            raise ValueError("Diagram structure dimension error: {}. "
-                             "Diagram structure dimension must be equal "
-                             "to 3.".format(len(X[z].shape)))
-        if (X[z].shape[2] != 2):
-            raise ValueError("Wrong dimension for persistent "
-                             "diagram coordinates: {}. "
-                             "Diagram coordinates dimension must be equal "
-                             "to 2.".format(X[z].shape[2]))
-
-    def _coordinates_control(self, X, z, i, j, w):
-        if (isinstance(X[z][i][j][w], numbers.Number)
-                and isinstance(X[z][i][j][w], numbers.Number)):
-            if (X[z][i][j][w] > X[z][i][j][w]
-                    or X[z][i][j][w] < 0 or X[z][i][j][w] < 0):
-                raise ValueError("Coordinates have the wrong value: {} . "
-                                 "Coordinates must be non-negative integers "
-                                 "and the 2nd must be greater than or equal "
-                                 "to the 1st one.".format(X[z][i][j][w]))
-        else:
-            raise TypeError("Coordinates have the wrong type: %s. "
-                            "Coordinates must be non-negative integers "
-                            "and the 2nd must be greater than or equal "
-                            "to the 1st one." % type(X[z][i][j][w]))
 
     def _validate_params(self):
         if (self.metric != 'bottleneck' and self.metric != 'wasserstein' and
@@ -145,13 +107,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             raise ValueError("delta has the wrong value: {}."
                              "delta must be a non-negative " 
                              "integer.".format(self.metric_params['delta']))
-        if (type(self.n_jobs) is not int and self.n_jobs is not None or
-                (self.n_jobs is not None and (self.n_jobs < -1 or 
-                                              self.n_jobs == 0))):
-            raise ValueError("n_jobs has the wrong value: {}. "
-                             "n_jobs must be equal to 'None' "
-                             "or -1, or it must be an integer greater "
-                             "than 0.".format(self.n_jobs))
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -176,12 +131,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         """
         # Check class parameters
         self._validate_params()
-        # List comprehensions to control input parameters
-        _n_outer_window = list(X.values())[0].shape[0]
-        [self._structure_control(X, z, _n_outer_window) for z in X.keys()]
-        [self._coordinates_control(X, z, i, j, w) for z in X.keys()
-         for i in range(0, X[z].shape[0]) for j in range(0, X[z][i].shape[0])
-         for w in range(0, X[z][i][j].shape[0])]
+        # Check function to control input parameters
+        check_diagram(X)
         # if everything is fine, fit can be performed
         if 'n_samples' in self.metric_params:
             self._n_samples = self.metric_params['n_samples']
