@@ -456,7 +456,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Filters all relevant persistence (sub)diagrams, and returns them.
+        r"""Filters all relevant persistence (sub)diagrams, and returns them.
 
         Parameters
         ----------
