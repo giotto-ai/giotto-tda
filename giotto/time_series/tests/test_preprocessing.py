@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 
+from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
 
@@ -90,9 +91,9 @@ def test_resampler_not_valid():
 def test_resampler_transform(fixed_resampler, remove_weekends, expected):
     resampler = Resampler(sampling_type='periodic', sampling_period='2d',
                           sampling_times=None, remove_weekends=remove_weekends)
-    assert resampler.fit_transform(signal_df).all() == expected.all()
-    assert fixed_resampler.fit_transform(
-        signal_df).all() == signal_resampled.all()
+    assert_almost_equal(resampler.fit_transform(signal_df), expected)
+    assert_almost_equal(fixed_resampler.fit_transform(signal_df),
+                        signal_resampled)
 
 
 signal = signal_array.reshape(-1, 1)
@@ -172,4 +173,4 @@ def test_stationarizer_not_valid():
                           ('log-return', signal_stationarized_log_return)])
 def test_stationarizer_transform(stationarization_type, expected):
     stationarizer = Stationarizer(stationarization_type=stationarization_type)
-    assert stationarizer.fit_transform(signal).all() == expected.all()
+    assert_almost_equal(stationarizer.fit_transform(signal), expected)

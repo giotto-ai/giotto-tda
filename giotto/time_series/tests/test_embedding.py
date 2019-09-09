@@ -2,6 +2,7 @@
 
 import pytest
 import numpy as np
+from numpy.testing import assert_almost_equal
 
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
@@ -106,4 +107,4 @@ def test_embedder_not_fitted(embedder):
 def test_embedder_transform(embedding_parameters_type, expected):
     embedder = TakensEmbedder(
         embedding_parameters_type=embedding_parameters_type)
-    assert embedder.fit_transform(signal).all() == expected.all()
+    assert_almost_equal(embedder.fit_transform(signal), expected)
