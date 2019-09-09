@@ -221,7 +221,7 @@ class PipelinePlus(Pipeline):
         if (isinstance(self._final_estimator, TargetResamplingClassifier)
            or isinstance(self._final_estimator, TargetResamplingRegressor)) \
            and store_y_resampled:
-            predict_params[self.steps[-1][0] + '__store_y_resampled'] = True
+            predict_params['store_y_resampled'] = True
         return super(PipelinePlus, self).predict(X, y=y, **predict_params)
 
     def get_y_resampled(self):
