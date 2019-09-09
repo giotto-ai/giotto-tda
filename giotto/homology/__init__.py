@@ -1,4 +1,4 @@
-"""The :mod:`giotto.homology` module implements transformers
+"""The module :mod:`giotto.homology` implements transformers
 to generate features from persistent homology.
 """
 

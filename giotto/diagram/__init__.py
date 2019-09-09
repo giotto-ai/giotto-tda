@@ -1,4 +1,4 @@
-"""The :mod:`giotto.diagram` module implements persistence diagrams
+"""The module :mod:`giotto.diagram` implements persistence diagrams
 transformers.
 It offers the possibility to stack across homology dimensions,
 scale, and filter diagrams.
@@ -12,7 +12,7 @@ from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
 __all__ = [
     'DiagramStacker',
     'DiagramScaler',
-    'DiagramFilter'
+    'DiagramFilter',
     'DiagramDistance',
     'DiagramNorm'
 ]

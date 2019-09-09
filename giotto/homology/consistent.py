@@ -3,15 +3,13 @@
 # License: TBD
 
 import numpy as np
-import sklearn as sk
-from numpy.random.mtrand import RandomState
+import math as m
+import itertools
 
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils._joblib import Parallel, delayed
-import math as m
-import itertools
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
@@ -29,18 +27,18 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     ----------
     metric : string or callable, optional, default: 'euclidean'
         If set to ``'precomputed'``, each entry in X along axis 0 is
-        interpreted to be a distance matrix. Otherwise, entries are interpreted
-        as feature arrays, and ``metric`` determines a rule with which to
-        calculate distances between pairs of instances (i.e. rows) in these
-        arrays.
+        interpreted to be a distance matrix. Otherwise, entries are
+        interpreted as feature arrays, and ``metric`` determines a rule with
+        which to calculate distances between pairs of instances (i.e. rows)
+        in these arrays.
         If ``metric`` is a string, it must be one of the options allowed by
         scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
-        "manhattan", or "cosine"
+        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including
+        "euclidean", "manhattan" or "cosine".
         If ``metric`` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value indicating
-        the distance between them.
+        two arrays from the entry in X as input, and return a value
+        indicating the distance between them.
 
     metric_params : dict, optional, default: {}
         Additional keyword arguments for the metric function.
@@ -50,11 +48,23 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         according to the consistent rescaling procedure.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from giotto.homology import ConsistentRescaling
+    >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
+    >>> cr = ConsistentRescaling()
+    >>> cr.fit(X)
+    >>> X_rescaled = cr.transform(X)
+    >>> print(X_rescaled.shape)
+    (1, 3, 3)
 
     """
+
     def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1,
                  n_jobs=None):
         self.metric = metric
@@ -81,8 +91,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _validate_params():
-        """A class method that checks whether the hyperparameters and the input
-        parameters of the :meth:`fit` are valid.
+        """A class method that checks whether the hyperparameters and the
+        input parameters of the :meth:`fit` are valid.
 
         """
         pass
@@ -152,11 +162,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Returns
         -------
         X_transformed : ndarray, shape (n_samples, n_points, n_points)
-            Array containing (as entries along axis 0) the distance
-            matrices after consistent rescaling.
+            Array containing (as entries along axis 0) the distance matrices
+            after consistent rescaling.
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['is_fitted'])
 
         X_transformed = Parallel(n_jobs=self.n_jobs)(

@@ -1,8 +1,12 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 #          Umberto Lupo <u.lupo@l2f.ch>
+#          Philippe Nguyen <p.nguyen@l2f.ch>
 # License: TBD
 
+import warnings
 import numpy as np
+
+from scipy.sparse import SparseEfficiencyWarning
 from sklearn.utils._joblib import Parallel, delayed
 from scipy import sparse as sp
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -78,7 +82,10 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         A = sp.csr_matrix((np.full(n_indices, 1),
                            (np.concatenate([first, second]),
                             np.concatenate([second, first]))))
-        sp.csr_matrix.setdiag(A, 0)
+        # See issue #36
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', SparseEfficiencyWarning)
+            sp.csr_matrix.setdiag(A, 0)
         return A
 
     def fit(self, X, y=None):
