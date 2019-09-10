@@ -65,10 +65,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, metric='euclidean', metric_params=None, n_neighbor=1,
+    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1,
                  n_jobs=None):
-        if metric_params is None:
-            metric_params = {}
         self.metric = metric
         self.metric_params = metric_params
         self.n_neighbor = n_neighbor
