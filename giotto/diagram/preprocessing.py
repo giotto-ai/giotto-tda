@@ -164,10 +164,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, metric='bottleneck',
-                 metric_params=None,
+                 metric_params={'order': np.inf, 'n_samples': 200},
                  function=np.max, n_jobs=None):
-        if metric_params is None:
-            metric_params = {'order': np.inf, 'n_samples': 200}
         self.metric = metric
         self.metric_params = metric_params
         self.function = function
