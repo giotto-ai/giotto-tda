@@ -215,10 +215,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, max_edge_length=np.inf, homology_dimensions=None,
+    def __init__(self, max_edge_length=np.inf, homology_dimensions=[0, 1],
                  n_jobs=None):
-        if homology_dimensions is None:
-            homology_dimensions = [0, 1]
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
         self.n_jobs = n_jobs
