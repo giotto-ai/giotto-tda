@@ -59,33 +59,22 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
            ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
 
+    order : int, optional, default: 2
+        Order of the norm used to combine subdiagrams distances into a single
+        distance
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     """
-    def __init__(self, metric='bottleneck',
-                 metric_params=None, n_jobs=None):
+    def __init__(self, metric='bottleneck', metric_params=None, order=2,
+                 n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
+        self.order = order
         self.n_jobs = n_jobs
-
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-        """
-        return {'metric': self.metric, 'metric_params': self.metric_params,
-                'n_jobs': self.n_jobs}
 
     def _validate_params(self):
         if (self.metric != 'bottleneck' and self.metric != 'wasserstein' and
@@ -183,7 +172,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             iterator = list(itertools.combinations(range(n_diagrams_X), 2))
             X_transformed = _parallel_pairwise(X, X, self.metric,
                                                self.effective_metric_params_,
-                                               iterator, self.n_jobs)
+                                               iterator, self.order, self.n_jobs)
             X_transformed = X_transformed + X_transformed.T
         else:
             max_betti_numbers = {
@@ -201,7 +190,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
                                                range(n_diagrams_X)))
             X_transformed = _parallel_pairwise(Y, X, self.metric,
                                                self.effective_metric_params_,
-                                               iterator, self.n_jobs)
+                                               iterator, self.order, self.n_jobs)
 
         return X_transformed
 
