@@ -51,22 +51,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-
-        """
-        return {'n_jobs': self.n_jobs}
-
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the

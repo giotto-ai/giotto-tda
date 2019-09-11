@@ -63,23 +63,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self.homology_dimensions = homology_dimensions
         self.n_jobs = n_jobs
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-        """
-        return {'metric': self.metric, 'max_edge_length': self.max_edge_length,
-                'homology_dimensions': self.homology_dimensions,
-                'n_jobs': self.n_jobs}
-
     @staticmethod
     def _validate_params(metric):
         """A class method that checks whether the hyperparameters and the input
@@ -221,22 +204,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self.homology_dimensions = homology_dimensions
         self.n_jobs = n_jobs
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-        """
-        return {'max_edge_length': self.max_edge_length, 'homology_dimensions': self.homology_dimensions,
-                'n_jobs': self.n_jobs}
-
     @staticmethod
     def _validate_params(homology_dimensions, n_dimensions):
         """A class method that checks whether the hyperparameters and the input parameters
@@ -353,21 +320,6 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
     def __init__(self, len_vector=8, n_jobs=None):
         self.len_vector = len_vector
         self.n_jobs = n_jobs
-
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-        """
-        return {'len_vector': self.len_vector, 'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params():

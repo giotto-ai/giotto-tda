@@ -71,25 +71,6 @@ class Resampler(BaseEstimator, TransformerMixin):
         self.sampling_times = sampling_times
         self.remove_weekends = remove_weekends
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-
-        """
-        return {'sampling_type': self.sampling_type,
-                'sampling_period': self.sampling_period,
-                'sampling_times': self.sampling_times,
-                'remove_weekends': self.remove_weekends}
-
     @staticmethod
     def _validate_params(sampling_type):
         """A class method that checks whether the hyperparameters and the
@@ -199,21 +180,6 @@ class Stationarizer(BaseEstimator, TransformerMixin):
 
     def __init__(self, stationarization_type='return'):
         self.stationarization_type = stationarization_type
-
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-        """
-        return {'stationarization_type': self.stationarization_type}
 
     @staticmethod
     def _validate_params(stationarization_type):

@@ -131,27 +131,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self.embedding_stride = embedding_stride
         self.n_jobs = n_jobs
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-        """
-        return {'outer_window_duration': self.outer_window_duration,
-                'outer_window_stride': self.outer_window_stride,
-                'embedding_parameters_type': self.embedding_parameters_type,
-                'embedding_time_delay': self.embedding_time_delay,
-                'embedding_dimension': self.embedding_dimension,
-                'embedding_stride': self.embedding_stride,
-                'n_jobs': self.n_jobs}
-
     def _validate_params(self, X):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.

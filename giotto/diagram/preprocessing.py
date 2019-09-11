@@ -28,22 +28,6 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
     def __init__(self):
         pass
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-
-        """
-        return {}
-
     @staticmethod
     def _validate_params():
         """A class method that checks whether the hyperparameters and the
@@ -179,23 +163,6 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self.metric_params = metric_params
         self.function = function
         self.n_jobs = n_jobs
-
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-
-        """
-        return {'metric': self.metric, 'metric_params': self.metric_params,
-                'function': self.function, 'n_jobs': self.n_jobs}
 
     def fit(self, X, y=None):
         """Fits the transformer by finding the scale factor according to the
@@ -358,30 +325,6 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         self.tolerance = tolerance
         self.max_iteration = max_iteration
         self.n_jobs = n_jobs
-
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional, default: True
-            Behaviour not yet implemented.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-
-        """
-        return {'homology_dimensions': self.homology_dimensions,
-                'filtering_parameters_type': self.filtering_parameters_type,
-                'delta': self.delta,
-                'metric': self.metric,
-                'metric_params': self.metric_params,
-                'epsilon': self.epsilon,
-                'tolerance': self.tolerance,
-                'max_iteration': self.max_iteration,
-                'n_jobs': self.n_jobs}
 
     @staticmethod
     def _validate_params(filtering_parameters_type):
