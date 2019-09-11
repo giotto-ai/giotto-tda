@@ -91,6 +91,7 @@ def _sample(X, n_samples):
         dimension: (maximum_persistences[dimension] -
                     minimum_persistences[dimension]) / n_samples
         for dimension in X.keys()}
+
     sampling = {
         dimension: np.arange(minimum_persistences[dimension],
                              maximum_persistences[dimension],
