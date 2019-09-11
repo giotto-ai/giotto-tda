@@ -6,6 +6,7 @@
 import numpy as np
 import math as m
 from sklearn.utils._joblib import Parallel, delayed
+from scipy.ndimage import gaussian_filter
 
 from gudhi import bottleneck_distance as gudhi_bottleneck_distance
 from ..external.bindings import wasserstein as hera_wasserstein_distance
@@ -20,7 +21,6 @@ def betti_function(diagram, sampling):
     alive = np.logical_and(born, not_dead)
     betti = np.sum(alive, axis=1).T
     return betti
-
 
 def landscape_function(diagram, n_layers, sampling):
     if diagram.size == 0:
@@ -42,6 +42,19 @@ def landscape_function(diagram, n_layers, sampling):
         axis=0)[-n_layers:, :], axis=0)
     return landscape
 
+def heat_function(diagram, sigma, sampling):
+    heat = np.zeros((sampling.shape[0], sampling.shape[0]))
+
+    sample_step = sampling[1] - sampling[0]
+
+    sampled_diagram = np.array(diagram // sample_step, dtype=int)
+    for sampled_point in sampled_diagram[sampled_diagram[:, 1] != 0]:
+        heat[sampled_point[0], sampled_point[1]] += 1
+        heat[sampled_point[1], sampled_point[0]] -= 1
+
+    heat = gaussian_filter(heat, sigma, mode='reflect')
+    return heat
+
 
 def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
                               order=2, n_layers=1):
@@ -49,13 +62,17 @@ def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
     landscape_y = landscape_function(diagram_y, n_layers, sampling[dimension])
     return np.linalg.norm(landscape_x - landscape_y, ord=order)
 
-
 def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
                           order=2):
     betti_x = betti_function(diagram_x, sampling[dimension])
     betti_y = betti_function(diagram_y, sampling[dimension])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
+def kernel_heat_distance(diagram_x, diagram_y, dimension, sigma=1.,
+                         sampling=None, order=2):
+    heat_x = heat_function(diagram_x, sigma, sampling[dimension])
+    heat_y = heat_function(diagram_y, sigma, sampling[dimension])
+    return np.linalg.norm(heat_x - heat_y, ord=order)
 
 def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf,
                         delta=0.0):
@@ -69,7 +86,8 @@ def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
 implemented_metric_recipes = {'bottleneck': bottleneck_distance,
                               'wasserstein': wasserstein_distance,
                               'landscape': kernel_landscape_distance,
-                              'betti': kernel_betti_distance}
+                              'betti': kernel_betti_distance,
+                              'heat': kernel_heat_distance}
 
 
 def _parallel_pairwise(X, Y, metric, metric_params, iterator, n_jobs):
@@ -101,11 +119,14 @@ def kernel_betti_norm(diagram, dimension, sampling=None, order=2):
     betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
 
+def kernel_heat_norm(diagram, dimension, sampling=None, sigma=1.,
+                     order=2, n_layers=1):
+    heat = heat_function(diagram, sigma, sampling[dimension])
+    return np.linalg.norm(heat, ord=order)
 
 def bottleneck_norm(diagram, dimension=None, order=np.inf):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
-
 
 def wasserstein_norm(diagram, dimension=None, order=1):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
@@ -115,7 +136,8 @@ def wasserstein_norm(diagram, dimension=None, order=1):
 implemented_norm_recipes = {'bottleneck': bottleneck_norm,
                             'wasserstein': wasserstein_norm,
                             'landscape': kernel_landscape_norm,
-                            'betti': kernel_betti_norm}
+                            'betti': kernel_betti_norm,
+                            'heat': kernel_heat_norm}
 
 
 def _parallel_norm(X, metric, metric_params, n_jobs):
@@ -126,7 +148,5 @@ def _parallel_norm(X, metric, metric_params, n_jobs):
         X[dimension][i, :, :], dimension, **metric_params)
         for i in range(next(iter(X.values())).shape[0])
         for dimension in X.keys())
-    norm_array = np.linalg.norm(np.array(norm_array).
-                                reshape((-1, n_dimensions)),
-                                ord=metric_params['order'], axis=1)
+    norm_array = np.array(norm_array).reshape((-1, n_dimensions))
     return norm_array

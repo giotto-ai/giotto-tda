@@ -40,6 +40,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
            number of independent topological holes (technically, the number
            of linearly independent homology classes) as can be read from a
            persistence (sub)diagram.
+        - ``'heat'`` heat kernel
 
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
@@ -53,6 +54,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
           (default = ``1``).
         - If ``metric == 'betti'`` the available arguments are ``order``
            (default = ``2``) and ``n_samples`` (default = ``200``).
+        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
+           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -116,7 +119,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         self._X = X
 
-        if self.metric in ['landscape', 'betti']:
+        if self.metric in ['landscape', 'betti', 'heat']:
             self.metric_params['sampling'] = _sample(self._X, self._n_samples)
 
         self._is_fitted = True
@@ -207,6 +210,7 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
            curve simply records the evolution in the number of independent topological
            holes (technically, the number of linearly independent homology classes)
            as can be read from a persistence (sub)diagram.
+        - ``'heat'`` heat kernel
 
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
@@ -220,13 +224,15 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
           (default = ``1``).
         - If ``metric == 'betti'`` the available arguments are ``order`` (default = ``2``)
            and ``n_samples`` (default = ``200``).
+        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
+           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless in
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params={'n_samples': 200, 'delta': 0.0}, n_jobs=None):
+    def __init__(self, metric='bottleneck', metric_params={'order': np.inf}, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.n_jobs = n_jobs
@@ -277,7 +283,7 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
         else:
             self._n_samples = None
 
-        if self.metric in ['landscape', 'betti']:
+        if self.metric in ['landscape', 'betti', 'heat']:
             self.metric_params['sampling'] = _sample(X, self._n_samples)
 
         self._is_fitted = True
@@ -312,6 +318,6 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
         if 'n_samples' in metric_params:
             metric_params.pop('n_samples')
 
-        X_transformed = _parallel_norm(X, self.metric, metric_params, self.n_jobs).reshape((-1, 1))
+        X_transformed = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
 
         return X_transformed
