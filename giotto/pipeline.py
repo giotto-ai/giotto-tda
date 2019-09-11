@@ -217,6 +217,13 @@ class PipelinePlus(Pipeline):
             fit_params[self.steps[-1][0] + '__store_y_resampled'] = True
         return super(PipelinePlus, self).fit_predict(X, y=y, **fit_params)
 
+    def predict(self, X, y=None, store_y_resampled=False, **predict_params):
+        if (isinstance(self._final_estimator, TargetResamplingClassifier)
+           or isinstance(self._final_estimator, TargetResamplingRegressor)) \
+           and store_y_resampled:
+            predict_params['store_y_resampled'] = True
+        return super(PipelinePlus, self).predict(X, y=y, **predict_params)
+
     def get_y_resampled(self):
         check_is_fitted(self._final_estimator, '_is_fitted')
         if (isinstance(self._final_estimator, TargetResamplingClassifier)

@@ -1,6 +1,5 @@
 import pyximport
 pyximport.install(language_level=3)
-from distutils.errors import CompileError
 
 try:
     from .hera_wasserstein import wasserstein
