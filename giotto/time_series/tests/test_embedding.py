@@ -2,10 +2,9 @@
 
 import pytest
 import numpy as np
-from numpy.testing import assert_almost_equal
 
+from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
-from sklearn.utils.testing import assert_raise_message
 
 from giotto.time_series import TakensEmbedder
 
@@ -50,55 +49,26 @@ signal_embedded_fixed = \
                [2.93799998, 2.98935825, 2.79848711, 2.41211849, 1.92484888]]])
 
 
-@pytest.fixture
-def embedder():
-    return TakensEmbedder()
-
-
-def test_embedder_init():
-    outer_window_duration = 40
-    outer_window_stride = 4
-    embedding_parameters_type = 'fixed'
-    embedding_dimension = 4
-    embedding_time_delay = 2
-    n_jobs = 2
-    embedder = TakensEmbedder(
-        outer_window_duration=outer_window_duration,
-        outer_window_stride=outer_window_stride,
-        embedding_parameters_type=embedding_parameters_type,
-        embedding_dimension=embedding_dimension,
-        embedding_time_delay=embedding_time_delay,
-        n_jobs=n_jobs)
-    assert embedder.get_params()[
-               'outer_window_duration'] == outer_window_duration
-    assert embedder.get_params()['outer_window_stride'] == outer_window_stride
-    assert embedder.get_params()[
-               'embedding_parameters_type'] == embedding_parameters_type
-    assert embedder.get_params()['embedding_dimension'] == embedding_dimension
-    assert embedder.get_params()[
-               'embedding_time_delay'] == embedding_time_delay
-    assert embedder.get_params()['n_jobs'] == n_jobs
-
-
 def test_embedder_params():
     embedding_parameters_type = 'not_defined'
     embedder = TakensEmbedder(
         embedding_parameters_type=embedding_parameters_type)
     msg = 'The embedding parameters type %s is not supported'
-    assert_raise_message(ValueError, msg % embedding_parameters_type,
-                         embedder.fit, signal)
+    with pytest.raises(ValueError, match=msg % embedding_parameters_type):
+        embedder.fit(signal)
 
     embedder = TakensEmbedder(outer_window_duration=signal.shape[0] + 1)
     msg = 'Not enough data to have a single outer window.'
-    assert_raise_message(ValueError, msg, embedder.fit, signal)
+
+    with pytest.raises(ValueError, match=msg):
+        embedder.fit(signal)
 
 
-def test_embedder_not_fitted(embedder):
-    msg = ("This %s instance is not fitted yet. Call \'fit\'"
-           " with appropriate arguments before using this method.")
+def test_embedder_not_fitted():
+    embedder = TakensEmbedder()
 
-    assert_raise_message(NotFittedError, msg % 'TakensEmbedder',
-                         embedder.transform, signal)
+    with pytest.raises(NotFittedError):
+        embedder.transform(signal)
 
 
 @pytest.mark.parametrize("embedding_parameters_type, expected",
@@ -107,4 +77,5 @@ def test_embedder_not_fitted(embedder):
 def test_embedder_transform(embedding_parameters_type, expected):
     embedder = TakensEmbedder(
         embedding_parameters_type=embedding_parameters_type)
+
     assert_almost_equal(embedder.fit_transform(signal), expected)
