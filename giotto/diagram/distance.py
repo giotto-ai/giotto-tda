@@ -9,6 +9,8 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
 import itertools
+import numbers
+from giotto.utils.validation import check_diagram
 
 from ._metrics import _parallel_pairwise, _parallel_norm
 from ._utils import _sample, _pad
@@ -82,9 +84,29 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return {'metric': self.metric, 'metric_params': self.metric_params,
                 'n_jobs': self.n_jobs}
 
-    @staticmethod
-    def _validate_params():
-        pass
+    def _validate_params(self):
+        if (self.metric != 'bottleneck' and self.metric != 'wasserstein' and
+                self.metric != 'landscape' and self.metric != 'betti'):
+            raise ValueError("metric parameter has the wrong value: {}."
+                             " Available values are: 'bottleneck',"
+                             " 'wasserstein', 'landscape',"
+                             " 'betti'.".format(self.metric))
+        if (type(self.metric_params['n_samples']) is not int):
+            raise TypeError("n_samples has the wrong type: %s. "
+                            "n_sample must be an integer greater "
+                            "than 0." % type(self.metric_params['n_samples']))
+        if (self.metric_params['n_samples'] <= 0):
+            raise ValueError("n_samples has the wrong value: {}. "
+                             "n_sample must be an integer greater "
+                             "than 0.".format(self.metric_params['n_samples']))
+        if not (isinstance(self.metric_params['delta'], numbers.Number)):
+            raise TypeError("delta has the wrong type: %s."
+                            "delta must be a non-negative " 
+                            "integer." % type(self.metric_params['delta']))
+        if (self.metric_params['delta'] < 0):
+            raise ValueError("delta has the wrong value: {}."
+                             "delta must be a non-negative " 
+                             "integer.".format(self.metric_params['delta']))
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -107,8 +129,11 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
+        # Check class parameters
         self._validate_params()
-
+        # Check function to control input parameters
+        check_diagram(X)
+        # if everything is fine, fit can be performed
         if 'n_samples' in self.metric_params:
             self._n_samples = self.metric_params['n_samples']
         else:
