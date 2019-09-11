@@ -42,7 +42,9 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
            number of independent topological holes (technically, the number
            of linearly independent homology classes) as can be read from a
            persistence (sub)diagram.
-        - ``'heat'`` heat kernel
+        - ``'heat'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "Heat kernels"obtained from persistence
+           (sub)diagrams.
 
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
@@ -122,7 +124,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         """
         self._validate_params()
-        check_diagram(X)
+        X = check_diagram(X)
 
         if self.metric_params is None:
             self.effective_metric_params_ = {}
@@ -159,7 +161,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Distance matrix between diagrams in X.
 
         """
-        check_diagram(X)
+        X = check_diagram(X)
         check_is_fitted(self, '_X')
 
         n_diagrams_X = next(iter(X.values())).shape[0]

@@ -29,10 +29,11 @@ def check_diagram(X):
                              "diagram coordinates: {}. "
                              "Diagram coordinates dimension must be equal "
                              "to 2.".format(X[z].shape[2]))
-        _diff_coord = (X[z].shape[0]*X[z].shape[1] - 
+        _diff_coord = (X[z].shape[0]*X[z].shape[1] -
                       np.sum(X[z][:, :, 1] >= X[z][:, :, 0]))
         if (_diff_coord > 0):
             raise ValueError("Coordinates have the wrong value: {} of "
                              "them are wrong. They must be "
                              "integers and the 2nd must be greater than "
                              "or equal to the 1st one.".format(_diff_coord))
+    return X
