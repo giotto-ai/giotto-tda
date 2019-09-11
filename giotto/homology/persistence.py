@@ -452,5 +452,4 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
                                                      for dimension in X.keys() for i in range(n_slices))
 
         X_transformed = np.hstack([np.concatenate([X_transformed[i * n_slices + j] for j in range(n_slices)], axis=0) for i in range(n_dimensions)])
-
         return X_transformed
