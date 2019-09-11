@@ -66,7 +66,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     """
     def __init__(self, metric='bottleneck',
-                 metric_params={'n_samples': 200, 'delta': 0.0}, n_jobs=None):
+                 metric_params=None, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.n_jobs = n_jobs
@@ -94,22 +94,22 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
                              " Available values are: 'bottleneck',"
                              " 'wasserstein', 'landscape',"
                              " 'betti'.".format(self.metric))
-        if (type(self.metric_params['n_samples']) is not int):
-            raise TypeError("n_samples has the wrong type: %s. "
-                            "n_sample must be an integer greater "
-                            "than 0." % type(self.metric_params['n_samples']))
-        if (self.metric_params['n_samples'] <= 0):
-            raise ValueError("n_samples has the wrong value: {}. "
-                             "n_sample must be an integer greater "
-                             "than 0.".format(self.metric_params['n_samples']))
-        if not (isinstance(self.metric_params['delta'], numbers.Number)):
-            raise TypeError("delta has the wrong type: %s."
-                            "delta must be a non-negative " 
-                            "integer." % type(self.metric_params['delta']))
-        if (self.metric_params['delta'] < 0):
-            raise ValueError("delta has the wrong value: {}."
-                             "delta must be a non-negative " 
-                             "integer.".format(self.metric_params['delta']))
+        # if (type(self.metric_params['n_samples']) is not int):
+        #     raise TypeError("n_samples has the wrong type: %s. "
+        #                     "n_sample must be an integer greater "
+        #                     "than 0." % type(self.metric_params['n_samples']))
+        # if (self.metric_params['n_samples'] <= 0):
+        #     raise ValueError("n_samples has the wrong value: {}. "
+        #                      "n_sample must be an integer greater "
+        #                      "than 0.".format(self.metric_params['n_samples']))
+        # if not (isinstance(self.metric_params['delta'], numbers.Number)):
+        #     raise TypeError("delta has the wrong type: %s."
+        #                     "delta must be a non-negative "
+        #                     "integer." % type(self.metric_params['delta']))
+        # if (self.metric_params['delta'] < 0):
+        #     raise ValueError("delta has the wrong value: {}."
+        #                      "delta must be a non-negative "
+        #                      "integer.".format(self.metric_params['delta']))
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -132,22 +132,20 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        # Check class parameters
         self._validate_params()
-        # Check function to control input parameters
         check_diagram(X)
-        # if everything is fine, fit can be performed
-        if 'n_samples' in self.metric_params:
-            self._n_samples = self.metric_params['n_samples']
+
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
         else:
-            self._n_samples = None
+            self.effective_metric_params_ = self.metric_params.copy()
+
+        if self.metric in ['landscape', 'betti', 'heat']:
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])
 
         self._X = X
 
-        if self.metric in ['landscape', 'betti', 'heat']:
-            self.metric_params['sampling'] = _sample(self._X, self._n_samples)
-
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -172,13 +170,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Distance matrix between diagrams in X.
 
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_diagram(X)
+        check_is_fitted(self, '_X')
+
         n_diagrams_X = next(iter(X.values())).shape[0]
-
-        metric_params = self.metric_params.copy()
-
-        if 'n_samples' in metric_params:
-            metric_params.pop('n_samples')
 
         is_same = np.all(
             [np.array_equal(X[dimension],
@@ -187,7 +182,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             # Only calculate metric for upper triangle
             iterator = list(itertools.combinations(range(n_diagrams_X), 2))
             X_transformed = _parallel_pairwise(X, X, self.metric,
-                                               metric_params,
+                                               self.effective_metric_params_,
                                                iterator, self.n_jobs)
             X_transformed = X_transformed + X_transformed.T
         else:
@@ -195,20 +190,17 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
                 dimension: max(self._X[dimension].shape[1],
                                X[dimension].shape[1])
                 for dimension in self._X.keys()}
-            self._X = _pad(self._X, max_betti_numbers)
+            _X = _pad(self._X, max_betti_numbers)
             X = _pad(X, max_betti_numbers)
-            Y = {
-                dimension: np.vstack([self._X[dimension],
-                                      X[dimension]])
-                for dimension in self._X.keys()}
+            Y = {dimension: np.vstack([_X[dimension], X[dimension]])
+                for dimension in _X.keys()}
             n_diagrams_Y = next(iter(Y.values())).shape[0]
 
             # Calculate all cells
             iterator = tuple(itertools.product(range(n_diagrams_Y),
                                                range(n_diagrams_X)))
-            X_transformed = _parallel_pairwise(Y, X,
-                                               self.metric,
-                                               metric_params,
+            X_transformed = _parallel_pairwise(Y, X, self.metric,
+                                               self.effective_metric_params_,
                                                iterator, self.n_jobs)
 
         return X_transformed
