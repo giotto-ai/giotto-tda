@@ -2,8 +2,7 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
-import sklearn as sk
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors.base import VALID_METRICS
 
@@ -89,19 +88,24 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         implemented_metric_types = set(['precomputed'] + [met for i in VALID_METRICS.values() for met in i])
 
         if metric not in implemented_metric_types:
-            raise ValueError('The metric you specified is not implemented.')
+            raise ValueError('The metric %s is not supported' % metric)
 
     def _ripser_diagram(self, X, is_distance_matrix, metric):
-        diagram = ripser(X, distance_matrix=is_distance_matrix, metric=metric, maxdim=max(self.homology_dimensions), thresh=self.max_edge_length)['dgms']
+        X_diagram = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
+                           metric=metric, maxdim=max(self.homology_dimensions),
+                           thresh=self.max_edge_length)['dgms']
 
         if 0 in self.homology_dimensions:
-            diagram[0] = diagram[0][:-1, :]
+            X_diagram[0] = X_diagram[0][:-1, :]
 
-        return {dimension: diagram[dimension] for dimension in self.homology_dimensions}
+        return {dimension: X_diagram[dimension]
+                for dimension in self.homology_dimensions}
 
     def _pad_diagram(self, diagram, max_length_list):
-        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])), (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
-        return {dimension: np.pad(diagram[dimension], padList[i], 'constant') for i, dimension in enumerate(self.homology_dimensions)}
+        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])),
+                    (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
+        return {dimension: np.pad(diagram[dimension], padList[i], 'constant')
+                for i, dimension in enumerate(self.homology_dimensions)}
 
     def _stack_padded_diagrams(self, diagrams):
         stacked_diagrams = {dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions}
@@ -170,7 +174,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             is an ndarrays of shape (m_{d,i}, 2).
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         is_distance_matrix = (self.metric == 'precomputed')
@@ -211,7 +215,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, max_edge_length=np.inf, homology_dimensions=[0, 1], n_jobs=None):
+    def __init__(self, max_edge_length=np.inf, homology_dimensions=[0, 1],
+                 n_jobs=None):
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
         self.n_jobs = n_jobs
@@ -240,7 +245,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         try:
             assert set(homology_dimensions).issubset(set(range(n_dimensions)))
         except AssertionError:
-            raise ValueError('The homology_dimensions specified contains element(s) that are not within the range 0 to the dimension of the images.')
+            raise ValueError('The homology_dimensions specified contains '
+                             'element(s) that are not within the range 0 to '
+                             'the dimension of the images.')
 
     def _gudhi_diagram(self, X):
         cubical_complex = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
@@ -313,7 +320,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             is an ndarrays of shape (m_{d,i}, 2).
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(X[i, :, :])
@@ -434,7 +441,7 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
             Array of persistent entropies (one value per sample and per key in X).
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
         n_samples = X[next(iter(X.keys()))].shape[0]

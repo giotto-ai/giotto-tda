@@ -95,7 +95,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from giotto.time_series import TakensEmbedder
-    >>> import matplotlib.pyplot as plt
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
     ...     for x in range(0,1000)])
@@ -111,12 +110,12 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> # Fit and transform the DataFrame
     >>> embedder.fit(signal_noise)
     >>> embedded_noise = embedder.transform(signal_noise)
-    >>> print('Optimal embedding time delay based on mutual information: ',
+    >>> print('Optimal embedding time delay based on mutual information:',
     ...       embedder.embedding_time_delay_)
-    Optimal embedding time delay based on mutual information:  1
-    >>> print('Optimal embedding dimension based on false nearest neighbors: ',
+    Optimal embedding time delay based on mutual information: 1
+    >>> print('Optimal embedding dimension based on false nearest neighbors:',
     ...       embedder.embedding_dimension_)
-    Optimal embedding dimension based on false nearest neighbors:  3
+    Optimal embedding dimension based on false nearest neighbors: 3
 
     """
 
@@ -153,17 +152,20 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
                 'embedding_stride': self.embedding_stride,
                 'n_jobs': self.n_jobs}
 
-    @staticmethod
-    def _validate_params(embedding_parameters_type):
+    def _validate_params(self, X):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
         """
-        # FIXME: shorter name
         implemented_embedding_parameters_types = ['fixed', 'search']
 
-        if embedding_parameters_type not in implemented_embedding_parameters_types:
-            raise ValueError('The embedding parameters type you specified is '
-                             'not implemented')
+        if self.embedding_parameters_type not in \
+                implemented_embedding_parameters_types:
+            raise ValueError(
+                'The embedding parameters type %s is not supported' %
+                self.embedding_parameters_type)
+
+        if X.shape[0] < self.outer_window_duration:
+            raise ValueError('Not enough data to have a single outer window.')
 
     @staticmethod
     def _embed(X, outer_window_duration, outer_window_stride,
@@ -218,7 +220,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         epsilon = 2.0 * np.std(X)
         tolerance = 10
 
-        # TODO: rename + simplify
         dim_by_delay = -embedding_dimension * embedding_time_delay
         non_zero_distance = distance[:dim_by_delay] > 0
 
@@ -254,7 +255,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        self._validate_params(self.embedding_parameters_type)
+        self._validate_params(X)
 
         if self.embedding_parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -312,11 +313,8 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
         """
 
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
-        if X.shape[0] < self.outer_window_duration:
-            raise ValueError('Not enough data to have a single outer window.')
 
         X_transformed = self._embed(X, self.outer_window_duration,
                                     self.outer_window_stride,

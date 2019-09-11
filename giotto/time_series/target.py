@@ -168,7 +168,6 @@ class Labeller(BaseEstimator, TransformerMixin):
                                               y, **labelling_kwargs,
                                               **function_kwargs)
 
-        # FIXME: simplify
         if self.thresholds is not None:
             y_transformedAbs = np.abs(y_transformed)
             y_transformed = np.concatenate(
