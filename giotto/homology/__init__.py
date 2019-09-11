@@ -9,7 +9,7 @@ from .consistent import ConsistentRescaling
 
 __all__ = [
     'VietorisRipsPersistence',
-    'CubicalPersistence'
+    'CubicalPersistence',
     'ConsistentRescaling',
     'PersistentEntropy'
 ]
