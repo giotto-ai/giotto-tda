@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import assert_raise_message
 
@@ -38,4 +39,4 @@ def test_rescaling_not_fitted(cr):
 
 
 def test_rescaling_transform(cr):
-    assert cr.fit_transform(X).all() == X_rescaled.all()
+    assert_almost_equal(cr.fit_transform(X), X_rescaled)

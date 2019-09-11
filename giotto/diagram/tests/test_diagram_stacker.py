@@ -20,8 +20,8 @@ def test_diagram_stacker(num_samples):
 
 
 @pytest.mark.parametrize("num_samples", [1, 10])
-@pytest.mark.parametrize("norm", ["bottleneck", "landscape", "betti"])
-def test_diagram_scaler(num_samples, norm):
+@pytest.mark.parametrize("metric", ["bottleneck", "landscape", "betti"])
+def test_diagram_scaler(num_samples, metric):
     rng = np.random.mtrand.RandomState(42)
 
     X = {
@@ -29,7 +29,10 @@ def test_diagram_scaler(num_samples, norm):
         1: rng.randn(num_samples, 3, 2)
     }
 
-    scaler = DiagramScaler(norm=norm, function=np.max, n_jobs=1)
+    scaler = DiagramScaler(
+        metric=metric,
+        metric_params={'order': np.inf, 'n_samples': 200},
+        function=np.max, n_jobs=1)
     Xtr = scaler.fit(X, None).transform(X, None)
 
     print(scaler._scale)
