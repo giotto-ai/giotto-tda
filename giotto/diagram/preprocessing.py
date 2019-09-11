@@ -132,12 +132,19 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
-    default: 'bottleneck'
-        The type of norm on persistence diagrams to be used. Defined in terms
-        of identically named distance functions between pairs of diagrams (see
-        :mod:'giotto.diagram.distance'), as the distance between
-        a diagram (or curve) and the trivial diagram (or curve).
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+        Which notion of distance between (sub)diagrams to use:
+
+        - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
+           perfect-matching--based notions of distance.
+        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like) distances
+           between "persistence landscapes" obtained from persistence (sub)diagrams.
+        - ``'betti'`` refers to a family of possible (:math:`L^p`-like) distances
+           between "Betti curves" obtained from persistence (sub)diagrams. A Betti
+           curve simply records the evolution in the number of independent topological
+           holes (technically, the number of linearly independent homology classes)
+           as can be read from a persistence (sub)diagram.
+        - ``'heat'`` heat kernel
 
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the norm function:
@@ -151,6 +158,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
           (default = ``1``).
         - If ``norm == 'betti'`` the available arguments are ``order``
           (default = ``2``) and ``n_samples`` (default = ``200``).
+        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
+           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
 
     function : callable, optional, default: numpy.max
         Function used to extract a single positive scalar from the collection
@@ -220,7 +229,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         if 'n_samples' in metric_params.keys():
             n_samples = metric_params.pop('n_samples')
 
-        if self.metric in ['landscape', 'betti']:
+        if self.metric in ['landscape', 'betti', 'heat']:
             metric_params['sampling'] = _sample(X, n_samples)
 
         norm_array = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
