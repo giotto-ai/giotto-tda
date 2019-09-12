@@ -2,7 +2,6 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
 import numpy as np
-import datetime as dt
 
 
 class Resampler(BaseEstimator, TransformerMixin):
@@ -10,25 +9,9 @@ class Resampler(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    sampling_type : str, optional, default: 'periodic'
-        The type of sampling. Its value can be either 'periodic' or 'fixed':
+    period : int, default: 2
+        The sampling period for periodic sampling.
 
-        - 'periodic':
-            It means sampling with a constant ``sampling_period``.
-        - 'fixed':
-            It entails that the list of sampling times has to be provided
-            via the parameter ``sampling_times``.
-
-    sampling_period : str, optional, default: '2h'
-        The sampling period for periodic sampling. Used only if
-        ``sampling_type`` is 'periodic'.
-
-    sampling_times : list of datetime, optional, default: [dt.time(0,0,0)]
-        dt.Datetime at which the samples should be taken. Used only if
-        ``sampling_type`` is 'fixed'.
-
-    remove_weekends : boolean, optional, default: True
-        Option to remove week-ends from the time series pd.DataFrame.
 
     Attributes
     ----------
@@ -47,38 +30,24 @@ class Resampler(BaseEstimator, TransformerMixin):
     ... for x in range(0, 300)])
     >>> plt.plot(signal)
     >>> plt.show()
-    >>> # Set up the DataFrame of the z-projection of the simulated solution
-    >>> df = pd.DataFrame(signal)
-    >>> df.index = pd.to_datetime(df.index, utc=True, unit='h')
     >>> # Set up the Resampler
-    >>> sampling_period = '10h'
-    >>> periodic_sampler = Resampler(sampling_type='periodic',
-    >>> sampling_period=sampling_period, remove_weekends=False)
+    >>> period = 10
+    >>> periodic_sampler = Resampler(period=period)
     >>> # Fit and transform the DataFrame
-    >>> periodic_sampler.fit(df)
-    >>> signal_resampled = periodic_sampler.transform(df)
+    >>> periodic_sampler.fit(signal)
+    >>> signal_resampled = periodic_sampler.transform(signal)
     >>> plt.plot(signal_resampled)
 
     """
-    valid_sampling_types = ['periodic', 'fixed']
+    def __init__(self, period=2):
+        self.period = period
 
-    def __init__(self, sampling_type='periodic', sampling_period='2h',
-                 sampling_times=None, remove_weekends=True):
-        if sampling_times is None:
-            sampling_times = [dt.time(0, 0, 0)]
-        self.sampling_type = sampling_type
-        self.sampling_period = sampling_period
-        self.sampling_times = sampling_times
-        self.remove_weekends = remove_weekends
-
-    @staticmethod
-    def _validate_params(sampling_type):
+    def _validate_params(self):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:``fit`` are valid.
         """
-        if sampling_type not in Resampler.valid_sampling_types:
-            raise ValueError('The sampling type %s is not supported' %
-                             sampling_type)
+        if not isinstance(self.period, int):
+            raise TypeError('The period ',  self.period, ' is not an int')
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -99,10 +68,11 @@ class Resampler(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params(self.sampling_type)
+        self._validate_params()
 
-        self._n_features = len(X.columns)
-        self._is_fitted = True
+        X = X.reshape((-1, 1))
+
+        self._n_features = X.shape[1]
         return self
 
     def transform(self, X, y=None):
@@ -126,17 +96,11 @@ class Resampler(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['_n_features'])
 
-        if self.sampling_type == 'periodic':
-            X = X.resample(self.sampling_period).first()
-        elif self.sampling_type == 'fixed':
-            X = X.iloc[np.isin(X.index.time, self.sampling_times)].copy()
+        X = X.reshape((-1, 1))
+        X_transformed = X[::self.period]
 
-        if self.remove_weekends:
-            X = X[:][X.index.dayofweek < 5]
-
-        X_transformed = X.iloc[:, 0].values.reshape((-1, self._n_features))
         return X_transformed
 
 

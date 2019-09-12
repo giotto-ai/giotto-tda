@@ -29,36 +29,12 @@ signal_resampled_4 = np.array(
      [1.7205845],
      [2.98935825]])
 
-@pytest.fixture
-def resampler():
-    return Resampler(period=3)
-
-def test_resampler_not_fitted():
-    resampler = Resampler()
-
-def test_resampler_init():
-    period = 2
+@pytest.mark.parametrize("period, expected",
+                         [(2, signal_resampled_2),
+                          (4, signal_resampled_4)])
+def test_resampler_transform(period, expected):
     resampler = Resampler(period=period)
-    assert resampler.get_params()['period'] == period
-
-
-def test_resampler_not_valid():
-    sampling_type = 'not_defined'
-    resampler = Resampler(sampling_type=sampling_type)
-    msg = 'The sampling type %s is not supported'
-
-    with pytest.raises(ValueError, match=msg % sampling_type):
-        resampler.fit(signal_df)
-
-
-@pytest.mark.parametrize("remove_weekends, expected",
-                         [(False, signal_resampled),
-                          (True, signal_resampled_no_weekends)])
-def test_resampler_transform(remove_weekends, expected):
-    resampler = Resampler(sampling_type='periodic', sampling_period='2d',
-                          remove_weekends=remove_weekends)
-    assert_almost_equal(resampler.fit_transform(signal_df), expected)
-
+    assert_almost_equal(resampler.fit_transform(signal_array), expected)
 
 signal = signal_array.reshape(-1, 1)
 
