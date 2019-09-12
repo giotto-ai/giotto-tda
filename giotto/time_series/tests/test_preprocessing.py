@@ -2,9 +2,7 @@
 
 import pytest
 
-import pandas as pd
 import numpy as np
-import datetime as dt
 
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
@@ -37,34 +35,16 @@ signal_resampled_no_weekends = np.array(
      [2.6569866],
      [2.41211849]])
 
-sampling_times = pd.date_range(start='1/1/1970', periods=20, freq='d').tolist()
-
 
 @pytest.fixture
 def resampler():
-    return Resampler(sampling_type='periodic', sampling_period='2d',
-                     sampling_times=None, remove_weekends=False)
-
-
-@pytest.fixture
-def fixed_resampler():
-    return Resampler(sampling_type='fixed', sampling_times=sampling_times,
-                     remove_weekends=False)
+    return Resampler(period=3)
 
 
 def test_resampler_init():
-    sampling_type = 'periodic'
-    sampling_period = '2d'
-    remove_weekends = False
-    sampling_times = [dt.time(0, 0, 0)]
-    resampler = Resampler(sampling_type=sampling_type,
-                          sampling_period=sampling_period,
-                          sampling_times=sampling_times,
-                          remove_weekends=remove_weekends)
-    assert resampler.get_params()['sampling_type'] == sampling_type
-    assert resampler.get_params()['sampling_period'] == sampling_period
-    assert resampler.get_params()['sampling_times'] == sampling_times
-    assert resampler.get_params()['remove_weekends'] == remove_weekends
+    period = 2
+    resampler = Resampler(period=period)
+    assert resampler.get_params()['period'] == period
 
 
 def test_resampler_not_fitted(resampler):
