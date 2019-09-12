@@ -16,11 +16,6 @@ X_tg_res = np.array([
                  np.array([1, 0, 2, 1]))), shape=(3, 3))])
 
 
-@pytest.fixture
-def transition_graph_parallel():
-    return TransitionGraph(n_jobs=2)
-
-
 def test_transition_graph_not_fitted():
     tg = TransitionGraph()
 
