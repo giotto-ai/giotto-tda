@@ -209,9 +209,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         """A class method that checks whether the hyperparameters and the input parameters
         of the :meth:`fit` are valid.
         """
-        try:
-            assert set(homology_dimensions).issubset(set(range(n_dimensions)))
-        except AssertionError:
+        if not set(homology_dimensions).issubset(set(range(n_dimensions))):
             raise ValueError('The homology_dimensions specified contains '
                              'element(s) that are not within the range 0 to '
                              'the dimension of the images.')
