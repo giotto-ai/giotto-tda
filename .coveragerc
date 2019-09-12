@@ -1,0 +1,4 @@
+[run]
+omit =
+    */giotto/external/*
+    **/setup.py
