@@ -29,6 +29,7 @@ signal_resampled_4 = np.array(
      [1.7205845],
      [2.98935825]])
 
+
 @pytest.mark.parametrize("period, expected",
                          [(2, signal_resampled_2),
                           (4, signal_resampled_4)])
