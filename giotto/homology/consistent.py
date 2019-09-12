@@ -119,7 +119,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         """
         self._validate_params()
 
-        self.is_fitted = True
+        self._is_fitted = True
         return self
 
     # @jit
@@ -150,7 +150,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_is_fitted'])
 
         X_transformed = Parallel(n_jobs=self.n_jobs)(
             delayed(pairwise_distances)(X[i], metric=self.metric, n_jobs=1,
