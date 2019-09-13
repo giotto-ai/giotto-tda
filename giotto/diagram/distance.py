@@ -12,7 +12,7 @@ import itertools
 import numbers
 from giotto.utils.validation import check_diagram
 
-from ._metrics import _parallel_pairwise, _parallel_norm
+from ._metrics import _parallel_pairwise, _parallel_norm, available_metric_params, available_metrics
 from ._utils import _sample, _pad
 
 
@@ -49,9 +49,9 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the available arguments are ``order``
-          (default = ``np.inf``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order``
+        - If ``metric == 'bottleneck'`` the only argument is
+         ``delta`` (default = ``0.0``).
+        - If ``metric == 'wasserstein'`` the available arguments are ``order``
           (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
           (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
@@ -79,28 +79,31 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _validate_params(self):
-        if (self.metric != 'bottleneck' and self.metric != 'wasserstein' and
-                self.metric != 'landscape' and self.metric != 'betti'):
-            raise ValueError("metric parameter has the wrong value: {}."
-                             " Available values are: 'bottleneck',"
-                             " 'wasserstein', 'landscape',"
-                             " 'betti'.".format(self.metric))
-        # if (type(self.metric_params['n_samples']) is not int):
-        #     raise TypeError("n_samples has the wrong type: %s. "
-        #                     "n_sample must be an integer greater "
-        #                     "than 0." % type(self.metric_params['n_samples']))
-        # if (self.metric_params['n_samples'] <= 0):
-        #     raise ValueError("n_samples has the wrong value: {}. "
-        #                      "n_sample must be an integer greater "
-        #                      "than 0.".format(self.metric_params['n_samples']))
-        # if not (isinstance(self.metric_params['delta'], numbers.Number)):
-        #     raise TypeError("delta has the wrong type: %s."
-        #                     "delta must be a non-negative "
-        #                     "integer." % type(self.metric_params['delta']))
-        # if (self.metric_params['delta'] < 0):
-        #     raise ValueError("delta has the wrong value: {}."
-        #                      "delta must be a non-negative "
-        #                      "integer.".format(self.metric_params['delta']))
+        if (self.metric not in available_metrics.keys()):
+            raise ValueError("No metric called {}."
+                             " Available metrics are {}.".format(self.metric,
+                                                                 list(available_metrics.keys())))
+
+        for (param, param_type, param_values) in available_metrics[self.metric]:
+            if param in self.effective_metric_params_.keys():
+                input_param = self.effective_metric_params_[param]
+                if not isinstance(input_param, param_type):
+                    raise TypeError("{} in params_metric is of type {}"
+                                    " but must be an {}.".format(param,
+                                                                 type(input_param),
+                                                                 type_param))
+
+                if input_param < param_values[0] or input_param > param_values[1]:
+                    raise ValueError("{} in param_metric should be between {} and"
+                                     " {} but has been set"
+                                     " to {}.".format(param, param_values[0],
+                                                      param_values[1], input_param))
+
+        for param in self.effective_metric_params_.keys():
+            if param not in available_metric_params:
+                    raise ValueError("{} in param_metric is not an available"
+                                     " parameter. Available metric_params."
+                                     " are ".format(param, available_metric_params))
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -123,13 +126,13 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params()
-        X = check_diagram(X)
-
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
+
+        self._validate_params()
+        X = check_diagram(X)
 
         if self.metric in ['landscape', 'betti', 'heat']:
             self.effective_metric_params_['sampling'] = \
