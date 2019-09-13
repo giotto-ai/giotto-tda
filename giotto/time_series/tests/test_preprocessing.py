@@ -30,12 +30,19 @@ signal_resampled_4 = np.array(
      [2.98935825]])
 
 
+def test_resampler_errors():
+    resampler = Resampler(period='blah')
+    with pytest.raises(TypeError):
+        resampler.fit(signal_array)
+
+
 @pytest.mark.parametrize("period, expected",
                          [(2, signal_resampled_2),
                           (4, signal_resampled_4)])
 def test_resampler_transform(period, expected):
     resampler = Resampler(period=period)
     assert_almost_equal(resampler.fit_transform(signal_array), expected)
+
 
 signal = signal_array.reshape(-1, 1)
 
@@ -88,7 +95,7 @@ def test_stationarizer_not_fitted():
         stationarizer.transform(signal)
 
 
-def test_stationarizer_not_valid():
+def test_stationarizer_errors():
     stationarization_type = 'not_defined'
     stationarizer = Stationarizer(stationarization_type=stationarization_type)
     msg = 'The transformation type %s is not supported'
