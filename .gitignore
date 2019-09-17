@@ -7,6 +7,7 @@
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 *.so
+build
 
 # Python jupyter notebooks
 examples/dask-worker-space
