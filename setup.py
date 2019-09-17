@@ -1,4 +1,8 @@
+#! /usr/bin/env python
+"""Toolbox for Topological Data Analysis in machine learning."""
+
 import os
+import codecs
 import re
 import sys
 import sysconfig
@@ -11,17 +15,62 @@ from setuptools.command.build_ext import build_ext
 from setuptools.command.test import test as TestCommand
 from shutil import copyfile, copymode
 
-with open('README.rst') as f:
-    long_description = f.read()
+version_file = os.path.join('giotto', '_version.py')
+with open(version_file) as f:
+    exec(f.read())
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
+
+DISTNAME = 'giotto'
+DESCRIPTION = 'Toolbox for Topological Data Analysis dataset in machine learning.'
+with codecs.open('README.rst', encoding='utf-8-sig') as f:
+    LONG_DESCRIPTION = f.read()
+MAINTAINER = 'Guillaume Tauzin'
+MAINTAINER_EMAIL = 'g.tauzin@l2f.ch'
+URL = 'https://github.com/giotto-learn/giotto'
+LICENSE = 'TBD'
+DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto'
+VERSION = __version__
+CLASSIFIERS = ['Intended Audience :: Science/Research',
+               'Intended Audience :: Developers',
+               'License :: OSI Approved',
+               'Programming Language :: C',
+               'Programming Language :: Python',
+               'Topic :: Software Development',
+               'Topic :: Scientific/Engineering',
+               'Operating System :: Microsoft :: Windows',
+               'Operating System :: POSIX',
+               'Operating System :: Unix',
+               'Operating System :: MacOS',
+               'Programming Language :: Python :: 3.6',
+               'Programming Language :: Python :: 3.7']
+KEYWORDS = 'machine learning topological data analysis persistent ' + \
+    'homology, persistence diagrams'
+INSTALL_REQUIRES = requirements
+EXTRAS_REQUIRE = {
+    'tests': [
+        'pytest',
+        'pytest-cov'],
+    'docs': [
+        'sphinx',
+        'sphinx-gallery',
+        'sphinx_rtd_theme',
+        'numpydoc'],
+    'examples': [
+        'matplotlib',
+        'pandas',
+        'keras',
+        'keras-metrics',
+        'tensorflow']
+    ]
+}
+
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
-
 
 class CMakeBuild(build_ext):
     def run(self):
@@ -64,46 +113,21 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-setup(name='giotto',
-      version='0.0.1',
-      description="""giotto is a scikit-learn-based machine learning library
-      that brings Topological Data Analysis to data scientists.""",
-      long_description=long_description,
-      url='https://git.l2f.ch/g.tauzin/giotto.git',
-      project_urls={
-          "Issue Tracker": "TBA",
-          "Documentation": "TBA",
-          "Source Code": "TBA"
-      },
-      maintainer='Guillaume Tauzin',
-      maintainer_email='guillaume.tauzin@epfl.ch',
-      license='TBA',
-      classifiers=[
-          'Development Status :: 3 - Alpha',
-          'Intended Audience :: Developers',
-          'Topic :: Software Development :: Build Tools',
-          'License :: OSI Approved :: TBA',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Programming Language :: Python :: 3.7',
-          'Programming Language :: Python :: 3.8'
-      ],
+setup(name=DISTNAME,
+      maintainer=MAINTAINER,
+      maintainer_email=MAINTAINER_EMAIL,
+      description=DESCRIPTION,
+      license=LICENSE,
+      url=URL,
+      version=VERSION,
+      download_url=DOWNLOAD_URL,
+      long_description=LONG_DESCRIPTION,
+      zip_safe=False,  # the package can run out of an .egg file
+      classifiers=CLASSIFIERS,
       packages=['giotto'],
-      include_package_data=True,
-      keywords="""machine learning, topological data analysis, persistent
-      homology, persistence diagrams""",
-      python_requires='>=3.5',
-      setup_requires=[
-        'cython >= 0.29.7',
-      ],
-      install_requires=requirements,
-      extras_require={
-          'docs': [  # `pip install -e ".[docs]"``
-              'sphinx',
-              ]
-      },
-      test_suite='tests',
-      tests_require=['pytest'],
+      keywords=KEYWORDS,
+      install_requires=INSTALL_REQUIRES,
+      extras_require=EXTRAS_REQUIRE,
       ext_modules=[CMakeExtension('giotto')],
       cmdclass=dict(build_ext=CMakeBuild),
       zip_safe=False)
