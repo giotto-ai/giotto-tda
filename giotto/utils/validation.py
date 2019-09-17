@@ -2,6 +2,8 @@
 import numpy as np
 import numbers
 
+from ..diagram._metrics import available_metric_params, available_metrics
+
 def check_diagram(X):
     """Input validation on a diagram
     """
@@ -37,3 +39,34 @@ def check_diagram(X):
                              "integers and the 2nd must be greater than "
                              "or equal to the 1st one.".format(_diff_coord))
     return X
+
+
+def validate_metric_params(metric, metric_params):
+    if (metric not in available_metrics.keys()):
+        raise ValueError("No metric called {}."
+                         " Available metrics are {}."
+                         "".format(metric,
+                                   list(available_metrics.keys())))
+
+    for (param, param_type, param_values) in available_metrics[metric]:
+        if param in metric_params.keys():
+            input_param = metric_params[param]
+            if not isinstance(input_param, param_type):
+                raise TypeError("{} in params_metric is of type {}"
+                                " but must be an {}."
+                                "".format(param, type(input_param),
+                                          param_type))
+
+           if input_param < param_values[0] \
+               or input_param > param_values[1]:
+                raise ValueError("{} in param_metric should be between {} "
+                                 "and {} but has been set to {}."
+                                 "".format(param, param_values[0],
+                                           param_values[1], input_param))
+
+    for param in metric_params.keys():
+        if param not in available_metric_params:
+            raise ValueError("{} in param_metric is not an available"
+                             " parameter. Available metric_params."
+                             " are {}".format(param,
+                                              available_metric_params))

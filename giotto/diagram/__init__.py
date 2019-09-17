@@ -5,7 +5,7 @@ scale, and filter diagrams.
 It also makes it possible to calculate distance matrices.
 """
 
-from .distance import DiagramDistance, DiagramNorm
+from .distance import DiagramDistance, DiagramAmplitude
 from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
 
 
@@ -14,5 +14,5 @@ __all__ = [
     'DiagramScaler',
     'DiagramFilter',
     'DiagramDistance',
-    'DiagramNorm'
+    'DiagramAmplitude'
 ]

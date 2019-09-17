@@ -9,10 +9,9 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
 import itertools
-import numbers
-from giotto.utils.validation import check_diagram
+from ..utils.validation import check_diagram, validate_metric_params
 
-from ._metrics import _parallel_pairwise, _parallel_norm, available_metric_params, available_metrics
+from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _sample, _pad
 
 
@@ -79,31 +78,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _validate_params(self):
-        if (self.metric not in available_metrics.keys()):
-            raise ValueError("No metric called {}."
-                             " Available metrics are {}.".format(self.metric,
-                                                                 list(available_metrics.keys())))
-
-        for (param, param_type, param_values) in available_metrics[self.metric]:
-            if param in self.effective_metric_params_.keys():
-                input_param = self.effective_metric_params_[param]
-                if not isinstance(input_param, param_type):
-                    raise TypeError("{} in params_metric is of type {}"
-                                    " but must be an {}.".format(param,
-                                                                 type(input_param),
-                                                                 type_param))
-
-                if input_param < param_values[0] or input_param > param_values[1]:
-                    raise ValueError("{} in param_metric should be between {} and"
-                                     " {} but has been set"
-                                     " to {}.".format(param, param_values[0],
-                                                      param_values[1], input_param))
-
-        for param in self.effective_metric_params_.keys():
-            if param not in available_metric_params:
-                    raise ValueError("{} in param_metric is not an available"
-                                     " parameter. Available metric_params."
-                                     " are ".format(param, available_metric_params))
+        validate_metric_params(selef.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -200,10 +175,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class DiagramNorm(BaseEstimator, TransformerMixin):
-    """Transformer for calculating the norm of a collections of persistence diagrams.
+class DiagramAmplitude(BaseEstimator, TransformerMixin):
+    """Transformer for calculating the amplitude of a collections of persistence diagrams.
     In the case in which diagrams in the collection have been consistently partitioned
-    into one or more subdiagrams (e.g. according to homology dimension), the norm of a
+    into one or more subdiagrams (e.g. according to homology dimension), the amplitude of a
     diagram is a *p*-norm of a vector of distances between respective subdiagrams of
     the same kind.
 
@@ -243,9 +218,10 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params={'order': np.inf}, n_jobs=None):
+    def __init__(self, metric='bottleneck', metric_params=None, order=2, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
+        self.order = order
         self.n_jobs = n_jobs
 
     @staticmethod
@@ -272,7 +248,14 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
+
         self._validate_params()
+        X = check_diagram(X)
+
 
         if 'n_samples' in self.metric_params:
             self._n_samples = self.metric_params['n_samples']
@@ -280,13 +263,14 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
             self._n_samples = None
 
         if self.metric in ['landscape', 'betti', 'heat']:
-            self.metric_params['sampling'] = _sample(X, self._n_samples)
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """Computes the norm of a each diagram inn the collection X, according to
+        """Computes the amplitude of a each diagram inn the collection X, according to
         the choice of ``metric`` and ``metric_params``.
 
         Parameters
@@ -303,17 +287,15 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
         Returns
         -------
         X_transformed : ndarray, shape (n_samples, n_samples)
-            Norm of the diagrams in X.
+            Amplitude of the diagrams in X.
 
         """
         check_is_fitted(self, ['_is_fitted'])
+        X = check_diagram(X)
+
         n_diagrams_X = next(iter(X.values())).shape[0]
 
-        metric_params = self.metric_params.copy()
-
-        if 'n_samples' in metric_params:
-            metric_params.pop('n_samples')
-
-        X_transformed = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
+        X_transformed = _parallel_amplitude(X, self.metric, self.effective_metric_params_,
+                                            self.n_jobs)
 
         return X_transformed

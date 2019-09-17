@@ -122,44 +122,45 @@ def _parallel_pairwise(X, Y, metric, metric_params, iterator, order, n_jobs):
     return distance_matrix
 
 
-def kernel_landscape_norm(diagram, dimension, sampling=None,
+def kernel_landscape_amplitude(diagram, dimension, sampling=None,
                           order=2, n_layers=1, **kw_args):
     landscape = landscape_function(diagram, n_layers, sampling[dimension])
     return np.linalg.norm(landscape, ord=order)
 
 
-def kernel_betti_norm(diagram, dimension, sampling=None, order=2, **kw_args):
+def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
+                           **kw_args):
     betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
 
-def kernel_heat_norm(diagram, dimension, sampling=None, sigma=1.,
+def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
                      order=2, n_layers=1, **kw_args):
     heat = heat_function(diagram, sigma, sampling[dimension])
     return np.linalg.norm(heat, ord=order)
 
-def bottleneck_norm(diagram, dimension=None, order=np.inf, **kw_args):
+def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
-def wasserstein_norm(diagram, dimension=None, order=1, **kw_args):
+def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 
-implemented_norm_recipes = {'bottleneck': bottleneck_norm,
-                            'wasserstein': wasserstein_norm,
-                            'landscape': kernel_landscape_norm,
-                            'betti': kernel_betti_norm,
-                            'heat': kernel_heat_norm}
+implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitude,
+                            'wasserstein': wasserstein_amplitude,
+                            'landscape': kernel_landscape_amplitude,
+                            'betti': kernel_betti_amplitude,
+                            'heat': kernel_heat_amplitude}
 
 
-def _parallel_norm(X, metric, metric_params, n_jobs):
+def _parallel_amplitude(X, metric, metric_params, n_jobs):
     n_dimensions = len(X.keys())
-    norm_func = implemented_norm_recipes[metric]
+    amplitude_func = implemented_amplitude_recipes[metric]
 
-    norm_array = Parallel(n_jobs=n_jobs)(delayed(norm_func)(
+    amplitude_array = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
         X[dimension][i, :, :], dimension, **metric_params)
         for i in range(next(iter(X.values())).shape[0])
         for dimension in X.keys())
-    norm_array = np.array(norm_array).reshape((-1, n_dimensions))
-    return norm_array
+    amplitude_array = np.array(amplitude_array).reshape((-1, n_dimensions))
+    return amplitude_array
