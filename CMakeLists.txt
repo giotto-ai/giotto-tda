@@ -31,7 +31,7 @@ set_target_properties(giotto_bottleneck PROPERTIES CMAKE_CXX_FLAGS_RELWITHDEBINF
 #   set(GUDHI_USE_TBB 1)
 # endif()
 
-set(GUDHI_SRC_DIR "giotto/externals/gudhi/src")
+set(GUDHI_SRC_DIR "giotto/externals/gudhi-devel/src")
 
 pybind11_add_module(giotto_cubical_complex "${BINDINGS_DIR}/cubical_complex_bindings.cpp")
 target_include_directories(giotto_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/Bitmap_cubical_complex/include")
