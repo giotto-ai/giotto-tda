@@ -51,7 +51,8 @@ INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
-        'pytest-cov'],
+        'pytest-cov',
+        'pytest-benchmark'],
     'docs': [
         'sphinx',
         'sphinx-gallery',
@@ -63,7 +64,6 @@ EXTRAS_REQUIRE = {
         'keras',
         'keras-metrics',
         'tensorflow']
-    ]
 }
 
 
