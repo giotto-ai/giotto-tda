@@ -129,5 +129,4 @@ setup(name=DISTNAME,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
       ext_modules=[CMakeExtension('giotto')],
-      cmdclass=dict(build_ext=CMakeBuild),
-      zip_safe=False)
+      cmdclass=dict(build_ext=CMakeBuild))
