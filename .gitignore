@@ -6,6 +6,7 @@
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
+*.so
 
 # Python jupyter notebooks
 examples/dask-worker-space
@@ -26,15 +27,10 @@ examples/*
 doc/build
 doc/generated
 
-# Emacs temporary files
-*~
-
 # Output files
 *.out
 
 # External
-build
-giotto/external/bindings/hera_wasserstein.cpp
-giotto/external/bindings/*.so
-.DS_Store
+*.DS_Store
 .idea/*
+*~
