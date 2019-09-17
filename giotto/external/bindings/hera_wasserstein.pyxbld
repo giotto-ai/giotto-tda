@@ -1,6 +1,0 @@
-def make_ext(modname, pyxfilename):
-    from distutils.extension import Extension
-    return Extension(name='hera_wasserstein',
-                     sources=['hera_wasserstein.pyx'],
-                     language='c++',
-                     include_dirs='giotto/external/hera/geom_matching/wasserstein/include')

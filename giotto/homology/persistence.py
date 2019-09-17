@@ -9,9 +9,8 @@ from sklearn.neighbors.base import VALID_METRICS
 from sklearn.utils._joblib import Parallel, delayed
 
 import numpy as np
-import gudhi as gd
-from ripser import ripser
-
+from ..externals.bindings import ripser
+from ..externals.bindings import CubicalComplex
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of persistence diagrams resulting
@@ -215,7 +214,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
                              'the dimension of the images.')
 
     def _gudhi_diagram(self, X):
-        cubical_complex = gd.CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
+        cubical_complex = CubicalComplex(dimensions=X.shape, top_dimensional_cells=X.flatten(order="F"))
         diagram = cubical_complex.persistence(homology_coeff_field=2, min_persistence=0)
 
         return {dimension: np.array([diagram[i][1] for i in range(len(diagram))

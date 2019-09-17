@@ -9,8 +9,10 @@ from sklearn.utils._joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter
 import numbers
 
-from gudhi import bottleneck_distance as gudhi_bottleneck_distance
-from ..external.bindings import wasserstein as hera_wasserstein_distance
+from giotto_wasserstein import wasserstein_distance \
+    as pairwise_wasserstein_distance
+from giotto_bottleneck import bottleneck_distance \
+    as pairwise_bottleneck_distance
 
 available_metric_params = ['order', 'delta', 'n_samples', 'n_layers', 'sigma']
 
@@ -90,11 +92,12 @@ def kernel_heat_distance(diagram_x, diagram_y, dimension, sigma=1.,
 
 def bottleneck_distance(diagram_x, diagram_y, dimension=None,
                         delta=0.0, **kw_args):
-    return gudhi_bottleneck_distance(diagram_x, diagram_y, delta)
+    return pairwise_bottleneck_distance(diagram_x[diagram_x[:, 1] != 0],
+                                        diagram_y[diagram_y[:, 1] != 0], delta)
 
 def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
                          delta=0.0, **kw_args):
-    return hera_wasserstein_distance(diagram_x, diagram_y, order, delta)
+    return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
 
 
 implemented_metric_recipes = {'bottleneck': bottleneck_distance,

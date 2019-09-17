@@ -4,5 +4,3 @@ scikit-learn >= 0.21.3
 keras
 keras-metrics
 tensorflow
-ripser
-gudhi
