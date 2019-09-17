@@ -10,7 +10,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
 import itertools
 from ..utils.validation import check_diagram, validate_metric_params
-
 from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _sample, _pad
 
@@ -78,7 +77,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _validate_params(self):
-        validate_metric_params(selef.metric, self.effective_metric_params_)
+        validate_metric_params(self.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -224,9 +223,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         self.order = order
         self.n_jobs = n_jobs
 
-    @staticmethod
-    def _validate_params():
-        pass
+    def _validate_params(self):
+        validate_metric_params(self.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
