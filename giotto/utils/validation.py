@@ -1,8 +1,8 @@
 """Utilities for input validation"""
 import numpy as np
 import numbers
-
 from ..diagram._metrics import available_metric_params, available_metrics
+
 
 def check_diagram(X):
     """Input validation on a diagram
