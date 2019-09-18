@@ -1,6 +1,10 @@
-[submodule "giotto/external/pybind11"]
-	path = giotto/external/pybind11
+[submodule "giotto/externals/pybind11"]
+	path = giotto/externals/pybind11
 	url = https://github.com/pybind/pybind11
-[submodule "giotto/external/hera"]
-	path = giotto/external/hera
-	url = https://bitbucket.org/grey_narn/hera/
+[submodule "giotto/externals/ripser.py"]
+	path = giotto/externals/ripser.py
+	url = https://github.com/scikit-tda/ripser.py
+[submodule "giotto/externals/gudhi-devel"]
+	path = giotto/externals/gudhi-devel
+	url = https://github.com/giotto-learn/gudhi-devel
+	branch = giotto

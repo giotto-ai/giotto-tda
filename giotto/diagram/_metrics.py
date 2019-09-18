@@ -7,10 +7,26 @@ import numpy as np
 import math as m
 from sklearn.utils._joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter
+import numbers
 
-from gudhi import bottleneck_distance as gudhi_bottleneck_distance
-from ..external.bindings import wasserstein as hera_wasserstein_distance
+from giotto_wasserstein import wasserstein_distance \
+    as pairwise_wasserstein_distance
+from giotto_bottleneck import bottleneck_distance \
+    as pairwise_bottleneck_distance
 
+available_metric_params = ['order', 'delta', 'n_samples', 'n_layers', 'sigma']
+
+available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
+                     'wasserstein': [('order', int, (1, np.inf)),
+                                     ('delta', numbers.Number, (0., 1.))],
+                     'betti': [('order', int, (1, np.inf)),
+                               ('n_samples', int, (1, np.inf))],
+                     'landscape': [('order', int, (1, np.inf)),
+                                   ('n_samples', int, (1, np.inf)),
+                                ('n_layers', int, (1, np.inf))],
+                     'heat': [('order', int, (1, np.inf)),
+                              ('n_samples', int, (1, np.inf)),
+                              ('sigma', numbers.Number, (0., np.inf))]}
 
 def betti_function(diagram, sampling):
     if diagram.size == 0:
@@ -74,13 +90,14 @@ def kernel_heat_distance(diagram_x, diagram_y, dimension, sigma=1.,
     heat_y = heat_function(diagram_y, sigma, sampling[dimension])
     return np.linalg.norm(heat_x - heat_y, ord=order)
 
-def bottleneck_distance(diagram_x, diagram_y, dimension=None, order=np.inf,
+def bottleneck_distance(diagram_x, diagram_y, dimension=None,
                         delta=0.0, **kw_args):
-    return gudhi_bottleneck_distance(diagram_x, diagram_y, delta)
+    return pairwise_bottleneck_distance(diagram_x[diagram_x[:, 1] != 0],
+                                        diagram_y[diagram_y[:, 1] != 0], delta)
 
 def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
                          delta=0.0, **kw_args):
-    return hera_wasserstein_distance(diagram_x, diagram_y, order, delta)
+    return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
 
 
 implemented_metric_recipes = {'bottleneck': bottleneck_distance,
@@ -108,44 +125,45 @@ def _parallel_pairwise(X, Y, metric, metric_params, iterator, order, n_jobs):
     return distance_matrix
 
 
-def kernel_landscape_norm(diagram, dimension, sampling=None,
+def kernel_landscape_amplitude(diagram, dimension, sampling=None,
                           order=2, n_layers=1, **kw_args):
     landscape = landscape_function(diagram, n_layers, sampling[dimension])
     return np.linalg.norm(landscape, ord=order)
 
 
-def kernel_betti_norm(diagram, dimension, sampling=None, order=2, **kw_args):
+def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
+                           **kw_args):
     betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
 
-def kernel_heat_norm(diagram, dimension, sampling=None, sigma=1.,
+def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
                      order=2, n_layers=1, **kw_args):
     heat = heat_function(diagram, sigma, sampling[dimension])
     return np.linalg.norm(heat, ord=order)
 
-def bottleneck_norm(diagram, dimension=None, order=np.inf, **kw_args):
+def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
-def wasserstein_norm(diagram, dimension=None, order=1, **kw_args):
+def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 
-implemented_norm_recipes = {'bottleneck': bottleneck_norm,
-                            'wasserstein': wasserstein_norm,
-                            'landscape': kernel_landscape_norm,
-                            'betti': kernel_betti_norm,
-                            'heat': kernel_heat_norm}
+implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitude,
+                            'wasserstein': wasserstein_amplitude,
+                            'landscape': kernel_landscape_amplitude,
+                            'betti': kernel_betti_amplitude,
+                            'heat': kernel_heat_amplitude}
 
 
-def _parallel_norm(X, metric, metric_params, n_jobs):
+def _parallel_amplitude(X, metric, metric_params, n_jobs):
     n_dimensions = len(X.keys())
-    norm_func = implemented_norm_recipes[metric]
+    amplitude_func = implemented_amplitude_recipes[metric]
 
-    norm_array = Parallel(n_jobs=n_jobs)(delayed(norm_func)(
+    amplitude_array = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
         X[dimension][i, :, :], dimension, **metric_params)
         for i in range(next(iter(X.values())).shape[0])
         for dimension in X.keys())
-    norm_array = np.array(norm_array).reshape((-1, n_dimensions))
-    return norm_array
+    amplitude_array = np.array(amplitude_array).reshape((-1, n_dimensions))
+    return amplitude_array

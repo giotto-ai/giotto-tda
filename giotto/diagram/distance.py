@@ -9,10 +9,8 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
 import itertools
-import numbers
-from giotto.utils.validation import check_diagram
-
-from ._metrics import _parallel_pairwise, _parallel_norm
+from ..utils.validation import check_diagram, validate_metric_params
+from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _sample, _pad
 
 
@@ -49,9 +47,9 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the available arguments are ``order``
-          (default = ``np.inf``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order``
+        - If ``metric == 'bottleneck'`` the only argument is
+         ``delta`` (default = ``0.0``).
+        - If ``metric == 'wasserstein'`` the available arguments are ``order``
           (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
           (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
@@ -79,28 +77,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _validate_params(self):
-        if (self.metric != 'bottleneck' and self.metric != 'wasserstein' and
-                self.metric != 'landscape' and self.metric != 'betti'):
-            raise ValueError("metric parameter has the wrong value: {}."
-                             " Available values are: 'bottleneck',"
-                             " 'wasserstein', 'landscape',"
-                             " 'betti'.".format(self.metric))
-        # if (type(self.metric_params['n_samples']) is not int):
-        #     raise TypeError("n_samples has the wrong type: %s. "
-        #                     "n_sample must be an integer greater "
-        #                     "than 0." % type(self.metric_params['n_samples']))
-        # if (self.metric_params['n_samples'] <= 0):
-        #     raise ValueError("n_samples has the wrong value: {}. "
-        #                      "n_sample must be an integer greater "
-        #                      "than 0.".format(self.metric_params['n_samples']))
-        # if not (isinstance(self.metric_params['delta'], numbers.Number)):
-        #     raise TypeError("delta has the wrong type: %s."
-        #                     "delta must be a non-negative "
-        #                     "integer." % type(self.metric_params['delta']))
-        # if (self.metric_params['delta'] < 0):
-        #     raise ValueError("delta has the wrong value: {}."
-        #                      "delta must be a non-negative "
-        #                      "integer.".format(self.metric_params['delta']))
+        validate_metric_params(self.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -123,13 +100,13 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params()
-        X = check_diagram(X)
-
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
+
+        self._validate_params()
+        X = check_diagram(X)
 
         if self.metric in ['landscape', 'betti', 'heat']:
             self.effective_metric_params_['sampling'] = \
@@ -161,8 +138,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Distance matrix between diagrams in X.
 
         """
+        check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
-        check_is_fitted(self, '_X')
 
         n_diagrams_X = next(iter(X.values())).shape[0]
 
@@ -197,10 +174,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return X_transformed
 
 
-class DiagramNorm(BaseEstimator, TransformerMixin):
-    """Transformer for calculating the norm of a collections of persistence diagrams.
+class DiagramAmplitude(BaseEstimator, TransformerMixin):
+    """Transformer for calculating the amplitude of a collections of persistence diagrams.
     In the case in which diagrams in the collection have been consistently partitioned
-    into one or more subdiagrams (e.g. according to homology dimension), the norm of a
+    into one or more subdiagrams (e.g. according to homology dimension), the amplitude of a
     diagram is a *p*-norm of a vector of distances between respective subdiagrams of
     the same kind.
 
@@ -240,14 +217,14 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params={'order': np.inf}, n_jobs=None):
+    def __init__(self, metric='bottleneck', metric_params=None, order=2, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
+        self.order = order
         self.n_jobs = n_jobs
 
-    @staticmethod
-    def _validate_params():
-        pass
+    def _validate_params(self):
+        validate_metric_params(self.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -269,7 +246,14 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
+
         self._validate_params()
+        X = check_diagram(X)
+
 
         if 'n_samples' in self.metric_params:
             self._n_samples = self.metric_params['n_samples']
@@ -277,13 +261,13 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
             self._n_samples = None
 
         if self.metric in ['landscape', 'betti', 'heat']:
-            self.metric_params['sampling'] = _sample(X, self._n_samples)
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """Computes the norm of a each diagram inn the collection X, according to
+        """Computes the amplitude of a each diagram inn the collection X, according to
         the choice of ``metric`` and ``metric_params``.
 
         Parameters
@@ -300,17 +284,15 @@ class DiagramNorm(BaseEstimator, TransformerMixin):
         Returns
         -------
         X_transformed : ndarray, shape (n_samples, n_samples)
-            Norm of the diagrams in X.
+            Amplitude of the diagrams in X.
 
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
+        X = check_diagram(X)
+
         n_diagrams_X = next(iter(X.values())).shape[0]
 
-        metric_params = self.metric_params.copy()
-
-        if 'n_samples' in metric_params:
-            metric_params.pop('n_samples')
-
-        X_transformed = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
+        X_transformed = _parallel_amplitude(X, self.metric, self.effective_metric_params_,
+                                            self.n_jobs)
 
         return X_transformed

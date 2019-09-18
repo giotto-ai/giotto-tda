@@ -1,0 +1,93 @@
+/******************************************************************************
+* Author:           Julián Burella Pérez
+* Description:      gudhi's simplex tree interfacing with pybind11
+* License:          TBD
+*****************************************************************************/
+
+#include "simplex_tree.h"
+#include "persistent_cohomology.h"
+#include "rips_complex.h"
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(giotto_simplex_tree, m) {
+    // Simplex_tree_interface_full_featured
+    using simplex_tree_interface_inst = Gudhi::Simplex_tree_interface<>;
+    py::class_<simplex_tree_interface_inst>(
+        m, "Simplex_tree_interface_full_featured")
+        .def(py::init<>())
+        .def("simplex_filtration",
+             &simplex_tree_interface_inst::simplex_filtration)
+        .def("assign_simplex_filtration",
+             &simplex_tree_interface_inst::assign_simplex_filtration)
+        .def("initialize_filtration",
+             &simplex_tree_interface_inst::initialize_filtration)
+        .def("num_vertices", &simplex_tree_interface_inst::num_vertices)
+        .def("num_simplices",
+             py::overload_cast<>(
+                 &simplex_tree_interface_inst::Simplex_tree::num_simplices))
+        .def("set_dimension", &simplex_tree_interface_inst::set_dimension)
+        .def("dimension",
+             py::overload_cast<>(
+                 &simplex_tree_interface_inst::Simplex_tree::dimension))
+        .def("upper_bound_dimension",
+             &simplex_tree_interface_inst::upper_bound_dimension)
+        .def("find_simplex", &simplex_tree_interface_inst::find_simplex)
+        .def(
+            "insert_simplex_and_subfaces",
+            py::overload_cast<
+                const std::vector<simplex_tree_interface_inst::Vertex_handle> &,
+                double>(
+                &simplex_tree_interface_inst::insert_simplex_and_subfaces))
+        .def("get_filtration", &simplex_tree_interface_inst::get_filtration)
+        .def("get_skeleton", &simplex_tree_interface_inst::get_skeleton)
+        .def("get_star", &simplex_tree_interface_inst::get_star)
+        .def("get_cofaces", &simplex_tree_interface_inst::get_cofaces)
+        .def("expansion", &simplex_tree_interface_inst::expansion)
+        .def("remove_maximal_simplex",
+             &simplex_tree_interface_inst::remove_maximal_simplex)
+        .def("prune_above_filtration",
+             &simplex_tree_interface_inst::prune_above_filtration)
+        .def("make_filtration_non_decreasing",
+             &simplex_tree_interface_inst::make_filtration_non_decreasing)
+        ;
+    // Simplex_tree_persistence_interface
+    using Persistent_cohomology_interface_inst =
+        Gudhi::Persistent_cohomology_interface<Gudhi::Simplex_tree<Gudhi::
+        Simplex_tree_options_full_featured>>;
+    py::class_<Persistent_cohomology_interface_inst>(
+        m, "Simplex_tree_persistence_interface")
+        .def(py::init<simplex_tree_interface_inst *, bool>())
+        .def("get_persistence",
+             &Persistent_cohomology_interface_inst::get_persistence)
+        .def("betti_numbers",
+             &Persistent_cohomology_interface_inst::betti_numbers)
+        .def("persistent_betti_numbers",
+             &Persistent_cohomology_interface_inst::persistent_betti_numbers)
+        .def("intervals_in_dimension",
+             &Persistent_cohomology_interface_inst::intervals_in_dimension)
+        .def("persistence_pairs",
+             &Persistent_cohomology_interface_inst::persistence_pairs)
+        .def("write_output_diagram",
+             &Persistent_cohomology_interface_inst::write_output_diagram)
+        ;
+
+    py::class_<Gudhi::rips_complex::Rips_complex_interface>(
+        m, "Rips_complex_interface")
+        .def(py::init<>())
+        .def("init_points",
+             &Gudhi::rips_complex::Rips_complex_interface::init_points)
+        .def("init_matrix",
+             &Gudhi::rips_complex::Rips_complex_interface::init_matrix)
+        .def("init_points_sparse",
+             &Gudhi::rips_complex::Rips_complex_interface::init_points_sparse)
+        .def("init_matrix_sparse",
+             &Gudhi::rips_complex::Rips_complex_interface::init_matrix_sparse)
+        .def("create_simplex_tree",
+             &Gudhi::rips_complex::Rips_complex_interface::create_simplex_tree)
+        ;
+    m.doc() = "GUDHI Simplex Tree functions interfacing";
+}

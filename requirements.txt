@@ -1,8 +1,3 @@
 numpy >= 1.17.0
 scipy
 scikit-learn >= 0.21.3
-keras
-keras-metrics
-tensorflow
-ripser
-gudhi
