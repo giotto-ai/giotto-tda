@@ -2,3 +2,10 @@
 omit =
     */giotto/external/*
     **/setup.py
+
+    */giotto/compose/*
+    */giotto/datasets/*
+    */giotto/images/*
+    */giotto/neural_network/*
+    */giotto/model_selection/*
+    **/base.py
