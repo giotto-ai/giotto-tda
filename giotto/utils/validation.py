@@ -57,7 +57,7 @@ def validate_metric_params(metric, metric_params):
                                 "".format(param, type(input_param),
                                           param_type))
 
-           if input_param < param_values[0] or input_param > param_values[1]:
+            if input_param < param_values[0] or input_param > param_values[1]:
                 raise ValueError("{} in param_metric should be between {} "
                                  "and {} but has been set to {}."
                                  "".format(param, param_values[0],

@@ -78,7 +78,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _validate_params(self):
-        validate_metric_params(selef.metric, self.effective_metric_params_)
+        validate_metric_params(self.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fit the estimator and return it.
@@ -139,8 +139,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Distance matrix between diagrams in X.
 
         """
+        check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
-        check_is_fitted(self, '_X')
 
         n_diagrams_X = next(iter(X.values())).shape[0]
 
@@ -266,7 +266,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['sampling'] = \
             _sample(X, self.effective_metric_params_['n_samples'])
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -290,7 +289,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Amplitude of the diagrams in X.
 
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
         X = check_diagram(X)
 
         n_diagrams_X = next(iter(X.values())).shape[0]

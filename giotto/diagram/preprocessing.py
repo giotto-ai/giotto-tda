@@ -5,13 +5,14 @@ import math as m
 import numpy as np
 import sklearn as sk
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from ..utils.validation import check_diagram, validate_metric_params
 from sklearn.base import BaseEstimator, TransformerMixin
 from functools import partial
 from sklearn.utils._joblib import Parallel, delayed
 import itertools
 
 from ._utils import _sort, _filter, _sample
-from ._metrics import _parallel_norm
+from ._metrics import _parallel_amplitude
 from .distance import DiagramDistance
 
 
@@ -28,8 +29,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
     def __init__(self):
         pass
 
-    @staticmethod
-    def _validate_params():
+    def _validate_params(self):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
 
@@ -64,6 +64,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
         """
         self._validate_params()
+        X = check_diagram(X)
 
         self._is_fitted = True
         return self
@@ -97,6 +98,8 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         """
         # Check is fit had been called
         check_is_fitted(self, ['_is_fitted'])
+        X = check_diagram(X)
+
 
         X_transformed = {None: np.concatenate(list(X.values()), axis=1)}
         return X_transformed
@@ -156,13 +159,15 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, metric='bottleneck',
-                 metric_params={'order': np.inf, 'n_samples': 200},
+    def __init__(self, metric='bottleneck', metric_params=None,
                  function=np.max, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.function = function
         self.n_jobs = n_jobs
+
+    def _validate_params(self):
+        validate_metric_params(self.metric, self.effective_metric_params_)
 
     def fit(self, X, y=None):
         """Fits the transformer by finding the scale factor according to the
@@ -189,20 +194,23 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        metric_params = self.metric_params.copy()
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
 
-        sampling = {dimension: None for dimension in X.keys()}
-
-        if 'n_samples' in metric_params.keys():
-            n_samples = metric_params.pop('n_samples')
+        self._validate_params()
+        X = check_diagram(X)
 
         if self.metric in ['landscape', 'betti', 'heat']:
-            metric_params['sampling'] = _sample(X, n_samples)
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])
 
-        norm_array = _parallel_norm(X, self.metric, metric_params, self.n_jobs)
-        self._scale = self.function(norm_array)
+        amplitude_array = _parallel_amplitude(X, self.metric,
+                                         self.effective_metric_params_,
+                                         self.n_jobs)
+        self._scale = self.function(amplitude_array)
 
-        self._is_fitted = True
         return self
 
     # @jit
@@ -232,7 +240,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
             Dictionary of rescaled persistence (sub)diagrams, each with the
             same shape as the corresponding (sub)diagram in X.
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
+        X = check_diagram(X)
 
         X_scaled = {dimension: X / self._scale for dimension, X in X.items()}
         return X_scaled
@@ -313,7 +322,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     def __init__(self, homology_dimensions=None,
                  filtering_parameters_type='fixed', delta=0.,
-                 metric='bottleneck', metric_params={'order': np.inf},
+                 metric='bottleneck', metric_params=None,
                  epsilon=1.,
                  tolerance=1e-2, max_iteration=20, n_jobs=None):
         self.homology_dimensions = homology_dimensions
@@ -326,9 +335,10 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         self.max_iteration = max_iteration
         self.n_jobs = n_jobs
 
-    @staticmethod
-    def _validate_params(filtering_parameters_type):
-        if (filtering_parameters_type not in
+    def _validate_params(self):
+        validate_metric_params(self.metric, self.effective_metric_params_)
+
+        if (self.filtering_parameters_type not in
                 DiagramFilter.implemented_filtering_parameters_types):
             raise ValueError("""The filtering parameters type you specified
                 is not implemented""")
@@ -396,17 +406,25 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
+
+        self._validate_params()
+        X = check_diagram(X)
+
+        if self.metric in ['landscape', 'betti', 'heat']:
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])
 
         if not self.homology_dimensions:
             self.homology_dimensions = set(X.keys())
 
-        self._validate_params(self.filtering_parameters_type)
-
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        r"""Filters all relevant persistence (sub)diagrams, and returns them.
+        """Filters all relevant persistence (sub)diagrams, and returns them.
 
         Parameters
         ----------
@@ -438,7 +456,8 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         """
 
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
+        X = check_diagram(X)
 
         X = _sort(X, self.homology_dimensions)
 
