@@ -8,4 +8,6 @@ omit =
     */giotto/images/*
     */giotto/neural_network/*
     */giotto/model_selection/*
+
     **/base.py
+    **/pipeline.py
