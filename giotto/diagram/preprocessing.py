@@ -452,7 +452,6 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             If ``homology_dimensions`` was set to be a list not containing all
             keys in X, only the corresponding (sub)diagrams are filtered and
             returned.
-
         """
 
         # Check if fit had been called
