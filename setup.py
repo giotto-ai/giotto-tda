@@ -59,7 +59,7 @@ EXTRAS_REQUIRE = {
         'sphinx_rtd_theme',
         'numpydoc'],
     'examples': [
-        'jupyter'
+        'jupyter',
         'matplotlib',
         'plotly',
         'pandas',
