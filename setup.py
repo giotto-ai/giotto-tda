@@ -53,13 +53,15 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'pytest-benchmark'],
-    'docs': [
+    'doc': [
         'sphinx',
         'sphinx-gallery',
         'sphinx_rtd_theme',
         'numpydoc'],
     'examples': [
+        'jupyter'
         'matplotlib',
+        'plotly',
         'pandas',
         'keras',
         'keras-metrics',
