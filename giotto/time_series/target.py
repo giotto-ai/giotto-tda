@@ -1,5 +1,4 @@
-import sklearn as sk
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
 import numpy as np
