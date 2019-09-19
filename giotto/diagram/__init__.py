@@ -7,12 +7,13 @@ It also makes it possible to calculate distance matrices.
 
 from .distance import DiagramDistance, DiagramAmplitude
 from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
-
+from .features import PersistentEntropy
 
 __all__ = [
     'DiagramStacker',
     'DiagramScaler',
     'DiagramFilter',
     'DiagramDistance',
-    'DiagramAmplitude'
+    'DiagramAmplitude',
+    'PersistentEntropy'
 ]
