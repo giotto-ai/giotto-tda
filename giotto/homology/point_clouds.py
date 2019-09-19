@@ -9,7 +9,7 @@ from sklearn.neighbors.base import VALID_METRICS
 from sklearn.utils._joblib import Parallel, delayed
 
 import numpy as np
-from ..externals.bindings import ripser
+from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
