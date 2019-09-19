@@ -5,11 +5,12 @@
 import numpy as np
 
 from sklearn.utils.validation import check_is_fitted
-from ..utils.validation import check_diagram, validate_metric_params
+from ..utils.validation import check_diagram
 
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from sklearn.utils._joblib import Parallel, delayed
+
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of persistent entropy from collections of

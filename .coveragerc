@@ -1,6 +1,6 @@
 [run]
 omit =
-    */giotto/external/*
+    */giotto/externals/*
     **/setup.py
 
     */giotto/compose/*
