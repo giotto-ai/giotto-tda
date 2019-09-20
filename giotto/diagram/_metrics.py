@@ -137,14 +137,17 @@ def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
     betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
 
+
 def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
                      order=2, n_layers=1, **kw_args):
     heat = heat_function(diagram, sigma, sampling[dimension])
     return np.linalg.norm(heat, ord=order)
 
+
 def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
+
 
 def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
