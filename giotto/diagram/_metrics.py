@@ -114,15 +114,20 @@ def _parallel_pairwise(X, Y, metric, metric_params, iterator, order, n_jobs):
     n_dimensions = len(X.keys())
     metric_func = implemented_metric_recipes[metric]
 
-    distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
     distance_array = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
         X[dimension][i, :, :], Y[dimension][j, :, :],
         dimension, **metric_params)
         for i, j in iterator for dimension in X.keys())
     distance_array = np.array(distance_array). \
         reshape((len(iterator), n_dimensions))
-    distance_array = np.linalg.norm(distance_array, axis=1, ord=order)
-    distance_matrix[tuple(zip(*iterator))] = distance_array
+    if order is not None:
+        distance_array = np.linalg.norm(distance_array, axis=1, ord=order)
+        distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
+        distance_matrix[tuple(zip(*iterator))] = distance_array
+    else:
+        distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
+        for dimension in range(n_dimensions):
+            distance_matrix[tuple(zip(*iterator)), dimension] = distance_array[:, dimension]
     return distance_matrix
 
 
