@@ -11,3 +11,4 @@ omit =
 
     **/base.py
     **/pipeline.py
+    **/_version.py
