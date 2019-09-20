@@ -61,7 +61,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     order : int, optional, default: 2
         Order of the norm used to combine subdiagrams distances into a single
-        distance
+        distance. If set to ``None``, returns one distance matrix per homology
+        dimension.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
