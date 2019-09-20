@@ -259,7 +259,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X_scaled : dict of int: ndarray
             Transformed array.
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
 
         X_scaled = {dimension: X * self._scale for dimension, X in X.items()}
         return X_scaled
