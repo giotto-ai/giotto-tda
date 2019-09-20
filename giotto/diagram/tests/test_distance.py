@@ -7,7 +7,7 @@ from sklearn.exceptions import NotFittedError
 
 from giotto.diagram import DiagramDistance, DiagramAmplitude
 
-X = {
+X_1 = {
     0: np.array([[[0., 0.36905774],
                   [0., 0.37293977],
                   [0., 0.38995215],
@@ -267,25 +267,27 @@ def test_not_fitted():
     da = DiagramAmplitude()
 
     with pytest.raises(NotFittedError):
-        dd.transform(X)
+        dd.transform(X_1)
 
     with pytest.raises(NotFittedError):
-        da.transform(X)
+        da.transform(X_1)
 
 
-parameters = [('wasserstein', {'order': 2, 'delta': 0.1}),
+parameters = [('bottleneck', None),
+              ('wasserstein', {'order': 2, 'delta': 0.1}),
               ('betti', {'n_samples': 10}),
-              ('bottleneck', None)]
+              ('landscape', {'n_samples': 10}),
+              ('heat', {'n_samples': 10})]
 
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters)
 def test_dd_transform(metric, metric_params):
     dd = DiagramDistance(metric=metric, metric_params=metric_params, n_jobs=1)
-    X_res = dd.fit_transform(X)
-    assert X_res.shape == (X[0].shape[0], X[0].shape[0])
-    X_res = dd.fit(X).transform(X_2)
-    assert X_res.shape == (X[0].shape[0] + X_2[0].shape[0], X_2[0].shape[0])
+    X_res = dd.fit_transform(X_1)
+    assert X_res.shape == (X_1[0].shape[0], X_1[0].shape[0])
+    X_res = dd.fit(X_1).transform(X_2)
+    assert X_res.shape == (X_1[0].shape[0] + X_2[0].shape[0], X_2[0].shape[0])
 
     da = DiagramAmplitude(metric=metric, metric_params=metric_params, n_jobs=1)
-    X_res = da.fit_transform(X)
-    assert X_res.shape == (X[0].shape[0], len(X.keys()))
+    X_res = da.fit_transform(X_1)
+    assert X_res.shape == (X_1[0].shape[0], len(X_1.keys()))
