@@ -279,6 +279,7 @@ def test_dd_transform(X, metric, metric_params):
     for i in range(len(X_1.keys())):
         assert X_res[i].shape == X[i].shape
 
+    dsc = DiagramScaler(metric=metric, metric_params=metric_params, n_jobs=1)
     X_inv_res = dsc.fit(X_res).inverse_transform(X_res)
     for i in range(len(X_inv_res.keys())):
         assert X_inv_res[i].shape == X[i].shape
