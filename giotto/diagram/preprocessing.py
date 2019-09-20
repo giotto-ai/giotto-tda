@@ -3,17 +3,13 @@
 
 import math as m
 import numpy as np
-import sklearn as sk
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from ..utils.validation import check_diagram, validate_metric_params
-from sklearn.base import BaseEstimator, TransformerMixin
-from functools import partial
-from sklearn.utils._joblib import Parallel, delayed
-import itertools
 
+from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from ..utils.validation import check_diagram, validate_metric_params
 from ._utils import _sort, _filter, _sample
 from ._metrics import _parallel_amplitude
-from .distance import DiagramDistance
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):
