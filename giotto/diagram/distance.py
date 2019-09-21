@@ -2,13 +2,12 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
-import math as m
 import numpy as np
-import sklearn as sk
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
-from functools import partial
 import itertools
+
+from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+
 from ..utils.validation import check_diagram, validate_metric_params
 from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _sample, _pad
@@ -274,7 +273,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes the amplitude of a each diagram inn the collection X, according to
+        """Computes the amplitude of a each diagram in the collection X, according to
         the choice of ``metric`` and ``metric_params``.
 
         Parameters
