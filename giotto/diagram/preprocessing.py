@@ -202,9 +202,12 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self._validate_params()
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat']:
             self.effective_metric_params_['sampling'] = \
             _sample(X, self.effective_metric_params_['n_samples'])
+        elif self.metric in ['betti']:
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])[:, None]
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                          self.effective_metric_params_,
@@ -414,9 +417,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         self._validate_params()
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat']:
             self.effective_metric_params_['sampling'] = \
             _sample(X, self.effective_metric_params_['n_samples'])
+        elif self.metric in ['betti']:
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])[:, None]
 
         if not self.homology_dimensions:
             self.homology_dimensions = set(X.keys())

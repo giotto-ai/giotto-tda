@@ -109,9 +109,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self._validate_params()
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat']:
             self.effective_metric_params_['sampling'] = \
             _sample(X, self.effective_metric_params_['n_samples'])
+        elif self.metric in ['betti']:
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])[:, None]
 
         self._X = X
 
@@ -261,9 +264,12 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         else:
             self._n_samples = None
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat']:
             self.effective_metric_params_['sampling'] = \
             _sample(X, self.effective_metric_params_['n_samples'])
+        elif self.metric in ['betti']:
+            self.effective_metric_params_['sampling'] = \
+            _sample(X, self.effective_metric_params_['n_samples'])[:, None]
 
         return self
 
