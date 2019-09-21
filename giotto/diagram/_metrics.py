@@ -78,8 +78,8 @@ def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
 
 def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
                           order=2, **kw_args):
-    betti_x = betti_function(diagram_x, sampling[dimension])
-    betti_y = betti_function(diagram_y, sampling[dimension])
+    betti_x = betti_function(diagram_x, sampling[dimension][:, None])
+    betti_y = betti_function(diagram_y, sampling[dimension][:, None])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
 
