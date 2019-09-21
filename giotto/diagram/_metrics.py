@@ -139,7 +139,7 @@ def kernel_landscape_amplitude(diagram, dimension, sampling=None,
 
 def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
                            **kw_args):
-    betti = betti_function(diagram, sampling[dimension])
+    betti = betti_function(diagram, sampling[dimension][:, None])
     return np.linalg.norm(betti, ord=order)
 
 
