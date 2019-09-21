@@ -4,7 +4,6 @@
 # License: TBD
 
 import numpy as np
-import math as m
 from sklearn.utils._joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter
 import numbers
@@ -38,8 +37,8 @@ def betti_function(diagram, sampling):
 
 
 def landscape_function(diagram, n_layers, sampling):
-    midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
-    heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
+    midpoints = (diagram[:, 1] + diagram[:, 0]) * np.sqrt(2) / 2.
+    heights = (diagram[:, 1] - diagram[:, 0]) * np.sqrt(2) / 2.
 
     mountains = [-np.abs(sampling - midpoints[i]) +
                  heights[i] for i in range(len(diagram))]
@@ -47,10 +46,9 @@ def landscape_function(diagram, n_layers, sampling):
                                  mountains[i],
                                  0) for i in range(len(diagram))])
 
-    last_layer = fibers.shape[0] - 1
     landscape = np.flip(np.partition(
         fibers,
-        range(last_layer - n_layers, last_layer, 1),
+        range(max(0, fibers.shape[0] - n_layers), fibers.shape[0]),
         axis=0)[-n_layers:, :], axis=0)
     return landscape
 
@@ -150,12 +148,12 @@ def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
 
 
 def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
-    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 
 def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
-    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 
