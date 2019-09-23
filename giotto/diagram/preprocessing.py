@@ -3,17 +3,13 @@
 
 import math as m
 import numpy as np
-import sklearn as sk
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from ..utils.validation import check_diagram, validate_metric_params
-from sklearn.base import BaseEstimator, TransformerMixin
-from functools import partial
-from sklearn.utils._joblib import Parallel, delayed
-import itertools
 
+from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from ..utils.validation import check_diagram, validate_metric_params
 from ._utils import _sort, _filter, _sample
 from ._metrics import _parallel_amplitude
-from .distance import DiagramDistance
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):
@@ -199,9 +195,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['sampling'] = \
-            _sample(X, self.effective_metric_params_['n_samples'])
+                _sample(X, self.effective_metric_params_['n_samples'])
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                          self.effective_metric_params_,
@@ -260,7 +256,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X_scaled : dict of int: ndarray
             Transformed array.
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
 
         X_scaled = {dimension: X * self._scale for dimension, X in X.items()}
         return X_scaled
@@ -329,9 +325,9 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['sampling'] = \
-            _sample(X, self.effective_metric_params_['n_samples'])
+                _sample(X, self.effective_metric_params_['n_samples'])
 
         if not self.homology_dimensions:
             self.homology_dimensions = set(X.keys())
