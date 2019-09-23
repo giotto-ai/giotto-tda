@@ -4,26 +4,46 @@
 # License: TBD
 
 import numpy as np
+import math as m
 from sklearn.utils._joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter
+import numbers
 
 from giotto_wasserstein import wasserstein_distance \
     as pairwise_wasserstein_distance
 from giotto_bottleneck import bottleneck_distance \
     as pairwise_bottleneck_distance
 
+available_metric_params = ['order', 'delta', 'n_samples', 'n_layers', 'sigma']
+
+available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
+                     'wasserstein': [('order', int, (1, np.inf)),
+                                     ('delta', numbers.Number, (0., 1.))],
+                     'betti': [('order', int, (1, np.inf)),
+                               ('n_samples', int, (1, np.inf))],
+                     'landscape': [('order', int, (1, np.inf)),
+                                   ('n_samples', int, (1, np.inf)),
+                                ('n_layers', int, (1, np.inf))],
+                     'heat': [('order', int, (1, np.inf)),
+                              ('n_samples', int, (1, np.inf)),
+                              ('sigma', numbers.Number, (0., np.inf))]}
 
 def betti_function(diagram, sampling):
+    if diagram.size == 0:
+        return np.zeros(sampling.shape)
+
     born = sampling >= diagram[:, 0]
     not_dead = sampling < diagram[:, 1]
     alive = np.logical_and(born, not_dead)
     betti = np.sum(alive, axis=1).T
     return betti
 
-
 def landscape_function(diagram, n_layers, sampling):
-    midpoints = (diagram[:, 1] + diagram[:, 0]) * np.sqrt(2) / 2.
-    heights = (diagram[:, 1] - diagram[:, 0]) * np.sqrt(2) / 2.
+    if diagram.size == 0:
+        return np.hstack([np.zeros(sampling.shape)] * n_layers)
+
+    midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
+    heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
 
     mountains = [-np.abs(sampling - midpoints[i]) +
                  heights[i] for i in range(len(diagram))]
@@ -31,12 +51,12 @@ def landscape_function(diagram, n_layers, sampling):
                                  mountains[i],
                                  0) for i in range(len(diagram))])
 
+    last_layer = fibers.shape[0] - 1
     landscape = np.flip(np.partition(
         fibers,
-        range(max(0, fibers.shape[0] - n_layers), fibers.shape[0]),
+        range(last_layer - n_layers, last_layer, 1),
         axis=0)[-n_layers:, :], axis=0)
     return landscape
-
 
 def heat_function(diagram, sigma, sampling):
     heat = np.zeros((sampling.shape[0], sampling.shape[0]))
@@ -53,34 +73,30 @@ def heat_function(diagram, sigma, sampling):
 
 
 def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
-                              order=2, n_layers=100, **kw_args):
+                              order=2, n_layers=100, **kwargs):
     landscape_x = landscape_function(diagram_x, n_layers, sampling[dimension])
     landscape_y = landscape_function(diagram_y, n_layers, sampling[dimension])
     return np.linalg.norm(landscape_x - landscape_y, ord=order)
 
-
 def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
                           order=2, **kw_args):
-    betti_x = betti_function(diagram_x, sampling[dimension][:, None])
-    betti_y = betti_function(diagram_y, sampling[dimension][:, None])
+    betti_x = betti_function(diagram_x, sampling[dimension])
+    betti_y = betti_function(diagram_y, sampling[dimension])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
-
 def kernel_heat_distance(diagram_x, diagram_y, dimension, sigma=1.,
-                         sampling=None, order=2, **kw_args):
+                         sampling=None, order=2, **kwargs):
     heat_x = heat_function(diagram_x, sigma, sampling[dimension])
     heat_y = heat_function(diagram_y, sigma, sampling[dimension])
     return np.linalg.norm(heat_x - heat_y, ord=order)
 
-
 def bottleneck_distance(diagram_x, diagram_y, dimension=None,
-                        delta=0.0, **kw_args):
+                        delta=0.0, **kwargs):
     return pairwise_bottleneck_distance(diagram_x[diagram_x[:, 1] != 0],
                                         diagram_y[diagram_y[:, 1] != 0], delta)
 
-
 def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
-                         delta=0.0, **kw_args):
+                         delta=0.0, **kwargs):
     return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
 
 
@@ -122,23 +138,20 @@ def kernel_landscape_amplitude(diagram, dimension, sampling=None,
 
 def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
                            **kw_args):
-    betti = betti_function(diagram, sampling[dimension][:, None])
+    betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
-
 
 def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
                      order=2, n_layers=1, **kw_args):
     heat = heat_function(diagram, sigma, sampling[dimension])
     return np.linalg.norm(heat, ord=order)
 
-
 def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
-    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
-
 def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
-    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 

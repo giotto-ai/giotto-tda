@@ -2,12 +2,13 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
+import math as m
 import numpy as np
-import itertools
-
-from sklearn.utils.validation import check_is_fitted
+import sklearn as sk
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
-
+from functools import partial
+import itertools
 from ..utils.validation import check_diagram, validate_metric_params
 from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _sample, _pad
@@ -76,6 +77,9 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.order = order
         self.n_jobs = n_jobs
 
+    def _validate_params(self):
+        validate_metric_params(self.metric, self.effective_metric_params_)
+
     def fit(self, X, y=None):
         """Fit the estimator and return it.
 
@@ -102,12 +106,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
-        validate_metric_params(self.metric, self.effective_metric_params_)
+        self._validate_params()
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'betti', 'heat']:
             self.effective_metric_params_['sampling'] = \
-                _sample(X, self.effective_metric_params_['n_samples'])
+            _sample(X, **self.effective_metric_params_)
 
         self._X = X
 
@@ -220,6 +224,9 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         self.order = order
         self.n_jobs = n_jobs
 
+    def _validate_params(self):
+        validate_metric_params(self.metric, self.effective_metric_params_)
+
     def fit(self, X, y=None):
         """Fit the estimator and return it.
 
@@ -245,22 +252,23 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
-        validate_metric_params(self.metric, self.effective_metric_params_)
+        self._validate_params()
         X = check_diagram(X)
 
-        if 'n_samples' in self.effective_metric_params_:
-            self._n_samples = self.effective_metric_params_['n_samples']
+
+        if 'n_samples' in self.metric_params:
+            self._n_samples = self.metric_params['n_samples']
         else:
             self._n_samples = None
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'betti', 'heat']:
             self.effective_metric_params_['sampling'] = \
-                _sample(X, self.effective_metric_params_['n_samples'])
+            _sample(X, **self.effective_metric_params_)
 
         return self
 
     def transform(self, X, y=None):
-        """Computes the amplitude of a each diagram in the collection X, according to
+        """Computes the amplitude of a each diagram inn the collection X, according to
         the choice of ``metric`` and ``metric_params``.
 
         Parameters
