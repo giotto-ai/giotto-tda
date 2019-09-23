@@ -1,8 +1,7 @@
 """Testing for DiagramDistance and DiagramAmplitude"""
 
-import pytest
 import numpy as np
-
+import pytest
 from sklearn.exceptions import NotFittedError
 
 from giotto.diagram import DiagramDistance, DiagramAmplitude

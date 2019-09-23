@@ -1,8 +1,7 @@
 """Testing for Resampler and Stationarizer"""
 
-import pytest
 import numpy as np
-
+import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 

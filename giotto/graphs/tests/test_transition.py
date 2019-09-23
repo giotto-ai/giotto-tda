@@ -1,8 +1,7 @@
 """Testing for TransitionGraph"""
 
-import pytest
 import numpy as np
-
+import pytest
 from scipy.sparse import csr_matrix
 from sklearn.exceptions import NotFittedError
 

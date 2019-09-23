@@ -3,8 +3,8 @@
 # License: TBD
 
 import numpy as np
-from sklearn.utils._joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
 

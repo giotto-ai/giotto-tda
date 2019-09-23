@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from ..validation import check_diagram
 from ..validation import validate_metric_params
 
