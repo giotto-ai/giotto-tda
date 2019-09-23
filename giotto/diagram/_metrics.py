@@ -7,26 +7,11 @@ import numpy as np
 import math as m
 from sklearn.utils._joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter
-import numbers
 
 from giotto_wasserstein import wasserstein_distance \
     as pairwise_wasserstein_distance
 from giotto_bottleneck import bottleneck_distance \
     as pairwise_bottleneck_distance
-
-available_metric_params = ['order', 'delta', 'n_samples', 'n_layers', 'sigma']
-
-available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
-                     'wasserstein': [('order', int, (1, np.inf)),
-                                     ('delta', numbers.Number, (0., 1.))],
-                     'betti': [('order', int, (1, np.inf)),
-                               ('n_samples', int, (1, np.inf))],
-                     'landscape': [('order', int, (1, np.inf)),
-                                   ('n_samples', int, (1, np.inf)),
-                                ('n_layers', int, (1, np.inf))],
-                     'heat': [('order', int, (1, np.inf)),
-                              ('n_samples', int, (1, np.inf)),
-                              ('sigma', numbers.Number, (0., np.inf))]}
 
 
 def betti_function(diagram, sampling):
