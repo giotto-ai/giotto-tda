@@ -93,9 +93,8 @@ def _sample(X, n_samples):
         for dimension in X.keys()}
 
     sampling = {
-        dimension: np.arange(minimum_persistences[dimension],
-                             maximum_persistences[dimension],
-                             step_persistences[dimension]).reshape((-1, 1))
+        dimension: (minimum_persistences[dimension] \
+            + np.array(range(n_samples))*step_persistences[dimension])
         for dimension in X.keys()}
 
     return sampling
