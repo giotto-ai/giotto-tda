@@ -77,9 +77,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         self.order = order
         self.n_jobs = n_jobs
 
-    def _validate_params(self):
-        validate_metric_params(self.metric, self.effective_metric_params_)
-
     def fit(self, X, y=None):
         """Fit the estimator and return it.
 
@@ -106,7 +103,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
-        self._validate_params()
+        validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
         if self.metric in ['landscape', 'betti', 'heat']:
@@ -224,9 +221,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         self.order = order
         self.n_jobs = n_jobs
 
-    def _validate_params(self):
-        validate_metric_params(self.metric, self.effective_metric_params_)
-
     def fit(self, X, y=None):
         """Fit the estimator and return it.
 
@@ -252,7 +246,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
-        self._validate_params()
+        validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
 
