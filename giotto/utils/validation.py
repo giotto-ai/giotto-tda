@@ -3,7 +3,7 @@ import numpy as np
 import numbers
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
-                     'wasserstein': [('order', int, (1, np.inf)),
+                     'wasserstein': [('order', int, (1e-16, np.inf)),
                                      ('delta', numbers.Number, (0., 1.))],
                      'betti': [('order', int, (1, np.inf)),
                                ('n_samples', int, (1, np.inf))],
