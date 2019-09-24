@@ -1,7 +1,6 @@
-from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
-
 import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
 
 def _derivation_function(function, X, delta_t=1, **function_kwargs):

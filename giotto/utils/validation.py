@@ -1,6 +1,7 @@
 """Utilities for input validation"""
-import numpy as np
 import numbers
+
+import numpy as np
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                      'wasserstein': [('order', int, (1e-16, np.inf)),

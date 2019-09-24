@@ -2,15 +2,15 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
-import numpy as np
 import itertools
 
-from sklearn.utils.validation import check_is_fitted
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
-from ..utils.validation import check_diagram, validate_metric_params
 from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _sample, _pad
+from ..utils.validation import check_diagram, validate_metric_params
 
 
 class DiagramDistance(BaseEstimator, TransformerMixin):
