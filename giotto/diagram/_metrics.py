@@ -28,22 +28,25 @@ available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                               ('n_samples', int, (1, np.inf)),
                               ('sigma', numbers.Number, (0., np.inf))]}
 
-def betti_function(diagram, sampling):
+def betti_function(diagrams, sampling):
     if diagram.size == 0:
         return np.zeros(sampling.shape)
 
-    born = sampling >= diagram[:, 0]
-    not_dead = sampling < diagram[:, 1]
+    # sampling must be a three-dimensional array with the last two
+    # axes having dimension equal to 1. diagrams must be a three-dimensional
+    # array whose entries along axis 0 are persistence diagrams
+    born = sampling >= diagrams[:, :, 0]
+    not_dead = sampling < diagrams[:, :, 1]
     alive = np.logical_and(born, not_dead)
-    betti = np.sum(alive, axis=1).T
+    betti = np.sum(alive, axis=2).T
     return betti
 
 def landscape_function(diagram, n_layers, sampling):
     if diagram.size == 0:
         return np.hstack([np.zeros(sampling.shape)] * n_layers)
 
-    midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
-    heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
+    midpoints = (diagram[:, :, 1] + diagram[:, :, 0]) * m.sqrt(2) / 2.
+    heights = (diagram[:, :, 1] - diagram[:, :, 0]) * m.sqrt(2) / 2.
 
     mountains = [-np.abs(sampling - midpoints[i]) +
                  heights[i] for i in range(len(diagram))]
@@ -135,22 +138,21 @@ def kernel_landscape_amplitude(diagram, dimension, sampling=None,
     landscape = landscape_function(diagram, n_layers, sampling[dimension])
     return np.linalg.norm(landscape, ord=order)
 
-
 def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
                            **kw_args):
     betti = betti_function(diagram, sampling[dimension])
     return np.linalg.norm(betti, ord=order)
 
 def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
-                     order=2, n_layers=1, **kw_args):
+                     order=2, **kw_args):
     heat = heat_function(diagram, sigma, sampling[dimension])
     return np.linalg.norm(heat, ord=order)
 
-def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
+def bottleneck_amplitude(diagram, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
-                          ord=order)
+                          ord=np.inf)
 
-def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
+def wasserstein_amplitude(diagram, order=1, **kw_args):
     return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
