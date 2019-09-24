@@ -1,9 +1,9 @@
 """Base class for sampling"""
 
-# Adapted form imbalanced-learn
+# Taken form imbalanced-learn
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
 #          Christos Aridas
-# License: MIT
+# License: Apache 2.0
 
 import warnings
 from abc import ABCMeta, abstractmethod

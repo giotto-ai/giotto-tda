@@ -1,16 +1,17 @@
 from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
+from ..base import SamplerMixin
 
 import numpy as np
 
 
-class Resampler(BaseEstimator, TransformerMixin):
+class Resampler(BaseEstimator,SamplerMixin):
     """Data sampling transformer that returns a sampled numpy.ndarray.
 
     Parameters
     ----------
     period : int, default: 2
-        The sampling period for periodic sampling.
+        The sampling period, i.e. pointd every period will be kept.
 
 
     Attributes
@@ -42,13 +43,6 @@ class Resampler(BaseEstimator, TransformerMixin):
     def __init__(self, period=2):
         self.period = period
 
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:``fit`` are valid.
-        """
-        if not isinstance(self.period, int):
-            raise TypeError('The period ',  self.period, ' is not an int')
-
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
         This method is just there to implement the usual API and hence
@@ -68,8 +62,6 @@ class Resampler(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params()
-
         X = X.reshape((-1, 1))
 
         self._n_features = X.shape[1]
