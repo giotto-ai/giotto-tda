@@ -62,7 +62,7 @@ def _filter(XScaled, homology_dimensions, cutoff):
                             homology_dimensions}}
 
 
-def _sample(X, n_samples):
+def _sample(X, n_samples=100, **kw_args):
     minimum_persistences = {
         dimension: np.min(X[dimension][:, :, 0]) *
         m.sqrt(2) if X[dimension][:, :, 0].size != 0
@@ -93,9 +93,8 @@ def _sample(X, n_samples):
         for dimension in X.keys()}
 
     sampling = {
-        dimension: np.arange(minimum_persistences[dimension],
-                             maximum_persistences[dimension],
-                             step_persistences[dimension]).reshape((-1, 1))
+        dimension: (minimum_persistences[dimension] \
+            + np.array(range(n_samples))*step_persistences[dimension])
         for dimension in X.keys()}
 
     return sampling

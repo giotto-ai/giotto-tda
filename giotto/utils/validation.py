@@ -1,7 +1,22 @@
 """Utilities for input validation"""
 import numpy as np
 import numbers
-from ..diagram._metrics import available_metric_params, available_metrics
+
+available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
+                     'wasserstein': [('order', int, (1, np.inf)),
+                                     ('delta', numbers.Number, (0., 1.))],
+                     'betti': [('order', int, (1, np.inf)),
+                               ('n_samples', int, (1, np.inf))],
+                     'landscape': [('order', int, (1, np.inf)),
+                                   ('n_samples', int, (1, np.inf)),
+                                   ('n_layers', int, (1, np.inf))],
+                     'heat': [('order', int, (1, np.inf)),
+                              ('n_samples', int, (1, np.inf)),
+                              ('sigma', numbers.Number, (0., np.inf))]}
+
+available_metric_params = list(set(
+    [param for param_list in available_metrics.values()
+     for (param, param_type, param_range) in param_list]))
 
 
 def check_diagram(X):
@@ -12,8 +27,8 @@ def check_diagram(X):
         if isinstance(z, numbers.Number):
             if (z < 0):
                 raise ValueError("X key has the wrong value: {}. "
-                                "X keys must be non-negative "
-                                "integers.".format(z))
+                                 "X keys must be non-negative "
+                                 "integers.".format(z))
         else:
             raise TypeError("X key has the wrong type: %s. "
                             "X keys must be non-negative "
@@ -31,8 +46,8 @@ def check_diagram(X):
                              "diagram coordinates: {}. "
                              "Diagram coordinates dimension must be equal "
                              "to 2.".format(X[z].shape[2]))
-        _diff_coord = (X[z].shape[0]*X[z].shape[1] -
-                      np.sum(X[z][:, :, 1] >= X[z][:, :, 0]))
+        _diff_coord = (X[z].shape[0] * X[z].shape[1] -
+                       np.sum(X[z][:, :, 1] >= X[z][:, :, 0]))
         if (_diff_coord > 0):
             raise ValueError("Coordinates have the wrong value: {} of "
                              "them are wrong. They must be "

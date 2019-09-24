@@ -136,7 +136,6 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         if X.shape[0] < self.outer_window_duration:
             raise ValueError('Not enough data to have a single outer window.')
 
-    @staticmethod
     def _embed(X, time_delay, dimension, stride=1):
         n_points = (X.shape[0] - time_delay *
                     dimension) // stride + 1

@@ -3,17 +3,13 @@
 
 import math as m
 import numpy as np
-import sklearn as sk
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from ..utils.validation import check_diagram, validate_metric_params
-from sklearn.base import BaseEstimator, TransformerMixin
-from functools import partial
-from sklearn.utils._joblib import Parallel, delayed
-import itertools
 
+from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+
+from ..utils.validation import check_diagram, validate_metric_params
 from ._utils import _sort, _filter, _sample
 from ._metrics import _parallel_amplitude
-from .distance import DiagramDistance
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):
@@ -166,9 +162,6 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         self.function = function
         self.n_jobs = n_jobs
 
-    def _validate_params(self):
-        validate_metric_params(self.metric, self.effective_metric_params_)
-
     def fit(self, X, y=None):
         """Fits the transformer by finding the scale factor according to the
         chosen parameters.
@@ -199,12 +192,12 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
-        self._validate_params()
+        validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['sampling'] = \
-            _sample(X, self.effective_metric_params_['n_samples'])
+                _sample(X, **self.effective_metric_params_)
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                          self.effective_metric_params_,
@@ -263,7 +256,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X_scaled : dict of int: ndarray
             Transformed array.
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['effective_metric_params_'])
 
         X_scaled = {dimension: X * self._scale for dimension, X in X.items()}
         return X_scaled
@@ -287,98 +280,16 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         When set to a list, it is interpreted as the list of those homology
         dimensions for which (sub)diagrams should be filtered.
 
-    filtering_parameters_type : str, optional, default: 'fixed'
-        When set to ``'fixed'``, ``'epsilon'`` is ignored and filtering
-        consists simply in removing from all persistent (sub)diagrams all
-        points an absolute distance ``delta`` from the diagonal.
-
     delta : float, optional, default: 0.
         The cutoff value controlling the amount of filtering.
-
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti',
-    optional, default: 'bottleneck'
-        Behaviour not implemented. This variable is currently ignored.
-
-    metric_params : dict, optional, default: {'n_samples': 200}
-        Behaviour not implemented. This variable is currently ignored.
-
-    epsilon : float, optional, default: 1.
-        Behaviour not implemented. This variable is currently ignored.
-
-    tolerance : float, optional, default: 1e-2
-        Behaviour not implemented. This variable is currently ignored.
-
-    max_iteration : int, optional, default: 20
-        Behaviour not implemented. This variable is currently ignored.
-
-    n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means using
-        all processors.
 
     """
 
     implemented_filtering_parameters_types = ['fixed', 'search']
 
-    def __init__(self, homology_dimensions=None,
-                 filtering_parameters_type='fixed', delta=0.,
-                 metric='bottleneck', metric_params=None,
-                 epsilon=1.,
-                 tolerance=1e-2, max_iteration=20, n_jobs=None):
+    def __init__(self, homology_dimensions=None, delta=0.):
         self.homology_dimensions = homology_dimensions
-        self.filtering_parameters_type = filtering_parameters_type
         self.delta = delta
-        self.metric = metric
-        self.metric_params = metric_params
-        self.epsilon = epsilon
-        self.tolerance = tolerance
-        self.max_iteration = max_iteration
-        self.n_jobs = n_jobs
-
-    def _validate_params(self):
-        validate_metric_params(self.metric, self.effective_metric_params_)
-
-        if (self.filtering_parameters_type not in
-                DiagramFilter.implemented_filtering_parameters_types):
-            raise ValueError("""The filtering parameters type you specified
-                is not implemented""")
-
-    def _bisection(self, X):
-        iterator = iter([(i, i) for i in range(len(X))])
-
-        numberPoints = [X[dimension].shape
-                        for dimension in self.homologyDimensions]
-        XConcatenated = np.concatenate(
-            [X[dimension] for dimension in self.homologyDimensions])
-
-        lowerCutoff = 0.
-        upperCutoff = 1.
-
-        currentMeanDistance = 0.
-        previousMeanDistance = 1.
-
-        while m.abs((currentMeanDistance - previousMeanDistance) >
-        self.tolerance and iteration <= self.max_iteration):
-            middlePoint = (lowerPoint + upperPoint) // 2.
-            middlePointIndex = indices[:, middlePoint]
-            # cutoff = m.sqrt(2.)/2. * (XConcatenated[indices[middlePoint][0],
-            # indices[middlePoint][0], 1] - XConcatenated[, , 0])
-            # XFiltered = _filter(XConcatenated, self.homologyDimensions,
-            # middleCutoff)
-
-            # XCOncatenated and XFIltered need to have the same homology
-            # dimensions!!!!!
-            # distance = _parallel_pairwise(XConcatenated, XFiltered, iterator,
-            # self.n_jobs)
-
-            if distance == tolerance:
-                return middleCutoff
-            elif (distance - tolerance) * () < 0:
-                upperCutoff = middleCutoff
-            else:
-                lowerCutoff = middleCutoff
-
-        return middleCutoff
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -411,12 +322,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
-        self._validate_params()
+        validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'betti', 'heat']:
+        if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['sampling'] = \
-            _sample(X, self.effective_metric_params_['n_samples'])
+                _sample(X, **self.effective_metric_params_)
 
         if not self.homology_dimensions:
             self.homology_dimensions = set(X.keys())
