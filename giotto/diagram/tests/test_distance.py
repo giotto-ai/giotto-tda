@@ -279,16 +279,23 @@ parameters = [('bottleneck', None),
               ('heat', {'n_samples': 10})]
 
 
-@pytest.mark.parametrize(('metric', 'metric_params',), parameters)
+@pytest.mark.parametrize(('metric', 'metric_params'), parameters)
 @pytest.mark.parametrize('order', [2, None])
 def test_dd_transform(metric, metric_params, order):
+    # X_fit == X_transform
     dd = DiagramDistance(metric=metric, metric_params=metric_params,
                          order=order, n_jobs=1)
     X_res = dd.fit_transform(X_1)
     assert X_res.shape == (X_1[0].shape[0], X_1[0].shape[0])
 
+    # X_fit != X_transform
     dd = DiagramDistance(metric=metric, metric_params=metric_params,
                          order=order, n_jobs=1)
+    X_res = dd.fit(X_1).transform(X_2)
+    assert X_res.shape == (X_1[0].shape[0] + X_2[0].shape[0], X_2[0].shape[0])
+
+    # X_fit != X_transform, default metric_params
+    dd = DiagramDistance(metric=metric, order=order, n_jobs=1)
     X_res = dd.fit(X_1).transform(X_2)
     assert X_res.shape == (X_1[0].shape[0] + X_2[0].shape[0], X_2[0].shape[0])
 
