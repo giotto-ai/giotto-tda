@@ -5,17 +5,8 @@ a transformer pipeline to sliding subwindows of the input data in the
 spirit of a pooling layer in a convolutional neural network.
 """
 
-# Adapted from scikit-learn
-# Author: (Pipeline)
-#         Edouard Duchesnay
-#         Gael Varoquaux
-#         Virgile Fritsch
-#         Alexandre Gramfort
-#         Lars Buitinck
-#         Christos Aridas
-#         Guillaume Lemaitre <g.lemaitre58@gmail.com>
-#         (SlidingWindowFeatureUnion)
-#         Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+# Adapted from scikit-learn and imbalanced-learn
+# Author: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: Apache 2.0
 
 

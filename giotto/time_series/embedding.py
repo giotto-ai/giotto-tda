@@ -5,7 +5,8 @@
 import numpy as np
 
 from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
+from ..base import ResamplerMixin
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
@@ -136,19 +137,18 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         if X.shape[0] < self.outer_window_duration:
             raise ValueError('Not enough data to have a single outer window.')
 
-    def _embed(X, time_delay, dimension, stride=1):
-        n_points = (X.shape[0] - time_delay *
-                    dimension) // stride + 1
+    def _embed(self, X):
+        n_points = (X.shape[0] - self.time_delay *
+                    self.dimension) // self.stride + 1
 
         X = np.flip(X)
 
-        XEmbedded = np.stack([ X[j * stride : j * stride
-                                 + time_delay * dimension:
-                  time_delay].flatten()
+        X_embedded = np.stack([ X[j * self.stride : j * self.stride
+                                 + self.time_delay * self.dimension:
+                  self.time_delay].flatten()
                 for j in range(0, n_points)])
 
-        return np.flip(XEmbedded).reshape(
-            (n_points, dimension))
+        return np.flip(X_embedded).reshape((n_points, dimension))
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):

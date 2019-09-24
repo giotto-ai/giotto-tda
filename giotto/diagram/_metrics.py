@@ -80,7 +80,7 @@ def bottleneck_distance(diagram_x, diagram_y, dimension=None,
 
 
 def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
-                         delta=0.0, **kw_args):
+                         delta=0.01, **kw_args):
     return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
 
 

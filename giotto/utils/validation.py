@@ -4,7 +4,7 @@ import numbers
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                      'wasserstein': [('order', int, (1, np.inf)),
-                                     ('delta', numbers.Number, (0., 1.))],
+                                     ('delta', numbers.Number, (1e-16, 1.))],
                      'betti': [('order', int, (1, np.inf)),
                                ('n_samples', int, (1, np.inf))],
                      'landscape': [('order', int, (1, np.inf)),
