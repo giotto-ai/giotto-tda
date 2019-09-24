@@ -151,7 +151,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         n_outer_windows = \
             (X.shape[0] - outer_window_duration) // outer_window_stride + 1
         n_points = (outer_window_duration - embedding_time_delay *
-                    embedding_dimension) // embedding_stride + 1
+                    (embedding_dimension - 1) - 1) // embedding_stride + 1
 
         X = np.flip(X)
 
@@ -159,7 +159,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
             np.stack([
                 X[i * outer_window_stride + j * embedding_stride:
                   i * outer_window_stride + j * embedding_stride +
-                  embedding_time_delay * embedding_dimension:
+                  embedding_time_delay * (embedding_dimension - 1) + 1:
                   embedding_time_delay].flatten()
                 for j in range(0, n_points)])
             for i in range(0, n_outer_windows)])

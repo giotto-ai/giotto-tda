@@ -3,8 +3,6 @@
 #          Matteo Caorsi <m.caorsi@l2f.ch>
 # License: TBD
 
-import math as m
-
 import numpy as np
 from giotto_bottleneck import bottleneck_distance \
     as pairwise_bottleneck_distance
@@ -23,8 +21,8 @@ def betti_function(diagram, sampling):
 
 
 def landscape_function(diagram, n_layers, sampling):
-    midpoints = (diagram[:, 1] + diagram[:, 0]) * m.sqrt(2) / 2.
-    heights = (diagram[:, 1] - diagram[:, 0]) * m.sqrt(2) / 2.
+    midpoints = (diagram[:, 1] + diagram[:, 0]) * np.sqrt(2) / 2.
+    heights = (diagram[:, 1] - diagram[:, 0]) * np.sqrt(2) / 2.
 
     mountains = [-np.abs(sampling - midpoints[i]) +
                  heights[i] for i in range(len(diagram))]
@@ -32,10 +30,9 @@ def landscape_function(diagram, n_layers, sampling):
                                  mountains[i],
                                  0) for i in range(len(diagram))])
 
-    last_layer = fibers.shape[0] - 1
     landscape = np.flip(np.partition(
         fibers,
-        range(last_layer - n_layers, last_layer, 1),
+        range(max(0, fibers.shape[0] - n_layers), fibers.shape[0]),
         axis=0)[-n_layers:, :], axis=0)
     return landscape
 
@@ -63,8 +60,8 @@ def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
 
 def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
                           order=2, **kw_args):
-    betti_x = betti_function(diagram_x, sampling[dimension])
-    betti_y = betti_function(diagram_y, sampling[dimension])
+    betti_x = betti_function(diagram_x, sampling[dimension][:, None])
+    betti_y = betti_function(diagram_y, sampling[dimension][:, None])
     return np.linalg.norm(betti_x - betti_y, ord=order)
 
 
@@ -124,7 +121,7 @@ def kernel_landscape_amplitude(diagram, dimension, sampling=None,
 
 def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
                            **kw_args):
-    betti = betti_function(diagram, sampling[dimension])
+    betti = betti_function(diagram, sampling[dimension][:, None])
     return np.linalg.norm(betti, ord=order)
 
 
@@ -135,12 +132,12 @@ def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
 
 
 def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
-    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 
 def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
-    return np.linalg.norm(m.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
+    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
                           ord=order)
 
 
