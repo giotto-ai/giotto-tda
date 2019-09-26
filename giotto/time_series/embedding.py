@@ -244,22 +244,18 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
             self.embedding_time_delay_ = mutual_information_list.index(
                 min(mutual_information_list)) + 1
 
-            n_false_neighbors_list = Parallel(n_jobs=self.n_jobs)(
+            n_false_nbhrs_list = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._false_nearest_neighbors)(
                     X, self.embedding_time_delay, embedding_dimension,
                     embedding_stride=1) for embedding_dimension in
                 range(1, self.embedding_dimension + 3))
 
-            variation_list = [
-                np.abs(n_false_neighbors_list[embedding_dimension - 1] - 2 *
-                       n_false_neighbors_list[embedding_dimension] +
-                       n_false_neighbors_list[embedding_dimension + 1]
-                       ) / (n_false_neighbors_list[embedding_dimension] + 1) /
-                embedding_dimension for embedding_dimension in
-                range(1, self.embedding_dimension + 1)]
+            variation_list = [np.abs(n_false_nbhrs_list[emb_dim - 1] - 2 *
+                n_false_nbhrs_list[emb_dim] + n_false_nbhrs_list[emb_dim + 1])
+                / (n_false_nbhrs_list[emb_dim] + 1) / emb_dim
+                for emb_dim in range(2, self.embedding_dimension + 1)]
 
-            e_d_temp = variation_list.index(min(variation_list))
-            self.embedding_dimension_ = e_d_temp + 1 if e_d_temp else 2
+            self.embedding_dimension_ = e_d_temp + 2
 
         else:
             self.embedding_time_delay_ = self.embedding_time_delay
