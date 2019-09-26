@@ -58,7 +58,8 @@ def pairwise_betti_distances(diagrams_1, linspace, step_size,
                              diagrams_2=None, p=2., **kw_args):
     # As for pairwise_landscape_distances, but for Betti curves.
 
-    betti_curves_1 = betti_curves(diagrams_1, linspace)
+    linsp = linspace[:, None, None]
+    betti_curves_1 = betti_curves(diagrams_1, linsp)
     if diagrams_2 is None:
         return (step_size ** (1 / p)) * pdist(betti_curves_1, 'minkowski', p=p)
     betti_curves_2 = betti_curves(diagrams_2, linspace)
@@ -74,14 +75,15 @@ def pairwise_landscape_distances(diagrams_1, linspace, step_size,
     # pairs (L1, L2) of persistence landscapes such that L1 is a landscape
     # coming from diagrams_1 and L2 is a landscape coming from diagrams_2.
 
+    linsp = linspace[:, None, None]
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
-    ls_1 = landscapes(diagrams_1, n_layers, linspace).reshape((
+    ls_1 = landscapes(diagrams_1, n_layers, linsp).reshape((
         n_samples_1, -1))
     if diagrams_2 is None:
         return (step_size ** (1 / p)) * pdist(ls_1, 'minkowski', p=p)
     n_samples_2, n_points_2 = diagrams_2.shape[:2]
     n_layers_12 = min(n_layers, n_points_1, n_points_2)
-    ls_2 = landscapes(diagrams_2, n_layers_12, linspace).reshape((
+    ls_2 = landscapes(diagrams_2, n_layers_12, linsp).reshape((
         n_samples_2, -1))
     return (step_size ** (1 / p)) * cdist(ls_1, ls_2, 'minkowski', p=p)
 
@@ -140,7 +142,7 @@ def _parallel_pairwise(X1, metric, metric_params, X2=None, iterator=None,
 
     n_dims = len(X1.keys())
     n_diags_1 = len(next(iter(X1.values())))
-    if Y is None:
+    if X2 is None:
         X2, n_diags_2 = X1, n_diags_1
     else:
         n_diags_2 = len(next(iter(X2.values())))
@@ -162,13 +164,15 @@ def _parallel_pairwise(X1, metric, metric_params, X2=None, iterator=None,
 
 
 def betti_amplitudes(diagrams, linspace, step_size, p=2., **kw_args):
-    bcs = betti_curves(diagrams, linspace)
+    linsp = linspace[:, None, None]
+    bcs = betti_curves(diagrams, linsp)
     return (step_size ** (1 / p)) * np.linalg.norm(bcs, axis=1, ord=p)
 
 
 def landscape_amplitudes(diagrams, linspace, step_size, p=2., n_layers=1,
                          **kw_args):
-    ls = landscapes(diagrams, linspace, n_layers).reshape((
+    linsp = linspace[:, None, None]
+    ls = landscapes(diagrams, linsp, n_layers).reshape((
         len(diagrams), -1))
     return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
