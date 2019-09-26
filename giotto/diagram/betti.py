@@ -5,7 +5,9 @@ from giotto.diagram._metrics import betti_curves
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-
+    """
+    DOC TO DO
+    """
     def __init__(self, n_sampled_values=100):
         self.n_sampled_values = n_sampled_values
 
@@ -19,7 +21,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         # Only parallelism is across dimensions
         bcs = Parallel(n_jobs=n_jobs)(delayed(betti_curves)(
-            X[dim], self._linspaces[dim]) for dim in X.keys())
+            X[dim], self._linspaces[dim][:, None, None]) for dim in X.keys())
         bcs = np.stack(bcs, axis=1)
         linspaces = np.vstack([self._linspaces[dim] for dim in X.keys()])
         linspaces = np.tile(linspaces, (n_samples, 1, 1))

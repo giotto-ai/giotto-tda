@@ -27,7 +27,7 @@ def betti_curves(diagrams, linspace):
 
 def landscapes(diagrams, linspace, n_layers):
     # Up to n_layers persistence landscapes across a collection of diagrams,
-    # via sampling at regular intervals.
+    # via sampling at regular intervals. linspace must be as in betti_curves
 
     n_points = diagrams.shape[1]
     n_layers_possible = min(n_points, n_layers)

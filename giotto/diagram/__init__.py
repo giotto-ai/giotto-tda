@@ -16,5 +16,6 @@ __all__ = [
     'DiagramDistance',
     'DiagramAmplitude',
     'PersistentEntropy',
-    'BettiCurve'
+    'BettiCurve',
+    'PersistenceLandscape'
 ]
