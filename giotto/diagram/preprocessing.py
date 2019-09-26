@@ -8,7 +8,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_amplitude
-from ._utils import _sort, _filter, _sample
+from ._utils import _sort, _filter, _create_linspaces
 from ..utils.validation import check_diagram, validate_metric_params
 
 
