@@ -4,8 +4,8 @@ from sklearn.utils.validation import check_is_fitted
 
 
 def _derivation_function(function, X, delta_t=1, **function_kwargs):
-    partial_window_begin = function(X[:, delta_t:], axis=1, **function_kwargs)
-    partial_window_end = function(X[:, :-delta_t], axis=1, **function_kwargs)
+    partial_window_begin = function(X[:, :-delta_t], axis=1, **function_kwargs)
+    partial_window_end = function(X[:, delta_t:], axis=1, **function_kwargs)
     derivative = (partial_window_end - partial_window_begin) / \
         partial_window_begin / delta_t
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
@@ -20,7 +20,7 @@ def _variation_function(function, X, delta_t=1, **function_kwargs):
     return variation.reshape((-1, 1))
 
 
-def _application_function(function, X, axis=1, delta_t=0, **function_kwargs):
+def _application_function(function, X, delta_t=0, **function_kwargs):
     return function(X, axis=1, **function_kwargs).reshape((-1, 1))
 
 
@@ -62,15 +62,10 @@ class Labeller(BaseEstimator, TransformerMixin):
     def _embed(y, window_size):
         n_windows = y.shape[0] - window_size + 1
 
-        y = np.flip(y)
         y_embedded = np.stack(
             [y[i: i + window_size].flatten() for i in range(0, n_windows)])
 
-        return np.flip(y_embedded).reshape((n_windows, window_size))
-
-    @staticmethod
-    def _roll(y, n_steps_future):
-        return y[n_steps_future:]
+        return y_embedded.reshape((n_windows, window_size))
 
     @staticmethod
     def _validate_params(labelling_kwargs):
@@ -159,9 +154,13 @@ class Labeller(BaseEstimator, TransformerMixin):
             y_transformed = np.nonzero(y_transformed)[1].reshape(
                 (y.shape[0], 1))
 
-        y_transformed = self._roll(y_transformed, self.n_steps_future)
+        if self.n_steps_future >= self.window_size:
+            y_transformed = y_transformed[self.n_steps_future - self.window_size + 1:]
+
         return y_transformed
 
     def cut(self, X):
-        X_cut = X[self.window_size - self.n_steps_future:-self.n_steps_future]
+        X_cut = X[:-self.n_steps_future]
+        if self.n_steps_future < self.window_size:
+            X_cut = X_cut[self.window_size - 1 - self.n_steps_future:]
         return X_cut
