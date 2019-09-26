@@ -196,17 +196,24 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['sampling'] = \
-                _sample(X, **self.effective_metric_params_)
+            self.effective_metric_params_['linspaces'], \
+                self.effective_metric_params_['step_sizes'] = \
+                _create_linspaces(X, **self.effective_metric_params_)
+            if self.metric == 'landscape':
+                self.effective_metric_params_['linspaces'] = {
+                    dim: np.sqrt(2) * linspace for dim, linspace in
+                    self.effective_metric_params_['linspaces'].items()}
+                self.effective_metric_params_['step_sizes'] = {
+                    dim: np.sqrt(2) * step_size for dim, step_size in
+                    self.effective_metric_params_['step_sizes'].items()}
 
         amplitude_array = _parallel_amplitude(X, self.metric,
-                                         self.effective_metric_params_,
-                                         self.n_jobs)
+                                            self.effective_metric_params_,
+                                            n_jobs=self.n_jobs)
         self._scale = self.function(amplitude_array)
 
         return self
 
-    # @jit
     def transform(self, X, y=None):
         """Rescales all persistence diagrams in the collection according to the
         factor computed during ``fit``.
@@ -326,8 +333,16 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['sampling'] = \
-                _sample(X, **self.effective_metric_params_)
+            self.effective_metric_params_['linspaces'], \
+                self.effective_metric_params_['step_sizes'] = \
+                _create_linspaces(X, **self.effective_metric_params_)
+            if self.metric == 'landscape':
+                self.effective_metric_params_['linspaces'] = {
+                    dim: np.sqrt(2) * linspace for dim, linspace in
+                    self.effective_metric_params_['linspaces'].items()}
+                self.effective_metric_params_['step_sizes'] = {
+                    dim: np.sqrt(2) * step_size for dim, step_size in
+                    self.effective_metric_params_['step_sizes'].items()}
 
         if not self.homology_dimensions:
             self.homology_dimensions = set(X.keys())
