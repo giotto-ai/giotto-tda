@@ -96,9 +96,9 @@ def kernel_bottleneck_distance(diagram_x, diagram_y, delta=0.0, **kw_args):
                                         diagram_y[diagram_y[:, 1] != 0], delta)
 
 
-def kernel_wasserstein_distance(diagram_x, diagram_y, order=1, delta=0.01,
+def kernel_wasserstein_distance(diagram_x, diagram_y, q=1, delta=0.01,
                                 **kw_args):
-    return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
+    return pairwise_wasserstein_distance(diagram_x, diagram_y, q, delta)
 
 
 # def kernel_heat_distance(diagram_x, diagram_y, linspaces, dimension, sigma=1.,
@@ -185,9 +185,9 @@ def bottleneck_amplitudes(diagrams, **kw_args):
     return np.linalg.norm(dists_to_diag, axis=1, ord=np.inf)
 
 
-def wasserstein_amplitudes(diagrams, order=1., **kw_args):
+def wasserstein_amplitudes(diagrams, q=1., **kw_args):
     dists_to_diag = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
-    return np.linalg.norm(dists_to_diag, axis=1, ord=order)
+    return np.linalg.norm(dists_to_diag, axis=1, ord=q)
 
 
 # def kernel_heat_amplitude(diagram, linspaces, dimension, sigma=1., order=2,

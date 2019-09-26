@@ -4,11 +4,11 @@ import numbers
 import numpy as np
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
-                     'wasserstein': [('order', int, (1e-16, np.inf)),
-                                     ('delta', numbers.Number, (0., 1.))],
-                     'betti': [('order', int, (1, np.inf)),
+                     'wasserstein': [('q', int, (1, np.inf)),
+                                     ('delta', numbers.Number, (1e-16, 1.))],
+                     'betti': [('p', int, (1, np.inf)),
                                ('n_sampled_values', int, (1, np.inf))],
-                     'landscape': [('order', int, (1, np.inf)),
+                     'landscape': [('p', int, (1, np.inf)),
                                    ('n_sampled_values', int, (1, np.inf)),
                                    ('n_layers', int, (1, np.inf))],
                      'heat': [('order', int, (1, np.inf)),

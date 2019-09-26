@@ -273,10 +273,10 @@ def test_not_fitted():
 
 
 parameters = [('bottleneck', None),
-              ('wasserstein', {'order': 2, 'delta': 0.1}),
+              ('wasserstein', {'q': 2, 'delta': 0.1}),
               ('betti', {'n_sampled_values': 10}),
               ('landscape', {'n_sampled_values': 10}),
-              #('heat', {'n_sampled_values': 10})
+              # ('heat', {'n_sampled_values': 10})
               ]
 
 
