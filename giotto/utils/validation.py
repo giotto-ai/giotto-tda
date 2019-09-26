@@ -7,12 +7,12 @@ available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                      'wasserstein': [('order', int, (1e-16, np.inf)),
                                      ('delta', numbers.Number, (0., 1.))],
                      'betti': [('order', int, (1, np.inf)),
-                               ('n_samples', int, (1, np.inf))],
+                               ('n_sampled_values', int, (1, np.inf))],
                      'landscape': [('order', int, (1, np.inf)),
-                                   ('n_samples', int, (1, np.inf)),
+                                   ('n_sampled_values', int, (1, np.inf)),
                                    ('n_layers', int, (1, np.inf))],
                      'heat': [('order', int, (1, np.inf)),
-                              ('n_samples', int, (1, np.inf)),
+                              ('n_sampled_values', int, (1, np.inf)),
                               ('sigma', numbers.Number, (0., np.inf))]}
 
 available_metric_params = list(set(

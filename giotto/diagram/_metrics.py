@@ -4,7 +4,7 @@
 # License: TBD
 
 import numpy as np
-from scipy.spatial.distance import cdist, pdist
+from scipy.spatial.distance import cdist, pdist, squareform
 from giotto_bottleneck import bottleneck_distance \
     as pairwise_bottleneck_distance
 from giotto_wasserstein import wasserstein_distance \
@@ -61,10 +61,11 @@ def pairwise_betti_distances(diagrams_1, linspace, step_size,
     linsp = linspace[:, None, None]
     betti_curves_1 = betti_curves(diagrams_1, linsp)
     if diagrams_2 is None:
-        return (step_size ** (1 / p)) * pdist(betti_curves_1, 'minkowski', p=p)
-    betti_curves_2 = betti_curves(diagrams_2, linspace)
-    return (step_size ** (1 / p)) * cdist(betti_curves_1, betti_curves_2,
-                                          'minkowski', p=p)
+        unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
+    betti_curves_2 = betti_curves(diagrams_2, linsp)
+    unnorm_dist = cdist(betti_curves_1, betti_curves_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
 
 
 def pairwise_landscape_distances(diagrams_1, linspace, step_size,
@@ -77,15 +78,17 @@ def pairwise_landscape_distances(diagrams_1, linspace, step_size,
 
     linsp = linspace[:, None, None]
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
-    ls_1 = landscapes(diagrams_1, n_layers, linsp).reshape((
+    ls_1 = landscapes(diagrams_1, linsp, n_layers).reshape((
         n_samples_1, -1))
     if diagrams_2 is None:
-        return (step_size ** (1 / p)) * pdist(ls_1, 'minkowski', p=p)
+        unnorm_dist = squareform(pdist(ls_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
     n_samples_2, n_points_2 = diagrams_2.shape[:2]
     n_layers_12 = min(n_layers, n_points_1, n_points_2)
-    ls_2 = landscapes(diagrams_2, n_layers_12, linsp).reshape((
+    ls_2 = landscapes(diagrams_2, linsp, n_layers_12).reshape((
         n_samples_2, -1))
-    return (step_size ** (1 / p)) * cdist(ls_1, ls_2, 'minkowski', p=p)
+    unnorm_dist = cdist(ls_1, ls_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
 
 
 def kernel_bottleneck_distance(diagram_x, diagram_y, delta=0.0, **kw_args):
@@ -93,7 +96,7 @@ def kernel_bottleneck_distance(diagram_x, diagram_y, delta=0.0, **kw_args):
                                         diagram_y[diagram_y[:, 1] != 0], delta)
 
 
-def kernel_wasserstein_distance(diagram_x, diagram_y, order=1, delta=0.0,
+def kernel_wasserstein_distance(diagram_x, diagram_y, order=1, delta=0.01,
                                 **kw_args):
     return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
 
@@ -147,7 +150,7 @@ def _parallel_pairwise(X1, metric, metric_params, X2=None, iterator=None,
     else:
         n_diags_2 = len(next(iter(X2.values())))
     dist_vecs = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
-        X1[dim][i, :, :], X2[dim][j, :, :], dim, **metric_params)
+        X1[dim][i, :, :], X2[dim][j, :, :], **metric_params)
         for i, j in iterator for dim in X1.keys())
     dist_vecs = np.array(dist_vecs).reshape((len(iterator), n_dims))
     if order is not None:
@@ -206,6 +209,9 @@ def _parallel_amplitude(X, metric, metric_params, n_jobs=None):
                     if key not in ['linspaces', 'step_sizes']}
     lins = metric_params.get('linspaces')
     st_sizes = metric_params.get('step_sizes')
+    lins = lins if lins is not None else {dim: None for dim in X.keys()}
+    st_sizes = st_sizes if st_sizes is not None else {dim: None for dim in
+                                                      X.keys()}
 
     # Only parallelism is across dimensions
     ampl_arr = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(

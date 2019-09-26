@@ -153,12 +153,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         if is_same:
             # Only calculate metric for upper triangle
             iterator = list(itertools.combinations(range(n_diags_X), 2))
-            X_transformed = _parallel_pairwise(X, self.metric,
-                                               self.effective_metric_params_,
-                                               iterator=iterator,
-                                               order=self.order,
-                                               n_jobs=self.n_jobs)
-            X_transformed = X_transformed + X_transformed.T
+            X_upp = _parallel_pairwise(X, self.metric,
+                                       self.effective_metric_params_,
+                                       iterator=iterator, order=self.order,
+                                       n_jobs=self.n_jobs)
+            transp_indices = (1, 0) if X_upp.ndim == 2 else (1, 0, 2)
+            X_transformed = X_upp + np.transpose(X_upp, transp_indices)
         else:
             max_betti_numbers = {dim: max(self._X[dim].shape[1],
                                           X[dim].shape[1]) for dim in
