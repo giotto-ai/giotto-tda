@@ -1,8 +1,7 @@
 """Testing for DiagramDistance and DiagramAmplitude"""
 
-import pytest
 import numpy as np
-
+import pytest
 from sklearn.exceptions import NotFittedError
 
 from giotto.diagram import DiagramDistance, DiagramAmplitude
@@ -280,19 +279,28 @@ parameters = [('bottleneck', None),
               ('heat', {'n_samples': 10})]
 
 
-@pytest.mark.parametrize(('metric', 'metric_params',), parameters)
+@pytest.mark.parametrize(('metric', 'metric_params'), parameters)
 @pytest.mark.parametrize('order', [2, None])
-def test_dd_transform(metric, metric_params, order):
+@pytest.mark.parametrize('n_jobs', [1, 2, 4])
+def test_dd_transform(metric, metric_params, order, n_jobs):
+    # X_fit == X_transform
     dd = DiagramDistance(metric=metric, metric_params=metric_params,
-                         order=order, n_jobs=1)
+                         order=order, n_jobs=n_jobs)
     X_res = dd.fit_transform(X_1)
     assert X_res.shape == (X_1[0].shape[0], X_1[0].shape[0])
 
+    # X_fit != X_transform
     dd = DiagramDistance(metric=metric, metric_params=metric_params,
-                         order=order, n_jobs=1)
+                         order=order, n_jobs=n_jobs)
     X_res = dd.fit(X_1).transform(X_2)
     assert X_res.shape == (X_1[0].shape[0] + X_2[0].shape[0], X_2[0].shape[0])
 
-    da = DiagramAmplitude(metric=metric, metric_params=metric_params, n_jobs=1)
+    # X_fit != X_transform, default metric_params
+    dd = DiagramDistance(metric=metric, order=order, n_jobs=n_jobs)
+    X_res = dd.fit(X_1).transform(X_2)
+    assert X_res.shape == (X_1[0].shape[0] + X_2[0].shape[0], X_2[0].shape[0])
+
+    da = DiagramAmplitude(metric=metric, metric_params=metric_params,
+                          n_jobs=n_jobs)
     X_res = da.fit_transform(X_1)
     assert X_res.shape == (X_1[0].shape[0], len(X_1.keys()))

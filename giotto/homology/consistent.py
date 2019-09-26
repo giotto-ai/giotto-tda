@@ -2,14 +2,14 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
-import numpy as np
-import math as m
 import itertools
+import math as m
 
-from sklearn.utils.validation import check_is_fitted
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):

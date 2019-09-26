@@ -2,13 +2,12 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: TBD
 
-from sklearn.utils.validation import check_is_fitted
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors.base import VALID_METRICS
-
 from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
 
-import numpy as np
 from ..externals.python import ripser
 
 

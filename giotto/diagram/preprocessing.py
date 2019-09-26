@@ -2,14 +2,14 @@
 # License: TBD
 
 import math as m
+
 import numpy as np
-
-from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
-from ..utils.validation import check_diagram, validate_metric_params
-from ._utils import _sort, _filter, _sample
 from ._metrics import _parallel_amplitude
+from ._utils import _sort, _filter, _sample
+from ..utils.validation import check_diagram, validate_metric_params
 
 
 class DiagramStacker(BaseEstimator, TransformerMixin):

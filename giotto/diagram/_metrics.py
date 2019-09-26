@@ -5,13 +5,12 @@
 
 import numpy as np
 from scipy.spatial.distance import cdist, pdist
-from sklearn.utils._joblib import Parallel, delayed
-from scipy.ndimage import gaussian_filter
-
-from giotto_wasserstein import wasserstein_distance \
-    as pairwise_wasserstein_distance
 from giotto_bottleneck import bottleneck_distance \
     as pairwise_bottleneck_distance
+from giotto_wasserstein import wasserstein_distance \
+    as pairwise_wasserstein_distance
+from scipy.ndimage import gaussian_filter
+from sklearn.utils._joblib import Parallel, delayed
 
 
 def betti_curves(diagrams, linspace):

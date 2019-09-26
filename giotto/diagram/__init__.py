@@ -6,8 +6,8 @@ It also makes it possible to calculate distance matrices.
 """
 
 from .distance import DiagramDistance, DiagramAmplitude
-from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
 from .features import PersistentEntropy
+from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
 
 __all__ = [
     'DiagramStacker',

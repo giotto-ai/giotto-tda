@@ -4,15 +4,14 @@
 # License: TBD
 
 import warnings
-import numpy as np
-
 from functools import partial
 
+import numpy as np
 from scipy.sparse import SparseEfficiencyWarning
-from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._joblib import Parallel, delayed
 from sklearn.neighbors import kneighbors_graph
+from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
 
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):

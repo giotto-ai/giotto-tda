@@ -1,7 +1,6 @@
 """Testing for OrdinalRepresentation"""
 
 import numpy as np
-
 from numpy.testing import assert_equal, assert_almost_equal
 
 from giotto.time_series import OrdinalRepresentation, Entropy

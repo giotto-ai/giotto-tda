@@ -3,13 +3,11 @@
 # License: TBD
 
 import numpy as np
-
-from sklearn.utils.validation import check_is_fitted
-from ..utils.validation import check_diagram
-
 from sklearn.base import BaseEstimator, TransformerMixin
-
 from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
+
+from ..utils.validation import check_diagram
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
