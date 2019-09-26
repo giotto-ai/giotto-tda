@@ -82,9 +82,9 @@ def test_inputs_dim3_coord_V():
         3: np.array([[[1, 1], [2, 2], ['b', 3]], [[4, 4], [5, 5], [6, 6]]])
         # Wrong array element value
     }
-    with pytest.raises(ValueError, match="They must be "
-                                         "integers and the 2nd must be greater than "
-                                         "or equal to the 1st one."):
+    with pytest.raises(ValueError, match="They must be integers and the 2nd "
+                                         "must be greater than or equal to "
+                                         "the 1st one."):
         check_diagram(X)
 
 
@@ -92,39 +92,39 @@ def test_inputs_dim3_coord_V():
 # Test for the wrong metric value
 def test_metric_V():
     with pytest.raises(ValueError, match="No metric called"):
-        validate_metric_params('bottleeck', metric_params={'n_samples': 200,
-                                                           'delta': 0.0})
+        validate_metric_params('bottleeck', metric_params={
+            'n_sampled_values': 200, 'delta': 0.01})
 
 
-# Test for the wrong n_sample type
-def test_n_samples_T():
+# Test for the wrong n_sampled_values type
+def test_n_sampled_values_T():
     with pytest.raises(TypeError, match=" in params_metric is of type "):
         validate_metric_params('landscape',
-                               metric_params={'n_samples': 'a',
-                                              'delta': 0.0})
+                               metric_params={'n_sampled_values': 'a',
+                                              'delta': 0.01})
 
 
-# Test for the wrong n_sample value
-def test_n_samples_V():
+# Test for the wrong n_sampled_values value
+def test_n_sampled_values_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('landscape',
-                               metric_params={'n_samples': -2,
-                                              'delta': 0.0})
+                               metric_params={'n_sampled_values': -2,
+                                              'delta': 0.01})
 
 
 # Test for the wrong delta value
 def test_delta_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('bottleneck',
-                               metric_params={'n_samples': 200,
-                                              'delta': -1}, )
+                               metric_params={'n_sampled_values': 200,
+                                              'delta': -1})
 
 
 # Test for the wrong delta value
 def test_delta_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('bottleneck',
-                               metric_params={'n_samples': 200,
+                               metric_params={'n_sampled_values': 200,
                                               'delta': 'a'})
 
 
@@ -132,7 +132,7 @@ def test_delta_T():
 def test_order_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
-                               metric_params={'n_samples': 200,
+                               metric_params={'n_sampled_values': 200,
                                               'order': -1})
 
 
@@ -140,7 +140,7 @@ def test_order_V():
 def test_order_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('heat',
-                               metric_params={'n_samples': 200,
+                               metric_params={'n_sampled_values': 200,
                                               'order': 'a'})
 
 
@@ -148,14 +148,14 @@ def test_order_T():
 def test_sigma_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
-                               metric_params={'n_samples': 200,
+                               metric_params={'n_sampled_values': 200,
                                               'sigma': -1})
 
 
 # Test for the wrong sigma type
 def test_sigma_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
-        validate_metric_params('heat', metric_params={'n_samples': 200,
+        validate_metric_params('heat', metric_params={'n_sampled_values': 200,
                                                       'sigma': 'a'})
 
 

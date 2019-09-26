@@ -58,7 +58,7 @@ def check_diagram(X):
 
 
 def validate_metric_params(metric, metric_params):
-    if (metric not in available_metrics.keys()):
+    if metric not in available_metrics.keys():
         raise ValueError("No metric called {}."
                          " Available metrics are {}."
                          "".format(metric,
