@@ -55,36 +55,36 @@ def landscapes(diagrams, linspace, n_layers):
 #     return heat
 
 
-def pairwise_betti_distances(diagrams_X, linspace, step_size,
-                             diagrams_Y=None, p=2., **kw_args):
+def pairwise_betti_distances(diagrams_1, linspace, step_size,
+                             diagrams_2=None, p=2., **kw_args):
     # As for pairwise_landscape_distances, but for Betti curves.
 
-    betti_curves_X = betti_curves(diagrams_X, linspace)
-    if diagrams_Y is None:
-        return (step_size ** (1 / p)) * pdist(betti_curves_X, 'minkowski', p=p)
-    betti_curves_Y = betti_curves(diagrams_Y, linspace)
-    return (step_size ** (1 / p)) * cdist(betti_curves_X, betti_curves_Y,
+    betti_curves_1 = betti_curves(diagrams_1, linspace)
+    if diagrams_2 is None:
+        return (step_size ** (1 / p)) * pdist(betti_curves_1, 'minkowski', p=p)
+    betti_curves_2 = betti_curves(diagrams_2, linspace)
+    return (step_size ** (1 / p)) * cdist(betti_curves_1, betti_curves_2,
                                           'minkowski', p=p)
 
 
-def pairwise_landscape_distances(diagrams_X, linspace, step_size,
-                                 diagrams_Y=None, p=2., n_layers=1, **kw_args):
-    # Approximate calculation of distances between: a) if diagrams_Y is None,
+def pairwise_landscape_distances(diagrams_1, linspace, step_size,
+                                 diagrams_2=None, p=2., n_layers=1, **kw_args):
+    # Approximate calculation of distances between: a) if diagrams_2 is None,
     # pairs (L1, L2) of persistence landscapes both obtained from a single
-    # collection diagrams_X of diagrams; b) if diagrams_Y is not None,
+    # collection diagrams_1 of diagrams; b) if diagrams_2 is not None,
     # pairs (L1, L2) of persistence landscapes such that L1 is a landscape
-    # coming from diagrams_X and L2 is a landscape coming from diagrams_Y.
+    # coming from diagrams_1 and L2 is a landscape coming from diagrams_2.
 
-    n_samples_X, n_points_X = diagrams_X.shape[:2]
-    ls_X = landscapes(diagrams_X, n_layers, linspace).reshape((
-        n_samples_X, -1))
-    if diagrams_Y is None:
-        return (step_size ** (1 / p)) * pdist(ls_X, 'minkowski', p=p)
-    n_samples_Y, n_points_Y = diagrams_Y.shape[:2]
-    n_layers_XY = min(n_layers, n_points_X, n_points_Y)
-    ls_Y = landscapes(diagrams_Y, n_layers_XY, linspace).reshape((
-        n_samples_Y, -1))
-    return (step_size ** (1 / p)) * cdist(ls_X, ls_Y, 'minkowski', p=p)
+    n_samples_1, n_points_1 = diagrams_1.shape[:2]
+    ls_1 = landscapes(diagrams_1, n_layers, linspace).reshape((
+        n_samples_1, -1))
+    if diagrams_2 is None:
+        return (step_size ** (1 / p)) * pdist(ls_1, 'minkowski', p=p)
+    n_samples_2, n_points_2 = diagrams_2.shape[:2]
+    n_layers_12 = min(n_layers, n_points_1, n_points_2)
+    ls_2 = landscapes(diagrams_2, n_layers_12, linspace).reshape((
+        n_samples_2, -1))
+    return (step_size ** (1 / p)) * cdist(ls_1, ls_2, 'minkowski', p=p)
 
 
 def kernel_bottleneck_distance(diagram_x, diagram_y, delta=0.0, **kw_args):
@@ -112,7 +112,7 @@ implemented_metric_recipes = {'bottleneck': kernel_bottleneck_distance,
                               }
 
 
-def _parallel_pairwise(X, metric, metric_params, Y=None, iterator=None,
+def _parallel_pairwise(X1, metric, metric_params, X2=None, iterator=None,
                        order=None, n_jobs=None):
     metric_func = implemented_metric_recipes[metric]
 
@@ -122,14 +122,14 @@ def _parallel_pairwise(X, metric, metric_params, Y=None, iterator=None,
                         if key not in ['linspaces', 'step_sizes']}
         lins = metric_params.get('linspaces')
         st_sizes = metric_params.get('step_sizes')
-        if Y is None:
+        if X2 is None:
             dist_arr = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
-                X[dim], lins[dim], st_sizes[dim], **const_params)
-                for dim in X.keys())
+                X1[dim], lins[dim], st_sizes[dim], **const_params)
+                for dim in X1.keys())
         else:
             dist_arr = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
-                X[dim], lins[dim], st_sizes[dim], diagrams_Y=Y[dim],
-                **const_params) for dim in X.keys())
+                X1[dim], lins[dim], st_sizes[dim], diagrams_2=X2[dim],
+                **const_params) for dim in X1.keys())
         dist_arr = np.stack(dist_arr, axis=2)
         if order is None:
             return dist_arr
@@ -139,24 +139,24 @@ def _parallel_pairwise(X, metric, metric_params, Y=None, iterator=None,
         raise ValueError("iterator cannot be set to None when the metric is "
                          "'bottleneck', 'wasserstein' or 'heat'")
 
-    n_dims = len(X.keys())
-    n_diags_X = len(next(iter(X.values())))
+    n_dims = len(X1.keys())
+    n_diags_1 = len(next(iter(X1.values())))
     if Y is None:
-        Y, n_diags_Y = X, n_diags_X
+        X2, n_diags_2 = X1, n_diags_1
     else:
-        n_diags_Y = len(next(iter(Y.values())))
+        n_diags_2 = len(next(iter(X2.values())))
     dist_vecs = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
-        X[dim][i, :, :], Y[dim][j, :, :], dim, **metric_params)
-        for i, j in iterator for dim in X.keys())
+        X1[dim][i, :, :], X2[dim][j, :, :], dim, **metric_params)
+        for i, j in iterator for dim in X1.keys())
     dist_vecs = np.array(dist_vecs).reshape((len(iterator), n_dims))
     if order is not None:
         dist_vec = np.linalg.norm(dist_vecs, axis=1, ord=order)
-        dist_mat = np.zeros((n_diags_X, n_diags_Y))
+        dist_mat = np.zeros((n_diags_1, n_diags_2))
         dist_mat[tuple(zip(*iterator))] = dist_vec
         return dist_mat
     dist_mats = []
-    for dim in X.keys():
-        dist_mat = np.zeros((n_diags_X, n_diags_Y))
+    for dim in X1.keys():
+        dist_mat = np.zeros((n_diags_1, n_diags_2))
         dist_mat[tuple(zip(*iterator))] = dist_vecs[:, dim]
         dist_mats.append(dist_mat)
     return np.stack(dist_mats, axis=2)
