@@ -15,5 +15,6 @@ __all__ = [
     'DiagramFilter',
     'DiagramDistance',
     'DiagramAmplitude',
-    'PersistentEntropy'
+    'PersistentEntropy',
+    'BettiCurve'
 ]
