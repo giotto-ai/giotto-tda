@@ -170,7 +170,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         input parameters of the :meth:`fit` are valid.
 
         """
-        if self.operations not in \
+        if self.operation not in \
                 self.valid_operations:
             raise ValueError(
                 'The transformation type %s is not supported' %
