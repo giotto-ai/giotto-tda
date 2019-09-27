@@ -5,9 +5,9 @@ import giotto as go
 import giotto.time_series as ts
 import giotto.diagram as diag
 import giotto.homology as hl
-import giotto.neural_network as nn
-import giotto.manifold as ma
 import giotto.compose as cp
+import giotto.manifold as ma
+from giotto.pipeline import Pipeline
 
 import numpy as np
 import pandas as pd
@@ -19,26 +19,8 @@ import argparse
 import sklearn.utils as skutils
 from sklearn.model_selection import TimeSeriesSplit, KFold
 import sklearn.preprocessing as skprep
-from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
-
-from keras.models import Sequential
-import keras.layers as klayers
-import keras.optimizers as koptimizers
-
-import keras
-import tensorflow as tf
-
-# If I don't do this, the GPU is automatically used and gets out of memory
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-
-def init_keras_session(n_cpus_k, n_gpus_k):
-    config = tf.ConfigProto(device_count={'CPU': n_cpus_k, 'GPU': n_gpus_k})
-
-    sess = tf.Session(config=config)
-    keras.backend.set_session(sess)
+from sklearn.ensemble import RandomForestClassifier
 
 
 def get_data(n_train, n_test):
@@ -68,20 +50,21 @@ def split_train_test(data, n_train, n_test):
 def make_pipeline():
     steps = [
         ('embedding', ts.TakensEmbedder()),
+        ('window', ts.SlidingWindow(width=5, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('distance', diag.DiagramDistance()),
         ('physical', ma.StatefulMDS()),
         ('kinematics', ma.Kinematics()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
-        ('aggregator', cp.FeatureAggregator(is_keras=True)),
-        ('classification', cp.TargetResamplingClassifier(classifier=nn.KerasClassifierWrapper(),
-                                                         resampler=cp.TargetResampler()))
+        ('aggregator', cp.FeatureAggregator(is_keras=False)),
+        ('classification', RandomForestClassifier())
     ]
     return Pipeline(steps)
 
 
 def get_param_grid():
     embedding_param = {}
+    window_param = {}
     distance_param = {}
     diagram_param = {}
     physical_param = {}
@@ -90,7 +73,7 @@ def get_param_grid():
     aggregator_param = {}
     classification_param = {}
 
-    embedding_param['outer_window_duration'] = [20, 30]
+    window_param['width'] = [2, 3]
 
     diagram_param['homology_dimensions'] = [[0, 1]]
     distance_param['metric'] = ['bottleneck']
@@ -102,21 +85,10 @@ def get_param_grid():
 
     aggregator_param['n_steps_in_past'] = [2]
 
-    classification_param['layers_kwargs'] = [
-        [
-            {'layer': klayers.normalization.BatchNormalization},
-            {'layer': layer, 'units': units, 'activation': 'tanh'},
-            {'layer': klayers.Dense}
-        ] for layer in [klayers.LSTM] for units in [1]]
-
-    classification_param['optimizer_kwargs'] = [{'optimizer': optimizer, 'lr': lr} for optimizer in [koptimizers.RMSprop]
-                                                for lr in [0.5]]
-    classification_param['batch_size'] = [10]
-    classification_param['epochs'] = [1]
-    classification_param['loss'] = ['sparse_categorical_crossentropy']
-    classification_param['metrics'] = [['sparse_categorical_accuracy']]
+    classification_param['n_estimators'] = [10, 100]
 
     embedding_param_grid = {'embedding__' + k: v for k, v in embedding_param.items()}
+    window_param_grid = {'window__' + k: v for k, v in window_param.items()}
     diagram_param_grid = {'diagram__' + k: v for k, v in diagram_param.items()}
     distance_param_grid = {'distance__' + k: v for k, v in distance_param.items()}
     physical_param_grid = {'physical__' + k: v for k, v in physical_param.items()}
@@ -158,6 +130,4 @@ if __name__ == "__main__":
     parser.add_argument('-n_cpus_k', '--number_cpus_keras', help="Number of CPUs used to initialize keras session. Warning: This might lead to an explosion of thread allocations.", type=int, default=1)
     parser.add_argument('-n_gpus_k', '--number_gpus_keras', help="Number of GPUs used to initialize keras session. Warning: In the case of a grid search, this has lead to crashes as GPU memory got full.", type=int, default=0)
     args = vars(parser.parse_args())
-
-    init_keras_session(args.pop('number_cpus_keras'), args.pop('number_gpus_keras'))
     main(**args)
