@@ -15,9 +15,14 @@
 #include <boost/type_traits.hpp>
 
 namespace hera {
+	// try to fix ssize_t error for VS compiler
+#ifdef _WIN32
+	typedef int ssize_t;
+#endif
 namespace bt {
 namespace dnn
 {
+
     // Weighted KDTree
     // Traits_ provides Coordinate, DistanceType, PointType, dimension(), distance(p1,p2), coordinate(p,i)
     template< class Traits_ >

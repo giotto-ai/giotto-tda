@@ -1,8 +1,7 @@
 """Testing for DiagramStacker and DiagramScaler"""
 
-import pytest
 import numpy as np
-
+import pytest
 from sklearn.exceptions import NotFittedError
 
 from giotto.diagram import DiagramStacker, DiagramScaler
@@ -267,7 +266,7 @@ def test_dst_transform(X):
 
 
 parameters = [('wasserstein', {'order': 2, 'delta': 0.1}),
-              ('betti', {'n_samples': 10}),
+              ('betti', {'n_sampled_values': 10}),
               ('bottleneck', None)]
 
 

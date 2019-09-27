@@ -2,12 +2,12 @@
 #          Umberto Lupo <u.lupo@l2f.ch>
 # License: Apache 2.0
 
-from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator
-from ..base import TransformerResamplerMixin
-from sklearn.utils._joblib import Parallel, delayed
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
+from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
 
 import numpy as np
 
@@ -218,22 +218,19 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
             self.time_delay_ = mutual_information_list.index(
                 min(mutual_information_list)) + 1
 
-            n_false_neighbors_list = Parallel(n_jobs=self.n_jobs)(
+            n_false_nbhrs_list = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._false_nearest_neighbors)(
-                    X, self.time_delay, dimension,
-                    stride=1) for dimension in
+                    X, self.time_delay, dim,
+                    stride=1) for dim in
                 range(1, self.dimension + 3))
 
-            variation_list = [
-                np.abs(n_false_neighbors_list[dimension - 1] - 2 *
-                       n_false_neighbors_list[dimension] +
-                       n_false_neighbors_list[dimension + 1]
-                       ) / (n_false_neighbors_list[dimension] + 1) /
-                dimension for dimension in
-                range(1, self.dimension + 1)]
+            variation_list = [np.abs(n_false_nbhrs_list[dim - 1] - 2 *
+                n_false_nbhrs_list[dim] + n_false_nbhrs_list[dim + 1])
+                / (n_false_nbhrs_list[dim] + 1) / dim
+                for dim in range(2, self.embedding_dimension + 1)]
 
-            e_d_temp = variation_list.index(min(variation_list))
-            self.dimension_ = e_d_temp + 1 if e_d_temp else 2
+            self.embedding_dimension_ = variation_list.index(min(
+                variation_list)) + 2
 
         else:
             self.time_delay_ = self.time_delay
@@ -292,6 +289,6 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
 
-        yt = y[self.time_delay_ * self.dimension_ - 1::self.stride]
+        yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
 
         return yt

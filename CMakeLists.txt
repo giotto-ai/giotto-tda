@@ -21,6 +21,8 @@ set_target_properties(giotto_wasserstein PROPERTIES CMAKE_CXX_FLAGS "${CMAKE_CXX
 set_target_properties(giotto_wasserstein PROPERTIES CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb -D_GLIBCXX_DEBUG")
 set_target_properties(giotto_wasserstein PROPERTIES CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -O2 -g -ggdb")
 
+target_compile_definitions(giotto_wasserstein PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+
 pybind11_add_module(giotto_bottleneck "${BINDINGS_DIR}/bottleneck_bindings.cpp")
 target_link_libraries(giotto_bottleneck LINK_PUBLIC ${Boost_LIBRARIES})
 set_target_properties(giotto_bottleneck PROPERTIES CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -28,6 +30,7 @@ set_target_properties(giotto_bottleneck PROPERTIES CMAKE_CXX_FLAGS "${CMAKE_CXX_
 set_target_properties(giotto_bottleneck PROPERTIES CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb -D_GLIBCXX_DEBUG")
 set_target_properties(giotto_bottleneck PROPERTIES CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -O2 -g -ggdb")
 
+target_compile_definitions(giotto_bottleneck PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
 set(GUDHI_SRC_DIR "giotto/externals/gudhi-devel/src")
 

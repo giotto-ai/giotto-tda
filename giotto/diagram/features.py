@@ -3,13 +3,11 @@
 # License: TBD
 
 import numpy as np
-
-from sklearn.utils.validation import check_is_fitted
-from ..utils.validation import check_diagram
-
 from sklearn.base import BaseEstimator, TransformerMixin
-
 from sklearn.utils._joblib import Parallel, delayed
+from sklearn.utils.validation import check_is_fitted
+
+from ..utils.validation import check_diagram
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
@@ -77,7 +75,6 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         self._is_fitted = True
         return self
 
-    #@jit
     def transform(self, X, y=None):
         """For each key in the dictionary X and for each persistence diagram in the
         corresponding ndarray, computes that diagram's persistent entropy. All results

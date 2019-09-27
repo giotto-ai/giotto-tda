@@ -1,17 +1,18 @@
 """Utilities for input validation"""
-import numpy as np
 import numbers
 
+import numpy as np
+
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
-                     'wasserstein': [('order', int, (1, np.inf)),
+                     'wasserstein': [('q', int, (1, np.inf)),
                                      ('delta', numbers.Number, (1e-16, 1.))],
-                     'betti': [('order', int, (1, np.inf)),
-                               ('n_samples', int, (1, np.inf))],
-                     'landscape': [('order', int, (1, np.inf)),
-                                   ('n_samples', int, (1, np.inf)),
+                     'betti': [('p', numbers.Number, (1, np.inf)),
+                               ('n_sampled_values', int, (1, np.inf))],
+                     'landscape': [('p', numbers.Number, (1, np.inf)),
+                                   ('n_sampled_values', int, (1, np.inf)),
                                    ('n_layers', int, (1, np.inf))],
-                     'heat': [('order', int, (1, np.inf)),
-                              ('n_samples', int, (1, np.inf)),
+                     'heat': [('order', numbers.Number, (1, np.inf)),
+                              ('n_sampled_values', int, (1, np.inf)),
                               ('sigma', numbers.Number, (0., np.inf))]}
 
 available_metric_params = list(set(
@@ -55,9 +56,24 @@ def check_diagram(X):
                              "or equal to the 1st one.".format(_diff_coord))
     return X
 
+# Check the type and range of numerical parameters
+def validate_params(parameters, references):
+    for key in references.keys():
+        if not isinstance(parameters[key],references[key][0]):
+            raise TypeError("Parameter {} is of type {}"
+                            " while it should be of type {}"
+                            "".format(key, type(parameters[key]),
+                                      references[key][0]))
+        if (parameters[key] < references[key][1][0] or
+            parameters[key] > references[key][1][1]):
+            raise ValueError("Parameter {} is {}, while it"
+                             " should be in the range ({},{})"
+                             "".format(key, parameters[key],
+                                       references[key][1][0],
+                                       references[key][1][1]))
 
 def validate_metric_params(metric, metric_params):
-    if (metric not in available_metrics.keys()):
+    if metric not in available_metrics.keys():
         raise ValueError("No metric called {}."
                          " Available metrics are {}."
                          "".format(metric,

@@ -5,7 +5,6 @@
 from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
-
 import numpy as np
 
 
