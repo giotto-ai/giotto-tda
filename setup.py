@@ -30,7 +30,7 @@ MAINTAINER = 'Guillaume Tauzin'
 MAINTAINER_EMAIL = 'g.tauzin@l2f.ch'
 URL = 'https://github.com/giotto-learn/giotto-learn'
 LICENSE = 'Apache 2.0'
-DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn/'
+DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn'
 VERSION = __version__
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
