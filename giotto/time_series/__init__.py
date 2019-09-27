@@ -5,6 +5,7 @@
 from .embedding import TakensEmbedder
 from .permutations import OrdinalRepresentation, Entropy
 from .preprocessing import Resampler, Stationarizer
+from .multivariate import PearsonCorrelation
 from .target import Labeller
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     'OrdinalRepresentation',
     'Entropy',
     'TakensEmbedder',
-    'Labeller'
+    'Labeller',
+    'PearsonCorrelation'
 ]

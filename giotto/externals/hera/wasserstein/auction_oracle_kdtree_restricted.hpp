@@ -293,8 +293,9 @@ IdxValPair<Real_> AuctionOracleKDTreeRestricted<Real_, PointContainer_>::get_opt
     // and vice versa.
 
     size_t best_item_idx { k_invalid_index };
-    size_t second_best_item_idx __attribute__((unused)) { k_invalid_index };
-    size_t best_diagonal_item_idx { k_invalid_index };
+    //size_t second_best_item_idx __attribute__((unused)) { k_invalid_index };
+	size_t second_best_item_idx { k_invalid_index };
+	size_t best_diagonal_item_idx { k_invalid_index };
     Real best_item_value;
     Real second_best_item_value;
 

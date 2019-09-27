@@ -56,6 +56,21 @@ def check_diagram(X):
                              "or equal to the 1st one.".format(_diff_coord))
     return X
 
+# Check the type and range of numerical parameters
+def validate_params(parameters, references):
+    for key in references.keys():
+        if not isinstance(parameters[key],references[key][0]):
+            raise TypeError("Parameter {} is of type {}"
+                            " while it should be of type {}"
+                            "".format(key, type(parameters[key]),
+                                      references[key][0]))
+        if (parameters[key] < references[key][1][0] or
+            parameters[key] > references[key][1][1]):
+            raise ValueError("Parameter {} is {}, while it"
+                             " should be in the range ({},{})"
+                             "".format(key, parameters[key],
+                                       references[key][1][0],
+                                       references[key][1][1]))
 
 def validate_metric_params(metric, metric_params):
     if (metric not in available_metrics.keys()):

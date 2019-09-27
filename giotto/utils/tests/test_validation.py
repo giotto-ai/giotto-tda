@@ -2,9 +2,26 @@ import numpy as np
 import pytest
 
 from ..validation import check_diagram
-from ..validation import validate_metric_params
+from ..validation import validate_metric_params, validate_params
 
 '''Tests for validation functions'''
+
+
+# Testing for validate_params
+def test_validate_params():
+    references ={'par1': [int, [0,1]]}
+    parameters = {'par1': 0.5}
+    
+    with pytest.raises(TypeError):
+        validate_params(parameters,references)
+    
+    parameters = {'par1': 2}
+    with pytest.raises(ValueError):
+        validate_params(parameters,references)
+
+    parameters = {'par0': 1}
+    with pytest.raises(KeyError):
+        validate_params(parameters,references)
 
 
 # Testing check_diagram
