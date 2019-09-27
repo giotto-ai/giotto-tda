@@ -17,11 +17,13 @@ import itertools
 from sklearn import pipeline
 from sklearn.base import clone
 from sklearn.base import BaseEstimator, TransformerMixin
+from .base import TransformerResamplerMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from .utils.validation import validate_params
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
-__all__ = ['Pipeline', 'make_pipeline', 'SlidingWindowFeatureUnion']
+__all__ = ['Pipeline', 'make_pipeline', 'SlidingTimeWindow']
 
 
 class Pipeline(pipeline.Pipeline):
@@ -298,6 +300,35 @@ class Pipeline(pipeline.Pipeline):
         return self.steps[-1][-1].fit_predict(Xt, yt, **fit_params)
 
     @property
+    def resample(self):
+        """Apply transformers/transformer_resamplers, and transform with the final estimator
+
+        This also works where final estimator is ``None``: all prior
+        transformations are applied.
+
+        Parameters
+        ----------
+        X : iterable
+            Data to transform. Must fulfill input requirements of first step
+            of the pipeline.
+
+        Returns
+        -------
+        Xt : array-like, shape = [n_samples, n_transformed_features]
+        """
+        # _final_estimator is None or has transform, otherwise attribute error
+        if self._final_estimator != 'passthrough':
+            self._final_estimator.resample
+        return self._resample
+
+    def _resample(self, X, y=None):
+        Xt, yt = X, y
+        for _, _, transform in self._iter():
+            yt =  transform.resample(yt)
+        return yt
+
+
+    @property
     def transform_resample(self):
         """Apply transformers/transformer_resamplers, and transform with the final estimator
 
@@ -493,6 +524,122 @@ def make_pipeline(*steps, **kwargs):
     return Pipeline(pipeline._name_estimators(steps), memory=memory)
 
 
+class SlidingTimeWindow(BaseEstimator, TransformerResamplerMixin):
+    """Concatenates results of multiple transformer objects.
+    This estimator applies a list of transformer objects in parallel to the
+    input data, then concatenates the results. This is useful to combine
+    several feature extraction mechanisms into a single transformer.
+    Parameters of the transformer may be set using the parameter
+    name after 'transformer__'.
+
+    Parameters
+    ----------
+    width: int, default: 1
+        Width of the sliding window.
+
+    stride: int, default: 1
+        Stride of the sliding window.
+
+    Examples
+    --------
+    >>> from giotto.pipeline import SlidingWindow
+    """
+    _hyperparameters = {'positive_definite': [bool, (False, True)]}
+
+    def __init__(self, width=1, stride=1):
+        self.width = width
+        self.stride = stride
+
+    def _view_X(X, begin, end, axis=0):
+        return np.roll(X, shift=-begin, axis=axis)[:end]
+
+    def _view_y(y, begin, end, axis=0):
+        return np.roll(y, shift=-begin, axis=axis)[:end]
+
+    def _slice_windows(self, X):
+        n_windows = (X.shape[0] - self.width) \
+            // self.stride + 1
+
+        window_slices = [
+            tuple(i * self.stride, self.width + i * self.stride)
+            for i in range(n_windows)
+        ]
+        return window_slices
+
+    def fit(self, X, y=None):
+        """Fit all transformers using X.
+
+        Parameters
+        ----------
+        X : iterable or array-like, depending on transformers
+            Input data, used to fit transformers.
+
+        y : array-like, shape (n_samples, ...), optional
+            Targets for supervised learning.
+
+        Returns
+        -------
+        self
+
+        """
+        validate_params(self.get_params(), self._hyperparameters)
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X):
+        """Slide windows over X.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, [n_features, ])
+            Input data.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray, shape (n_windows, n_samples_window,
+            n_features)
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        window_slices = self._slice_windows(X)
+
+        Xt = np.stack([self._view_X(X, begin, end)
+                       for begin, end in window_slices])
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples - 1``.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        yt = y[self.width - 1 :: self.stride]
+
+        return yt
+
+
 class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
     """Concatenates results of multiple transformer objects.
     This estimator applies a list of transformer objects in parallel to the
@@ -506,14 +653,17 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
     transformer : object, required
         Transformer object to be applied to each subwindow of the data.
 
-    width: ndarray of int, required
-        Duration of the outer sliding window.
+    axes: list of int, optional (default=None)
+        Axes on which to slide the window.
 
-    stride: ndarray of int, default: None
-        Stride of the outer sliding window.
+    width: list of int, optional (default=None)
+        Width of the sliding window.
 
-    padding: int, default: None
-        Duration of the outer sliding window.
+    stride: list of int, default: None
+        Stride of the sliding window.
+
+    padding: list of int, optional (default=None)
+        Padding applied to the input before sliding the window.
 
     n_jobs : int or None, optional (default=None)
         Number of jobs to run in parallel.
@@ -537,14 +687,13 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
     >>> from giotto.pipeline import SlidingWindowFeatureUnion
     """
     def __init__(self, transformer, axes=[0], width=None, stride=None,
-                 padding=None, n_jobs=None, verbose=False):
+                 padding=None, n_jobs=None):
         self.transformer = transformer
         self.axes = axes
         self.width = width
         self.stride = stride
         self.padding = padding
         self.n_jobs = n_jobs
-        self.verbose = verbose
 
     def _validate_params(self):
         """A class method that checks whether the hyperparameters and the input
@@ -552,15 +701,47 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
 
         """
         try:
-            assert self._dimension == len(width)
-            assert self._dimension == len(stride)
-            assert self._dimension == len(padding)
+            assert self._dimension == len(self.width_)
+            assert self._dimension == len(self.stride_)
+            assert self._dimension == len(self.padding_)
         except AssertionError:
             raise ValueError("axes, width, stride, and padding do not have the same"
-                             "length.")
+                             " length.")
+
+        if len(self.axes) != 1 or self.axes[0] != 0:
+            raise NotImplementedError("This transformer has only been"
+                                      " implemented for time series"
+                                      " for which axes = [0]")
 
     def _pad(self, X, axis):
         return X
+
+    def _view_X(X, begin, end, axis):
+        return np.roll(X, shift=-begin, axis=axis)[:end]
+
+    def _view_y(y, begin, end, axis):
+        return np.roll(y, shift=-begin, axis=axis)[:end]
+
+    def _parallel_func(self, X, y, fit_params, func, window_slices):
+        """Runs func in parallel on X and y"""
+        return Parallel(n_jobs=self.n_jobs)(
+            delayed(func)(transformer, self._view_X(_X, begin, end, axis),
+                          self._view_y(y, axis, begin, end, axis))
+            for begin, end in window_slices)
+
+    def _slice_windows(self):
+        n_windows = [
+            (X.shape[self.axes[dimension]] - 2*self.width_[dimension]+1) \
+            // self._stride[dimension] + 1
+            for dimension in range(self._dimension)
+            ]
+
+        window_slices = [
+            tuple(i*self.stride_[dimension],
+                  2*self.width_[dimension]+1 + i*self.stride_[dimension])
+            for i in range(n_windows[dimension])
+        ]
+        return window_slices
 
     def fit(self, X, y=None):
         """Fit all transformers using X.
@@ -598,11 +779,9 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
         self._validate_params()
         _X = self._pad(X)
 
-        self.window_iterator =
-
-        transformers = self._parallel_func(_X, y, {}, _fit_one)
-
-        self._update_transformer_list(transformers)
+        window_slices = self._slice_windows()
+        window_transformers = [clone(self.transformer) for _ in range(2)]
+        fit = self._parallel_func(_X, y, {}, fit, window_slices)
         return self
 
     def fit_transform(self, X, y=None, **fit_params):
@@ -624,10 +803,9 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
             sum of n_components (output dimension) over transformers.
 
         """
-        results = self._parallel_func(X, y, fit_params, _fit_transform_one)
-        if not results:
-            # All transformers are None
-            return np.zeros((X.shape[0], 0))
+        _X = self._pad(X)
+
+        fit = self._parallel_func(_X, y, {}, fit)
 
         Xs, transformers = zip(*results)
         self._update_transformer_list(transformers)
@@ -637,13 +815,6 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
         else:
             Xs = np.hstack(Xs)
         return Xs
-
-    def _parallel_func(self, X, y, fit_params, func):
-        """Runs func in parallel on X and y"""
-        return Parallel(n_jobs=self.n_jobs)(
-            delayed(func)(transformer, X, y, weight, **fit_params)
-            for idx, (name, transformer, weight)
-            in enumerate(transformers, 1))
 
     def transform(self, X):
         """Transform X separately by each transformer, concatenate results.
