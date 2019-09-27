@@ -1,15 +1,20 @@
-import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
+#          Umberto Lupo <u.lupo@l2f.ch>
+# License: Apache 2.0
+
 from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator
+from ..base import TransformerResamplerMixin
+import numpy as np
 
 
-class Resampler(BaseEstimator, TransformerMixin):
+class Resampler(BaseEstimator, TransformerResamplerMixin):
     """Data sampling transformer that returns a sampled numpy.ndarray.
 
     Parameters
     ----------
     period : int, default: 2
-        The sampling period for periodic sampling.
+        The sampling period, i.e. pointd every period will be kept.
 
 
     Attributes
@@ -41,13 +46,6 @@ class Resampler(BaseEstimator, TransformerMixin):
     def __init__(self, period=2):
         self.period = period
 
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:``fit`` are valid.
-        """
-        if not isinstance(self.period, int):
-            raise TypeError('The period ',  self.period, ' is not an int')
-
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
         This method is just there to implement the usual API and hence
@@ -55,7 +53,7 @@ class Resampler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : DataFrame, shape (n_samples, n_features)
+        X : ndarray, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -67,43 +65,66 @@ class Resampler(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params()
-
         X = X.reshape((-1, 1))
 
         self._n_features = X.shape[1]
         return self
 
     def transform(self, X, y=None):
-        """Resample X according to the 'sampling_type'.
+        """Transform/resample X.
 
         Parameters
         ----------
-        X : DataFrame, shape (n_samples, n_features)
-            Input data.
+        X : ndarray, shape (n_samples, n_features)
+            Input data. ``
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need of a target, yet the pipeline API
             requires this parameter.
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples_new, n_features)
-            The resampled array. ``n_samples_new`` depends on
-            ``sampling_period`` if ``sampling_type`` is 'periodic' or on the
-            number of ``sampling_times`` if ``sampling_type`` is 'fixed'.
+        Xt : ndarray, shape (n_samples_new, n_features)
+            The transformed/resampled input array.
+            ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_n_features'])
 
-        X = X.reshape((-1, 1))
-        X_transformed = X[::self.period]
+        X = X.reshape((-1, self._n_features))
+        Xt = X[::self.period]
 
-        return X_transformed
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples // period``.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_n_features'])
+
+        yt = y[::self.period]
+
+        return yt
 
 
-class Stationarizer(BaseEstimator, TransformerMixin):
+class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     """Data sampling transformer that returns numpy.ndarray.
 
     Parameters
@@ -139,22 +160,21 @@ class Stationarizer(BaseEstimator, TransformerMixin):
     >>> plt.plot(signal_stationarized)
 
     """
-    valid_stationarization_types = ['return', 'log-return']
+    valid_operations = ['return', 'log-return']
 
-    def __init__(self, stationarization_type='return'):
-        self.stationarization_type = stationarization_type
+    def __init__(self, operation='return'):
+        self.operation = operation
 
-    @staticmethod
-    def _validate_params(stationarization_type):
+    def _validate_params(self):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
 
         """
-        if stationarization_type not in \
-                Stationarizer.valid_stationarization_types:
+        if self.operation not in \
+                self.valid_operations:
             raise ValueError(
                 'The transformation type %s is not supported' %
-                stationarization_type)
+                self.operation)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -176,38 +196,63 @@ class Stationarizer(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params(self.stationarization_type)
+        self._validate_params()
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """Stationarize X according to ``stationarization_type``.
+        """Transform/resample X.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features)
-            Input data.
+            Input data. ``
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need of a target, yet the pipeline API
             requires this parameter.
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples - 1, n_features)
-            The array containing the stationarized inputs.
+        Xt : ndarray, shape (n_samples_new, n_features)
+            The transformed/resampled input array.
+            ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-        X_transformed = X
-        if self.stationarization_type == 'return':
-            X_transformed = np.diff(X_transformed, n=1,
-                                    axis=0) / X_transformed[1:, :]
-        else:  # 'log-return' stationarization type
-            X_transformed = np.log(X_transformed)
-            X_transformed = np.diff(X_transformed, n=1, axis=0)
+        Xt = X
+        if self.operation == 'return':
+            Xt = np.diff(Xt, n=1, axis=0) / Xt[1:, :]
+        else:  # 'log-return' operation
+            Xt =  np.diff(np.log(Xt), n=1, axis=0)
 
-        return X_transformed
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples - 1``.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        yt = y[1:]
+
+        return yt

@@ -324,28 +324,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        if self.metric_params is None:
-            self.effective_metric_params_ = {}
-        else:
-            self.effective_metric_params_ = self.metric_params.copy()
-
-        validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
-        if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['linspaces'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _create_linspaces(X, **self.effective_metric_params_)
-            if self.metric == 'landscape':
-                self.effective_metric_params_['linspaces'] = {
-                    dim: np.sqrt(2) * linspace for dim, linspace in
-                    self.effective_metric_params_['linspaces'].items()}
-                self.effective_metric_params_['step_sizes'] = {
-                    dim: np.sqrt(2) * step_size for dim, step_size in
-                    self.effective_metric_params_['step_sizes'].items()}
-
-        if not self.homology_dimensions:
-            self.homology_dimensions = set(X.keys())
+        if self.homology_dimensions is None:
+            self.homology_dimensions_ = set(X.keys())
+        else:
+            self.homology_dimensions_ = self.homology_dimensions
 
         return self
 
@@ -381,10 +365,10 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         """
 
         # Check if fit had been called
-        check_is_fitted(self, ['effective_metric_params_'])
+        check_is_fitted(self, ['homology_dimensions_'])
         X = check_diagram(X)
 
-        X = _sort(X, self.homology_dimensions)
+        X = _sort(X, self.homology_dimensions_)
 
-        X_filtered = _filter(X, self.homology_dimensions, self.delta)
+        X_filtered = _filter(X, self.homology_dimensions_, self.delta)
         return X_filtered

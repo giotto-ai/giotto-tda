@@ -1,16 +1,145 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 #          Umberto Lupo <u.lupo@l2f.ch>
-# License: TBD
+# License: Apache 2.0
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
+from ..base import TransformerResamplerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
+from ..utils.validation import validate_params
+
+import numpy as np
 
 
-class TakensEmbedder(BaseEstimator, TransformerMixin):
+class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
+    """Concatenates results of multiple transformer objects.
+    This estimator applies a list of transformer objects in parallel to the
+    input data, then concatenates the results. This is useful to combine
+    several feature extraction mechanisms into a single transformer.
+    Parameters of the transformer may be set using the parameter
+    name after 'transformer__'.
+
+    Parameters
+    ----------
+    width: int, default: 1
+        Width of the sliding window.
+
+    stride: int, default: 1
+        Stride of the sliding window.
+
+    Examples
+    --------
+    >>> from giotto.pipeline import SlidingWindow
+    """
+    _hyperparameters = {'width': [int, (1, np.inf)],
+                        'stride': [int, (1, np.inf)]}
+
+    def __init__(self, width=1, stride=1):
+        self.width = width
+        self.stride = stride
+
+    def _slice_windows(self, X):
+        n_windows = (X.shape[0] - self.width) \
+            // self.stride + 1
+
+        window_slices = [
+            (i * self.stride, self.width + i * self.stride)
+            for i in range(n_windows)
+        ]
+        return window_slices
+
+    def fit(self, X, y=None):
+        """Fit all transformers using X.
+
+        Parameters
+        ----------
+        X : iterable or array-like, depending on transformers
+            Input data, used to fit transformers.
+
+        y : array-like, shape (n_samples, ...), optional
+            Targets for supervised learning.
+
+        Returns
+        -------
+        self
+
+        """
+        validate_params(self.get_params(), self._hyperparameters)
+
+        if X.shape[0] < self.width:
+            raise ValueError("X of length {} does not have enough points"
+                             " to have a single window of width {}."
+                             "".format(X.shape[0]), self.width)
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X, y=None):
+        """Slide windows over X.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, [n_features, ])
+            Input data.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray, shape (n_windows, n_samples_window,
+            n_features)
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        if X.shape[0] < self.width:
+            raise ValueError("X of length {} does not have enough points"
+                             " to have a single window of width {}."
+                             "".format(X.shape[0]), self.width)
+
+        window_slices = self._slice_windows(X)
+
+        Xt = np.stack([X[begin:end] for begin, end in window_slices])
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples - 1``.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        if X.shape[0] < self.width:
+            raise ValueError("X of length {} does not have enough points"
+                             " to have a single window of width {}."
+                             "".format(X.shape[0]), self.width)
+
+        yt = y[self.width - 1 :: self.stride]
+
+        return yt
+
+
+class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     r"""Transformer returning a representation of a scalar-valued time series as
     a time series of point clouds.
 
@@ -34,13 +163,7 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    outer_window_duration: int, default: 20
-        Duration of the outer sliding window.
-
-    outer_window_stride: int, default: 2
-        Stride of the outer sliding window.
-
-    embedding_parameters_type: 'search' | 'fixed', default: 'search'
+    parameters_type: 'search' | 'fixed', default: 'search'
         If set to 'fixed' and if values for ``embedding_time_delay`` and
         ``embedding_dimension`` are provided, these values are used in
         ``transform()``.
@@ -54,18 +177,18 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         out, but the final values are constrained to be not greater than the
         values initially set.
 
-    embedding_time_delay: int, default: 1
+    time_delay: int, default: 1
         Time delay between two consecutive values for constructing one
         embedded point. If ``embedding_parameters_type`` is 'search',
         it corresponds to the maximal embedding time delay that will be
         considered.
 
-    embedding_dimension: int, default: 5
+    dimension: int, default: 5
         Dimension of the embedding space. If ``embedding_parameters_type`` is
         'search', it corresponds to the maximum embedding dimension that will
         be considered.
 
-    embedding_stride: int, default: 1
+    stride: int, default: 1
         Stride duration between two consecutive embedded points. It defaults
         to 1 as this is the usual value in the statement of Takens's embedding
         theorem.
@@ -77,17 +200,17 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    embedding_time_delay_: int
+    time_delay_: int
         Actual embedding time delay used to embed. If
-        ``embedding_parameters_type`` is 'search', it is the calculated
+        ``parameters_type`` is 'search', it is the calculated
         optimal embedding time delay. Otherwise it has the same value as
-        ``embedding_time_delay``.
+        ``time_delay``.
 
-    embedding_dimension_: int
+    dimension_: int
         Actual embedding dimension used to embed. If
-        ``embedding_parameters_type`` is 'search', it is the calculated
+        ``parameters_type`` is 'search', it is the calculated
         optimal embedding dimension. Otherwise it has the same value as
-        ``embedding_dimension``.
+        ``dimension``.
 
     Examples
     --------
@@ -103,107 +226,86 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
     >>> embedder = TakensEmbedder(
     >>>     outer_window_duration=outer_window_duration,
     ...     outer_window_stride=outer_window_stride,
-    ...     embedding_parameters_type='search',
-    ...     embedding_dimension=5,
-    ...     embedding_time_delay=1, n_jobs=-1)
+    ...     parameters_type='search',
+    ...     dimension=5,
+    ...     time_delay=1, n_jobs=-1)
     >>> # Fit and transform the DataFrame
     >>> embedder.fit(signal_noise)
     >>> embedded_noise = embedder.transform(signal_noise)
     >>> print('Optimal embedding time delay based on mutual information:',
-    ...       embedder.embedding_time_delay_)
+    ...       embedder.time_delay_)
     Optimal embedding time delay based on mutual information: 1
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
-    ...       embedder.embedding_dimension_)
+    ...       embedder.dimension_)
     Optimal embedding dimension based on false nearest neighbors: 3
 
     """
+    implemented_parameters_types = ['fixed', 'search']
 
-    def __init__(self, outer_window_duration=20, outer_window_stride=2,
-                 embedding_parameters_type='search',
-                 embedding_time_delay=1, embedding_dimension=5,
-                 embedding_stride=1, n_jobs=None):
-        self.outer_window_duration = outer_window_duration
-        self.outer_window_stride = outer_window_stride
-        self.embedding_parameters_type = embedding_parameters_type
-        self.embedding_time_delay = embedding_time_delay
-        self.embedding_dimension = embedding_dimension
-        self.embedding_stride = embedding_stride
+    def __init__(self, parameters_type='search', time_delay=1, dimension=5,
+                 stride=1, n_jobs=None):
+        self.parameters_type = parameters_type
+        self.time_delay = time_delay
+        self.dimension = dimension
+        self.stride = stride
         self.n_jobs = n_jobs
 
-    def _validate_params(self, X):
+    def _validate_params(self):
         """A class method that checks whether the hyperparameters and the
         input parameters of the :meth:`fit` are valid.
         """
-        implemented_embedding_parameters_types = ['fixed', 'search']
 
-        if self.embedding_parameters_type not in \
-                implemented_embedding_parameters_types:
+        if self.parameters_type not in \
+                self.implemented_parameters_types:
             raise ValueError(
                 'The embedding parameters type %s is not supported' %
-                self.embedding_parameters_type)
-
-        if X.shape[0] < self.outer_window_duration:
-            raise ValueError('Not enough data to have a single outer window.')
+                self.parameters_type)
 
     @staticmethod
-    def _embed(X, outer_window_duration, outer_window_stride,
-               embedding_time_delay, embedding_dimension, embedding_stride=1):
-        n_outer_windows = \
-            (X.shape[0] - outer_window_duration) // outer_window_stride + 1
-        n_points = (outer_window_duration - embedding_time_delay *
-                    (embedding_dimension - 1) - 1) // embedding_stride + 1
+    def _embed(X, time_delay, dimension, stride):
+        n_points = (X.shape[0] - time_delay * dimension) // stride + 1
 
         X = np.flip(X)
+        X_embedded = np.stack([ X[j * stride : j * stride
+                                 + time_delay * dimension:
+                                  time_delay].flatten()
+                                for j in range(0, n_points)])
 
-        XEmbedded = np.stack([
-            np.stack([
-                X[i * outer_window_stride + j * embedding_stride:
-                  i * outer_window_stride + j * embedding_stride +
-                  embedding_time_delay * (embedding_dimension - 1) + 1:
-                  embedding_time_delay].flatten()
-                for j in range(0, n_points)])
-            for i in range(0, n_outer_windows)])
-
-        return np.flip(XEmbedded).reshape(
-            (n_outer_windows, n_points, embedding_dimension))
+        return np.flip(X_embedded).reshape((n_points, dimension))
 
     @staticmethod
-    def _mutual_information(X, embedding_time_delay, n_bins):
+    def _mutual_information(X, time_delay, n_bins):
         """This function calculates the mutual information given the delay
         """
-        contingency = np.histogram2d(X.reshape((-1,))[:-embedding_time_delay],
-                                     X.reshape((-1,))[embedding_time_delay:],
+        contingency = np.histogram2d(X.reshape((-1,))[:-time_delay],
+                                     X.reshape((-1,))[time_delay:],
                                      bins=n_bins)[0]
         mutual_information = mutual_info_score(None, None,
                                                contingency=contingency)
         return mutual_information
 
     @staticmethod
-    def _false_nearest_neighbors(X, embedding_time_delay, embedding_dimension,
-                                 embedding_stride=1):
+    def _false_nearest_neighbors(X, time_delay, dimension,
+                                 stride=1):
         """Calculates the number of false nearest neighbours of embedding
         dimension"""
-        XEmbedded = TakensEmbedder._embed(X, X.shape[0], 1,
-                                          embedding_time_delay,
-                                          embedding_dimension,
-                                          embedding_stride)
-        XEmbedded = XEmbedded.reshape((XEmbedded.shape[1], XEmbedded.shape[2]))
+        X_embedded = TakensEmbedder._embed(X, time_delay, dimension, stride)
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
-            XEmbedded)
-        distances, indices = neighbor.kneighbors(XEmbedded)
+            X_embedded)
+        distances, indices = neighbor.kneighbors(X_embedded)
         distance = distances[:, 1]
         XNeighbor = X[indices[:, 1]]
 
         epsilon = 2.0 * np.std(X)
         tolerance = 10
 
-        dim_by_delay = -embedding_dimension * embedding_time_delay
+        dim_by_delay = -dimension * time_delay
         non_zero_distance = distance[:dim_by_delay] > 0
 
         false_neighbor_criteria = \
             np.abs(np.roll(X, dim_by_delay)[
-                   X.shape[0] - XEmbedded.shape[0]:dim_by_delay] -
+                   X.shape[0] - X_embedded.shape[0]:dim_by_delay] -
                    np.roll(XNeighbor, dim_by_delay)[:dim_by_delay]) \
             / distance[:dim_by_delay] > tolerance
 
@@ -233,36 +335,34 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        self._validate_params(X)
+        self._validate_params()
 
-        if self.embedding_parameters_type == 'search':
+        if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
-                delayed(self._mutual_information)(X, embedding_time_delay,
+                delayed(self._mutual_information)(X, time_delay,
                                                   n_bins=100)
-                for embedding_time_delay in
-                range(1, self.embedding_time_delay + 1))
-            self.embedding_time_delay_ = mutual_information_list.index(
+                for time_delay in
+                range(1, self.time_delay + 1))
+            self.time_delay_ = mutual_information_list.index(
                 min(mutual_information_list)) + 1
 
             n_false_nbhrs_list = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._false_nearest_neighbors)(
-                    X, self.embedding_time_delay, embedding_dimension,
-                    embedding_stride=1) for embedding_dimension in
-                range(1, self.embedding_dimension + 3))
+                    X, self.time_delay, dim,
+                    stride=1) for dim in
+                range(1, self.dimension + 3))
 
-            variation_list = [np.abs(n_false_nbhrs_list[emb_dim - 1] - 2 *
-                n_false_nbhrs_list[emb_dim] + n_false_nbhrs_list[emb_dim + 1])
-                / (n_false_nbhrs_list[emb_dim] + 1) / emb_dim
-                for emb_dim in range(2, self.embedding_dimension + 1)]
+            variation_list = [ np.abs(n_false_nbhrs_list[dim-1]
+                - 2 * n_false_nbhrs_list[dim] + n_false_nbhrs_list[dim+1])
+                / (n_false_nbhrs_list[dim] + 1) / dim
+                for dim in range(2, self.dimension + 1) ]
 
-            self.embedding_dimension_ = variation_list.index(min(
-                variation_list)) + 2
+            self.dimension_ = variation_list.index(min(variation_list)) + 2
 
         else:
-            self.embedding_time_delay_ = self.embedding_time_delay
-            self.embedding_dimension_ = self.embedding_dimension
+            self.time_delay_ = self.time_delay
+            self.dimension_ = self.dimension
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -278,22 +378,44 @@ class TakensEmbedder(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_outer_windows, n_points,
-        embedding_dimension_)
+        X_transformed : ndarray, shape (n_points,
+        dimension_)
             Array of embedded point cloud per outer window.
             ``n_outer_windows`` is  ``(n_samples - outer_window_duration) //
             outer_window_stride + 1``, and ``n_points`` is ``(
-            outer_window_duration - embedding_time_delay *
-            embedding_dimension) // embedding_stride + 1``.
+            outer_window_duration - time_delay *
+            dimension) // stride + 1``.
 
         """
 
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['time_delay_', 'dimension_'])
 
-        X_transformed = self._embed(X, self.outer_window_duration,
-                                    self.outer_window_stride,
-                                    self.embedding_time_delay_,
-                                    self.embedding_dimension_,
-                                    self.embedding_stride)
-        return X_transformed
+        Xt = self._embed(X, self.time_delay_, self.dimension_, self.stride)
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples - 1``.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['time_delay_', 'dimension_'])
+
+        yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
+
+        return yt

@@ -2,7 +2,7 @@
    useful to apply Topological Data Analysis techniques to time series.
 """
 
-from .embedding import TakensEmbedder
+from .embedding import SlidingWindow, TakensEmbedder
 from .permutations import OrdinalRepresentation, Entropy
 from .preprocessing import Resampler, Stationarizer
 from .multivariate import PearsonCorrelation
@@ -14,6 +14,7 @@ __all__ = [
     'OrdinalRepresentation',
     'Entropy',
     'TakensEmbedder',
+    'SlidingWindow',
     'Labeller',
     'PearsonCorrelation'
 ]
