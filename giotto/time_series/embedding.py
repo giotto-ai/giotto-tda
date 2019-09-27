@@ -3,7 +3,8 @@
 # License: Apache 2.0
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
+from ..base import TransformerResamplerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils._joblib import Parallel, delayed
