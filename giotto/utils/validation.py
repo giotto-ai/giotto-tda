@@ -6,12 +6,12 @@ import numpy as np
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                      'wasserstein': [('q', int, (1, np.inf)),
                                      ('delta', numbers.Number, (1e-16, 1.))],
-                     'betti': [('p', int, (1, np.inf)),
+                     'betti': [('p', numbers.Number, (1, np.inf)),
                                ('n_sampled_values', int, (1, np.inf))],
-                     'landscape': [('p', int, (1, np.inf)),
+                     'landscape': [('p', numbers.Number, (1, np.inf)),
                                    ('n_sampled_values', int, (1, np.inf)),
                                    ('n_layers', int, (1, np.inf))],
-                     'heat': [('order', int, (1, np.inf)),
+                     'heat': [('order', numbers.Number, (1, np.inf)),
                               ('n_sampled_values', int, (1, np.inf)),
                               ('sigma', numbers.Number, (0., np.inf))]}
 
