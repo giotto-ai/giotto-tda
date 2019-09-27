@@ -9,8 +9,135 @@ from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
+from ..utils.validation import validate_params
 
 import numpy as np
+
+
+class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
+    """Concatenates results of multiple transformer objects.
+    This estimator applies a list of transformer objects in parallel to the
+    input data, then concatenates the results. This is useful to combine
+    several feature extraction mechanisms into a single transformer.
+    Parameters of the transformer may be set using the parameter
+    name after 'transformer__'.
+
+    Parameters
+    ----------
+    width: int, default: 1
+        Width of the sliding window.
+
+    stride: int, default: 1
+        Stride of the sliding window.
+
+    Examples
+    --------
+    >>> from giotto.pipeline import SlidingWindow
+    """
+    _hyperparameters = {'width': [int, (1, np.inf)],
+                        'stride': [int, (1, np.inf)]}
+
+    def __init__(self, width=1, stride=1):
+        self.width = width
+        self.stride = stride
+
+    def _slice_windows(self, X):
+        n_windows = (X.shape[0] - self.width) \
+            // self.stride + 1
+
+        window_slices = [
+            (i * self.stride, self.width + i * self.stride)
+            for i in range(n_windows)
+        ]
+        return window_slices
+
+    def fit(self, X, y=None):
+        """Fit all transformers using X.
+
+        Parameters
+        ----------
+        X : iterable or array-like, depending on transformers
+            Input data, used to fit transformers.
+
+        y : array-like, shape (n_samples, ...), optional
+            Targets for supervised learning.
+
+        Returns
+        -------
+        self
+
+        """
+        validate_params(self.get_params(), self._hyperparameters)
+
+        if X.shape[0] < self.width:
+            raise ValueError("X of length {} does not have enough points"
+                             " to have a single window of width {}."
+                             "".format(X.shape[0]), self.width)
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X, y=None):
+        """Slide windows over X.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, [n_features, ])
+            Input data.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray, shape (n_windows, n_samples_window,
+            n_features)
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        if X.shape[0] < self.width:
+            raise ValueError("X of length {} does not have enough points"
+                             " to have a single window of width {}."
+                             "".format(X.shape[0]), self.width)
+
+        window_slices = self._slice_windows(X)
+
+        Xt = np.stack([X[begin:end] for begin, end in window_slices])
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples - 1``.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+
+        if X.shape[0] < self.width:
+            raise ValueError("X of length {} does not have enough points"
+                             " to have a single window of width {}."
+                             "".format(X.shape[0]), self.width)
+
+        yt = y[self.width - 1 :: self.stride]
+
+        return yt
+
 
 class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     r"""Transformer returning a representation of a scalar-valued time series as
@@ -225,13 +352,12 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
                     stride=1) for dim in
                 range(1, self.dimension + 3))
 
-            variation_list = [np.abs(n_false_nbhrs_list[dim - 1] - 2 *
-                n_false_nbhrs_list[dim] + n_false_nbhrs_list[dim + 1])
+            variation_list = [ np.abs(n_false_nbhrs_list[dim-1]
+                - 2 * n_false_nbhrs_list[dim] + n_false_nbhrs_list[dim+1])
                 / (n_false_nbhrs_list[dim] + 1) / dim
-                for dim in range(2, self.embedding_dimension + 1)]
+                for dim in range(2, self.dimension + 1) ]
 
-            self.embedding_dimension_ = variation_list.index(min(
-                variation_list)) + 2
+            self.dimension_ = variation_list.index(min(variation_list)) + 2
 
         else:
             self.time_delay_ = self.time_delay

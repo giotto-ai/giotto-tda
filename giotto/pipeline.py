@@ -13,6 +13,7 @@ spirit of a pooling layer in a convolutional neural network.
 import functools
 from collections import defaultdict
 import itertools
+import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import clone
@@ -23,7 +24,7 @@ from .utils.validation import validate_params
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
-__all__ = ['Pipeline', 'make_pipeline', 'SlidingTimeWindow']
+__all__ = ['Pipeline', 'make_pipeline', 'SlidingWindowFeatureUnion']
 
 
 class Pipeline(pipeline.Pipeline):
@@ -149,10 +150,15 @@ class Pipeline(pipeline.Pipeline):
             # Fit or load from cache the current transfomer
             if (hasattr(cloned_transformer, "resample") or
                 hasattr(cloned_transformer, "fit_transform_resample")):
-                X, y, fitted_transformer = \
-                    fit_transform_resample_one_cached(
+                if y is None:
+                    X, fitted_transformer = fit_transform_one_cached(
                         cloned_transformer, None, X, y,
                         **fit_params_steps[name])
+                else:
+                    X, y, fitted_transformer = \
+                        fit_transform_resample_one_cached(
+                            cloned_transformer, None, X, y,
+                            **fit_params_steps[name])
             else:
                 X, fitted_transformer = fit_transform_one_cached(
                     cloned_transformer, None, X, y,
@@ -353,8 +359,8 @@ class Pipeline(pipeline.Pipeline):
     def _transform_resample(self, X, y):
         Xt, yt = X, y
         for _, _, transform in self._iter():
-            Xt =  transform.transform(Xt, yt)
-        return Xt
+            Xt, yt =  transform.transform_resample(Xt, yt)
+        return Xt, yt
 
     @property
     def transform(self):
@@ -456,7 +462,7 @@ def _fit_transform_one(transformer, weight, X, y, **fit_params):
         X_res = transformer.fit(X, y, **fit_params).transform(X)
     # if we have a weight for this transformer, multiply output
     if weight is None:
-        return res, transformer
+        return X_res, transformer
     return X_res * weight, transformer
 
 
@@ -522,122 +528,6 @@ def make_pipeline(*steps, **kwargs):
         raise TypeError('Unknown keyword arguments: "{}"'
                         .format(list(kwargs.keys())[0]))
     return Pipeline(pipeline._name_estimators(steps), memory=memory)
-
-
-class SlidingTimeWindow(BaseEstimator, TransformerResamplerMixin):
-    """Concatenates results of multiple transformer objects.
-    This estimator applies a list of transformer objects in parallel to the
-    input data, then concatenates the results. This is useful to combine
-    several feature extraction mechanisms into a single transformer.
-    Parameters of the transformer may be set using the parameter
-    name after 'transformer__'.
-
-    Parameters
-    ----------
-    width: int, default: 1
-        Width of the sliding window.
-
-    stride: int, default: 1
-        Stride of the sliding window.
-
-    Examples
-    --------
-    >>> from giotto.pipeline import SlidingWindow
-    """
-    _hyperparameters = {'positive_definite': [bool, (False, True)]}
-
-    def __init__(self, width=1, stride=1):
-        self.width = width
-        self.stride = stride
-
-    def _view_X(X, begin, end, axis=0):
-        return np.roll(X, shift=-begin, axis=axis)[:end]
-
-    def _view_y(y, begin, end, axis=0):
-        return np.roll(y, shift=-begin, axis=axis)[:end]
-
-    def _slice_windows(self, X):
-        n_windows = (X.shape[0] - self.width) \
-            // self.stride + 1
-
-        window_slices = [
-            tuple(i * self.stride, self.width + i * self.stride)
-            for i in range(n_windows)
-        ]
-        return window_slices
-
-    def fit(self, X, y=None):
-        """Fit all transformers using X.
-
-        Parameters
-        ----------
-        X : iterable or array-like, depending on transformers
-            Input data, used to fit transformers.
-
-        y : array-like, shape (n_samples, ...), optional
-            Targets for supervised learning.
-
-        Returns
-        -------
-        self
-
-        """
-        validate_params(self.get_params(), self._hyperparameters)
-
-        self._is_fitted = True
-        return self
-
-    def transform(self, X):
-        """Slide windows over X.
-
-        Parameters
-        ----------
-        X : ndarray, shape (n_samples, [n_features, ])
-            Input data.
-
-        y : None
-            Ignored.
-
-        Returns
-        -------
-        X_transformed : ndarray, shape (n_windows, n_samples_window,
-            n_features)
-
-        """
-        # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
-
-        window_slices = self._slice_windows(X)
-
-        Xt = np.stack([self._view_X(X, begin, end)
-                       for begin, end in window_slices])
-        return Xt
-
-    def resample(self, y, X=None):
-        """Resample y.
-
-        Parameters
-        ----------
-        y : ndarray, shape (n_samples, n_features)
-            Target.
-
-        X : None
-            There is no need of input data,
-            yet the pipeline API requires this parameter.
-
-        Returns
-        -------
-        yt : ndarray, shape (n_samples_new, 1)
-            The resampled target.
-            ``n_samples_new = n_samples - 1``.
-
-        """
-        # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
-
-        yt = y[self.width - 1 :: self.stride]
-
-        return yt
 
 
 class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
