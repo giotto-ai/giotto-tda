@@ -1,13 +1,13 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-# License: TBD
+# License: Apache 2.0
 
 import giotto as go
 import giotto.time_series as ts
 import giotto.diagram as diag
-import giotto.homology as hl
-import giotto.neural_network as nn
-import giotto.manifold as ma
 import giotto.compose as cp
+import giotto.homology as hl
+import giotto.manifold as ma
+from giotto.pipeline import Pipeline
 
 import numpy as np
 import pandas as pd
@@ -19,25 +19,7 @@ import argparse
 import sklearn.utils as skutils
 from sklearn.model_selection import TimeSeriesSplit, KFold
 import sklearn.preprocessing as skprep
-from sklearn.pipeline import Pipeline
-
-from keras.models import Sequential
-import keras.layers as klayers
-import keras.optimizers as koptimizers
-
-import keras
-import tensorflow as tf
-
-# from dask_ml.model_selection import GridSearchCV
-
-# If I don't do this, the GPU is automatically used and gets out of memory
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-
-def init_keras_session():
-    sess = tf.Session()
-    keras.backend.set_session(sess)
+from sklearn.ensemble import RandomForestClassifier
 
 
 def get_data(n_train, n_test):
@@ -67,14 +49,16 @@ def main(n_jobs):
     X_train, y_train, X_test, y_test = split_train_test(data, n_train, n_test)
 
     steps = [
-        ('stationarizing', ts.Stationarizer(stationarization_type='return')),
-        ('embedding', ts.TakensEmbedder(outer_window_duration=20)),
+        ('stationarizing', ts.Stationarizer(operation='return')),
+        ('embedding', ts.TakensEmbedder(dimension=5, time_delay=5)),
+        ('window', ts.SlidingWindow(width=5, stride=1)),
         ('diagram', hl.VietorisRipsPersistence(homology_dimensions=[0, 1], n_jobs=n_jobs)),
-        ('distance', diag.DiagramDistance(metric='bottleneck', metric_params={'order': np.inf}, n_jobs=n_jobs)),
+        ('distance', diag.DiagramDistance(metric='bottleneck', metric_params={'delta':0.1}, order = np.inf, n_jobs=n_jobs)),
         ('physical', ma.StatefulMDS(n_components=3, n_jobs=n_jobs)),
         ('kinematics', ma.Kinematics(orders=[0, 1, 2])),
         ('scaling', skprep.MinMaxScaler(copy=True)),
-        ('aggregator', cp.FeatureAggregator(n_steps_in_past=2, is_keras=True))
+        ('aggregator', cp.FeatureAggregator(is_keras=False)),
+        ('classification', RandomForestClassifier())
     ]
 
     # Running the full pipeline
@@ -92,5 +76,4 @@ if __name__ == "__main__":
     parser.add_argument('-n_jobs', help="Number of processes", type=int, required=True)
     args = vars(parser.parse_args())
 
-    init_keras_session()
     main(**args)
