@@ -26,9 +26,9 @@ DISTNAME = 'giotto-learn'
 DESCRIPTION = 'Toolbox for Topological Data Analysis dataset in machine learning.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
-MAINTAINER = 'Matteo Caorsi'
-MAINTAINER_EMAIL = 'm.caorsi@l2f.ch'
-URL = 'https://github.com/matteocao/giotto-learn/'
+MAINTAINER = 'Guillaume Tauzin'
+MAINTAINER_EMAIL = 'g.tauzin@l2f.ch'
+URL = 'https://github.com/giotto-learn/giotto-learn'
 LICENSE = 'Apache 2.0'
 DOWNLOAD_URL = 'https://github.com/matteocao/giotto-learn/'
 VERSION = __version__
@@ -53,9 +53,6 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'pytest-benchmark'],
-    'binary': [
-        'wheel',
-        'twine'],
     'doc': [
         'sphinx',
         'sphinx-gallery',
