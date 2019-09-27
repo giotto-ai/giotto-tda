@@ -12,7 +12,7 @@ spirit of a pooling layer in a convolutional neural network.
 
 import functools
 from collections import defaultdict
-from itertools import islice
+import itertools
 
 from sklearn import pipeline
 from sklearn.base import clone
@@ -493,7 +493,7 @@ def make_pipeline(*steps, **kwargs):
     return Pipeline(pipeline._name_estimators(steps), memory=memory)
 
 
-class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
+class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
     """Concatenates results of multiple transformer objects.
     This estimator applies a list of transformer objects in parallel to the
     input data, then concatenates the results. This is useful to combine
@@ -536,45 +536,31 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
     --------
     >>> from giotto.pipeline import SlidingWindowFeatureUnion
     """
-    def __init__(self, transformer, width=None, stride=None, padding=None,
-                 n_jobs=None, verbose=False):
+    def __init__(self, transformer, axes=[0], width=None, stride=None,
+                 padding=None, n_jobs=None, verbose=False):
         self.transformer = transformer
+        self.axes = axes
         self.width = width
         self.stride = stride
         self.padding = padding
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def get_params(self, deep=True):
-        """Get parameters for this estimator.
-
-        Parameters
-        ----------
-        deep : boolean, optional
-            If True, will return the parameters for this estimator and
-            contained subobjects that are estimators.
-
-        Returns
-        -------
-        params : mapping of string to any
-            Parameter names mapped to their values.
-
-        """
-        return {'width': self.width, 'stride': self.stride,
-                'padding': self.padding, 'transformer': self.transformer,
-                'n_jobs': self.n_jobs}
-
-    @staticmethod
-    def _validate_params(shape_input, shape_width, shape_stride, shape_padding):
+    def _validate_params(self):
         """A class method that checks whether the hyperparameters and the input
         parameters of the :meth:`fit` are valid.
 
         """
         try:
-            assert dimension_image == dimension_direction
+            assert self._dimension == len(width)
+            assert self._dimension == len(stride)
+            assert self._dimension == len(padding)
         except AssertionError:
-            raise ValueError("The dimension of the direction vector does not"
-                             "correspond to the dimension of the image.")
+            raise ValueError("axes, width, stride, and padding do not have the same"
+                             "length.")
+
+    def _pad(self, X, axis):
+        return X
 
     def fit(self, X, y=None):
         """Fit all transformers using X.
@@ -592,10 +578,29 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
         self
 
         """
-        self._dimension = len(X.shape) - 1
-        self._validate_params(self._dimension, len(self.direction))
+        self._dimension = len(axes)
 
-        transformers = self._parallel_func(X, y, {}, _fit_one)
+        if self.width is None:
+            self.width_ = self._dimension * [1]
+        else:
+            self.width_ = self.width
+
+        if self.stride is None:
+            self.stride_ = self._dimension * [1]
+        else:
+            self.stride_ = self.stride
+
+        if self.padding is None:
+            self.padding_ =self._dimension * [0]
+        else:
+            self.width_ = self.width
+
+        self._validate_params()
+        _X = self._pad(X)
+
+        self.window_iterator =
+
+        transformers = self._parallel_func(_X, y, {}, _fit_one)
 
         self._update_transformer_list(transformers)
         return self
@@ -635,10 +640,6 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerMixin):
 
     def _parallel_func(self, X, y, fit_params, func):
         """Runs func in parallel on X and y"""
-        self.transformer_list = list(self.transformer_list)
-        self._validate_transformers()
-        transformers = list(self._iter())
-
         return Parallel(n_jobs=self.n_jobs)(
             delayed(func)(transformer, X, y, weight, **fit_params)
             for idx, (name, transformer, weight)
