@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
-from ._utils import _sample, _pad
+from ._utils import _create_linspaces, _pad
 from ..utils.validation import check_diagram, validate_metric_params
 
 
@@ -43,20 +43,21 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
            distances between "Heat kernels"obtained from persistence
            (sub)diagrams.
 
-    metric_params : dict, optional, default: {'n_samples': 200}
+    metric_params : dict, optional, default: {'n_sampled_values': 100}
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the only argument is
-         ``delta`` (default = ``0.0``).
+          ``delta`` (default = ``0.0``).
         - If ``metric == 'wasserstein'`` the available arguments are ``order``
           (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
-          (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
-          (default = ``1``).
+          (default = ``2``), ``n_sampled_values`` (default = ``100``) and
+          ``n_layers`` (default = ``1``).
         - If ``metric == 'betti'`` the available arguments are ``order``
-           (default = ``2``) and ``n_samples`` (default = ``200``).
-        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
-           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
+          (default = ``2``) and ``n_sampled_values`` (default = ``100``).
+        - If ``metric == 'heat'`` the available arguments are ``order``
+          (default = ``2``), ``sigma`` (default = ``1``) and
+          ``n_sampled_values`` (default = ``100``).
 
     order : int, optional, default: 2
         Order of the norm used to combine subdiagrams distances into a single
@@ -69,7 +70,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params=None, order=2,
+    def __init__(self, metric='landscape', metric_params=None, order=2,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -106,11 +107,18 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['sampling'] = \
-                _sample(X, **self.effective_metric_params_)
+            self.effective_metric_params_['linspaces'], \
+                self.effective_metric_params_['step_sizes'] = \
+                _create_linspaces(X, **self.effective_metric_params_)
+            if self.metric == 'landscape':
+                self.effective_metric_params_['linspaces'] = {
+                    dim: np.sqrt(2) * linspace for dim, linspace in
+                    self.effective_metric_params_['linspaces'].items()}
+                self.effective_metric_params_['step_sizes'] = {
+                    dim: np.sqrt(2) * step_size for dim, step_size in
+                    self.effective_metric_params_['step_sizes'].items()}
 
         self._X = X
-
         return self
 
     def transform(self, X, y=None):
@@ -138,44 +146,46 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
 
-        n_diagrams_X = next(iter(X.values())).shape[0]
+        n_diags_X = len(next(iter(X.values())))
 
         is_same = np.all(
-            [np.array_equal(X[dimension],
-                            self._X[dimension]) for dimension in X.keys()])
+            [np.array_equal(X[dim], self._X[dim]) for dim in X.keys()])
         if is_same:
             # Only calculate metric for upper triangle
-            iterator = list(itertools.combinations(range(n_diagrams_X), 2))
-            X_transformed = _parallel_pairwise(X, X, self.metric,
-                                               self.effective_metric_params_,
-                                               iterator, self.order, self.n_jobs)
-            X_transformed = X_transformed + X_transformed.T
+            iterator = list(itertools.combinations(range(n_diags_X), 2))
+            X_upp = _parallel_pairwise(X, self.metric,
+                                       self.effective_metric_params_,
+                                       iterator=iterator, order=self.order,
+                                       n_jobs=self.n_jobs)
+            transp_indices = (1, 0) if X_upp.ndim == 2 else (1, 0, 2)
+            X_transformed = X_upp + np.transpose(X_upp, transp_indices)
         else:
-            max_betti_numbers = {
-                dimension: max(self._X[dimension].shape[1],
-                               X[dimension].shape[1])
-                for dimension in self._X.keys()}
+            max_betti_numbers = {dim: max(self._X[dim].shape[1],
+                                          X[dim].shape[1]) for dim in
+                                 self._X.keys()}
             _X = _pad(self._X, max_betti_numbers)
-            X = _pad(X, max_betti_numbers)
-            Y = {dimension: np.vstack([_X[dimension], X[dimension]])
-                for dimension in _X.keys()}
-            n_diagrams_Y = next(iter(Y.values())).shape[0]
+            X2 = _pad(X, max_betti_numbers)
+            X1 = {dim: np.vstack([_X[dim], X2[dim]]) for dim in _X.keys()}
+            n_diags_1 = len(next(iter(X1.values())))
 
             # Calculate all cells
-            iterator = tuple(itertools.product(range(n_diagrams_Y),
-                                               range(n_diagrams_X)))
-            X_transformed = _parallel_pairwise(Y, X, self.metric,
+            iterator = tuple(itertools.product(range(n_diags_1),
+                                               range(n_diags_X)))
+            X_transformed = _parallel_pairwise(X1, self.metric,
                                                self.effective_metric_params_,
-                                               iterator, self.order, self.n_jobs)
+                                               X2=X2, iterator=iterator,
+                                               order=self.order,
+                                               n_jobs=self.n_jobs)
 
         return X_transformed
 
 
 class DiagramAmplitude(BaseEstimator, TransformerMixin):
-    """Transformer for calculating the amplitude of a collections of persistence diagrams.
-    In the case in which diagrams in the collection have been consistently partitioned
-    into one or more subdiagrams (e.g. according to homology dimension), the amplitude of a
-    diagram is a *p*-norm of a vector of distances between respective subdiagrams of
+    """Transformer for calculating the amplitude of a collections of
+    persistence diagrams. In the case in which diagrams in the collection
+    have been consistently partitioned into one or more subdiagrams (e.g.
+    according to homology dimension), the amplitude of a diagram is a
+    *p*-norm of a vector of distances between respective subdiagrams of
     the same kind.
 
     Parameters
@@ -185,36 +195,41 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "persistence landscapes" obtained from persistence (sub)diagrams.
-        - ``'betti'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "Betti curves" obtained from persistence (sub)diagrams. A Betti
-           curve simply records the evolution in the number of independent topological
-           holes (technically, the number of linearly independent homology classes)
-           as can be read from a persistence (sub)diagram.
-        - ``'heat'`` heat kernel
+        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like)
+          distances between "persistence landscapes" obtained from
+          persistence (sub)diagrams.
+        - ``'betti'`` refers to a family of possible (:math:`L^p`-like)
+          distances between "Betti curves" obtained from persistence
+          (sub)diagrams. A Betti curve simply records the evolution in the
+          number of independent topological holes (technically, the number
+          of linearly independent homology classes) as can be read from a
+          persistence (sub)diagram.
+        - ``'heat'`` refers to the heat kernel
 
-    metric_params : dict, optional, default: {'n_samples': 200}
+    metric_params : dict, optional, default: {'n_sampled_values': 100}
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the available arguments are ``order`` (default = ``np.inf``)
-          and ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order`` (default = ``1``)
-          and ``delta`` (default = ``0.0``).
+        - If ``metric == 'bottleneck'`` the available arguments are ``order``
+          (default = ``np.inf``) and ``delta`` (default = ``0.0``).
+        - If ``metric == 'wasserstein'`` the only argument is ``order``
+          (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
-          (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
-          (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``order`` (default = ``2``)
-           and ``n_samples`` (default = ``200``).
-        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
-           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
+          (default = ``2``), ``n_sampled_values`` (default = ``100``) and
+          ``n_layers`` (default = ``1``).
+        - If ``metric == 'betti'`` the available arguments are ``order``
+          (default = ``2``) and ``n_sampled_values`` (default = ``100``).
+        - If ``metric == 'heat'`` the available arguments are ``order``
+          (default = ``2``), ``sigma`` (default = ``1``) and
+          ``n_sampled_values`` (default = ``100``).
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     """
-    def __init__(self, metric='bottleneck', metric_params=None, order=2, n_jobs=None):
+    def __init__(self, metric='landscape', metric_params=None, order=2,
+                 n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.order = order
@@ -248,14 +263,17 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
 
-        if 'n_samples' in self.effective_metric_params_:
-            self._n_samples = self.effective_metric_params_['n_samples']
-        else:
-            self._n_samples = None
-
         if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['sampling'] = \
-                _sample(X, **self.effective_metric_params_)
+            self.effective_metric_params_['linspaces'], \
+                self.effective_metric_params_['step_sizes'] = \
+                _create_linspaces(X, **self.effective_metric_params_)
+            if self.metric == 'landscape':
+                self.effective_metric_params_['linspaces'] = {
+                    dim: np.sqrt(2) * linspace for dim, linspace in
+                    self.effective_metric_params_['linspaces'].items()}
+                self.effective_metric_params_['step_sizes'] = {
+                    dim: np.sqrt(2) * step_size for dim, step_size in
+                    self.effective_metric_params_['step_sizes'].items()}
 
         return self
 
@@ -283,9 +301,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['effective_metric_params_'])
         X = check_diagram(X)
 
-        n_diagrams_X = next(iter(X.values())).shape[0]
-
-        X_transformed = _parallel_amplitude(X, self.metric, self.effective_metric_params_,
-                                            self.n_jobs)
+        X_transformed = _parallel_amplitude(X, self.metric,
+                                            self.effective_metric_params_,
+                                            n_jobs=self.n_jobs)
 
         return X_transformed

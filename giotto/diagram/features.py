@@ -75,7 +75,6 @@ class PersistentEntropy(BaseEstimator, TransformerMixin):
         self._is_fitted = True
         return self
 
-    #@jit
     def transform(self, X, y=None):
         """For each key in the dictionary X and for each persistence diagram in the
         corresponding ndarray, computes that diagram's persistent entropy. All results

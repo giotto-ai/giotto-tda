@@ -4,157 +4,218 @@
 # License: TBD
 
 import numpy as np
+from scipy.spatial.distance import cdist, pdist, squareform
 from giotto_bottleneck import bottleneck_distance \
     as pairwise_bottleneck_distance
 from giotto_wasserstein import wasserstein_distance \
     as pairwise_wasserstein_distance
-from scipy.ndimage import gaussian_filter
+# from scipy.ndimage import gaussian_filter
 from sklearn.utils._joblib import Parallel, delayed
 
 
-def betti_function(diagram, sampling):
-    born = sampling >= diagram[:, 0]
-    not_dead = sampling < diagram[:, 1]
+def betti_curves(diagrams, linspace):
+    # linspace must be a three-dimensional array with the last two
+    # axes having dimension equal to 1. diagrams must be a three-dimensional
+    # array whose entries along axis 0 are persistence diagrams
+
+    born = linspace >= diagrams[:, :, 0]
+    not_dead = linspace < diagrams[:, :, 1]
     alive = np.logical_and(born, not_dead)
-    betti = np.sum(alive, axis=1).T
+    betti = np.sum(alive, axis=2).T
     return betti
 
 
-def landscape_function(diagram, n_layers, sampling):
-    midpoints = (diagram[:, 1] + diagram[:, 0]) * np.sqrt(2) / 2.
-    heights = (diagram[:, 1] - diagram[:, 0]) * np.sqrt(2) / 2.
+def landscapes(diagrams, linspace, n_layers):
+    # Up to n_layers persistence landscapes across a collection of diagrams,
+    # via sampling at regular intervals. linspace must be as in betti_curves
 
-    mountains = [-np.abs(sampling - midpoints[i]) +
-                 heights[i] for i in range(len(diagram))]
-    fibers = np.vstack([np.where(mountains[i] > 0,
-                                 mountains[i],
-                                 0) for i in range(len(diagram))])
-
-    landscape = np.flip(np.partition(
-        fibers,
-        range(max(0, fibers.shape[0] - n_layers), fibers.shape[0]),
-        axis=0)[-n_layers:, :], axis=0)
-    return landscape
+    n_points = diagrams.shape[1]
+    n_layers_possible = min(n_points, n_layers)
+    midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) * np.sqrt(2) / 2.
+    heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) * np.sqrt(2) / 2.
+    fibers = np.maximum(-np.abs(linspace - midpoints) + heights, 0)
+    top_pos = range(n_points - n_layers_possible, n_points)
+    ls = np.flip(np.partition(fibers, top_pos, axis=2)[:, :, -n_layers:],
+                 axis=2)
+    return np.transpose(ls, (1, 2, 0))
 
 
-def heat_function(diagram, sigma, sampling):
-    heat = np.zeros((sampling.shape[0], sampling.shape[0]))
-
-    sample_step = sampling[1] - sampling[0]
-
-    sampled_diagram = np.array(diagram // sample_step, dtype=int)
-    for sampled_point in sampled_diagram[sampled_diagram[:, 1] != 0]:
-        heat[sampled_point[0], sampled_point[1]] += 1
-        heat[sampled_point[1], sampled_point[0]] -= 1
-
-    heat = gaussian_filter(heat, sigma, mode='reflect')
-    return heat
-
-
-def kernel_landscape_distance(diagram_x, diagram_y, dimension, sampling=None,
-                              order=2, n_layers=100, **kw_args):
-    landscape_x = landscape_function(diagram_x, n_layers, sampling[dimension])
-    landscape_y = landscape_function(diagram_y, n_layers, sampling[dimension])
-    return np.linalg.norm(landscape_x - landscape_y, ord=order)
+# def heat_function(diagram, sigma, linspace):
+#     heat = np.zeros((linspace.shape[0], linspace.shape[0]))
+#
+#     sample_step = linspace[1] - linspace[0]
+#
+#     sampled_diagram = np.array(diagram // sample_step, dtype=int)
+#     for sampled_point in sampled_diagram[sampled_diagram[:, 1] != 0]:
+#         heat[sampled_point[0], sampled_point[1]] += 1
+#         heat[sampled_point[1], sampled_point[0]] -= 1
+#
+#     heat = gaussian_filter(heat, sigma, mode='reflect')
+#     return heat
 
 
-def kernel_betti_distance(diagram_x, diagram_y, dimension, sampling=None,
-                          order=2, **kw_args):
-    betti_x = betti_function(diagram_x, sampling[dimension][:, None])
-    betti_y = betti_function(diagram_y, sampling[dimension][:, None])
-    return np.linalg.norm(betti_x - betti_y, ord=order)
+def pairwise_betti_distances(diagrams_1, linspace, step_size,
+                             diagrams_2=None, p=2., **kw_args):
+    # As for pairwise_landscape_distances, but for Betti curves.
+
+    linsp = linspace[:, None, None]
+    betti_curves_1 = betti_curves(diagrams_1, linsp)
+    if diagrams_2 is None:
+        unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
+    betti_curves_2 = betti_curves(diagrams_2, linsp)
+    unnorm_dist = cdist(betti_curves_1, betti_curves_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
 
 
-def kernel_heat_distance(diagram_x, diagram_y, dimension, sigma=1.,
-                         sampling=None, order=2, **kw_args):
-    heat_x = heat_function(diagram_x, sigma, sampling[dimension])
-    heat_y = heat_function(diagram_y, sigma, sampling[dimension])
-    return np.linalg.norm(heat_x - heat_y, ord=order)
+def pairwise_landscape_distances(diagrams_1, linspace, step_size,
+                                 diagrams_2=None, p=2., n_layers=1, **kw_args):
+    # Approximate calculation of distances between: a) if diagrams_2 is None,
+    # pairs (L1, L2) of persistence landscapes both obtained from a single
+    # collection diagrams_1 of diagrams; b) if diagrams_2 is not None,
+    # pairs (L1, L2) of persistence landscapes such that L1 is a landscape
+    # coming from diagrams_1 and L2 is a landscape coming from diagrams_2.
+
+    linsp = linspace[:, None, None]
+    n_samples_1, n_points_1 = diagrams_1.shape[:2]
+    ls_1 = landscapes(diagrams_1, linsp, n_layers).reshape((
+        n_samples_1, -1))
+    if diagrams_2 is None:
+        unnorm_dist = squareform(pdist(ls_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
+    n_samples_2, n_points_2 = diagrams_2.shape[:2]
+    n_layers_12 = min(n_layers, n_points_1, n_points_2)
+    ls_2 = landscapes(diagrams_2, linsp, n_layers_12).reshape((
+        n_samples_2, -1))
+    unnorm_dist = cdist(ls_1, ls_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
 
 
-def bottleneck_distance(diagram_x, diagram_y, dimension=None,
-                        delta=0.0, **kw_args):
+def kernel_bottleneck_distance(diagram_x, diagram_y, delta=0.0, **kw_args):
     return pairwise_bottleneck_distance(diagram_x[diagram_x[:, 1] != 0],
                                         diagram_y[diagram_y[:, 1] != 0], delta)
 
 
-def wasserstein_distance(diagram_x, diagram_y, dimension=None, order=1,
-                         delta=0.01, **kw_args):
-    return pairwise_wasserstein_distance(diagram_x, diagram_y, order, delta)
+def kernel_wasserstein_distance(diagram_x, diagram_y, q=1, delta=0.01,
+                                **kw_args):
+    return pairwise_wasserstein_distance(diagram_x, diagram_y, q, delta)
 
 
-implemented_metric_recipes = {'bottleneck': bottleneck_distance,
-                              'wasserstein': wasserstein_distance,
-                              'landscape': kernel_landscape_distance,
-                              'betti': kernel_betti_distance,
-                              'heat': kernel_heat_distance}
+# def kernel_heat_distance(diagram_x, diagram_y, linspaces, dimension, sigma=1.,
+#                          order=2, **kw_args):
+#     heat_x = heat_function(diagram_x, sigma, linspaces[dimension])
+#     heat_y = heat_function(diagram_y, sigma, linspaces[dimension])
+#     return np.linalg.norm(heat_x - heat_y, ord=order)
 
 
-def _parallel_pairwise(X, Y, metric, metric_params, iterator, order, n_jobs):
-    n_diagrams_X = list(X.values())[0].shape[0]
-    n_diagrams_Y = list(Y.values())[0].shape[0]
-    n_dimensions = len(X.keys())
+implemented_metric_recipes = {'bottleneck': kernel_bottleneck_distance,
+                              'wasserstein': kernel_wasserstein_distance,
+                              'landscape': pairwise_landscape_distances,
+                              'betti': pairwise_betti_distances,  # 'heat':
+                              # kernel_heat_distance
+                              }
+
+
+def _parallel_pairwise(X1, metric, metric_params, X2=None, iterator=None,
+                       order=None, n_jobs=None):
     metric_func = implemented_metric_recipes[metric]
 
-    distance_array = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
-        X[dimension][i, :, :], Y[dimension][j, :, :],
-        dimension, **metric_params)
-        for i, j in iterator for dimension in X.keys())
-    distance_array = np.array(distance_array). \
-        reshape((len(iterator), n_dimensions))
-    if order is not None:
-        distance_array = np.linalg.norm(distance_array, axis=1, ord=order)
-        distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
-        distance_matrix[tuple(zip(*iterator))] = distance_array
+    if metric in ['landscape', 'betti']:
+        # Only parallelism is across dimensions here
+        const_params = {key: value for key, value in metric_params.items()
+                        if key not in ['linspaces', 'step_sizes']}
+        lins = metric_params.get('linspaces')
+        st_sizes = metric_params.get('step_sizes')
+        if X2 is None:
+            dist_arr = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
+                X1[dim], lins[dim], st_sizes[dim], **const_params)
+                for dim in X1.keys())
+        else:
+            dist_arr = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
+                X1[dim], lins[dim], st_sizes[dim], diagrams_2=X2[dim],
+                **const_params) for dim in X1.keys())
+        dist_arr = np.stack(dist_arr, axis=2)
+        if order is None:
+            return dist_arr
+        return np.linalg.norm(dist_arr, axis=2, ord=order)
+
+    if iterator is None:  # TODO Remove 'heat' when this is no longer the case
+        raise ValueError("iterator cannot be set to None when the metric is "
+                         "'bottleneck', 'wasserstein' or 'heat'")
+
+    n_dims = len(X1.keys())
+    n_diags_1 = len(next(iter(X1.values())))
+    if X2 is None:
+        X2, n_diags_2 = X1, n_diags_1
     else:
-        distance_matrix = np.zeros((n_diagrams_X, n_diagrams_Y))
-        for dimension in range(n_dimensions):
-            distance_matrix[tuple(zip(*iterator)), dimension] = distance_array[:, dimension]
-    return distance_matrix
+        n_diags_2 = len(next(iter(X2.values())))
+    dist_vecs = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
+        X1[dim][i, :, :], X2[dim][j, :, :], **metric_params)
+        for i, j in iterator for dim in X1.keys())
+    dist_vecs = np.array(dist_vecs).reshape((len(iterator), n_dims))
+    if order is not None:
+        dist_vec = np.linalg.norm(dist_vecs, axis=1, ord=order)
+        dist_mat = np.zeros((n_diags_1, n_diags_2))
+        dist_mat[tuple(zip(*iterator))] = dist_vec
+        return dist_mat
+    dist_mats = []
+    for dim in X1.keys():
+        dist_mat = np.zeros((n_diags_1, n_diags_2))
+        dist_mat[tuple(zip(*iterator))] = dist_vecs[:, dim]
+        dist_mats.append(dist_mat)
+    return np.stack(dist_mats, axis=2)
 
 
-def kernel_landscape_amplitude(diagram, dimension, sampling=None,
-                          order=2, n_layers=1, **kw_args):
-    landscape = landscape_function(diagram, n_layers, sampling[dimension])
-    return np.linalg.norm(landscape, ord=order)
+def betti_amplitudes(diagrams, linspace, step_size, p=2., **kw_args):
+    linsp = linspace[:, None, None]
+    bcs = betti_curves(diagrams, linsp)
+    return (step_size ** (1 / p)) * np.linalg.norm(bcs, axis=1, ord=p)
 
 
-def kernel_betti_amplitude(diagram, dimension, sampling=None, order=2,
-                           **kw_args):
-    betti = betti_function(diagram, sampling[dimension][:, None])
-    return np.linalg.norm(betti, ord=order)
+def landscape_amplitudes(diagrams, linspace, step_size, p=2., n_layers=1,
+                         **kw_args):
+    linsp = linspace[:, None, None]
+    ls = landscapes(diagrams, linsp, n_layers).reshape((
+        len(diagrams), -1))
+    return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
 
-def kernel_heat_amplitude(diagram, dimension, sampling=None, sigma=1.,
-                     order=2, n_layers=1, **kw_args):
-    heat = heat_function(diagram, sigma, sampling[dimension])
-    return np.linalg.norm(heat, ord=order)
+def bottleneck_amplitudes(diagrams, **kw_args):
+    dists_to_diag = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
+    return np.linalg.norm(dists_to_diag, axis=1, ord=np.inf)
 
 
-def bottleneck_amplitude(diagram, dimension=None, order=np.inf, **kw_args):
-    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
-                          ord=order)
+def wasserstein_amplitudes(diagrams, q=1., **kw_args):
+    dists_to_diag = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
+    return np.linalg.norm(dists_to_diag, axis=1, ord=q)
 
 
-def wasserstein_amplitude(diagram, dimension=None, order=1, **kw_args):
-    return np.linalg.norm(np.sqrt(2) / 2. * (diagram[:, 1] - diagram[:, 0]),
-                          ord=order)
+# def kernel_heat_amplitude(diagram, linspaces, dimension, sigma=1., order=2,
+#                           **kw_args):
+#     heat = heat_function(diagram, sigma, linspaces[dimension])
+#     return np.linalg.norm(heat, ord=order)
 
 
-implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitude,
-                            'wasserstein': wasserstein_amplitude,
-                            'landscape': kernel_landscape_amplitude,
-                            'betti': kernel_betti_amplitude,
-                            'heat': kernel_heat_amplitude}
+implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
+                                 'wasserstein': wasserstein_amplitudes,
+                                 'landscape': landscape_amplitudes,
+                                 'betti': betti_amplitudes,  # 'heat': kernel_heat_amplitude
+                                 }
 
 
-def _parallel_amplitude(X, metric, metric_params, n_jobs):
-    n_dimensions = len(X.keys())
+def _parallel_amplitude(X, metric, metric_params, n_jobs=None):
     amplitude_func = implemented_amplitude_recipes[metric]
+    const_params = {key: value for key, value in metric_params.items()
+                    if key not in ['linspaces', 'step_sizes']}
+    lins = metric_params.get('linspaces')
+    st_sizes = metric_params.get('step_sizes')
+    lins = lins if lins is not None else {dim: None for dim in X.keys()}
+    st_sizes = st_sizes if st_sizes is not None else {dim: None for dim in
+                                                      X.keys()}
 
-    amplitude_array = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
-        X[dimension][i, :, :], dimension, **metric_params)
-        for i in range(next(iter(X.values())).shape[0])
-        for dimension in X.keys())
-    amplitude_array = np.array(amplitude_array).reshape((-1, n_dimensions))
-    return amplitude_array
+    # Only parallelism is across dimensions
+    ampl_arr = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
+        X[dim], linspace=lins[dim], step_size=st_sizes[dim], **const_params)
+        for dim in X.keys())
+    ampl_arr = np.stack(ampl_arr, axis=1)
+    return ampl_arr
