@@ -14,12 +14,13 @@ import sklearn.utils as skutils
 from sklearn.model_selection import TimeSeriesSplit
 import sklearn.preprocessing as skprep
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
 
 data = np.random.rand(600, 1)
 
 
 def split_train_test(data):
-    n_train = int(0.7) * data.shape[0]
+    n_train = int(0.7 * data.shape[0])
     n_test = data.shape[0] - n_train
     labeller = ts.Labeller(labelling_kwargs={'type': 'derivation'},
                            window_size=5, percentiles=[80], n_steps_future=1)
@@ -45,7 +46,7 @@ def make_pipeline():
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.DiagramScaler()),
         ('filter', diag.DiagramFilter(delta=0.1)),
-        ('entropy', hl.PersistentEntropy()),
+        ('entropy', diag.PersistentEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
         ('classification', RandomForestClassifier())
    ]
@@ -101,5 +102,5 @@ def test_grid_search_time_series():
     pipeline = make_pipeline()
     param_grid = get_param_grid()
     cv = TimeSeriesSplit(n_splits=2)
-    grid = GridSearchCV(estimator=estimator, param_grid=param_grid, cv=cv, verbose=0)
+    grid = GridSearchCV(estimator=pipeline, param_grid=param_grid, cv=cv, verbose=0)
     grid_result = grid.fit(X_train, y_train)
