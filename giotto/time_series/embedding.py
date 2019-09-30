@@ -72,7 +72,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         if X.shape[0] < self.width:
             raise ValueError("X of length {} does not have enough points"
                              " to have a single window of width {}."
-                             "".format(X.shape[0]), self.width)
+                             "".format(X.shape[0], self.width))
 
         self._is_fitted = True
         return self

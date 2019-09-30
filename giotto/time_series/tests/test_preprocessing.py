@@ -95,18 +95,18 @@ def test_stationarizer_not_fitted():
 
 
 def test_stationarizer_errors():
-    stationarization_type = 'not_defined'
-    stationarizer = Stationarizer(stationarization_type=stationarization_type)
-    msg = 'The transformation type %s is not supported'
+    operation = 'not_defined'
+    stationarizer = Stationarizer(operation=operation)
+    msg = 'The stationarization operation %s is not supported'
 
-    with pytest.raises(ValueError, match=msg % stationarization_type):
+    with pytest.raises(ValueError, match=msg % operation):
         stationarizer.fit(signal)
 
 
-@pytest.mark.parametrize("stationarization_type, expected",
+@pytest.mark.parametrize("operation, expected",
                          [('return', signal_stationarized_return),
                           ('log-return', signal_stationarized_log_return)])
-def test_stationarizer_transform(stationarization_type, expected):
-    stationarizer = Stationarizer(stationarization_type=stationarization_type)
+def test_stationarizer_transform(operation, expected):
+    stationarizer = Stationarizer(operation=operation)
 
     assert_almost_equal(stationarizer.fit_transform(signal), expected)
