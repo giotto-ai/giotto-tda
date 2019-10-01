@@ -5,6 +5,7 @@
 from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
+from ..utils.validation import validate_params
 import numpy as np
 
 
@@ -43,6 +44,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     >>> plt.plot(signal_resampled)
 
     """
+    _hyperparameters = {'period': [int, (1, np.inf)]}
+
     def __init__(self, period=2):
         self.period = period
 
@@ -65,6 +68,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
             Returns self.
 
         """
+        validate_params(self.get_params(), self._hyperparameters)
         X = X.reshape((-1, 1))
 
         self._n_features = X.shape[1]
@@ -129,8 +133,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    stationarization_type : str, default: 'return'
-        The type of stationarization technique with which to stationarize
+    operation : str, default: 'return'
+        The type of stationarization operation with which to stationarize
         the time series. It can have two values:
 
         - 'return':
@@ -172,9 +176,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         if self.operation not in \
                 self.valid_operations:
-            raise ValueError(
-                'The transformation type %s is not supported' %
-                self.operation)
+            raise ValueError("The stationarization operation {} is not"
+                             " supported".format(self.operation))
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.

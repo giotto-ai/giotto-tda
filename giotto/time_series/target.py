@@ -63,7 +63,7 @@ class Labeller(BaseEstimator, TransformerMixin):
         n_windows = y.shape[0] - window_size + 1
 
         y_embedded = np.stack(
-            [y[i: i + window_size].flatten() for i in range(0, n_windows)])
+            [y[i: i + window_size].reshape((-1, 1)) for i in range(0, n_windows)])
 
         return y_embedded.reshape((n_windows, window_size))
 

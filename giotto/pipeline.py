@@ -269,11 +269,11 @@ class Pipeline(pipeline.Pipeline):
         last_step = self._final_estimator
         Xt, yt, fit_params = self._fit(X, y, **fit_params)
         if last_step == 'passthrough':
-            return Xt
+            return Xt, yt
         elif hasattr(last_step, 'fit_transform_resample'):
             return last_step.fit_transform_resample(Xt, yt, **fit_params)
         elif hasattr(last_step, 'fit_transform'):
-            return last_step.fit_transform(Xt, yt, **fit_params)
+            return last_step.fit_transform(Xt, yt, **fit_params), yt
 
     @if_delegate_has_method(delegate='_final_estimator')
     def fit_predict(self, X, y=None, **fit_params):
@@ -352,14 +352,21 @@ class Pipeline(pipeline.Pipeline):
         Xt : array-like, shape = [n_samples, n_transformed_features]
         """
         # _final_estimator is None or has transform, otherwise attribute error
-        if self._final_estimator != 'passthrough':
-            self._final_estimator.transform_resample
+        final_estimator = self._final_estimator
+        if final_estimator != 'passthrough':
+            if hasattr(final_estimator, 'transform_resample'):
+                final_estimator.transform_resample
+            else:
+                final_estimator.transform
         return self._transform_resample
 
     def _transform_resample(self, X, y):
         Xt, yt = X, y
         for _, _, transform in self._iter():
-            Xt, yt =  transform.transform_resample(Xt, yt)
+            if hasattr(transform, 'transform_resample'):
+                Xt, yt = transform.transform_resample(Xt, yt)
+            else:
+                Xt = transform.transform(Xt)
         return Xt, yt
 
     @property
@@ -387,7 +394,7 @@ class Pipeline(pipeline.Pipeline):
     def _transform(self, X, y=None):
         Xt, yt = X, y
         for _, _, transform in self._iter():
-            Xt =  transform.transform(Xt, yt)
+            Xt =  transform.transform(Xt)
         return Xt
 
     @property
@@ -444,10 +451,10 @@ class Pipeline(pipeline.Pipeline):
         """
         Xt, yt = X, y
         for _, _, transform in self._iter(with_final=False):
-            if (hasattr(cloned_transformer, "transform_resample")):
+            if (hasattr(transform, "transform_resample")):
                 Xt, yt = transform.transform_resample(Xt, yt)
             else:
-                Xt = transform.transform(Xt, yt)
+                Xt = transform.transform(Xt)
 
         score_params = {}
         if sample_weight is not None:
