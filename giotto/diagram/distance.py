@@ -303,6 +303,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         X_transformed = _parallel_amplitude(X, self.metric,
                                             self.effective_metric_params_,
+                                            order=self.order,
                                             n_jobs=self.n_jobs)
 
         return X_transformed

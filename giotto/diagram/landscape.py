@@ -7,7 +7,7 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from giotto.utils.validation import check_diagram
-from giotto.diagram._metrics import landscape_function
+from giotto.diagram._metrics import landscapes
 from giotto.diagram._utils import _create_linspaces
 
 
@@ -40,7 +40,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        
+
         X = check_diagram(X)
 
         self._linspaces, _ = \

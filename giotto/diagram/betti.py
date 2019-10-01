@@ -1,15 +1,17 @@
-import numpy as np 
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from giotto.diagram._utils import _create_linspaces
 from giotto.diagram._metrics import betti_curves
+from sklearn.utils._joblib import Parallel, delayed
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
     """
     DOC TO DO
     """
-    def __init__(self, n_sampled_values=100):
+    def __init__(self, n_sampled_values=100, n_jobs=None):
         self.n_sampled_values = n_sampled_values
+        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
         self._linspaces, _ = \

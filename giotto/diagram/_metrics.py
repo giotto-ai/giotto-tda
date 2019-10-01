@@ -203,7 +203,7 @@ implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  }
 
 
-def _parallel_amplitude(X, metric, metric_params, n_jobs=None):
+def _parallel_amplitude(X, metric, metric_params, order=None, n_jobs=None):
     amplitude_func = implemented_amplitude_recipes[metric]
     const_params = {key: value for key, value in metric_params.items()
                     if key not in ['linspaces', 'step_sizes']}
@@ -218,4 +218,6 @@ def _parallel_amplitude(X, metric, metric_params, n_jobs=None):
         X[dim], linspace=lins[dim], step_size=st_sizes[dim], **const_params)
         for dim in X.keys())
     ampl_arr = np.stack(ampl_arr, axis=1)
-    return ampl_arr
+    if order is None:
+        return ampl_arr
+    return np.linalg.norm(ampl_arr, axis=1, ord=order)
