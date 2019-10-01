@@ -1,12 +1,11 @@
 # Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: Apache 2.0
 
-import giotto as go
+import giotto as gt
 import giotto.time_series as ts
 import giotto.homology as hl
 import giotto.diagram as diag
 from giotto.pipeline import Pipeline
-
 import numpy as np
 from numpy.testing import assert_almost_equal
 
@@ -37,9 +36,7 @@ def split_train_test(data):
 
     return X_train, y_train, X_test, y_test
 
-
-
-def make_pipeline():
+def get_steps():
     steps = [
         ('embedding', ts.TakensEmbedder()),
         ('window', ts.SlidingWindow(width=5, stride=1)),
@@ -48,9 +45,8 @@ def make_pipeline():
         ('filter', diag.DiagramFilter(delta=0.1)),
         ('entropy', diag.PersistentEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
-        ('classification', RandomForestClassifier())
    ]
-    return Pipeline(steps)
+    return steps
 
 def get_param_grid():
     embedding_param = {}
@@ -69,7 +65,7 @@ def get_param_grid():
                          for k, v in window_param.items()}
     diagram_param_grid = {'diagram__' + k: v
                           for k, v in diagram_param.items()}
-    classification_param_grid = {'classification__classifier__' + k: v
+    classification_param_grid = {'classification__' + k: v
                                  for k, v in classification_param.items()}
 
     param_grid = {**embedding_param_grid, **diagram_param_grid,
@@ -79,27 +75,30 @@ def get_param_grid():
 
 
 def test_pipeline_time_series():
-    X_train, y_train, X_test, y_test = split_train_test(data)
+    X_train, y_train, _, _ = split_train_test(data)
 
-    pipeline = make_pipeline()
-    X_train_predict, y_train_predict = pipeline.fit(X_train, y_train).\
-        transform_resample(X_train)
-
-    X_test_predict, y_test_predict = pipeline.transform_resample(X_test,
-                                                                 y_test)
+    steps = get_steps()
+    pipeline = Pipeline(steps)
+    X_train_final, y_train_final = pipeline.\
+        fit_transform_resample(X_train, y_train)
 
     # Running the pipeline step by step
-    X_test_temp, y_test_temp = X_test, y_test
-    for _, transformer in steps[:-1]:
-        X_test_temp, y_test_temp = transformer.fit(X_temp, y_temp).\
-            transform_resample(X_temp, y_temp)
-    assert_almost_equal(X_test_predict, X_test_temp)
-    assert_almost_equal(y_test_predict, y_test_temp)
+    X_train_temp, y_train_temp = X_train, y_train
+    for _, transformer in steps:
+        if hasattr(transformer, 'fit_transform_resample'):
+            X_train_temp, y_train_temp = transformer.\
+                fit_transform_resample(X_train_temp, y_train_temp)
+        else:
+            X_train_temp = transformer.\
+                fit_transform(X_train_temp, y_train_temp)
+    assert_almost_equal(X_train_final, X_train_temp)
+    assert_almost_equal(y_train_final, y_train_temp)
 
 def test_grid_search_time_series():
     X_train, y_train, X_test, y_test = split_train_test(data)
 
-    pipeline = make_pipeline()
+    steps = get_steps() + [('classification', RandomForestClassifier())]
+    pipeline = Pipeline(steps)
     param_grid = get_param_grid()
     cv = TimeSeriesSplit(n_splits=2)
     grid = GridSearchCV(estimator=pipeline, param_grid=param_grid, cv=cv, verbose=0)
