@@ -33,21 +33,29 @@ def check_diagram(X):
     if X.shape[2] != 3:
         raise ValueError("X should be a 3d np.array with a 3rd dimension of"
                          " 3 components: X.shape[2] = {}".format(X.shape[2]))
+
     for dim in homology_dimensions:
-        if dim != int(dim):
-            raise ValueError("All homology dimensions should be"
-                             " integer valued: {} can't be casted"
-                             " to an int of the same value.".format(dim))
-        if dim != np.abs(dim):
-            raise ValueError("All homology dimensions should be"
-                             " integer valued: {} can't be casted"
-                             " to an int of the same value.".format(dim))
+        if dim == np.nan:
+            if len(homology_dimensions) != 1:
+                raise ValueError("np.nan is a valid homology dimension for a "
+                                 "stacked diagram but it should be the only "
+                                 "one: homology_dimensions "
+                                 "= {}".format(homology_dimensions))
+        else:
+            if dim != int(dim):
+                raise ValueError("All homology dimensions should be"
+                                 " integer valued: {} can't be casted"
+                                 " to an int of the same value.".format(dim))
+            if dim != np.abs(dim):
+                raise ValueError("All homology dimensions should be"
+                                 " integer valued: {} can't be casted"
+                                 " to an int of the same value.".format(dim))
 
     n_points_above_diag = np.sum(X[:, :, 1] >= X[:, :, 0])
     n_points_global = X.shape[0] * X.shape[1]
     if n_points_above_diag != n_points_global:
         raise ValueError("All points of all n_samples persistent diagrams "
-                         "should be above the diagonal, X[:,:,1] >= X[:,:,0]."
+                         "should be above the diagonal, X[:,:,1] > =X[:,:,0]."
                          " {} points in all n_samples diagrams are under the "
                          "diagonal.".format(n_points_global-n_points_above_diag))
     return X

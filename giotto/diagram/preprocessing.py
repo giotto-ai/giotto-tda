@@ -86,7 +86,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         Xt = X
-        Xt[:, :, 2] = -1
+        Xt[:, :, 2] = np.nan
         return Xt
 
 
