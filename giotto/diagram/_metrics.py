@@ -22,11 +22,8 @@ def betti_curves(diagrams, linspace):
 
 
 def landscapes(diagrams, linspace, n_layers):
-    """Up to n_layers persistence landscapes across a collection of diagrams,
-    via sampling at regular intervals. linspace must be as in betti_curves"""
-
     n_points = diagrams.shape[1]
-    n_layers_possible = min(n_points, n_layers)
+    n_layers_possible = min(n_points, n_layers) # This is not true
     midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) * np.sqrt(2) / 2.
     heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) * np.sqrt(2) / 2.
     fibers = np.maximum(-np.abs(linspace - midpoints) + heights, 0)
@@ -36,18 +33,16 @@ def landscapes(diagrams, linspace, n_layers):
     return np.transpose(ls, (1, 2, 0))
 
 
-# def heat_function(diagram, sigma, linspace):
-#     heat = np.zeros((linspace.shape[0], linspace.shape[0]))
-#
-#     sample_step = linspace[1] - linspace[0]
-#
-#     sampled_diagram = np.array(diagram // sample_step, dtype=int)
-#     for sampled_point in sampled_diagram[sampled_diagram[:, 1] != 0]:
-#         heat[sampled_point[0], sampled_point[1]] += 1
-#         heat[sampled_point[1], sampled_point[0]] -= 1
-#
-#     heat = gaussian_filter(heat, sigma, mode='reflect')
-#     return heat
+def heat(diagrams, linspace, step_size, sigma):
+    heats = np.zeros((diagrams.shape[0], linspace.shape[0], linspace.shape[0]))
+
+    sampled_diagrams = np.array(diagrams // step_size, dtype=int)
+    for sampled_point in sampled_diagram[sampled_diagram[:, 1] != 0]:
+        heats[sampled_point[0], sampled_point[1]] += 1
+        heats[sampled_point[1], sampled_point[0]] -= 1
+
+    heat = gaussian_filter(heats, sigma, mode='reflect')
+    return heats
 
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, linspace, step_size,
@@ -63,12 +58,6 @@ def pairwise_betti_distances(diagrams_1, diagrams_2, linspace, step_size,
 
 def pairwise_landscape_distances(diagrams_1,  diagrams_2, linspace, step_size,
                                 p=2., n_layers=1, **kwargs):
-    # Approximate calculation of distances between: a) if diagrams_2 is None,
-    # pairs (L1, L2) of persistence landscapes both obtained from a single
-    # collection diagrams_1 of diagrams; b) if diagrams_2 is not None,
-    # pairs (L1, L2) of persistence landscapes such that L1 is a landscape
-    # coming from diagrams_1 and L2 is a landscape coming from diagrams_2.
-
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     ls_1 = landscapes(diagrams_1, linspace, n_layers).reshape((
         n_samples_1, -1))
@@ -100,25 +89,25 @@ def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
         for diagram_1 in diagrams_1] for diagram_2 in diagrams_2])
 
 
-# def kernel_heat_distance(diagram_x, diagram_y, linspaces, dimension, sigma=1.,
-#                          order=2, **kwargs):
-#     heat_x = heat_function(diagram_x, sigma, linspaces[dimension])
-#     heat_y = heat_function(diagram_y, sigma, linspaces[dimension])
-#     return np.linalg.norm(heat_x - heat_y, ord=order)
+def kernel_heat_distance(diagrams_1, diagrams_2, linspace, step_size, sigma=1.,
+                         order=2, **kwargs):
+    heat_1 = heat(diagrams_1, linspace)
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
+    heat_2 = heat(diagrams_2, linspace)
+    unnorm_dist = cdist(betti_curves_1, heat_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
 
 
 implemented_metric_recipes = {'bottleneck': kernel_bottleneck_distance,
                               'wasserstein': kernel_wasserstein_distance,
                               'landscape': pairwise_landscape_distances,
-                              'betti': pairwise_betti_distances #,
-                              # 'heat': kernel_heat_distance
-                              }
+                              'betti': pairwise_betti_distances,
+                              'heat': kernel_heat_distance}
 
 def _dist_wrapper(dist_func, dist_matrices, slice_, dim, *args, **kwargs):
-    """Write in-place to a slice of a distance matrix corresponding to a
-    dimension."""
-    res = dist_func(*args, **kwargs)
-    dist_matrices[:, slice_, int(dim)] = res
+    dist_matrices[:, slice_, int(dim)] = dist_func(*args, **kwargs)
 
 def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
     metric_func = implemented_metric_recipes[metric]
@@ -169,18 +158,17 @@ def wasserstein_amplitudes(diagrams, p=1., **kwargs):
     return np.linalg.norm(dists_to_diago, axis=1, ord=p)
 
 
-# def kernel_heat_amplitude(diagram, linspaces, dimension, sigma=1., order=2,
-#                           **kwargs):
-#     heat = heat_function(diagram, sigma, linspaces[dimension])
-#     return np.linalg.norm(heat, ord=order)
+def kernel_heat_amplitude(diagrams, linspace, step_size, sigma=1., order=2,
+                          **kwargs):
+    heat = heat(diagrams, linspace, step_size, sigma)
+    return np.linalg.norm(heat, ord=order)
 
 
 implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,
                                  'landscape': landscape_amplitudes,
                                  'betti': betti_amplitudes,
-                                 # 'heat': kernel_heat_amplitude
-                                 }
+                                 'heat': kernel_heat_amplitude}
 
 
 def _parallel_amplitude(X, metric, metric_params, n_jobs):
