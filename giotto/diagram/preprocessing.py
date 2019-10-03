@@ -1,5 +1,4 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-# License: TBD
+# License: Apache 2.0
 
 import math as m
 
@@ -8,7 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_amplitude
-from ._utils import _sort, _filter, _create_linspaces
+from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
@@ -39,15 +38,10 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers d representing homology dimensions, and whose values
-            are ndarrays of shape (n_samples, M_d, 2) whose each entries along
-            axis 0 are persistence diagrams with M_d persistent topological
-            features. For example, X could be the result of applying the
-            ``transform`` method of a ``VietorisRipsPersistence`` transformer
-            to a collection of point clouds/distance matrices, but only if
-            that transformer was instantiated with ``pad=True``.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -71,15 +65,10 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers d representing homology dimensions, and whose values
-            are ndarrays of shape (n_samples, M_d, 2) whose each entries
-            along axis 0 are persistence diagrams with M_d persistent
-            topological features. For example, X could be the result of
-            applying the ``transform`` method of a ``VietorisRipsPersistence``
-            transformer to a collection of point clouds/distance matrices,
-            but only if that transformer was instantiated with ``pad=True``.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -96,9 +85,9 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
         X = check_diagram(X)
 
-
-        X_transformed = {None: np.concatenate(list(X.values()), axis=1)}
-        return X_transformed
+        Xt = X
+        Xt[:, :, 2] = -1
+        return Xt
 
 
 class DiagramScaler(BaseEstimator, TransformerMixin):
@@ -153,6 +142,11 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
+    Attributess
+    ----------
+    scale_ : float
+        The scaling factor used to rescale diagrams.
+
     """
 
     def __init__(self, metric='bottleneck', metric_params=None,
@@ -168,15 +162,10 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers d representing homology dimensions, and whose values
-            are ndarrays of shape (n_samples, M_d, 2) whose each entries
-            along axis 0 are persistence diagrams with M_d persistent
-            topological features. For example, X could be the result of
-            applying the ``transform`` method of a ``VietorisRipsPersistence``
-            transformer to a collection of point clouds/distance matrices,
-            but only if that transformer was instantiated with ``pad=True``.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -198,7 +187,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['linspaces'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _create_linspaces(X, **self.effective_metric_params_)
+                _discretize(X, **self.effective_metric_params_)
             if self.metric == 'landscape':
                 self.effective_metric_params_['linspaces'] = {
                     dim: np.sqrt(2) * linspace for dim, linspace in
@@ -208,9 +197,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
                     self.effective_metric_params_['step_sizes'].items()}
 
         amplitude_array = _parallel_amplitude(X, self.metric,
-                                            self.effective_metric_params_,
-                                            n_jobs=self.n_jobs)
-        self._scale = self.function(amplitude_array)
+                                              self.effective_metric_params_,
+                                              n_jobs=self.n_jobs)
+        self.scale_ = self.function(amplitude_array)
 
         return self
 
@@ -220,15 +209,10 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers d representing homology dimensions, and whose values are
-            ndarrays of shape (n_samples, M_d, 2) whose each entries along axis
-            0 are persistence diagrams with M_d persistent topological
-            features. For example, X could be the result of applying the
-            ``transform`` method of a ``VietorisRipsPersistence`` transformer
-            to a collection of point clouds/distance matrices, but only if
-            that transformer was instantiated with ``pad=True``.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -236,15 +220,15 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_scaled : dict of int: ndarray
+        Xs : dict of int: ndarray
             Dictionary of rescaled persistence (sub)diagrams, each with the
             same shape as the corresponding (sub)diagram in X.
         """
-        check_is_fitted(self, ['effective_metric_params_'])
-        X = check_diagram(X)
+        check_is_fitted(self, ['scale_', 'effective_metric_params_'])
 
-        X_scaled = {dimension: X / self._scale for dimension, X in X.items()}
-        return X_scaled
+        Xs = check_diagram(X)
+        Xs[:, :, :2] = X[:, :, :2] / self.scale_
+        return Xs
 
     def inverse_transform(self, X, copy=None):
         """Scale back the data to the original representation. Multiplies
@@ -265,9 +249,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, ['effective_metric_params_'])
 
-        X_scaled = {dimension: X * self._scale for dimension, X in X.items()}
-        return X_scaled
-
+        Xs = check_diagram(X)
+        Xs[:, :, :2] = X[:, :, :2] * self.scale_
+        return Xs
 
 class DiagramFilter(BaseEstimator, TransformerMixin):
     """Transformer filtering collections of persistence diagrams in which each
@@ -305,15 +289,10 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers d representing homology dimensions, and whose values are
-            ndarrays of shape (n_samples, M_d, 2) whose each entries along axis
-            0 are persistence diagrams with M_d persistent topological
-            features. For example, X could be the result of applying the
-            ``transform`` method of a ``VietorisRipsPersistence`` transformer
-            to a collection of point clouds/distance matrices, but only if that
-            transformer was instantiated with ``pad=True``.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -327,9 +306,9 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         if self.homology_dimensions is None:
-            self.homology_dimensions_ = set(X.keys())
+            self.homology_dimensions_ = set(X[0,:,2])
         else:
-            self.homology_dimensions_ = self.homology_dimensions
+            self.homology_dimensions_ = sorted(self.homology_dimensions)
 
         return self
 
@@ -338,15 +317,10 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers d representing homology dimensions, and whose values are
-            ndarrays of shape (n_samples, M_d, 2) whose each entries along axis
-            0 are persistence diagrams with M_d persistent topological
-            features. For example, X could be the result of applying the
-            ``transform`` method of a ``VietorisRipsPersistence`` transformer
-            to a collection of point clouds/distance matrices, but only if that
-            transformer was instantiated with ``pad=True``.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -354,7 +328,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_filtered : dict of int: ndarray
+        Xt : dict of int: ndarray
             Dictionary of filtered persistence (sub)diagrams. The value
             corresponding to key d has shape (n_samples, F_d, 2), where
             :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to
@@ -369,6 +343,5 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         X = _sort(X, self.homology_dimensions_)
-
-        X_filtered = _filter(X, self.homology_dimensions_, self.delta)
-        return X_filtered
+        Xt = _filter(X, self.homology_dimensions_, self.delta)
+        return Xt
