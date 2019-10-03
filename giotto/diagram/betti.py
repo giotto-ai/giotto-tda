@@ -1,6 +1,6 @@
-import numpy as np 
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from giotto.diagram._utils import _create_linspaces
+from giotto.diagram._utils import _discretize
 from giotto.diagram._metrics import betti_curves
 
 
@@ -13,7 +13,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         self._linspaces, _ = \
-            _create_linspaces(X, n_sampled_values=self.n_sampled_values)
+            _discretize(X, n_sampled_values=self.n_sampled_values)
         return self
 
     def transform(self, X, y=None):
