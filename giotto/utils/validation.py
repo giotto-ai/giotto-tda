@@ -1,10 +1,12 @@
 """Utilities for input validation"""
+# License : Apache 2.0
+
 import numbers
 
 import numpy as np
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
-                     'wasserstein': [('q', int, (1, np.inf)),
+                     'wasserstein': [('p', int, (1, np.inf)),
                                      ('delta', numbers.Number, (1e-16, 1.))],
                      'betti': [('p', numbers.Number, (1, np.inf)),
                                ('n_sampled_values', int, (1, np.inf))],
@@ -23,37 +25,31 @@ available_metric_params = list(set(
 def check_diagram(X):
     """Input validation on a diagram
     """
-    _n_outer_window = list(X.values())[0].shape[0]
-    for z in X.keys():
-        if isinstance(z, numbers.Number):
-            if (z < 0):
-                raise ValueError("X key has the wrong value: {}. "
-                                 "X keys must be non-negative "
-                                 "integers.".format(z))
-        else:
-            raise TypeError("X key has the wrong type: %s. "
-                            "X keys must be non-negative "
-                            "integers." % type(z))
-        if (_n_outer_window != X[z].shape[0]):
-            raise ValueError("Diagram first dimension has the wrong value: {}."
-                             " Diagram first dimension must be equal "
-                             "for all subarrays.".format(X[z].shape[0]))
-        if (len(X[z].shape) != 3):
-            raise ValueError("Diagram structure dimension error: {}. "
-                             "Diagram structure dimension must be equal "
-                             "to 3.".format(len(X[z].shape)))
-        if (X[z].shape[2] != 2):
-            raise ValueError("Wrong dimension for persistent "
-                             "diagram coordinates: {}. "
-                             "Diagram coordinates dimension must be equal "
-                             "to 2.".format(X[z].shape[2]))
-        _diff_coord = (X[z].shape[0] * X[z].shape[1] -
-                       np.sum(X[z][:, :, 1] >= X[z][:, :, 0]))
-        if (_diff_coord > 0):
-            raise ValueError("Coordinates have the wrong value: {} of "
-                             "them are wrong. They must be "
-                             "integers and the 2nd must be greater than "
-                             "or equal to the 1st one.".format(_diff_coord))
+    homology_dimensions = sorted(list(set(X[0, :, 2])))
+
+    if len(X.shape) != 3:
+        raise ValueError("X should be a 3d np.array: X.shape"
+                         " = {}".format(X.shape))
+    if X.shape[2] != 3:
+        raise ValueError("X should be a 3d np.array with a 3rd dimension of"
+                         " 3 components: X.shape[2] = {}".format(X.shape[2]))
+    for dim in homology_dimensions:
+        if dim != int(dim):
+            raise ValueError("All homology dimensions should be"
+                             " integer valued: {} can't be casted"
+                             " to an int of the same value.".format(dim))
+        if dim != np.abs(dim):
+            raise ValueError("All homology dimensions should be"
+                             " integer valued: {} can't be casted"
+                             " to an int of the same value.".format(dim))
+
+    n_points_above_diag = np.sum(X[:, :, 1] >= X[:, :, 0])
+    n_points_global = X.shape[0] * X.shape[1]
+    if n_points_above_diag != n_points_global:
+        raise ValueError("All points of all n_samples persistent diagrams "
+                         "should be above the diagonal, X[:,:,1] >= X[:,:,0]."
+                         " {} points in all n_samples diagrams are under the "
+                         "diagonal.".format(n_points_global-n_points_above_diag))
     return X
 
 # Check the type and range of numerical parameters
