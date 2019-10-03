@@ -4,11 +4,8 @@ and implements utilities to build a composite transformer by applying
 a transformer pipeline to sliding subwindows of the input data in the
 spirit of a pooling layer in a convolutional neural network.
 """
-
 # Adapted from scikit-learn and imbalanced-learn
-# Author: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: Apache 2.0
-
 
 import functools
 from collections import defaultdict

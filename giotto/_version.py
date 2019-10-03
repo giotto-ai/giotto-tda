@@ -2,8 +2,7 @@
 ``giotto`` is a set of python methods to apply Topological Data Analysis
 algorithms in a machine learning framework.
 """
-# Based on NiLearn package
-# License: simplified BSD
+# License: Apache 2.0
 
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/

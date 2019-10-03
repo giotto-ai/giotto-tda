@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""Toolbox for Topological Data Analysis in machine learning."""
+"""Toolbox for Machine Learning using Topological Data Analysis."""
 
 import os
 import codecs
@@ -23,11 +23,11 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 DISTNAME = 'giotto-learn'
-DESCRIPTION = 'Toolbox for Topological Data Analysis dataset in machine learning.'
+DESCRIPTION = 'Toolbox for Machine Learning using Topological Data Analysis.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = 'Guillaume Tauzin'
-MAINTAINER_EMAIL = 'g.tauzin@l2f.ch'
+MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-learn/giotto-learn'
 LICENSE = 'Apache 2.0'
 DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn'
@@ -52,6 +52,7 @@ EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
         'pytest-cov',
+        'pytest-azurepipelines',
         'pytest-benchmark'],
     'doc': [
         'sphinx',
@@ -63,10 +64,7 @@ EXTRAS_REQUIRE = {
         'jupyter',
         'matplotlib',
         'plotly',
-        'pandas',
-        'keras',
-        'keras-metrics',
-        'tensorflow']
+        'pandas']
 }
 
 
@@ -125,7 +123,7 @@ setup(name=DISTNAME,
       version=VERSION,
       download_url=DOWNLOAD_URL,
       long_description=LONG_DESCRIPTION,
-      zip_safe=False,  # the package can run out of an .egg file
+      zip_safe=False,
       classifiers=CLASSIFIERS,
       packages=find_packages(),
       keywords=KEYWORDS,

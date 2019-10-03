@@ -8,7 +8,7 @@ from sklearn.utils._joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from giotto.utils.validation import check_diagram
 from giotto.diagram._metrics import landscape_function
-from giotto.diagram._utils import _create_linspaces
+from giotto.diagram._utils import _discretize
 
 
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
@@ -40,11 +40,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        
+
         X = check_diagram(X)
 
         self._linspaces, _ = \
-            _create_linspaces(X, n_sampled_values=self.n_sampled_values)
+            _discretize(X, n_sampled_values=self.n_sampled_values)
 
         self._is_fitted = True
         return self

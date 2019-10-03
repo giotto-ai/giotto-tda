@@ -1,6 +1,4 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
-# License: TBD
+# License: Apache 2.0
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -66,35 +64,41 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         """A class method that checks whether the hyperparameters and the input
         parameters of the :meth:`fit` are valid.
         """
-        implemented_metric_types = set(['precomputed'] + [met for i in VALID_METRICS.values() for met in i])
+        implemented_metric_types = set(['precomputed'] + \
+                                       [met for i in VALID_METRICS.values()
+                                        for met in i])
 
         if metric not in implemented_metric_types:
             raise ValueError('The metric %s is not supported' % metric)
 
     def _ripser_diagram(self, X, is_distance_matrix, metric):
-        X_diagram = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
-                           metric=metric, maxdim=max(self.homology_dimensions),
-                           thresh=self.max_edge_length)['dgms']
+        Xds = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
+                     metric=metric, maxdim=self._max_homology_dimension,
+                     thresh=self.max_edge_length)['dgms']
 
-        if 0 in self.homology_dimensions:
-            X_diagram[0] = X_diagram[0][:-1, :]
+        if 0 in self._homology_dimensions:
+            Xds[0] = Xds[0][:-1, :]
 
-        return {dimension: X_diagram[dimension]
-                for dimension in self.homology_dimensions}
+        Xds = { dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
+                                                        dtype=Xds[dim].dtype)])
+                for dim in self._homology_dimensions }
+        return Xds
 
-    def _pad_diagram(self, diagram, max_length_list):
-        padList = [((0, max(0, max_length_list[i] - diagram[dimension].shape[0])),
-                    (0, 0)) for i, dimension in enumerate(self.homology_dimensions)]
-        return {dimension: np.pad(diagram[dimension], padList[i], 'constant')
-                for i, dimension in enumerate(self.homology_dimensions)}
+    def _pad_diagram(self, Xd, max_n_points, min_values):
+        for dim in self._homology_dimensions:
+            n_points = len(Xd[dim])
+            n_points_to_pad =  max_n_points[dim] - n_points
+            if n_points == 0 and n_points_to_pad == 0:
+                n_points_to_pad = 1
 
-    def _stack_padded_diagrams(self, diagrams):
-        stacked_diagrams = {dimension: np.stack([diagrams[i][dimension] for i in range(len(diagrams))], axis=0) for dimension in self.homology_dimensions}
+            if n_points_to_pad > 0:
+                padding = ((0, n_points_to_pad), (0, 0))
+                Xd[dim] = np.pad(Xd[dim], padding, 'constant')
+                Xd[dim][-n_points_to_pad:, :] = \
+                    [min_values[dim], min_values[dim], dim]
+        Xd = np.vstack([Xd[dim] for dim in self._homology_dimensions])
+        return Xd
 
-        # for dimension in self.homology_dimensions:
-        #     if stackedDiagrams[dimension].size == 0:
-        #         del stackedDiagrams[dimension]
-        return stacked_diagrams
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -103,11 +107,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``metric == 'precomputed'``, the input should be an ndarray
-            whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be interpreted as
-            an ndarray of n_points in Euclidean space of dimension n_features.
+        X : ndarray, shape (n_samples, n_points, n_points) or
+            (n_samples, n_points, n_features)
+            Input data. If ``metric == 'precomputed'``, the input should be an
+            ndarray whose each entry along axis 0 is a distance matrix of shape
+            (n_points, n_points). Otherwise, each such entry will be
+            interpreted as an ndarray of n_points in Euclidean space of
+            dimension n_features.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -122,23 +128,26 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         self._validate_params(self.metric)
 
-        self._is_fitted = True
+        self._homology_dimensions = sorted(self.homology_dimensions)
+        self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
     def transform(self, X, y=None):
         """Computes, for each dimension in ``homology_dimensions`` and for each
-        point cloud or distance matrix in X, the relevant persistence diagram as
-        an array of pairs (b, d) -- one per persistent topological hole -- where
-        b is the scale at which the topological hole first appears, and d the scale
-        at which the same hole disappears.
+        point cloud or distance matrix in X, the relevant persistence diagram
+        as an array of pairs (b, d) -- one per persistent topological hole --
+        where b is the scale at which the topological hole first appears, and
+        d the scale at which the same hole disappears.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, n_points, n_features)
-            Input data. If ``metric == 'precomputed'``, the input should be
-            an ndarray whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be interpreted as
-            an ndarray of n_points in Euclidean space of dimension n_features.
+        X : ndarray, shape (n_samples, n_points, n_points) or
+            (n_samples, n_points, n_features)
+            Input data. If ``metric == 'precomputed'``, the input should be an
+            ndarray whose each entry along axis 0 is a distance matrix of shape
+            (n_points, n_points). Otherwise, each such entry will be
+            interpreted as an ndarray of n_points in Euclidean space of
+            dimension n_features.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -146,27 +155,32 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : dict of int: ndarray or dict of int: list
-            Dictionary whose keys are the integers in ``self.homology_dimensions``,
-            and whose values are ndarrays of shape (n_samples, M_d, 2) where,
-            if m_{d,i} is the number of persistent topological features in the relevant
-            dimension d found in sample i, then M_d = max {m_{d,i}: i = 1, ..., n_samples}.
-            If ``pad == False``, then each list has length n_samples and its i-th entry
-            is an ndarrays of shape (m_{d,i}, 2).
+        Xt : ndarray, shape (n_samples, n_points, 3)
+            Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['_homology_dimensions',
+                               '_max_homology_dimension'])
 
         is_distance_matrix = (self.metric == 'precomputed')
 
-        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix, self.metric)
-                                                     for i in range(X.shape[0]))
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix,
+                                          self.metric)
+            for i in range(X.shape[0]))
 
-        max_length_list = [max(1, np.max([X_transformed[i][dimension].shape[0] for i in range(len(X_transformed))]))
-                           for dimension in self.homology_dimensions]
-        X_transformed = Parallel(n_jobs=self.n_jobs)(delayed(self._pad_diagram)(X_transformed[i], max_length_list)
-                                                     for i in range(len(X_transformed)))
-        X_transformed = self._stack_padded_diagrams(X_transformed)
+        max_n_points = { dim: max(1, np.max([Xt[i][dim].shape[0]
+                                             for i in range(len(Xt))]))
+                         for dim in self.homology_dimensions }
+        min_values = { dim: min([ np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
+                                        else np.inf for i in range(len(Xt))])
+                         for dim in self.homology_dimensions }
 
-        return X_transformed
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._pad_diagram)(Xt[i], max_n_points, min_values)
+            for i in range(len(Xt)))
+        Xt = np.stack(Xt)
+        return Xt

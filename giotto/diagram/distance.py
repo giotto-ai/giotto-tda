@@ -1,6 +1,4 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
-# License: TBD
+# License: Apache 2.0
 
 import itertools
 
@@ -9,7 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
-from ._utils import _create_linspaces, _pad
+from ._utils import _discretize, _pad
 from ..utils.validation import check_diagram, validate_metric_params
 
 
@@ -24,8 +22,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
-    default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti' | 'heat',
+    optional, default: 'bottleneck'
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -48,14 +46,14 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         - If ``metric == 'bottleneck'`` the only argument is
           ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the available arguments are ``order``
+        - If ``metric == 'wasserstein'`` the available arguments are ``p``
           (default = ``1``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'landscape'`` the available arguments are ``order``
+        - If ``metric == 'landscape'`` the available arguments are ``p``
           (default = ``2``), ``n_sampled_values`` (default = ``100``) and
           ``n_layers`` (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``order``
+        - If ``metric == 'betti'`` the available arguments are ``p``
           (default = ``2``) and ``n_sampled_values`` (default = ``100``).
-        - If ``metric == 'heat'`` the available arguments are ``order``
+        - If ``metric == 'heat'`` the available arguments are ``p``
           (default = ``2``), ``sigma`` (default = ``1``) and
           ``n_sampled_values`` (default = ``100``).
 
@@ -82,11 +80,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers representing homology dimensions, and whose values are
-            ndarrays of shape (n_samples, M, 2) whose each entries along axis
-            0 are persistence diagrams.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -109,7 +106,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['linspaces'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _create_linspaces(X, **self.effective_metric_params_)
+                _discretize(X, **self.effective_metric_params_)
             if self.metric == 'landscape':
                 self.effective_metric_params_['linspaces'] = {
                     dim: np.sqrt(2) * linspace for dim, linspace in
@@ -127,11 +124,10 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative
-            integers representing homology dimensions, and whose values are
-            ndarrays of shape (n_samples, M, 2) whose each entries along axis
-            0 are persistence diagrams.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -139,45 +135,26 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples, n_samples)
+        Xt : ndarray, shape (n_samples, n_samples) if ``order`` is ``None``
+        (n_samples, n_samples, n_dimensions) else.
             Distance matrix between diagrams in X.
 
         """
         check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
 
-        n_diags_X = len(next(iter(X.values())))
-
-        is_same = np.all(
-            [np.array_equal(X[dim], self._X[dim]) for dim in X.keys()])
-        if is_same:
-            # Only calculate metric for upper triangle
-            iterator = list(itertools.combinations(range(n_diags_X), 2))
-            X_upp = _parallel_pairwise(X, self.metric,
-                                       self.effective_metric_params_,
-                                       iterator=iterator, order=self.order,
-                                       n_jobs=self.n_jobs)
-            transp_indices = (1, 0) if X_upp.ndim == 2 else (1, 0, 2)
-            X_transformed = X_upp + np.transpose(X_upp, transp_indices)
+        if (X==self._X).all():
+            X2 = None
         else:
-            max_betti_numbers = {dim: max(self._X[dim].shape[1],
-                                          X[dim].shape[1]) for dim in
-                                 self._X.keys()}
-            _X = _pad(self._X, max_betti_numbers)
-            X2 = _pad(X, max_betti_numbers)
-            X1 = {dim: np.vstack([_X[dim], X2[dim]]) for dim in _X.keys()}
-            n_diags_1 = len(next(iter(X1.values())))
+            X2 = X
 
-            # Calculate all cells
-            iterator = tuple(itertools.product(range(n_diags_1),
-                                               range(n_diags_X)))
-            X_transformed = _parallel_pairwise(X1, self.metric,
-                                               self.effective_metric_params_,
-                                               X2=X2, iterator=iterator,
-                                               order=self.order,
-                                               n_jobs=self.n_jobs)
+        Xt = _parallel_pairwise(self._X, X2, self.metric,
+                                self.effective_metric_params_,
+                                n_jobs=self.n_jobs)
+        if self.order is not None:
+            Xt = np.linalg.norm(Xt, axis=2, ord=self.order)
 
-        return X_transformed
+        return Xt
 
 
 class DiagramAmplitude(BaseEstimator, TransformerMixin):
@@ -240,10 +217,10 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers representing
-            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
-            whose each entries along axis 0 are persistence diagrams.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -266,7 +243,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['linspaces'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _create_linspaces(X, **self.effective_metric_params_)
+                _discretize(X, **self.effective_metric_params_)
             if self.metric == 'landscape':
                 self.effective_metric_params_['linspaces'] = {
                     dim: np.sqrt(2) * linspace for dim, linspace in
@@ -283,10 +260,10 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
-            Input data. Dictionary whose keys are typically non-negative integers representing
-            homology dimensions, and whose values are ndarrays of shape (n_samples, M, 2)
-            whose each entries along axis 0 are persistence diagrams.
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -294,15 +271,17 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples, n_samples)
+        Xt : ndarray, shape (n_samples, 1) if ``order`` is ``None``
+        (n_samples, n_samples, n_dimensions) else
             Amplitude of the diagrams in X.
 
         """
         check_is_fitted(self, ['effective_metric_params_'])
         X = check_diagram(X)
 
-        X_transformed = _parallel_amplitude(X, self.metric,
-                                            self.effective_metric_params_,
-                                            n_jobs=self.n_jobs)
-
-        return X_transformed
+        Xt = _parallel_amplitude(X, self.metric,
+                                 self.effective_metric_params_,
+                                 n_jobs=self.n_jobs)
+        if self.order is None:
+            return Xt
+        return np.linalg.norm(Xt, axis=1, ord=self.order)
