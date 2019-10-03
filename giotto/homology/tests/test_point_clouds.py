@@ -31,11 +31,10 @@ def test_vrp_not_fitted():
 
 def test_vrp_transform():
     vrp = VietorisRipsPersistence()
-    X_vrp_res = {0: np.array([[[0., 0.43094373],
-                               [0., 0.5117411],
-                               [0., 0.60077095],
-                               [0., 0.62186205]]]),
-                 1: np.array([[[0.69093919, 0.80131882]]])}
+    X_vrp_res = np.array([[[0., 0.43094373, 0],
+                           [0., 0.5117411, 0],
+                           [0., 0.60077095, 0],
+                           [0., 0.62186205, 0],
+                           [0.69093919, 0.80131882, 1]]])
 
-    assert_almost_equal(vrp.fit_transform(X)[0], X_vrp_res[0])
-    assert_almost_equal(vrp.fit_transform(X)[1], X_vrp_res[1])
+    assert_almost_equal(vrp.fit_transform(X), X_vrp_res)
