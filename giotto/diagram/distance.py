@@ -41,7 +41,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
            distances between "Heat kernels"obtained from persistence
            (sub)diagrams.
 
-    metric_params : dict, optional, default: {'n_sampled_values': 100}
+    metric_params : dict, optional, default: {'n_values': 100}
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the only argument is
@@ -49,13 +49,13 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the available arguments are ``p``
           (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``p``
-          (default = ``2``), ``n_sampled_values`` (default = ``100``) and
+          (default = ``2``), ``n_values`` (default = ``100``) and
           ``n_layers`` (default = ``1``).
         - If ``metric == 'betti'`` the available arguments are ``p``
-          (default = ``2``) and ``n_sampled_values`` (default = ``100``).
+          (default = ``2``) and ``n_values`` (default = ``100``).
         - If ``metric == 'heat'`` the available arguments are ``p``
           (default = ``2``), ``sigma`` (default = ``1``) and
-          ``n_sampled_values`` (default = ``100``).
+          ``n_values`` (default = ``100``).
 
     order : int, optional, default: 2
         Order of the norm used to combine subdiagrams distances into a single
@@ -183,7 +183,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
           persistence (sub)diagram.
         - ``'heat'`` refers to the heat kernel
 
-    metric_params : dict, optional, default: {'n_sampled_values': 100}
+    metric_params : dict, optional, default: {'n_values': 100}
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the available arguments are ``order``
@@ -191,13 +191,13 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is ``order``
           (default = ``1``) and ``delta`` (default = ``0.0``).
         - If ``metric == 'landscape'`` the available arguments are ``order``
-          (default = ``2``), ``n_sampled_values`` (default = ``100``) and
+          (default = ``2``), ``n_values`` (default = ``100``) and
           ``n_layers`` (default = ``1``).
         - If ``metric == 'betti'`` the available arguments are ``order``
-          (default = ``2``) and ``n_sampled_values`` (default = ``100``).
+          (default = ``2``) and ``n_values`` (default = ``100``).
         - If ``metric == 'heat'`` the available arguments are ``order``
           (default = ``2``), ``sigma`` (default = ``1``) and
-          ``n_sampled_values`` (default = ``100``).
+          ``n_values`` (default = ``100``).
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
