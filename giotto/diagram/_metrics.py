@@ -48,10 +48,6 @@ def heat(diagrams, sampling, step_size, sigma):
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
-    print(diagrams_1.shape)
-    print(diagrams_1)
-    print(diagrams_2.shape)
-    print(diagrams_2)
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
@@ -128,19 +124,17 @@ def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
     if X2 is None:
         X2 = X1
 
-    distance_matrices = np.empty((X1.shape[0], X2.shape[0],
-                                  len(homology_dimensions)),
-                                 dtype=X1.dtype, order='F')
-    func_delayed = delayed(_matrix_wrapper)
-    Parallel(n_jobs=n_jobs, prefer='threads')(func_delayed(
-        metric_func, distance_matrices, s, dim,
+    distance_matrices = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
         _subdiagrams(X1, [dim], remove_dim=True),
         _subdiagrams(X2[s], [dim], remove_dim=True),
         sampling=samplings[dim], step_size=step_sizes[dim],
-        **effective_metric_params)
-        for s in gen_even_slices(_num_samples(X2), effective_n_jobs(n_jobs))
-        for dim in homology_dimensions)
+        **effective_metric_params) for dim in homology_dimensions
+        for s in gen_even_slices(X2.shape[0], effective_n_jobs(n_jobs)))
 
+    distance_matrices = np.concatenate(distance_matrices, axis=1)
+    distance_matrices = np.stack(
+        [distance_matrices[:, i*X2.shape[0]: (i+1)*X2.shape[0]]
+         for i in range(len(homology_dimensions))], axis=2)
     return distance_matrices
 
 
@@ -190,14 +184,13 @@ def _parallel_amplitude(X, metric, metric_params, n_jobs):
     step_sizes = effective_metric_params.pop('step_sizes',
         {dim: None for dim in homology_dimensions})
 
-    amplitude_arrays = np.empty((X.shape[0], len(homology_dimensions)),
-                                dtype=X.dtype, order='F')
-    func_delayed = delayed(_arrays_wrapper)
-    Parallel(n_jobs=n_jobs, prefer='threads')(func_delayed(
-        amplitude_func, amplitude_arrays, s, dim,
+    amplitude_arrays = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
         _subdiagrams(X, [dim], remove_dim=True)[s], sampling=samplings[dim],
         step_size=step_sizes[dim], **effective_metric_params)
-        for s in en_even_slices(_num_samples(X), effective_n_jobs(n_jobs))
+        for s in gen_even_slices(_num_samples(X), effective_n_jobs(n_jobs))
         for dim in homology_dimensions)
+
+    amplitude_arrays = np.concatenate(amplitude_arrays).reshape(
+        X.shape[0], len(homology_dimensions))
 
     return amplitude_arrays
