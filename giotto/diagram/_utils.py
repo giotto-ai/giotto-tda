@@ -11,10 +11,12 @@ def _rotate_anticlockwise(X):
     rot_mat = (np.sqrt(2) / 2.) * np.array([[1, 1, 0], [-1, 1, 0], [0, 0, 1]])
     return np.dot(X, rot_mat)
 
-def _subdiagrams(X, homology_dimensions):
+def _subdiagrams(X, homology_dimensions, remove_dim=False):
     for dim in homology_dimensions:
         Xs = X[X[:,:,2] == dim]
         Xs = Xs.reshape(X.shape[0], -1, 3)
+    if remove_dim:
+        Xs = Xs[:, :, :2]
     return Xs
 
 def _pad(X, max_betti_numbers):
@@ -50,7 +52,7 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
         Xf = np.concatenate([Xf, Xdim], axis=1)
     return Xf
 
-def _discretize(X, n_sampled_values=100, **kw_args):
+def _discretize(X, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
 
     min_vals = { dim: np.min(X[X[:, :, 2] == dim][:, 0])
@@ -70,12 +72,12 @@ def _discretize(X, n_sampled_values=100, **kw_args):
                      if (max_vals[dim] != min_vals[dim]) else global_max_val
                  for dim in homology_dimensions }
 
-    n_segments = n_sampled_values + 1
+    n_segments = n_values + 1
     step_sizes = { dim: (max_vals[dim] - min_vals[dim])/n_segments
                    for dim in homology_dimensions }
-    linspaces = { dim: (np.linspace(
+    samplings = { dim: (np.linspace(
         min_vals[dim], max_vals[dim],
         num=n_segments, endpoint=False)[1:]).reshape(-1, 1 ,1)
                   for dim in homology_dimensions }
 
-    return linspaces, step_sizes
+    return samplings, step_sizes

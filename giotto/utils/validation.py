@@ -9,12 +9,12 @@ available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                      'wasserstein': [('p', int, (1, np.inf)),
                                      ('delta', numbers.Number, (1e-16, 1.))],
                      'betti': [('p', numbers.Number, (1, np.inf)),
-                               ('n_sampled_values', int, (1, np.inf))],
+                               ('n_values', int, (1, np.inf))],
                      'landscape': [('p', numbers.Number, (1, np.inf)),
-                                   ('n_sampled_values', int, (1, np.inf)),
+                                   ('n_values', int, (1, np.inf)),
                                    ('n_layers', int, (1, np.inf))],
                      'heat': [('order', numbers.Number, (1, np.inf)),
-                              ('n_sampled_values', int, (1, np.inf)),
+                              ('n_values', int, (1, np.inf)),
                               ('sigma', numbers.Number, (0., np.inf))]}
 
 available_metric_params = list(set(
@@ -25,8 +25,6 @@ available_metric_params = list(set(
 def check_diagram(X):
     """Input validation on a diagram
     """
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
-
     if len(X.shape) != 3:
         raise ValueError("X should be a 3d np.array: X.shape"
                          " = {}".format(X.shape))
@@ -34,6 +32,7 @@ def check_diagram(X):
         raise ValueError("X should be a 3d np.array with a 3rd dimension of"
                          " 3 components: X.shape[2] = {}".format(X.shape[2]))
 
+    homology_dimensions = sorted(list(set(X[0, :, 2])))
     for dim in homology_dimensions:
         if dim == np.nan:
             if len(homology_dimensions) != 1:
