@@ -11,10 +11,12 @@ def _rotate_anticlockwise(X):
     rot_mat = (np.sqrt(2) / 2.) * np.array([[1, 1, 0], [-1, 1, 0], [0, 0, 1]])
     return np.dot(X, rot_mat)
 
-def _subdiagrams(X, homology_dimensions):
+def _subdiagrams(X, homology_dimensions, remove_dim=False):
     for dim in homology_dimensions:
         Xs = X[X[:,:,2] == dim]
         Xs = Xs.reshape(X.shape[0], -1, 3)
+    if remove_dim:
+        Xs = Xs[:, :, :2]
     return Xs
 
 def _pad(X, max_betti_numbers):
@@ -73,9 +75,9 @@ def _discretize(X, n_sampled_values=100, **kw_args):
     n_segments = n_sampled_values + 1
     step_sizes = { dim: (max_vals[dim] - min_vals[dim])/n_segments
                    for dim in homology_dimensions }
-    linspaces = { dim: (np.linspace(
+    samplings = { dim: (np.sampling(
         min_vals[dim], max_vals[dim],
         num=n_segments, endpoint=False)[1:]).reshape(-1, 1 ,1)
                   for dim in homology_dimensions }
 
-    return linspaces, step_sizes
+    return samplings, step_sizes
