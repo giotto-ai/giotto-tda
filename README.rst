@@ -1,9 +1,15 @@
 .. -*- mode: rst -*-
 
-|Azure|_ 
+|Azure|_ |Azure-cov|_ |Azure-test|_
 
-.. |Azure| image:: https://dev.azure.com/matteocaorsi/matteocao/_apis/build/status/matteocao.giotto-learn?branchName=master
-.. _Azure: https://dev.azure.com/matteocaorsi/matteocao/
+.. |Azure| image:: https://dev.azure.com/giotto-learn/giotto-learn/_apis/build/status/giotto-learn.giotto-learn?branchName=master
+.. _Azure: https://dev.azure.com/giotto-learn/giotto-learn/
+
+.. |Azure-cov| image:: https://coveralls.io/repos/neovim/neovim/badge.svg?branch=master
+.. _Azure-cov: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=364&view=codecoverage-tab
+
+.. |Azure-test| image:: https://travis-ci.org/scikit-learn/scikit-learn.svg?branch=master
+.. _Azure-test: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=364&view=ms.vss-test-web.build-test-results-tab
 
 
 giotto-learn
