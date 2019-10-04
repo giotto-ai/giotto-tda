@@ -1,4 +1,5 @@
 """Testing for DiagramStacker and DiagramScaler"""
+# License : Apache 2.0
 
 import numpy as np
 import pytest

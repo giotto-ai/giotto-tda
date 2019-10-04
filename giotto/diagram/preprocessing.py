@@ -185,13 +185,13 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['linspaces'], \
+            self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
             if self.metric == 'landscape':
-                self.effective_metric_params_['linspaces'] = {
-                    dim: np.sqrt(2) * linspace for dim, linspace in
-                    self.effective_metric_params_['linspaces'].items()}
+                self.effective_metric_params_['samplings'] = {
+                    dim: np.sqrt(2) * sampling for dim, sampling in
+                    self.effective_metric_params_['samplings'].items()}
                 self.effective_metric_params_['step_sizes'] = {
                     dim: np.sqrt(2) * step_size for dim, step_size in
                     self.effective_metric_params_['step_sizes'].items()}

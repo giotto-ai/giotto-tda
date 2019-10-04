@@ -52,7 +52,7 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
         Xf = np.concatenate([Xf, Xdim], axis=1)
     return Xf
 
-def _discretize(X, n_sampled_values=100, **kw_args):
+def _discretize(X, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
 
     min_vals = { dim: np.min(X[X[:, :, 2] == dim][:, 0])
@@ -72,10 +72,10 @@ def _discretize(X, n_sampled_values=100, **kw_args):
                      if (max_vals[dim] != min_vals[dim]) else global_max_val
                  for dim in homology_dimensions }
 
-    n_segments = n_sampled_values + 1
+    n_segments = n_values + 1
     step_sizes = { dim: (max_vals[dim] - min_vals[dim])/n_segments
                    for dim in homology_dimensions }
-    samplings = { dim: (np.sampling(
+    samplings = { dim: (np.linspace(
         min_vals[dim], max_vals[dim],
         num=n_segments, endpoint=False)[1:]).reshape(-1, 1 ,1)
                   for dim in homology_dimensions }

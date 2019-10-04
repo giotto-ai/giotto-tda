@@ -1,20 +1,21 @@
+'''Tests for validation functions'''
+# License: Apache 2.0
+
 import numpy as np
 import pytest
 
 from ..validation import check_diagram
 from ..validation import validate_metric_params, validate_params
 
-'''Tests for validation functions'''
-
 
 # Testing for validate_params
 def test_validate_params():
     references ={'par1': [int, [0,1]]}
     parameters = {'par1': 0.5}
-    
+
     with pytest.raises(TypeError):
         validate_params(parameters,references)
-    
+
     parameters = {'par1': 2}
     with pytest.raises(ValueError):
         validate_params(parameters,references)
@@ -27,81 +28,15 @@ def test_validate_params():
 # Testing check_diagram
 # Test for the wrong array key value
 def test_inputs_keys_V():
-    X = {
-        0: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        -1: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        # Wrong array key
-        3: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]])
-    }
-    with pytest.raises(ValueError, match="X keys must be non-negative "
-                                         "integers."):
+    X = np.array([[[1, 1, 0], [2, 2, -1]]])
+    with pytest.raises(ValueError):
         check_diagram(X)
-
-
-# Test for the wrong array key type
-def test_inputs_keys_T():
-    X = {
-        0: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        'a': np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        # Wrong array key
-        3: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]])
-    }
-    with pytest.raises(TypeError, match="X keys must be non-negative "
-                                        "integers."):
-        check_diagram(X)
-
 
 # Test for the wrong structure dimension
 def test_inputs_arrayStruc_V():
-    X = {
-        0: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        1: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        3: np.array([[[1, 1], [2, 2]], [[4, 4], [5, 5], [6, 6]]])
-        # Wrong array structure dimension
-    }
-    with pytest.raises(ValueError,
-                       match="Diagram structure dimension must be equal "
-                             "to 3."):
-        check_diagram(X)
+    X = np.array([[[[1, 1, 0], [2, 2, 1]]]])
 
-
-# Test for the wrong 1st array dimension
-def test_inputs_arraydim1_V():
-    X = {
-        0: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        1: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        3: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]],
-                     [[4, 4], [5, 5], [6, 6]]])  # Wrong array 1st dimension
-    }
-    with pytest.raises(ValueError, match="Diagram first dimension must "
-                                         "be equal for all subarrays."):
-        check_diagram(X)
-
-
-# Test for the wrong 3rd array dimension
-def test_inputs_arraydim3_V():
-    X = {
-        0: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        1: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        3: np.array([[[1], [2], [3]], [[4], [5], [6]]])
-        # Wrong array 3rd dimension
-    }
-    with pytest.raises(ValueError, match=" Diagram coordinates dimension "
-                                         "must be equal to 2."):
-        check_diagram(X)
-
-
-# Test for the wrong value of a 3rd dimension array's elements
-def test_inputs_dim3_coord_V():
-    X = {
-        0: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        1: np.array([[[1, 1], [2, 2], [3, 3]], [[4, 4], [5, 5], [6, 6]]]),
-        3: np.array([[[1, 1], [2, 2], ['b', 3]], [[4, 4], [5, 5], [6, 6]]])
-        # Wrong array element value
-    }
-    with pytest.raises(ValueError, match="They must be integers and the 2nd "
-                                         "must be greater than or equal to "
-                                         "the 1st one."):
+    with pytest.raises(ValueError):
         check_diagram(X)
 
 
@@ -110,22 +45,22 @@ def test_inputs_dim3_coord_V():
 def test_metric_V():
     with pytest.raises(ValueError, match="No metric called"):
         validate_metric_params('bottleeck', metric_params={
-            'n_sampled_values': 200, 'delta': 0.01})
+            'n_values': 200, 'delta': 0.01})
 
 
-# Test for the wrong n_sampled_values type
-def test_n_sampled_values_T():
+# Test for the wrong n_values type
+def test_n_values_T():
     with pytest.raises(TypeError, match=" in params_metric is of type "):
         validate_metric_params('landscape',
-                               metric_params={'n_sampled_values': 'a',
+                               metric_params={'n_values': 'a',
                                               'delta': 0.01})
 
 
-# Test for the wrong n_sampled_values value
-def test_n_sampled_values_V():
+# Test for the wrong n_values value
+def test_n_values_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('landscape',
-                               metric_params={'n_sampled_values': -2,
+                               metric_params={'n_values': -2,
                                               'delta': 0.01})
 
 
@@ -133,7 +68,7 @@ def test_n_sampled_values_V():
 def test_delta_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('bottleneck',
-                               metric_params={'n_sampled_values': 200,
+                               metric_params={'n_values': 200,
                                               'delta': -1})
 
 
@@ -141,7 +76,7 @@ def test_delta_V():
 def test_delta_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('bottleneck',
-                               metric_params={'n_sampled_values': 200,
+                               metric_params={'n_values': 200,
                                               'delta': 'a'})
 
 
@@ -149,7 +84,7 @@ def test_delta_T():
 def test_order_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
-                               metric_params={'n_sampled_values': 200,
+                               metric_params={'n_values': 200,
                                               'order': -1})
 
 
@@ -157,7 +92,7 @@ def test_order_V():
 def test_order_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('heat',
-                               metric_params={'n_sampled_values': 200,
+                               metric_params={'n_values': 200,
                                               'order': 'a'})
 
 
@@ -165,14 +100,14 @@ def test_order_T():
 def test_sigma_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
-                               metric_params={'n_sampled_values': 200,
+                               metric_params={'n_values': 200,
                                               'sigma': -1})
 
 
 # Test for the wrong sigma type
 def test_sigma_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
-        validate_metric_params('heat', metric_params={'n_sampled_values': 200,
+        validate_metric_params('heat', metric_params={'n_values': 200,
                                                       'sigma': 'a'})
 
 
