@@ -75,7 +75,7 @@ def _discretize(X, n_sampled_values=100, **kw_args):
     n_segments = n_sampled_values + 1
     step_sizes = { dim: (max_vals[dim] - min_vals[dim])/n_segments
                    for dim in homology_dimensions }
-    samplings = { dim: (np.sampling(
+    samplings = { dim: (np.linspace(
         min_vals[dim], max_vals[dim],
         num=n_segments, endpoint=False)[1:]).reshape(-1, 1 ,1)
                   for dim in homology_dimensions }

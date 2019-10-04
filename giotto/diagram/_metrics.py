@@ -48,6 +48,10 @@ def heat(diagrams, sampling, step_size, sigma):
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
+    print(diagrams_1.shape)
+    print(diagrams_1)
+    print(diagrams_2.shape)
+    print(diagrams_2)
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
@@ -128,14 +132,14 @@ def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
                                   len(homology_dimensions)),
                                  dtype=X1.dtype, order='F')
     func_delayed = delayed(_matrix_wrapper)
-    slices = list(gen_even_slices(_num_samples(X2), effective_n_jobs(n_jobs)))
-    Parallel(n_jobs=n_jobs)(func_delayed(
+    Parallel(n_jobs=n_jobs, prefer='threads')(func_delayed(
         metric_func, distance_matrices, s, dim,
         _subdiagrams(X1, [dim], remove_dim=True),
         _subdiagrams(X2[s], [dim], remove_dim=True),
         sampling=samplings[dim], step_size=step_sizes[dim],
         **effective_metric_params)
-        for s in slices for dim in homology_dimensions)
+        for s in gen_even_slices(_num_samples(X2), effective_n_jobs(n_jobs))
+        for dim in homology_dimensions)
 
     return distance_matrices
 
@@ -189,11 +193,11 @@ def _parallel_amplitude(X, metric, metric_params, n_jobs):
     amplitude_arrays = np.empty((X.shape[0], len(homology_dimensions)),
                                 dtype=X.dtype, order='F')
     func_delayed = delayed(_arrays_wrapper)
-    slices = list(gen_even_slices(_num_samples(X), effective_n_jobs(n_jobs)))
-    Parallel(n_jobs=n_jobs)(func_delayed(
+    Parallel(n_jobs=n_jobs, prefer='threads')(func_delayed(
         amplitude_func, amplitude_arrays, s, dim,
         _subdiagrams(X, [dim], remove_dim=True)[s], sampling=samplings[dim],
         step_size=step_sizes[dim], **effective_metric_params)
-        for s in slices for dim in homology_dimensions)
+        for s in en_even_slices(_num_samples(X), effective_n_jobs(n_jobs))
+        for dim in homology_dimensions)
 
     return amplitude_arrays
