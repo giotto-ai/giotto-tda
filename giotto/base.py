@@ -1,8 +1,5 @@
 """Base class for transforming and resampling"""
-
-# Authors: Guillaume Tauzin <guillaune.tauzin@epfl.ch>
 # License: Apache 2.0
-
 
 class TransformerResamplerMixin:
     """Mixin class for all transformers resamplers in giotto."""
