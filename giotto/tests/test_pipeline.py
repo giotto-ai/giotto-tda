@@ -75,7 +75,7 @@ def get_param_grid():
 
 
 def test_pipeline_time_series():
-    X_train, y_train, _, _ = split_train_test(data)
+    X_train, y_train, X_test, y_test = split_train_test(data)
 
     steps = get_steps()
     pipeline = Pipeline(steps)
@@ -91,8 +91,24 @@ def test_pipeline_time_series():
         else:
             X_train_temp = transformer.\
                 fit_transform(X_train_temp, y_train_temp)
+
     assert_almost_equal(X_train_final, X_train_temp)
     assert_almost_equal(y_train_final, y_train_temp)
+
+    pipeline.fit(X_train, y_train)
+    X_test_final, y_test_final = pipeline.transform_resample(X_test, y_test)
+
+    X_test_temp, y_test_temp = X_test, y_test
+    for _, transformer in steps:
+        if hasattr(transformer, 'transform_resample'):
+            X_test_temp, y_test_temp = transformer.\
+                transform_resample(X_test_temp, y_test_temp)
+        else:
+            X_test_temp = transformer.transform(X_test_temp)
+
+    assert_almost_equal(X_test_final, X_test_temp)
+    assert_almost_equal(y_test_final, y_test_temp)
+
 
 def test_grid_search_time_series():
     X_train, y_train, X_test, y_test = split_train_test(data)

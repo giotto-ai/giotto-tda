@@ -144,7 +144,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
 
-        self._linspaces, _ = \
+        self._samplings, _ = \
             _discretize(X, n_sampled_values=self.n_sampled_values)
         return self
 
@@ -170,14 +170,14 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_linspaces'])
+        check_is_fitted(self, ['_samplings'])
         X = check_diagram(X)
 
         homology_dimensions = sorted(list(set(X[0, :, 2])))
 
         # Only parallelism is across dimensions
         bcs = Parallel(n_jobs=self.n_jobs)(
-            delayed(betti_curves)(X[dim], self._linspaces[dim])
+            delayed(betti_curves)(X[dim], self._samplings[dim])
             for dim in homology_dimensions)
         Xt = np.stack(bcs, axis=1)
         return Xt
@@ -227,7 +227,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         X = check_diagram(X)
 
-        self._linspaces, _ = \
+        self._samplings, _ = \
             _discretize(X, n_sampled_values=self.n_sampled_values)
 
         self._is_fitted = True
@@ -255,13 +255,13 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Array of the persitence landscapes of the diagrams in X.
 
         """
-        check_is_fitted(self, ['_linspaces'])
+        check_is_fitted(self, ['_samplings'])
         X = check_diagram(X)
 
         homology_dimensions = sorted(list(set(X[0, :, 2])))
 
         pls = Parallel(n_jobs=self.n_jobs)(
-            delayed(landscape_function)(X[dim], self._linspaces[dim])
+            delayed(landscape_function)(X[dim], self._samplings[dim])
             for dim in homology_dimensions)
         Xt = np.stack(pls, axis=1)
         return Xt
