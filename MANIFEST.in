@@ -1,8 +1,8 @@
 # Include the README
-include *.rst
+include README.rst
 
 # Include the license file
-include LICENSE.txt
+include LICENSE
 
 # Include the requirements file
 include requirements.txt

@@ -1,0 +1,259 @@
+jobs:
+- job: 'Test_linux'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: git submodule update --init --recursive
+    displayName: 'Fetching pybind11 and external dependencies'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests,doc]"
+      pip install wheel
+      pip install twine
+    displayName: 'Install dev environment'
+
+  - script: pytest --cov giotto --cov-report html
+    displayName: 'Test with pytest'
+
+  - script: |
+      cd doc/
+      make html
+      cd ..
+    displayName: 'Build sphinx doc'
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: doc/build
+      includeRootFolder: true
+      archiveType: 'zip'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+    displayName: 'archive doc'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+
+- job: 'Test_mac_2'
+  pool:
+    vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: git submodule update --init --recursive
+    displayName: 'Fetching pybind11 and external dependencies'
+
+  - script: |
+      brew update
+      brew install boost
+      brew install gcc
+    displayName: 'install boost and gcc'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests,doc]"
+      pip install wheel
+      pip install twine
+    displayName: 'Install dev environment'
+
+  - script: pytest --cov giotto --cov-report html
+    displayName: 'Test with pytest'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+
+
+- job: 'Test_mac_1'
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: git submodule update --init --recursive
+    displayName: 'Fetching pybind11 and external dependencies'
+
+  - script: |
+      brew update
+      brew install boost
+      brew install gcc
+    displayName: 'install boost and gcc'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests,doc]"
+      pip install wheel
+      pip install twine
+    displayName: 'Install dev environment'
+
+  - script: pytest --cov giotto --cov-report html
+    displayName: 'Test with pytest'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+
+- job: 'Test_win'
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+
+  - script: git submodule update --init --recursive
+    displayName: 'Fetching pybind11 and external dependencies'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests,doc]"
+      pip install wheel
+      pip install twine
+    displayName: 'Install dev environment'
+
+  - script: pytest --cov giotto --cov-report html
+    displayName: 'Test with pytest'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+
+- job: 'Test_win_2'
+  pool:
+    vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+
+  - script: git submodule update --init --recursive
+    displayName: 'Fetching pybind11 and external dependencies'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests,doc]"
+      pip install wheel
+      pip install twine
+    displayName: 'Install dev environment'
+
+  - script: pytest --cov giotto --cov-report html
+    displayName: 'Test with pytest'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel'
