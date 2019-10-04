@@ -52,4 +52,4 @@ Project maintainers who do not follow or enforce the Code of Conduct in good fai
 Attribution
 -----------
 
-This Code of Conduct is adapted from the Contributor Covenant, version 1.4, available at <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>, and includes some aspects of the TensorFlow Code of Conduct, available at <https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md>
+This Code of Conduct is adapted from the Contributor Covenant, version 1.4, available at <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>, and includes some aspects of the Giotto Code of Conduct, available at <https://github.com/giotto-learn/giotto-learn/blob/master/CODE_OF_CONDUCT.rst>
