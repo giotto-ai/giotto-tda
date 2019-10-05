@@ -1,4 +1,5 @@
-"""Testing for VietorisRipsPersistence"""
+"""Testing for persistent homology on grid."""
+# License : Apache 2.0
 
 import numpy as np
 import pytest

@@ -1,6 +1,5 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
-# License: TBD
+"""Embedding of multivariate time-series."""
+# License: Apache 2.0
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -25,9 +24,9 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
         using all processors.
 
     """
-    
-    _hyperparameters = {'positive_definite': [bool, [0,1]]}
-    
+
+    _hyperparameters = {'positive_definite': [bool, [0, 1]]}
+
 
     def __init__(self, positive_definite=True, n_jobs=None):
         self.n_jobs = n_jobs
@@ -53,8 +52,8 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        # validate numerical parameters
-        validate_params(self.get_params(),self._hyperparameters)
+        validate_params(self.get_params(),self._hyperparameters)\
+
         self._is_fitted = True
         return self
 
@@ -72,22 +71,17 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray of int, shape (n_samples, n_points, d)
+        Xt : ndarray of int, shape (n_samples, n_points, d)
             The transformed array.
 
         """
-
-
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-        n_samples = X.shape[0]
         n_features = X.shape[1]
-        
-        if self.positive_definite:
-            X_transformed = np.ones((n_features,n_features))-np.abs(np.corrcoef(X.T))
-        else:
-            X_transformed = np.corrcoef(X)
-        
-        return X_transformed
 
+        Xt = np.corrcoef(X.T)
+        if self.positive_definite:
+            Xt = np.ones((n_features, n_features))-np.abs(Xt)
+
+        return Xt

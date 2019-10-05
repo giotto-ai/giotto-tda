@@ -75,18 +75,18 @@ def pairwise_landscape_distances(diagrams_1,  diagrams_2, sampling, step_size,
 
 def kernel_bottleneck_distance(diagrams_1, diagrams_2, delta=0.0, **kwargs):
     return np.array([[
-        pairwise_bottleneck_distance(diagram_1[diagram_2[:, 1] != 0],
-                                     diagram_2[diagram_2[:, 1] != 0],
-                                     delta)
+        pairwise_bottleneck_distance(
+            diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
+            diagram_2[diagram_2[:, 0] != diagram_2[:, 1]], delta)
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
 
 
 def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
                                 **kwargs):
     return np.array([[
-        pairwise_wasserstein_distance(diagram_1[diagram_2[:, 1] != 0],
-                                      diagram_2[diagram_2[:, 1] != 0],
-                                      p, delta)
+        pairwise_wasserstein_distance(
+            diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
+            diagram_2[diagram_2[:, 0] != diagram_2[:, 1]], p, delta)
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
 
 

@@ -1,4 +1,5 @@
-"""Testing for TakensEmbedder"""
+"""Testing for time series embedding."""
+# License : Apache 2.0
 
 import numpy as np
 import pytest
