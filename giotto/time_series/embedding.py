@@ -1,5 +1,4 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
+"""Time series embedding."""
 # License: Apache 2.0
 
 import numpy as np

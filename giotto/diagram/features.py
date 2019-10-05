@@ -114,9 +114,15 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless in
         a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Attributes
+    ----------
+    samplings_ : dict of ndarrays
+        Dictionary for which is key is an homology dimension and each value is
+        the corresponding filtration values sampling.
+
     """
-    def __init__(self, n_sampled_values=100, n_jobs=None):
-        self.n_sampled_values = n_sampled_values
+    def __init__(self, n_values=100, n_jobs=None):
+        self.n_values = n_values
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -144,8 +150,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
 
-        self._samplings, _ = \
-            _discretize(X, n_sampled_values=self.n_sampled_values)
+        self.samplings_, _ = _discretize(X, n_values=self.n_values)
         return self
 
     def transform(self, X, y=None):
@@ -165,22 +170,25 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_sampled_values)
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
             Array of the persistent entropies of the diagrams in X.
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_samplings'])
+        check_is_fitted(self, ['samplings_'])
         X = check_diagram(X)
 
         homology_dimensions = sorted(list(set(X[0, :, 2])))
+        n_dimensions = len(homology_dimensions)
 
-        # Only parallelism is across dimensions
-        bcs = Parallel(n_jobs=self.n_jobs)(
-            delayed(betti_curves)(X[dim], self._samplings[dim])
-            for dim in homology_dimensions)
-        Xt = np.stack(bcs, axis=1)
-        return Xt
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
+            betti_curves)(_subdiagrams(X, [dim])[s, :, :2], self._samplings[dim])
+            for dim in homology_dimensions
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+        n_slices = len(Xt) // n_dimensions
+        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
+                                        for j in range(n_slices)], axis=0)
+                        for i in range(n_dimensions)])
 
 
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
@@ -192,13 +200,20 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    samplings_ : dict of ndarrays
+        Dictionary for which is key is an homology dimension and each value is
+        the corresponding filtration values sampling.
 
     """
-    def __init__(self, n_layers=1, n_sampled_values=100, n_jobs=None):
+    def __init__(self, n_layers=1, n_values=100, n_jobs=None):
         self.n_layers = n_layers
-        self.n_sampled_values = n_sampled_values
+        self.n_values = n_values
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -224,11 +239,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-
         X = check_diagram(X)
 
-        self._samplings, _ = \
-            _discretize(X, n_sampled_values=self.n_sampled_values)
+        self.samplings_, _ = _discretize(X, n_values=self.n_values)
 
         self._is_fitted = True
         return self
@@ -251,17 +264,116 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions,
-        n_layers, n_sampled_values)
+        n_layers, n_values)
             Array of the persitence landscapes of the diagrams in X.
 
         """
-        check_is_fitted(self, ['_samplings'])
+        check_is_fitted(self, ['samplings_'])
         X = check_diagram(X)
 
         homology_dimensions = sorted(list(set(X[0, :, 2])))
+        n_dimensions = len(homology_dimensions)
 
-        pls = Parallel(n_jobs=self.n_jobs)(
-            delayed(landscape_function)(X[dim], self._samplings[dim])
-            for dim in homology_dimensions)
-        Xt = np.stack(pls, axis=1)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
+            landscapes)(_subdiagrams(X, [dim])[s, :, :2], self._samplings[dim],
+                        self.n_layers) for dim in homology_dimensions
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+        n_slices = len(Xt) // n_dimensions
+        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
+                                        for j in range(n_slices)], axis=0)
+                        for i in range(n_dimensions)])
+        return Xt
+
+
+class HeatKernel(BaseEstimator, TransformerMixin):
+    """Transformer for the calculation of the persistence landscapes from a
+    collection of persistence diagrams. Given a generic persistence diagram
+    consisting of birth-death-dimension tuples (b, d, k), their k-persistence
+    landscapes are TO DO.
+
+    Parameters
+    ----------
+    n_jobs : int or None, optional, default: None
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    samplings_ : dict of ndarrays
+        Dictionary for which is key is an homology dimension and each value is
+        the corresponding filtration values sampling.
+
+    """
+    def __init__(self, sigma, n_values=100, n_jobs=None):
+        self.sigma = sigma
+        self.n_values = n_values
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+
+        This method is just there to implement the usual API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        """
+        X = check_diagram(X)
+
+        self.samplings_, self._step_size = _discretize(X, n_values=self.n_values)
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X, y=None):
+        """For each persistence subdiagram corresponding to an homology
+        dimension k, computes that subdiagram's landscapes.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_points, 3)
+            Input data. Array of persistence diagrams each of them containing
+            a collection of points representing persistence feature through
+            their birth, death and homology dimension.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray, shape (n_samples, n_values, n_values,
+            n_homology_dimensions)
+            Array of the persitence landscapes of the diagrams in X.
+
+        """
+        check_is_fitted(self, ['samplings_'])
+        X = check_diagram(X)
+
+        homology_dimensions = sorted(list(set(X[0, :, 2])))
+        n_dimensions = len(homology_dimensions)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
+            heat)(_subdiagrams(X, [dim])[s, :, :2], self._samplings[dim],
+                  self._step_size, self.sigma) for dim in homology_dimensions
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+        n_slices = len(Xt) // n_dimensions
+        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
+                                        for j in range(n_slices)], axis=0)
+                        for i in range(n_dimensions)])
         return Xt

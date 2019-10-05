@@ -1,4 +1,5 @@
-"""Testing for Resampler and Stationarizer"""
+"""Testing for time series preprocessors."""
+# License : Apache 2.0
 
 import numpy as np
 import pytest

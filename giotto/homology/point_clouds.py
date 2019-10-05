@@ -1,3 +1,4 @@
+"""Persistent homology on point clouds."""
 # License: Apache 2.0
 
 import numpy as np
@@ -5,6 +6,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors.base import VALID_METRICS
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
+from ._utils import _pad_diagram
 
 from ..externals.python import ripser
 
@@ -83,22 +85,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                                         dtype=Xds[dim].dtype)])
                 for dim in self._homology_dimensions }
         return Xds
-
-    def _pad_diagram(self, Xd, max_n_points, min_values):
-        for dim in self._homology_dimensions:
-            n_points = len(Xd[dim])
-            n_points_to_pad =  max_n_points[dim] - n_points
-            if n_points == 0 and n_points_to_pad == 0:
-                n_points_to_pad = 1
-
-            if n_points_to_pad > 0:
-                padding = ((0, n_points_to_pad), (0, 0))
-                Xd[dim] = np.pad(Xd[dim], padding, 'constant')
-                Xd[dim][-n_points_to_pad:, :] = \
-                    [min_values[dim], min_values[dim], dim]
-        Xd = np.vstack([Xd[dim] for dim in self._homology_dimensions])
-        return Xd
-
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -180,7 +166,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                          for dim in self.homology_dimensions }
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._pad_diagram)(Xt[i], max_n_points, min_values)
+            delayed(_pad_diagram)(Xt[i], self._homology_dimensions,
+                                  max_n_points, min_values)
             for i in range(len(Xt)))
         Xt = np.stack(Xt)
         return Xt

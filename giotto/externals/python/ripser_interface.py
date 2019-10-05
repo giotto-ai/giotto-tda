@@ -159,18 +159,6 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, distance_matrix=False,
     if distance_matrix:
         if not (X.shape[0] == X.shape[1]):
             raise Exception("Distance matrix is not square")
-    else:
-        if X.shape[0] == X.shape[1]:
-            warnings.warn(
-                "The input matrix is square, but the distance_matrix "
-                + "flag is off.  Did you mean to indicate that "
-                + "this was a distance matrix?"
-            )
-        elif X.shape[0] < X.shape[1]:
-            warnings.warn(
-                "The input point cloud has more columns than rows; "
-                + "did you mean to transpose?"
-            )
 
     if n_perm and distance_matrix and sparse.issparse(X):
         raise Exception(
