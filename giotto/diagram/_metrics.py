@@ -23,26 +23,33 @@ def betti_curves(diagrams, sampling):
 
 def landscapes(diagrams, sampling, n_layers):
     n_points = diagrams.shape[1]
-    n_layers_possible = min(n_points, n_layers) # This is not true
+    n_layers_possible = min(n_points, n_layers)  # This is not true
     midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) * np.sqrt(2) / 2.
     heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) * np.sqrt(2) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
     top_pos = range(n_points - n_layers_possible, n_points)
     ls = np.flip(np.partition(fibers, top_pos, axis=2)[:, :, -n_layers:],
                  axis=2)
-    return np.transpose(ls, (1, 2, 0))
+    ls = np.transpose(ls, (1, 2, 0))
+    return ls
+    
 
+def heat(diagrams, sampling_len, step_size, sigma):
+    n_samples, n_points = diagrams.shape[:2]
+    heats = np.zeros((n_samples, sampling_len, sampling_len))
 
-def heat(diagrams, sampling, step_size, sigma):
-    heats = np.zeros((diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
-
-    sampled_diagrams = np.array(diagrams // step_size, dtype=int)
-    for sampled_point in sampled_diagram[sampled_diagram[:, 1] != 0]:
-        heats[sampled_point[0], sampled_point[1]] += 1
-        heats[sampled_point[1], sampled_point[0]] -= 1
-
-    heats = np.stack([gaussian_filter(heat, sigma, mode='reflect')
-                     for heat in heats])
+    sampled_diags = np.array(diagrams // step_size, dtype=int)
+    sample_indices = np.arange(n_samples)[:, None, None]
+    sample_indices = np.tile(sample_indices, reps=(n_points, 1))
+    sampled_diags = np.concatenate([sample_indices, sampled_diags], axis=2)
+    unique, counts = zip(*(np.unique(diag, axis=0, return_counts=True)
+                           for diag in sampled_diags))
+    unique = tuple(tuple(row) for row in np.concatenate(unique).T)
+    counts = np.concatenate(counts).T
+    heats[unique] = counts
+    heats = np.stack([gaussian_filter(h, sigma, mode='reflect')
+                      for h in heats])
+    heats = heats - np.transpose(heats, (0, 2, 1))
     return heats
 
 
