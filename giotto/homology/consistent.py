@@ -1,6 +1,5 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
-# License: TBD
+"""Rescaling method for persistent homology."""
+# License: Apache2.0
 
 import itertools
 import math as m
@@ -10,6 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
+from ..utils.validation import validate_params
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
@@ -64,6 +64,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     (1, 3, 3)
 
     """
+    _hyperparameters = {'n_neighbor': [int, (1, np.inf)]}
 
     def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1,
                  n_jobs=None):
@@ -72,25 +73,21 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         self.n_neighbor = n_neighbor
         self.n_jobs = n_jobs
 
-    @staticmethod
-    def _validate_params():
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
+    def _consistent_homology_distance(self, X):
+        Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
+                                **self.metric_params)
 
-        """
-        pass
+        indices_k_neighbor = np.argsort(X)[:, self.n_neighbor]
+        distance_k_neighbor = Xm[np.arange(X.shape[0]),
+                                 indices_k_neighbor]
 
-    @staticmethod
-    def _consistent_homology_distance(X, n_neighbor):
-        indices_k_neighbor = np.argsort(X)[:, n_neighbor]
-        distance_k_neighbor = X[np.arange(X.shape[0]), indices_k_neighbor]
         # Only calculate metric for upper triangle
-        X_consistent = np.zeros(X.shape)
-        iterator = itertools.combinations(range(X.shape[0]), 2)
+        Xc = np.zeros(Xm.shape)
+        iterator = itertools.combinations(range(Xm.shape[0]), 2)
         for i, j in iterator:
-            X_consistent[i, j] = X[i, j] / (m.sqrt(distance_k_neighbor[i] *
-                                                   distance_k_neighbor[j]))
-        return X_consistent + X_consistent.T
+            Xc[i, j] = Xm[i, j] / (m.sqrt(distance_k_neighbor[i] *
+                                          distance_k_neighbor[j]))
+        return Xc + Xc.T
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -117,7 +114,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params()
+        self.validate_params(self.get_params(), self._hyperparameters)
 
         self._is_fitted = True
         return self
@@ -144,7 +141,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_samples, n_points, n_points)
+        Xt : ndarray, shape (n_samples, n_points, n_points)
             Array containing (as entries along axis 0) the distance matrices
             after consistent rescaling.
 
@@ -152,14 +149,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
-        X_transformed = Parallel(n_jobs=self.n_jobs)(
-            delayed(pairwise_distances)(X[i], metric=self.metric, n_jobs=1,
-                                        **self.metric_params)
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._consistent_homology_distance)(Xt[i])
             for i in range(X.shape[0]))
-
-        X_transformed = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consistent_homology_distance)(X_transformed[i],
-                                                        self.n_neighbor)
-            for i in range(X.shape[0]))
-        X_transformed = np.array(X_transformed)
-        return X_transformed
+        Xt = np.array(Xt)
+        return Xt
