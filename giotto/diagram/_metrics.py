@@ -34,13 +34,13 @@ def landscapes(diagrams, sampling, n_layers):
     return ls
     
 
-
 def heat(diagrams, sampling_len, step_size, sigma):
-    heats = np.zeros((diagrams.shape[0], sampling_len, sampling_len))
+    n_samples, n_points = diagrams.shape[:2]
+    heats = np.zeros((n_samples, sampling_len, sampling_len))
 
     sampled_diags = np.array(diagrams // step_size, dtype=int)
-    sample_indices = np.arange(len(diagrams))[:, None, None]
-    sample_indices = np.tile(sample_indices, reps=(diagrams.shape[1], 1))
+    sample_indices = np.arange(n_samples)[:, None, None]
+    sample_indices = np.tile(sample_indices, reps=(n_points, 1))
     sampled_diags = np.concatenate([sample_indices, sampled_diags], axis=2)
     unique, counts = zip(*(np.unique(diag, axis=0, return_counts=True)
                            for diag in sampled_diags))
