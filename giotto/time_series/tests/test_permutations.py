@@ -1,4 +1,5 @@
-"""Testing for OrdinalRepresentation"""
+"""Testing for time series ordinal representation."""
+# License : Apache 2.0
 
 import numpy as np
 from numpy.testing import assert_equal, assert_almost_equal

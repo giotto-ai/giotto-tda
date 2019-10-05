@@ -1,4 +1,5 @@
-"""Testing for ConsistentRescaling"""
+"""Testing for consistent homology."""
+# License : Apache 2.0
 
 import numpy as np
 import pytest

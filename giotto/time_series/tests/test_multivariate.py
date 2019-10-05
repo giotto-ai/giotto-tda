@@ -1,4 +1,5 @@
-"""Testing for PearsonCorrelation"""
+"""Testing for multivariate time series embedding."""
+# License : Apache 2.0
 
 import numpy as np
 from numpy.testing import assert_equal, assert_almost_equal
@@ -12,4 +13,3 @@ def test_multivariate_transform():
     X_res = np.ones((3,3)) - np.abs(np.corrcoef(X.T))
 
     assert_almost_equal(corr.fit_transform(X), X_res)
-
