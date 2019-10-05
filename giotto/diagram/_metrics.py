@@ -31,8 +31,7 @@ def landscapes(diagrams, sampling, n_layers):
     ls = np.flip(np.partition(fibers, top_pos, axis=2)[:, :, -n_layers:],
                  axis=2)
     ls = np.transpose(ls, (1, 2, 0))
-    if n_layers <= n_points:
-        return ls
+    return ls
     
 
 
