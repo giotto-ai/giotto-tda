@@ -23,15 +23,17 @@ def betti_curves(diagrams, sampling):
 
 def landscapes(diagrams, sampling, n_layers):
     n_points = diagrams.shape[1]
-    n_layers_possible = min(n_points, n_layers)  # This is not true
+
     midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) * np.sqrt(2) / 2.
     heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) * np.sqrt(2) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
-    top_pos = range(n_points - n_layers_possible, n_points)
-    ls = np.flip(np.partition(fibers, top_pos, axis=2)[:, :, -n_layers:],
-                 axis=2)
-    ls = np.transpose(ls, (1, 2, 0))
-    return ls
+    top_pos = range(n_points - n_layers, n_points)
+    fibers.partition(top_pos, axis=2)
+    fibers = np.flip(fibers[:, :, -n_layers:], axis=2)
+    fibers = np.transpose(fibers, (1, 2, 0))
+    pad_with = ((0, 0), (0, max(0, n_layers - n_points)), (0, 0))
+    fibers = np.pad(fibers, pad_with, 'constant', constant_values=0)
+    return fibers
     
 
 def heat(diagrams, sampling_len, step_size, sigma):
@@ -64,17 +66,21 @@ def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
     return (step_size ** (1 / p)) * unnorm_dist
 
 
-def pairwise_landscape_distances(diagrams_1,  diagrams_2, sampling, step_size,
-                                p=2., n_layers=1, **kwargs):
+def pairwise_landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
+                                 p=2., n_layers=1, **kwargs):
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
-    ls_1 = landscapes(diagrams_1, sampling, n_layers).reshape((
-        n_samples_1, -1))
+    n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
+        ls_1 = landscapes(diagrams_1, sampling, n_layers_1).reshape((
+            n_samples_1, -1))
         unnorm_dist = squareform(pdist(ls_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
     n_samples_2, n_points_2 = diagrams_2.shape[:2]
-    n_layers_12 = min(n_layers, n_points_1, n_points_2)
-    ls_2 = landscapes(diagrams_2, sampling, n_layers_12).reshape((
+    n_layers_2 = min(n_layers, n_points_2)
+    n_layers = max(n_layers_1, n_layers_2)
+    ls_1 = landscapes(diagrams_1, sampling, n_layers).reshape((
+        n_samples_1, -1))
+    ls_2 = landscapes(diagrams_2, sampling, n_layers).reshape((
         n_samples_2, -1))
     unnorm_dist = cdist(ls_1, ls_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
@@ -97,14 +103,14 @@ def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
 
 
-def kernel_heat_distance(diagrams_1, diagrams_2, sampling, step_size, sigma=1.,
-                         order=2, **kwargs):
-    heat_1 = heat(diagrams_1, sampling)
+def kernel_heat_distance(diagrams_1, diagrams_2, sampling_len, step_size,
+                         sigma=1., p=2., **kwargs):
+    heat_1 = heat(diagrams_1, sampling_len, step_size, sigma)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heat(diagrams_2, sampling)
-    unnorm_dist = cdist(betti_curves_1, heat_2, 'minkowski', p=p)
+    heat_2 = heat(diagrams_2, sampling_len, step_size, sigma)
+    unnorm_dist = cdist(heat_1, heat_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
 
