@@ -12,9 +12,7 @@ from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
-version_file = os.path.join('giotto', '_version.py')
-with open(version_file) as f:
-    exec(f.read())
+import giotto
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -28,7 +26,7 @@ MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-learn/giotto-learn'
 LICENSE = 'Apache 2.0'
 DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn'
-VERSION = __version__
+VERSION = giotto.__version__
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
