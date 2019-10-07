@@ -114,7 +114,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self.validate_params(self.get_params(), self._hyperparameters)
+        validate_params(self.get_params(), self._hyperparameters)
 
         self._is_fitted = True
         return self
@@ -150,7 +150,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consistent_homology_distance)(Xt[i])
+            delayed(self._consistent_homology_distance)(X[i])
             for i in range(X.shape[0]))
         Xt = np.array(Xt)
         return Xt
