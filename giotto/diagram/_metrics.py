@@ -34,26 +34,21 @@ def landscapes(diagrams, sampling, n_layers):
     pad_with = ((0, 0), (0, max(0, n_layers - n_points)), (0, 0))
     fibers = np.pad(fibers, pad_with, 'constant', constant_values=0)
     return fibers
-    
 
-def heats(diagrams, sampling_len, step_size, sigma):
-    n_samples, n_points = diagrams.shape[:2]
-    heats = np.zeros((n_samples, sampling_len, sampling_len))
+def _heat(sampled_diag, sampling_len, sigma):
+    heat_ = np.zeros((sampling_len, sampling_len))
+    unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
+    unique = tuple(tuple(row) for row in unique.T)
+    heat_[unique] = counts
+    heat_ = gaussian_filter(heat_, sigma, mode='reflect')
+    return heat_
 
-    sampled_diags = np.array(diagrams // step_size, dtype=int)
-    sample_indices = np.arange(n_samples)[:, None, None]
-    sample_indices = np.tile(sample_indices, reps=(n_points, 1))
-    sampled_diags = np.concatenate([sample_indices, sampled_diags], axis=2)
-    unique, counts = zip(*(np.unique(diag, axis=0, return_counts=True)
-                           for diag in sampled_diags))
-    unique = tuple(tuple(row) for row in np.concatenate(unique).T)
-    counts = np.concatenate(counts).T
-    heats[unique] = counts
-    heats = np.stack([gaussian_filter(h, sigma, mode='reflect')
-                      for h in heats])
-    heats = heats - np.transpose(heats, (0, 2, 1))
-    return heats
-
+def heats(diagrams, sampling, step_size, sigma):
+    sampled_diags = np.array((diagrams - sampling[0]) / step_size, dtype=int)
+    heats_ = np.stack([_heat(sampled_diag, sampling.shape[0], sigma)
+                       for sampled_diag in sampled_diags])
+    heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
+    return heats_
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
@@ -103,13 +98,15 @@ def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
 
 
-def kernel_heat_distance(diagrams_1, diagrams_2, sampling_len, step_size,
+def kernel_heat_distance(diagrams_1, diagrams_2, sampling, step_size,
                          sigma=1., p=2., **kwargs):
-    heat_1 = heats(diagrams_1, sampling_len, step_size, sigma)
+    heat_1 = heats(diagrams_1, sampling, step_size, sigma).\
+        reshape((diagrams_1.shape[0], -1))
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heats(diagrams_2, sampling_len, step_size, sigma)
+    heat_2 = heats(diagrams_2, sampling, step_size, sigma).\
+        reshape((diagrams_2.shape[0], -1))
     unnorm_dist = cdist(heat_1, heat_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
