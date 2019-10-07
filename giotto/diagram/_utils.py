@@ -56,29 +56,19 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
 def _discretize(X, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
 
-    min_vals = { dim: np.min(X[X[:, :, 2] == dim][:, 0])
+    min_vals = { dim: np.min(_subdiagrams(X, [dim], remove_dim=True)[:, :, 0])
                  for dim in homology_dimensions }
-    # global_min_val = min(list(min_vals.values()))
-    # min_vals = { dim: min_vals[dim]
-    #              if (min_vals[dim] != np.inf) else global_min_val
-    #              for dim in homology_dimensions }
 
-    max_vals = { dim: np.max(X[X[:, :, 2] == dim][:, 0])
+    max_vals = { dim: np.max(_subdiagrams(X, [dim], remove_dim=True)[:, :, 1])
                  for dim in homology_dimensions }
     global_max_val = max(list(max_vals.values()))
-    # max_vals = { dim: max_vals[dim]
-    #              if (max_vals[dim] != -np.inf) else global_max_val
-    #              for dim in homology_dimensions }
     max_vals = { dim: max_vals[dim]
                      if (max_vals[dim] != min_vals[dim]) else global_max_val
                  for dim in homology_dimensions }
 
-    n_segments = n_values + 1
-    step_sizes = { dim: (max_vals[dim] - min_vals[dim])/n_segments
-                   for dim in homology_dimensions }
-    samplings = { dim: (np.linspace(
-        min_vals[dim], max_vals[dim],
-        num=n_segments, endpoint=False)[1:]).reshape(-1, 1 ,1)
+    samplings = { dim: (np.linspace(min_vals[dim], max_vals[dim],
+                                    num=n_values)).reshape(-1, 1 ,1)
                   for dim in homology_dimensions }
-
+    step_sizes = { dim: (samplings[dim][1] - samplings[dim][0])
+                   for dim in homology_dimensions }
     return samplings, step_sizes
