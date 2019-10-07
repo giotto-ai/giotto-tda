@@ -47,10 +47,33 @@ Welcome to giotto's API reference!
    graphs.GraphGeodesicDistance
 
 
-:mod:`giotto.images`: Preprocessing for images
-==============================================
+..
+   :mod:`giotto.images`: Preprocessing for images
+   ==============================================
 
-.. automodule:: giotto.images
+   .. automodule:: giotto.images
+      :no-members:
+      :no-inherited-members:
+
+   .. currentmodule:: giotto
+
+   .. autosummary::
+      :toctree: generated/
+      :template: class.rst
+
+       images.ImageInverter
+       images.HeightFiltration
+       images.RadialFiltration
+       images.DilationFiltration
+       images.ErosionFiltration
+       images.SignedDistanceFiltration
+       images.DensityFiltration
+
+
+:mod:`giotto.base`: Base
+========================
+
+.. automodule:: giotto.base
    :no-members:
    :no-inherited-members:
 
@@ -60,13 +83,7 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-    images.ImageInverter
-    images.HeightFiltration
-    images.RadialFiltration
-    images.DilationFiltration
-    images.ErosionFiltration
-    images.SignedDistanceFiltration
-    images.DensityFiltration
+   base.TransformerResamplerMixin
 
 
 :mod:`giotto.pipeline`: Pipeline
@@ -82,7 +99,8 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-   pipeline.SlidingWindowFeatureUnion
+   pipeline.Pipeline
+   pipeline.make_pipeline
 
 
 :mod:`giotto.homology`: Persistent homology
@@ -99,8 +117,8 @@ Welcome to giotto's API reference!
    :template: class.rst
 
    homology.VietorisRipsPersistence
-   homology.CubicalPersistence
-   homology.PersistentEntropy
+   ..
+      homology.CubicalPersistence
 
    homology.ConsistentRescaling
 
@@ -123,76 +141,79 @@ Welcome to giotto's API reference!
    diagram.DiagramFilter
 
    diagram.DiagramDistance
-   diagram.DiagramNorm
+   diagram.DiagramAmplitude
 
-:mod:`giotto.manifold`: Manifold learning
-=========================================
+   diagram.PersistentEntropy
+   diagram.PersistenceLandscape
+   diagram.BettiCurve
+   diagram.HeatKernel
 
-.. automodule:: giotto.manifold
-   :no-members:
-   :no-inherited-members:
+..
+   :mod:`giotto.manifold`: Manifold learning
+   =========================================
 
-.. currentmodule:: giotto
+   .. automodule:: giotto.manifold
+      :no-members:
+      :no-inherited-members:
 
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
+   .. currentmodule:: giotto
 
-   manifold.StatefulMDS
+   .. autosummary::
+      :toctree: generated/
+      :template: class.rst
 
-   manifold.Kinematics
+      manifold.StatefulMDS
 
-
-:mod:`giotto.compose`: Features and targets composition
-=======================================================
-
-.. automodule:: giotto.compose
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: giotto
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   compose.TargetResampler
-   compose.FeatureAggregator
-
-   compose.TargetResamplingClassifier
-   compose.TargetResamplingRegressor
+      manifold.Kinematics
 
 
+..
+   :mod:`giotto.compose`: Features and targets composition
+   =======================================================
 
-:mod:`giotto.neural_network`: Neural network with Keras
-=======================================================
+   .. automodule:: giotto.compose
+      :no-members:
+      :no-inherited-members:
 
-.. automodule:: giotto.neural_network
-   :no-members:
-   :no-inherited-members:
+   .. currentmodule:: giotto
 
-.. currentmodule:: giotto
+   .. autosummary::
+      :toctree: generated/
+      :template: class.rst
 
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   neural_network.KerasClassifierWrapper
-   neural_network.KerasRegressorWrapper
+      compose.FeatureAggregator
 
 
-:mod:`giotto.model_selection`: Hyper-parameter search extension
-===============================================================
+..
+   :mod:`giotto.neural_network`: Neural network with Keras
+   =======================================================
 
-.. automodule:: giotto.model_selection
-   :no-members:
-   :no-inherited-members:
+   .. automodule:: giotto.neural_network
+      :no-members:
+      :no-inherited-members:
 
-.. currentmodule:: giotto
+   .. currentmodule:: giotto
 
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
+   .. autosummary::
+      :toctree: generated/
+      :template: class.rst
 
-   model_selection.GridSearchCV
-   model_selection.RandomizedSearchCV
+      neural_network.KerasClassifierWrapper
+      neural_network.KerasRegressorWrapper
+
+
+   :mod:`giotto.model_selection`: Hyper-parameter search extension
+   ===============================================================
+
+   .. automodule:: giotto.model_selection
+      :no-members:
+      :no-inherited-members:
+
+   .. currentmodule:: giotto
+
+   .. autosummary::
+      :toctree: generated/
+      :template: class.rst
+
+      model_selection.GridSearchCV
+      model_selection.RandomizedSearchCV
