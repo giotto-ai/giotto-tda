@@ -3,10 +3,11 @@
 
 import numpy as np
 
+
 def _pad_diagram(Xd, homology_dimensions, max_n_points, min_values):
     for dim in homology_dimensions:
         n_points = len(Xd[dim])
-        n_points_to_pad =  max_n_points[dim] - n_points
+        n_points_to_pad = max_n_points[dim] - n_points
         if n_points == 0 and n_points_to_pad == 0:
             n_points_to_pad = 1
 

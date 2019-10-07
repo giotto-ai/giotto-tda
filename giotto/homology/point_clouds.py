@@ -66,9 +66,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         """A class method that checks whether the hyperparameters and the input
         parameters of the :meth:`fit` are valid.
         """
-        implemented_metric_types = set(['precomputed'] + \
-                                       [met for i in VALID_METRICS.values()
-                                        for met in i])
+        implemented_metric_types = \
+            set(['precomputed'] + [met for i in VALID_METRICS.values() for
+                                   met in i])
 
         if metric not in implemented_metric_types:
             raise ValueError('The metric %s is not supported' % metric)
@@ -81,9 +81,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         if 0 in self._homology_dimensions:
             Xds[0] = Xds[0][:-1, :]
 
-        Xds = { dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
-                                                        dtype=Xds[dim].dtype)])
-                for dim in self._homology_dimensions }
+        Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
+                                                       dtype=Xds[dim].dtype)])
+               for dim in self._homology_dimensions}
         return Xds
 
     def fit(self, X, y=None):
@@ -158,12 +158,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                           self.metric)
             for i in range(X.shape[0]))
 
-        max_n_points = { dim: max(1, np.max([Xt[i][dim].shape[0]
-                                             for i in range(len(Xt))]))
-                         for dim in self.homology_dimensions }
-        min_values = { dim: min([ np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                        else np.inf for i in range(len(Xt))])
-                         for dim in self.homology_dimensions }
+        max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
+                                            for i in range(len(Xt))]))
+                        for dim in self.homology_dimensions}
+        min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
+                                else np.inf for i in range(len(Xt))])
+                      for dim in self.homology_dimensions}
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(_pad_diagram)(Xt[i], self._homology_dimensions,

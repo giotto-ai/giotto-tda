@@ -10,8 +10,6 @@ from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from ..utils.validation import validate_params
 
-import numpy as np
-
 
 class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """Concatenates results of multiple transformer objects.
@@ -31,7 +29,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     Examples
     --------
-    >>> from giotto.pipeline import SlidingWindow
+    >>> from giotto.time_series import SlidingWindow
     """
     _hyperparameters = {'width': [int, (1, np.inf)],
                         'stride': [int, (1, np.inf)]}
@@ -42,7 +40,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     def _slice_windows(self, X):
         n_windows = (X.shape[0] - self.width) \
-            // self.stride + 1
+                    // self.stride + 1
 
         window_slices = [
             (i * self.stride, self.width + i * self.stride)
@@ -97,9 +95,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['_is_fitted'])
 
         if X.shape[0] < self.width:
-            raise ValueError("X of length {} does not have enough points"
-                             " to have a single window of width {}."
-                             "".format(X.shape[0]), self.width)
+            raise ValueError(
+                f"X of length {X.shape[0]} does not have enough points to "
+                f"have a single window of width {self.width}.")
 
         window_slices = self._slice_windows(X)
 
@@ -129,11 +127,11 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['_is_fitted'])
 
         if X.shape[0] < self.width:
-            raise ValueError("X of length {} does not have enough points"
-                             " to have a single window of width {}."
-                             "".format(X.shape[0]), self.width)
+            raise ValueError(
+                f"X of length {X.shape[0]} does not have enough points to "
+                f"have a single window of width {self.width}.")
 
-        yt = y[self.width - 1 :: self.stride]
+        yt = y[self.width - 1:: self.stride]
 
         return yt
 
@@ -265,10 +263,10 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         n_points = (X.shape[0] - time_delay * dimension) // stride + 1
 
         X = np.flip(X)
-        X_embedded = np.stack([ X[j * stride : j * stride
-                                 + time_delay * dimension:
-                                  time_delay].flatten()
-                                for j in range(0, n_points)])
+        points_ = [X[j * stride:
+                     j * stride + time_delay * dimension:
+                     time_delay].flatten() for j in range(0, n_points)]
+        X_embedded = np.stack(points_)
 
         return np.flip(X_embedded).reshape((n_points, dimension))
 
@@ -351,10 +349,11 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
                     stride=1) for dim in
                 range(1, self.dimension + 3))
 
-            variation_list = [ np.abs(n_false_nbhrs_list[dim-1]
-                - 2 * n_false_nbhrs_list[dim] + n_false_nbhrs_list[dim+1])
-                / (n_false_nbhrs_list[dim] + 1) / dim
-                for dim in range(2, self.dimension + 1) ]
+            variation_list = [np.abs(n_false_nbhrs_list[dim - 1]
+                                     - 2 * n_false_nbhrs_list[dim] +
+                                     n_false_nbhrs_list[dim + 1])
+                              / (n_false_nbhrs_list[dim] + 1) / dim
+                              for dim in range(2, self.dimension + 1)]
 
             self.dimension_ = variation_list.index(min(variation_list)) + 2
 
@@ -415,6 +414,6 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
 
-        yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
+        yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
 
         return yt

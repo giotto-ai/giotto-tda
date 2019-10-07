@@ -6,8 +6,8 @@ from sklearn.utils.validation import check_is_fitted
 def _derivation_function(function, X, delta_t=1, **function_kwargs):
     partial_window_begin = function(X[:, :-delta_t], axis=1, **function_kwargs)
     partial_window_end = function(X[:, delta_t:], axis=1, **function_kwargs)
-    derivative = (partial_window_end - partial_window_begin) / \
-        partial_window_begin / delta_t
+    derivative = (partial_window_end -
+                  partial_window_begin) / partial_window_begin / delta_t
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
     return derivative.reshape((-1, 1))
 
@@ -34,11 +34,12 @@ class Labeller(BaseEstimator, TransformerMixin):
         The type of sampling
 
         - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+        - data_iter: an iterator. If data_iter is 'points' then each object
+        in the iterator should be a numpy array of dimension (number of
+        points, number of coordinates), or equivalent nested list structure.
+        If data_iter is 'distance_matrix' then each object in the iterator
+        should be a full (symmetric) square matrix (numpy array) of shape (
+        number of points, number of points), __or a sparse distance matrix
 
     Attributes
     ----------
@@ -63,7 +64,8 @@ class Labeller(BaseEstimator, TransformerMixin):
         n_windows = y.shape[0] - window_size + 1
 
         y_embedded = np.stack(
-            [y[i: i + window_size].reshape((-1, 1)) for i in range(0, n_windows)])
+            [y[i: i + window_size].reshape((-1, 1)) for i in
+             range(0, n_windows)])
 
         return y_embedded.reshape((n_windows, window_size))
 
@@ -115,7 +117,8 @@ class Labeller(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, y):
-        """Implementation of the sk-learn transform function that samples the input.
+        """Implementation of the sk-learn transform function that samples
+        the input.
 
         Parameters
         ----------
@@ -155,7 +158,8 @@ class Labeller(BaseEstimator, TransformerMixin):
                 (y.shape[0], 1))
 
         if self.n_steps_future >= self.window_size:
-            y_transformed = y_transformed[self.n_steps_future - self.window_size + 1:]
+            y_transformed = y_transformed[
+                            self.n_steps_future - self.window_size + 1:]
 
         return y_transformed
 
