@@ -35,20 +35,20 @@ def landscapes(diagrams, sampling, n_layers):
     fibers = np.pad(fibers, pad_with, 'constant', constant_values=0)
     return fibers
 
-def _heat(sampled_diag, sampling_len, sigma):
-    heat_ = np.zeros((sampling_len, sampling_len))
+
+def _heat(heat, sampled_diag, sigma):
     unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
     unique = tuple(tuple(row) for row in unique.T)
-    heat_[unique] = counts
-    heat_ = gaussian_filter(heat_, sigma, mode='reflect')
-    return heat_
+    heat[unique] = counts
+    heat[:, :] = gaussian_filter(heat, sigma, mode='reflect')
+
 
 def heats(diagrams, sampling, step_size, sigma):
+    heats_ = np.zeros((diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
     sampled_diags = np.array((diagrams - sampling[0]) / step_size, dtype=int)
-    heats_ = np.stack([_heat(sampled_diag, sampling.shape[0], sigma)
-                       for sampled_diag in sampled_diags])
-    heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
-    return heats_
+    [_heat(heats_[i], sampled_diag, sigma) for i, sampled_diag in enumerate(sampled_diags)]
+    return heats_ - np.transpose(heats_, (0, 2, 1))
+
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
