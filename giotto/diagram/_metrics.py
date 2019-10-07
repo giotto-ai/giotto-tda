@@ -36,7 +36,7 @@ def landscapes(diagrams, sampling, n_layers):
     return fibers
     
 
-def heat(diagrams, sampling_len, step_size, sigma):
+def heats(diagrams, sampling_len, step_size, sigma):
     n_samples, n_points = diagrams.shape[:2]
     heats = np.zeros((n_samples, sampling_len, sampling_len))
 
@@ -105,11 +105,11 @@ def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
 
 def kernel_heat_distance(diagrams_1, diagrams_2, sampling_len, step_size,
                          sigma=1., p=2., **kwargs):
-    heat_1 = heat(diagrams_1, sampling_len, step_size, sigma)
+    heat_1 = heats(diagrams_1, sampling_len, step_size, sigma)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heat(diagrams_2, sampling_len, step_size, sigma)
+    heat_2 = heats(diagrams_2, sampling_len, step_size, sigma)
     unnorm_dist = cdist(heat_1, heat_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
