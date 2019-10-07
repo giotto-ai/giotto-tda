@@ -7,7 +7,7 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import gen_even_slices
 from ..utils.validation import check_diagram
 from ._utils import _subdiagrams, _discretize
-from giotto.diagram._metrics import betti_curves, landscapes
+from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 
 class PersistentEntropy(BaseEstimator, TransformerMixin):
@@ -149,6 +149,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
 
         self.samplings_, _ = _discretize(X, n_values=self.n_values)
         return self
@@ -175,20 +176,20 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['samplings_'])
+        check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        homology_dimensions = sorted(list(set(X[0, :, 2])))
-        n_dimensions = len(homology_dimensions)
+        n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            betti_curves)(_subdiagrams(X, [dim])[s, :, :2], self._samplings[dim])
-            for dim in homology_dimensions
+            betti_curves)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim])
+            for dim in self.homology_dimensions_
             for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
-        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
+        Xt = np.stack([np.concatenate([Xt[i * n_slices + j]
                                         for j in range(n_slices)], axis=0)
-                        for i in range(n_dimensions)])
+                        for i in range(n_dimensions)], axis=2)
+        return Xt
 
 
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
@@ -241,8 +242,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
 
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self.samplings_, _ = _discretize(X, n_values=self.n_values)
-
+        self.samplings_ = { dim: np.sqrt(2) * sampling for dim, sampling in
+                            self.samplings_.items()}
         self._is_fitted = True
         return self
 
@@ -268,20 +271,19 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Array of the persitence landscapes of the diagrams in X.
 
         """
-        check_is_fitted(self, ['samplings_'])
+        check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        homology_dimensions = sorted(list(set(X[0, :, 2])))
-        n_dimensions = len(homology_dimensions)
+        n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            landscapes)(_subdiagrams(X, [dim])[s, :, :2], self._samplings[dim],
-                        self.n_layers) for dim in homology_dimensions
+            landscapes)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
+                        self.n_layers) for dim in self.homology_dimensions_
             for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
-        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
+        Xt = np.stack([np.concatenate([Xt[i * n_slices + j]
                                         for j in range(n_slices)], axis=0)
-                        for i in range(n_dimensions)])
+                        for i in range(n_dimensions)], axis=3)
         return Xt
 
 
@@ -334,10 +336,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
 
         self.samplings_, self._step_size = _discretize(X, n_values=self.n_values)
-
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -362,18 +363,18 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Array of the persitence landscapes of the diagrams in X.
 
         """
-        check_is_fitted(self, ['samplings_'])
+        check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        homology_dimensions = sorted(list(set(X[0, :, 2])))
-        n_dimensions = len(homology_dimensions)
+        n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            heat)(_subdiagrams(X, [dim])[s, :, :2], self._samplings[dim],
-                  self._step_size, self.sigma) for dim in homology_dimensions
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+            heats)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
+                  self._step_size[dim], self.sigma)
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(X.shape[0], effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
-        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
+        Xt = np.stack([np.concatenate([Xt[i * n_slices + j]
                                         for j in range(n_slices)], axis=0)
-                        for i in range(n_dimensions)])
+                        for i in range(n_dimensions)], axis=3)
         return Xt

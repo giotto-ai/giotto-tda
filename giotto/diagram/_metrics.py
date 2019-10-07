@@ -42,13 +42,13 @@ def _heat(heat, sampled_diag, sigma):
     heat[unique] = counts
     heat[:, :] = gaussian_filter(heat, sigma, mode='reflect')
 
-
 def heats(diagrams, sampling, step_size, sigma):
     heats_ = np.zeros((diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
     sampled_diags = np.array((diagrams - sampling[0]) / step_size, dtype=int)
     [_heat(heats_[i], sampled_diag, sigma) for i, sampled_diag in enumerate(sampled_diags)]
-    return heats_ - np.transpose(heats_, (0, 2, 1))
-
+    heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
+    heats_ = np.rot90(heats_, k=1, axes=(1,2))
+    return heats_
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
