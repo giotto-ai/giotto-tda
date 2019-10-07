@@ -50,7 +50,7 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'pytest-azurepipelines',
-        'pytest-benchmark'
+        'pytest-benchmark',
         'flake8'],
     'doc': [
         'sphinx',
