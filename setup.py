@@ -49,6 +49,8 @@ KEYWORDS = 'machine learning topological data analysis persistent ' + \
     'homology, persistence diagrams'
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
+    'code-analysis': [
+        'flake8'],
     'tests': [
         'pytest',
         'pytest-cov',
