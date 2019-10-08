@@ -100,6 +100,11 @@ Welcome to giotto's API reference!
    :template: class.rst
 
    pipeline.Pipeline
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
    pipeline.make_pipeline
 
 
