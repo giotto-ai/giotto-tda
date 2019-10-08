@@ -55,9 +55,10 @@ def check_diagram(X):
     if n_points_above_diag != n_points_global:
         raise ValueError("All points of all n_samples persistent diagrams "
                          "should be above the diagonal, X[:,:,1] > =X[:,:,0]."
-                         " {} points in all n_samples diagrams are under the "
-                         "diagonal.".format(n_points_global-n_points_above_diag))
+                         f" {n_points_global - n_points_above_diag} points in "
+                         "all n_samples diagrams are under the diagonal.")
     return X
+
 
 # Check the type and range of numerical parameters
 def validate_params(parameters, references):
@@ -99,6 +100,7 @@ def validate_params(parameters, references):
                                  " should be one of the following {}"
                                  "".format(key, parameters[key],
                                            references[key][1]))
+
 
 def validate_metric_params(metric, metric_params):
     if metric not in available_metrics.keys():

@@ -1,4 +1,4 @@
-"""Persistent homology on point clouds."""
+"""Persistent homology on point clouds or finite metric spaces."""
 # License: Apache 2.0
 
 import numpy as np
@@ -12,12 +12,15 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of persistence diagrams resulting
-    from Vietoris-Rips filtrations. Given a point cloud in Euclidean space
-    or an abstract metric space encoded by a distance matrix, information
-    about the appearance and disappearance of "topological holes"
-    (technically, homology classes) of various dimensions and at different
-    distance scales is summarised in the corresponding persistence diagram.
+    """Transformer for the calculation of `persistence diagrams <LINK TO
+    GLOSSARY>`_ (equivalently, `persistence barcodes <LINK TO GLOSSARY>`_)
+    resulting from `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_. Given a
+    `point cloud <LINK TO GLOSSARY>`_ in Euclidean space or an abstract
+    `metric space <LINK TO GLOSSARY>`_ encoded by a distance matrix,
+    information about the appearance and disappearance of "topological
+    voids" (technically, `homology classes <LINK TO GLOSSARY>`_) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     Parameters
     ----------
@@ -43,9 +46,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         connected by an edge, and topological features at scales larger than
         this value will not be detected.
 
-    homology_dimensions : list, optional, default: [0, 1]
-        List of dimensions (non-negative integers). Topological holes of each
-        of these dimensions will be detected.
+    homology_dimensions : iterable, optional, default: (0, 1)
+        Dimensions (non-negative integers) of the topological voids to be
+        detected.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -55,7 +58,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=[0, 1], n_jobs=None):
+                 homology_dimensions=(0, 1), n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -66,7 +69,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         """A class method that checks whether the hyperparameters and the input
         parameters of the :meth:`fit` are valid.
         """
-        implemented_metric_types = set(['precomputed'] + \
+        implemented_metric_types = set(['precomputed'] +
                                        [met for i in VALID_METRICS.values()
                                         for met in i])
 
@@ -81,9 +84,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         if 0 in self._homology_dimensions:
             Xds[0] = Xds[0][:-1, :]
 
-        Xds = { dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
-                                                        dtype=Xds[dim].dtype)])
-                for dim in self._homology_dimensions }
+        Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
+                                                       dtype=Xds[dim].dtype)])
+               for dim in self._homology_dimensions}
         return Xds
 
     def fit(self, X, y=None):
@@ -119,11 +122,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes, for each dimension in ``homology_dimensions`` and for each
-        point cloud or distance matrix in X, the relevant persistence diagram
-        as an array of pairs (b, d) -- one per persistent topological hole --
-        where b is the scale at which the topological hole first appears, and
-        d the scale at which the same hole disappears.
+        """Computes, for each point cloud or distance matrix in X, the relevant
+        persistence diagram/barcode as an array of triples [b, d, k], each
+        representing a persistent topological feature in dimension k which
+        appears at the scale defined by b and disappears at the scale defined
+        by d. d cannot exceed ``max_edge_length``; when d > 0, k is restricted
+        to belong to ``homology_dimensions``.
+
 
         Parameters
         ----------
@@ -141,10 +146,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_points, 3)
-            Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        Xt : ndarray, shape (n_samples, n_bars, 3)
+            Array of persistence barcodes computed from the feature arrays or
+            distance matrices in X. As the number of bars is generally
+            different between different entries in X, ``n_bars`` is the maximum
+            number of bars detected across all samples, and barcodes are padded
+            by ``[0, 0, np.inf]`` when necessary.
 
         """
         # Check if fit had been called
@@ -158,12 +165,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                           self.metric)
             for i in range(X.shape[0]))
 
-        max_n_points = { dim: max(1, np.max([Xt[i][dim].shape[0]
-                                             for i in range(len(Xt))]))
-                         for dim in self.homology_dimensions }
-        min_values = { dim: min([ np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                        else np.inf for i in range(len(Xt))])
-                         for dim in self.homology_dimensions }
+        max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
+                                            for i in range(len(Xt))]))
+                        for dim in self.homology_dimensions}
+        min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
+                                else np.inf for i in range(len(Xt))])
+                      for dim in self.homology_dimensions}
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(_pad_diagram)(Xt[i], self._homology_dimensions,

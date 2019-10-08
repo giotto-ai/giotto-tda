@@ -14,7 +14,6 @@ def _derivation_function(function, X, delta=1, **function_params):
     partial_window_end = function(X[:, delta:], axis=1, **function_params)
     derivative = (partial_window_end - partial_window_begin) / \
         partial_window_begin / delta
-
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
     return derivative.reshape((-1, 1))
 
@@ -41,11 +40,12 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         The type of sampling
 
         - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object in the iterator
-          should be a numpy array of dimension (number of points, number of coordinates),
-          or equivalent nested list structure. If data_iter is 'distance_matrix' then each
-          object in the iterator should be a full (symmetric) square matrix (numpy array)
-          of shape (number of points, number of points), __or a sparse distance matrix
+        - data_iter: an iterator. If data_iter is 'points' then each object
+        in the iterator should be a numpy array of dimension (number of
+        points, number of coordinates), or equivalent nested list structure.
+        If data_iter is 'distance_matrix' then each object in the iterator
+        should be a full (symmetric) square matrix (numpy array) of shape (
+        number of points, number of points), __or a sparse distance matrix
 
     Attributes
     ----------

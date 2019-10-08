@@ -123,7 +123,7 @@ Welcome to giotto's API reference!
    homology.ConsistentRescaling
 
 
-:mod:`giotto.diagram`: Persistent diagrams
+:mod:`giotto.diagram`: Persistence diagrams
 ==========================================
 
 .. automodule:: giotto.diagram

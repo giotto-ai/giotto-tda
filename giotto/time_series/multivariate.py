@@ -8,8 +8,9 @@ from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 
 
 class PearsonCorrelation(BaseEstimator, TransformerMixin):
-    """Transformer performing an argsort of each row in each array in a collection.
-    Based on ideas in `arXiv:1904.07403 <https://arxiv.org/abs/1904.07403>`_.
+    """Transformer performing an argsort of each row in each array in a
+    collection. Based on ideas in `arXiv:1904.07403
+    <https://arxiv.org/abs/1904.07403>`_.
 
     Parameters
     ----------
@@ -18,7 +19,10 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'positive_definite': [bool, (0, 1)]}
 
-    def __init__(self, positive_definite=True):
+    _hyperparameters = {'positive_definite': [bool, [0, 1]]}
+
+    def __init__(self, positive_definite=True, n_jobs=None):
+        self.n_jobs = n_jobs
         self.positive_definite = positive_definite
 
     def fit(self, X, y=None):

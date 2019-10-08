@@ -223,7 +223,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         if self.operation == 'return':
             Xt = np.diff(Xt, n=1, axis=0) / Xt[1:, :]
         else:  # 'log-return' operation
-            Xt =  np.diff(np.log(Xt), n=1, axis=0)
+            Xt = np.diff(np.log(Xt), n=1, axis=0)
 
         return Xt
 
