@@ -71,7 +71,7 @@ def validate_params(parameters, references):
         if len(references[key]) == 1:
             break
         if references[key][0] == list:
-            for parameter in parameter[key]:
+            for parameter in parameters[key]:
                 if not isinstance(parameter, references[key][1][1]):
                     raise TypeError("Parameter {} is a list of {}"
                                     " but contains an element of type {}"
