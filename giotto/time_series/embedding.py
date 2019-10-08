@@ -120,7 +120,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return yt
 
 
-class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
+class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     r"""Transformer returning a representation of a scalar-valued time
     series as a time series of point clouds.
 
@@ -196,14 +196,14 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> from giotto.time_series import TakensEmbedder
+    >>> from giotto.time_series import TakensEmbedding
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
     ...     for x in range(0,1000)])
-    >>> # Set up the Takens Embedder
+    >>> # Set up the transformer
     >>> outer_window_duration = 50
     >>> outer_window_stride = 5
-    >>> embedder = TakensEmbedder(
+    >>> embedder = TakensEmbedding(
     >>>     outer_window_duration=outer_window_duration,
     ...     outer_window_stride=outer_window_stride,
     ...     parameters_type='search',
@@ -261,7 +261,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
                                  stride=1):
         """Calculates the number of false nearest neighbours of embedding
         dimension. """
-        X_embedded = TakensEmbedder._embed(X, time_delay, dimension, stride)
+        X_embedded = TakensEmbedding._embed(X, time_delay, dimension, stride)
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
             X_embedded)
