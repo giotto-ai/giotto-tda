@@ -61,8 +61,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     >>> from giotto.homology import ConsistentRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsistentRescaling()
-    >>> cr.fit(X)
-    >>> X_rescaled = cr.transform(X)
+    >>> X_rescaled = cr.fit_transform(X)
     >>> print(X_rescaled.shape)
     (1, 3, 3)
 
@@ -112,12 +111,12 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
-        n_points, n_features)
+        n_points, n_dimensions)
             Input data. If ``metric=='precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_features.
+            dimension n_dimensions.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -142,12 +141,12 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
-        n_points, n_features)
+        n_points, n_dimensions)
             Input data. If ``metric=='precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_features.
+            dimension n_dimensions.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API

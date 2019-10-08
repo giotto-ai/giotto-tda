@@ -97,12 +97,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or
-            (n_samples, n_points, n_features)
+            (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_features.
+            dimension n_dimensions.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -123,23 +123,23 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Computes, for each point cloud or distance matrix in X, the relevant
-        persistence diagram/barcode as an array of triples [b, d, k], each
-        representing a persistent topological feature in dimension k which
-        appears at the scale defined by b and disappears at the scale defined
-        by d. d cannot exceed ``max_edge_length``; k belongs to
-        ``homology_dimensions``, or is ``np.inf`` in the case of padded
-        bars.
-
+        persistence diagram as an array of triples [b, d, k]. When k is
+        not equal to ``np.inf``, each triple represents a persistent
+        topological feature in dimension k (belonging to
+        ``homology_dimensions``) which is born at b and dies at d. Triples
+        ``[0., 0., np.inf]`` are used for padding, as the number of persistent
+        topological features is generally different between different entries
+        in X.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or
-            (n_samples, n_points, n_features)
+            (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_features.
+            dimension n_dimensions.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -147,12 +147,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_bars, 3)
-            Array of persistence barcodes computed from the feature arrays or
-            distance matrices in X. As the number of bars is generally
-            different between different entries in X, ``n_bars`` is the maximum
-            number of bars detected across all samples, and barcodes are padded
-            by ``[0, 0, np.inf]`` when necessary.
+        Xt : ndarray, shape (n_samples, n_features, 3)
+            Array of persistence diagrams computed from the feature arrays or
+            distance matrices in X. ``n_features`` is the maximum number of
+            topological features across all samples in X, and padding by ``[0,
+            0, np.inf]`` is performed when necessary.
 
         """
         # Check if fit had been called

@@ -11,19 +11,36 @@ from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of persistence entropy from a collection
-    of persistence diagrams. Given a generic persistence diagram consisting of
-    birth-death-dimension tuples (b, d, k), its k-persistence entropy is simply
-    the (base e) entropy of the collection of differences d - b for points of
-    homology dimension k, normalized by the sum of all such differences.
+    """Transformer for the calculation of `persistence entropy <LINK TO
+    GLOSSARY>`_ (sometimes called "persistent entropy") from a collection of
+    persistence diagrams.
+
+    Given a persistence diagram consisting of birth-death-dimension triples
+    (b, d, k), its k-persistence entropy is simply the (base e) entropy of
+    the collection of differences d - b for points of homology dimension k,
+    normalized by the sum of all such differences.
 
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    See also
+    --------
+    VietorisRipsPersistence
+
+    References
+    ----------
+    .. [1] M. Rucco, F. Castiglione, E. Merelli, and M. Pettini,
+           "Characterisation of the idiotypic immunenetwork through
+           persistent entropy", in S. Battiston, F. De Pellegrini,
+           G. Caldarelli, and E. Merelli (eds), *Proceedings of ECCS 2014*,
+           pages 117--128, *Springer Proceedings in Complexity*, 2014.
 
     """
+
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
@@ -41,10 +58,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            a collection of triples representing persistent topological
+            features through their birth, death and homology dimension.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -67,7 +84,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -133,7 +150,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -160,7 +177,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -225,7 +242,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -255,7 +272,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -320,7 +337,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -347,7 +364,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
+        X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams each of them containing
             a collection of points representing persistence feature through
             their birth, death and homology dimension.
@@ -360,7 +377,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_values, n_values,
             n_homology_dimensions)
-            Array of the persitence landscapes of the diagrams in X.
+            Array of the persistence landscapes of the diagrams in X.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
