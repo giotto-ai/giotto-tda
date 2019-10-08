@@ -46,9 +46,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         connected by an edge, and topological features at scales larger than
         this value will not be detected.
 
-    homology_dimensions : list, optional, default: (0, 1)
-        List of dimensions (non-negative integers). Topological voids in each
-        of these dimensions will be detected.
+    homology_dimensions : iterable, optional, default: (0, 1)
+        Dimensions (non-negative integers) of the topological voids to be
+        detected.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless

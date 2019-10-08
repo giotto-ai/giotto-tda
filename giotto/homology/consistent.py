@@ -1,5 +1,5 @@
 """Rescaling method for persistent homology."""
-# License: Apache2.0
+# License: Apache 2.0
 
 import itertools
 import math as m
@@ -13,8 +13,7 @@ from ..utils.validation import validate_params
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    r"""Transformer rescaling pairwise distances in data according to the
-    ideas in `arXiv:1606.02353 <https://arxiv.org/abs/1606.02353>`_.
+    r"""Transformer rescaling pairwise distances according to the ideas in [1].
     The computation during ``transform``, for each entry in X, is:
     :math:`d_{\mathrm{consistent}}(\star_i, \star_j) = [d(\star_i,
     \star_{k_i}) d(\star_j, \star_{k_j})]^{-1/2}d(\star_i, \star_j)`
@@ -63,7 +62,19 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     >>> print(X_rescaled.shape)
     (1, 3, 3)
 
+    See also
+    --------
+    VietorisRipsPersistence
+
+    References
+    ----------
+    .. [1] T. Berry and T. Sauer, "Consistent manifold representation for
+    topological data analysis", *Foundations of data analysis*, **1**,
+    1--38, 2019, doi: `10.3934/fods.2019001
+    <http://dx.doi.org/10.3934/fods.2019001>`_.
+
     """
+
     _hyperparameters = {'n_neighbor': [int, (1, np.inf)]}
 
     def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1,
@@ -119,7 +130,6 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         self._is_fitted = True
         return self
 
-    # @jit
     def transform(self, X, y=None):
         """For each entry in the input data array X, finds the metric structure
         after consistent rescaling and encodes it as a distance matrix. Then,
