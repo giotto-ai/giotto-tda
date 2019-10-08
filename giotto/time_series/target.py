@@ -2,7 +2,7 @@
 
 import numpy as np
 import numbers
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted, column_or_1d
 from ..base import TransformerResamplerMixin
 from .embedding import SlidingWindow
@@ -55,7 +55,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     implemented_labelling_recipes = {'application': _application_function,
                                      'variation': _variation_function,
                                      'derivation': _derivation_function}
-    _hyperparameters = {'labelling':
+    _hyperparameters = {'labelling': \
         (str, ['application', 'variation', 'derivation']),
                         'delta': [int, (1, np.inf)],
                         'function': (callable),
@@ -90,7 +90,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         self : object
             Returns self.
         """
-        _validate_params(self.get_params(), self._hyperparameters)
+        validate_params(self.get_params(), self._hyperparameters)
         column_or_1d(X)
 
         if self.function_params is None:
@@ -98,7 +98,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         else:
             self.effective_function_params_ = self.function_params.copy()
 
-        self._labeller = implemented_labelling_recipes[self.labelling]
+        self._labeller = self.implemented_labelling_recipes[self.labelling]
 
         self._sliding_window = SlidingWindow(width=self.width,
                                              stride=self.stride).fit(X)
@@ -116,7 +116,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         return self
 
     def transform(self, X):
-        """Transform/resample X.
+        """Transform X.
 
         Parameters
         ----------
@@ -166,7 +166,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         column_or_1d(y)
 
         yt = self._sliding_window.transform(y)
-        yt = self._labeller(self.function, yt, **labelling_params,
+        yt = self._labeller(self.function, yt, self.delta,
                             **self.effective_function_params_)
 
         if self.thresholds_ is not None:
@@ -174,7 +174,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             yt = np.concatenate(
                 [1 * (yt >= 0) * (yt < self.thresholds_[0])] +
                 [1 * (yt >= self.thresholds_[i]) *
-                 (ytAbs < self.thresholds_[i + 1]) for i in range(
+                 (yt < self.thresholds_[i + 1]) for i in range(
                     len(self.thresholds_) - 1)] +
                 [1 * (yt >= self.thresholds_[-1])], axis=1)
             yt = np.nonzero(yt)[1].reshape((y.shape[0], 1))
