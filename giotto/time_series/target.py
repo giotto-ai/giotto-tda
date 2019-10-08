@@ -1,30 +1,37 @@
+# License : Apache 2.0
+
 import numpy as np
+import numbers
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, column_or_1d
+from ..base import TransformerResamplerMixin
+from .embedding import SlidingWindow
+from ..utils.validation import validate_params
 
 
-def _derivation_function(function, X, delta_t=1, **function_kwargs):
-    partial_window_begin = function(X[:, :-delta_t], axis=1, **function_kwargs)
-    partial_window_end = function(X[:, delta_t:], axis=1, **function_kwargs)
+def _derivation_function(function, X, delta=1, **function_params):
+    partial_window_begin = function(X[:, :-delta], axis=1, **function_params)
+    partial_window_end = function(X[:, delta:], axis=1, **function_params)
     derivative = (partial_window_end - partial_window_begin) / \
-        partial_window_begin / delta_t
+        partial_window_begin / delta
+
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
     return derivative.reshape((-1, 1))
 
 
-def _variation_function(function, X, delta_t=1, **function_kwargs):
-    full_window = function(X, axis=1, **function_kwargs)
-    partial_window = function(X[:, :-delta_t], axis=1, **function_kwargs)
-    variation = (full_window - partial_window) / partial_window / delta_t
+def _variation_function(function, X, delta=1, **function_params):
+    full_window = function(X, axis=1, **function_params)
+    partial_window = function(X[:, :-delta], axis=1, **function_params)
+    variation = (full_window - partial_window) / partial_window / delta
     variation[(partial_window == 0) & (full_window == 0)] = 0
     return variation.reshape((-1, 1))
 
 
-def _application_function(function, X, delta_t=0, **function_kwargs):
-    return function(X, axis=1, **function_kwargs).reshape((-1, 1))
+def _application_function(function, X, delta=0, **function_params):
+    return function(X, axis=1, **function_params).reshape((-1, 1))
 
 
-class Labeller(BaseEstimator, TransformerMixin):
+class Labeller(BaseEstimator, TransformerResamplerMixin):
     """
     Target transformer.
 
@@ -45,39 +52,29 @@ class Labeller(BaseEstimator, TransformerMixin):
     is_fitted : boolean
         Whether the transformer has been fitted
     """
-    implementedLabellingRecipes = {'application': _application_function,
-                                   'variation': _variation_function,
-                                   'derivation': _derivation_function}
+    implemented_labelling_recipes = {'application': _application_function,
+                                     'variation': _variation_function,
+                                     'derivation': _derivation_function}
+    _hyperparameters = {'labelling':
+        (str, ['application', 'variation', 'derivation']),
+                        'delta': [int, (1, np.inf)],
+                        'function': (callable),
+                        'percentiles': (list, [numbers.Number, (0., 1.)]),
+                        'n_steps_future': (int, [1, np.inf])}
 
-    def __init__(self, labelling_kwargs={'type': 'derivation', 'delta_t': 1},
-                 function_kwargs={'function': np.std},
-                 window_size=2, percentiles=None, n_steps_future=1):
-        self.labelling_kwargs = labelling_kwargs
-        self.function_kwargs = function_kwargs
-        self.window_size = window_size
+    def __init__(self, width=2, stride=1, labelling='application', delta=1,
+                 function=np.std, function_params=None, percentiles=None,
+                 n_steps_future=1):
+        self.width = width
+        self.stride = stride
+        self.labelling = labelling
+        self.delta = delta
+        self.function = function
+        self.function_params = function_params
         self.percentiles = percentiles
         self.n_steps_future = n_steps_future
 
-    @staticmethod
-    def _embed(y, window_size):
-        n_windows = y.shape[0] - window_size + 1
-
-        y_embedded = np.stack(
-            [y[i: i + window_size].reshape((-1, 1)) for i in range(0, n_windows)])
-
-        return y_embedded.reshape((n_windows, window_size))
-
-    @staticmethod
-    def _validate_params(labelling_kwargs):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-        """
-        if labelling_kwargs['type'] not in \
-                Labeller.implementedLabellingRecipes.keys():
-            raise ValueError(
-                'The labelling type you specified is not implemented')
-
-    def fit(self, y, X=None):
+    def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
 
         Parameters
@@ -93,74 +90,96 @@ class Labeller(BaseEstimator, TransformerMixin):
         self : object
             Returns self.
         """
-        self._validate_params(self.labelling_kwargs)
+        _validate_params(self.get_params(), self._hyperparameters)
+        column_or_1d(X)
 
-        self._y = self._embed(y, self.window_size)
+        if self.function_params is None:
+            self.effective_function_params_ = {}
+        else:
+            self.effective_function_params_ = self.function_params.copy()
 
-        labelling_kwargs = self.labelling_kwargs.copy()
-        function_kwargs = self.function_kwargs.copy()
-        self._y_transformed = Labeller.implementedLabellingRecipes[
-            labelling_kwargs.pop('type')](function_kwargs.pop('function'),
-                                          self._y, **labelling_kwargs,
-                                          **function_kwargs)
+        self._labeller = implemented_labelling_recipes[self.labelling]
+
+        self._sliding_window = SlidingWindow(width=self.width,
+                                             stride=self.stride).fit(X)
+
+        _X = self._sliding_window.transform(X)
+        _X = self._labeller(self.function, _X, self.delta,
+                            **self.effective_function_params_)
 
         if self.percentiles is not None:
-            self.thresholds = [
-                np.percentile(np.abs(self._y_transformed.flatten()),
-                              percentile) for percentile in self.percentiles]
+            self.thresholds_ = [
+                np.percentile(np.abs(_X.flatten()), percentile)
+                for percentile in self.percentiles]
         else:
-            self.thresholds = None
-
-        self.is_fitted = True
+            self.thresholds_ = None
         return self
 
-    def transform(self, y):
-        """Implementation of the sk-learn transform function that samples the input.
+    def transform(self, X):
+        """Transform/resample X.
 
         Parameters
         ----------
-        X : array-like of shape = [n_samples, n_features]
-            The input samples.
+        X : ndarray, shape (n_samples, n_features)
+            Input data. ``
+
+        y : None
+            There is no need of a target, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        X_transformed : array of int of shape = [n_samples, n_features]
-            The array containing the element-wise square roots of the values
-            in `X`
+        Xt : ndarray, shape (n_samples_new, n_features)
+            The transformed/resampled input array.
+            ``n_samples_new = n_samples // period``.
+
+        """
+        Xt = column_or_1d(X).copy()
+
+        Xt = Xt[:-self.n_steps_future]
+
+        if self.n_steps_future < self.width:
+            Xt = Xt[self.width - 1 - self.n_steps_future:]
+        return Xt
+
+    def resample(self, y, X=None):
+        """Resample y.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples, n_features)
+            Target.
+
+        X : None
+            There is no need of input data,
+            yet the pipeline API requires this parameter.
+
+        Returns
+        -------
+        yt : ndarray, shape (n_samples_new, 1)
+            The resampled target.
+            ``n_samples_new = n_samples - 1``.
+
         """
         # Check is fit had been called
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['_labeller', '_sliding_window', 'threshold_'])
+        column_or_1d(y)
 
-        y = self._embed(y, self.window_size)
-        if np.array_equal(y, self._y):
-            y_transformed = self._y_transformed
-        else:
-            labelling_kwargs = self.labelling_kwargs.copy()
-            function_kwargs = self.function_kwargs.copy()
-            y_transformed = Labeller.implementedLabellingRecipes[
-                labelling_kwargs.pop('type')](function_kwargs.pop('function'),
-                                              y, **labelling_kwargs,
-                                              **function_kwargs)
+        yt = self._sliding_window.transform(y)
+        yt = self._labeller(self.function, yt, **labelling_params,
+                            **self.effective_function_params_)
 
-        if self.thresholds is not None:
-            y_transformedAbs = np.abs(y_transformed)
-            y_transformed = np.concatenate(
-                [1 * (y_transformedAbs >= 0) * (y_transformedAbs <
-                                                self.thresholds[0])] +
-                [1 * (y_transformedAbs >= self.thresholds[i]) *
-                 (y_transformedAbs < self.thresholds[i + 1]) for i in range(
-                    len(self.thresholds) - 1)] +
-                [1 * (y_transformedAbs >= self.thresholds[-1])], axis=1)
-            y_transformed = np.nonzero(y_transformed)[1].reshape(
-                (y.shape[0], 1))
+        if self.thresholds_ is not None:
+            yt = np.abs(yt)
+            yt = np.concatenate(
+                [1 * (yt >= 0) * (yt < self.thresholds_[0])] +
+                [1 * (yt >= self.thresholds_[i]) *
+                 (ytAbs < self.thresholds_[i + 1]) for i in range(
+                    len(self.thresholds_) - 1)] +
+                [1 * (yt >= self.thresholds_[-1])], axis=1)
+            yt = np.nonzero(yt)[1].reshape((y.shape[0], 1))
 
-        if self.n_steps_future >= self.window_size:
-            y_transformed = y_transformed[self.n_steps_future - self.window_size + 1:]
+        if self.n_steps_future >= self.width:
+            yt = yt[self.n_steps_future - self.width + 1:]
 
-        return y_transformed
-
-    def cut(self, X):
-        X_cut = X[:-self.n_steps_future]
-        if self.n_steps_future < self.window_size:
-            X_cut = X_cut[self.window_size - 1 - self.n_steps_future:]
-        return X_cut
+        return yt
