@@ -1,6 +1,7 @@
 """Base class for transforming and resampling"""
 # License: Apache 2.0
 
+
 class TransformerResamplerMixin:
     """Mixin class for all transformers resamplers in giotto."""
 

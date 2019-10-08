@@ -9,8 +9,9 @@ from sklearn.utils.validation import check_is_fitted
 
 
 class OrdinalRepresentation(BaseEstimator, TransformerMixin):
-    """Transformer performing an argsort of each row in each array in a collection.
-    Based on ideas in `arXiv:1904.07403 <https://arxiv.org/abs/1904.07403>`_.
+    """Transformer performing an argsort of each row in each array in a
+    collection. Based on ideas in `arXiv:1904.07403
+    <https://arxiv.org/abs/1904.07403>`_.
 
     Parameters
     ----------
@@ -108,11 +109,13 @@ class Entropy(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     len_vector : int, optional, default: 8
-        Used for performance optimization by exploiting numpy's vectorization capabilities.
+        Used for performance optimization by exploiting numpy's
+        vectorization capabilities.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
 
     """
 

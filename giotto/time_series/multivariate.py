@@ -3,14 +3,14 @@
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._joblib import Parallel, delayed
 from ..utils import validate_params
 from sklearn.utils.validation import check_is_fitted
 
 
 class PearsonCorrelation(BaseEstimator, TransformerMixin):
-    """Transformer performing an argsort of each row in each array in a collection.
-    Based on ideas in `arXiv:1904.07403 <https://arxiv.org/abs/1904.07403>`_.
+    """Transformer performing an argsort of each row in each array in a
+    collection. Based on ideas in `arXiv:1904.07403
+    <https://arxiv.org/abs/1904.07403>`_.
 
     Parameters
     ----------
@@ -26,7 +26,6 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'positive_definite': [bool, [0, 1]]}
-
 
     def __init__(self, positive_definite=True, n_jobs=None):
         self.n_jobs = n_jobs
@@ -52,7 +51,7 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        validate_params(self.get_params(),self._hyperparameters)\
+        validate_params(self.get_params(), self._hyperparameters)
 
         self._is_fitted = True
         return self

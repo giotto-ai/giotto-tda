@@ -51,17 +51,18 @@ signal_embedded_fixed = \
 
 
 def test_embedder_params():
-   parameters_type = 'not_defined'
-   embedder = TakensEmbedder(parameters_type=parameters_type)
-   msg = 'The embedding parameters type %s is not supported'
-   with pytest.raises(ValueError, match=msg % parameters_type):
-       embedder.fit(signal)
+    parameters_type = 'not_defined'
+    embedder = TakensEmbedder(parameters_type=parameters_type)
+    msg = 'The embedding parameters type %s is not supported'
+    with pytest.raises(ValueError, match=msg % parameters_type):
+        embedder.fit(signal)
+
 
 def test_embedder_not_fitted():
     embedder = TakensEmbedder()
-
     with pytest.raises(NotFittedError):
         embedder.transform(signal)
+
 
 @pytest.mark.parametrize("parameters_type, expected",
                          [('search', signal_embedded_search),
@@ -70,6 +71,7 @@ def test_embedder_transform(parameters_type, expected):
     embedder = TakensEmbedder(parameters_type=parameters_type)
 
     assert_almost_equal(embedder.fit_transform(signal), expected)
+
 
 def test_window_params():
     window = SlidingWindow(width=signal.shape[0] + 1)
