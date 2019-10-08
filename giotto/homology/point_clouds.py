@@ -46,8 +46,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         connected by an edge, and topological features at scales larger than
         this value will not be detected.
 
-    homology_dimensions : list, optional, default: [0, 1]
-        List of dimensions (non-negative integers). Topological holes of each
+    homology_dimensions : list, optional, default: (0, 1)
+        List of dimensions (non-negative integers). Topological voids in each
         of these dimensions will be detected.
 
     n_jobs : int or None, optional, default: None
@@ -58,7 +58,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=[0, 1], n_jobs=None):
+                 homology_dimensions=(0, 1), n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
