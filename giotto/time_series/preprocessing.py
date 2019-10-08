@@ -1,11 +1,10 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
 # License: Apache 2.0
 
 from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
 from ..utils.validation import validate_params
+from sklearn.utils.validation import check_array, column_or_1d
 import numpy as np
 
 
@@ -69,6 +68,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
+        check_array(X)
+
         X = X.reshape((-1, 1))
 
         self._n_features = X.shape[1]
@@ -95,6 +96,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_n_features'])
+        X = check_array(X, copy=True)
 
         X = X.reshape((-1, self._n_features))
         Xt = X[::self.period]
@@ -122,9 +124,9 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_n_features'])
+        yt = column_or_1d(y).copy()
 
         yt = y[::self.period]
-
         return yt
 
 
@@ -164,20 +166,10 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     >>> plt.plot(signal_stationarized)
 
     """
-    valid_operations = ['return', 'log-return']
+    _hyperparameters = {'operation': [str, ['return', 'log-return']]}
 
     def __init__(self, operation='return'):
         self.operation = operation
-
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-
-        """
-        if self.operation not in \
-                self.valid_operations:
-            raise ValueError("The stationarization operation {} is not"
-                             " supported".format(self.operation))
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -199,7 +191,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
             Returns self.
 
         """
-        self._validate_params()
+        validate_params(self.get_params, self._hyperparameters)
+        check_array(X)
 
         self._is_fitted = True
         return self
@@ -225,8 +218,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
+        Xt = check_array(X, copy=True)
 
-        Xt = X
         if self.operation == 'return':
             Xt = np.diff(Xt, n=1, axis=0) / Xt[1:, :]
         else:  # 'log-return' operation
@@ -255,6 +248,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
+        yt = column_or_1d(y).copy()
 
         yt = y[1:]
 
