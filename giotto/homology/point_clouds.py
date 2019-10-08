@@ -126,8 +126,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         persistence diagram/barcode as an array of triples [b, d, k], each
         representing a persistent topological feature in dimension k which
         appears at the scale defined by b and disappears at the scale defined
-        by d. d cannot exceed ``max_edge_length``; when d > 0, k is restricted
-        to belong to ``homology_dimensions``.
+        by d. d cannot exceed ``max_edge_length``; k belongs to
+        ``homology_dimensions``, or is ``np.inf`` in the case of padded
+        bars.
 
 
         Parameters
