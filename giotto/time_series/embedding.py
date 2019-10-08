@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
-from joblib import Parallel, delayed, effective_n_jobs
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 from ..utils.validation import validate_params
 
