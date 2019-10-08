@@ -11,9 +11,9 @@ from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of persistent entropy from a collection
+    """Transformer for the calculation of persistence entropy from a collection
     of persistence diagrams. Given a generic persistence diagram consisting of
-    birth-death-dimension tuples (b, d, k), its k-persistent entropy is simply
+    birth-death-dimension tuples (b, d, k), its k-persistence entropy is simply
     the (base e) entropy of the collection of differences d - b for points of
     homology dimension k, normalized by the sum of all such differences.
 
@@ -63,7 +63,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's persistent entropy.
+        dimension k, computes that subdiagram's persistence entropy.
 
         Parameters
         ----------
