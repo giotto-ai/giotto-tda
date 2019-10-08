@@ -42,13 +42,14 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         efficient than passing the metric name as a string.
         Distance matrices are not supported.
         Valid values for metric are:
-        - from scikit-learn: ['cityblock', 'cosine', 'euclidean', 'l1', 'l2',
-          'manhattan']
-        - from scipy.spatial.distance: ['braycurtis', 'canberra', 'chebyshev',
-          'correlation', 'dice', 'hamming', 'jaccard', 'kulsinski',
-          'mahalanobis', 'minkowski', 'rogerstanimoto', 'russellrao',
-          'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean',
-          'yule']
+        - from scikit-learn: ['cityblock', 'cosine', 'euclidean', 'l1',
+        'l2', 'manhattan']
+        - from scipy.spatial.distance: ['braycurtis', 'canberra',
+        'chebyshev', 'correlation', 'dice', 'hamming', 'jaccard',
+        'kulsinski', 'mahalanobis', 'minkowski', 'rogerstanimoto',
+        'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath',
+        'sqeuclidean', 'yule']
+
         See the documentation for scipy.spatial.distance for details on these
         metrics.
 
