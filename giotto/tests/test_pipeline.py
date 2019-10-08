@@ -1,4 +1,3 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
 # License: Apache 2.0
 
 import giotto as gt
