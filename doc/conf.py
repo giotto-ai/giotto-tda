@@ -12,6 +12,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +23,6 @@ author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -46,7 +46,6 @@ extensions = [
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_class_members_toctree = False
 
-
 # For maths, use mathjax by default and svg if NO_MATHJAX env variable is set
 # (useful for viewing the doc offline)
 if os.environ.get('NO_MATHJAX'):
@@ -56,7 +55,6 @@ else:
     extensions.append('sphinx.ext.mathjax')
     mathjax_path = ('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/'
                     'MathJax.js?config=TeX-AMS_SVG')
-
 
 autodoc_default_flags = ['members', 'inherited-members']
 

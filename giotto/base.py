@@ -11,12 +11,14 @@ class TransformerResamplerMixin:
         """Fit to data, then transform it.
         Fits transformer to X and y with optional parameters fit_params
         and returns a transformed version of X.
+
         Parameters
         ----------
         X : numpy array of shape [n_samples, n_features]
             Training set.
         y : numpy array of shape [n_samples]
             Target values.
+
         Returns
         -------
         X_new : numpy array of shape [n_samples, n_features_new]
@@ -35,12 +37,14 @@ class TransformerResamplerMixin:
         """Fit to data, then transform it.
         Fits transformer to X and y with optional parameters fit_params
         and returns a transformed version of X.
+
         Parameters
         ----------
         X : numpy array of shape [n_samples, n_features]
             Training set.
         y : numpy array of shape [n_samples]
             Target values.
+
         Returns
         -------
         X_new : numpy array of shape [n_samples, n_features_new]
@@ -52,12 +56,14 @@ class TransformerResamplerMixin:
         """Fit to data, then transform it.
         Fits transformer to X and y with optional parameters fit_params
         and returns a transformed version of X.
+
         Parameters
         ----------
         X : numpy array of shape [n_samples, n_features]
             Training set.
         y : numpy array of shape [n_samples]
             Target values.
+
         Returns
         -------
         X_new : numpy array of shape [n_samples, n_features_new]
