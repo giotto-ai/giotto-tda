@@ -206,7 +206,7 @@ Welcome to giotto's API reference!
       neural_network.KerasClassifierWrapper
       neural_network.KerasRegressorWrapper
 
-
+..
    :mod:`giotto.model_selection`: Hyper-parameter search extension
    ===============================================================
 
