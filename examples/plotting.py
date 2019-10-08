@@ -1,19 +1,21 @@
+"""Plot functions """
+
 import numpy as np
 import plotly.graph_objs as gobj
 
+
 def plot_diagram(diagram, homology_dimensions=None):
-    '''
-    Plots one persistence diagram.
+    """Plots one persistence diagram.
 
     Parameters
     ----------
     diagram : dict of np.arrays of shape (*,2)
         The persistence diagram to plot, where the keys of the dict correspond to homology dimensions and each
-        entry is the collection of (birth,death) points in R^2 of the corresponding homology dimension. 
+        entry is the collection of (birth,death) points in R^2 of the corresponding homology dimension.
     homology_dimensions : list of ints, default None
         The list of homology dimensions that will appear on the plot. None means that all the homology dimensions
         contained in diagram will be plotted.
-    '''
+    """
     if homology_dimensions is None:
         homology_dimensions = diagram.keys()
 
@@ -69,8 +71,7 @@ def plot_diagram(diagram, homology_dimensions=None):
 
 
 def plot_landscapes(landscape, homology_dimensions=None):
-    '''
-    Plots the landscapes by homology dimension.
+    """Plots the landscapes by homology dimension.
 
     Parameters
     ----------
@@ -79,7 +80,7 @@ def plot_landscapes(landscape, homology_dimensions=None):
     homology_dimensions : list of ints, default None
         The list of homology dimensions for which the landscape is plotted. None means that the landscape of
         every homology dimension is plotted.
-    '''
+    """
     if homology_dimensions is None:
         homology_dimensions = landscape.keys()
 
@@ -123,8 +124,8 @@ def plot_landscapes(landscape, homology_dimensions=None):
 
 
 def plot_betti_curves(betti_curves, homology_dimensions=None):
-    '''
-    Plots the Betti curves of different homology dimensions on the same plot.
+    """ Plots the Betti curves of different homology dimensions on the same
+    plot.
 
     Parameters
     ----------
@@ -133,7 +134,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None):
     homology_dimensions : list of ints, default None
         The list of homology dimensions that will appear on the plot. None means that the Betti curves of every homology
         dimension contained in betti_curves will be plotted.
-    '''
+    """
     if homology_dimensions is None:
         homology_dimensions = betti_curves.keys()
 
@@ -189,7 +190,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None):
 
 
 def plot_betti_surfaces(betti_curves, homology_dimensions=None):
-    '''
+    """
     Plots the Betti surfaces (Betti number against time and epsilon) by homology dimension.
 
     Parameters
@@ -199,7 +200,7 @@ def plot_betti_surfaces(betti_curves, homology_dimensions=None):
     homology_dimensions : list of ints, default None
         The list of homology dimensions for which the Betti surface is plotted. None means that the Betti surface of
         every homology dimension is plotted.
-    '''
+    """
     if homology_dimensions is None:
         homology_dimensions = betti_curves[0].keys()
 
