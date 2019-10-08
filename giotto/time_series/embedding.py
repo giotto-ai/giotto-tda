@@ -6,8 +6,8 @@ from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils._joblib import Parallel, delayed
-from sklearn.utils.validation import check_is_fitted
+from joblib import Parallel, delayed, effective_n_jobs
+from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 from ..utils.validation import validate_params
 
 import numpy as np
@@ -67,11 +67,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-
-        if X.shape[0] < self.width:
-            raise ValueError("X of length {} does not have enough points"
-                             " to have a single window of width {}."
-                             "".format(X.shape[0], self.width))
+        check_array(X)
 
         self._is_fitted = True
         return self
@@ -89,17 +85,13 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_windows, n_samples_window,
+        Xt : ndarray, shape (n_windows, n_samples_window,
             n_features)
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
-        if X.shape[0] < self.width:
-            raise ValueError("X of length {} does not have enough points"
-                             " to have a single window of width {}."
-                             "".format(X.shape[0]), self.width)
+        X = check_array(X)
 
         window_slices = self._slice_windows(X)
 
@@ -127,14 +119,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
-        if X.shape[0] < self.width:
-            raise ValueError("X of length {} does not have enough points"
-                             " to have a single window of width {}."
-                             "".format(X.shape[0]), self.width)
+        yt = column_or_1d(y).copy()
 
         yt = y[self.width - 1 :: self.stride]
-
         return yt
 
 
@@ -164,26 +151,26 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     ----------
     parameters_type: 'search' | 'fixed', default: 'search'
         If set to 'fixed' and if values for ``embedding_time_delay`` and
-        ``embedding_dimension`` are provided, these values are used in
+        ``dimension`` are provided, these values are used in
         ``transform()``.
         If set to 'search' and if ``embedding_time_delay`` and
-        ``embedding_dimension`` are not set, optimal values are
+        ``dimension`` are not set, optimal values are
         automatically found for those parameters using mutual information
-        (``embedding_time_delay``) and false nearest neighbors (
-        ``embedding_dimension``) criteria.
-        If set to 'search' and if ``embedding_time_delay`` and
-        ``embedding_dimension`` are set, a similar optimization is carried
+        (`time_delay``) and false nearest neighbors (
+        ``dimension``) criteria.
+        If set to 'search' and if ``time_delay`` and
+        ``dimension`` are set, a similar optimization is carried
         out, but the final values are constrained to be not greater than the
         values initially set.
 
     time_delay: int, default: 1
         Time delay between two consecutive values for constructing one
-        embedded point. If ``embedding_parameters_type`` is 'search',
+        embedded point. If ``parameters_type`` is 'search',
         it corresponds to the maximal embedding time delay that will be
         considered.
 
     dimension: int, default: 5
-        Dimension of the embedding space. If ``embedding_parameters_type`` is
+        Dimension of the embedding space. If ``parameters_type`` is
         'search', it corresponds to the maximum embedding dimension that will
         be considered.
 
@@ -239,7 +226,10 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     Optimal embedding dimension based on false nearest neighbors: 3
 
     """
-    implemented_parameters_types = ['fixed', 'search']
+    _hyperparameters = {'parameters_type': [str,  ['fixed', 'search']],
+                        'time_delay': [int, (1, np.inf)],
+                        'dimension': [int, (1, np.inf)],
+                        'stride': [int, (1, np.inf)]}
 
     def __init__(self, parameters_type='search', time_delay=1, dimension=5,
                  stride=1, n_jobs=None):
@@ -248,17 +238,6 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         self.dimension = dimension
         self.stride = stride
         self.n_jobs = n_jobs
-
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-        """
-
-        if self.parameters_type not in \
-                self.implemented_parameters_types:
-            raise ValueError(
-                'The embedding parameters type %s is not supported' %
-                self.parameters_type)
 
     @staticmethod
     def _embed(X, time_delay, dimension, stride):
@@ -334,7 +313,8 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         self : object
             Returns self.
         """
-        self._validate_params()
+        validate_params(self.get_params(), self._hyperparameters)
+        check_array(X)
 
         if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -377,8 +357,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape (n_points,
-        dimension_)
+        Xt : ndarray, shape (n_points, n_dimension_)
             Array of embedded point cloud per outer window.
             ``n_outer_windows`` is  ``(n_samples - outer_window_duration) //
             outer_window_stride + 1``, and ``n_points`` is ``(
@@ -386,9 +365,9 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
             dimension) // stride + 1``.
 
         """
-
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
+        X = check_array(X)
 
         Xt = self._embed(X, self.time_delay_, self.dimension_, self.stride)
         return Xt
@@ -414,7 +393,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
+        yt = column_or_1d(y).copy()
 
         yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
-
         return yt
