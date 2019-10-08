@@ -39,13 +39,10 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         self.stride = stride
 
     def _slice_windows(self, X):
-        n_windows = (X.shape[0] - self.width) \
-                    // self.stride + 1
+        n_windows = (X.shape[0] - self.width) // self.stride + 1
 
-        window_slices = [
-            (i * self.stride, self.width + i * self.stride)
-            for i in range(n_windows)
-        ]
+        window_slices = [(i * self.stride, self.width + i * self.stride)
+                         for i in range(n_windows)]
         return window_slices
 
     def fit(self, X, y=None):
@@ -133,22 +130,22 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         yt = y[self.width - 1:: self.stride]
 
+        yt = y[self.width - 1:: self.stride]
         return yt
 
 
 class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
-    r"""Transformer returning a representation of a scalar-valued time series as
-    a time series of point clouds.
+    r"""Transformer returning a representation of a scalar-valued time
+    series as a time series of point clouds.
 
-    Based on the following time-delay embedding
-    technique named after `F. Takens <https://doi.org/10.1007/BFb0091924>`_:
-    given a time series :math:`X(t)`, one extracts a set of vectors in
-    :math:`\mathbb{R}^d`, each of the form
-        :math:`\Xi_i := [X(t_i), X(t_i + \tau), ..., X(t_i + (d-1)\tau)]`.
-    The set :math:`\{\Xi_i\}` is called the Takens embedding of the time
-    series, :math:`\tau` is called the embedding time delay, :math:`d` is
-    called the embedding dimension, and the difference between :math:`t_i` and
-    :math:`t_{i-1}` is called the embedding stride.
+    Based on the following time-delay embedding technique named after `F.
+    Takens <https://doi.org/10.1007/BFb0091924>`_: given a time series
+    :math:`X(t)`, one extracts a set of vectors in :math:`\mathbb{R}^d`,
+    each of the form :math:`\Xi_i := [X(t_i), X(t_i + \tau), ..., X(t_i + (
+    d-1)\tau)]`. The set :math:`\{\Xi_i\}` is called the Takens embedding of
+    the time series, :math:`\tau` is called the embedding time delay,
+    :math:`d` is called the embedding dimension, and the difference between
+    :math:`t_i` and :math:`t_{i-1}` is called the embedding stride.
 
     If :math:`d` and :math:`\tau` are not explicitly set by the user, suitable
     values are calculated during ``fit()``.
@@ -272,7 +269,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
-        """This function calculates the mutual information given the delay
+        """This function calculates the mutual information given the delay.
         """
         contingency = np.histogram2d(X.reshape((-1,))[:-time_delay],
                                      X.reshape((-1,))[time_delay:],
@@ -285,7 +282,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     def _false_nearest_neighbors(X, time_delay, dimension,
                                  stride=1):
         """Calculates the number of false nearest neighbours of embedding
-        dimension"""
+        dimension. """
         X_embedded = TakensEmbedder._embed(X, time_delay, dimension, stride)
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
@@ -315,8 +312,8 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
-        work in pipelines.
+        This method is just there to implement the usual API and hence work
+        in pipelines.
 
         Parameters
         ----------
@@ -415,5 +412,4 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['time_delay_', 'dimension_'])
 
         yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
-
         return yt

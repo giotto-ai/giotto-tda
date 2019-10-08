@@ -85,8 +85,8 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
         X = check_diagram(X)
 
-        Xt = X
-        Xt[:, :, 2] = np.nan
+        Xt = X.copy()
+        Xt[:, :, 2] = np.inf
         return Xt
 
 

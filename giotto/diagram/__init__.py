@@ -6,7 +6,7 @@ It also makes it possible to calculate distance matrices.
 """
 
 from .distance import DiagramDistance, DiagramAmplitude
-from .features import PersistentEntropy
+from .features import PersistentEntropy, BettiCurve, PersistenceLandscape, HeatKernel
 from .preprocessing import DiagramStacker, DiagramScaler, DiagramFilter
 
 __all__ = [
@@ -18,4 +18,5 @@ __all__ = [
     'PersistentEntropy',
     'BettiCurve',
     'PersistenceLandscape'
+    'HeatKernel'
 ]
