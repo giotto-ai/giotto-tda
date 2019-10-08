@@ -23,7 +23,7 @@ Welcome to giotto's API reference!
    time_series.Resampler
    time_series.Stationarizer
 
-   time_series.TakensEmbedder
+   time_series.TakensEmbedding
 
    time_series.OrdinalRepresentation
    time_series.Entropy
