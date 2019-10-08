@@ -100,6 +100,11 @@ Welcome to giotto's API reference!
    :template: class.rst
 
    pipeline.Pipeline
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
    pipeline.make_pipeline
 
 
@@ -201,7 +206,7 @@ Welcome to giotto's API reference!
       neural_network.KerasClassifierWrapper
       neural_network.KerasRegressorWrapper
 
-
+..
    :mod:`giotto.model_selection`: Hyper-parameter search extension
    ===============================================================
 
