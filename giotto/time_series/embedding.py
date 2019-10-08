@@ -10,8 +10,6 @@ from sklearn.utils._joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from ..utils.validation import validate_params
 
-import numpy as np
-
 
 class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """Concatenates results of multiple transformer objects.
