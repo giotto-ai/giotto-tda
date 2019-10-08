@@ -1,16 +1,14 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
-# License: TBD
+# License: Apache 2.0
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._joblib import Parallel, delayed
+from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
 
 
 class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
-    """Given a collection of graphs presented as adjacency matrices,
+    """Given a collection of graphs presented as sparse adjacency matrices,
     this transformer calculates for each graph the length of the shortest
     path between any of its two vertices. The result is a collection of
     dense distance matrices of variable size.
@@ -105,7 +103,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray of float, shape (n_samples, ) or
+        Xt : ndarray of float, shape (n_samples, ) or
         (n_samples, n_vertices, n_vertices)
             Resulting array of distance matrices. If the distance matrices
             have variable size across samples, X is one-dimensional.
@@ -116,7 +114,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         n_samples = X.shape[0]
 
-        X_transformed = Parallel(n_jobs=self.n_jobs)(
+        Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._geodesic_distance)(X[i]) for i in range(n_samples))
-        X_transformed = np.array(X_transformed)
-        return X_transformed
+        Xt = np.array(Xt)
+        return Xt

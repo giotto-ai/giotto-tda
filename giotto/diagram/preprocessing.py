@@ -76,7 +76,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : dict of None: ndarray
+        Xt : dict of None: ndarray
             Dictionary with a single ``None`` key, and corresponding value an
             ndarray of shape (n_samples, :math:`\\sum_{\\mathrm{d}}` M_d, 2).
 

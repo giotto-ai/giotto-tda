@@ -1,7 +1,4 @@
-# Authors: Guillaume Tauzin <guillaume.tauzin@epfl.ch>
-#          Umberto Lupo <u.lupo@l2f.ch>
-#          Philippe Nguyen <p.nguyen@l2f.ch>
-# License: TBD
+# License: Apache 2.0
 
 import warnings
 
@@ -9,7 +6,7 @@ import numpy as np
 from scipy import sparse as sp
 from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._joblib import Parallel, delayed
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 
 
@@ -51,14 +48,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    @staticmethod
-    def _validate_params():
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-        """
-        pass
-
     def _make_adjacency_matrix(self, X):
+        Xm = np.argsort(X, axis=1)
         indices = np.unique(X, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
@@ -92,7 +83,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
             Returns self.
 
         """
-        self._validate_params()
 
         self._is_fitted = True
         return self
@@ -114,7 +104,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : array of sparse boolean matrices, shape (n_samples, )
+        Xt : array of sparse boolean matrices, shape (n_samples, )
             The collection of ``n_samples`` transition graphs. Each transition
             graph is encoded by a sparse matrix of boolean type.
 
@@ -124,8 +114,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         n_samples = X.shape[0]
 
-        X_transformed = Parallel(n_jobs=self.n_jobs)(
+        Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
-            range(n_samples))
-        X_transformed = np.array(X_transformed)
-        return X_transformed
+            range(X.shape[0]))
+        Xt = np.array(Xt)
+        return Xt

@@ -7,7 +7,7 @@ import math as m
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
-from sklearn.utils._joblib import Parallel, delayed
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from ..utils.validation import validate_params
 

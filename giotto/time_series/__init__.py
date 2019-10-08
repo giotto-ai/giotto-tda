@@ -3,7 +3,7 @@
 """
 
 from .embedding import SlidingWindow, TakensEmbedder
-from .permutations import OrdinalRepresentation, Entropy
+from .features import PermutationEntropy
 from .preprocessing import Resampler, Stationarizer
 from .multivariate import PearsonCorrelation
 from .target import Labeller
@@ -11,8 +11,7 @@ from .target import Labeller
 __all__ = [
     'Resampler',
     'Stationarizer',
-    'OrdinalRepresentation',
-    'Entropy',
+    'PermutationEntropy',
     'TakensEmbedder',
     'SlidingWindow',
     'Labeller',

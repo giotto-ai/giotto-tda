@@ -4,7 +4,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from ..utils import validate_params
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 
 
 class PearsonCorrelation(BaseEstimator, TransformerMixin):
@@ -14,16 +14,10 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    len_vector : int, optional, default: 8
-        Used for performance optimization by exploiting numpy's
-        vectorization capabilities.
-
-    n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
-
+    positive_definite : bool, default: True
+        Whether the correlation should be output as a positive definite matrix.
     """
+    _hyperparameters = {'positive_definite': [bool, (0, 1)]}
 
     _hyperparameters = {'positive_definite': [bool, [0, 1]]}
 
@@ -52,6 +46,7 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
+        check_array(X)
 
         self._is_fitted = True
         return self
@@ -76,11 +71,12 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
+        X = check_array(X)
 
         n_features = X.shape[1]
 
         Xt = np.corrcoef(X.T)
         if self.positive_definite:
-            Xt = np.ones((n_features, n_features))-np.abs(Xt)
+            Xt = np.ones((n_features, n_features)) - np.abs(Xt)
 
         return Xt
