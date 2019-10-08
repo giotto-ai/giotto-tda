@@ -1,13 +1,11 @@
 # License: Apache 2.0
 
-import itertools
-
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
-from ._utils import _discretize, _pad
+from ._utils import _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
