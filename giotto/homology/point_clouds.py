@@ -4,7 +4,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors.base import VALID_METRICS
-from sklearn.utils._joblib import Parallel, delayed
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from ._utils import _pad_diagram
 

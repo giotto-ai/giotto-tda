@@ -7,7 +7,7 @@ from giotto_bottleneck import bottleneck_distance \
 from giotto_wasserstein import wasserstein_distance \
     as pairwise_wasserstein_distance
 from scipy.ndimage import gaussian_filter
-from sklearn.utils._joblib import Parallel, delayed, effective_n_jobs
+from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils.validation import _num_samples
 from sklearn.utils import gen_even_slices
 from ._utils import _subdiagrams

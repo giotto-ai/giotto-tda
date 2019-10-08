@@ -2,7 +2,7 @@
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._joblib import Parallel, delayed, effective_n_jobs
+from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import gen_even_slices
 from ..utils.validation import check_diagram
