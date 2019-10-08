@@ -42,7 +42,7 @@ def get_steps():
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.DiagramScaler()),
         ('filter', diag.DiagramFilter(delta=0.1)),
-        ('entropy', diag.PersistentEntropy()),
+        ('entropy', diag.PersistenceEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
    ]
     return steps

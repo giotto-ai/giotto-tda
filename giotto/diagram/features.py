@@ -10,7 +10,7 @@ from ._utils import _subdiagrams, _discretize
 from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 
-class PersistentEntropy(BaseEstimator, TransformerMixin):
+class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of persistent entropy from a collection
     of persistence diagrams. Given a generic persistence diagram consisting of
     birth-death-dimension tuples (b, d, k), its k-persistent entropy is simply

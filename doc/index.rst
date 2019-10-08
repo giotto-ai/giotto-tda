@@ -148,7 +148,7 @@ Welcome to giotto's API reference!
    diagram.DiagramDistance
    diagram.DiagramAmplitude
 
-   diagram.PersistentEntropy
+   diagram.PersistenceEntropy
    diagram.PersistenceLandscape
    diagram.BettiCurve
    diagram.HeatKernel
