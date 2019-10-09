@@ -178,7 +178,7 @@ def wasserstein_amplitudes(diagrams, p=1., **kwargs):
 
 def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., order=2,
                           **kwargs):
-    heat = heat(diagrams, sampling, step_size, sigma)
+    heat = heats(diagrams, sampling, step_size, sigma)
     return np.linalg.norm(heat, ord=order)
 
 
