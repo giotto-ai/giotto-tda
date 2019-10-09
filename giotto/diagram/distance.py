@@ -78,10 +78,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -122,10 +124,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -215,10 +219,12 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -258,10 +264,12 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
