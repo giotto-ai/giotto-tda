@@ -54,7 +54,6 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         check_array(X, allow_nd=True)

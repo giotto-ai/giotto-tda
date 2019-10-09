@@ -80,10 +80,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
-
         self._is_fitted = True
         return self
 
