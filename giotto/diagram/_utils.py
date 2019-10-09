@@ -8,17 +8,20 @@ def _rotate_clockwise(X):
     rot_mat = (np.sqrt(2) / 2.) * np.array([[1, -1, 0], [1, 1, 0], [0, 0, 1]])
     return np.dot(X, rot_mat)
 
+
 def _rotate_anticlockwise(X):
     rot_mat = (np.sqrt(2) / 2.) * np.array([[1, 1, 0], [-1, 1, 0], [0, 0, 1]])
     return np.dot(X, rot_mat)
 
+
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     for dim in homology_dimensions:
-        Xs = X[X[:,:,2] == dim]
+        Xs = X[X[:, :, 2] == dim]
         Xs = Xs.reshape(X.shape[0], -1, 3)
     if remove_dim:
         Xs = Xs[:, :, :2]
     return Xs
+
 
 def _pad(X, max_betti_numbers):
     X_padded = {dim: np.pad(
@@ -27,11 +30,13 @@ def _pad(X, max_betti_numbers):
         (0, 0)), 'constant') for dim in X.keys()}
     return X_padded
 
+
 def _sort(Xs, homology_dimensions):
     indices = np.argsort(Xs[:, :, 1] - Xs[:, :, 0], axis=1)
     indices = np.stack([indices, indices, indices], axis=2)
     Xs = np.flip(np.take_along_axis(Xs, indices, axis=1), axis=1)
     return Xs
+
 
 def _filter(Xs, filtered_homology_dimensions, cutoff):
     homology_dimensions = sorted(list(set(Xs[0, :, 2])))
@@ -53,6 +58,7 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
         Xf = np.concatenate([Xf, Xdim], axis=1)
     return Xf
 
+
 def _discretize(X, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
 
@@ -67,7 +73,7 @@ def _discretize(X, n_values=100, **kw_args):
                  for dim in homology_dimensions }
 
     samplings = { dim: (np.linspace(min_vals[dim], max_vals[dim],
-                                    num=n_values)).reshape(-1, 1 ,1)
+                                    num=n_values)).reshape(-1, 1, 1)
                   for dim in homology_dimensions }
     step_sizes = { dim: (samplings[dim][1] - samplings[dim][0])
                    for dim in homology_dimensions }
