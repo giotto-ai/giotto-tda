@@ -12,13 +12,14 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of `persistence diagrams <LINK TO
-    GLOSSARY>`_ (equivalently, `persistence barcodes <LINK TO GLOSSARY>`_)
-    resulting from `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_. Given a
-    `point cloud <LINK TO GLOSSARY>`_ in Euclidean space or an abstract
-    `metric space <LINK TO GLOSSARY>`_ encoded by a distance matrix,
-    information about the appearance and disappearance of "topological
-    voids" (technically, `homology classes <LINK TO GLOSSARY>`_) of various
+    """`Persistence diagrams <LINK TO GLOSSARY>`_ (equivalently,
+    `persistence barcodes <LINK TO GLOSSARY>`_) resulting from
+    `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_.
+
+    Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space,
+    or an abstract `metric space <LINK TO GLOSSARY>`_ encoded by a distance
+    matrix, information about the appearance and disappearance of topological
+    features (technically, `homology classes <LINK TO GLOSSARY>`_) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
@@ -41,10 +42,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     max_edge_length : float, optional, default: np.inf
         Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter.
-        Points whose distance is greater than this value will never be
-        connected by an edge, and topological features at scales larger than
-        this value will not be detected.
+        parameter. Points whose distance is greater than this value will
+        never be connected by an edge, and topological features at scales
+        larger than this value will not be detected.
 
     homology_dimensions : iterable, optional, default: (0, 1)
         Dimensions (non-negative integers) of the topological voids to be
@@ -121,9 +121,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Compute, for each point cloud or distance matrix in X, the relevant
-        persistence diagram as an array of triples [b, d, k]. When k is
+        persistence diagram as an array of triples [b, d, q]. When q is
         not equal to ``np.inf``, each triple represents a persistent
-        topological feature in dimension k (belonging to
+        topological feature in dimension q (belonging to
         ``homology_dimensions``) which is born at b and dies at d. Triples
         ``[0., 0., np.inf]`` are used for padding, as the number of persistent
         topological features is generally different between different entries
