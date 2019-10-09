@@ -305,7 +305,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         self : object
-            Returns self.
+
         """
         validate_params(self.get_params(), self._hyperparameters)
         check_array(X)

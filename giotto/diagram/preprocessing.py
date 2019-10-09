@@ -50,7 +50,6 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         self._validate_params()
@@ -178,7 +177,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
+
         """
         if self.metric_params is None:
             self.effective_metric_params_ = {}
@@ -309,7 +308,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
+
         """
         X = check_diagram(X)
 

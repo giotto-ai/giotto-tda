@@ -72,7 +72,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -81,7 +80,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence subdiagram corresponding to an homology
+        """For each persistence diagram, computes  corresponding to homology
         dimension k, computes that subdiagram's persistence entropy.
 
         Parameters
@@ -123,7 +122,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the betti curves from a collection
+    """Transformer for the calculation of the Betti curves from a collection
     of persistence diagrams. Given a generic persistence diagram consisting of
     birth-death-dimension tuples (b, d, k), its k-betti curve is simply
     the number of persistent points of homology dimension k alive at changing
@@ -168,7 +167,6 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -264,7 +262,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -297,7 +294,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions,
         n_layers, n_values)
-            Array of the persitence landscapes of the diagrams in X.
+            Array of the persistence landscapes of the diagrams in X.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
@@ -363,7 +360,6 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)

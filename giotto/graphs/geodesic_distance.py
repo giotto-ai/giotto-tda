@@ -78,7 +78,6 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         self._validate_params()

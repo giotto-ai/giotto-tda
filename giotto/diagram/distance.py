@@ -92,7 +92,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         if self.metric_params is None:
@@ -233,7 +232,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         if self.metric_params is None:
