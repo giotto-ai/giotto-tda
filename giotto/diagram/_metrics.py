@@ -42,21 +42,19 @@ def _heat(heat, sampled_diag, sigma):
     heat[unique] = counts
     heat[:, :] = gaussian_filter(heat, sigma, mode='reflect')
 
-
 def heats(diagrams, sampling, step_size, sigma):
-    heats_ = np.zeros(
-        (diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
-    sampled_diags = np.array((diagrams - sampling[0]) / step_size, dtype=int)
-    [_heat(heats_[i], sampled_diag, sigma) for i, sampled_diag in
-     enumerate(sampled_diags)]
+    heats_ = np.zeros((diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
+    sampled_diags = np.copy(diagrams)
+    sampled_diags[diagrams < sampling[0]] = sampling[0]
+    sampled_diags[diagrams > sampling[-1]] = sampling[-1]
+    sampled_diags = np.array((sampled_diags - sampling[0]) / step_size, dtype=int)
+    [_heat(heats_[i], sampled_diag, sigma) for i, sampled_diag in enumerate(sampled_diags)]
     heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
-    heats_ = np.rot90(heats_, k=1, axes=(1, 2))
+    heats_ = np.rot90(heats_, k=1, axes=(1,2))
     return heats_
-
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
-    sampling = sampling[:, None, None]
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
@@ -68,7 +66,6 @@ def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
 
 def pairwise_landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
                                  p=2., n_layers=1, **kwargs):
-    sampling = sampling[:, None, None]
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
@@ -106,12 +103,12 @@ def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
 
 def kernel_heat_distance(diagrams_1, diagrams_2, sampling, step_size,
                          sigma=1., p=2., **kwargs):
-    heat_1 = heats(diagrams_1, sampling, step_size, sigma). \
+    heat_1 = heats(diagrams_1, sampling, step_size, sigma).\
         reshape((diagrams_1.shape[0], -1))
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heats(diagrams_2, sampling, step_size, sigma). \
+    heat_2 = heats(diagrams_2, sampling, step_size, sigma).\
         reshape((diagrams_2.shape[0], -1))
     unnorm_dist = cdist(heat_1, heat_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
@@ -123,21 +120,19 @@ implemented_metric_recipes = {'bottleneck': kernel_bottleneck_distance,
                               'betti': pairwise_betti_distances,
                               'heat': kernel_heat_distance}
 
-
 def _matrix_wrapper(distance_func, distance_matrices, slice_, dim,
                     *args, **kwargs):
     distance_matrices[:, slice_, int(dim)] = distance_func(*args, **kwargs)
-
 
 def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
     metric_func = implemented_metric_recipes[metric]
     homology_dimensions = sorted(list(set(X1[0, :, 2])))
 
     effective_metric_params = metric_params.copy()
-    samplings = effective_metric_params.pop('samplings', {
-        dim: None for dim in homology_dimensions})
-    step_sizes = effective_metric_params.pop('step_sizes', {
-        dim: None for dim in homology_dimensions})
+    samplings = effective_metric_params.pop('samplings',
+        {dim: None for dim in homology_dimensions})
+    step_sizes = effective_metric_params.pop('step_sizes',
+        {dim: None for dim in homology_dimensions})
 
     if X2 is None:
         X2 = X1
@@ -151,7 +146,7 @@ def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
 
     distance_matrices = np.concatenate(distance_matrices, axis=1)
     distance_matrices = np.stack(
-        [distance_matrices[:, i * X2.shape[0]: (i + 1) * X2.shape[0]]
+        [distance_matrices[:, i*X2.shape[0]: (i+1)*X2.shape[0]]
          for i in range(len(homology_dimensions))], axis=2)
     return distance_matrices
 
@@ -172,7 +167,6 @@ def bottleneck_amplitudes(diagrams, **kwargs):
     dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
 
-
 def wasserstein_amplitudes(diagrams, p=1., **kwargs):
     dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=p)
@@ -189,20 +183,18 @@ implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'betti': betti_amplitudes,
                                  'heat': kernel_heat_amplitude}
 
-
 def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,
                     *args, **kwargs):
     amplitude_arrays[slice_, int(dim)] = amplitude_func(*args, **kwargs)
-
 
 def _parallel_amplitude(X, metric, metric_params, n_jobs):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
     amplitude_func = implemented_amplitude_recipes[metric]
     effective_metric_params = metric_params.copy()
-    samplings = effective_metric_params.pop('samplings', {
-        dim: None for dim in homology_dimensions})
-    step_sizes = effective_metric_params.pop('step_sizes', {
-        dim: None for dim in homology_dimensions})
+    samplings = effective_metric_params.pop('samplings',
+        {dim: None for dim in homology_dimensions})
+    step_sizes = effective_metric_params.pop('step_sizes',
+        {dim: None for dim in homology_dimensions})
 
     amplitude_arrays = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
         _subdiagrams(X, [dim], remove_dim=True)[s], sampling=samplings[dim],
