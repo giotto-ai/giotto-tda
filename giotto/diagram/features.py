@@ -15,8 +15,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     in a collection.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    (b, d, k), its k-persistence entropy is simply the (base e) entropy of
-    the collection of differences d - b for points of homology dimension k,
+    [b, d, q], its q-persistence entropy is simply the (base e) entropy of
+    the collection of differences d - b for points of homology dimension q,
     normalized by the sum of all such differences.
 
     Parameters
@@ -51,9 +51,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -71,16 +71,16 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence diagram corresponding to homology
-        dimension k, compute that subdiagram's persistence entropy.
+        """For each persistence diagram, compute the vector of q-persistence
+        entropies corresponding to each available homology dimension q.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -113,11 +113,13 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the Betti curves from a collection
-    of persistence diagrams. Given a generic persistence diagram consisting of
-    birth-death-dimension tuples (b, d, k), its k-betti curve is simply
-    the number of persistent points of homology dimension k alive at changing
-    filtration values.
+    """`Betti curves <LINK TO GLOSSARY>`_ associated to persistence
+    diagrams, sampled at discrete values of the `filtration parameter
+    <LINK TO GLOSSARY>`_.
+
+    Given a persistence diagram consisting of birth-death-dimension triples
+    [b, d, q], its q-Betti curve is simply the number of persistent features
+    in homology dimension q alive at changing filtration values.
 
     Parameters
     ----------
@@ -146,9 +148,9 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -174,9 +176,9 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -209,7 +211,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of the persistence landscapes from a
     collection of persistence diagrams. Given a generic persistence diagram
-    consisting of birth-death-dimension tuples (b, d, k), their k-persistence
+    consisting of birth-death-dimension tuples (b, d, q), their q-persistence
     landscapes are TO DO.
 
     Parameters
@@ -241,9 +243,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -272,9 +274,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -307,7 +309,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 class HeatKernel(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of the persistence landscapes from a
     collection of persistence diagrams. Given a generic persistence diagram
-    consisting of birth-death-dimension tuples (b, d, k), their k-persistence
+    consisting of birth-death-dimension tuples (b, d, q), their q-persistence
     landscapes are TO DO.
 
     Parameters
@@ -339,9 +341,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -367,9 +369,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None

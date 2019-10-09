@@ -38,8 +38,8 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
             Triples in which k equals ``np.inf`` are used for padding and
             carry no information.
 
@@ -66,8 +66,8 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
             Triples in which k equals ``np.inf`` are used for padding and
             carry no information.
 
@@ -165,8 +165,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
             Triples in which k equals ``np.inf`` are used for padding and
             carry no information.
 
@@ -214,8 +214,8 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
             Triples in which k equals ``np.inf`` are used for padding and
             carry no information.
 
@@ -296,9 +296,9 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -326,9 +326,9 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
-            triples (b, d, k) representing persistent topological features
-            through their birth (b), death (d) and homology dimension (k).
-            Triples in which k equals ``np.inf`` are used for padding and
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
