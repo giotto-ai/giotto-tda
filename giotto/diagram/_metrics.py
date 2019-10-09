@@ -56,7 +56,6 @@ def heats(diagrams, sampling, step_size, sigma):
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
-    sampling = sampling[:, None, None]
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
@@ -68,7 +67,6 @@ def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
 
 def pairwise_landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
                                  p=2., n_layers=1, **kwargs):
-    sampling = sampling[:, None, None]
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
@@ -157,14 +155,13 @@ def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
-    bcs = betti_curves(diagrams, sampling.reshape(-1, 1, 1))
+    bcs = betti_curves(diagrams, sampling)
     return (step_size ** (1 / p)) * np.linalg.norm(bcs, axis=1, ord=p)
 
 
 def landscape_amplitudes(diagrams, sampling, step_size, p=2., n_layers=1,
                          **kwargs):
-    ls = landscapes(diagrams, sampling.reshape(-1, 1, 1),
-                    n_layers).reshape(len(diagrams), -1)
+    ls = landscapes(diagrams, sampling, n_layers).reshape(len(diagrams), -1)
     return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
 

@@ -16,10 +16,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     `persistence barcodes <LINK TO GLOSSARY>`_) resulting from
     `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_.
 
-    Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space,
-    or an abstract `metric space <LINK TO GLOSSARY>`_ encoded by a distance
-    matrix, information about the appearance and disappearance of topological
-    features (technically, `homology classes <LINK TO GLOSSARY>`_) of various
+    Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space, or an
+    abstract `metric space <LINK TO GLOSSARY>`_ encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, `homology classes <LINK TO GLOSSARY>`_) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
