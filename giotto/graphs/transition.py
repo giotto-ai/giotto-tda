@@ -49,18 +49,19 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _make_adjacency_matrix(self, X):
-        indices = np.unique(X, axis=0, return_inverse=True)[1]
+        Xm = np.argsort(X, axis=1)
+        indices = np.unique(Xm, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
         second = indices[1:]
-        A = sp.csr_matrix((np.full(n_indices, 1),
+        Xm = sp.csr_matrix((np.full(n_indices, 1),
                            (np.concatenate([first, second]),
                             np.concatenate([second, first]))))
         # See issue #36
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', SparseEfficiencyWarning)
-            sp.csr_matrix.setdiag(A, 0)
-        return A
+            sp.csr_matrix.setdiag(Xm, 0)
+        return Xm
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -113,6 +114,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
-            range(X.shape[0]))
+            range(n_samples))
         Xt = np.array(Xt)
         return Xt

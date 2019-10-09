@@ -118,7 +118,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         return self
 
     def transform(self, X):
-        """Transform/resample X.
+        """Transform X.
 
         Parameters
         ----------
@@ -168,7 +168,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         column_or_1d(y)
 
         yt = self._sliding_window.transform(y)
-        yt = self._labeller(self.function, yt, **labelling_params,
+        yt = self._labeller(self.function, yt, self.delta,
                             **self.effective_function_params_)
 
         if self.thresholds_ is not None:
@@ -176,7 +176,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             yt = np.concatenate(
                 [1 * (yt >= 0) * (yt < self.thresholds_[0])] +
                 [1 * (yt >= self.thresholds_[i]) *
-                 (ytAbs < self.thresholds_[i + 1]) for i in range(
+                 (yt < self.thresholds_[i + 1]) for i in range(
                     len(self.thresholds_) - 1)] +
                 [1 * (yt >= self.thresholds_[-1])], axis=1)
             yt = np.nonzero(yt)[1].reshape((y.shape[0], 1))

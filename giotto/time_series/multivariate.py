@@ -19,11 +19,9 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'positive_definite': [bool, (0, 1)]}
 
-    _hyperparameters = {'positive_definite': [bool, [0, 1]]}
-
     def __init__(self, positive_definite=True, n_jobs=None):
-        self.n_jobs = n_jobs
         self.positive_definite = positive_definite
+        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -73,10 +71,8 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
         X = check_array(X)
 
-        n_features = X.shape[1]
-
         Xt = np.corrcoef(X.T)
         if self.positive_definite:
-            Xt = np.ones((n_features, n_features)) - np.abs(Xt)
+            Xt = np.ones((X.shape[1], X.shape[1])) - np.abs(Xt)
 
         return Xt

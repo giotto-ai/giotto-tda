@@ -37,12 +37,12 @@ def split_train_test(data):
 
 def get_steps():
     steps = [
-        ('embedding', ts.TakensEmbedder()),
+        ('embedding', ts.TakensEmbedding()),
         ('window', ts.SlidingWindow(width=5, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.DiagramScaler()),
         ('filter', diag.DiagramFilter(delta=0.1)),
-        ('entropy', diag.PersistentEntropy()),
+        ('entropy', diag.PersistenceEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
    ]
     return steps
