@@ -116,7 +116,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['_is_fitted'])
         yt = column_or_1d(y).copy()
 
-        yt = y[self.width - 1 :: self.stride]
+        yt = y[self.width - 1:: self.stride]
         return yt
 
 
@@ -220,7 +220,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     Optimal embedding dimension based on false nearest neighbors: 3
 
     """
-    _hyperparameters = {'parameters_type': [str,  ['fixed', 'search']],
+    _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
                         'time_delay': [int, (1, np.inf)],
                         'dimension': [int, (1, np.inf)],
                         'stride': [int, (1, np.inf)]}
@@ -389,5 +389,5 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['time_delay_', 'dimension_'])
         yt = column_or_1d(y).copy()
 
-        yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
+        yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
         return yt

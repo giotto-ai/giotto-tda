@@ -7,7 +7,7 @@ from sklearn.exceptions import NotFittedError
 
 from giotto.diagram import PersistenceEntropy
 
-X_pe = np.array([[[0, 1, 0], [2, 3, 0],[4, 6, 1], [2, 6,1]]])
+X_pe = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 
 
 def test_pe_not_fitted():
