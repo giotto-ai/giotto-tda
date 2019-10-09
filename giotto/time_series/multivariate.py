@@ -40,7 +40,6 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         validate_params(self.get_params(), self._hyperparameters)

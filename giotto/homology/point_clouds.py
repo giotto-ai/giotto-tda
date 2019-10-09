@@ -111,10 +111,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
-
         self._validate_params(self.metric)
 
         self._homology_dimensions = sorted(self.homology_dimensions)
@@ -122,7 +120,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes, for each point cloud or distance matrix in X, the relevant
+        """Compute, for each point cloud or distance matrix in X, the relevant
         persistence diagram as an array of triples [b, d, k]. When k is
         not equal to ``np.inf``, each triple represents a persistent
         topological feature in dimension k (belonging to

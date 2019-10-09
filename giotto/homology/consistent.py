@@ -125,7 +125,6 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         validate_params(self.get_params(), self._hyperparameters)
@@ -134,9 +133,9 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each entry in the input data array X, finds the metric structure
+        """For each entry in the input data array X, find the metric structure
         after consistent rescaling and encodes it as a distance matrix. Then,
-        arranges all results in a single ndarray of appropriate shape.
+        arrange all results in a single ndarray of appropriate shape.
 
         Parameters
         ----------
