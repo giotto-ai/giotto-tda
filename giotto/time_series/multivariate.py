@@ -73,6 +73,6 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
 
         Xt = np.corrcoef(X.T)
         if self.positive_definite:
-            Xt = np.ones((X.shape[1], X.shape[1])) - np.abs(Xt)
+            Xt = 1.0 - np.abs(Xt)
 
         return Xt
