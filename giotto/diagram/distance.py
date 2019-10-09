@@ -141,7 +141,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
 
-        if (X==self._X).all():
+        if np.array_equal(X, self._X):
             X2 = None
         else:
             X2 = X
