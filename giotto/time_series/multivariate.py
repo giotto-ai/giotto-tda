@@ -4,7 +4,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from ..utils import validate_params
-from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
+from sklearn.utils.validation import check_is_fitted, check_array
 
 
 class PearsonCorrelation(BaseEstimator, TransformerMixin):

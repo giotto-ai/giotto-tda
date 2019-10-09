@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
-from joblib import Parallel, delayed, effective_n_jobs
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 from ..utils.validation import validate_params
 
@@ -116,7 +116,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['_is_fitted'])
         yt = column_or_1d(y).copy()
 
-        yt = y[self.width - 1 :: self.stride]
+        yt = y[self.width - 1:: self.stride]
         return yt
 
 
@@ -220,7 +220,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     Optimal embedding dimension based on false nearest neighbors: 3
 
     """
-    _hyperparameters = {'parameters_type': [str,  ['fixed', 'search']],
+    _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
                         'time_delay': [int, (1, np.inf)],
                         'dimension': [int, (1, np.inf)],
                         'stride': [int, (1, np.inf)]}
@@ -390,5 +390,5 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['time_delay_', 'dimension_'])
         yt = column_or_1d(y).copy()
 
-        yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
+        yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
         return yt

@@ -2,7 +2,7 @@
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from joblib import Parallel, delayed, effective_n_jobs
+from joblib import Parallel, delayed
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 
@@ -16,8 +16,9 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless in
-        a :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
 
     """
 
@@ -85,7 +86,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._permutation_entropy)(X[s])
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+            self._permutation_entropy)(X[s]) for s in gen_even_slices(
+            len(self.n_jobs)))
         Xt = np.concatenate(Xt)
         return Xt

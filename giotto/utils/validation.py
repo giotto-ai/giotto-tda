@@ -71,7 +71,7 @@ def validate_params(parameters, references):
         if len(references[key]) == 1:
             break
         if references[key][0] == list:
-            for parameter in parameter[key]:
+            for parameter in parameters[key]:
                 if not isinstance(parameter, references[key][1][1]):
                     raise TypeError("Parameter {} is a list of {}"
                                     " but contains an element of type {}"
@@ -79,7 +79,7 @@ def validate_params(parameters, references):
                                               references[key][0]))
                 if isinstance(references[key][1], tuple):
                     if (parameter < references[key][1][1][0] or
-                        parameter > references[key][1][1][1]):
+                            parameter > references[key][1][1][1]):
                         raise ValueError("Parameter {} is a list containing {}"
                                          "which should be in the range ({},{})"
                                          "".format(key, parameter,
@@ -88,7 +88,7 @@ def validate_params(parameters, references):
             break
         if isinstance(references[key][1], tuple):
             if (parameters[key] < references[key][1][0] or
-                parameters[key] > references[key][1][1]):
+                    parameters[key] > references[key][1][1]):
                 raise ValueError("Parameter {} is {}, while it"
                                  " should be in the range ({},{})"
                                  "".format(key, parameters[key],
@@ -97,9 +97,9 @@ def validate_params(parameters, references):
         if isinstance(references[key][1], list):
             if parameters[key] not in references[key][1]:
                 ValueError("Parameter {} is {}, while it"
-                                 " should be one of the following {}"
-                                 "".format(key, parameters[key],
-                                           references[key][1]))
+                           " should be one of the following {}"
+                           "".format(key, parameters[key],
+                                     references[key][1]))
 
 
 def validate_metric_params(metric, metric_params):

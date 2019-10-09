@@ -49,7 +49,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _make_adjacency_matrix(self, X):
-        Xm = np.argsort(X, axis=1)
         indices = np.unique(X, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
@@ -111,8 +110,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
-        n_samples = X.shape[0]
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
