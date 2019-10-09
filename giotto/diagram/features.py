@@ -201,8 +201,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
             _subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim])
-                                          for dim in self.homology_dimensions_
-                                          for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
         Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
             n_slices)], axis=0) for i in range(
@@ -355,8 +355,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
 
-        self.samplings_, self._step_size = _discretize(X,
-                                                       n_values=self.n_values)
+        self.samplings_, self._step_size = _discretize(
+            X, n_values=self.n_values)
         return self
 
     def transform(self, X, y=None):
@@ -389,10 +389,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             heats)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
                    self._step_size[dim], self.sigma)
-                                          for dim in self.homology_dimensions_
-                                          for s in gen_even_slices(X.shape[0],
-                                                                   effective_n_jobs(
-                                                                       self.n_jobs)))
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(X.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
         Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
             n_slices)], axis=0) for i in range(n_dimensions)], axis=3)
