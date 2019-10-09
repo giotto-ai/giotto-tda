@@ -87,10 +87,14 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
 
+        Attributes
+        __________
+        thresholds_ :
+
         Returns
         -------
         self : object
-            Returns self.
+
         """
         validate_params(self.get_params(), self._hyperparameters)
         column_or_1d(X)

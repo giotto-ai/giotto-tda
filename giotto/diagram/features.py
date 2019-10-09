@@ -12,8 +12,8 @@ from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of `persistence entropy <LINK TO
-    GLOSSARY>`_ (sometimes called "persistent entropy") from a collection of
-    persistence diagrams.
+    GLOSSARY>`_ (sometimes called "persistent entropy" [1]_) from a
+    collection of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     (b, d, k), its k-persistence entropy is simply the (base e) entropy of
@@ -44,7 +44,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _persistent_entropy(self, X):
+    def _persistence_entropy(self, X):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
         X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
         return - np.sum(np.nan_to_num(
@@ -59,9 +59,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of triples representing persistent topological
-            features through their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -70,7 +72,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -79,15 +80,17 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's persistence entropy.
+        """For each persistence diagram corresponding to homology
+        dimension k, compute that subdiagram's persistence entropy.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -95,9 +98,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_dimensions)
-            Array of persistent entropies (one value per sample and perhomology
-            dimension).
+        Xt : ndarray, shape (n_samples, n_homology_dimensions)
+            Array of persistence entropies (one value per sample and per
+            homology dimension).
 
         """
         # Check if fit had been called
@@ -108,7 +111,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         n_dimensions = len(homology_dimensions)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._persistent_entropy)(_subdiagrams(X, [dim])[s, :, :2])
+            self._persistence_entropy)(_subdiagrams(X, [dim])[s, :, :2])
             for dim in homology_dimensions
             for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
@@ -119,7 +122,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the betti curves from a collection
+    """Transformer for the calculation of the Betti curves from a collection
     of persistence diagrams. Given a generic persistence diagram consisting of
     birth-death-dimension tuples (b, d, k), its k-betti curve is simply
     the number of persistent points of homology dimension k alive at changing
@@ -152,9 +155,11 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -163,7 +168,6 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -174,14 +178,16 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's betti curve.
+        dimension k, compute that subdiagram's betti curve.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -190,7 +196,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
-            Array of the persistent entropies of the diagrams in X.
+            Array of the persistence entropies of the diagrams in X.
 
         """
         # Check if fit had been called
@@ -244,9 +250,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -255,7 +263,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -269,14 +276,16 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's landscapes.
+        dimension k, compute that subdiagram's landscapes.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -286,7 +295,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions,
         n_layers, n_values)
-            Array of the persitence landscapes of the diagrams in X.
+            Array of the persistence landscapes of the diagrams in X.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
@@ -338,9 +347,11 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -349,7 +360,6 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         X = check_diagram(X)
@@ -361,14 +371,16 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's landscapes.
+        dimension k, compute that subdiagram's landscapes.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
