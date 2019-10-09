@@ -80,8 +80,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence diagram, computes  corresponding to homology
-        dimension k, computes that subdiagram's persistence entropy.
+        """For each persistence diagram corresponding to homology
+        dimension k, compute that subdiagram's persistence entropy.
 
         Parameters
         ----------
@@ -177,7 +177,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's betti curve.
+        dimension k, compute that subdiagram's betti curve.
 
         Parameters
         ----------
@@ -275,7 +275,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's landscapes.
+        dimension k, compute that subdiagram's landscapes.
 
         Parameters
         ----------
@@ -370,7 +370,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence subdiagram corresponding to an homology
-        dimension k, computes that subdiagram's landscapes.
+        dimension k, compute that subdiagram's landscapes.
 
         Parameters
         ----------

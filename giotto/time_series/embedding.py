@@ -247,8 +247,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
-        """This function calculates the mutual information given the delay.
-        """
+        """Calculate the mutual information given the delay."""
         contingency = np.histogram2d(X.reshape((-1,))[:-time_delay],
                                      X.reshape((-1,))[time_delay:],
                                      bins=n_bins)[0]
@@ -259,7 +258,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     @staticmethod
     def _false_nearest_neighbors(X, time_delay, dimension,
                                  stride=1):
-        """Calculates the number of false nearest neighbours of embedding
+        """Calculate the number of false nearest neighbours of embedding
         dimension. """
         X_embedded = TakensEmbedding._embed(X, time_delay, dimension, stride)
 
