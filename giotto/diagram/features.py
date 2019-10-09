@@ -11,9 +11,8 @@ from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of `persistence entropy <LINK TO
-    GLOSSARY>`_ (sometimes called "persistent entropy" [1]_) from a
-    collection of persistence diagrams.
+    """`Persistence entropies <LINK TO GLOSSARY>`_ of the persistence diagrams
+    in a collection.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     (b, d, k), its k-persistence entropy is simply the (base e) entropy of
@@ -30,14 +29,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     See also
     --------
     VietorisRipsPersistence
-
-    References
-    ----------
-    .. [1] M. Rucco, F. Castiglione, E. Merelli, and M. Pettini,
-           "Characterisation of the idiotypic immunenetwork through
-           persistent entropy", in S. Battiston, F. De Pellegrini,
-           G. Caldarelli, and E. Merelli (eds), *Proceedings of ECCS 2014*,
-           pages 117--128, *Springer Proceedings in Complexity*, 2014.
 
     """
 

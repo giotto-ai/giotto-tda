@@ -1,4 +1,4 @@
-""" Utilities function for diagrams."""
+"""Utility functions for diagrams."""
 # License: Apache 2.0
 
 import numpy as np
