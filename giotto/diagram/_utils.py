@@ -31,7 +31,7 @@ def _pad(X, max_betti_numbers):
     return X_padded
 
 
-def _sort(Xs, homology_dimensions):
+def _sort(Xs):
     indices = np.argsort(Xs[:, :, 1] - Xs[:, :, 0], axis=1)
     indices = np.stack([indices, indices, indices], axis=2)
     Xs = np.flip(np.take_along_axis(Xs, indices, axis=1), axis=1)
