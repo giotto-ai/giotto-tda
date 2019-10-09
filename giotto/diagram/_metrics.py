@@ -56,6 +56,7 @@ def heats(diagrams, sampling, step_size, sigma):
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
+    sampling = sampling[:, None, None]
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
@@ -67,6 +68,7 @@ def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
 
 def pairwise_landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
                                  p=2., n_layers=1, **kwargs):
+    sampling = sampling[:, None, None]
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
