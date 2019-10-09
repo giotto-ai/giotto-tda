@@ -224,7 +224,7 @@ parameters = [('bottleneck', None),
               ('wasserstein', {'p': 2, 'delta': 0.1}),
               ('betti', {'p': 2.1, 'n_values': 10}),
               ('landscape', {'n_values': 10}),
-              # ('heat', {'n_sampled_values': 10})
+              # ('heat', {'n_values': 10}) See issue #63
               ]
 
 
