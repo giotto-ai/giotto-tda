@@ -178,8 +178,7 @@ def wasserstein_amplitudes(diagrams, p=1., **kwargs):
 def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., order=2,
                           **kwargs):
     heat = heats(diagrams, sampling, step_size, sigma)
-    return np.linalg.norm(heat, ord=order)
-
+    return np.linalg.norm(heat, axis=(1, 2), ord=order)
 
 implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,
