@@ -17,7 +17,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     geometric mean of the distances to the respective :math:`k`-th nearest
     neighbours. Based on ideas in [1]_.
 
-    The computation during ``transform`` depends on the nature of the array
+    The computation during `transform` depends on the nature of the array
     X. If each entry in X along axis 0 represents a distance matrix :math:`D`,
     then the corresponding entry in the transformed array is the distance
     matrix :math:`D'_{ij} = D_{ij}/\sqrt{D_{ik_i}D_{jk_j}}`, where :math:`k_i`
@@ -29,16 +29,16 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : string or callable, optional, default: 'euclidean'
-        If set to ``'precomputed'``, each entry in X along axis 0 is
+        If set to `'precomputed'`, each entry in X along axis 0 is
         interpreted to be a distance matrix. Otherwise, entries are
-        interpreted as feature arrays, and ``metric`` determines a rule with
+        interpreted as feature arrays, and `metric` determines a rule with
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
-        If ``metric`` is a string, it must be one of the options allowed by
+        If `metric` is a string, it must be one of the options allowed by
         scipy.spatial.distance.pdist for its metric parameter, or a metric
         listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including
         "euclidean", "manhattan" or "cosine".
-        If ``metric`` is a callable function, it is called on each pair of
+        If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
         two arrays from the entry in X as input, and return a value
         indicating the distance between them.
@@ -51,8 +51,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         according to the consistent rescaling procedure.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        The number of jobs to use for the computation. `None` means 1
+        unless in a :obj:`joblib.parallel_backend` context. `-1` means
         using all processors.
 
     Examples
@@ -112,11 +112,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
             n_points, n_dimensions)
-            Input data. If ``metric=='precomputed'``, the input should be an
+            Input data. If `metric=='precomputed'`, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be
-            interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_dimensions.
+            `(n_points, n_points)`. Otherwise, each such entry will be
+            interpreted as an ndarray of `n_points` in Euclidean space of
+            dimension `n_dimensions`.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -141,11 +141,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
             n_points, n_dimensions)
-            Input data. If ``metric=='precomputed'``, the input should be an
+            Input data. If `metric=='precomputed'`, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be
-            interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_dimensions.
+            `(n_points, n_points)`. Otherwise, each such entry will be
+            interpreted as an ndarray of `n_points` in Euclidean space of
+            dimension `n_dimensions`.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
