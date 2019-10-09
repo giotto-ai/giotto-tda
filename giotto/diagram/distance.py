@@ -144,7 +144,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
 
-        if (X==self._X).all():
+        if np.array_equal(X, self._X):
             X2 = None
         else:
             X2 = X
@@ -168,7 +168,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+        default: 'bottleneck'
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -257,8 +258,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes the amplitude of a each diagram in the collection X, according to
-        the choice of ``metric`` and ``metric_params``.
+        """Computes the amplitude of a each diagram in the collection X,
+        according to the choice of ``metric`` and ``metric_params``.
 
         Parameters
         ----------

@@ -20,8 +20,8 @@ data = np.random.rand(600, 1)
 def split_train_test(data):
     n_train = int(0.7 * data.shape[0])
     n_test = data.shape[0] - n_train
-    labeller = ts.Labeller(labelling_kwargs={'type': 'derivation'},
-                           window_size=5, percentiles=[80], n_steps_future=1)
+    labeller = ts.Labeller(labelling='derivation', width=5, percentiles=[80],
+                           n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
     labeller.fit(y_train)
