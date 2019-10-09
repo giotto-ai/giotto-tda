@@ -102,18 +102,21 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+        default: 'bottleneck'
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "persistence landscapes" obtained from persistence (sub)diagrams.
-        - ``'betti'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "Betti curves" obtained from persistence (sub)diagrams. A Betti
-           curve simply records the evolution in the number of independent topological
-           holes (technically, the number of linearly independent homology classes)
-           as can be read from a persistence (sub)diagram.
+        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "persistence landscapes" obtained from
+           persistence (sub)diagrams.
+        - ``'betti'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "Betti curves" obtained from persistence (
+           sub)diagrams. A Betti curve simply records the evolution in the
+           number of independent topological holes (technically, the number
+           of linearly independent homology classes) as can be read from a
+           persistence (sub)diagram.
         - ``'heat'`` heat kernel
 
     metric_params : dict, optional, default: {'n_samples': 200}
@@ -128,8 +131,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
           (default = ``1``).
         - If ``norm == 'betti'`` the available arguments are ``order``
           (default = ``2``) and ``n_samples`` (default = ``200``).
-        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
-           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
+        - If ``metric == 'heat'`` the available arguments are ``order``
+          (default = ``2``), ``sigma`` (default = ``1``), and ``n_samples`` (
+          default = ``200``).
 
     function : callable, optional, default: numpy.max
         Function used to extract a single positive scalar from the collection
@@ -251,6 +255,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Xs[:, :, :2] = X[:, :, :2] * self.scale_
         return Xs
 
+
 class DiagramFilter(BaseEstimator, TransformerMixin):
     """Transformer filtering collections of persistence diagrams in which each
     diagram is partitioned into one or more subdiagrams (e.g. according to
@@ -304,7 +309,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         if self.homology_dimensions is None:
-            self.homology_dimensions_ = set(X[0,:,2])
+            self.homology_dimensions_ = set(X[0, :, 2])
         else:
             self.homology_dimensions_ = sorted(self.homology_dimensions)
 
