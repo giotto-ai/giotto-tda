@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from giotto.time_series import TakensEmbedder
+from giotto.time_series import TakensEmbedding
 from giotto.time_series import SlidingWindow
 
 signal = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
@@ -52,14 +52,14 @@ signal_embedded_fixed = \
 
 def test_embedder_params():
     parameters_type = 'not_defined'
-    embedder = TakensEmbedder(parameters_type=parameters_type)
+    embedder = TakensEmbedding(parameters_type=parameters_type)
     msg = 'The embedding parameters type %s is not supported'
     with pytest.raises(ValueError, match=msg % parameters_type):
         embedder.fit(signal)
 
 
 def test_embedder_not_fitted():
-    embedder = TakensEmbedder()
+    embedder = TakensEmbedding()
     with pytest.raises(NotFittedError):
         embedder.transform(signal)
 
@@ -68,7 +68,7 @@ def test_embedder_not_fitted():
                          [('search', signal_embedded_search),
                           ('fixed', signal_embedded_fixed)])
 def test_embedder_transform(parameters_type, expected):
-    embedder = TakensEmbedder(parameters_type=parameters_type)
+    embedder = TakensEmbedding(parameters_type=parameters_type)
 
     assert_almost_equal(embedder.fit_transform(signal), expected)
 

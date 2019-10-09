@@ -1,7 +1,5 @@
 # License: Apache 2.0
 
-import math as m
-
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted

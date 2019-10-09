@@ -23,7 +23,7 @@ Welcome to giotto's API reference!
    time_series.Resampler
    time_series.Stationarizer
 
-   time_series.TakensEmbedder
+   time_series.TakensEmbedding
 
    time_series.OrdinalRepresentation
    time_series.Entropy
@@ -100,6 +100,11 @@ Welcome to giotto's API reference!
    :template: class.rst
 
    pipeline.Pipeline
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
    pipeline.make_pipeline
 
 
@@ -143,7 +148,7 @@ Welcome to giotto's API reference!
    diagram.DiagramDistance
    diagram.DiagramAmplitude
 
-   diagram.PersistentEntropy
+   diagram.PersistenceEntropy
    diagram.PersistenceLandscape
    diagram.BettiCurve
    diagram.HeatKernel
@@ -201,7 +206,7 @@ Welcome to giotto's API reference!
       neural_network.KerasClassifierWrapper
       neural_network.KerasRegressorWrapper
 
-
+..
    :mod:`giotto.model_selection`: Hyper-parameter search extension
    ===============================================================
 

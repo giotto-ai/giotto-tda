@@ -13,14 +13,18 @@ from ..utils.validation import validate_params
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    r"""Transformer rescaling pairwise distances according to the ideas in [1].
-    The computation during ``transform``, for each entry in X, is:
-    :math:`d_{\mathrm{consistent}}(\star_i, \star_j) = [d(\star_i,
-    \star_{k_i}) d(\star_j, \star_{k_j})]^{-1/2}d(\star_i, \star_j)`
-    where :math:`\star_i, \star_j` are the :math:`i`-th and :math:`j`-th data
-    instances in that entry, :math:`d` is the original distance function, and
-    :math:`k_i` is the index of the :math:`k`-th nearest neighbor to
-    :math:`\star_i` according to :math:`d`.
+    r"""Transformer rescaling distances between pairs of points by the
+    geometric mean of the distances to the respective :math:`k`-th nearest
+    neighbours. Based on ideas in [1]_.
+
+    The computation during ``transform`` depends on the nature of the array
+    X. If each entry in X along axis 0 represents a distance matrix :math:`D`,
+    then the corresponding entry in the transformed array is the distance
+    matrix :math:`D'_{ij} = D_{ij}/\sqrt{D_{ik_i}D_{jk_j}}`, where :math:`k_i`
+    is the index of the :math:`k`-th largest value in row :math:`i` (and
+    similarly for :math:`j`). If the entries in X represent point clouds,
+    their distance matrices are first computed, and then rescaled according
+    to the same formula.
 
     Parameters
     ----------
@@ -57,8 +61,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     >>> from giotto.homology import ConsistentRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsistentRescaling()
-    >>> cr.fit(X)
-    >>> X_rescaled = cr.transform(X)
+    >>> X_rescaled = cr.fit_transform(X)
     >>> print(X_rescaled.shape)
     (1, 3, 3)
 
@@ -69,9 +72,9 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     References
     ----------
     .. [1] T. Berry and T. Sauer, "Consistent manifold representation for
-    topological data analysis", *Foundations of data analysis*, **1**,
-    1--38, 2019, doi: `10.3934/fods.2019001
-    <http://dx.doi.org/10.3934/fods.2019001>`_.
+           topological data analysis", *Foundations of data analysis*,
+           **1**, 1--38, 2019, doi: `10.3934/fods.2019001
+           <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
 
@@ -108,12 +111,12 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
-        n_points, n_features)
+        n_points, n_dimensions)
             Input data. If ``metric=='precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_features.
+            dimension n_dimensions.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -138,12 +141,12 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
-        n_points, n_features)
+        n_points, n_dimensions)
             Input data. If ``metric=='precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_features.
+            dimension n_dimensions.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
