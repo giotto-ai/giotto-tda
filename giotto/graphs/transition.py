@@ -49,8 +49,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _make_adjacency_matrix(self, X):
-        Xm = np.argsort(X, axis=1)
-        indices = np.unique(Xm, axis=0, return_inverse=True)[1]
+        indices = np.unique(X, axis=0, return_inverse=True)[1]
         n_indices = 2 * (len(indices) - 1)
         first = indices[:-1]
         second = indices[1:]
