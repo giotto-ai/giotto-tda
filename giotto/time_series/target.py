@@ -1,4 +1,5 @@
 # License : Apache 2.0
+import types
 
 import numpy as np
 import numbers
@@ -12,8 +13,8 @@ from ..utils.validation import validate_params
 def _derivation_function(function, X, delta=1, **function_params):
     partial_window_begin = function(X[:, :-delta], axis=1, **function_params)
     partial_window_end = function(X[:, delta:], axis=1, **function_params)
-    derivative = (partial_window_end - partial_window_begin) / \
-        partial_window_begin / delta
+    duration_ = (partial_window_end - partial_window_begin)
+    derivative = duration_ / partial_window_begin / delta
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
     return derivative.reshape((-1, 1))
 
@@ -55,12 +56,13 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     implemented_labelling_recipes = {'application': _application_function,
                                      'variation': _variation_function,
                                      'derivation': _derivation_function}
-    _hyperparameters = {'labelling': \
-        (str, ['application', 'variation', 'derivation']),
-                        'delta': [int, (1, np.inf)],
-                        'function': (callable),
-                        'percentiles': (list, [numbers.Number, (0., 1.)]),
-                        'n_steps_future': (int, [1, np.inf])}
+    _hyperparameters = {
+        'labelling':
+            (str, ['application', 'variation', 'derivation']),
+        'delta': [int, (1, np.inf)],
+        'function': [types.FunctionType],
+        'percentiles': (list, [numbers.Number, (0., 1.)]),
+        'n_steps_future': (int, [1, np.inf])}
 
     def __init__(self, width=2, stride=1, labelling='application', delta=1,
                  function=np.std, function_params=None, percentiles=None,
@@ -85,10 +87,14 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
 
+        Attributes
+        __________
+        thresholds_ :
+
         Returns
         -------
         self : object
-            Returns self.
+
         """
         validate_params(self.get_params(), self._hyperparameters)
         column_or_1d(X)

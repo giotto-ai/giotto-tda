@@ -78,10 +78,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -90,7 +92,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         if self.metric_params is None:
@@ -122,10 +123,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -141,7 +144,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         check_is_fitted(self, 'effective_metric_params_')
         X = check_diagram(X)
 
-        if (X==self._X).all():
+        if np.array_equal(X, self._X):
             X2 = None
         else:
             X2 = X
@@ -165,7 +168,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+        default: 'bottleneck'
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -215,10 +219,12 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -227,7 +233,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         if self.metric_params is None:
@@ -253,15 +258,17 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes the amplitude of a each diagram in the collection X, according to
-        the choice of ``metric`` and ``metric_params``.
+        """Computes the amplitude of a each diagram in the collection X,
+        according to the choice of ``metric`` and ``metric_params``.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API

@@ -116,11 +116,11 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['_is_fitted'])
         yt = column_or_1d(y).copy()
 
-        yt = y[self.width - 1 :: self.stride]
+        yt = y[self.width - 1:: self.stride]
         return yt
 
 
-class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
+class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     r"""Transformer returning a representation of a scalar-valued time
     series as a time series of point clouds.
 
@@ -196,14 +196,14 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> from giotto.time_series import TakensEmbedder
+    >>> from giotto.time_series import TakensEmbedding
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
     ...     for x in range(0,1000)])
-    >>> # Set up the Takens Embedder
+    >>> # Set up the transformer
     >>> outer_window_duration = 50
     >>> outer_window_stride = 5
-    >>> embedder = TakensEmbedder(
+    >>> embedder = TakensEmbedding(
     >>>     outer_window_duration=outer_window_duration,
     ...     outer_window_stride=outer_window_stride,
     ...     parameters_type='search',
@@ -220,7 +220,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     Optimal embedding dimension based on false nearest neighbors: 3
 
     """
-    _hyperparameters = {'parameters_type': [str,  ['fixed', 'search']],
+    _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
                         'time_delay': [int, (1, np.inf)],
                         'dimension': [int, (1, np.inf)],
                         'stride': [int, (1, np.inf)]}
@@ -247,8 +247,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
-        """This function calculates the mutual information given the delay.
-        """
+        """Calculate the mutual information given the delay."""
         contingency = np.histogram2d(X.reshape((-1,))[:-time_delay],
                                      X.reshape((-1,))[time_delay:],
                                      bins=n_bins)[0]
@@ -259,9 +258,9 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
     @staticmethod
     def _false_nearest_neighbors(X, time_delay, dimension,
                                  stride=1):
-        """Calculates the number of false nearest neighbours of embedding
+        """Calculate the number of false nearest neighbours of embedding
         dimension. """
-        X_embedded = TakensEmbedder._embed(X, time_delay, dimension, stride)
+        X_embedded = TakensEmbedding._embed(X, time_delay, dimension, stride)
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
             X_embedded)
@@ -305,7 +304,7 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         self : object
-            Returns self.
+
         """
         validate_params(self.get_params(), self._hyperparameters)
         check_array(X)
@@ -390,5 +389,5 @@ class TakensEmbedder(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, ['time_delay_', 'dimension_'])
         yt = column_or_1d(y).copy()
 
-        yt = y[self.time_delay_ * self.dimension_ - 1 :: self.stride]
+        yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
         return yt

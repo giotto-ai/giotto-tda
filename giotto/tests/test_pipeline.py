@@ -20,8 +20,8 @@ data = np.random.rand(600, 1)
 def split_train_test(data):
     n_train = int(0.7 * data.shape[0])
     n_test = data.shape[0] - n_train
-    labeller = ts.Labeller(labelling_kwargs={'type': 'derivation'},
-                           window_size=5, percentiles=[80], n_steps_future=1)
+    labeller = ts.Labeller(labelling='derivation', width=5, percentiles=[80],
+                           n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
     labeller.fit(y_train)
@@ -37,12 +37,12 @@ def split_train_test(data):
 
 def get_steps():
     steps = [
-        ('embedding', ts.TakensEmbedder()),
+        ('embedding', ts.TakensEmbedding()),
         ('window', ts.SlidingWindow(width=5, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.DiagramScaler()),
         ('filter', diag.DiagramFilter(delta=0.1)),
-        ('entropy', diag.PersistentEntropy()),
+        ('entropy', diag.PersistenceEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
    ]
     return steps

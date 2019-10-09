@@ -64,7 +64,6 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         validate_params(self.get_params(), self._hyperparameters)
@@ -188,7 +187,6 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         validate_params(self.get_params, self._hyperparameters)

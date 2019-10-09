@@ -1,7 +1,5 @@
 # License: Apache 2.0
 
-import math as m
-
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -38,10 +36,12 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -50,7 +50,6 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
         self._validate_params()
@@ -65,10 +64,12 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -104,18 +105,21 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional, default: 'bottleneck'
+    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
+        default: 'bottleneck'
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "persistence landscapes" obtained from persistence (sub)diagrams.
-        - ``'betti'`` refers to a family of possible (:math:`L^p`-like) distances
-           between "Betti curves" obtained from persistence (sub)diagrams. A Betti
-           curve simply records the evolution in the number of independent topological
-           holes (technically, the number of linearly independent homology classes)
-           as can be read from a persistence (sub)diagram.
+        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "persistence landscapes" obtained from
+           persistence (sub)diagrams.
+        - ``'betti'`` refers to a family of possible (:math:`L^p`-like)
+           distances between "Betti curves" obtained from persistence (
+           sub)diagrams. A Betti curve simply records the evolution in the
+           number of independent topological holes (technically, the number
+           of linearly independent homology classes) as can be read from a
+           persistence (sub)diagram.
         - ``'heat'`` heat kernel
 
     metric_params : dict, optional, default: {'n_samples': 200}
@@ -130,8 +134,9 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
           (default = ``1``).
         - If ``norm == 'betti'`` the available arguments are ``order``
           (default = ``2``) and ``n_samples`` (default = ``200``).
-        - If ``metric == 'heat'`` the available arguments are ``order`` (default = ``2``)
-           ``sigma`` (default = ``1``), and ``n_samples`` (default = ``200``).
+        - If ``metric == 'heat'`` the available arguments are ``order``
+          (default = ``2``), ``sigma`` (default = ``1``), and ``n_samples`` (
+          default = ``200``).
 
     function : callable, optional, default: numpy.max
         Function used to extract a single positive scalar from the collection
@@ -162,10 +167,12 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -174,7 +181,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
+
         """
         if self.metric_params is None:
             self.effective_metric_params_ = {}
@@ -209,10 +216,12 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -253,6 +262,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         Xs[:, :, :2] = X[:, :, :2] * self.scale_
         return Xs
 
+
 class DiagramFilter(BaseEstimator, TransformerMixin):
     """Transformer filtering collections of persistence diagrams in which each
     diagram is partitioned into one or more subdiagrams (e.g. according to
@@ -289,10 +299,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -301,12 +313,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
+
         """
         X = check_diagram(X)
 
         if self.homology_dimensions is None:
-            self.homology_dimensions_ = set(X[0,:,2])
+            self.homology_dimensions_ = set(X[0, :, 2])
         else:
             self.homology_dimensions_ = sorted(self.homology_dimensions)
 
@@ -317,10 +329,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, 3)
-            Input data. Array of persistence diagrams each of them containing
-            a collection of points representing persistence feature through
-            their birth, death and homology dimension.
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples (b, d, k) representing persistent topological features
+            through their birth (b), death (d) and homology dimension (k).
+            Triples in which k equals ``np.inf`` are used for padding and
+            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
