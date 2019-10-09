@@ -180,6 +180,7 @@ def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., order=2,
     heat = heats(diagrams, sampling, step_size, sigma)
     return np.linalg.norm(heat, axis=(1, 2), ord=order)
 
+
 implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,
                                  'landscape': landscape_amplitudes,
