@@ -112,6 +112,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
 
+        n_samples = X.shape[0]
+
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
             range(n_samples))
