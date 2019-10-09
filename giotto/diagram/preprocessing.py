@@ -356,6 +356,6 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['homology_dimensions_'])
         X = check_diagram(X)
 
-        X = _sort(X, self.homology_dimensions_)
+        X = _sort(X)
         Xt = _filter(X, self.homology_dimensions_, self.delta)
         return Xt
