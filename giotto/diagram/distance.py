@@ -21,7 +21,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` |
-             ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -169,7 +169,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` |
-             ``'betti'``, optional, default: ``'bottleneck'``
+        ``'betti'``, optional, default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
