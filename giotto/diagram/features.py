@@ -52,7 +52,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -79,7 +79,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -165,7 +165,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -193,7 +193,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -270,7 +270,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -301,7 +301,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -381,7 +381,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -410,7 +410,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None

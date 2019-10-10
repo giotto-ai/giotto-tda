@@ -39,34 +39,34 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
            distances between "Heat kernels"obtained from persistence
            (sub)diagrams.
 
-    metric_params : dict, optional, default: {'n_values': 100}
+    metric_params : dict, optional, default: ``{'n_values': 100}``
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the only argument is
-          `delta` (default = `0.`).
+          `delta` (default: `0.`).
         - If ``metric == 'wasserstein'`` the available arguments are `p`
-          (default = ``1.``) and `delta` (default = ``0.``).
+          (default: ``1.``) and `delta` (default: ``0.``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (default = ``2.``), `n_values` (default = ``100``) and
-          `n_layers` (default = ``1``).
+          (default: ``2.``), `n_values` (default: ``100``) and
+          `n_layers` (default: ``1``).
         - If ``metric == 'betti'`` the available arguments are `p`
-          (default = ``2.``) and `n_values` (default = ``100``).
+          (default: ``2.``) and `n_values` (default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p`
-          (default = ``2.``), `sigma` (default = ``1.``) and
-          `n_values` (default = ``100``).
+          (default: ``2.``), `sigma` (default: ``1.``) and
+          `n_values` (default: ``100``).
 
-    order : int, optional, default: 2
+    order : float, optional, default: ``2.``
         Order of the norm used to combine subdiagrams distances into a single
         distance. If set to ``None``, returns one distance matrix per homology
         dimension.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     """
-    def __init__(self, metric='landscape', metric_params=None, order=2,
+    def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -82,7 +82,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -127,7 +127,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -136,8 +136,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_samples) if `order` is ``None``
-        (n_samples, n_samples, n_dimensions) else.
+        Xt : ndarray, shape (n_samples, n_samples) if `order` is ``None``, \
+            else (n_samples, n_samples, n_dimensions).
             Distance matrix between diagrams in X.
 
         """
@@ -186,29 +186,29 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
           persistence (sub)diagram.
         - ``'heat'`` refers to the heat kernel
 
-    metric_params : dict, optional, default: {'n_values': 100}
+    metric_params : dict, optional, default: ``{'n_values': 100}``
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the available arguments are `order`
-          (default = ``np.inf``) and `delta` (default = ``0.``).
+          (default: ``numpy.inf``) and `delta` (default: ``0.``).
         - If ``metric == 'wasserstein'`` the only argument is `order`
-          (default = ``1.``) and `delta` (default = ``0.``).
+          (default: ``1.``) and `delta` (default: ``0.``).
         - If ``metric == 'landscape'`` the available arguments are `order`
-          (default = ``2.``), `n_values` (default = ``100``) and
-          `n_layers` (default = ``1``).
+          (default: ``2.``), `n_values` (default: ``100``) and
+          `n_layers` (default: ``1``).
         - If ``metric == 'betti'`` the available arguments are `order`
-          (default = ``2.``) and `n_values` (default = ``100``).
+          (default: ``2.``) and `n_values` (default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `order`
-          (default = ``2.``), `sigma` (default = ``1.``) and
-          `n_values` (default = ``100``).
+          (default: ``2.``), `sigma` (default: ``1.``) and
+          `n_values` (default: ``100``).
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     """
-    def __init__(self, metric='landscape', metric_params=None, order=2,
+    def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -224,7 +224,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -268,7 +268,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -277,7 +277,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1) if `order` is ``None``, else
+        Xt : ndarray, shape (n_samples, 1) if `order` is ``None``, else \
             (n_samples, n_samples, n_dimensions)
             Amplitude of the diagrams in X.
 

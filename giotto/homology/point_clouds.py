@@ -121,7 +121,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         """Compute, for each point cloud or distance matrix in X,
         the relevant persistence diagram as an array of triples [b, d,
-        q]. When q is not equal to ``np.inf``, each triple represents a
+        q]. When q is not equal to ``numpy.inf``, each triple represents a
         persistent topological feature in dimension q (belonging to
         `homology_dimensions`) which is born at b and dies at d. Triples
         `[0., 0., np.inf]` are used for padding, as the number of persistent
