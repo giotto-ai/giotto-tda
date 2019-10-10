@@ -152,14 +152,13 @@ def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
-    bcs = betti_curves(diagrams, sampling.reshape(-1, 1, 1))
+    bcs = betti_curves(diagrams, sampling)
     return (step_size ** (1 / p)) * np.linalg.norm(bcs, axis=1, ord=p)
 
 
 def landscape_amplitudes(diagrams, sampling, step_size, p=2., n_layers=1,
                          **kwargs):
-    ls = landscapes(diagrams, sampling.reshape(-1, 1, 1),
-                    n_layers).reshape(len(diagrams), -1)
+    ls = landscapes(diagrams, sampling, n_layers).reshape(len(diagrams), -1)
     return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
 
@@ -176,6 +175,7 @@ def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., order=2,
                           **kwargs):
     heat = heats(diagrams, sampling, step_size, sigma)
     return np.linalg.norm(heat, axis=(1, 2), ord=order)
+
 
 implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,

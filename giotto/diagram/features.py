@@ -113,9 +113,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """`Betti curves <LINK TO GLOSSARY>`_ associated to persistence
-    diagrams, sampled at discrete values of the `filtration parameter
-    <LINK TO GLOSSARY>`_.
+    """`Betti curves <LINK TO GLOSSARY>`_ associated to the persistence
+    diagrams in a collection, and sampled at discrete values of the
+    `filtration parameter <LINK TO GLOSSARY>`_.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], its q-Betti curve is simply the number of persistent features
