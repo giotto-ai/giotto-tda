@@ -81,6 +81,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True)
+
         self._is_fitted = True
         return self
 
@@ -108,11 +110,11 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
+        Xt = check_array(X, copy=True, allow_nd=True)
 
-        n_samples = X.shape[0]
+        Xt = np.argsort(Xt, axis=2)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
-            range(n_samples))
-        Xt = np.array(Xt)
+            range(X.shape[0]))
         return Xt
