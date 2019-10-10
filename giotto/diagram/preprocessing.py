@@ -105,7 +105,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` |
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'``, optional,  default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
