@@ -42,16 +42,20 @@ def _heat(heat, sampled_diag, sigma):
     heat[unique] = counts
     heat[:, :] = gaussian_filter(heat, sigma, mode='reflect')
 
+
 def heats(diagrams, sampling, step_size, sigma):
     heats_ = np.zeros((diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
     sampled_diags = np.copy(diagrams)
     sampled_diags[diagrams < sampling[0]] = sampling[0]
     sampled_diags[diagrams > sampling[-1]] = sampling[-1]
-    sampled_diags = np.array((sampled_diags - sampling[0]) / step_size, dtype=int)
-    [_heat(heats_[i], sampled_diag, sigma) for i, sampled_diag in enumerate(sampled_diags)]
+    sampled_diags = np.array((sampled_diags - sampling[0]) / step_size,
+                             dtype=int)
+    [_heat(heats_[i], sampled_diag, sigma)
+     for i, sampled_diag in enumerate(sampled_diags)]
     heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
     heats_ = np.rot90(heats_, k=1, axes=(1,2))
     return heats_
+
 
 def pairwise_betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                              p=2., **kwargs):
@@ -120,9 +124,11 @@ implemented_metric_recipes = {'bottleneck': kernel_bottleneck_distance,
                               'betti': pairwise_betti_distances,
                               'heat': kernel_heat_distance}
 
+
 def _matrix_wrapper(distance_func, distance_matrices, slice_, dim,
                     *args, **kwargs):
     distance_matrices[:, slice_, int(dim)] = distance_func(*args, **kwargs)
+
 
 def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
     metric_func = implemented_metric_recipes[metric]
@@ -166,6 +172,7 @@ def bottleneck_amplitudes(diagrams, **kwargs):
     dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
 
+
 def wasserstein_amplitudes(diagrams, p=1., **kwargs):
     dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=p)
@@ -183,9 +190,11 @@ implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'betti': betti_amplitudes,
                                  'heat': kernel_heat_amplitude}
 
+
 def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,
                     *args, **kwargs):
     amplitude_arrays[slice_, int(dim)] = amplitude_func(*args, **kwargs)
+
 
 def _parallel_amplitude(X, metric, metric_params, n_jobs):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
