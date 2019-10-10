@@ -87,7 +87,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
     # @jit
     def transform(self, X, y=None):
-        """For each adjancency matrix in X, compute the lenghts of the graph
+        """For each adjancency matrix in `X`, compute the lenghts of the graph
         shortest path between any two vertices, and arrange them in a
         distance matrix. The method
         :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path` is used.

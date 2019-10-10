@@ -231,7 +231,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         -------
         Xs : dict of int: ndarray
             Dictionary of rescaled persistence (sub)diagrams, each with the
-            same shape as the corresponding (sub)diagram in X.
+            same shape as the corresponding (sub)diagram in `X`.
         """
         check_is_fitted(self, ['scale_', 'effective_metric_params_'])
 
@@ -276,12 +276,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    homology_dimensions : list or None, optional, default: None
+    homology_dimensions : list or None, optional, default: ``None``
         When set to ``None``, all available (sub)diagrams will be filtered.
         When set to a list, it is interpreted as the list of those homology
         dimensions for which (sub)diagrams should be filtered.
 
-    delta : float, optional, default: 0.
+    delta : float, optional, default: ``0.``
         The cutoff value controlling the amount of filtering.
 
     """
@@ -348,7 +348,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to
             filtering.
             If `homology_dimensions` was set to be a list not containing all
-            keys in X, only the corresponding (sub)diagrams are filtered and
+            keys in `X`, only the corresponding (sub)diagrams are filtered and
             returned.
         """
 

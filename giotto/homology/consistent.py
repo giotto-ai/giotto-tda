@@ -17,18 +17,18 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     of the distances to the respective :math:`k`-th nearest neighbours.
 
     Based on ideas in [1]_. The computation during `transform` depends on
-    the nature of the array  X. If each entry in X along axis 0 represents a
+    the nature of the array `X`. If each entry in `X` along axis 0 represents a
     distance matrix :math:`D`, then the corresponding entry in the
     transformed array is the distance matrix :math:`D'_{ij} = D_{ij}/\sqrt{
     D_{ik_i}D_{jk_j}}`, where :math:`k_i` is the index of the :math:`k`-th
     largest value in row :math:`i` (and similarly for :math:`j`). If the
-    entries in X represent point clouds, their distance matrices are first
+    entries in `X` represent point clouds, their distance matrices are first
     computed, and then rescaled according to the same formula.
 
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, each entry in X along axis 0 is
+        If set to `'precomputed'`, each entry in `X` along axis 0 is
         interpreted to be a distance matrix. Otherwise, entries are
         interpreted as feature arrays, and `metric` determines a rule with
         which to calculate distances between pairs of instances (i.e. rows)
@@ -39,10 +39,10 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value
+        two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict, optional, default: {}
+    metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
     n_neighbor : int, optional, default: 1

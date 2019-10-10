@@ -36,16 +36,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value
+        two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    max_edge_length : float, optional, default: np.inf
+    max_edge_length : float, optional, default: ``numpy.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
 
-    homology_dimensions : iterable, optional, default: (0, 1)
+    homology_dimensions : iterable, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological voids to be
         detected.
 
@@ -119,14 +119,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each point cloud or distance matrix in X,
+        """Compute, for each point cloud or distance matrix in `X`, 
         the relevant persistence diagram as an array of triples [b, d,
         q]. When q is not equal to ``numpy.inf``, each triple represents a
         persistent topological feature in dimension q (belonging to
         `homology_dimensions`) which is born at b and dies at d. Triples
-        `[0., 0., np.inf]` are used for padding, as the number of persistent
-        topological features is generally different between different entries
-        in X.
+        ``[0., 0., numpy.inf]`` are used for padding, as the number of
+        persistent topological features is generally different between
+        different entries in `X`.
 
         Parameters
         ----------
@@ -147,8 +147,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. `n_features` is the maximum number of
-            topological features across all samples in `X`, and padding by `[0,
-            0, np.inf]` is performed when necessary.
+            topological features across all samples in `X`, and padding by
+            ``[0., 0., numpy.inf]`` is performed when necessary.
 
         """
         # Check if fit had been called

@@ -118,7 +118,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes the distance matrix between the diagrams in X, according to
+        """Computes the distance matrix between the diagrams in `X`, according to
         the choice of `metric` and `metric_params`.
 
         Parameters
@@ -138,7 +138,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_samples) if `order` is ``None``, \
             else (n_samples, n_samples, n_dimensions).
-            Distance matrix between diagrams in X.
+            Distance matrix between diagrams in `X`.
 
         """
         check_is_fitted(self, 'effective_metric_params_')
@@ -279,7 +279,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, 1) if `order` is ``None``, else \
             (n_samples, n_samples, n_dimensions)
-            Amplitude of the diagrams in X.
+            Amplitude of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['effective_metric_params_'])

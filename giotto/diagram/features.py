@@ -312,7 +312,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions,
         n_layers, n_values)
-            Array of the persistence landscapes of the diagrams in X.
+            Array of the persistence landscapes of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
@@ -421,7 +421,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_values, n_values,
             n_homology_dimensions)
-            Array of the persistence landscapes of the diagrams in X.
+            Array of the persistence landscapes of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
