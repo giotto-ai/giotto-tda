@@ -120,10 +120,15 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     [b, d, q], the value of its q-Betti curve at parameter r is simply the
     number of persistent features in homology dimension q which are alive at r.
     Approximate Betti curves are constructed by sampling the `filtration
-    parameter <LINK TO GLOSSARY>` _ at evenly spaced values.
+    parameter <LINK TO GLOSSARY>` _ at evenly spaced values, once per
+    available homology dimension.
 
     Parameters
     ----------
+    n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during `fit`.
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
@@ -136,7 +141,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     samplings_ : dict
         For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during `fit`.
+        filtration parameters, calculated during `fit` according to the
+        minimum birth and maximum death values observed across all samples.
 
     See also
     --------
@@ -196,8 +202,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
-            Array of the persistence entropies of the diagrams in X.
+        Xt : ndarray, shape (n_samples, n_values, n_homology_dimensions)
+            Betti curves.
 
         """
         # Check if fit had been called
@@ -224,6 +230,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
+    n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during `fit`.
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -328,6 +338,13 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
+    sigma : float
+        Standard deviation for Gaussian kernel.
+
+    n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during `fit`.
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
