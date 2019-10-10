@@ -28,15 +28,15 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : string or callable, optional, default: 'euclidean'
+    metric : string or callable, optional, default: ``'euclidean'``
         If set to `'precomputed'`, each entry in X along axis 0 is
         interpreted to be a distance matrix. Otherwise, entries are
         interpreted as feature arrays, and `metric` determines a rule with
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including
+        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including
         "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
@@ -51,8 +51,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         according to the consistent rescaling procedure.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. `None` means 1
-        unless in a :obj:`joblib.parallel_backend` context. `-1` means
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
     Examples
@@ -110,7 +110,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
+        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, \
             n_points, n_dimensions)
             Input data. If `metric=='precomputed'`, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -139,7 +139,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples,
+        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, \
             n_points, n_dimensions)
             Input data. If `metric=='precomputed'`, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
