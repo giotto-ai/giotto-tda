@@ -13,18 +13,17 @@ from ..utils.validation import validate_params
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    r"""Transformer rescaling distances between pairs of points by the
-    geometric mean of the distances to the respective :math:`k`-th nearest
-    neighbours. Based on ideas in [1]_.
+    r"""Rescaling of distances between pairs of points by the geometric mean
+    of the distances to the respective :math:`k`-th nearest neighbours.
 
-    The computation during `transform` depends on the nature of the array
-    X. If each entry in X along axis 0 represents a distance matrix :math:`D`,
-    then the corresponding entry in the transformed array is the distance
-    matrix :math:`D'_{ij} = D_{ij}/\sqrt{D_{ik_i}D_{jk_j}}`, where :math:`k_i`
-    is the index of the :math:`k`-th largest value in row :math:`i` (and
-    similarly for :math:`j`). If the entries in X represent point clouds,
-    their distance matrices are first computed, and then rescaled according
-    to the same formula.
+    Based on ideas in [1]_. The computation during `transform` depends on
+    the nature of the array  X. If each entry in X along axis 0 represents a
+    distance matrix :math:`D`, then the corresponding entry in the
+    transformed array is the distance matrix :math:`D'_{ij} = D_{ij}/\sqrt{
+    D_{ik_i}D_{jk_j}}`, where :math:`k_i` is the index of the :math:`k`-th
+    largest value in row :math:`i` (and similarly for :math:`j`). If the
+    entries in X represent point clouds, their distance matrices are first
+    computed, and then rescaled according to the same formula.
 
     Parameters
     ----------
