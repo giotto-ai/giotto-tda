@@ -32,8 +32,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
         ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
-        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including "euclidean",
-        "manhattan", or "cosine".
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``,
+        including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
         two arrays from the entry in X as input, and return a value
