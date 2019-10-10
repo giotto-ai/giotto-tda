@@ -70,7 +70,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence diagram, compute the vector of q-persistence
+        """For each persistence diagram, compute the vector of persistence
         entropies corresponding to each available homology dimension q.
 
         Parameters
@@ -100,10 +100,12 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         homology_dimensions = sorted(list(set(X[0, :, 2])))
         n_dimensions = len(homology_dimensions)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._persistence_entropy)(_subdiagrams(X, [dim])[s, :, :2])
-            for dim in homology_dimensions
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            Xt = Parallel(n_jobs=self.n_jobs)(delayed(
+                self._persistence_entropy)(_subdiagrams(X, [dim])[s, :, :2])
+                for dim in homology_dimensions
+                for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+                                              )
         n_slices = len(Xt) // n_dimensions
         Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
                                         for j in range(n_slices)], axis=0)
@@ -116,10 +118,9 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], the value of its q-Betti curve at parameter r is simply the
-    number of persistent features in homology dimension q alive at r. Betti
-    curves are constructed by sampling the `filtration parameter <LINK TO
-    GLOSSARY>` _ at evenly spaced values which
-    are stored as attributes in `fit`.
+    number of persistent features in homology dimension q which are alive at r.
+    Approximate Betti curves are constructed by sampling the `filtration
+    parameter <LINK TO GLOSSARY>` _ at evenly spaced values.
 
     Parameters
     ----------
@@ -134,8 +135,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Homology dimensions seen in `fit`.
 
     samplings_ : dict
-        For each number in `homology_dimensions_`, store a discrete sampling of
-        filtration parameters calculated during `fit`.
+        For each number in `homology_dimensions_`, a discrete sampling of
+        filtration parameters, calculated during `fit`.
 
     See also
     --------
@@ -177,8 +178,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence subdiagram corresponding to an homology
-        dimension k, compute that subdiagram's betti curve.
+        """Compute the Betti curves (one per homology dimension available in
+        `fit`) of each diagram.
 
         Parameters
         ----------
@@ -211,8 +212,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
         Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(
-            n_dimensions)], axis=2)
+            n_slices)], axis=0) for i in range(n_dimensions)], axis=2)
         return Xt
 
 
