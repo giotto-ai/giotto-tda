@@ -53,8 +53,7 @@ signal_embedded_fixed = \
 def test_embedder_params():
     parameters_type = 'not_defined'
     embedder = TakensEmbedding(parameters_type=parameters_type)
-    msg = 'The embedding parameters type %s is not supported'
-    with pytest.raises(ValueError, match=msg % parameters_type):
+    with pytest.raises(ValueError):
         embedder.fit(signal)
 
 
@@ -75,7 +74,5 @@ def test_embedder_transform(parameters_type, expected):
 
 def test_window_params():
     window = SlidingWindow(width=signal.shape[0] + 1)
-    msg = 'does not have enough points to have a single window of width'
-
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(ValueError):
         window.fit(signal)

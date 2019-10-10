@@ -307,7 +307,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X)
+        X = column_or_1d(X)
 
         if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -361,7 +361,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
-        X = check_array(X)
+        Xt = column_or_1d(X).copy()
 
         Xt = self._embed(X, self.time_delay_, self.dimension_, self.stride)
         return Xt

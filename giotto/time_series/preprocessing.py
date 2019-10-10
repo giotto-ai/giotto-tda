@@ -189,7 +189,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        validate_params(self.get_params, self._hyperparameters)
+        validate_params(self.get_params(), self._hyperparameters)
         check_array(X)
 
         self._is_fitted = True
