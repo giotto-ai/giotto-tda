@@ -98,9 +98,7 @@ def test_stationarizer_not_fitted():
 def test_stationarizer_errors():
     operation = 'not_defined'
     stationarizer = Stationarizer(operation=operation)
-    msg = 'The stationarization operation %s is not supported'
-
-    with pytest.raises(ValueError, match=msg % operation):
+    with pytest.raises(ValueError):
         stationarizer.fit(signal)
 
 
