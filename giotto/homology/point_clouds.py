@@ -12,8 +12,7 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <LINK TO GLOSSARY>`_ (equivalently,
-    `persistence barcodes <LINK TO GLOSSARY>`_) resulting from
+    """`Persistence diagrams <LINK TO GLOSSARY>`_ resulting from
     `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_.
 
     Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space, or an

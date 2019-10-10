@@ -11,8 +11,7 @@ from giotto.diagram._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """`Persistence entropies <LINK TO GLOSSARY>`_ of the persistence diagrams
-    in a collection.
+    """`Persistence entropies <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], its q-persistence entropy is the (base e) entropy of the
@@ -113,15 +112,14 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """`Betti curves <LINK TO GLOSSARY>`_ associated to each persistence
-    diagram in a collection. Constructed by sampling the
-    `filtration parameter <LINK TO GLOSSARY>` _ at evenly spaced values.
+    """`Betti curves <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], the value of its q-Betti curve at parameter r is simply the
-    number of persistent features in homology dimension q alive at r. The
-    array of discrete parameter values used for sampling is stored as an
-    attribute in `fit`.
+    number of persistent features in homology dimension q alive at r. Betti
+    curves are constructed by sampling the `filtration parameter <LINK TO
+    GLOSSARY>` _ at evenly spaced values which
+    are stored as attributes in `fit`.
 
     Parameters
     ----------
