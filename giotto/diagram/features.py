@@ -22,8 +22,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        The number of jobs to use for the computation. `None` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. `-1` means using all
         processors.
 
     See also
@@ -53,7 +53,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -80,7 +80,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -113,26 +113,35 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """`Betti curves <LINK TO GLOSSARY>`_ associated to persistence
-    diagrams, sampled at discrete values of the `filtration parameter
-    <LINK TO GLOSSARY>`_.
+    """`Betti curves <LINK TO GLOSSARY>`_ associated to each persistence
+    diagram in a collection. Constructed by sampling the
+    `filtration parameter <LINK TO GLOSSARY>` _ at evenly spaced values.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], its q-Betti curve is simply the number of persistent features
-    in homology dimension q alive at changing filtration values.
+    [b, d, q], the value of its q-Betti curve at parameter r is simply the
+    number of persistent features in homology dimension q alive at r. The
+    array of discrete parameter values used for sampling is stored as an
+    attribute in `fit`.
 
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        The number of jobs to use for the computation. `None` means 1
+        unless in a :obj:`joblib.parallel_backend` context. `-1` means
         using all processors.
 
     Attributes
     ----------
-    samplings_ : dict of ndarrays
-        Dictionary for which is key is an homology dimension and each value is
-        the corresponding filtration values sampling.
+    homology_dimensions_ : list
+        Homology dimensions seen in `fit`.
+
+    samplings_ : dict
+        For each number in `homology_dimensions_`, store a discrete sampling of
+        filtration parameters calculated during `fit`.
+
+    See also
+    --------
+    VietorisRipsPersistence
 
     """
     def __init__(self, n_values=100, n_jobs=None):
@@ -151,7 +160,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -179,7 +188,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -218,15 +227,22 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        The number of jobs to use for the computation. `None` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. `-1` means using all
         processors.
 
     Attributes
     ----------
-    samplings_ : dict of ndarrays
-        Dictionary for which is key is an homology dimension and each value is
-        the corresponding filtration values sampling.
+    homology_dimensions_ : list
+        Homology dimensions seen in `fit`.
+
+    samplings_ : dict
+        For each number in `homology_dimensions_`, store a discrete sampling of
+        filtration parameters calculated during `fit`.
+
+    See also
+    --------
+    VietorisRipsPersistence
 
     """
     def __init__(self, n_layers=1, n_values=100, n_jobs=None):
@@ -246,7 +262,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -277,7 +293,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -309,21 +325,28 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 class HeatKernel(BaseEstimator, TransformerMixin):
     """Transformer for the calculation of the persistence landscapes from a
     collection of persistence diagrams. Given a generic persistence diagram
-    consisting of birth-death-dimension tuples (b, d, q), their q-persistence
+    consisting of birth-death-dimension triples [b, d, q], their q-persistence
     landscapes are TO DO.
 
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        The number of jobs to use for the computation. `None` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. `-1` means using all
         processors.
 
     Attributes
     ----------
-    samplings_ : dict of ndarrays
-        Dictionary for which is key is an homology dimension and each value is
-        the corresponding filtration values sampling.
+    homology_dimensions_ : list
+        Homology dimensions seen in `fit`.
+
+    samplings_ : dict
+        For each number in `homology_dimensions_`, store a discrete sampling of
+        filtration parameters calculated during `fit`.
+
+    See also
+    --------
+    VietorisRipsPersistence
 
     """
     def __init__(self, sigma, n_values=100, n_jobs=None):
@@ -343,7 +366,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None
@@ -372,7 +395,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals `np.inf` are used for padding and
             carry no information.
 
         y : None

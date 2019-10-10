@@ -96,10 +96,10 @@ def validate_params(parameters, references):
                                            references[key][1][1]))
         if isinstance(references[key][1], list):
             if parameters[key] not in references[key][1]:
-                ValueError("Parameter {} is {}, while it"
-                           " should be one of the following {}"
-                           "".format(key, parameters[key],
-                                     references[key][1]))
+                raise ValueError("Parameter {} is {}, while it"
+                                 " should be one of the following {}"
+                                 "".format(key, parameters[key],
+                                           references[key][1]))
 
 
 def validate_metric_params(metric, metric_params):

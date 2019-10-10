@@ -64,7 +64,6 @@ def _discretize(X, n_values=100, **kw_args):
 
     min_vals = {dim: np.min(_subdiagrams(X, [dim], remove_dim=True)[:, :, 0])
                 for dim in homology_dimensions}
-
     max_vals = {dim: np.max(_subdiagrams(X, [dim], remove_dim=True)[:, :, 1])
                 for dim in homology_dimensions}
     global_max_val = max(list(max_vals.values()))
@@ -73,9 +72,12 @@ def _discretize(X, n_values=100, **kw_args):
         (max_vals[dim] != min_vals[dim]) else
         global_max_val for dim in homology_dimensions}
 
-    samplings = {dim: (np.linspace(min_vals[dim], max_vals[dim],
-                                   num=n_values))
-                 for dim in homology_dimensions}
-    step_sizes = {dim: (samplings[dim][1] - samplings[dim][0])
-                  for dim in homology_dimensions}
+    samplings = {}
+    step_sizes = {}
+    for dim in homology_dimensions:
+        samplings[dim], step_sizes[dim] = np.linspace(min_vals[dim],
+                                                      max_vals[dim],
+                                                      retstep=True,
+                                                      num=n_values)
+        samplings[dim] = samplings[dim][:, None, None]
     return samplings, step_sizes

@@ -16,29 +16,29 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     `persistence barcodes <LINK TO GLOSSARY>`_) resulting from
     `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_.
 
-    Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space,
-    or an abstract `metric space <LINK TO GLOSSARY>`_ encoded by a distance
-    matrix, information about the appearance and disappearance of topological
-    features (technically, `homology classes <LINK TO GLOSSARY>`_) of various
+    Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space, or an
+    abstract `metric space <LINK TO GLOSSARY>`_ encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, `homology classes <LINK TO GLOSSARY>`_) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
     Parameters
     ----------
     metric : string or callable, optional, default: 'euclidean'
-        If set to ``'precomputed'``, input data is to be interpreted as a
+        If set to `'precomputed'`, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
-        and ``metric`` determines a rule with which to calculate distances
+        and `metric` determines a rule with which to calculate distances
         between pairs of instances (i.e. rows) in these arrays.
-        If ``metric`` is a string, it must be one of the options allowed by
+        If `metric` is a string, it must be one of the options allowed by
         scipy.spatial.distance.pdist for its metric parameter, or a metric
         listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
         "manhattan", or "cosine".
-        If ``metric`` is a callable function, it is called on each pair of
+        If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value indicating
-        the distance between them.
+        two arrays from the entry in X as input, and return a value
+        indicating the distance between them.
 
     max_edge_length : float, optional, default: np.inf
         Upper bound on the maximum value of the Vietoris-Rips filtration
@@ -51,8 +51,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         detected.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        The number of jobs to use for the computation. `None` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. `-1` means using all
         processors.
 
     """
@@ -98,11 +98,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or
             (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
+            Input data. If `metric == 'precomputed'`, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
-            interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_dimensions.
+            interpreted as an ndarray of `n_points` in Euclidean space of
+            dimension `n_dimensions`.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -120,12 +120,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each point cloud or distance matrix in X, the relevant
-        persistence diagram as an array of triples [b, d, q]. When q is
-        not equal to ``np.inf``, each triple represents a persistent
-        topological feature in dimension q (belonging to
-        ``homology_dimensions``) which is born at b and dies at d. Triples
-        ``[0., 0., np.inf]`` are used for padding, as the number of persistent
+        """Compute, for each point cloud or distance matrix in X,
+        the relevant persistence diagram as an array of triples [b, d,
+        q]. When q is not equal to `np.inf`, each triple represents a
+        persistent topological feature in dimension q (belonging to
+        `homology_dimensions`) which is born at b and dies at d. Triples
+        `[0., 0., np.inf]` are used for padding, as the number of persistent
         topological features is generally different between different entries
         in X.
 
@@ -133,11 +133,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or
             (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
+            Input data. If `metric == 'precomputed'`, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
-            interpreted as an ndarray of n_points in Euclidean space of
-            dimension n_dimensions.
+            interpreted as an ndarray of `n_points` in Euclidean space of
+            dimension `n_dimensions`.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -147,9 +147,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
-            distance matrices in X. ``n_features`` is the maximum number of
-            topological features across all samples in X, and padding by ``[0,
-            0, np.inf]`` is performed when necessary.
+            distance matrices in `X`. `n_features` is the maximum number of
+            topological features across all samples in `X`, and padding by `[0,
+            0, np.inf]` is performed when necessary.
 
         """
         # Check if fit had been called
