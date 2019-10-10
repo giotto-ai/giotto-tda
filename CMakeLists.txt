@@ -13,7 +13,7 @@ target_compile_options(giotto_ripser PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBC
 # Cannot have two inlined namespace !
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(giotto_ripser PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    set_target_properties(giotto_ripser PROPERTIES LINK_FLAGS -fopenmp)
+    target_link_libraries(giotto_ripser PRIVATE -fopenmp)
 endif()
 target_compile_definitions(giotto_ripser PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
 
@@ -40,7 +40,7 @@ target_compile_options(giotto_cubical_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb
 # Cannot have two inlined namespace !
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(giotto_cubical_complex PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    set_target_properties(giotto_cubical_complex PROPERTIES LINK_FLAGS -fopenmp)
+    target_link_libraries(giotto_cubical_complex PRIVATE -fopenmp)
 endif()
 
 target_compile_definitions(giotto_cubical_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
@@ -57,7 +57,7 @@ target_compile_options(giotto_persistent_cohomology PUBLIC $<$<CONFIG:DEBUG>:-O2
 # Cannot have two inlined namespace !
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(giotto_persistent_cohomology PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    set_target_properties(giotto_persistent_cohomology PROPERTIES LINK_FLAGS -fopenmp)
+    target_link_libraries(giotto_persistent_cohomology PRIVATE -fopenmp)
 endif()
 target_compile_definitions(giotto_persistent_cohomology PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
@@ -74,6 +74,6 @@ target_compile_options(giotto_simplex_tree PUBLIC -Ofast -shared -pthread -fPIC
 target_compile_options(giotto_simplex_tree PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(giotto_simplex_tree PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    set_target_properties(giotto_simplex_tree PROPERTIES LINK_FLAGS -fopenmp)
+    target_link_libraries(giotto_simplex_tree PRIVATE -fopenmp)
 endif()
 target_compile_definitions(giotto_simplex_tree PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
