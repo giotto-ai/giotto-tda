@@ -22,8 +22,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. `None` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. `-1` means using all
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     See also
@@ -53,7 +53,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -80,7 +80,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -126,8 +126,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. `None` means 1
-        unless in a :obj:`joblib.parallel_backend` context. `-1` means
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
     Attributes
@@ -160,7 +160,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -188,7 +188,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -227,8 +227,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. `None` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. `-1` means using all
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     Attributes
@@ -262,7 +262,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -293,7 +293,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -331,8 +331,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. `None` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. `-1` means using all
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     Attributes
@@ -366,7 +366,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -395,7 +395,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals `np.inf` are used for padding and
+            Triples in which q equals ``np.inf`` are used for padding and
             carry no information.
 
         y : None

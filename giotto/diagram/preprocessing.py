@@ -96,17 +96,17 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
 
-    A scale factor is calculated during ``fit`` which depends on the entire
-    collection, and it is applied during ``transform``. The value of the scale
+    A scale factor is calculated during `fit` which depends on the entire
+    collection, and it is applied during `transform`. The value of the scale
     factor depends on a chosen norm function which is internally evaluated on
-    each persistent diagram separately, and on a function (e.g. ``np.max``)
+    each persistent diagram separately, and on a function (e.g. `np.max`)
     which is applied to the resulting collection of norms to extract a single
     scale factor.
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
-        default: 'bottleneck'
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` |
+             ``'betti'``, optional,  default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -125,17 +125,17 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: {'n_samples': 200}
         Additional keyword arguments for the norm function:
 
-        - If ``norm == 'bottleneck'`` the only argument is ``order``
+        - If ``norm == 'bottleneck'`` the only argument is `order`
           (default = ``np.inf``).
-        - If ``norm == 'wasserstein'`` the only argument is ``order``
+        - If ``norm == 'wasserstein'`` the only argument is `order`
+          (default = ``1.``).
+        - If ``norm == 'landscape'`` the available arguments are `order`
+          (default = ``2.``), `n_samples` (default = ``200``) and `n_layers`
           (default = ``1``).
-        - If ``norm == 'landscape'`` the available arguments are ``order``
-          (default = ``2``), ``n_samples`` (default = ``200``) and ``n_layers``
-          (default = ``1``).
-        - If ``norm == 'betti'`` the available arguments are ``order``
-          (default = ``2``) and ``n_samples`` (default = ``200``).
-        - If ``metric == 'heat'`` the available arguments are ``order``
-          (default = ``2``), ``sigma`` (default = ``1``), and ``n_samples`` (
+        - If ``norm == 'betti'``` the available arguments are `order`
+          (default = ``2.``) and `n_samples` (default = ``200``).
+        - If ``metric == 'heat'`` the available arguments are `order`
+          (default = ``2.``), `sigma` (default = ``1.``), and `n_samples` (
           default = ``200``).
 
     function : callable, optional, default: numpy.max
@@ -212,7 +212,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Rescales all persistence diagrams in the collection according to the
-        factor computed during ``fit``.
+        factor computed during `fit`.
 
         Parameters
         ----------
@@ -241,7 +241,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, X, copy=None):
         """Scale back the data to the original representation. Multiplies
-        by the scale found in ``fit``.
+        by the scale found in `fit`.
 
         Parameters
         ----------
@@ -347,7 +347,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             corresponding to key d has shape (n_samples, F_d, 2), where
             :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to
             filtering.
-            If ``homology_dimensions`` was set to be a list not containing all
+            If `homology_dimensions` was set to be a list not containing all
             keys in X, only the corresponding (sub)diagrams are filtered and
             returned.
         """

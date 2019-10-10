@@ -20,8 +20,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti' | 'heat',
-    optional, default: 'bottleneck'
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` |
+             ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -43,17 +43,17 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the only argument is
-          ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the available arguments are ``p``
-          (default = ``1``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'landscape'`` the available arguments are ``p``
-          (default = ``2``), ``n_values`` (default = ``100``) and
-          ``n_layers`` (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``p``
-          (default = ``2``) and ``n_values`` (default = ``100``).
-        - If ``metric == 'heat'`` the available arguments are ``p``
-          (default = ``2``), ``sigma`` (default = ``1``) and
-          ``n_values`` (default = ``100``).
+          `delta` (default = `0.`).
+        - If ``metric == 'wasserstein'`` the available arguments are `p`
+          (default = ``1.``) and `delta` (default = ``0.``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (default = ``2.``), `n_values` (default = ``100``) and
+          `n_layers` (default = ``1``).
+        - If ``metric == 'betti'`` the available arguments are `p`
+          (default = ``2.``) and `n_values` (default = ``100``).
+        - If ``metric == 'heat'`` the available arguments are `p`
+          (default = ``2.``), `sigma` (default = ``1.``) and
+          `n_values` (default = ``100``).
 
     order : int, optional, default: 2
         Order of the norm used to combine subdiagrams distances into a single
@@ -119,7 +119,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Computes the distance matrix between the diagrams in X, according to
-        the choice of ``metric`` and ``metric_params``.
+        the choice of `metric` and `metric_params`.
 
         Parameters
         ----------
@@ -136,7 +136,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_samples) if ``order`` is ``None``
+        Xt : ndarray, shape (n_samples, n_samples) if `order` is ``None``
         (n_samples, n_samples, n_dimensions) else.
             Distance matrix between diagrams in X.
 
@@ -168,8 +168,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
-        default: 'bottleneck'
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` |
+             ``'betti'``, optional, default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -188,18 +188,18 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: {'n_values': 100}
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the available arguments are ``order``
-          (default = ``np.inf``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order``
-          (default = ``1``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'landscape'`` the available arguments are ``order``
-          (default = ``2``), ``n_values`` (default = ``100``) and
-          ``n_layers`` (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``order``
-          (default = ``2``) and ``n_values`` (default = ``100``).
-        - If ``metric == 'heat'`` the available arguments are ``order``
-          (default = ``2``), ``sigma`` (default = ``1``) and
-          ``n_values`` (default = ``100``).
+        - If ``metric == 'bottleneck'`` the available arguments are `order`
+          (default = ``np.inf``) and `delta` (default = ``0.``).
+        - If ``metric == 'wasserstein'`` the only argument is `order`
+          (default = ``1.``) and `delta` (default = ``0.``).
+        - If ``metric == 'landscape'`` the available arguments are `order`
+          (default = ``2.``), `n_values` (default = ``100``) and
+          `n_layers` (default = ``1``).
+        - If ``metric == 'betti'`` the available arguments are `order`
+          (default = ``2.``) and `n_values` (default = ``100``).
+        - If ``metric == 'heat'`` the available arguments are `order`
+          (default = ``2.``), `sigma` (default = ``1.``) and
+          `n_values` (default = ``100``).
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -259,7 +259,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Computes the amplitude of a each diagram in the collection X,
-        according to the choice of ``metric`` and ``metric_params``.
+        according to the choice of `metric` and `metric_params`.
 
         Parameters
         ----------
@@ -276,8 +276,8 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1) if ``order`` is ``None``
-        (n_samples, n_samples, n_dimensions) else
+        Xt : ndarray, shape (n_samples, 1) if `order` is ``None``, else
+            (n_samples, n_samples, n_dimensions)
             Amplitude of the diagrams in X.
 
         """
