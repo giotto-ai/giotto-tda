@@ -32,8 +32,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
         ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
-        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including "euclidean",
-        "manhattan", or "cosine".
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``,
+        including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
         two arrays from the entry in X as input, and return a value
@@ -121,7 +121,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         """Compute, for each point cloud or distance matrix in X,
         the relevant persistence diagram as an array of triples [b, d,
-        q]. When q is not equal to ``np.inf``, each triple represents a
+        q]. When q is not equal to ``numpy.inf``, each triple represents a
         persistent topological feature in dimension q (belonging to
         `homology_dimensions`) which is born at b and dies at d. Triples
         `[0., 0., np.inf]` are used for padding, as the number of persistent

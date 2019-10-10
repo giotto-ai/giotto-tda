@@ -7,7 +7,7 @@ from scipy import sparse as sp
 from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted
 
 
 class TransitionGraph(BaseEstimator, TransformerMixin):

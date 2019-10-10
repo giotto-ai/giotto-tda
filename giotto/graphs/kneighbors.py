@@ -26,7 +26,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_neighbors : int, optional (default = 5)
+    n_neighbors : int, optional (default: 5)
         Number of neighbors to use by default for :meth:`kneighbors` queries.
 
     metric : string or callable, default 'minkowski'
@@ -47,16 +47,16 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath',
         'sqeuclidean', 'yule']
 
-        See the documentation for ``scipy.spatial.distance`` for details on these
-        metrics.
+        See the documentation for ``scipy.spatial.distance`` for details on
+        these metrics.
 
-    p : integer, optional (default = 2)
+    p : integer, optional (default: 2)
         Parameter for the Minkowski metric from
         sklearn.metrics.pairwise.pairwise_distances. When p = 1, this is
         equivalent to using manhattan_distance (l1), and euclidean_distance
         (l2) for p = 2. For arbitrary p, minkowski_distance (l_p) is used.
 
-    metric_params : dict, optional (default = None)
+    metric_params : dict, optional (default: None)
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional (default=None)
