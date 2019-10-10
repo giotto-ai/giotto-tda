@@ -15,8 +15,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     in a collection.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], its q-persistence entropy is simply the (base e) entropy of
-    the collection of differences d - b for points of homology dimension q,
+    [b, d, q], its q-persistence entropy is the (base e) entropy of the
+    collection of differences d - b for points of homology dimension q,
     normalized by the sum of all such differences.
 
     Parameters

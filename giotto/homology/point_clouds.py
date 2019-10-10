@@ -25,15 +25,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : string or callable, optional, default: 'euclidean'
+    metric : string or callable, optional, default: ``'euclidean'``
         If set to `'precomputed'`, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
         and `metric` determines a rule with which to calculate distances
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
+        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including "euclidean",
         "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
@@ -96,7 +96,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -131,7 +131,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
