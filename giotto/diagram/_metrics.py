@@ -54,7 +54,7 @@ def heats(diagrams, sampling, step_size, sigma):
     [_heat(heats_[i], sampled_diag, sigma)
      for i, sampled_diag in enumerate(sampled_diags)]
     heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
-    heats_ = np.rot90(heats_, k=1, axes=(1,2))
+    heats_ = np.rot90(heats_, k=1, axes=(1, 2))
     return heats_
 
 
@@ -136,10 +136,9 @@ def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
     homology_dimensions = sorted(list(set(X1[0, :, 2])))
 
     effective_metric_params = metric_params.copy()
-    samplings = effective_metric_params.pop('samplings',
-        {dim: None for dim in homology_dimensions})
-    step_sizes = effective_metric_params.pop('step_sizes',
-        {dim: None for dim in homology_dimensions})
+    none_dict = {dim: None for dim in homology_dimensions}
+    samplings = effective_metric_params.pop('samplings', none_dict)
+    step_sizes = effective_metric_params.pop('step_sizes', none_dict)
 
     if X2 is None:
         X2 = X1
@@ -201,10 +200,9 @@ def _parallel_amplitude(X, metric, metric_params, n_jobs):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
     amplitude_func = implemented_amplitude_recipes[metric]
     effective_metric_params = metric_params.copy()
-    samplings = effective_metric_params.pop('samplings',
-        {dim: None for dim in homology_dimensions})
-    step_sizes = effective_metric_params.pop('step_sizes',
-        {dim: None for dim in homology_dimensions})
+    none_dict = {dim: None for dim in homology_dimensions}
+    samplings = effective_metric_params.pop('samplings', none_dict)
+    step_sizes = effective_metric_params.pop('step_sizes', none_dict)
 
     amplitude_arrays = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
         _subdiagrams(X, [dim], remove_dim=True)[s], sampling=samplings[dim],
