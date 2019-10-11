@@ -9,7 +9,7 @@ from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class DiagramStacker(BaseEstimator, TransformerMixin):
+class Stacking(BaseEstimator, TransformerMixin):
     """Transformer for stacking persistence subdiagrams.
 
     Useful when topological
@@ -40,7 +40,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -68,7 +68,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -91,7 +91,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         return Xt
 
 
-class DiagramScaler(BaseEstimator, TransformerMixin):
+class Scaler(BaseEstimator, TransformerMixin):
     """Transformer scaling collections of persistence diagrams in which each
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
@@ -122,21 +122,21 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
            persistence (sub)diagram.
         - ``'heat'`` heat kernel
 
-    metric_params : dict, optional, default: {'n_samples': 200}
+    metric_params : dict, optional, default: ``{'n_samples': 200}``
         Additional keyword arguments for the norm function:
 
         - If ``norm == 'bottleneck'`` the only argument is `order`
-          (default = ``np.inf``).
+          (default: ``numpy.inf``).
         - If ``norm == 'wasserstein'`` the only argument is `order`
-          (default = ``1.``).
+          (default: ``1.``).
         - If ``norm == 'landscape'`` the available arguments are `order`
-          (default = ``2.``), `n_samples` (default = ``200``) and `n_layers`
-          (default = ``1``).
+          (default: ``2.``), `n_samples` (default: ``200``) and `n_layers`
+          (default: ``1``).
         - If ``norm == 'betti'``` the available arguments are `order`
-          (default = ``2.``) and `n_samples` (default = ``200``).
+          (default: ``2.``) and `n_samples` (default: ``200``).
         - If ``metric == 'heat'`` the available arguments are `order`
-          (default = ``2.``), `sigma` (default = ``1.``), and `n_samples` (
-          default = ``200``).
+          (default: ``2.``), `sigma` (default: ``1.``), and `n_samples` (
+          default: ``200``).
 
     function : callable, optional, default: numpy.max
         Function used to extract a single positive scalar from the collection
@@ -171,7 +171,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -220,7 +220,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -231,7 +231,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         -------
         Xs : dict of int: ndarray
             Dictionary of rescaled persistence (sub)diagrams, each with the
-            same shape as the corresponding (sub)diagram in X.
+            same shape as the corresponding (sub)diagram in `X`.
         """
         check_is_fitted(self, ['scale_', 'effective_metric_params_'])
 
@@ -263,7 +263,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         return Xs
 
 
-class DiagramFilter(BaseEstimator, TransformerMixin):
+class Filtering(BaseEstimator, TransformerMixin):
     """Transformer filtering collections of persistence diagrams in which each
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
@@ -276,12 +276,12 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    homology_dimensions : list or None, optional, default: None
+    homology_dimensions : list or None, optional, default: ``None``
         When set to ``None``, all available (sub)diagrams will be filtered.
         When set to a list, it is interpreted as the list of those homology
         dimensions for which (sub)diagrams should be filtered.
 
-    delta : float, optional, default: 0.
+    delta : float, optional, default: ``0.``
         The cutoff value controlling the amount of filtering.
 
     """
@@ -303,7 +303,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -333,7 +333,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -348,7 +348,7 @@ class DiagramFilter(BaseEstimator, TransformerMixin):
             :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to
             filtering.
             If `homology_dimensions` was set to be a list not containing all
-            keys in X, only the corresponding (sub)diagrams are filtered and
+            keys in `X`, only the corresponding (sub)diagrams are filtered and
             returned.
         """
 

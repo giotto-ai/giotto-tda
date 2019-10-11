@@ -9,10 +9,10 @@ def plot_diagram(diagram, homology_dimensions=None):
 
     Parameters
     ----------
-    diagram : dict of np.arrays of shape (*,2)
+    diagram : dict of ndarray of shape (*, 2)
         The persistence diagram to plot, where the keys of the dict correspond to homology dimensions and each
         entry is the collection of (birth,death) points in R^2 of the corresponding homology dimension.
-    homology_dimensions : list of ints, default None
+    homology_dimensions : list of int, default ``None``
         The list of homology dimensions that will appear on the plot. None means that all the homology dimensions
         contained in diagram will be plotted.
     """
@@ -77,7 +77,7 @@ def plot_landscapes(landscape, homology_dimensions=None):
     ----------
     landscape : dict of np.arrays of shape (n_layers,n_sampled_values,2)
         The landcsapes to plot, where the keys of the dict correspond to homology dimensions.
-    homology_dimensions : list of ints, default None
+    homology_dimensions : list of ints, default ``None``
         The list of homology dimensions for which the landscape is plotted. None means that the landscape of
         every homology dimension is plotted.
     """
@@ -131,7 +131,8 @@ def plot_betti_curves(betti_curves, homology_dimensions=None):
     ----------
     betti_curves : dict of np.arrays of shape (n_sampled_values,2)
         The Betti curves to plot, where the keys of the dict correspond to homology dimensions.
-    homology_dimensions : list of ints, default None
+
+    homology_dimensions : list of ints, default ``None``
         The list of homology dimensions that will appear on the plot. None means that the Betti curves of every homology
         dimension contained in betti_curves will be plotted.
     """
@@ -197,7 +198,7 @@ def plot_betti_surfaces(betti_curves, homology_dimensions=None):
     ----------
     betti_curves : collection (list or np.array) of dict of np.arrays of shape (n_sampled_values,2)
         The Betti curves across time , where the keys of the dict correspond to homology dimensions.
-    homology_dimensions : list of ints, default None
+    homology_dimensions : list of ints, default ``None``
         The list of homology dimensions for which the Betti surface is plotted. None means that the Betti surface of
         every homology dimension is plotted.
     """

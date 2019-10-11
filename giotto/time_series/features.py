@@ -62,7 +62,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Calculate the entropy of each array in X.
+        """Calculate the entropy of each array in `X`.
 
         Parameters
         ----------
@@ -76,7 +76,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of int, shape (n_samples, n_points)
-            Array of entropies (one per array in X).
+            Array of entropies (one per array in `X`).
 
         """
 

@@ -7,17 +7,12 @@ spirit of a pooling layer in a convolutional neural network.
 # Adapted from scikit-learn and imbalanced-learn
 # License: Apache 2.0
 
-import functools
-from collections import defaultdict
-import itertools
 import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import clone
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from .base import TransformerResamplerMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from .utils.validation import validate_params
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
@@ -302,7 +297,8 @@ class Pipeline(pipeline.Pipeline):
 
     @property
     def resample(self):
-        """Apply transformers/transformer_resamplers, and transform with the final estimator
+        """Apply transformers/transformer_resamplers, and transform with the
+        final estimator.
 
         This also works where final estimator is ``None``: all prior
         transformations are applied.
@@ -331,7 +327,8 @@ class Pipeline(pipeline.Pipeline):
 
     @property
     def transform_resample(self):
-        """Apply transformers/transformer_resamplers, and transform with the final estimator
+        """Apply transformers/transformer_resamplers, and transform with the
+        final estimator.
 
         This also works where final estimator is ``None``: all prior
         transformations are applied.
@@ -366,7 +363,8 @@ class Pipeline(pipeline.Pipeline):
 
     @property
     def transform(self):
-        """Apply transformers/transformer_resamplers, and transform with the final estimator
+        """Apply transformers/transformer_resamplers, and transform with the
+        final estimator.
 
         This also works where final estimator is ``None``: all prior
         transformations are applied.

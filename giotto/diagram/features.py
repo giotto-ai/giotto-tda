@@ -25,6 +25,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in `fit`, sorted in ascending order.
+
     See also
     --------
     VietorisRipsPersistence
@@ -36,9 +41,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     def _persistence_entropy(self, X):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
+        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape((-1, 1))
         return - np.sum(np.nan_to_num(
-            X_normalized * np.log(X_normalized)), axis=1).reshape(-1, 1)
+            X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -52,7 +57,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -65,12 +70,14 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """For each persistence diagram, compute the vector of q-persistence
+        """For each persistence diagram, compute the vector of persistence
         entropies corresponding to each available homology dimension q.
 
         Parameters
@@ -79,7 +86,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -97,17 +104,16 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
         X = check_diagram(X)
 
-        homology_dimensions = sorted(list(set(X[0, :, 2])))
-        n_dimensions = len(homology_dimensions)
+        n_samples = len(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._persistence_entropy)(_subdiagrams(X, [dim])[s, :, :2])
-            for dim in homology_dimensions
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
-                                        for j in range(n_slices)], axis=0)
-                        for i in range(n_dimensions)])
+        with np.errstate(divide='ignore', invalid='ignore'):
+            Xt = Parallel(n_jobs=self.n_jobs)(
+                delayed(self._persistence_entropy)(_subdiagrams(X, [dim])[s])
+                for dim in self.homology_dimensions_
+                for s in gen_even_slices(
+                    n_samples, effective_n_jobs(self.n_jobs))
+            )
+        Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples)).T
         return Xt
 
 
@@ -116,13 +122,17 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], the value of its q-Betti curve at parameter r is simply the
-    number of persistent features in homology dimension q alive at r. Betti
-    curves are constructed by sampling the `filtration parameter <LINK TO
-    GLOSSARY>` _ at evenly spaced values which
-    are stored as attributes in `fit`.
+    number of persistent features in homology dimension q which are alive at r.
+    Approximate Betti curves are constructed by sampling the `filtration
+    parameter <LINK TO GLOSSARY>`_ at evenly spaced values, once per
+    available homology dimension.
 
     Parameters
     ----------
+    n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during `fit`.
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
@@ -131,11 +141,12 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        Homology dimensions seen in `fit`.
+        Homology dimensions seen in `fit`, sorted in ascending order.
 
     samplings_ : dict
-        For each number in `homology_dimensions_`, store a discrete sampling of
-        filtration parameters calculated during `fit`.
+        For each number in `homology_dimensions_`, a discrete sampling of
+        filtration parameters, calculated during `fit` according to the
+        minimum birth and maximum death values observed across all samples.
 
     See also
     --------
@@ -158,7 +169,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -172,13 +183,14 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self.samplings_, _ = _discretize(X, n_values=self.n_values)
         return self
 
     def transform(self, X, y=None):
-        """For each persistence subdiagram corresponding to an homology
-        dimension k, compute that subdiagram's betti curve.
+        """Compute the Betti curves (one per homology dimension available in
+        `fit`) of each diagram.
 
         Parameters
         ----------
@@ -186,7 +198,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -196,23 +208,23 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
-            Array of the persistence entropies of the diagrams in X.
+            Betti curves.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        n_dimensions = len(self.homology_dimensions_)
+        n_samples = len(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
-            _subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim])
+                _subdiagrams(X, [dim], remove_dim=True)[s],
+                self.samplings_[dim])
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(
-            n_dimensions)], axis=2)
+            for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt).\
+            reshape((self._n_dimensions, n_samples, -1)).\
+            transpose((1, 0, 2))
         return Xt
 
 
@@ -224,6 +236,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
+    n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during `fit`.
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -260,7 +276,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -275,6 +291,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
+
         self.samplings_, _ = _discretize(X, n_values=self.n_values)
         self.samplings_ = {dim: np.sqrt(2) * sampling for dim, sampling in
                            self.samplings_.items()}
@@ -291,7 +309,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -300,23 +318,25 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions,
-        n_layers, n_values)
-            Array of the persistence landscapes of the diagrams in X.
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+            n_layers, n_values)
+            Array of the persistence landscapes of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        n_dimensions = len(self.homology_dimensions_)
+        n_samples = len(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            landscapes)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
-                        self.n_layers) for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(n_dimensions)], axis=3)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
+                _subdiagrams(X, [dim], remove_dim=True)[s],
+                self.samplings_[dim],
+                self.n_layers)
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples,
+                                         self.n_layers, self.n_values)).\
+            transpose((1, 0, 2, 3))
         return Xt
 
 
@@ -328,6 +348,13 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
+    sigma : float
+        Standard deviation for Gaussian kernel.
+
+    n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during `fit`.
+
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -364,7 +391,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -378,6 +405,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self.samplings_, self._step_size = _discretize(
             X, n_values=self.n_values)
@@ -393,7 +421,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
+            Triples in which q equals ``numpy.inf`` are used for padding and
             carry no information.
 
         y : None
@@ -402,23 +430,22 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_values, n_values,
-            n_homology_dimensions)
-            Array of the persistence landscapes of the diagrams in X.
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values, \
+            n_values)
+            Array of the persistence landscapes of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        n_dimensions = len(self.homology_dimensions_)
+        n_samples = len(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            heats)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
-                   self._step_size[dim], self.sigma)
+            heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
+                   self.samplings_[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(n_dimensions)], axis=3)
+            for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples,
+                                         self.n_values, self.n_values)).\
+            transpose((1, 0, 2, 3))
         return Xt
