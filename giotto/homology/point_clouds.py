@@ -65,7 +65,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
-    See the documentation of :meth:`transform` for additional information.
+    See :meth:`transform` for additional information.
 
     """
 
@@ -132,7 +132,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        r"""Compute, for each point cloud or distance matrix in `X`, the
+        """Compute, for each point cloud or distance matrix in `X`, the
         relevant persistence diagram as an array of triples [b, d, q]. Each
         triple represents a persistent topological feature in dimension q
         (belonging to `homology_dimensions`) which is born at b and dies at d.
@@ -145,7 +145,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or \\
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -161,7 +161,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
-            distance matrices in `X`. `n_features` equals :math:`\sum_q n_q`,
+            distance matrices in `X`. `n_features` equals :math:`\\sum_q n_q`,
             where :math:`n_q` is the maximum number of topological features
             in dimension :math:`q` across all samples in `X`.
 
