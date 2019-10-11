@@ -110,13 +110,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
-            if self.metric == 'landscape':
-                self.effective_metric_params_['samplings'] = {
-                    dim: np.sqrt(2) * sampling for dim, sampling in
-                    self.effective_metric_params_['samplings'].items()}
-                self.effective_metric_params_['step_sizes'] = {
-                    dim: np.sqrt(2) * step_size for dim, step_size in
-                    self.effective_metric_params_['step_sizes'].items()}
 
         self._X = X
         return self
@@ -248,13 +241,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
-            if self.metric == 'landscape':
-                self.effective_metric_params_['samplings'] = {
-                    dim: np.sqrt(2) * sampling for dim, sampling in
-                    self.effective_metric_params_['samplings'].items()}
-                self.effective_metric_params_['step_sizes'] = {
-                    dim: np.sqrt(2) * step_size for dim, step_size in
-                    self.effective_metric_params_['step_sizes'].items()}
 
         return self
 

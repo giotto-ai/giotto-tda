@@ -24,8 +24,8 @@ def betti_curves(diagrams, sampling):
 def landscapes(diagrams, sampling, n_layers):
     n_points = diagrams.shape[1]
 
-    midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) * np.sqrt(2) / 2.
-    heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) * np.sqrt(2) / 2.
+    midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) / 2.
+    heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
     top_pos = range(n_points - n_layers, n_points)
     fibers.partition(top_pos, axis=2)
