@@ -1,11 +1,11 @@
-"""Testing for DiagramStacker and DiagramScaler"""
+"""Testing for Stacking and Scaler"""
 # License : Apache 2.0
 
 import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
 
-from giotto.diagram import DiagramStacker, DiagramScaler
+from giotto.diagram import Stacking, Scaler
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],
@@ -209,8 +209,8 @@ X_2 = np.array([[[0., 0.36905774, 0],
 
 
 def test_not_fitted():
-    dst = DiagramStacker()
-    dsc = DiagramScaler()
+    dst = Stacking()
+    dsc = Scaler()
 
     with pytest.raises(NotFittedError):
         dst.transform(X_1)
@@ -224,7 +224,7 @@ def test_not_fitted():
 
 @pytest.mark.parametrize('X', [X_1, X_2])
 def test_dst_transform(X):
-    dst = DiagramStacker()
+    dst = Stacking()
     X_res = dst.fit_transform(X)
     assert X_res.shape == X.shape
 
@@ -237,10 +237,10 @@ parameters = [('wasserstein', {'order': 2, 'delta': 0.1}),
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters)
 @pytest.mark.parametrize('X', [X_1, X_2])
 def test_dd_transform(X, metric, metric_params):
-    dsc = DiagramScaler(metric=metric, metric_params=metric_params, n_jobs=1)
+    dsc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
     X_res = dsc.fit_transform(X)
     assert X_res.shape == X.shape
 
-    dsc = DiagramScaler(metric=metric, metric_params=metric_params, n_jobs=1)
+    dsc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
     X_inv_res = dsc.fit(X_res).inverse_transform(X_res)
     assert X_inv_res.shape == X.shape

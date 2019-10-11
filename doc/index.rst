@@ -141,9 +141,9 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-   diagram.DiagramStacker
-   diagram.DiagramScaler
-   diagram.DiagramFilter
+   diagram.Stacking
+   diagram.Scaler
+   diagram.Filtering
 
    diagram.DiagramDistance
    diagram.DiagramAmplitude
