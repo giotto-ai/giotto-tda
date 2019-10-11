@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(giotto_bindings)
 
-add_subdirectory(giotto/externals/pybind11)
+find_package(pybind11 REQUIRED)
 set(BINDINGS_DIR "giotto/externals/bindings")
 
 find_package(Boost 1.56 REQUIRED)
