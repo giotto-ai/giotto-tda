@@ -42,11 +42,11 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         - data_type: string, must equal either 'points' or 'distance_matrix'.
         - data_iter: an iterator. If data_iter is 'points' then each object
-        in the iterator should be a numpy array of dimension (number of
-        points, number of coordinates), or equivalent nested list structure.
-        If data_iter is 'distance_matrix' then each object in the iterator
-        should be a full (symmetric) square matrix (numpy array) of shape (
-        number of points, number of points), __or a sparse distance matrix
+          in the iterator should be a numpy array of dimension (number of
+          points, number of coordinates), or equivalent nested list structure.
+          If data_iter is 'distance_matrix' then each object in the iterator
+          should be a full (symmetric) square matrix (numpy array) of shape (
+          number of points, number of points), __or a sparse distance matrix
 
     Attributes
     ----------
