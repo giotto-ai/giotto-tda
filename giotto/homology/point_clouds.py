@@ -56,10 +56,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    CubicalPersistence, ConsistentRescaling
+    ConsistentRescaling
 
     Notes
     -----
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
+    for computing Vietoris-Rips persistent homology.
+
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
     See the documentation of :meth:`transform` for additional information.
@@ -160,7 +163,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. `n_features` equals :math:`\sum_q n_q`,
             where :math:`n_q` is the maximum number of topological features
-            in dimension q across all samples in `X`.
+            in dimension :math:`q` across all samples in `X`.
 
         """
         # Check if fit had been called

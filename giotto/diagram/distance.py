@@ -65,6 +65,12 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Notes
+    -----
+    `Hera <https://bitbucket.org/grey_narn/hera>`_ is used as a C++ backend
+    for computing bottleneck and Wasserstein distances between persistence
+    diagrams.
+
     """
     def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
