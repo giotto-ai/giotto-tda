@@ -33,7 +33,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, homology.VietorisRipsPersistence
+    DiagramDistance, giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -121,8 +121,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     [b, d, q], the value of its q-Betti curve at parameter r is simply the
     number of persistent features in homology dimension q which are alive at r.
     Approximate Betti curves are constructed by sampling the `filtration
-    parameter <LINK TO GLOSSARY>`_ at evenly spaced values, once per
-    available homology dimension.
+    parameter <LINK TO GLOSSARY>`_ at evenly spaced values, once per available
+    homology dimension.
 
     Parameters
     ----------
@@ -227,8 +227,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams of different homology dimensions are considered
-    separately, and layers of their associated persistence landscapes are
-    computed.
+    separately, and approximations to the layers of their associated
+    persistence landscapes are constructed by sampling the `filtration
+    parameter <LINK TO GLOSSARY>`_ at evenly spaced values.
 
     Parameters
     ----------
@@ -247,8 +248,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         Homology dimensions seen in :meth:`fit`.
 
     samplings_ : dict
-        For each number in `homology_dimensions_`, store a discrete sampling of
-        filtration parameters calculated during :meth:`fit`.
+        For each number in `homology_dimensions_`, a discrete sampling of
+        filtration parameters, calculated during :meth:`fit` according to the
+        minimum birth and maximum death values observed across all samples.
 
     See also
     --------
@@ -358,8 +360,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         Homology dimensions seen in :meth:`fit`.
 
     samplings_ : dict
-        For each number in `homology_dimensions_`, store a discrete sampling of
-        filtration parameters calculated during :meth:`fit`.
+        For each number in `homology_dimensions_`, a discrete sampling of
+        filtration parameters, calculated during :meth:`fit` according to the
+        minimum birth and maximum death values observed across all samples.
 
     See also
     --------
