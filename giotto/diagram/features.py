@@ -32,7 +32,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, BettiCurve, PersistenceLandscape, HeatKernel
+    BettiCurve, PersistenceLandscape, HeatKernel, DiagramAmplitude, \
+    DiagramDistance, homology.VietorisRipsPersistence
 
     """
 
@@ -146,8 +147,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, PersistenceLandscape, PersistenceEntropy, \
-    HeatKernel
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
+    DiagramDistance, homology.VietorisRipsPersistence
 
     """
     def __init__(self, n_values=100, n_jobs=None):
@@ -225,8 +226,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """`Persistence landscapes <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], layers of the persistence landscapes associated to different
-    homology dimensions are computed separately.
+    [b, d, q], subdiagrams of different homology dimensions are considered
+    separately, and layers of their associated persistence landscapes are
+    computed.
 
     Parameters
     ----------
@@ -250,7 +252,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, BettiCurve, PersistenceEntropy, HeatKernel
+    BettiCurve, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
+    DiagramDistance, homology.VietorisRipsPersistence
 
     """
     def __init__(self, n_layers=1, n_values=100, n_jobs=None):
@@ -360,8 +363,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, BettiCurve, PersistenceLandscape, \
-    PersistenceEntropy
+    BettiCurve, PersistenceLandscape, PersistenceEntropy, DiagramAmplitude, \
+    DiagramDistance, homology.VietorisRipsPersistence
 
     """
     def __init__(self, sigma, n_values=100, n_jobs=None):
