@@ -319,6 +319,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
+        n_samples = len(X)
         n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
