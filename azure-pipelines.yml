@@ -15,10 +15,20 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: git submodule update --init --recursive
-    displayName: 'Fetching pybind11 and external dependencies'
+    displayName: 'Fetching external dependencies'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
+
+  - script: |
+      python -m pip install pytest
+      git clone https://github.com/pybind/pybind11.git
+      cd pybind11
+      mkdir build
+      cd build
+      cmake ..
+      sudo make install
+    displayName: 'Install pybind11'
 
   - script: |
       pip install -e ".[tests,doc]"
@@ -76,13 +86,14 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: git submodule update --init --recursive
-    displayName: 'Fetching pybind11 and external dependencies'
+    displayName: 'Fetching external dependencies'
 
   - script: |
       brew update
       brew install boost
       brew install gcc
-    displayName: 'install boost and gcc'
+      brew install pybind11
+    displayName: 'install boost, pybind11 and gcc'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -112,7 +123,6 @@ jobs:
       artifactName: 'wheel_and_doc'
 
 
-
 - job: 'Test_mac_1'
   pool:
     vmImage: 'macOS-10.14'
@@ -129,13 +139,14 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: git submodule update --init --recursive
-    displayName: 'Fetching pybind11 and external dependencies'
+    displayName: 'Fetching external dependencies'
 
   - script: |
       brew update
       brew install boost
       brew install gcc
-    displayName: 'install boost and gcc'
+      brew install pybind11
+    displayName: 'install boost, pybind11 and gcc'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -180,12 +191,21 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-
   - script: git submodule update --init --recursive
-    displayName: 'Fetching pybind11 and external dependencies'
+    displayName: 'Fetching external dependencies'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
+
+  - script: |
+      python -m pip install pytest
+      git clone --recursive https://github.com/pybind/pybind11.git
+      cd pybind11
+      mkdir build
+      cd build
+      cmake .. -A x64
+      cmake --install .
+    displayName: 'Install pybind11'
 
   - script: |
       pip install -e ".[tests,doc]"
@@ -211,7 +231,6 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-
 - job: 'Test_win_2'
   pool:
     vmImage: 'windows-2019'
@@ -227,12 +246,21 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-
   - script: git submodule update --init --recursive
-    displayName: 'Fetching pybind11 and external dependencies'
+    displayName: 'Fetching external dependencies'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
+
+  - script: |
+      python -m pip install pytest
+      git clone --recursive https://github.com/pybind/pybind11.git
+      cd pybind11
+      mkdir build
+      cd build
+      cmake .. -A x64
+      cmake --install .
+    displayName: 'Install pybind11'
 
   - script: |
       pip install -e ".[tests,doc]"
