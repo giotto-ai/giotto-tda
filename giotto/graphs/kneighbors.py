@@ -47,8 +47,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath',
         'sqeuclidean', 'yule']
 
-        See the documentation for ``scipy.spatial.distance`` for details on these
-        metrics.
+        See the documentation for ``scipy.spatial.distance`` for details on
+        these metrics.
 
     p : integer, optional (default = 2)
         Parameter for the Minkowski metric from
