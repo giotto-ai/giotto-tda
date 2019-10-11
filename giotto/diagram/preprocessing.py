@@ -93,11 +93,11 @@ class Scaler(BaseEstimator, TransformerMixin):
     homology dimension).
 
     A scale factor is calculated during meth:`fit` which depends on the entire
-    collection, and it is applied during meth:`transform`. The value of the scale
-    factor depends on a chosen norm function which is internally evaluated on
-    each persistent diagram separately, and on a function (e.g. `np.max`)
-    which is applied to the resulting collection of norms to extract a single
-    scale factor.
+    collection, and it is applied during meth:`transform`. The value of the
+    scale factor depends on a chosen norm function which is internally
+    evaluated on each persistent diagram separately, and on a function (e.g.
+    `numpy.max`) which is applied to the resulting collection of norms to
+    extract a single scale factor.
 
     Parameters
     ----------
