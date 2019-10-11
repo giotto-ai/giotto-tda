@@ -133,9 +133,6 @@ Welcome to giotto's API reference!
    :template: class.rst
 
    homology.VietorisRipsPersistence
-   ..
-      homology.CubicalPersistence
-
    homology.ConsistentRescaling
 
 
