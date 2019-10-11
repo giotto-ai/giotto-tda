@@ -36,7 +36,7 @@ def check_diagram(X):
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:
-                raise ValueError("np.nan is a valid homology dimension for a "
+                raise ValueError("np.inf is a valid homology dimension for a "
                                  "stacked diagram but it should be the only "
                                  "one: homology_dimensions "
                                  "= {}".format(homology_dimensions))
