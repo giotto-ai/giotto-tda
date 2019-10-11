@@ -214,7 +214,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
-            _subdiagrams(X, [dim], remove_dim=False)[s], self.samplings_[dim])
+            _subdiagrams(X, [dim], remove_dim=True)[s], self.samplings_[dim])
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape((n_dimensions, n_samples, -1)).\
