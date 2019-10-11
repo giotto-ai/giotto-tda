@@ -40,8 +40,6 @@ class Stacking(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -68,8 +66,6 @@ class Stacking(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -96,8 +92,8 @@ class Scaler(BaseEstimator, TransformerMixin):
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
 
-    A scale factor is calculated during `fit` which depends on the entire
-    collection, and it is applied during `transform`. The value of the scale
+    A scale factor is calculated during meth:`fit` which depends on the entire
+    collection, and it is applied during meth:`transform`. The value of the scale
     factor depends on a chosen norm function which is internally evaluated on
     each persistent diagram separately, and on a function (e.g. `np.max`)
     which is applied to the resulting collection of norms to extract a single
@@ -171,8 +167,6 @@ class Scaler(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -212,7 +206,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Rescales all persistence diagrams in the collection according to the
-        factor computed during `fit`.
+        factor computed during meth:`fit`.
 
         Parameters
         ----------
@@ -220,8 +214,6 @@ class Scaler(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -241,7 +233,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, X, copy=None):
         """Scale back the data to the original representation. Multiplies
-        by the scale found in `fit`.
+        by the scale found in meth:`fit`.
 
         Parameters
         ----------
@@ -303,8 +295,6 @@ class Filtering(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -333,8 +323,6 @@ class Filtering(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API

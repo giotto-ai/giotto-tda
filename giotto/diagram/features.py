@@ -28,7 +28,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        Homology dimensions seen in `fit`, sorted in ascending order.
+        Homology dimensions seen in meth:`fit`, sorted in ascending order.
 
     See also
     --------
@@ -57,8 +57,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -78,7 +76,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each persistence diagram, compute the vector of persistence
-        entropies corresponding to each available homology dimension q.
+        entropies corresponding to each homology dimension seen in meth:`fit`.
 
         Parameters
         ----------
@@ -86,8 +84,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -131,7 +127,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     ----------
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
-        dimension, to sample during `fit`.
+        dimension, to sample during meth:`fit`.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1
@@ -141,11 +137,11 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        Homology dimensions seen in `fit`, sorted in ascending order.
+        Homology dimensions seen in meth:`fit`, sorted in ascending order.
 
     samplings_ : dict
         For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during `fit` according to the
+        filtration parameters, calculated during meth:`fit` according to the
         minimum birth and maximum death values observed across all samples.
 
     See also
@@ -169,8 +165,6 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -190,7 +184,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Compute the Betti curves (one per homology dimension available in
-        `fit`) of each diagram.
+        meth:`fit`) of each diagram.
 
         Parameters
         ----------
@@ -198,8 +192,6 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -238,7 +230,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     ----------
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
-        dimension, to sample during `fit`.
+        dimension, to sample during meth:`fit`.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -248,11 +240,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        Homology dimensions seen in `fit`.
+        Homology dimensions seen in meth:`fit`.
 
     samplings_ : dict
         For each number in `homology_dimensions_`, store a discrete sampling of
-        filtration parameters calculated during `fit`.
+        filtration parameters calculated during meth:`fit`.
 
     See also
     --------
@@ -276,8 +268,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -309,8 +299,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -353,7 +341,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
-        dimension, to sample during `fit`.
+        dimension, to sample during meth:`fit`.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -363,11 +351,11 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        Homology dimensions seen in `fit`.
+        Homology dimensions seen in meth:`fit`.
 
     samplings_ : dict
         For each number in `homology_dimensions_`, store a discrete sampling of
-        filtration parameters calculated during `fit`.
+        filtration parameters calculated during meth:`fit`.
 
     See also
     --------
@@ -391,8 +379,6 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -421,8 +407,6 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
