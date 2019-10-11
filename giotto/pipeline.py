@@ -178,7 +178,7 @@ class Pipeline(pipeline.Pipeline):
             the pipeline.
 
         **fit_params : dict of string -> object
-            Parameters passed to the meth:`fit` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 
@@ -211,7 +211,7 @@ class Pipeline(pipeline.Pipeline):
             the pipeline.
 
         **fit_params : dict of string -> object
-            Parameters passed to the meth:`fit` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 
@@ -245,7 +245,7 @@ class Pipeline(pipeline.Pipeline):
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
         **fit_params : dict of string -> object
-            Parameters passed to the meth:`fit` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 
@@ -284,7 +284,7 @@ class Pipeline(pipeline.Pipeline):
             of the pipeline.
 
         **fit_params : dict of string -> object
-            Parameters passed to the meth:`fit` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 

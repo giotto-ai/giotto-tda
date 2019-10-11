@@ -92,8 +92,8 @@ class Scaler(BaseEstimator, TransformerMixin):
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
 
-    A scale factor is calculated during meth:`fit` which depends on the entire
-    collection, and it is applied during meth:`transform`. The value of the
+    A scale factor is calculated during :meth:`fit` which depends on the entire
+    collection, and it is applied during :meth:`transform`. The value of the
     scale factor depends on a chosen norm function which is internally
     evaluated on each persistent diagram separately, and on a function (e.g.
     `numpy.max`) which is applied to the resulting collection of norms to
@@ -189,13 +189,6 @@ class Scaler(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
-            if self.metric == 'landscape':
-                self.effective_metric_params_['samplings'] = {
-                    dim: np.sqrt(2) * sampling for dim, sampling in
-                    self.effective_metric_params_['samplings'].items()}
-                self.effective_metric_params_['step_sizes'] = {
-                    dim: np.sqrt(2) * step_size for dim, step_size in
-                    self.effective_metric_params_['step_sizes'].items()}
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,
@@ -206,7 +199,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Rescales all persistence diagrams in the collection according to the
-        factor computed during meth:`fit`.
+        factor computed during :meth:`fit`.
 
         Parameters
         ----------
@@ -233,7 +226,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, X, copy=None):
         """Scale back the data to the original representation. Multiplies
-        by the scale found in meth:`fit`.
+        by the scale found in :meth:`fit`.
 
         Parameters
         ----------
