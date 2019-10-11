@@ -101,11 +101,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         n_dimensions = len(homology_dimensions)
 
         with np.errstate(divide='ignore', invalid='ignore'):
-            Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-                self._persistence_entropy)(_subdiagrams(X, [dim])[s, :, :2])
+            Xt = Parallel(n_jobs=self.n_jobs)(
+                delayed(self._persistence_entropy)(_subdiagrams(X, [dim])[s])
                 for dim in homology_dimensions
                 for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
-                                              )
+            )
         n_slices = len(Xt) // n_dimensions
         Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
                                         for j in range(n_slices)], axis=0)
@@ -214,7 +214,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
-            _subdiagrams(X, [dim], remove_dim=True)[s], self.samplings_[dim])
+                _subdiagrams(X, [dim], remove_dim=True)[s],
+                self.samplings_[dim])
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape((n_dimensions, n_samples, -1)).\
@@ -318,12 +319,15 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
+        n_samples = len(X)
         n_dimensions = len(self.homology_dimensions_)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            landscapes)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
-                        self.n_layers) for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
+                _subdiagrams(X, [dim], remove_dim=True)[s],
+                self.samplings_[dim],
+                self.n_layers)
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
         n_slices = len(Xt) // n_dimensions
         Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
             n_slices)], axis=0) for i in range(n_dimensions)], axis=3)

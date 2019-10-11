@@ -9,7 +9,7 @@ from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class DiagramStacker(BaseEstimator, TransformerMixin):
+class Stacking(BaseEstimator, TransformerMixin):
     """Transformer for stacking persistence subdiagrams.
 
     Useful when topological
@@ -91,7 +91,7 @@ class DiagramStacker(BaseEstimator, TransformerMixin):
         return Xt
 
 
-class DiagramScaler(BaseEstimator, TransformerMixin):
+class Scaler(BaseEstimator, TransformerMixin):
     """Transformer scaling collections of persistence diagrams in which each
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
@@ -263,7 +263,7 @@ class DiagramScaler(BaseEstimator, TransformerMixin):
         return Xs
 
 
-class DiagramFilter(BaseEstimator, TransformerMixin):
+class Filtering(BaseEstimator, TransformerMixin):
     """Transformer filtering collections of persistence diagrams in which each
     diagram is partitioned into one or more subdiagrams (e.g. according to
     homology dimension).
