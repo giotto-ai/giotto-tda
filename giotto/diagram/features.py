@@ -120,7 +120,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     [b, d, q], the value of its q-Betti curve at parameter r is simply the
     number of persistent features in homology dimension q which are alive at r.
     Approximate Betti curves are constructed by sampling the `filtration
-    parameter <LINK TO GLOSSARY>` _ at evenly spaced values, once per
+    parameter <LINK TO GLOSSARY>`_ at evenly spaced values, once per
     available homology dimension.
 
     Parameters
@@ -137,7 +137,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        Homology dimensions seen in `fit`.
+        Homology dimensions seen in `fit`, sorted in ascending order.
 
     samplings_ : dict
         For each number in `homology_dimensions_`, a discrete sampling of
@@ -202,7 +202,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_values, n_homology_dimensions)
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
             Betti curves.
 
         """
@@ -210,15 +210,15 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
+        n_samples = len(X)
         n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
-            _subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim])
+            _subdiagrams(X, [dim], remove_dim=False)[s], self.samplings_[dim])
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(n_dimensions)], axis=2)
+            for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt).reshape((n_dimensions, n_samples, -1)).\
+            transpose((1, 0, 2))
         return Xt
 
 
