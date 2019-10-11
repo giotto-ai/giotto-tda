@@ -25,6 +25,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in `fit`, sorted in ascending order.
+
     See also
     --------
     VietorisRipsPersistence
@@ -36,9 +41,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     def _persistence_entropy(self, X):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
+        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape((-1, 1))
         return - np.sum(np.nan_to_num(
-            X_normalized * np.log(X_normalized)), axis=1).reshape(-1, 1)
+            X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -65,6 +70,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self._is_fitted = True
         return self
@@ -97,19 +104,16 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['_is_fitted'])
         X = check_diagram(X)
 
-        homology_dimensions = sorted(list(set(X[0, :, 2])))
-        n_dimensions = len(homology_dimensions)
+        n_samples = len(X)
 
         with np.errstate(divide='ignore', invalid='ignore'):
             Xt = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._persistence_entropy)(_subdiagrams(X, [dim])[s])
-                for dim in homology_dimensions
-                for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+                for dim in self.homology_dimensions_
+                for s in gen_even_slices(
+                    n_samples, effective_n_jobs(self.n_jobs))
             )
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.hstack([np.concatenate([Xt[i * n_slices + j]
-                                        for j in range(n_slices)], axis=0)
-                        for i in range(n_dimensions)])
+        Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples)).T
         return Xt
 
 
@@ -179,6 +183,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self.samplings_, _ = _discretize(X, n_values=self.n_values)
         return self
@@ -211,14 +216,14 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         n_samples = len(X)
-        n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
                 _subdiagrams(X, [dim], remove_dim=True)[s],
                 self.samplings_[dim])
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape((n_dimensions, n_samples, -1)).\
+        Xt = np.concatenate(Xt).\
+            reshape((self._n_dimensions, n_samples, -1)).\
             transpose((1, 0, 2))
         return Xt
 
@@ -286,6 +291,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
+
         self.samplings_, _ = _discretize(X, n_values=self.n_values)
         self.samplings_ = {dim: np.sqrt(2) * sampling for dim, sampling in
                            self.samplings_.items()}
@@ -311,8 +318,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions,
-        n_layers, n_values)
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+            n_layers, n_values)
             Array of the persistence landscapes of the diagrams in `X`.
 
         """
@@ -320,7 +327,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         n_samples = len(X)
-        n_dimensions = len(self.homology_dimensions_)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
                 _subdiagrams(X, [dim], remove_dim=True)[s],
@@ -328,9 +334,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
                 self.n_layers)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(n_dimensions)], axis=3)
+        Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples,
+                                         self.n_layers, self.n_values)).\
+            transpose((1, 0, 2, 3))
         return Xt
 
 
@@ -399,6 +405,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self.samplings_, self._step_size = _discretize(
             X, n_values=self.n_values)
@@ -423,23 +430,22 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_values, n_values,
-            n_homology_dimensions)
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values, \
+            n_values)
             Array of the persistence landscapes of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
         X = check_diagram(X)
 
-        n_dimensions = len(self.homology_dimensions_)
+        n_samples = len(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            heats)(_subdiagrams(X, [dim])[s, :, :2], self.samplings_[dim],
-                   self._step_size[dim], self.sigma)
+            heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
+                   self.samplings_[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        n_slices = len(Xt) // n_dimensions
-        Xt = np.stack([np.concatenate([Xt[i * n_slices + j] for j in range(
-            n_slices)], axis=0) for i in range(n_dimensions)], axis=3)
+            for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples,
+                                         self.n_values, self.n_values)).\
+            transpose((1, 0, 2, 3))
         return Xt
