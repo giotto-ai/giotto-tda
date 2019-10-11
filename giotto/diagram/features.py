@@ -32,7 +32,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    VietorisRipsPersistence, BettiCurve, PersistenceLandscape, HeatKernel
 
     """
 
@@ -146,7 +146,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    VietorisRipsPersistence, PersistenceLandscape, PersistenceEntropy, \
+    HeatKernel
 
     """
     def __init__(self, n_values=100, n_jobs=None):
@@ -224,8 +225,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """`Persistence landscapes <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], for each n its q-persistence
-    landscape up to layer k is computed.
+    [b, d, q], layers of the persistence landscapes associated to different
+    homology dimensions are computed separately.
 
     Parameters
     ----------
@@ -249,7 +250,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    VietorisRipsPersistence, BettiCurve, PersistenceEntropy, HeatKernel
 
     """
     def __init__(self, n_layers=1, n_values=100, n_jobs=None):
@@ -359,7 +360,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    VietorisRipsPersistence, BettiCurve, PersistenceLandscape, \
+    PersistenceEntropy
 
     """
     def __init__(self, sigma, n_values=100, n_jobs=None):
