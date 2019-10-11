@@ -16,8 +16,6 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     This estimator applies a list of transformer objects in parallel to the
     input data, then concatenates the results. This is useful to combine
     several feature extraction mechanisms into a single transformer.
-    Parameters of the transformer may be set using the parameter
-    name after 'transformer__'.
 
     Parameters
     ----------
@@ -351,7 +349,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_points, n_dimension_)
+        Xt : ndarray, shape (n_points, n_dimension)
             Array of embedded point cloud per outer window.
             ``n_outer_windows`` is  ``(n_samples - outer_window_duration) //
             outer_window_stride + 1``, and ``n_points`` is ``(

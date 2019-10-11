@@ -62,10 +62,6 @@ class Pipeline(pipeline.Pipeline):
         Read-only attribute to access any step parameter by user given name.
         Keys are step names and values are steps parameters.
 
-    Notes
-    -----
-    See :ref:`sphx_glr_auto_examples_pipeline_plot_pipeline_classification.py`
-
     See also
     --------
     make_pipeline : helper function to make pipeline.
@@ -239,6 +235,7 @@ class Pipeline(pipeline.Pipeline):
         Fits all the transformers/samplers one after the other and
         transform/sample the data, then uses fit_resample on transformed
         data with the final estimator.
+
         Parameters
         ----------
         X : iterable
@@ -251,6 +248,7 @@ class Pipeline(pipeline.Pipeline):
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
+
         Returns
         -------
         Xt : array-like, shape = [n_samples, n_transformed_features]
@@ -710,10 +708,12 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
 
     def transform(self, X):
         """Transform X separately by each transformer, concatenate results.
+
         Parameters
         ----------
         X : iterable or array-like, depending on transformers
             Input data to be transformed.
+
         Returns
         -------
         X_t : array-like or sparse matrix, shape (n_samples, sum_n_components)
