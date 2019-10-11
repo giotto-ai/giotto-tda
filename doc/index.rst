@@ -161,6 +161,23 @@ Welcome to giotto's API reference!
    diagram.BettiCurve
    diagram.HeatKernel
 
+:mod:`giotto.utils`: Validation
+===============================
+
+.. automodule:: giotto.utils
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   utils.check_diagram
+   utils.validate_params
+   utils.validate_metric_params
+
 ..
    :mod:`giotto.manifold`: Manifold learning
    =========================================
