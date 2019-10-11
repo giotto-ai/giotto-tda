@@ -46,13 +46,23 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         larger than this value will not be detected.
 
     homology_dimensions : iterable, optional, default: ``(0, 1)``
-        Dimensions (non-negative integers) of the topological voids to be
+        Dimensions (non-negative integers) of the topological features to be
         detected.
 
     n_jobs : int or None, optional, default: None
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    See also
+    --------
+    CubicalPersistence, ConsistentRescaling
+
+    Notes
+    -----
+    Persistence diagrams produced by this class must be interpreted with
+    care due to the presence of padding triples which carry no information.
+    See the documentation of :meth:`transform` for additional information.
 
     """
 
@@ -119,14 +129,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each point cloud or distance matrix in `X`,
-        the relevant persistence diagram as an array of triples [b, d,
-        q]. When q is not equal to ``numpy.inf``, each triple represents a
-        persistent topological feature in dimension q (belonging to
-        `homology_dimensions`) which is born at b and dies at d. Triples
-        ``[0., 0., numpy.inf]`` are used for padding, as the number of
-        persistent topological features is generally different between
-        different entries in `X`.
+        r"""Compute, for each point cloud or distance matrix in `X`, the
+        relevant persistence diagram as an array of triples [b, d, q]. Each
+        triple represents a persistent topological feature in dimension q
+        (belonging to `homology_dimensions`) which is born at b and dies at d.
+        Only triples in which b < d are meaningful. Triples in which b and d
+        are equal ("diagonal elements") may be artificially introduced during
+        the computation for padding purposes, since the number of non-trivial
+        persistent topological features is typically not constant across
+        samples. They carry no information and hence should be effectively
+        ignored by any further computation.
 
         Parameters
         ----------
@@ -146,9 +158,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
-            distance matrices in `X`. `n_features` is the maximum number of
-            topological features across all samples in `X`, and padding by
-            ``[0., 0., numpy.inf]`` is performed when necessary.
+            distance matrices in `X`. `n_features` equals :math:`\sum_q n_q`,
+            where :math:`n_q` is the maximum number of topological features
+            in dimension q across all samples in `X`.
 
         """
         # Check if fit had been called
@@ -157,21 +169,21 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         is_distance_matrix = (self.metric == 'precomputed')
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix,
-                                          self.metric)
-            for i in range(X.shape[0]))
+        n_samples = len(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(
+                X[i], is_distance_matrix, self.metric)
+            for i in range(n_samples))
 
         max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
-                                            for i in range(len(Xt))]))
+                                            for i in range(n_samples)]))
                         for dim in self.homology_dimensions}
         min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                else np.inf for i in range(len(Xt))])
+                                else np.inf for i in range(n_samples)])
                       for dim in self.homology_dimensions}
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(_pad_diagram)(Xt[i], self._homology_dimensions,
-                                  max_n_points, min_values)
-            for i in range(len(Xt)))
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
+                Xt[i], self._homology_dimensions, max_n_points, min_values)
+            for i in range(n_samples))
         Xt = np.stack(Xt)
         return Xt

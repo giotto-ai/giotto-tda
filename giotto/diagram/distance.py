@@ -82,8 +82,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -127,8 +125,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -224,8 +220,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -268,8 +262,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``numpy.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
