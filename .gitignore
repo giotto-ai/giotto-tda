@@ -35,3 +35,4 @@ doc/generated
 *.DS_Store
 .idea/*
 *~
+giotto/externals/ripser.py/
