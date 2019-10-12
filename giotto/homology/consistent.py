@@ -71,8 +71,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     References
     ----------
     .. [1] T. Berry and T. Sauer, "Consistent manifold representation for
-           topological data analysis", *Foundations of data analysis*,
-           **1**, 1--38, 2019, doi: `10.3934/fods.2019001
+           topological data analysis"; *Foundations of data analysis*, **1**,
+           1--38, 2019, doi: `10.3934/fods.2019001
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """

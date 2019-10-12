@@ -94,7 +94,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                      thresh=self.max_edge_length)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xds[0] = Xds[0][:-1, :]
+            Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
 
         Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
                                                        dtype=Xds[dim].dtype)])
