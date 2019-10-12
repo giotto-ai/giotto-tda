@@ -15,7 +15,7 @@ class Stacking(BaseEstimator, TransformerMixin):
     Useful when topological
     persistence information per sample has been previously separated according
     to some criterion (e.g. by homology dimension if produced by an instance of
-    ```VietorisRipsPersistence``).
+    :class:`giotto.homology.VietorisRipsPersistence`).
 
     """
 

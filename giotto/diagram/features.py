@@ -148,7 +148,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     See also
     --------
     PersistenceLandscape, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, homology.VietorisRipsPersistence
+    DiagramDistance, giotto.homology.VietorisRipsPersistence
 
     """
     def __init__(self, n_values=100, n_jobs=None):
@@ -255,7 +255,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, homology.VietorisRipsPersistence
+    DiagramDistance, giotto.homology.VietorisRipsPersistence
 
     """
     def __init__(self, n_layers=1, n_values=100, n_jobs=None):
@@ -367,7 +367,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, PersistenceEntropy, DiagramAmplitude, \
-    DiagramDistance, homology.VietorisRipsPersistence
+    DiagramDistance, giotto.homology.VietorisRipsPersistence
 
     """
     def __init__(self, sigma, n_values=100, n_jobs=None):
