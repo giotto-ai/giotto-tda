@@ -44,6 +44,7 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Programming Language :: Python :: 3.7']
 KEYWORDS = 'machine learning topological data analysis persistent ' + \
            'homology, persistence diagrams'
+SETUP_REQUIRES = ['pybind11']
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
     'tests': [
@@ -135,6 +136,7 @@ setup(name=DISTNAME,
       classifiers=CLASSIFIERS,
       packages=find_packages(),
       keywords=KEYWORDS,
+      setup_requires=SETUP_REQUIRES,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
       ext_modules=[CMakeExtension('giotto')],
