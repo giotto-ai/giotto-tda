@@ -16,6 +16,10 @@ class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
     Useful if one wishes to use topological features all at once -- and not
     separated between different homology dimensions -- in later processing.
 
+    See also
+    --------
+    giotto.homology.VietorisRipsPersistence
+
     """
 
     def __init__(self):
@@ -86,16 +90,15 @@ class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
 
 
 class Scaler(BaseEstimator, TransformerMixin):
-    """Transformer scaling collections of persistence diagrams in which each
-    diagram is partitioned into one or more subdiagrams (e.g. according to
-    homology dimension).
+    """Scaling of persistence diagrams.
 
-    A scale factor is calculated during :meth:`fit` which depends on the entire
-    collection, and it is applied during :meth:`transform`. The value of the
-    scale factor depends on a chosen norm function which is internally
-    evaluated on each persistent diagram separately, and on a function (e.g.
-    `numpy.max`) which is applied to the resulting collection of norms to
-    extract a single scale factor.
+    For each homology dimension, a scale factor is calculated during
+    :meth:`fit` by considering all available persistence diagrams, and applied
+    during :meth:`transform`. The value of the scale factor depends on a
+    chosen norm function which is internally evaluated on each persistent
+    diagram separately, and on a function (e.g. ``numpy.max``) which is
+    applied to the resulting collection of norms to extract a single scale
+    factor.
 
     Parameters
     ----------
@@ -141,10 +144,15 @@ class Scaler(BaseEstimator, TransformerMixin):
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
-    Attributess
+    Attributes
     ----------
     scale_ : float
         The scaling factor used to rescale diagrams.
+
+    See also
+    --------
+    Filtering, DiagramAmplitude, DiagramDistance, \
+    giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -266,6 +274,11 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     delta : float, optional, default: ``0.``
         The cutoff value controlling the amount of filtering.
+
+    See also
+    --------
+    Scaling, DiagramAmplitude, DiagramDistance, \
+    giotto.homology.VietorisRipsPersistence
 
     """
 
