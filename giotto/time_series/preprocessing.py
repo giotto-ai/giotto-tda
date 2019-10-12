@@ -50,7 +50,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -173,7 +174,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is just there to implement the usual API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters

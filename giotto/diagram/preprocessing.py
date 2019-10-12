@@ -30,7 +30,8 @@ class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -56,8 +57,7 @@ class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Stacks all available persistence subdiagrams corresponding
-        to each sample into one persistence diagram.
+        """Replace all homology dimensions in `X` with ``numpy.inf``.
 
         Parameters
         ----------
@@ -72,9 +72,8 @@ class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : dict of None: ndarray
-            Dictionary with a single ``None`` key, and corresponding value an
-            ndarray of shape (n_samples, :math:`\\sum_{\\mathrm{d}}` M_d, 2).
+        Xt : ndarray, shape (n_samples, n_features, 3)
+            Output persistence diagram.
 
         """
         # Check is fit had been called
@@ -278,7 +277,8 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
