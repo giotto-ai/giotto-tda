@@ -14,9 +14,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """`Persistence entropies <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], its q-persistence entropy is the (base e) entropy of the
-    collection of differences d - b for points of homology dimension q,
-    normalized by the sum of all such differences.
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately, and their respective persistence entropies are
+    calculated as the (base e) entropies of the collections of differences
+    d - b, normalized by the sum of all such differences.
 
     Parameters
     ----------
@@ -47,9 +48,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Store all distinct homology dimensions observed in
+        :attr:`homology_dimensions_`. Then, return the estimator.
 
-        This method is just there to implement the usual API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -76,8 +78,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence diagram, compute the vector of persistence
-        entropies corresponding to each homology dimension seen in :meth:`fit`.
+        """Compute the persistence entropies of diagrams in `X`.
 
         Parameters
         ----------
@@ -93,8 +94,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions)
-            Array of persistence entropies (one value per sample and per
-            homology dimension).
+            Persistence entropies: one value per sample and per homology
+            dimension seen in :meth:`fit`. Index i along axis 1 corresponds
+            to the i-th homology dimension in :attr:`homology_dimensions_`.
 
         """
         # Check if fit had been called
@@ -118,11 +120,10 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     """`Betti curves <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], the value of its q-Betti curve at parameter r is simply the
-    number of persistent features in homology dimension q which are alive at r.
-    Approximate Betti curves are constructed by sampling the `filtration
-    parameter <LINK TO GLOSSARY>`_ at evenly spaced values, once per available
-    homology dimension.
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately, and their respective Betti curves are
+    obtained by evenly sampling the `filtration parameter <LINK TO
+    GLOSSARY>`_.
 
     Parameters
     ----------
@@ -150,15 +151,25 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     PersistenceLandscape, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
     DiagramDistance, giotto.homology.VietorisRipsPersistence
 
+    Notes
+    -----
+    The samplings in :attr:`samplings_` are in general different between
+    different homology dimensions. This means that the j-th entry of a Betti
+    curve in homology dimension q typically arises from a different parameter
+    values to the j-th entry of a curve in dimension q'.
+
     """
     def __init__(self, n_values=100, n_jobs=None):
         self.n_values = n_values
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Store all distinct homology dimensions observed in
+        :attr:`homology_dimensions_` and, for each dimension separately,
+        store evenly sample filtration parameter values in :attr:`samplings_`.
+        Then, return the estimator.
 
-        This method is just there to implement the usual API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -185,8 +196,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute the Betti curves (one per homology dimension available in
-        :meth:`fit`) of each diagram.
+        """Compute the Betti curves of diagrams in `X`.
 
         Parameters
         ----------
@@ -202,7 +212,10 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
-            Betti curves.
+            Betti curves: one curve (represented as a one-dimensional array
+            of integer values) per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
 
         """
         # Check if fit had been called
@@ -226,10 +239,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """`Persistence landscapes <LINK TO GLOSSARY>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], subdiagrams of different homology dimensions are considered
-    separately, and approximations to the layers of their associated
-    persistence landscapes are constructed by sampling the `filtration
-    parameter <LINK TO GLOSSARY>`_ at evenly spaced values.
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately, and layers of their respective persistence
+    landscapes are obtained by evenly sampling the `filtration parameter <LINK TO
+    GLOSSARY>`_.
 
     Parameters
     ----------
@@ -257,6 +270,14 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     BettiCurve, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
     DiagramDistance, giotto.homology.VietorisRipsPersistence
 
+    Notes
+    -----
+    The samplings in :attr:`samplings_` are in general different between
+    different homology dimensions. This means that the j-th entry of the
+    k-layer of a persistence landscape in homology dimension q typically
+    arises from a different parameter value to the j-th entry of a k-layer in
+    dimension q'.
+
     """
     def __init__(self, n_layers=1, n_values=100, n_jobs=None):
         self.n_layers = n_layers
@@ -264,9 +285,12 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Store all distinct homology dimensions observed in
+        :attr:`homology_dimensions_` and, for each dimension separately,
+        store evenly sample filtration parameter values in :attr:`samplings_`.
+        Then, return the estimator.
 
-        This method is just there to implement the usual API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -296,8 +320,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each persistence subdiagram corresponding to an homology
-        dimension k, compute that subdiagram's landscapes.
+        """Compute the persistence landscapes of diagrams in `X`.
 
         Parameters
         ----------
@@ -314,7 +337,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions, \
             n_layers, n_values)
-            Array of the persistence landscapes of the diagrams in `X`.
+            Persistence lanscapes: one landscape (represented as a
+            two-dimensional array) per sample and per homology dimension seen
+            in :meth:`fit`. Each landscape contains a number `n_layers` of
+            layers. Index i along axis 1 corresponds to the i-th homology
+            dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
@@ -376,9 +403,12 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Store all distinct homology dimensions observed in
+        :attr:`homology_dimensions_` and, for each dimension separately,
+        store evenly sample filtration parameter values in :attr:`samplings_`.
+        Then, return the estimator.
 
-        This method is just there to implement the usual API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
