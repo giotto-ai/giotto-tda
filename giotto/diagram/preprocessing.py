@@ -9,13 +9,12 @@ from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class Stacking(BaseEstimator, TransformerMixin):
-    """Transformer for stacking persistence subdiagrams.
+class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
+    """Forget about the homology dimension of points in persistence diagrams
+    by replacing these dimensions with ``numpy.inf``.
 
-    Useful when topological
-    persistence information per sample has been previously separated according
-    to some criterion (e.g. by homology dimension if produced by an instance of
-    :class:`giotto.homology.VietorisRipsPersistence`).
+    Useful if one wishes to use topological features all at once -- and not
+    separated between different homology dimensions -- in later processing.
 
     """
 

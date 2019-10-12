@@ -149,7 +149,7 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-   diagram.Stacking
+   diagram.ForgetHomologyDimension
    diagram.Scaler
    diagram.Filtering
 

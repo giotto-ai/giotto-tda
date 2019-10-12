@@ -1,11 +1,11 @@
-"""Testing for Stacking and Scaler"""
+"""Testing for ForgetHomologyDimension and Scaler"""
 # License : Apache 2.0
 
 import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
 
-from giotto.diagram import Stacking, Scaler
+from giotto.diagram import ForgetHomologyDimension, Scaler
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],
@@ -209,7 +209,7 @@ X_2 = np.array([[[0., 0.36905774, 0],
 
 
 def test_not_fitted():
-    dst = Stacking()
+    dst = ForgetHomologyDimension()
     dsc = Scaler()
 
     with pytest.raises(NotFittedError):
@@ -224,7 +224,7 @@ def test_not_fitted():
 
 @pytest.mark.parametrize('X', [X_1, X_2])
 def test_dst_transform(X):
-    dst = Stacking()
+    dst = ForgetHomologyDimension()
     X_res = dst.fit_transform(X)
     assert X_res.shape == X.shape
 
