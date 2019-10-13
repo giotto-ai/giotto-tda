@@ -4,7 +4,6 @@
 import os
 import codecs
 import re
-from git import Repo
 import sys
 import sysconfig
 import platform
@@ -51,21 +50,21 @@ KEYWORDS = 'machine learning topological data analysis persistent ' + \
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
     'tests': [
-              'pytest',
-              'pytest-cov',
-              'pytest-azurepipelines',
-              'pytest-benchmark'],
-              'doc': [
-                      'sphinx',
-                      'sphinx-gallery',
-                      'sphinx-issues',
-                      'sphinx_rtd_theme',
-                      'numpydoc'],
-              'examples': [
-                           'jupyter',
-                           'matplotlib',
-                           'plotly',
-                           'pandas']
+        'pytest',
+        'pytest-cov',
+        'pytest-azurepipelines',
+        'pytest-benchmark'],
+    'doc': [
+        'sphinx',
+        'sphinx-gallery',
+        'sphinx-issues',
+        'sphinx_rtd_theme',
+        'numpydoc'],
+    'examples': [
+        'jupyter',
+        'matplotlib',
+        'plotly',
+        'pandas']
 }
 
 
@@ -81,7 +80,7 @@ class CMakeBuild(build_ext):
         except OSError:
             raise RuntimeError("CMake must be installed to build the following extensions: " +
                                ", ".join(e.name for e in self.extensions))
-        
+
         if platform.system() == "Windows":
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
             if cmake_version < '3.1.0':
@@ -89,12 +88,15 @@ class CMakeBuild(build_ext):
         
         for ext in self.extensions:
             self.install_pybind11(ext)
-        
+                
         for ext in self.extensions:
             self.build_extension(ext)
     
     def install_pybind11(self, ext):
-        # install pybind11
+        # install gitpython
+        subprocess.check_call(['pip','install','gitpython'])
+        # import gitpython
+        from git import Repo
         dir_start = os.getcwd()
         dir_pybind11 = os.path.join(dir_start, 'pybind11')
         if os.path.exists(dir_pybind11):
@@ -115,15 +117,15 @@ class CMakeBuild(build_ext):
         subprocess.check_call(cmakeCmd1, cwd=dir_build)
         subprocess.check_call(cmakeCmd2, cwd=dir_build)
         os.chdir(dir_start)
-    
+        
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
-            
+
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
-                      
+
         if platform.system() == "Windows":
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
             if sys.maxsize > 2**32:
@@ -132,7 +134,7 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j2']
-                                      
+
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
