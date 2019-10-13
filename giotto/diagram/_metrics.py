@@ -45,6 +45,7 @@ def _heat(heat, sampled_diag, sigma):
 def heats(diagrams, sampling, step_size, sigma):
     heats_ = np.zeros((diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
     sampled_diags = np.copy(diagrams)
+    sampling = sampling.reshape((-1,))
     sampled_diags[diagrams < sampling[0]] = sampling[0]
     sampled_diags[diagrams > sampling[-1]] = sampling[-1]
     sampled_diags = np.array((sampled_diags - sampling[0]) / step_size, dtype=int)
