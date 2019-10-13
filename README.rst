@@ -40,6 +40,6 @@ To use:
    import giotto as gt
 
 
-Contacts
---------
+Contacts:
+---------
 maintainers@giotto.ai
