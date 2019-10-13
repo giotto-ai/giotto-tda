@@ -113,9 +113,13 @@ class CMakeBuild(build_ext):
             if sys.maxsize > 2**32:
                 cmakeCmd1 += ['-A', 'x64']
         else:
-            cmakeCmd2 = ['sudo', 'make', 'install']
+            cmakeCmd2 = ['make', 'install']
+            cmakeCmd2_sudo = ['sudo', 'make', 'install']
         subprocess.check_call(cmakeCmd1, cwd=dir_build)
-        subprocess.check_call(cmakeCmd2, cwd=dir_build)
+        try: 
+            subprocess.check_call(cmakeCmd2, cwd=dir_build)
+        except:
+            subprocess.check_call(cmakeCmd2_sudo, cwd=dir_build)
         os.chdir(dir_start)
         
     def build_extension(self, ext):
