@@ -12,8 +12,8 @@ target_compile_options(giotto_ripser PUBLIC -O3 -D_hypot=hypot)
 target_compile_options(giotto_ripser PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 # Cannot have two inlined namespace !
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(giotto_ripser PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    target_link_libraries(giotto_ripser PRIVATE -fopenmp)
+    target_compile_options(giotto_ripser PUBLIC -march=native -D_GLIBCXX_PARALLEL)
+    target_link_libraries(giotto_ripser PRIVATE)
 endif()
 target_compile_definitions(giotto_ripser PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
 
@@ -39,8 +39,8 @@ target_compile_options(giotto_cubical_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb
 
 # Cannot have two inlined namespace !
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(giotto_cubical_complex PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    target_link_libraries(giotto_cubical_complex PRIVATE -fopenmp)
+    target_compile_options(giotto_cubical_complex PUBLIC -march=native -D_GLIBCXX_PARALLEL)
+    target_link_libraries(giotto_cubical_complex PRIVATE)
 endif()
 
 target_compile_definitions(giotto_cubical_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
@@ -56,8 +56,8 @@ target_compile_options(giotto_persistent_cohomology PUBLIC $<$<CONFIG:DEBUG>:-O2
 
 # Cannot have two inlined namespace !
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(giotto_persistent_cohomology PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    target_link_libraries(giotto_persistent_cohomology PRIVATE -fopenmp)
+    target_compile_options(giotto_persistent_cohomology PUBLIC -march=native -D_GLIBCXX_PARALLEL)
+    target_link_libraries(giotto_persistent_cohomology PRIVATE)
 endif()
 target_compile_definitions(giotto_persistent_cohomology PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
@@ -73,7 +73,7 @@ target_compile_options(giotto_simplex_tree PUBLIC -Ofast -shared -pthread -fPIC
                         -fwrapv -Wall -fno-strict-aliasing -frounding-math)
 target_compile_options(giotto_simplex_tree PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(giotto_simplex_tree PUBLIC -march=native -fopenmp -D_GLIBCXX_PARALLEL)
-    target_link_libraries(giotto_simplex_tree PRIVATE -fopenmp)
+    target_compile_options(giotto_simplex_tree PUBLIC -march=native -D_GLIBCXX_PARALLEL)
+    target_link_libraries(giotto_simplex_tree PRIVATE)
 endif()
 target_compile_definitions(giotto_simplex_tree PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
