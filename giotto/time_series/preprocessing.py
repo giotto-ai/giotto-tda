@@ -16,13 +16,6 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     period : int, default: 2
         The sampling period, i.e. pointd every period will be kept.
 
-
-    Attributes
-    ----------
-    _n_features : int
-        Number of features (i.e. number fo time series) passed as an input
-        of the resampler.
-
     Examples
     --------
     >>> import pandas as pd
@@ -67,11 +60,9 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X)
+        check_array(X.reshape((X.shape[0], -1)))
 
-        X = X.reshape((-1, 1))
-
-        self._n_features = X.shape[1]
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -94,13 +85,10 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_n_features'])
-        X = check_array(X, copy=True)
+        check_is_fitted(self, ['_is_fitted'])
+        Xt = check_array(X.reshape((X.shape[0], -1)))
 
-        X = X.reshape((-1, self._n_features))
-        Xt = X[::self.period]
-
-        return Xt
+        return Xt[::self.period]
 
     def resample(self, y, X=None):
         """Resample y.
@@ -122,11 +110,10 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_n_features'])
-        yt = column_or_1d(y).copy()
+        check_is_fitted(self, ['_is_fitted'])
+        yt = column_or_1d(y)
 
-        yt = y[::self.period]
-        return yt
+        return yt[::self.period]
 
 
 class Stationarizer(BaseEstimator, TransformerResamplerMixin):
@@ -216,14 +203,12 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X, copy=True)
+        Xt = check_array(X.reshape((X.shape[0], -1)))
 
         if self.operation == 'return':
-            Xt = np.diff(Xt, n=1, axis=0) / Xt[1:, :]
+            return np.diff(Xt, n=1, axis=0) / Xt[1:]
         else:  # 'log-return' operation
-            Xt = np.diff(np.log(Xt), n=1, axis=0)
-
-        return Xt
+            return np.diff(np.log(Xt), n=1, axis=0)
 
     def resample(self, y, X=None):
         """Resample y.
@@ -246,8 +231,6 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        yt = column_or_1d(y).copy()
+        yt = column_or_1d(y)
 
-        yt = y[1:]
-
-        return yt
+        return yt[1:]
