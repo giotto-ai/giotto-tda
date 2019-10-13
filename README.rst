@@ -26,7 +26,6 @@ To install:
 
 .. code-block:: bash
 
-   pip install gitpython
    git clone https://github.com/giotto-learn/giotto-learn.git
    cd giotto-learn
    git submodule update --init --recursive
@@ -39,6 +38,7 @@ To use:
 .. code-block:: python
 
    import giotto as gt
+
 
 Contacts
 --------
