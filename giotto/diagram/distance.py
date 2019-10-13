@@ -65,6 +65,11 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    effective_metric_params_ : dict
+        TODO
+
     Notes
     -----
     `Hera <https://bitbucket.org/grey_narn/hera>`_ is used as a C++ backend
@@ -201,6 +206,11 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    Attributes
+    ----------
+    effective_metric_params_ : dict
+        TODO
 
     """
     def __init__(self, metric='landscape', metric_params=None, order=2.,

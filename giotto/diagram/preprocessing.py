@@ -146,6 +146,9 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
+    effective_metric_params_ : dict
+        TODO
+
     scale_ : float
         The scaling factor used to rescale diagrams.
 
@@ -275,14 +278,20 @@ class Filtering(BaseEstimator, TransformerMixin):
     delta : float, optional, default: ``0.``
         The cutoff value controlling the amount of filtering.
 
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        If `homology_dimensions` is set to ``None``, then this is the
+        list of homology dimensions seen in :meth:`fit`, sorted in ascending
+        order. Otherwise, it is a similarly sorted version of
+        `homology_dimensions`.
+
     See also
     --------
     Scaling, DiagramAmplitude, DiagramDistance, \
     giotto.homology.VietorisRipsPersistence
 
     """
-
-    implemented_filtering_parameters_types = ['fixed', 'search']
 
     def __init__(self, homology_dimensions=None, delta=0.):
         self.homology_dimensions = homology_dimensions
