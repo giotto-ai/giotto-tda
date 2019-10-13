@@ -259,10 +259,10 @@ def test_da_transform(metric, metric_params, n_jobs):
     da = DiagramAmplitude(metric=metric, metric_params=metric_params,
                           n_jobs=n_jobs)
     X_res = da.fit_transform(X_1)
-    assert X_res.shape == (X_1.shape[0],)
+    assert X_res.shape == (X_1.shape[0], 1)
 
     # X_fit != X_transform
     da = DiagramAmplitude(metric=metric, metric_params=metric_params,
                           n_jobs=n_jobs)
     X_res = da.fit(X_1).transform(X_2)
-    assert X_res.shape == (X_2.shape[0],)
+    assert X_res.shape == (X_2.shape[0], 1)

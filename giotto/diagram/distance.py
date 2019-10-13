@@ -166,7 +166,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         Xt = _parallel_pairwise(self._X, X2, self.metric,
                                 self.effective_metric_params_,
                                 self.homology_dimensions_,
-                                n_jobs=self.n_jobs)
+                                self.n_jobs)
         if self.order is not None:
             Xt = np.linalg.norm(Xt, axis=2, ord=self.order)
 
@@ -327,7 +327,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         Xt = _parallel_amplitude(X, self.metric,
                                  self.effective_metric_params_,
                                  self.homology_dimensions_,
-                                 n_jobs=self.n_jobs)
+                                 self.n_jobs)
         if self.order is None:
             return Xt
         Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape((-1, 1))
