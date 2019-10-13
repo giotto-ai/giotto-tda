@@ -38,18 +38,18 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the only argument is
-          `delta` (default: `0.`).
+        - If ``metric == 'bottleneck'`` the only argument is `delta` (float,
+          default: `0.01`).
         - If ``metric == 'wasserstein'`` the available arguments are `p`
-          (default: ``2.``) and `delta` (default: ``0.``).
+          (int, default: ``2``) and `delta` (float, default: ``0.``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (default: ``2.``), `n_values` (default: ``100``) and
-          `n_layers` (default: ``1``).
+          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
         - If ``metric == 'betti'`` the available arguments are `p`
-          (default: ``2.``) and `n_values` (default: ``100``).
+          (float, default: ``2.``) and `n_values` (int, default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p`
-          (default: ``2.``), `sigma` (default: ``1.``) and
-          `n_values` (default: ``100``).
+          (float, default: ``2.``), `sigma` (float, default: ``1.``) and
+          `n_values` (int, default: ``100``).
 
     order : float, optional, default: ``2.``
         Order of the norm used to combine subdiagrams distances into a single
@@ -209,15 +209,16 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` there are no available arguments.
-        - If ``metric == 'wasserstein'`` the only argument is `p` (default:
-          ``2.``).
-        - If ``metric == 'betti'`` the available arguments are `p` (default:
-          ``2.``) and `n_values` (default: ``100``).
+        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
+          default: ``2``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_values` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (default: ``2.``), `n_values` (default: ``100``) and `n_layers`
-          (default: ``1``).
-        - If ``metric == 'heat'`` the available arguments are `p` (default:
-          ``2.``), `sigma` (default: ``1.``) and `n_values` (default: ``100``).
+          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          (int, default: ``100``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each persistence diagram

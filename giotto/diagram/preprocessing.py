@@ -128,17 +128,17 @@ class Scaler(BaseEstimator, TransformerMixin):
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
 
-        - If ``norm == 'bottleneck'`` there are no available arguments.
-        - If ``norm == 'wasserstein'`` the only argument is `order`
-          (default: ``2.``).
-        - If ``norm == 'landscape'`` the available arguments are `order`
-          (default: ``2.``), `n_samples` (default: ``200``) and `n_layers`
-          (default: ``1``).
-        - If ``norm == 'betti'``` the available arguments are `order`
-          (default: ``2.``) and `n_samples` (default: ``200``).
-        - If ``metric == 'heat'`` the available arguments are `order`
-          (default: ``2.``), `sigma` (default: ``1.``), and `n_samples` (
-          default: ``200``).
+        - If ``metric == 'bottleneck'`` there are no available arguments.
+        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
+          default: ``2``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_values` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          (int, default: ``100``).
 
     function : callable, optional, default: numpy.max
         Function used to extract a single positive scalar from the collection
@@ -154,6 +154,9 @@ class Scaler(BaseEstimator, TransformerMixin):
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params` as
         well as on any relevant quantities computed in :meth:`fit`.
+
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     scale_ : float
         The scaling factor used to rescale diagrams.
@@ -203,6 +206,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
 
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['samplings'], \
@@ -211,7 +215,8 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,
-                                              n_jobs=self.n_jobs)
+                                              self.homology_dimensions_,
+                                              self.n_jobs)
         self.scale_ = self.function(amplitude_array)
 
         return self
@@ -237,7 +242,8 @@ class Scaler(BaseEstimator, TransformerMixin):
             Dictionary of rescaled persistence (sub)diagrams, each with the
             same shape as the corresponding (sub)diagram in `X`.
         """
-        check_is_fitted(self, ['scale_', 'effective_metric_params_'])
+        check_is_fitted(self, ['scale_', 'homology_dimensions_',
+                               'effective_metric_params_'])
 
         Xs = check_diagram(X)
         Xs[:, :, :2] /= self.scale_
