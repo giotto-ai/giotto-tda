@@ -7,17 +7,12 @@ spirit of a pooling layer in a convolutional neural network.
 # Adapted from scikit-learn and imbalanced-learn
 # License: Apache 2.0
 
-import functools
-from collections import defaultdict
-import itertools
 import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import clone
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from .base import TransformerResamplerMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from .utils.validation import validate_params
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 
@@ -66,10 +61,6 @@ class Pipeline(pipeline.Pipeline):
     named_steps : dict
         Read-only attribute to access any step parameter by user given name.
         Keys are step names and values are steps parameters.
-
-    Notes
-    -----
-    See :ref:`sphx_glr_auto_examples_pipeline_plot_pipeline_classification.py`
 
     See also
     --------
@@ -187,7 +178,7 @@ class Pipeline(pipeline.Pipeline):
             the pipeline.
 
         **fit_params : dict of string -> object
-            Parameters passed to the ``fit`` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 
@@ -220,7 +211,7 @@ class Pipeline(pipeline.Pipeline):
             the pipeline.
 
         **fit_params : dict of string -> object
-            Parameters passed to the ``fit`` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 
@@ -244,6 +235,7 @@ class Pipeline(pipeline.Pipeline):
         Fits all the transformers/samplers one after the other and
         transform/sample the data, then uses fit_resample on transformed
         data with the final estimator.
+
         Parameters
         ----------
         X : iterable
@@ -253,9 +245,10 @@ class Pipeline(pipeline.Pipeline):
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
         **fit_params : dict of string -> object
-            Parameters passed to the ``fit`` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
+
         Returns
         -------
         Xt : array-like, shape = [n_samples, n_transformed_features]
@@ -291,7 +284,7 @@ class Pipeline(pipeline.Pipeline):
             of the pipeline.
 
         **fit_params : dict of string -> object
-            Parameters passed to the ``fit`` method of each step, where
+            Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
 
@@ -304,7 +297,8 @@ class Pipeline(pipeline.Pipeline):
 
     @property
     def resample(self):
-        """Apply transformers/transformer_resamplers, and transform with the final estimator
+        """Apply transformers/transformer_resamplers, and transform with the
+        final estimator.
 
         This also works where final estimator is ``None``: all prior
         transformations are applied.
@@ -333,7 +327,8 @@ class Pipeline(pipeline.Pipeline):
 
     @property
     def transform_resample(self):
-        """Apply transformers/transformer_resamplers, and transform with the final estimator
+        """Apply transformers/transformer_resamplers, and transform with the
+        final estimator.
 
         This also works where final estimator is ``None``: all prior
         transformations are applied.
@@ -368,7 +363,8 @@ class Pipeline(pipeline.Pipeline):
 
     @property
     def transform(self):
-        """Apply transformers/transformer_resamplers, and transform with the final estimator
+        """Apply transformers/transformer_resamplers, and transform with the
+        final estimator.
 
         This also works where final estimator is ``None``: all prior
         transformations are applied.
@@ -712,10 +708,12 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
 
     def transform(self, X):
         """Transform X separately by each transformer, concatenate results.
+
         Parameters
         ----------
         X : iterable or array-like, depending on transformers
             Input data to be transformed.
+
         Returns
         -------
         X_t : array-like or sparse matrix, shape (n_samples, sum_n_components)

@@ -12,8 +12,7 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <LINK TO GLOSSARY>`_ (equivalently,
-    `persistence barcodes <LINK TO GLOSSARY>`_) resulting from
+    """`Persistence diagrams <LINK TO GLOSSARY>`_ resulting from
     `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_.
 
     Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space, or an
@@ -25,35 +24,48 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : string or callable, optional, default: 'euclidean'
+    metric : string or callable, optional, default: ``'euclidean'``
         If set to `'precomputed'`, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
         and `metric` determines a rule with which to calculate distances
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
-        "manhattan", or "cosine".
+        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``,
+        including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value
+        two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    max_edge_length : float, optional, default: np.inf
+    max_edge_length : float, optional, default: ``numpy.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
 
-    homology_dimensions : iterable, optional, default: (0, 1)
-        Dimensions (non-negative integers) of the topological voids to be
+    homology_dimensions : iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological features to be
         detected.
 
     n_jobs : int or None, optional, default: None
-        The number of jobs to use for the computation. `None` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. `-1` means using all
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    See also
+    --------
+    ConsistentRescaling
+
+    Notes
+    -----
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
+    for computing Vietoris-Rips persistent homology.
+
+    Persistence diagrams produced by this class must be interpreted with
+    care due to the presence of padding triples which carry no information.
+    See :meth:`transform` for additional information.
 
     """
 
@@ -96,9 +108,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
-            Input data. If `metric == 'precomputed'`, the input should be an
+            Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of `n_points` in Euclidean space of
@@ -120,20 +132,22 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each point cloud or distance matrix in X,
-        the relevant persistence diagram as an array of triples [b, d,
-        q]. When q is not equal to `np.inf`, each triple represents a
-        persistent topological feature in dimension q (belonging to
-        `homology_dimensions`) which is born at b and dies at d. Triples
-        `[0., 0., np.inf]` are used for padding, as the number of persistent
-        topological features is generally different between different entries
-        in X.
+        """Compute, for each point cloud or distance matrix in `X`, the
+        relevant persistence diagram as an array of triples [b, d, q]. Each
+        triple represents a persistent topological feature in dimension q
+        (belonging to `homology_dimensions`) which is born at b and dies at d.
+        Only triples in which b < d are meaningful. Triples in which b and d
+        are equal ("diagonal elements") may be artificially introduced during
+        the computation for padding purposes, since the number of non-trivial
+        persistent topological features is typically not constant across
+        samples. They carry no information and hence should be effectively
+        ignored by any further computation.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
-            Input data. If `metric == 'precomputed'`, the input should be an
+            Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
             (n_points, n_points). Otherwise, each such entry will be
             interpreted as an ndarray of `n_points` in Euclidean space of
@@ -147,9 +161,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
-            distance matrices in `X`. `n_features` is the maximum number of
-            topological features across all samples in `X`, and padding by `[0,
-            0, np.inf]` is performed when necessary.
+            distance matrices in `X`. `n_features` equals :math:`\\sum_q n_q`,
+            where :math:`n_q` is the maximum number of topological features
+            in dimension :math:`q` across all samples in `X`.
 
         """
         # Check if fit had been called
@@ -158,21 +172,21 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         is_distance_matrix = (self.metric == 'precomputed')
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._ripser_diagram)(X[i, :, :], is_distance_matrix,
-                                          self.metric)
-            for i in range(X.shape[0]))
+        n_samples = len(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(
+                X[i], is_distance_matrix, self.metric)
+            for i in range(n_samples))
 
         max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
-                                            for i in range(len(Xt))]))
+                                            for i in range(n_samples)]))
                         for dim in self.homology_dimensions}
         min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                else np.inf for i in range(len(Xt))])
+                                else np.inf for i in range(n_samples)])
                       for dim in self.homology_dimensions}
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(_pad_diagram)(Xt[i], self._homology_dimensions,
-                                  max_n_points, min_values)
-            for i in range(len(Xt)))
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
+                Xt[i], self._homology_dimensions, max_n_points, min_values)
+            for i in range(n_samples))
         Xt = np.stack(Xt)
         return Xt

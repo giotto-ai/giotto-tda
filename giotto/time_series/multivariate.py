@@ -49,7 +49,7 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each array in X, argsort each row in ascending order.
+        """For each array in `X`, argsort each row in ascending order.
 
         Parameters
         ----------

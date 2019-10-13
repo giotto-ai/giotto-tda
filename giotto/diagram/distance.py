@@ -20,8 +20,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti' | 'heat',
-    optional, default: 'bottleneck'
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -39,34 +39,40 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
            distances between "Heat kernels"obtained from persistence
            (sub)diagrams.
 
-    metric_params : dict, optional, default: {'n_values': 100}
+    metric_params : dict, optional, default: ``{'n_values': 100}``
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the only argument is
-          ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the available arguments are ``p``
-          (default = ``1``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'landscape'`` the available arguments are ``p``
-          (default = ``2``), ``n_values`` (default = ``100``) and
-          ``n_layers`` (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``p``
-          (default = ``2``) and ``n_values`` (default = ``100``).
-        - If ``metric == 'heat'`` the available arguments are ``p``
-          (default = ``2``), ``sigma`` (default = ``1``) and
-          ``n_values`` (default = ``100``).
+          `delta` (default: `0.`).
+        - If ``metric == 'wasserstein'`` the available arguments are `p`
+          (default: ``1.``) and `delta` (default: ``0.``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (default: ``2.``), `n_values` (default: ``100``) and
+          `n_layers` (default: ``1``).
+        - If ``metric == 'betti'`` the available arguments are `p`
+          (default: ``2.``) and `n_values` (default: ``100``).
+        - If ``metric == 'heat'`` the available arguments are `p`
+          (default: ``2.``), `sigma` (default: ``1.``) and
+          `n_values` (default: ``100``).
 
-    order : int, optional, default: 2
+    order : float, optional, default: ``2.``
         Order of the norm used to combine subdiagrams distances into a single
         distance. If set to ``None``, returns one distance matrix per homology
         dimension.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Notes
+    -----
+    `Hera <https://bitbucket.org/grey_narn/hera>`_ is used as a C++ backend
+    for computing bottleneck and Wasserstein distances between persistence
+    diagrams.
+
     """
-    def __init__(self, metric='landscape', metric_params=None, order=2,
+    def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -82,8 +88,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -106,20 +110,13 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
-            if self.metric == 'landscape':
-                self.effective_metric_params_['samplings'] = {
-                    dim: np.sqrt(2) * sampling for dim, sampling in
-                    self.effective_metric_params_['samplings'].items()}
-                self.effective_metric_params_['step_sizes'] = {
-                    dim: np.sqrt(2) * step_size for dim, step_size in
-                    self.effective_metric_params_['step_sizes'].items()}
 
         self._X = X
         return self
 
     def transform(self, X, y=None):
-        """Computes the distance matrix between the diagrams in X, according to
-        the choice of ``metric`` and ``metric_params``.
+        """Computes the distance matrix between the diagrams in `X`, according to
+        the choice of `metric` and `metric_params`.
 
         Parameters
         ----------
@@ -127,8 +124,6 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which k equals ``np.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -136,9 +131,9 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_samples) if ``order`` is ``None``
-        (n_samples, n_samples, n_dimensions) else.
-            Distance matrix between diagrams in X.
+        Xt : ndarray, shape (n_samples, n_samples) if `order` is ``None``, \
+            else (n_samples, n_samples, n_dimensions).
+            Distance matrix between diagrams in `X`.
 
         """
         check_is_fitted(self, 'effective_metric_params_')
@@ -168,8 +163,9 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : 'bottleneck' | 'wasserstein' | 'landscape' | 'betti', optional,
-        default: 'bottleneck'
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
+
         Which notion of distance between (sub)diagrams to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -185,29 +181,29 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
           persistence (sub)diagram.
         - ``'heat'`` refers to the heat kernel
 
-    metric_params : dict, optional, default: {'n_values': 100}
+    metric_params : dict, optional, default: ``{'n_values': 100}``
         Additional keyword arguments for the metric function:
 
-        - If ``metric == 'bottleneck'`` the available arguments are ``order``
-          (default = ``np.inf``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'wasserstein'`` the only argument is ``order``
-          (default = ``1``) and ``delta`` (default = ``0.0``).
-        - If ``metric == 'landscape'`` the available arguments are ``order``
-          (default = ``2``), ``n_values`` (default = ``100``) and
-          ``n_layers`` (default = ``1``).
-        - If ``metric == 'betti'`` the available arguments are ``order``
-          (default = ``2``) and ``n_values`` (default = ``100``).
-        - If ``metric == 'heat'`` the available arguments are ``order``
-          (default = ``2``), ``sigma`` (default = ``1``) and
-          ``n_values`` (default = ``100``).
+        - If ``metric == 'bottleneck'`` the available arguments are `order`
+          (default: ``numpy.inf``) and `delta` (default: ``0.``).
+        - If ``metric == 'wasserstein'`` the only argument is `order`
+          (default: ``1.``) and `delta` (default: ``0.``).
+        - If ``metric == 'landscape'`` the available arguments are `order`
+          (default: ``2.``), `n_values` (default: ``100``) and
+          `n_layers` (default: ``1``).
+        - If ``metric == 'betti'`` the available arguments are `order`
+          (default: ``2.``) and `n_values` (default: ``100``).
+        - If ``metric == 'heat'`` the available arguments are `order`
+          (default: ``2.``), `sigma` (default: ``1.``) and
+          `n_values` (default: ``100``).
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
     """
-    def __init__(self, metric='landscape', metric_params=None, order=2,
+    def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -223,8 +219,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -247,19 +241,12 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
-            if self.metric == 'landscape':
-                self.effective_metric_params_['samplings'] = {
-                    dim: np.sqrt(2) * sampling for dim, sampling in
-                    self.effective_metric_params_['samplings'].items()}
-                self.effective_metric_params_['step_sizes'] = {
-                    dim: np.sqrt(2) * step_size for dim, step_size in
-                    self.effective_metric_params_['step_sizes'].items()}
 
         return self
 
     def transform(self, X, y=None):
         """Computes the amplitude of a each diagram in the collection X,
-        according to the choice of ``metric`` and ``metric_params``.
+        according to the choice of `metric` and `metric_params`.
 
         Parameters
         ----------
@@ -267,8 +254,6 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
-            Triples in which q equals ``np.inf`` are used for padding and
-            carry no information.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -276,9 +261,9 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1) if ``order`` is ``None``
-        (n_samples, n_samples, n_dimensions) else
-            Amplitude of the diagrams in X.
+        Xt : ndarray, shape (n_samples, 1) if `order` is ``None``, else \
+            (n_samples, n_samples, n_dimensions)
+            Amplitude of the diagrams in `X`.
 
         """
         check_is_fitted(self, ['effective_metric_params_'])
