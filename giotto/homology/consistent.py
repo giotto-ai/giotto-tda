@@ -2,8 +2,6 @@
 # License: Apache 2.0
 
 import itertools
-import math as m
-
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
@@ -76,7 +74,6 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
-
     _hyperparameters = {'n_neighbor': [int, (1, np.inf)]}
 
     def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1,
@@ -90,7 +87,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
                                 **self.metric_params)
 
-        indices_k_neighbor = np.argsort(X)[:, self.n_neighbor]
+        indices_k_neighbor = np.argsort(Xm)[:, self.n_neighbor]
         distance_k_neighbor = Xm[np.arange(X.shape[0]),
                                  indices_k_neighbor]
 
@@ -98,8 +95,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Xc = np.zeros(Xm.shape)
         iterator = itertools.combinations(range(Xm.shape[0]), 2)
         for i, j in iterator:
-            Xc[i, j] = Xm[i, j] / (m.sqrt(distance_k_neighbor[i] *
-                                          distance_k_neighbor[j]))
+            Xc[i, j] = Xm[i, j] / (np.sqrt(distance_k_neighbor[i] *
+                                           distance_k_neighbor[j]))
         return Xc + Xc.T
 
     def fit(self, X, y=None):
