@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
-project(giotto_bindings)
+cmake_minimum_required(VERSION 3.9)
+project(giotto_bindings LANGUAGES CXX)
 
 find_package(pybind11 REQUIRED)
 set(BINDINGS_DIR "giotto/externals/bindings")
@@ -7,7 +7,10 @@ set(BINDINGS_DIR "giotto/externals/bindings")
 find_package(Boost 1.56 REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
+find_package(OpenMP REQUIRED)
+
 pybind11_add_module(giotto_ripser "${BINDINGS_DIR}/ripser_bindings.cpp")
+target_link_libraries(giotto_ripser PRIVATE OpenMP::OpenMP_CXX)
 target_compile_options(giotto_ripser PUBLIC -O3 -D_hypot=hypot)
 target_compile_options(giotto_ripser PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 # Cannot have two inlined namespace !
@@ -32,6 +35,7 @@ target_compile_definitions(giotto_bottleneck PRIVATE BOOST_RESULT_OF_USE_DECLTYP
 set(GUDHI_SRC_DIR "giotto/externals/gudhi-devel/src")
 
 pybind11_add_module(giotto_cubical_complex "${BINDINGS_DIR}/cubical_complex_bindings.cpp")
+target_link_libraries(giotto_cubical_complex PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(giotto_cubical_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_include_directories(giotto_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/Bitmap_cubical_complex/include")
 target_compile_options(giotto_cubical_complex PUBLIC -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math)
@@ -46,6 +50,7 @@ endif()
 target_compile_definitions(giotto_cubical_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
 pybind11_add_module(giotto_persistent_cohomology "${BINDINGS_DIR}/persistent_cohomology_bindings.cpp")
+target_link_libraries(giotto_persistent_cohomology PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(giotto_persistent_cohomology LINK_PUBLIC ${Boost_LIBRARIES})
 target_include_directories(giotto_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(giotto_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/common/include")
@@ -62,6 +67,7 @@ endif()
 target_compile_definitions(giotto_persistent_cohomology PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
 pybind11_add_module(giotto_simplex_tree "${BINDINGS_DIR}/simplex_tree_bindings.cpp")
+target_link_libraries(giotto_simplex_tree PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(giotto_simplex_tree LINK_PUBLIC ${Boost_LIBRARIES})
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Simplex_tree/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/common/include")
