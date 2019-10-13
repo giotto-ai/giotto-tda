@@ -53,7 +53,8 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'pytest-azurepipelines',
-        'pytest-benchmark'],
+        'pytest-benchmark',
+        'flake8'],
     'doc': [
         'sphinx',
         'sphinx-gallery',
@@ -85,14 +86,13 @@ class CMakeBuild(build_ext):
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
             if cmake_version < '3.1.0':
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
-        
-        for ext in self.extensions:
-            self.install_pybind11(ext)
-                
+
+        self.install_dependencies()
+
         for ext in self.extensions:
             self.build_extension(ext)
-    
-    def install_pybind11(self, ext):
+
+    def install_dependencies(self):
         # install gitpython
         subprocess.check_call(['pip','install','gitpython'])
         # import gitpython
@@ -101,27 +101,33 @@ class CMakeBuild(build_ext):
         dir_pybind11 = os.path.join(dir_start, 'pybind11')
         if os.path.exists(dir_pybind11):
             return 0
-        os.mkdir(dir_pybind11 )
-        Repo.clone_from("https://github.com/pybind/pybind11.git",dir_pybind11)
+        os.mkdir(dir_pybind11)
+        Repo.clone_from("https://github.com/pybind/pybind11.git", dir_pybind11)
         os.chdir(dir_pybind11)
         dir_build = os.path.join(dir_pybind11,'build')
         os.mkdir(dir_build)
         os.chdir(dir_build)
-        cmakeCmd1 = ['cmake', '-DPYBIND11_TEST=OFF', '..']
+        cmake_cmd1 = ['cmake', '-DPYBIND11_TEST=OFF', '..']
         if platform.system() == "Windows":
-            cmakeCmd2 = ['cmake', '--install', '.']
+            cmake_cmd2 = ['cmake', '--install', '.']
             if sys.maxsize > 2**32:
-                cmakeCmd1 += ['-A', 'x64']
+                cmake_cmd1 += ['-A', 'x64']
         else:
-            cmakeCmd2 = ['make', 'install']
-            cmakeCmd2_sudo = ['sudo', 'make', 'install']
-        subprocess.check_call(cmakeCmd1, cwd=dir_build)
-        try: 
-            subprocess.check_call(cmakeCmd2, cwd=dir_build)
+            cmake_cmd2 = ['make', 'install']
+            cmake_cmd2_sudo = ['sudo', 'make', 'install']
+        subprocess.check_call(cmake_cmd1, cwd=dir_build)
+        try:
+            subprocess.check_call(cmake_cmd2, cwd=dir_build)
         except:
-            subprocess.check_call(cmakeCmd2_sudo, cwd=dir_build)
+            subprocess.check_call(cmake_cmd2_sudo, cwd=dir_build)
         os.chdir(dir_start)
-        
+
+        # Neat but not working
+        repo = Repo(dir_start)
+        for submodule in repo.submodules:
+            submodule.update(init=True, recursive=True)
+        # subprocess.call(['git', 'submodule', 'update', '--init', '--recursive'])
+
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
