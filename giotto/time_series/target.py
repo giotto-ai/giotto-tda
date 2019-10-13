@@ -140,6 +140,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             ``n_samples_new = n_samples // period``.
 
         """
+        # Check is fit had been called
+        check_is_fitted(self, ['_labeller', '_sliding_window', 'thresholds_'])
         Xt = column_or_1d(X).copy()
 
         Xt = Xt[:-self.n_steps_future]
@@ -168,7 +170,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_labeller', '_sliding_window', 'threshold_'])
+        check_is_fitted(self, ['_labeller', '_sliding_window', 'thresholds_'])
         column_or_1d(y)
 
         yt = self._sliding_window.transform(y)
@@ -183,7 +185,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                  (yt < self.thresholds_[i + 1]) for i in range(
                     len(self.thresholds_) - 1)] +
                 [1 * (yt >= self.thresholds_[-1])], axis=1)
-            yt = np.nonzero(yt)[1].reshape((y.shape[0], 1))
+            yt = np.nonzero(yt)[1].reshape((yt.shape[0], 1))
 
         if self.n_steps_future >= self.width:
             yt = yt[self.n_steps_future - self.width + 1:]
