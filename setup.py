@@ -94,7 +94,7 @@ class CMakeBuild(build_ext):
 
     def install_dependencies(self):
         # install gitpython
-        subprocess.check_call(['pip','install','gitpython'])
+        subprocess.check_call(['pip3','install','gitpython'])
         # import gitpython
         from git import Repo
         dir_start = os.getcwd()
