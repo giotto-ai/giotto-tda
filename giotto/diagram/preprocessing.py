@@ -9,7 +9,7 @@ from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
+class ForgetHomologyDimensions(BaseEstimator, TransformerMixin):
     """Forget about the homology dimension of points in persistence diagrams
     by replacing these dimensions with ``numpy.inf``.
 
@@ -90,21 +90,27 @@ class ForgetHomologyDimension(BaseEstimator, TransformerMixin):
 
 
 class Scaler(BaseEstimator, TransformerMixin):
-    """Scaling of persistence diagrams.
+    """Linear scaling of persistence diagrams.
 
-    For each homology dimension, a scale factor is calculated during
-    :meth:`fit` by considering all available persistence diagrams, and applied
-    during :meth:`transform`. The value of the scale factor depends on a
-    chosen norm function which is internally evaluated on each persistent
-    diagram separately, and on a function (e.g. ``numpy.max``) which is
-    applied to the resulting collection of norms to extract a single scale
-    factor.
+    A positive scale factor is calculated during :meth:`fit` by considering all
+    available persistence diagrams and homology dimensions. During
+    :meth:`transform`, all birth-death pairs are divided by this factor.
+
+    The value of the scale factor depends on two things:
+
+        - A way of computing, for each homology dimension, the `amplitude
+          <LINK TO GLOSSARY>`_ in that dimension of a persistence diagram
+          consisting of birth-death-dimension triples [b, d, q]. Together,
+          `metric` and `metric_params` define this in the same way as
+          in :class:`DiagramAmplitude`.
+        - A scalar-valued function (e.g. ``numpy.max``) which is applied to
+          the resulting two-dimensional array of amplitudes.
 
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'``, optional,  default: ``'bottleneck'``
-        Which notion of distance between (sub)diagrams to use:
+        Which notion of amplitude to use:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
@@ -119,13 +125,12 @@ class Scaler(BaseEstimator, TransformerMixin):
            persistence (sub)diagram.
         - ``'heat'`` heat kernel
 
-    metric_params : dict, optional, default: ``{'n_samples': 200}``
-        Additional keyword arguments for the norm function:
+    metric_params : dict or None, optional, default: ``None``
+        Additional keyword arguments for the metric function:
 
-        - If ``norm == 'bottleneck'`` the only argument is `order`
-          (default: ``numpy.inf``).
+        - If ``norm == 'bottleneck'`` there are no available arguments.
         - If ``norm == 'wasserstein'`` the only argument is `order`
-          (default: ``1.``).
+          (default: ``2.``).
         - If ``norm == 'landscape'`` the available arguments are `order`
           (default: ``2.``), `n_samples` (default: ``200``) and `n_layers`
           (default: ``1``).
@@ -147,7 +152,8 @@ class Scaler(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     effective_metric_params_ : dict
-        TODO
+        Dictionary containing all information present in `metric_params` as
+        well as on any relevant quantities computed in :meth:`fit`.
 
     scale_ : float
         The scaling factor used to rescale diagrams.
@@ -156,6 +162,10 @@ class Scaler(BaseEstimator, TransformerMixin):
     --------
     Filtering, DiagramAmplitude, DiagramDistance, \
     giotto.homology.VietorisRipsPersistence
+
+    Notes
+    -----
+    Just as in :class:`DiagramAmplitude` and :class:`DiagramDistance`, TODO
 
     """
 
@@ -230,7 +240,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ['scale_', 'effective_metric_params_'])
 
         Xs = check_diagram(X)
-        Xs[:, :, :2] = X[:, :, :2] / self.scale_
+        Xs[:, :, :2] /= self.scale_
         return Xs
 
     def inverse_transform(self, X, copy=None):

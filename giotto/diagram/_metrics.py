@@ -90,7 +90,7 @@ def pairwise_landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
     return (step_size ** (1 / p)) * unnorm_dist
 
 
-def kernel_bottleneck_distance(diagrams_1, diagrams_2, delta=0.0, **kwargs):
+def kernel_bottleneck_distance(diagrams_1, diagrams_2, delta=0.01, **kwargs):
     return np.array([[
         pairwise_bottleneck_distance(
             diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
@@ -98,7 +98,7 @@ def kernel_bottleneck_distance(diagrams_1, diagrams_2, delta=0.0, **kwargs):
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
 
 
-def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=1, delta=0.01,
+def kernel_wasserstein_distance(diagrams_1, diagrams_2, p=2., delta=0.01,
                                 **kwargs):
     return np.array([[
         pairwise_wasserstein_distance(
@@ -132,10 +132,9 @@ def _matrix_wrapper(distance_func, distance_matrices, slice_, dim,
     distance_matrices[:, slice_, int(dim)] = distance_func(*args, **kwargs)
 
 
-def _parallel_pairwise(X1, X2, metric, metric_params, n_jobs):
+def _parallel_pairwise(X1, X2, metric, metric_params,
+                       homology_dimensions, n_jobs):
     metric_func = implemented_metric_recipes[metric]
-    homology_dimensions = sorted(list(set(X1[0, :, 2])))
-
     effective_metric_params = metric_params.copy()
     none_dict = {dim: None for dim in homology_dimensions}
     samplings = effective_metric_params.pop('samplings', none_dict)
@@ -174,15 +173,15 @@ def bottleneck_amplitudes(diagrams, **kwargs):
     return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
 
 
-def wasserstein_amplitudes(diagrams, p=1., **kwargs):
+def wasserstein_amplitudes(diagrams, p=2., **kwargs):
     dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=p)
 
 
-def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., order=2,
+def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., p=2.,
                           **kwargs):
     heat = heats(diagrams, sampling, step_size, sigma)
-    return np.linalg.norm(heat, axis=(1, 2), ord=order)
+    return np.linalg.norm(heat, axis=(1, 2), ord=p)
 
 
 implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
@@ -197,8 +196,7 @@ def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,
     amplitude_arrays[slice_, int(dim)] = amplitude_func(*args, **kwargs)
 
 
-def _parallel_amplitude(X, metric, metric_params, n_jobs):
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
     amplitude_func = implemented_amplitude_recipes[metric]
     effective_metric_params = metric_params.copy()
     none_dict = {dim: None for dim in homology_dimensions}
