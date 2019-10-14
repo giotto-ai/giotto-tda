@@ -1,23 +1,23 @@
-"""The module :mod:`giotto.diagram` implements persistence diagrams
+"""The module :mod:`giotto.diagrams` implements persistence diagrams
 transformers.
 It offers the possibility to stack across homology dimensions,
 scale, and filter diagrams.
 It also makes it possible to calculate distance matrices.
 """
 
-from .distance import DiagramDistance, DiagramAmplitude
+from .distance import PairwiseDistance, Amplitude
 from .features import PersistenceEntropy, BettiCurve, PersistenceLandscape, \
     HeatKernel
-from .preprocessing import Stacking, Scaler, Filtering
+from .preprocessing import ForgetDimension, Scaler, Filtering
 
 __all__ = [
-    'Stacking',
-    'Scaler',
-    'Filtering',
-    'DiagramDistance',
-    'DiagramAmplitude',
-    'PersistenceEntropy',
+    'ForgetDimension',
     'BettiCurve',
     'PersistenceLandscape',
-    'HeatKernel'
+    'HeatKernel',
+    'PersistenceEntropy',
+    'Amplitude',
+    'Scaler',
+    'Filtering',
+    'PairwiseDistance',
 ]

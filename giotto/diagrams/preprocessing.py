@@ -9,13 +9,16 @@ from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class Stacking(BaseEstimator, TransformerMixin):
-    """Transformer for stacking persistence subdiagrams.
+class ForgetDimension(BaseEstimator, TransformerMixin):
+    """Forget about the homology dimension of points in persistence diagrams
+    by replacing these dimensions with ``numpy.inf``.
 
-    Useful when topological
-    persistence information per sample has been previously separated according
-    to some criterion (e.g. by homology dimension if produced by an instance of
-    :class:`giotto.homology.VietorisRipsPersistence`).
+    Useful if one wishes to use topological features all at once -- and not
+    separated between different homology dimensions -- in later processing.
+
+    See also
+    --------
+    giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -31,7 +34,8 @@ class Stacking(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -57,8 +61,7 @@ class Stacking(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Stacks all available persistence subdiagrams corresponding
-        to each sample into one persistence diagram.
+        """Replace all homology dimensions in `X` with ``numpy.inf``.
 
         Parameters
         ----------
@@ -73,9 +76,8 @@ class Stacking(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : dict of None: ndarray
-            Dictionary with a single ``None`` key, and corresponding value an
-            ndarray of shape (n_samples, :math:`\\sum_{\\mathrm{d}}` M_d, 2).
+        Xt : ndarray, shape (n_samples, n_features, 3)
+            Output persistence diagram.
 
         """
         # Check is fit had been called
@@ -88,65 +90,83 @@ class Stacking(BaseEstimator, TransformerMixin):
 
 
 class Scaler(BaseEstimator, TransformerMixin):
-    """Transformer scaling collections of persistence diagrams in which each
-    diagram is partitioned into one or more subdiagrams (e.g. according to
-    homology dimension).
+    """Linear scaling of persistence diagrams.
 
-    A scale factor is calculated during :meth:`fit` which depends on the entire
-    collection, and it is applied during :meth:`transform`. The value of the
-    scale factor depends on a chosen norm function which is internally
-    evaluated on each persistent diagram separately, and on a function (e.g.
-    `numpy.max`) which is applied to the resulting collection of norms to
-    extract a single scale factor.
+    A positive scale factor is calculated during :meth:`fit` by considering all
+    available persistence diagrams and homology dimensions. During
+    :meth:`transform`, all birth-death pairs are divided by this factor.
+
+    The value of the scale factor depends on two things:
+
+        - A way of computing, for each homology dimension, the `amplitude
+          <LINK TO GLOSSARY>`_ in that dimension of a persistence diagram
+          consisting of birth-death-dimension triples [b, d, q]. Together,
+          `metric` and `metric_params` define this in the same way as
+          in :class:`Amplitude`.
+        - A scalar-valued function which is applied to the resulting
+          two-dimensional array of amplitudes.
 
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'``, optional,  default: ``'bottleneck'``
-        Which notion of distance between (sub)diagrams to use:
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like)
-           distances between "persistence landscapes" obtained from
-           persistence (sub)diagrams.
-        - ``'betti'`` refers to a family of possible (:math:`L^p`-like)
-           distances between "Betti curves" obtained from persistence (
-           sub)diagrams. A Betti curve simply records the evolution in the
-           number of independent topological holes (technically, the number
-           of linearly independent homology classes) as can be read from a
-           persistence (sub)diagram.
-        - ``'heat'`` heat kernel
+        - ``'landscape'`` refers to the :math:`L^p` distance between
+          persistence landscapes.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
 
-    metric_params : dict, optional, default: ``{'n_samples': 200}``
-        Additional keyword arguments for the norm function:
+    metric_params : dict or None, optional, default: ``None``
+        Additional keyword arguments for the metric function:
 
-        - If ``norm == 'bottleneck'`` the only argument is `order`
-          (default: ``numpy.inf``).
-        - If ``norm == 'wasserstein'`` the only argument is `order`
-          (default: ``1.``).
-        - If ``norm == 'landscape'`` the available arguments are `order`
-          (default: ``2.``), `n_samples` (default: ``200``) and `n_layers`
-          (default: ``1``).
-        - If ``norm == 'betti'``` the available arguments are `order`
-          (default: ``2.``) and `n_samples` (default: ``200``).
-        - If ``metric == 'heat'`` the available arguments are `order`
-          (default: ``2.``), `sigma` (default: ``1.``), and `n_samples` (
-          default: ``200``).
+        - If ``metric == 'bottleneck'`` there are no available arguments.
+        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
+          default: ``2``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_values` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          (int, default: ``100``).
 
-    function : callable, optional, default: numpy.max
-        Function used to extract a single positive scalar from the collection
-        of norms of diagrams.
+    function : callable, optional, default: ``numpy.max``
+        Function used to extract a positive scalar from the collection of
+        amplitude vectors in :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
-    Attributess
+    Attributes
     ----------
+    effective_metric_params_ : dict
+        Dictionary containing all information present in `metric_params` as
+        well as on any relevant quantities computed in :meth:`fit`.
+
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
     scale_ : float
         The scaling factor used to rescale diagrams.
+
+    See also
+    --------
+    Filtering, Amplitude, PairwiseDistance, \
+    giotto.homology.VietorisRipsPersistence
+
+    Notes
+    -----
+    To compute scaling factors without first splitting the computation between
+    different homology dimensions, data should be first transformed by an
+    instance of :class:`ForgetDimension`.
 
     """
 
@@ -158,8 +178,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Fits the transformer by finding the scale factor according to the
-        chosen parameters.
+        """Fit the estimator by finding the scale factor, then returns it.
 
         Parameters
         ----------
@@ -184,6 +203,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
 
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['samplings'], \
@@ -192,14 +212,14 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,
-                                              n_jobs=self.n_jobs)
+                                              self.homology_dimensions_,
+                                              self.n_jobs)
         self.scale_ = self.function(amplitude_array)
 
         return self
 
     def transform(self, X, y=None):
-        """Rescales all persistence diagrams in the collection according to the
-        factor computed during :meth:`fit`.
+        """Divide all birth and death values in `X` by :attr:`scale_`.
 
         Parameters
         ----------
@@ -214,14 +234,15 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xs : dict of int: ndarray
-            Dictionary of rescaled persistence (sub)diagrams, each with the
-            same shape as the corresponding (sub)diagram in `X`.
+        Xs : ndarray, shape (n_samples, n_features, 3)
+            Rescaled diagrams.
+
         """
-        check_is_fitted(self, ['scale_', 'effective_metric_params_'])
+        check_is_fitted(self, ['scale_', 'homology_dimensions_',
+                               'effective_metric_params_'])
 
         Xs = check_diagram(X)
-        Xs[:, :, :2] = X[:, :, :2] / self.scale_
+        Xs[:, :, :2] /= self.scale_
         return Xs
 
     def inverse_transform(self, X, copy=None):
@@ -230,56 +251,64 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : dict of int: ndarray
+        X : ndarray, shape (n_samples, n_features, 3)
             Data to apply the inverse transform to.
-
-        copy : bool, optional (default: None)
-            Copy the input X or not.
 
         Returns
         -------
-        X_scaled : dict of int: ndarray
-            Transformed array.
+        Xs : ndarray, shape (n_samples, n_features, 3)
+            Rescaled diagrams.
+
         """
         check_is_fitted(self, ['effective_metric_params_'])
 
         Xs = check_diagram(X)
-        Xs[:, :, :2] = X[:, :, :2] * self.scale_
+        Xs[:, :, :2] *= self.scale_
         return Xs
 
 
 class Filtering(BaseEstimator, TransformerMixin):
-    """Transformer filtering collections of persistence diagrams in which each
-    diagram is partitioned into one or more subdiagrams (e.g. according to
-    homology dimension).
+    """Filtering of persistence diagrams.
 
-    Filtering a persistence (sub)diagram means removing
-    all points whose distance from the diagonal is less than or equal to a
-    certain cutoff value: that is, the cutoff value can be interpreted as the
-    "minimum amount of persistence" required from points in the filtered
-    diagram.
+    Filtering a diagram means removing all points whose distance from the
+    diagonal is less than or equal to a certain cutoff value which can be
+    interpreted as (:math:`1/\\sqrt{2}` times) the "minimum amount of
+    persistence" required from points in the filtered diagram.
 
     Parameters
     ----------
     homology_dimensions : list or None, optional, default: ``None``
-        When set to ``None``, all available (sub)diagrams will be filtered.
-        When set to a list, it is interpreted as the list of those homology
-        dimensions for which (sub)diagrams should be filtered.
+        When set to ``None``, subdiagrams corresponding to all homology
+        dimensions seen in :meth:`fit` will be filtered.
+        Otherwise, it is the list of those homology dimensions at which
+        filtering should occur.
 
-    delta : float, optional, default: ``0.``
+    epsilon : float, optional, default: ``0.01``
         The cutoff value controlling the amount of filtering.
+
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        If `homology_dimensions` is set to ``None``, then this is the
+        list of homology dimensions seen in :meth:`fit`, sorted in ascending
+        order. Otherwise, it is a similarly sorted version of
+        `homology_dimensions`.
+
+    See also
+    --------
+    Scaling, Amplitude, PairwiseDistance, \
+    giotto.homology.VietorisRipsPersistence
 
     """
 
-    implemented_filtering_parameters_types = ['fixed', 'search']
-
-    def __init__(self, homology_dimensions=None, delta=0.):
+    def __init__(self, homology_dimensions=None, epsilon=0.01):
         self.homology_dimensions = homology_dimensions
-        self.delta = delta
+        self.epsilon = epsilon
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -308,7 +337,7 @@ class Filtering(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        r"""Filters all relevant persistence (sub)diagrams, and returns them.
+        """Filter all relevant persistence subdiagrams.
 
         Parameters
         ----------
@@ -323,14 +352,11 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : dict of int: ndarray
-            Dictionary of filtered persistence (sub)diagrams. The value
-            corresponding to key d has shape (n_samples, F_d, 2), where
-            :math:`F_\mathrm{d} \leq M_\mathrm{d}` in general, due to
-            filtering.
-            If `homology_dimensions` was set to be a list not containing all
-            keys in `X`, only the corresponding (sub)diagrams are filtered and
-            returned.
+        Xt : ndarray, shape (n_samples, n_features, 3)
+            Filtered persistence diagrams. Only the subdiagrams corresponding
+            to dimensions in :attr:`homology_dimensions_` are filtered.
+            Discarded points are replaced by points on the diagonal.
+
         """
 
         # Check if fit had been called
@@ -338,5 +364,5 @@ class Filtering(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         X = _sort(X)
-        Xt = _filter(X, self.homology_dimensions_, self.delta)
+        Xt = _filter(X, self.homology_dimensions_, self.epsilon)
         return Xt

@@ -91,7 +91,9 @@ def get_greedy_perm(X, n_perm=None, distance_matrix=False, metric="euclidean"):
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, distance_matrix=False,
            metric="euclidean", n_perm=None):
-    """Compute persistence diagrams for X data array. If X is not a distance matrix, it will be converted to a distance matrix using the chosen metric.
+    """Compute persistence diagrams for X data array. If X is not a distance
+    matrix, it will be converted to a distance matrix using the chosen metric.
+
     Parameters
     ----------
     X: ndarray (n_samples, n_features)
