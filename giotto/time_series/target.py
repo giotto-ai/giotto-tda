@@ -37,7 +37,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    samplingType : str
+    labelling : str
         The type of sampling
 
         - data_type: string, must equal either 'points' or 'distance_matrix'.

@@ -263,9 +263,9 @@ def plot_betti_curves(betti_curves, samplings=None, homology_dimensions=None):
         is input, the samplings will start at 0 with step 1.
     """
     if homology_dimensions is None:
-        homology_dimensions = np.arange(0,betti_curves.shape[0])
+        homology_dimensions = np.arange(0, betti_curves.shape[0])
     if samplings is None:
-        samplings = np.arange(0,betti_curves.shape[1])
+        samplings = np.arange(0, betti_curves.shape[1])
     layout = {
         "title": "Betti curves",
         "xaxis1": {
