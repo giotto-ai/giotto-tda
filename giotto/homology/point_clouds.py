@@ -2,11 +2,13 @@
 # License: Apache 2.0
 
 import numpy as np
+import numbers
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors.base import VALID_METRICS
 from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from ._utils import _pad_diagram
+from ..utils.validation import validate_params
 
 from ..externals.python import ripser
 
@@ -68,25 +70,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     See :meth:`transform` for additional information.
 
     """
+    _hyperparameters = {'max_edge_length': (numbers.Number),
+                        'infinity_values': (numbers.Number),
+                        'homology_dimensions': (tuple, (int, (0, np.inf)))}
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), n_jobs=None):
+                 homology_dimensions=(0, 1), infinity_values=None,
+                 n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
+        self.infinity_values = infinity_values
         self.homology_dimensions = homology_dimensions
         self.n_jobs = n_jobs
-
-    @staticmethod
-    def _validate_params(metric):
-        """A class method that checks whether the hyperparameters and the input
-        parameters of the :meth:`fit` are valid.
-        """
-        implemented_metric_types = set(['precomputed'] +
-                                       [met for i in VALID_METRICS.values()
-                                        for met in i])
-
-        if metric not in implemented_metric_types:
-            raise ValueError('The metric %s is not supported' % metric)
 
     def _ripser_diagram(self, X, is_distance_matrix, metric):
         Xds = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
@@ -125,7 +120,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        self._validate_params(self.metric)
+
+        # validate_params(self.get_params(), self._hyperparameters)
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
@@ -182,7 +178,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                             for i in range(n_samples)]))
                         for dim in self.homology_dimensions}
         min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                else np.inf for i in range(n_samples)])
+                                else 0 for i in range(n_samples)])
                       for dim in self.homology_dimensions}
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
