@@ -105,6 +105,7 @@ def validate_params(parameters, references):
                                  "".format(key, parameters[key],
                                            references[key][1]))
 
+
 def validate_metric_params(metric, metric_params):
     if metric not in available_metrics.keys():
         raise ValueError("No metric called {}."
