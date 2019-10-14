@@ -69,10 +69,10 @@ def validate_params(parameters, references):
                             "".format(key, type(parameters[key]),
                                       references[key][0]))
         if len(references[key]) == 1:
-            break
+            continue
         if references[key][0] == list:
             for parameter in parameters[key]:
-                if not isinstance(parameter, references[key][1][1]):
+                if not isinstance(parameter, references[key][1][0]):
                     raise TypeError("Parameter {} is a list of {}"
                                     " but contains an element of type {}"
                                     "".format(key, type(parameters[key]),
@@ -100,7 +100,6 @@ def validate_params(parameters, references):
                                  " should be one of the following {}"
                                  "".format(key, parameters[key],
                                            references[key][1]))
-
 
 def validate_metric_params(metric, metric_params):
     if metric not in available_metrics.keys():
