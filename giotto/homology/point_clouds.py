@@ -4,9 +4,8 @@
 import numpy as np
 import numbers
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.neighbors.base import VALID_METRICS
 from joblib import Parallel, delayed
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted
 from ._utils import _pad_diagram
 from ..utils.validation import validate_params
 
@@ -75,9 +74,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     See :meth:`transform` for additional information.
 
     """
-    _hyperparameters = {'max_edge_length': (numbers.Number),
-                        'infinity_values': (numbers.Number),
-                        'homology_dimensions': (tuple, (int, (0, np.inf)))}
+    _hyperparameters = {'max_edge_length': [numbers.Number],
+                        'infinity_values_': [numbers.Number],
+                        '_homology_dimensions': [list, [int, (0, np.inf)]]}
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
                  homology_dimensions=(0, 1), infinity_values=None,
@@ -126,10 +125,19 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-
-        # validate_params(self.get_params(), self._hyperparameters)
+        if self.infinity_values is None:
+            self.infinity_values_ = self.max_edge_length
+        else:
+            self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
+
+        validate_params({**self.get_params(),
+                         'infinity_values_': self.infinity_values_,
+                         '_homology_dimensions': self._homology_dimensions},
+                         self._hyperparameters)
+        check_array(X, allow_nd=True)
+
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -169,8 +177,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_homology_dimensions',
+        check_is_fitted(self, ['infinity_values_',
+                               '_homology_dimensions',
                                '_max_homology_dimension'])
+        X = check_array(X, allow_nd=True)
 
         is_distance_matrix = (self.metric == 'precomputed')
 
@@ -191,4 +201,5 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                 Xt[i], self._homology_dimensions, max_n_points, min_values)
             for i in range(n_samples))
         Xt = np.stack(Xt)
+        Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
         return Xt
