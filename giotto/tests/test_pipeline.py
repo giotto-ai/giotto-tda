@@ -41,7 +41,7 @@ def get_steps():
         ('window', ts.SlidingWindow(width=5, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.Scaler()),
-        ('filter', diag.Filtering(delta=0.1)),
+        ('filter', diag.Filtering(epsilon=0.1)),
         ('entropy', diag.PersistenceEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
    ]

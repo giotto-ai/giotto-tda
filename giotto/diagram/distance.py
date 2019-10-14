@@ -210,7 +210,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Distance or dissimilarity function used to define the amplitude of
-        a subdiagram as its distance from the trivial (i.e. diagonal) diagram:
+        a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
