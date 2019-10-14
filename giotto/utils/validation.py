@@ -60,6 +60,10 @@ def check_diagram(X):
     return X
 
 
+def check_graph(X):
+    return X
+
+
 # Check the type and range of numerical parameters
 def validate_params(parameters, references):
     for key in references.keys():
