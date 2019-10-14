@@ -14,7 +14,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     Parameters
     ----------
     period : int, default: 2
-        The sampling period, i.e. pointd every period will be kept.
+        The sampling period, i.e. one point every period will be kept.
 
     Examples
     --------
@@ -81,8 +81,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples_new, n_features)
-            The transformed/resampled input array.
-            ``n_samples_new = n_samples // period``.
+            The transformed/resampled input array. ``n_samples_new =
+            n_samples // period``.
 
         """
         # Check if fit had been called
@@ -106,8 +106,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         yt : ndarray, shape (n_samples_new, 1)
-            The resampled target.
-            ``n_samples_new = n_samples // period``.
+            The resampled target. ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
@@ -122,19 +121,19 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    operation : str, default: 'return'
+    operation : ``'return'`` | ``'log-return'``, default: ``'return'``
         The type of stationarization operation with which to stationarize
         the time series. It can have two values:
 
-        - 'return':
-            This option transforms the time series :math:`{X_t}_t` into the
-            time series of relative returns, i.e. the ratio :math:`(X_t-X_{
-            t-1})/X_t`.
+        - ``'return'``:
+          This option transforms the time series :math:`{X_t}_t` into the
+          time series of relative returns, i.e. the ratio :math:`(X_t-X_{
+          t-1})/X_t`.
 
-        - 'log-return':
-            This option transforms the time series :math:`{X_t}_t` into the
-            time series of relative log-returns, i.e. :math:`\\log(X_t/X_{
-            t-1})`.
+        - ``'log-return'``:
+          This option transforms the time series :math:`{X_t}_t` into the
+          time series of relative log-returns, i.e. :math:`\\log(X_t/X_{
+          t-1})`.
 
     Examples
     --------
@@ -189,7 +188,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features)
-            Input data. ``
+            Input data.
 
         y : None
             There is no need of a target, yet the pipeline API
@@ -198,8 +197,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples_new, n_features)
-            The transformed/resampled input array.
-            ``n_samples_new = n_samples - 1``.
+            The transformed/resampled input array. ``n_samples_new =
+            n_samples - 1``.
 
         """
         # Check if fit had been called
@@ -226,8 +225,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         yt : ndarray, shape (n_samples_new, 1)
-            The resampled target.
-            ``n_samples_new = n_samples - 1``.
+            The resampled target. ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called
