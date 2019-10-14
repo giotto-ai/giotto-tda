@@ -78,8 +78,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_windows, n_samples_window,
-            n_features)
+        Xt : ndarray, shape (n_windows, n_samples_window, \
+             n_features)
 
         """
         # Check if fit had been called
@@ -119,20 +119,20 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    """Transformer returning a representation of a scalar-valued time
-    series as a time series of point clouds.
+    """Representation of a univariate time series as a time series of
+    point clouds.
 
-    Based on the following time-delay embedding technique named after `F.
-    Takens <https://doi.org/10.1007/BFb0091924>`_: given a time series
-    :math:`X(t)`, one extracts a set of vectors in :math:`\\mathbb{R}^d`,
-    each of the form :math:`\\Xi_i := [X(t_i), X(t_i + \\tau), ..., X(t_i + (
-    d-1)\\tau)]`. The set :math:`\\{\\Xi_i\\}` is called the Takens
-    embedding of the time series, :math:`\\tau` is called the embedding time
-    delay, :math:`d` is called the embedding dimension, and the difference
-    between :math:`t_i` and :math:`t_{i-1}` is called the embedding stride.
+    Based on the following time-delay embedding technique named after F.
+    Takens [1]_: given a time series :math:`X(t)`, one extracts a set of
+    vectors in :math:`\\mathbb{R}^d`, each of the form :math:`\\Xi_i := [X(
+    t_i), X(t_i + \\tau), ..., X(t_i + (d-1)\\tau)]`. The set
+    :math:`\\{\\Xi_i\\}` is called the Takens embedding of the time series,
+    :math:`\\tau` is called the embedding time delay, :math:`d` is called
+    the embedding dimension, and the difference between :math:`t_i` and
+    :math:`t_{i-1}` is called the embedding stride.
 
     If :math:`d` and :math:`\\tau` are not explicitly set by the user, suitable
-    values are calculated during ``fit()``.
+    values are calculated during :meth:`fit`.
 
     During :meth:`transform`, a Takens embedding procedure is applied on
     intervals of the input time series called "outer windows",
@@ -141,30 +141,27 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    parameters_type: 'search' | 'fixed', default: 'search'
-        If set to 'fixed' and if values for ``embedding_time_delay`` and
-        ``dimension`` are provided, these values are used in
-        ``transform()``.
-        If set to 'search' and if ``embedding_time_delay`` and
-        ``dimension`` are not set, optimal values are
-        automatically found for those parameters using mutual information
-        (`time_delay``) and false nearest neighbors (
-        ``dimension``) criteria.
-        If set to 'search' and if ``time_delay`` and
-        ``dimension`` are set, a similar optimization is carried
-        out, but the final values are constrained to be not greater than the
-        values initially set.
+    parameters_type: ``'search'`` | ``'fixed'``, default: ``'search'``
+        If set to 'fixed' and if values for `embedding_time_delay` and
+        `dimension` are provided, these values are used in :meth:`transform`.
+        If set to ``'search'`` and if `embedding_time_delay` and `dimension`
+        are not set, optimal values are automatically found for those
+        parameters using mutual information (`time_delay`) and false nearest
+        neighbors (`dimension`) criteria.
+        If set to 'search' and if `time_delay` and `dimension` are set,
+        a similar optimization is carried out, but the final values are
+        constrained to be not greater than the values initially set.
 
     time_delay: int, default: ``1``
         Time delay between two consecutive values for constructing one
-        embedded point. If ``parameters_type`` is 'search',
+        embedded point. If `parameters_type` is ``'search'``,
         it corresponds to the maximal embedding time delay that will be
         considered.
 
     dimension: int, default: ``5``
-        Dimension of the embedding space. If ``parameters_type`` is
-        'search', it corresponds to the maximum embedding dimension that will
-        be considered.
+        Dimension of the embedding space. If `parameters_type` is ``'search'``,
+        it corresponds to the maximum embedding dimension that will be
+        considered.
 
     stride: int, default: ``1``
         Stride duration between two consecutive embedded points. It defaults
@@ -180,15 +177,13 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     ----------
     time_delay_: int
         Actual embedding time delay used to embed. If
-        ``parameters_type`` is 'search', it is the calculated
-        optimal embedding time delay. Otherwise it has the same value as
-        ``time_delay``.
+        `parameters_type` is ``'search'``, it is the calculated optimal
+        embedding time delay. Otherwise it has the same value as `time_delay`.
 
     dimension_: int
-        Actual embedding dimension used to embed. If
-        ``parameters_type`` is 'search', it is the calculated
-        optimal embedding dimension. Otherwise it has the same value as
-        ``dimension``.
+        Actual embedding dimension used to embed. If `parameters_type` is
+        ``'search'``, it is the calculated optimal embedding dimension.
+        Otherwise it has the same value as `dimension`.
 
     Examples
     --------
@@ -216,6 +211,17 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
     ...       embedder.dimension_)
     Optimal embedding dimension based on false nearest neighbors: 3
+
+    See also
+    --------
+    giotto.homology.VietorisRipsPersistence
+
+    References
+    ----------
+    .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
+           D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
+           1980*. Lecture Notes in Mathematics, vol 898. Springer, 1981;
+           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
     """
     _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
@@ -351,10 +357,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         -------
         Xt : ndarray, shape (n_points, n_dimension)
             Array of embedded point cloud per outer window.
-            ``n_outer_windows`` is  ``(n_samples - outer_window_duration) //
-            outer_window_stride + 1``, and ``n_points`` is ``(
-            outer_window_duration - time_delay *
-            dimension) // stride + 1``.
+            ``n_outer_windows = (n_samples - outer_window_duration) //
+            outer_window_stride + 1``, and ``n_points = (
+            outer_window_duration - time_delay * dimension) // stride + 1``.
 
         """
         # Check if fit had been called
@@ -379,8 +384,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         yt : ndarray, shape (n_samples_new, 1)
-            The resampled target.
-            ``n_samples_new = n_samples - 1``.
+            The resampled target. ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called

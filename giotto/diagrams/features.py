@@ -424,7 +424,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     .. [1] J. Reininghaus, S. Huber, U. Bauer, R. Kwitt, "A Stable Multi-Scale
            Kernel for Topological Machine Learning"; *2015 IEEE Conference on
            Computer Vision and Pattern Recognition (CVPR)*, pp. 4741--4748,
-           2015, doi: `10.1109/CVPR.2015.7299106
+           2015; doi: `10.1109/CVPR.2015.7299106
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
