@@ -13,13 +13,12 @@ from ..utils.validation import validate_params
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    r"""Rescaling of distances between pairs of points by the geometric mean
+    """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
 
     Based on ideas in [1]_. The computation during :meth:`transform` depends on
     the nature of the array `X`. If each entry in `X` along axis 0 represents a
-    distance matrix :math:`D`, then the corresponding entry in the
-    transformed array is the distance matrix :math:`D'_{ij} = D_{ij}/\sqrt{
+    distance matrix :math:`D`, then the corresponding entry in the\\sqrt{
     D_{ik_i}D_{jk_j}}`, where :math:`k_i` is the index of the :math:`k`-th
     largest value in row :math:`i` (and similarly for :math:`j`). If the
     entries in `X` represent point clouds, their distance matrices are first
@@ -45,11 +44,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
-    n_neighbor : int, optional, default: 1
+    n_neighbor : int, optional, default: ``1``
         Rank of the neighbors to be used to modify the metric structure
         according to the consistent rescaling procedure.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.

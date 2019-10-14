@@ -9,7 +9,7 @@ from ._utils import _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class DiagramDistance(BaseEstimator, TransformerMixin):
+class Distance(BaseEstimator, TransformerMixin):
     """`Distances <LINK TO GLOSSARY>`_ between pairs of persistence diagrams,
     constructed from the distances between their respective subdiagrams with
     constant homology dimension.
@@ -84,7 +84,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    DiagramAmplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
+    Amplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
     giotto.homology.VietorisRipsPersistence
 
     Notes
@@ -189,7 +189,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return Xt
 
 
-class DiagramAmplitude(BaseEstimator, TransformerMixin):
+class Amplitude(BaseEstimator, TransformerMixin):
     """`Amplitudes <LINK TO GLOSSARY>`_ of persistence diagrams, constructed
     from the amplitudes of their subdiagrams with constant homology dimension.
 
@@ -257,7 +257,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    DiagramDistance, Scaler, Filtering, \
+    Distance, Scaler, Filtering, \
     BettiCurve, PersistenceLandscape, \
     HeatKernel, giotto.homology.VietorisRipsPersistence
 

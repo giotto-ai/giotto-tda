@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
 
-from giotto.diagram import ForgetHomologyDimensions, Scaler
+from giotto.diagrams import ForgetHomologyDimensions, Scaler
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],

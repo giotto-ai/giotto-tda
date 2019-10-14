@@ -42,7 +42,7 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Operating System :: MacOS',
                'Programming Language :: Python :: 3.6',
                'Programming Language :: Python :: 3.7']
-KEYWORDS = 'machine learning topological data analysis persistent ' + \
+KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
            'homology, persistence diagrams'
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {

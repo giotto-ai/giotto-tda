@@ -102,7 +102,7 @@ class Scaler(BaseEstimator, TransformerMixin):
           <LINK TO GLOSSARY>`_ in that dimension of a persistence diagram
           consisting of birth-death-dimension triples [b, d, q]. Together,
           `metric` and `metric_params` define this in the same way as
-          in :class:`DiagramAmplitude`.
+          in :class:`Amplitude`.
         - A scalar-valued function which is applied to the resulting
           two-dimensional array of amplitudes.
 
@@ -140,7 +140,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         Function used to extract a positive scalar from the collection of
         amplitude vectors in :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
@@ -159,7 +159,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Filtering, DiagramAmplitude, DiagramDistance, \
+    Filtering, Amplitude, Distance, \
     giotto.homology.VietorisRipsPersistence
 
     Notes
@@ -272,7 +272,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     Filtering a diagram means removing all points whose distance from the
     diagonal is less than or equal to a certain cutoff value which can be
-    interpreted as (:math`1/\\sqrt{2}` times) the "minimum amount of
+    interpreted as (:math:`1/\\sqrt{2}` times) the "minimum amount of
     persistence" required from points in the filtered diagram.
 
     Parameters
@@ -296,7 +296,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Scaling, DiagramAmplitude, DiagramDistance, \
+    Scaling, Amplitude, Distance, \
     giotto.homology.VietorisRipsPersistence
 
     """

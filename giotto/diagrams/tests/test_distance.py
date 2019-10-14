@@ -1,10 +1,10 @@
-"""Testing for DiagramDistance and DiagramAmplitude"""
+"""Testing for Distance and Amplitude"""
 
 import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
 
-from giotto.diagram import DiagramDistance, DiagramAmplitude
+from giotto.diagrams import Distance, Amplitude
 
 X_1 = np.array([
     [[0., 0.36905774, 0],
@@ -210,8 +210,8 @@ X_2 = np.array([
 
 
 def test_not_fitted():
-    dd = DiagramDistance()
-    da = DiagramAmplitude()
+    dd = Distance()
+    da = Amplitude()
 
     with pytest.raises(NotFittedError):
         dd.transform(X_1)
@@ -233,14 +233,14 @@ parameters = [('bottleneck', None),
 @pytest.mark.parametrize('order', [2, None])
 def test_dd_transform(metric, metric_params, order, n_jobs):
     # X_fit == X_transform
-    dd = DiagramDistance(metric=metric, metric_params=metric_params,
-                         order=order, n_jobs=n_jobs)
+    dd = Distance(metric=metric, metric_params=metric_params,
+                  order=order, n_jobs=n_jobs)
     X_res = dd.fit_transform(X_1)
     assert (X_res.shape[0], X_res.shape[1]) == (X_1.shape[0], X_1.shape[0])
 
     # X_fit != X_transform
-    dd = DiagramDistance(metric=metric, metric_params=metric_params,
-                         order=order, n_jobs=n_jobs)
+    dd = Distance(metric=metric, metric_params=metric_params,
+                  order=order, n_jobs=n_jobs)
     X_res = dd.fit(X_1).transform(X_2)
     assert (X_res.shape[0], X_res.shape[1]) == (X_1.shape[0], X_2.shape[0])
 
@@ -248,7 +248,7 @@ def test_dd_transform(metric, metric_params, order, n_jobs):
         assert X_res.shape[2] == len(np.unique(X_2[:, :, 2]))
 
     # X_fit != X_transform, default metric_params
-    dd = DiagramDistance(metric=metric, order=order, n_jobs=n_jobs)
+    dd = Distance(metric=metric, order=order, n_jobs=n_jobs)
     X_res = dd.fit(X_1).transform(X_2)
     assert (X_res.shape[0], X_res.shape[1]) == (X_1.shape[0], X_2.shape[0])
 
@@ -256,13 +256,13 @@ def test_dd_transform(metric, metric_params, order, n_jobs):
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters)
 @pytest.mark.parametrize('n_jobs', [1, 2, 4])
 def test_da_transform(metric, metric_params, n_jobs):
-    da = DiagramAmplitude(metric=metric, metric_params=metric_params,
-                          n_jobs=n_jobs)
+    da = Amplitude(metric=metric, metric_params=metric_params,
+                   n_jobs=n_jobs)
     X_res = da.fit_transform(X_1)
     assert X_res.shape == (X_1.shape[0], 1)
 
     # X_fit != X_transform
-    da = DiagramAmplitude(metric=metric, metric_params=metric_params,
-                          n_jobs=n_jobs)
+    da = Amplitude(metric=metric, metric_params=metric_params,
+                   n_jobs=n_jobs)
     X_res = da.fit(X_1).transform(X_2)
     assert X_res.shape == (X_2.shape[0], 1)

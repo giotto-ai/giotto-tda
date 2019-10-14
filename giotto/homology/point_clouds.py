@@ -49,7 +49,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
-    n_jobs : int or None, optional, default: None
+    infinity_values : float or None, default : ``None``
+        Which death value to assign to features which are still alive at
+        filtration value `max_edge_length`. ``None`` has the same behaviour
+        as `max_edge_length`.
+
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -80,6 +85,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     def _validate_params(metric):
         """A class method that checks whether the hyperparameters and the input
         parameters of the :meth:`fit` are valid.
+
         """
         implemented_metric_types = set(['precomputed'] +
                                        [met for i in VALID_METRICS.values()

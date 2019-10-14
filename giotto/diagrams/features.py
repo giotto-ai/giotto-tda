@@ -7,13 +7,13 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import gen_even_slices
 from ..utils.validation import check_diagram
 from ._utils import _subdiagrams, _discretize
-from giotto.diagram._metrics import betti_curves, landscapes, heats
+from giotto.diagrams._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """`Persistence entropies <LINK TO GLOSSARY>`_ of persistence diagrams.
 
-    Given a persistence diagram consisting of birth-death-dimension triples
+    Given a persistence diagrams consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
     calculated as the (base e) entropies of the collections of differences
@@ -21,7 +21,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -33,8 +33,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
+    Distance, giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -130,7 +130,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
@@ -147,8 +147,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
+    Distance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -251,7 +251,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -268,8 +268,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
+    Distance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -386,7 +386,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -403,8 +403,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
+    Distance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
