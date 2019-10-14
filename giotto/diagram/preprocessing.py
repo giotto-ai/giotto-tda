@@ -272,7 +272,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     Filtering a diagram means removing all points whose distance from the
     diagonal is less than or equal to a certain cutoff value which can be
-    interpreted as (:math`1/\\sqrt{2}` times) the "minimum amount of 
+    interpreted as (:math`1/\\sqrt{2}` times) the "minimum amount of
     persistence" required from points in the filtered diagram.
 
     Parameters
