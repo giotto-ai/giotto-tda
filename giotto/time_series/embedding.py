@@ -78,8 +78,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_windows, n_samples_window,
-            n_features)
+        Xt : ndarray, shape (n_windows, n_samples_window, \
+             n_features)
 
         """
         # Check if fit had been called
@@ -119,8 +119,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    """Transformer returning a representation of a scalar-valued time
-    series as a time series of point clouds.
+    """Representation of a scalar-valued time series as a time series of
+    point clouds.
 
     Based on the following time-delay embedding technique named after `F.
     Takens <https://doi.org/10.1007/BFb0091924>`_: given a time series

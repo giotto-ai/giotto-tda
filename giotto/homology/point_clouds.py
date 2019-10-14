@@ -135,7 +135,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         validate_params({**self.get_params(),
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
-                         self._hyperparameters)
+                        self._hyperparameters)
         check_array(X, allow_nd=True)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
