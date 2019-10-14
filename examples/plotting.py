@@ -345,15 +345,17 @@ def plot_betti_surfaces(betti_curves, samplings=None, homology_dimensions=None):
             "exponentformat" : "e"
         } 
     }
+    if betti_curves.shape[0]==1:
+        plot_betti_curves(betti_curves[0],samplings,homology_dimensions)
+    else:
+        for i, dimension in enumerate(homology_dimensions):
+            fig = gobj.Figure()
+            fig.update_layout(scene=scene, title="Betti surface for homology dimension "+str(dimension))
+            fig.add_trace(gobj.Surface(x=samplings, y=np.arange(betti_curves.shape[0]),
+                                       z=betti_curves[:,i,:],connectgaps=True, hoverinfo='none'))
+            
+            fig.show()
 
-    for i, dimension in enumerate(homology_dimensions):
-        fig = gobj.Figure()
-        fig.update_layout(scene=scene, title="Betti surface for homology dimension "+str(dimension))
-        fig.add_trace(gobj.Surface(x=samplings, y=np.arange(betti_curves.shape[0]),
-                                   z=betti_curves[:,i,:],connectgaps=True, hoverinfo='none'))
-        
-        fig.show()
-        
 
 
 
