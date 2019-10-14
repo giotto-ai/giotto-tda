@@ -34,7 +34,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
-    Distance, giotto.homology.VietorisRipsPersistence
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -148,7 +148,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     See also
     --------
     PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    Distance, giotto.homology.VietorisRipsPersistence
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -269,7 +269,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
-    Distance, giotto.homology.VietorisRipsPersistence
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -404,7 +404,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
-    Distance, giotto.homology.VietorisRipsPersistence
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----

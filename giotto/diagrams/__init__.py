@@ -5,7 +5,7 @@ scale, and filter diagrams.
 It also makes it possible to calculate distance matrices.
 """
 
-from .distance import Distance, Amplitude
+from .distance import PairwiseDistance, Amplitude
 from .features import PersistenceEntropy, BettiCurve, PersistenceLandscape, \
     HeatKernel
 from .preprocessing import ForgetHomologyDimensions, Scaler, Filtering
@@ -19,5 +19,5 @@ __all__ = [
     'Amplitude',
     'Scaler',
     'Filtering',
-    'Distance',
+    'PairwiseDistance',
 ]

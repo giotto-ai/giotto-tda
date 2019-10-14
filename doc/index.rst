@@ -153,7 +153,7 @@ Welcome to giotto's API reference!
    diagram.Scaler
    diagram.Filtering
 
-   diagram.Distance
+   diagram.PairwiseDistance
    diagram.Amplitude
 
    diagram.PersistenceEntropy

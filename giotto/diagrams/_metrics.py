@@ -57,41 +57,26 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
-def inner_betti_distances(diagrams, sampling, step_size, p):
-    betti_c = betti_curves(diagrams, sampling)
-    unnorm_dist = squareform(pdist(betti_c, 'minkowski', p=p))
-    return (step_size ** (1 / p)) * unnorm_dist
-
-
 def betti_distances(diagrams_1, diagrams_2, sampling, step_size,
-                    ignore_diagrams_2=False, p=2., **kwargs):
-    if ignore_diagrams_2:
-        return inner_betti_distances(diagrams_1, sampling, step_size, p)
-    if np.array_equal(diagrams_1, diagrams_2):
-        return inner_betti_distances(diagrams_1, sampling, step_size, p)
+                    p=2., **kwargs):
     betti_curves_1 = betti_curves(diagrams_1, sampling)
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(betti_curves_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
     betti_curves_2 = betti_curves(diagrams_2, sampling)
     unnorm_dist = cdist(betti_curves_1, betti_curves_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
 
-def inner_landscape_distances(diagrams, sampling, step_size, p, n_layers):
-    ls = landscapes(diagrams, sampling, n_layers).reshape((
-        len(diagrams), -1))
-    unnorm_dist = squareform(pdist(ls, 'minkowski', p=p))
-    return (step_size ** (1 / p)) * unnorm_dist
-
-
 def landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
-                        ignore_diagrams_2=False, p=2., n_layers=1, **kwargs):
+                        p=2., n_layers=1, **kwargs):
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
-    if ignore_diagrams_2:
-        return inner_landscape_distances(diagrams_1, sampling,
-                                         step_size, p, n_layers_1)
     if np.array_equal(diagrams_1, diagrams_2):
-        return inner_landscape_distances(diagrams_1, sampling,
-                                         step_size, p, n_layers_1)
+        ls_1 = landscapes(diagrams_1, sampling, n_layers_1).reshape((
+            n_samples_1, -1))
+        unnorm_dist = squareform(pdist(ls_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
     n_samples_2, n_points_2 = diagrams_2.shape[:2]
     n_layers_2 = min(n_layers, n_points_2)
     n_layers = max(n_layers_1, n_layers_2)
@@ -103,73 +88,32 @@ def landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
     return (step_size ** (1 / p)) * unnorm_dist
 
 
-def _remove_diagonal(diagram):
-    return diagram[diagram[:, 0] != diagram[:, 1]]
-
-
-def inner_bottleneck_distances(diagrams, delta):
-    linear_size = len(diagrams)
-    D_upper = np.zeros((linear_size, linear_size))
-    indices = np.triu_indices(linear_size, 1)
-    dist_vector = [bottleneck_distance(
-        _remove_diagonal(diagrams[i]), _remove_diagonal(diagrams[j]), delta)
-        for i, j in zip(*indices)]
-    D_upper[indices] = dist_vector
-    return D_upper + D_upper.T
-
-
-def bottleneck_distances(diagrams_1, diagrams_2, ignore_diagrams_2=False,
-                         delta=0.01, **kwargs):
-    if ignore_diagrams_2:
-        return inner_bottleneck_distances(diagrams_1, delta)
-    if np.array_equal(diagrams_1, diagrams_2):
-        return inner_bottleneck_distances(diagrams_1, delta)
+def bottleneck_distances(diagrams_1, diagrams_2, delta=0.01, **kwargs):
     return np.array([[
         bottleneck_distance(
-            _remove_diagonal(diagram_1), _remove_diagonal(diagram_2), delta)
+            diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
+            diagram_2[diagram_2[:, 0] != diagram_2[:, 1]], delta)
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
 
 
-def inner_wasserstein_distances(diagrams, p, delta):
-    linear_size = len(diagrams)
-    D_upper = np.zeros((linear_size, linear_size))
-    indices = np.triu_indices(linear_size, 1)
-    dist_vector = [wasserstein_distance(
-        _remove_diagonal(diagrams[i]), _remove_diagonal(diagrams[j]), p, delta)
-        for i, j in zip(*indices)]
-    D_upper[indices] = dist_vector
-    return D_upper + D_upper.T
-
-
-def wasserstein_distances(diagrams_1, diagrams_2, ignore_diagrams_2=False,
-                          p=2, delta=0.01, **kwargs):
-    if ignore_diagrams_2:
-        return inner_wasserstein_distances(diagrams_1, p, delta)
-    if np.array_equal(diagrams_1, diagrams_2):
-        return inner_wasserstein_distances(diagrams_1, p, delta)
+def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01,
+                          **kwargs):
     return np.array([[
         wasserstein_distance(
-            _remove_diagonal(diagram_1), _remove_diagonal(diagram_2), p, delta)
+            diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
+            diagram_2[diagram_2[:, 0] != diagram_2[:, 1]], p, delta)
         for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
-
-
-def inner_heat_distances(diagrams, sampling, step_size, sigma, p):
-    heat = heats(diagrams, sampling, step_size, sigma).\
-        reshape((len(diagrams), -1))
-    unnorm_dist = squareform(pdist(heat, 'minkowski', p=p))
-    return (step_size ** (1 / p)) * unnorm_dist
 
 
 def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
-                   ignore_diagrams_2=False, sigma=1., p=2., **kwargs):
-    if ignore_diagrams_2:
-        return inner_heat_distances(diagrams_1, sampling, step_size, sigma, p)
-    if np.array_equal(diagrams_1, diagrams_2):
-        return inner_heat_distances(diagrams_1, sampling, step_size, sigma, p)
+                   sigma=1., p=2., **kwargs):
     heat_1 = heats(diagrams_1, sampling, step_size, sigma).\
-        reshape((len(diagrams_1), -1))
+        reshape((diagrams_1.shape[0], -1))
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
     heat_2 = heats(diagrams_2, sampling, step_size, sigma).\
-        reshape((len(diagrams_2), -1))
+        reshape((diagrams_2.shape[0], -1))
     unnorm_dist = cdist(heat_1, heat_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
@@ -196,15 +140,11 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
 
     if X2 is None:
         X2 = X1
-        id2 = True
-    else:
-        id2 = False
 
     distance_matrices = Parallel(n_jobs=n_jobs)(delayed(metric_func)(
         _subdiagrams(X1, [dim], remove_dim=True),
-        _subdiagrams(X2[s], [dim], remove_dim=True) if not id2 else None,
+        _subdiagrams(X2[s], [dim], remove_dim=True),
         sampling=samplings[dim], step_size=step_sizes[dim],
-        ignore_diagrams_2=id2,
         **effective_metric_params) for dim in homology_dimensions
         for s in gen_even_slices(X2.shape[0], effective_n_jobs(n_jobs)))
 
@@ -236,8 +176,8 @@ def wasserstein_amplitudes(diagrams, p=2., **kwargs):
     return np.linalg.norm(dists_to_diago, axis=1, ord=p)
 
 
-def kernel_heat_amplitude(diagrams, sampling, step_size, sigma=1., p=2.,
-                          **kwargs):
+def heat_amplitudes(diagrams, sampling, step_size, sigma=1., p=2.,
+                    **kwargs):
     heat = heats(diagrams, sampling, step_size, sigma)
     return np.linalg.norm(heat, axis=(1, 2), ord=p)
 
@@ -246,7 +186,7 @@ implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,
                                  'landscape': landscape_amplitudes,
                                  'betti': betti_amplitudes,
-                                 'heat': kernel_heat_amplitude}
+                                 'heat': heat_amplitudes}
 
 
 def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,

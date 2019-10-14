@@ -159,7 +159,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Filtering, Amplitude, Distance, \
+    Filtering, Amplitude, PairwiseDistance, \
     giotto.homology.VietorisRipsPersistence
 
     Notes
@@ -296,7 +296,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Scaling, Amplitude, Distance, \
+    Scaling, Amplitude, PairwiseDistance, \
     giotto.homology.VietorisRipsPersistence
 
     """

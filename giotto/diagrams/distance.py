@@ -9,7 +9,7 @@ from ._utils import _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class Distance(BaseEstimator, TransformerMixin):
+class PairwiseDistance(BaseEstimator, TransformerMixin):
     """`Distances <LINK TO GLOSSARY>`_ between pairs of persistence diagrams,
     constructed from the distances between their respective subdiagrams with
     constant homology dimension.
@@ -164,7 +164,7 @@ class Distance(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples_fit, n_samples, \
              n_homology_dimensions) if `order` is ``None``, \
              else (n_samples_fit, n_samples).
-            Distance matrix or collection of distance matrices between
+            PairwiseDistance matrix or collection of distance matrices between
             diagrams in `X` and diagrams seen in :meth:`fit`. In the
             second case, index i along axis 2 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -257,7 +257,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Distance, Scaler, Filtering, \
+    PairwiseDistance, Scaler, Filtering, \
     BettiCurve, PersistenceLandscape, \
     HeatKernel, giotto.homology.VietorisRipsPersistence
 
