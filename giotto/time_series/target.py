@@ -59,8 +59,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     _hyperparameters = {
         'labelling':
             (str, ['application', 'variation', 'derivation']),
-        'delta': [int, (1, np.inf)],
-        'function': [types.FunctionType],
+        'delta': (int, (1, np.inf)),
+        'function': (types.FunctionType),
         'percentiles': (list, [numbers.Number, (0., 1.)]),
         'n_steps_future': (int, [1, np.inf])}
 
@@ -96,7 +96,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
+        # validate_params(self.get_params(), self._hyperparameters)
         column_or_1d(X)
 
         if self.function_params is None:

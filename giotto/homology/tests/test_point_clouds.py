@@ -20,7 +20,7 @@ def test_vrp_params():
     vrp = VietorisRipsPersistence(metric=metric)
 
     with pytest.raises(ValueError):
-        vrp.fit(X)
+        vrp.fit_transform(X)
 
 
 def test_vrp_not_fitted():
