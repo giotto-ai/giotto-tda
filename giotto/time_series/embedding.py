@@ -119,17 +119,17 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    """Representation of a scalar-valued time series as a time series of
+    """Representation of a univariate time series as a time series of
     point clouds.
 
-    Based on the following time-delay embedding technique named after `F.
-    Takens <https://doi.org/10.1007/BFb0091924>`_: given a time series
-    :math:`X(t)`, one extracts a set of vectors in :math:`\\mathbb{R}^d`,
-    each of the form :math:`\\Xi_i := [X(t_i), X(t_i + \\tau), ..., X(t_i + (
-    d-1)\\tau)]`. The set :math:`\\{\\Xi_i\\}` is called the Takens
-    embedding of the time series, :math:`\\tau` is called the embedding time
-    delay, :math:`d` is called the embedding dimension, and the difference
-    between :math:`t_i` and :math:`t_{i-1}` is called the embedding stride.
+    Based on the following time-delay embedding technique named after F.
+    Takens [1]_: given a time series :math:`X(t)`, one extracts a set of
+    vectors in :math:`\\mathbb{R}^d`, each of the form :math:`\\Xi_i := [X(
+    t_i), X(t_i + \\tau), ..., X(t_i + (d-1)\\tau)]`. The set
+    :math:`\\{\\Xi_i\\}` is called the Takens embedding of the time series,
+    :math:`\\tau` is called the embedding time delay, :math:`d` is called
+    the embedding dimension, and the difference between :math:`t_i` and
+    :math:`t_{i-1}` is called the embedding stride.
 
     If :math:`d` and :math:`\\tau` are not explicitly set by the user, suitable
     values are calculated during ``fit()``.
@@ -216,6 +216,17 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
     ...       embedder.dimension_)
     Optimal embedding dimension based on false nearest neighbors: 3
+
+    See also
+    --------
+    giotto.homology.VietorisRipsPersistence
+
+    References
+    ----------
+    .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
+           D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
+           1980*. Lecture Notes in Mathematics, vol 898. Springer, 1981,
+           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
     """
     _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
