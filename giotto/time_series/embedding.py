@@ -60,7 +60,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X)
+        check_array(X, ensure_2d=False, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -84,7 +84,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        X = check_array(X)
+        X = check_array(X, ensure_2d=False, allow_nd=True)
 
         window_slices = self._slice_windows(X)
 
@@ -112,7 +112,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        yt = column_or_1d(y).copy()
+        y = column_or_1d(y)
 
         yt = y[self.width - 1:: self.stride]
         return yt
@@ -305,7 +305,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        X = column_or_1d(X)
+        X = check_array(X.reshape(X.shape[0], 1), allow_nd=True)
 
         if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -359,7 +359,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
-        Xt = column_or_1d(X).copy()
+        X = check_array(X.reshape(X.shape[0], 1), allow_nd=True)
 
         Xt = self._embed(X, self.time_delay_, self.dimension_, self.stride)
         return Xt
@@ -385,7 +385,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
-        yt = column_or_1d(y).copy()
+        yt = column_or_1d(y)
 
         yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
         return yt
