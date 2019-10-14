@@ -19,10 +19,10 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    width: int, default: 1
+    width : int, default: ``1``
         Width of the sliding window.
 
-    stride: int, default: 1
+    stride : int, default: ``1``
         Stride of the sliding window.
 
     Examples
@@ -123,47 +123,43 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     point clouds.
 
     Based on the following time-delay embedding technique named after F.
-    Takens [1]_: given a time series :math:`X(t)`, one extracts a set of
-    vectors in :math:`\\mathbb{R}^d`, each of the form :math:`\\Xi_i := [X(
-    t_i), X(t_i + \\tau), ..., X(t_i + (d-1)\\tau)]`. The set
-    :math:`\\{\\Xi_i\\}` is called the Takens embedding of the time series,
-    :math:`\\tau` is called the embedding time delay, :math:`d` is called
-    the embedding dimension, and the difference between :math:`t_i` and
-    :math:`t_{i-1}` is called the embedding stride.
+    Takens [1]_: given a time series :math:`X_t`, one extracts a list of
+    vectors in :math:`\\mathbb{R}^d`, each of the form
+    :math:`\\mathcal{X}_i := (X_{t_i}, X_{t_i + \\tau}, \\ldots , X_{t_i + (
+    d-1)\\tau})`. The set :math:`\\{\\mathcal{X}_i\\}_i` is called the `Takens
+    embedding <LINK TO GLOSSARY>`_ of the time series, :math:`\\tau` is
+    called the embedding time delay, :math:`d` is called the embedding
+    dimension, and the difference between :math:`t_i` and :math:`t_{i-1}` is
+    called the embedding stride.
 
-    If :math:`d` and :math:`\\tau` are not explicitly set by the user, suitable
-    values are calculated during :meth:`fit`.
-
-    During :meth:`transform`, a Takens embedding procedure is applied on
-    intervals of the input time series called "outer windows",
-    in a sliding-window fashion. This allows to track the evolution of the
-    dynamics underlying the time series.
+    If :math:`d` and :math:`\\tau` are not explicitly set, suitable values
+    are calculated during :meth:`fit`. [2]_
 
     Parameters
     ----------
-    parameters_type: ``'search'`` | ``'fixed'``, default: ``'search'``
-        If set to 'fixed' and if values for `embedding_time_delay` and
+    parameters_type : ``'search'`` | ``'fixed'``, default: ``'search'``
+        If set to ``'fixed'`` and if values for `embedding_time_delay` and
         `dimension` are provided, these values are used in :meth:`transform`.
         If set to ``'search'`` and if `embedding_time_delay` and `dimension`
         are not set, optimal values are automatically found for those
-        parameters using mutual information (`time_delay`) and false nearest
-        neighbors (`dimension`) criteria.
+        parameters using criteria based on mutual information (`time_delay`)
+        and false nearest neighbors. [2]_
         If set to 'search' and if `time_delay` and `dimension` are set,
         a similar optimization is carried out, but the final values are
         constrained to be not greater than the values initially set.
 
-    time_delay: int, default: ``1``
+    time_delay : int, default: ``1``
         Time delay between two consecutive values for constructing one
         embedded point. If `parameters_type` is ``'search'``,
         it corresponds to the maximal embedding time delay that will be
         considered.
 
-    dimension: int, default: ``5``
+    dimension : int, default: ``5``
         Dimension of the embedding space. If `parameters_type` is ``'search'``,
         it corresponds to the maximum embedding dimension that will be
         considered.
 
-    stride: int, default: ``1``
+    stride : int, default: ``1``
         Stride duration between two consecutive embedded points. It defaults
         to 1 as this is the usual value in the statement of Takens's embedding
         theorem.
@@ -175,12 +171,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     Attributes
     ----------
-    time_delay_: int
+    time_delay_ : int
         Actual embedding time delay used to embed. If
         `parameters_type` is ``'search'``, it is the calculated optimal
         embedding time delay. Otherwise it has the same value as `time_delay`.
 
-    dimension_: int
+    dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
         ``'search'``, it is the calculated optimal embedding dimension.
         Otherwise it has the same value as `dimension`.
@@ -192,7 +188,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     >>> from giotto.time_series import TakensEmbedding
     >>> # Create a noisy signal sampled
     >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
-    ...     for x in range(0,1000)])
+    ...     for x in range(0, 1000)])
     >>> # Set up the transformer
     >>> outer_window_duration = 50
     >>> outer_window_stride = 5
@@ -222,6 +218,11 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
            D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
            1980*. Lecture Notes in Mathematics, vol 898. Springer, 1981;
            doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
+
+    .. [2] N. Sanderson, "Topological Data Analysis of Time Series using
+           Witness Complexes", PhD thesis, University of Colorado at
+           Boulder, 2018; `https://scholar.colorado.edu/math_gradetds/67
+           <https://scholar.colorado.edu/math_gradetds/67>`_.
 
     """
     _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
@@ -293,8 +294,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence work
-        in pipelines.
+
+        This method is there to implement the usual scikit-learn API and hence
+        work in pipelines.
 
         Parameters
         ----------
