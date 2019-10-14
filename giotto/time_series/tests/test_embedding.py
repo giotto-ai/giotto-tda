@@ -73,6 +73,6 @@ def test_embedder_transform(parameters_type, expected):
 
 
 def test_window_params():
-    window = SlidingWindow(width=signal.shape[0] + 1)
+    window = SlidingWindow(width=0)
     with pytest.raises(ValueError):
         window.fit(signal)

@@ -1,6 +1,7 @@
+"""Time series labelling."""
 # License : Apache 2.0
-import types
 
+import types
 import numpy as np
 import numbers
 from sklearn.base import BaseEstimator
@@ -10,24 +11,25 @@ from .embedding import SlidingWindow
 from ..utils.validation import validate_params
 
 
-def _derivation_function(function, X, delta=1, **function_params):
-    partial_window_begin = function(X[:, :-delta], axis=1, **function_params)
-    partial_window_end = function(X[:, delta:], axis=1, **function_params)
+def _derivation_function(function, X, time_delta=1, **function_params):
+    partial_window_begin = function(X[:, :-time_delta], axis=1,
+                                    **function_params)
+    partial_window_end = function(X[:, time_delta:], axis=1, **function_params)
     duration_ = (partial_window_end - partial_window_begin)
-    derivative = duration_ / partial_window_begin / delta
+    derivative = duration_ / partial_window_begin / time_delta
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
     return derivative.reshape((-1, 1))
 
 
-def _variation_function(function, X, delta=1, **function_params):
+def _variation_function(function, X, time_delta=1, **function_params):
     full_window = function(X, axis=1, **function_params)
-    partial_window = function(X[:, :-delta], axis=1, **function_params)
-    variation = (full_window - partial_window) / partial_window / delta
+    partial_window = function(X[:, :-time_delta], axis=1, **function_params)
+    variation = (full_window - partial_window) / partial_window / time_delta
     variation[(partial_window == 0) & (full_window == 0)] = 0
     return variation.reshape((-1, 1))
 
 
-def _application_function(function, X, delta=0, **function_params):
+def _application_function(function, X, time_delta=0, **function_params):
     return function(X, axis=1, **function_params).reshape((-1, 1))
 
 
@@ -37,40 +39,29 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    labelling : str
-        The type of sampling
-
-        - data_type: string, must equal either 'points' or 'distance_matrix'.
-        - data_iter: an iterator. If data_iter is 'points' then each object
-          in the iterator should be a numpy array of dimension (number of
-          points, number of coordinates), or equivalent nested list structure.
-          If data_iter is 'distance_matrix' then each object in the iterator
-          should be a full (symmetric) square matrix (numpy array) of shape (
-          number of points, number of points), __or a sparse distance matrix
 
     Attributes
     ----------
-    is_fitted : boolean
-        Whether the transformer has been fitted
+    thresholds_ : list of floats
     """
     implemented_labelling_recipes = {'application': _application_function,
                                      'variation': _variation_function,
                                      'derivation': _derivation_function}
     _hyperparameters = {
         'labelling':
-            (str, ['application', 'variation', 'derivation']),
-        'delta': (int, (1, np.inf)),
-        'function': (types.FunctionType),
-        'percentiles': (list, [numbers.Number, (0., 1.)]),
-        'n_steps_future': (int, [1, np.inf])}
+            [str, ['application', 'variation', 'derivation']],
+        'time_delta': [int, (1, np.inf)],
+        'function': [types.FunctionType],
+        'percentiles': [list, [numbers.Number, (0., 1.)]],
+        'n_steps_future': [int, [1, np.inf]]}
 
-    def __init__(self, width=2, stride=1, labelling='application', delta=1,
-                 function=np.std, function_params=None, percentiles=None,
-                 n_steps_future=1):
+    def __init__(self, width=2, stride=1, labelling='application',
+                 time_delta=1, function=np.std, function_params=None,
+                 percentiles=None, n_steps_future=1):
         self.width = width
         self.stride = stride
         self.labelling = labelling
-        self.delta = delta
+        self.time_delta = time_delta
         self.function = function
         self.function_params = function_params
         self.percentiles = percentiles
@@ -96,8 +87,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        # validate_params(self.get_params(), self._hyperparameters)
-        column_or_1d(X)
+        validate_params(self.get_params(), self._hyperparameters)
+        X = column_or_1d(X)
 
         if self.function_params is None:
             self.effective_function_params_ = {}
@@ -110,7 +101,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                                              stride=self.stride).fit(X)
 
         _X = self._sliding_window.transform(X)
-        _X = self._labeller(self.function, _X, self.delta,
+        _X = self._labeller(self.function, _X, self.time_delta,
                             **self.effective_function_params_)
 
         if self.percentiles is not None:
@@ -121,7 +112,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             self.thresholds_ = None
         return self
 
-    def transform(self, X):
+    def transform(self, X, y=None):
         """Transform X.
 
         Parameters
@@ -142,9 +133,9 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         """
         # Check is fit had been called
         check_is_fitted(self, ['_labeller', '_sliding_window', 'thresholds_'])
-        Xt = column_or_1d(X).copy()
+        X = column_or_1d(X)
 
-        Xt = Xt[:-self.n_steps_future]
+        Xt = X[:-self.n_steps_future]
 
         if self.n_steps_future < self.width:
             Xt = Xt[self.width - 1 - self.n_steps_future:]
@@ -171,10 +162,10 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         """
         # Check is fit had been called
         check_is_fitted(self, ['_labeller', '_sliding_window', 'thresholds_'])
-        column_or_1d(y)
+        y = column_or_1d(y)
 
         yt = self._sliding_window.transform(y)
-        yt = self._labeller(self.function, yt, self.delta,
+        yt = self._labeller(self.function, yt, self.time_delta,
                             **self.effective_function_params_)
 
         if self.thresholds_ is not None:
@@ -190,4 +181,4 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         if self.n_steps_future >= self.width:
             yt = yt[self.n_steps_future - self.width + 1:]
 
-        return yt
+        return yt.reshape((yt.shape[0], ))

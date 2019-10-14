@@ -61,7 +61,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X.reshape((X.shape[0], -1)))
+        check_array(X, ensure_2d=False)
 
         self._is_fitted = True
         return self
@@ -87,7 +87,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X.reshape((X.shape[0], -1)))
+        Xt = check_array(X, ensure_2d=False)
 
         return Xt[::self.period]
 
@@ -111,9 +111,9 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        yt = column_or_1d(y)
+        y = column_or_1d(y)
 
-        return yt[::self.period]
+        return y[::self.period]
 
 
 class Stationarizer(BaseEstimator, TransformerResamplerMixin):
@@ -177,7 +177,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X)
+        check_array(X, ensure_2d=False)
 
         self._is_fitted = True
         return self
@@ -203,12 +203,12 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X.reshape((X.shape[0], -1)))
+        X = check_array(X, ensure_2d=False)
 
         if self.operation == 'return':
-            return np.diff(Xt, n=1, axis=0) / Xt[1:]
+            return np.diff(X, n=1, axis=0) / X[1:]
         else:  # 'log-return' operation
-            return np.diff(np.log(Xt), n=1, axis=0)
+            return np.diff(np.log(X), n=1, axis=0)
 
     def resample(self, y, X=None):
         """Resample y.
@@ -230,6 +230,6 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        yt = column_or_1d(y)
+        y = column_or_1d(y)
 
-        return yt[1:]
+        return y[1:]

@@ -5,6 +5,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
+from ..utils.validation import check_graph
 
 
 class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
@@ -45,13 +46,6 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    @staticmethod
-    def _validate_params():
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-        """
-        pass
-
     def _geodesic_distance(self, X):
         X_distance = graph_shortest_path(X)
         X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a
@@ -80,7 +74,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        self._validate_params()
+        X = check_graph(X)
 
         self._is_fitted = True
         return self
@@ -110,10 +104,9 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-
-        n_samples = X.shape[0]
+        X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._geodesic_distance)(X[i]) for i in range(n_samples))
+            delayed(self._geodesic_distance)(X[i]) for i in range(X.shape[0]))
         Xt = np.array(Xt)
         return Xt
