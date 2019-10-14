@@ -28,7 +28,6 @@ To install:
 
    git clone https://github.com/giotto-learn/giotto-learn.git
    cd giotto-learn
-   git submodule update --init --recursive
    pip install .
 
 
