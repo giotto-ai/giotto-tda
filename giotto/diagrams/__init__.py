@@ -8,10 +8,10 @@ It also makes it possible to calculate distance matrices.
 from .distance import PairwiseDistance, Amplitude
 from .features import PersistenceEntropy, BettiCurve, PersistenceLandscape, \
     HeatKernel
-from .preprocessing import ForgetHomologyDimensions, Scaler, Filtering
+from .preprocessing import ForgetDimension, Scaler, Filtering
 
 __all__ = [
-    'ForgetHomologyDimensions',
+    'ForgetDimension',
     'BettiCurve',
     'PersistenceLandscape',
     'HeatKernel',

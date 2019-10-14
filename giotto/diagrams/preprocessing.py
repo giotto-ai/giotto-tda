@@ -9,7 +9,7 @@ from ._utils import _sort, _filter, _discretize
 from ..utils.validation import check_diagram, validate_metric_params
 
 
-class ForgetHomologyDimensions(BaseEstimator, TransformerMixin):
+class ForgetDimension(BaseEstimator, TransformerMixin):
     """Forget about the homology dimension of points in persistence diagrams
     by replacing these dimensions with ``numpy.inf``.
 
@@ -166,7 +166,7 @@ class Scaler(BaseEstimator, TransformerMixin):
     -----
     To compute scaling factors without first splitting the computation between
     different homology dimensions, data should be first transformed by an
-    instance of :class:`ForgetHomologyDimensions`.
+    instance of :class:`ForgetDimension`.
 
     """
 

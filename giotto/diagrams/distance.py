@@ -91,7 +91,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     -----
     To compute distances without first splitting the computation between
     different homology dimensions, data should be first transformed by an
-    instance of :class:`ForgetHomologyDimensions`.
+    instance of :class:`ForgetDimension`.
 
     `Hera <https://bitbucket.org/grey_narn/hera>`_ is used as a C++ backend
     for computing bottleneck and Wasserstein distances between persistence
@@ -265,7 +265,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
     -----
     To compute amplitudes without first splitting the computation between
     different homology dimensions, data should be first transformed by an
-    instance of :class:`ForgetHomologyDimensions`.
+    instance of :class:`ForgetDimension`.
 
     """
     def __init__(self, metric='landscape', metric_params=None, order=2.,
