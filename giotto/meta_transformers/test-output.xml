@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="0" failures="3" hostname="matteos-mbp.lan" name="pytest" skipped="0" tests="3" time="0.646" timestamp="2019-10-12T22:41:30.373790"><testcase classname="giotto.meta_transformers.tests.test_features" file="giotto/meta_transformers/tests/test_features.py" line="9" name="test_EntropyGenerator_transform" time="0.003"><failure message="ValueError: All points of all n_samples persistent diagrams should be above the diagonal, X[:,:,1] &gt; =X[:,:,0]. 4 points in all n_samples diagrams are under the diagonal.">def test_EntropyGenerator_transform():
+        # X = np.asarray([[[1,2],[2,1],[1,1]]]) #this creates infinity
+        X = np.asarray([[[1,1.1,0],[1,0.9,0.5],[0.9,1,0.2],[0.9,-1,0.2]]])
+        ent = EntropyGenerator()
+&gt;       X_tr = ent.fit_transform(X)
+
+tests/test_features.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/sklearn/base.py:553: in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+features.py:183: in fit
+    Pipeline(self.steps).fit(X)
+../pipeline.py:191: in fit
+    Xt, yt, fit_params = self._fit(X, y, **fit_params)
+../pipeline.py:153: in _fit
+    **fit_params_steps[name])
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/joblib/memory.py:355: in __call__
+    return self.func(*args, **kwargs)
+../pipeline.py:460: in _fit_transform_one
+    X_res = transformer.fit_transform(X, y, **fit_params)
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/sklearn/base.py:553: in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+../diagram/preprocessing.py:301: in fit
+    X = check_diagram(X)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+X = array([[[nan, nan,  0.],
+        [nan, nan,  0.],
+        [nan, nan,  0.],
+        [nan, nan,  1.]]])
+
+    def check_diagram(X):
+        &quot;&quot;&quot;Input validation on a diagram
+        &quot;&quot;&quot;
+        if len(X.shape) != 3:
+            raise ValueError(&quot;X should be a 3d np.array: X.shape&quot;
+                             &quot; = {}&quot;.format(X.shape))
+        if X.shape[2] != 3:
+            raise ValueError(&quot;X should be a 3d np.array with a 3rd dimension of&quot;
+                             &quot; 3 components: X.shape[2] = {}&quot;.format(X.shape[2]))
+    
+        homology_dimensions = sorted(list(set(X[0, :, 2])))
+        for dim in homology_dimensions:
+            if dim == np.inf:
+                if len(homology_dimensions) != 1:
+                    raise ValueError(&quot;np.inf is a valid homology dimension for a &quot;
+                                     &quot;stacked diagram but it should be the only &quot;
+                                     &quot;one: homology_dimensions &quot;
+                                     &quot;= {}&quot;.format(homology_dimensions))
+            else:
+                if dim != int(dim):
+                    raise ValueError(&quot;All homology dimensions should be&quot;
+                                     &quot; integer valued: {} can&apos;t be casted&quot;
+                                     &quot; to an int of the same value.&quot;.format(dim))
+                if dim != np.abs(dim):
+                    raise ValueError(&quot;All homology dimensions should be&quot;
+                                     &quot; integer valued: {} can&apos;t be casted&quot;
+                                     &quot; to an int of the same value.&quot;.format(dim))
+    
+        n_points_above_diag = np.sum(X[:, :, 1] &gt;= X[:, :, 0])
+        n_points_global = X.shape[0] * X.shape[1]
+        if n_points_above_diag != n_points_global:
+&gt;           raise ValueError(&quot;All points of all n_samples persistent diagrams &quot;
+                             &quot;should be above the diagonal, X[:,:,1] &gt; =X[:,:,0].&quot;
+                             f&quot; {n_points_global - n_points_above_diag} points in &quot;
+                             &quot;all n_samples diagrams are under the diagonal.&quot;)
+E           ValueError: All points of all n_samples persistent diagrams should be above the diagonal, X[:,:,1] &gt; =X[:,:,0]. 4 points in all n_samples diagrams are under the diagonal.
+
+../utils/validation.py:56: ValueError</failure></testcase><testcase classname="giotto.meta_transformers.tests.test_features" file="giotto/meta_transformers/tests/test_features.py" line="16" name="test_BettiCurveGenerator_transform" time="0.002"><failure message="ValueError: All points of all n_samples persistent diagrams should be above the diagonal, X[:,:,1] &gt; =X[:,:,0]. 3 points in all n_samples diagrams are under the diagonal.">def test_BettiCurveGenerator_transform():
+        X = np.asarray([[[1,2],[2,1],[1,1]]])
+        ent = BettiCurveGenerator()
+&gt;       X_tr = ent.fit_transform(X)
+
+tests/test_features.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/sklearn/base.py:553: in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+features.py:377: in fit
+    Pipeline(self.steps).fit(X)
+../pipeline.py:191: in fit
+    Xt, yt, fit_params = self._fit(X, y, **fit_params)
+../pipeline.py:153: in _fit
+    **fit_params_steps[name])
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/joblib/memory.py:355: in __call__
+    return self.func(*args, **kwargs)
+../pipeline.py:460: in _fit_transform_one
+    X_res = transformer.fit_transform(X, y, **fit_params)
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/sklearn/base.py:553: in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+../diagram/preprocessing.py:301: in fit
+    X = check_diagram(X)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+X = array([[[nan, nan,  0.],
+        [nan, nan,  0.],
+        [nan, nan,  1.]]])
+
+    def check_diagram(X):
+        &quot;&quot;&quot;Input validation on a diagram
+        &quot;&quot;&quot;
+        if len(X.shape) != 3:
+            raise ValueError(&quot;X should be a 3d np.array: X.shape&quot;
+                             &quot; = {}&quot;.format(X.shape))
+        if X.shape[2] != 3:
+            raise ValueError(&quot;X should be a 3d np.array with a 3rd dimension of&quot;
+                             &quot; 3 components: X.shape[2] = {}&quot;.format(X.shape[2]))
+    
+        homology_dimensions = sorted(list(set(X[0, :, 2])))
+        for dim in homology_dimensions:
+            if dim == np.inf:
+                if len(homology_dimensions) != 1:
+                    raise ValueError(&quot;np.inf is a valid homology dimension for a &quot;
+                                     &quot;stacked diagram but it should be the only &quot;
+                                     &quot;one: homology_dimensions &quot;
+                                     &quot;= {}&quot;.format(homology_dimensions))
+            else:
+                if dim != int(dim):
+                    raise ValueError(&quot;All homology dimensions should be&quot;
+                                     &quot; integer valued: {} can&apos;t be casted&quot;
+                                     &quot; to an int of the same value.&quot;.format(dim))
+                if dim != np.abs(dim):
+                    raise ValueError(&quot;All homology dimensions should be&quot;
+                                     &quot; integer valued: {} can&apos;t be casted&quot;
+                                     &quot; to an int of the same value.&quot;.format(dim))
+    
+        n_points_above_diag = np.sum(X[:, :, 1] &gt;= X[:, :, 0])
+        n_points_global = X.shape[0] * X.shape[1]
+        if n_points_above_diag != n_points_global:
+&gt;           raise ValueError(&quot;All points of all n_samples persistent diagrams &quot;
+                             &quot;should be above the diagonal, X[:,:,1] &gt; =X[:,:,0].&quot;
+                             f&quot; {n_points_global - n_points_above_diag} points in &quot;
+                             &quot;all n_samples diagrams are under the diagonal.&quot;)
+E           ValueError: All points of all n_samples persistent diagrams should be above the diagonal, X[:,:,1] &gt; =X[:,:,0]. 3 points in all n_samples diagrams are under the diagonal.
+
+../utils/validation.py:56: ValueError</failure></testcase><testcase classname="giotto.meta_transformers.tests.test_features" file="giotto/meta_transformers/tests/test_features.py" line="23" name="test_LandscapeGenerator_transform" time="0.002"><failure message="ValueError: All points of all n_samples persistent diagrams should be above the diagonal, X[:,:,1] &gt; =X[:,:,0]. 3 points in all n_samples diagrams are under the diagonal.">def test_LandscapeGenerator_transform():
+        X = np.asarray([[[1,2],[2,1],[1,1]]])
+        ent = LandscapeGenerator()
+&gt;       X_tr = ent.fit_transform(X)
+
+tests/test_features.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/sklearn/base.py:553: in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+features.py:584: in fit
+    Pipeline(self.steps).fit(X)
+../pipeline.py:191: in fit
+    Xt, yt, fit_params = self._fit(X, y, **fit_params)
+../pipeline.py:153: in _fit
+    **fit_params_steps[name])
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/joblib/memory.py:355: in __call__
+    return self.func(*args, **kwargs)
+../pipeline.py:460: in _fit_transform_one
+    X_res = transformer.fit_transform(X, y, **fit_params)
+../../../../../anaconda3/envs/giotto-plot/lib/python3.7/site-packages/sklearn/base.py:553: in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+../diagram/preprocessing.py:301: in fit
+    X = check_diagram(X)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+X = array([[[nan, nan,  0.],
+        [nan, nan,  0.],
+        [nan, nan,  1.]]])
+
+    def check_diagram(X):
+        &quot;&quot;&quot;Input validation on a diagram
+        &quot;&quot;&quot;
+        if len(X.shape) != 3:
+            raise ValueError(&quot;X should be a 3d np.array: X.shape&quot;
+                             &quot; = {}&quot;.format(X.shape))
+        if X.shape[2] != 3:
+            raise ValueError(&quot;X should be a 3d np.array with a 3rd dimension of&quot;
+                             &quot; 3 components: X.shape[2] = {}&quot;.format(X.shape[2]))
+    
+        homology_dimensions = sorted(list(set(X[0, :, 2])))
+        for dim in homology_dimensions:
+            if dim == np.inf:
+                if len(homology_dimensions) != 1:
+                    raise ValueError(&quot;np.inf is a valid homology dimension for a &quot;
+                                     &quot;stacked diagram but it should be the only &quot;
+                                     &quot;one: homology_dimensions &quot;
+                                     &quot;= {}&quot;.format(homology_dimensions))
+            else:
+                if dim != int(dim):
+                    raise ValueError(&quot;All homology dimensions should be&quot;
+                                     &quot; integer valued: {} can&apos;t be casted&quot;
+                                     &quot; to an int of the same value.&quot;.format(dim))
+                if dim != np.abs(dim):
+                    raise ValueError(&quot;All homology dimensions should be&quot;
+                                     &quot; integer valued: {} can&apos;t be casted&quot;
+                                     &quot; to an int of the same value.&quot;.format(dim))
+    
+        n_points_above_diag = np.sum(X[:, :, 1] &gt;= X[:, :, 0])
+        n_points_global = X.shape[0] * X.shape[1]
+        if n_points_above_diag != n_points_global:
+&gt;           raise ValueError(&quot;All points of all n_samples persistent diagrams &quot;
+                             &quot;should be above the diagonal, X[:,:,1] &gt; =X[:,:,0].&quot;
+                             f&quot; {n_points_global - n_points_above_diag} points in &quot;
+                             &quot;all n_samples diagrams are under the diagonal.&quot;)
+E           ValueError: All points of all n_samples persistent diagrams should be above the diagonal, X[:,:,1] &gt; =X[:,:,0]. 3 points in all n_samples diagrams are under the diagonal.
+
+../utils/validation.py:56: ValueError</failure></testcase></testsuite></testsuites>
