@@ -335,13 +335,12 @@ class Filtering(BaseEstimator, TransformerMixin):
         else:
             self.homology_dimensions_ = self.homology_dimensions
 
-        print(self.homology_dimensions_)
         validate_params({**self.get_params(),
                          'homology_dimensions_': self.homology_dimensions_},
-                         self._hyperparameters)
+                        self._hyperparameters)
 
         self.homology_dimensions_ = \
-            [ float(dim) for dim in self.homology_dimensions_]
+            [float(dim) for dim in self.homology_dimensions_]
 
         return self
 

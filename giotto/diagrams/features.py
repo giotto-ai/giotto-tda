@@ -230,7 +230,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
                 _subdiagrams(X, [dim], remove_dim=True)[s],
                 self._samplings[dim])
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0], effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(X.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).\
             reshape((self._n_dimensions, X.shape[0], -1)).\
             transpose((1, 0, 2))
@@ -360,7 +361,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
                 self._samplings[dim],
                 self.n_layers)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0], effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(X.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape((self._n_dimensions, X.shape[0],
                                          self.n_layers, self.n_values)).\
             transpose((1, 0, 2, 3))
@@ -502,7 +504,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
                    self._samplings[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0], effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(X.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape((self._n_dimensions, X.shape[0],
                                          self.n_values, self.n_values)).\
             transpose((1, 0, 2, 3))

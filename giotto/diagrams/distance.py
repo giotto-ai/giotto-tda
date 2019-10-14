@@ -141,7 +141,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             if isinstance(self.order, int):
                 hyperparameters['order'] = float(self.order)
         else:
-             hyperparameters['order'] = 1. # Automatically pass validate_params
+            hyperparameters['order'] = 1.  # Automatically pass validate_params
 
         validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
@@ -322,7 +322,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
             if isinstance(self.order, int):
                 hyperparameters['order'] = float(self.order)
         else:
-             hyperparameters['order'] = 1. # Automatically pass validate_params
+            hyperparameters['order'] = 1.  # Automatically pass validate_params
 
         validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
