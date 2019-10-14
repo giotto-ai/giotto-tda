@@ -2,7 +2,7 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from giotto.diagram._utils import _subdiagrams
+from giotto.diagrams._utils import _subdiagrams
 
 def plot_point_cloud(point_cloud, dimension = None):
     """This functions plot the first 2 or 3 coordinates of the point cloud.
