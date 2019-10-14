@@ -8,7 +8,7 @@ from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors import kneighbors_graph
 from joblib import Parallel, delayed
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted
 
 
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
@@ -97,18 +97,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
         self.metric_params = metric_params
 
-    @staticmethod
-    def _validate_params():
-        """A class method that checks whether the hyperparameters and the
-        input parameters of :meth:`fit` are valid.
-
-        """
-        pass
-
-    def _knn_graph(self, nearest_neighbors_params):
-        return partial(kneighbors_graph, **nearest_neighbors_params,
-                       mode='connectivity', include_self=False)
-
     def _make_adjacency_matrix(self, X):
         A = self._nearest_neighbors(X)
         rows, cols = A.nonzero()
@@ -139,12 +127,13 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        self._validate_params()
+        check_array(X, allow_nd=True)
 
-        nearest_neighbors_params = self.get_params()
-        self._nearest_neighbors = self._knn_graph(nearest_neighbors_params)
+        self._nearest_neighbors = partial(
+            kneighbors_graph, n_neighbors=self.n_neighbors, metric=self.metric,
+            p=self.p, metric_params=self.metric_params, mode='connectivity',
+            include_self=False)
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -170,12 +159,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
-
-        n_samples = X.shape[0]
+        check_is_fitted(self, ['_nearest_neighbors'])
+        X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(X[i]) for i in
-            range(n_samples))
+            range(X.shape[0]))
         Xt = np.array(Xt)
         return Xt
