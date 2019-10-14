@@ -1,6 +1,3 @@
-[submodule "giotto/externals/pybind11"]
-	path = giotto/externals/pybind11
-	url = https://github.com/pybind/pybind11
 [submodule "giotto/externals/ripser"]
 	path = giotto/externals/ripser
 	url = https://github.com/scikit-tda/ripser.py.git
