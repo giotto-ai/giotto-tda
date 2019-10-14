@@ -50,7 +50,7 @@ class TransformerResamplerMixin:
         X_new : numpy array of shape [n_samples, n_features_new]
             Transformed array.
         """
-        return self.transform(X, y), self.resample(y, X)
+        return self.transform(X), self.resample(y, X)
 
     def fit_transform_resample(self, X, y, **fit_params):
         """Fit to data, then transform it.

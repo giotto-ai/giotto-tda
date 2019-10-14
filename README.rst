@@ -38,3 +38,8 @@ To use:
 .. code-block:: python
 
    import giotto as gt
+
+
+Contacts:
+---------
+maintainers@giotto.ai

@@ -24,14 +24,11 @@ def split_train_test(data):
                            n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
-    labeller.fit(y_train)
-    y_train = labeller.transform(y_train)
-    X_train = labeller.cut(X_train)
+    X_train, y_train = labeller.fit_transform_resample(X_train, y_train)
 
     X_test = data[n_train:n_train + n_test]
     y_test = X_test
-    y_test = labeller.transform(y_test)
-    X_test = labeller.cut(X_test)
+    X_test, y_test = labeller.fit_transform_resample(X_test, y_test)
 
     return X_train, y_train, X_test, y_test
 

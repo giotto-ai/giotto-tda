@@ -22,18 +22,28 @@ jobs:
 
   - script: |
       pip install -e ".[tests,doc]"
-      pip install wheel
-      pip install twine
+      pip uninstall -y giotto-learn
+      pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report html
+  - script: pytest --cov giotto --cov-report xml
     displayName: 'Test with pytest'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest  --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+    displayName: 'install and test the wheels'
 
   - script: |
       cd doc/
       make html
       cd ..
     displayName: 'Build sphinx doc'
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: doc/build
@@ -43,9 +53,6 @@ jobs:
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       replaceExistingArchive: true
     displayName: 'archive doc'
-
-  - script: python setup.py sdist bdist_wheel
-    displayName: 'build the wheels'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -82,6 +89,7 @@ jobs:
       brew update
       brew install boost
       brew install gcc
+#      brew install pybind11
     displayName: 'install boost and gcc'
 
   - script: python -m pip install --upgrade pip setuptools
@@ -89,15 +97,21 @@ jobs:
 
   - script: |
       pip install -e ".[tests,doc]"
-      pip install wheel
-      pip install twine
+      pip uninstall -y giotto-learn
+      pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report html
+  - script: pytest --cov giotto --cov-report xml
     displayName: 'Test with pytest'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+    displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -135,6 +149,7 @@ jobs:
       brew update
       brew install boost
       brew install gcc
+#      brew install pybind11
     displayName: 'install boost and gcc'
 
   - script: python -m pip install --upgrade pip setuptools
@@ -142,15 +157,21 @@ jobs:
 
   - script: |
       pip install -e ".[tests,doc]"
-      pip install wheel
-      pip install twine
+      pip uninstall -y giotto-learn
+      pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report html
+  - script: pytest --cov giotto --cov-report xml
     displayName: 'Test with pytest'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+    displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -189,15 +210,21 @@ jobs:
 
   - script: |
       pip install -e ".[tests,doc]"
-      pip install wheel
-      pip install twine
+      pip uninstall -y giotto-learn
+      pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report html
+  - script: pytest --cov giotto --cov-report xml
     displayName: 'Test with pytest'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+    displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -236,15 +263,21 @@ jobs:
 
   - script: |
       pip install -e ".[tests,doc]"
-      pip install wheel
-      pip install twine
+      pip uninstall -y giotto-learn
+      pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report html
+  - script: pytest --cov giotto --cov-report xml
     displayName: 'Test with pytest'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+    displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
     displayName: 'copy files'
