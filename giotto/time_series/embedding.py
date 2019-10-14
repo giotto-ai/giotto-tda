@@ -123,14 +123,14 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     point clouds.
 
     Based on the following time-delay embedding technique named after F.
-    Takens [1]_: given a time series :math:`X_t`, one extracts a set of
-    vectors in :math:`\\mathbb{R}^d`, each of the form :math:`\\Xi_i :=
-    [X_{t_i}, X_{t_i + \\tau}, \\ldots , X_{t_i + (d-1)\\tau}]`. The set
-    :math:`\\{\\Xi_i\\}_i` is called the `Takens embedding <LINK TO
-    GLOSSARY>`_ of the time series, :math:`\\tau` is called the embedding
-    time delay, :math:`d` is called the embedding dimension, and the
-    difference between :math:`t_i` and :math:`t_{i-1}` is called the
-    embedding stride.
+    Takens [1]_: given a time series :math:`X_t`, one extracts a list of
+    vectors in :math:`\\mathbb{R}^d`, each of the form
+    :math:`\\mathcal{X}_i := (X_{t_i}, X_{t_i + \\tau}, \\ldots , X_{t_i + (
+    d-1)\\tau})`. The set :math:`\\{\\mathcal{X}_i\\}_i` is called the `Takens
+    embedding <LINK TO GLOSSARY>`_ of the time series, :math:`\\tau` is
+    called the embedding time delay, :math:`d` is called the embedding
+    dimension, and the difference between :math:`t_i` and :math:`t_{i-1}` is
+    called the embedding stride.
 
     If :math:`d` and :math:`\\tau` are not explicitly set, suitable values
     are calculated during :meth:`fit`. [2]_
@@ -294,8 +294,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence work
-        in pipelines.
+
+        This method is there to implement the usual scikit-learn API and hence
+        work in pipelines.
 
         Parameters
         ----------
