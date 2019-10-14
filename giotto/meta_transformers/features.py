@@ -2,12 +2,9 @@
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
 from giotto.pipeline import Pipeline
-from ..utils import validate_params, validate_metric_params
 from giotto import homology as hl
 from giotto import diagrams as diag
-import numbers
 
 
 class EntropyGenerator(BaseEstimator, TransformerMixin):
@@ -104,14 +101,10 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'max_edge_length': [numbers.Number, (0, np.inf)],
-                        'epsilon': [numbers.Number, (0, 1)]}
-
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=None, scaler_metric='bottleneck',
+                 homology_dimensions=(0, 1), scaler_metric='bottleneck',
                  scaler_metric_params=None, epsilon=0., n_jobs=None,
                  function=np.max):
-        self.steps = None
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -120,14 +113,6 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         self.function = function
         self.scaler_metric = scaler_metric
         self.scaler_metric_params = scaler_metric_params
-
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-
-        """
-        # still need to check the homology dimensions with utils fnc
-        validate_params(self.get_params(), self._hyperparameters)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -153,41 +138,23 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         """
 
-        if self.scaler_metric_params is None:
-            self.effective_metric_params_ = {}
-        else:
-            self.effective_metric_params_ = self.scaler_metric_params.copy()
-
-        validate_metric_params(self.scaler_metric,
-                               self.effective_metric_params_)
-
-        if self.homology_dimensions is None:
-            self.effective_homology_dimensions_ = (0, 1)
-        else:
-            self.effective_homology_dimensions_ = \
-                self.homology_dimensions.copy()
-
-        self._validate_params()
-
-        self._is_fitted = True
-
-        self.steps = [
+        steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
                 max_edge_length=self.max_edge_length,
-                homology_dimensions=self.effective_homology_dimensions_,
+                homology_dimensions=self.homology_dimensions,
                 n_jobs=self.n_jobs)),
             ('rescaler', diag.Scaler(
                 metric=self.scaler_metric,
-                metric_params=self.effective_metric_params_,
+                metric_params=self.scaler_metric_params,
                 function=self.function,
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
                 epsilon=self.epsilon,
-                homology_dimensions=self.effective_homology_dimensions_)),
+                homology_dimensions=self.homology_dimensions)),
             ('entropy', diag.PersistenceEntropy(n_jobs=self.n_jobs))]
 
-        Pipeline(self.steps).fit(X)
+        self._pipeline = Pipeline(steps).fit(X)
 
         return self
 
@@ -208,18 +175,16 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape: (n_samples, n_homology_dimensions)
+        Xt : ndarray, shape: (n_samples, n_homology_dimensions)
             The Persistent Entropy. ``n_samples`` is not modified by the
             algorithm: the Persistent Entropy is computed per point cloud.
             ``n_homology_dimensions`` is the number of homology
             dimensions considered, i.e. the length of ``homology_dimensions``.
 
         """
-        # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
 
-        X_transformed = Pipeline(self.steps).transform(X)
-        return X_transformed
+        Xt = self._pipeline.transform(X)
+        return Xt
 
 
 class BettiCurveGenerator(BaseEstimator, TransformerMixin):
@@ -299,16 +264,11 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         array.
 
     """
-    _hyperparameters = {'max_edge_length': [numbers.Number, (0, np.inf)],
-                        'epsilon': [numbers.Number, (0, 1)],
-                        'n_values': [int, (1, np.inf)]
-                        }
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=None, scaler_metric='bottleneck',
+                 homology_dimensions=(0, 1), scaler_metric='bottleneck',
                  scaler_metric_params=None, epsilon=0., n_jobs=None,
                  function=np.max, n_values=100):
-        self.steps = None
         self.metric = 'euclidean'
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -318,14 +278,6 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         self.epsilon = epsilon
         self.function = function
         self.n_values = n_values
-
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:`fit` are valid.
-
-        """
-        # still need to check the homology dimensions with utils fnc
-        validate_params(self.get_params(), self._hyperparameters)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -351,40 +303,23 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         """
 
-        if self.scaler_metric_params is None:
-            self.effective_metric_params_ = {}
-        else:
-            self.effective_metric_params_ = self.scaler_metric_params.copy()
-
-        validate_metric_params(self.scaler_metric,
-                               self.effective_metric_params_)
-
-        self._validate_params()
-
-        if self.homology_dimensions is None:
-            self.effective_homology_dimensions_ = (0, 1)
-        else:
-            self.effective_homology_dimensions_ = \
-                self.homology_dimensions.copy()
-
-        self.steps = [
+        steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
                 max_edge_length=self.max_edge_length,
-                homology_dimensions=self.effective_homology_dimensions_,
+                homology_dimensions=self.homology_dimensions,
                 n_jobs=self.n_jobs)),
             ('rescaler', diag.Scaler(
                 metric=self.scaler_metric,
-                metric_params=self.effective_metric_params_,
+                metric_params=self.scaler_metric_params,
                 function=self.function,
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
                 epsilon=self.epsilon,
-                homology_dimensions=self.effective_homology_dimensions_)),
+                homology_dimensions=self.homology_dimensions)),
             ('betticurve', diag.BettiCurve(n_values=self.n_values))]
 
-        Pipeline(self.steps).fit(X)
-        self._is_fitted = True
+        self._pipeline = Pipeline(steps).fit(X)
         return self
 
     def transform(self, X, y=None):
@@ -404,7 +339,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape: (n_samples, n_homology_dimensions, \
+        Xt : ndarray, shape: (n_samples, n_homology_dimensions, \
                         n_sampled_values)
             The Betti Curves. ``n_samples`` is not modified by the
             algorithm: the Bettiv curves are computed per point cloud.
@@ -414,11 +349,9 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
             used to sample the continuous Betti Curves into arrays.
 
         """
-        # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
 
-        X_transformed = Pipeline(self.steps).transform(X)
-        return X_transformed
+        Xt = self._pipeline.transform(X)
+        return Xt
 
 
 class LandscapeGenerator(BaseEstimator, TransformerMixin):
@@ -501,17 +434,11 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         consider.
 
     """
-    _hyperparameters = {'max_edge_length': [numbers.Number, (0, np.inf)],
-                        'epsilon': [numbers.Number, (0, 1)],
-                        'n_values': [int, (1, np.inf)],
-                        'n_layers': [int, (1, np.inf)]
-                        }
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=None, scaler_metric='bottleneck',
+                 homology_dimensions=(0, 1), scaler_metric='bottleneck',
                  scaler_metric_params=None, epsilon=0., n_jobs=None,
                  function=np.max, n_values=100, n_layers=1):
-        self.steps = None
         self.metric = 'euclidean'
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -522,14 +449,6 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         self.function = function
         self.n_values = n_values
         self.n_layers = n_layers
-
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the
-        input parameters of the :meth:``fit`` are valid.
-
-        """
-        # still need to check the homology dimensions with utils fnc
-        validate_params(self.get_params(), self._hyperparameters)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -555,41 +474,24 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         """
 
-        if self.scaler_metric_params is None:
-            self.effective_metric_params_ = {}
-        else:
-            self.effective_metric_params_ = self.scaler_metric_params.copy()
-
-        validate_metric_params(self.scaler_metric,
-                               self.effective_metric_params_)
-
-        self._validate_params()
-
-        if self.homology_dimensions is None:
-            self.effective_homology_dimensions_ = [0, 1]
-        else:
-            self.effective_homology_dimensions_ = \
-                self.homology_dimensions.copy()
-
-        self.steps = [
+        steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
                 max_edge_length=self.max_edge_length,
-                homology_dimensions=self.effective_homology_dimensions_,
+                homology_dimensions=self.homology_dimensions,
                 n_jobs=self.n_jobs)),
             ('rescaler', diag.Scaler(
                 metric=self.scaler_metric,
-                metric_params=self.effective_metric_params_,
+                metric_params=self.scaler_metric_params,
                 function=self.function,
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
                 epsilon=self.epsilon,
-                homology_dimensions=self.effective_homology_dimensions_)),
+                homology_dimensions=self.homology_dimensions)),
             ('landscape', diag.PersistenceLandscape(
                 n_values=self.n_values, n_layers=self.n_layers))]
 
-        Pipeline(self.steps).fit(X)
-        self._is_fitted = True
+        self._pipeline = Pipeline(steps).fit(X)
         return self
 
     def transform(self, X, y=None):
@@ -609,7 +511,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_transformed : ndarray, shape: (n_samples, n_homology_dimensions, \
+        Xt : ndarray, shape: (n_samples, n_homology_dimensions, \
                         n_values)
             The Persistence Landscape. ``n_samples`` is not modified by the
             algorithm: the Betti curves are computed per point cloud.
@@ -619,8 +521,6 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
             used to sample the continuous persistence landscape into arrays.
 
         """
-        # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
 
-        X_transformed = Pipeline(self.steps).transform(X)
-        return X_transformed
+        Xt = self._pipeline.transform(X)
+        return Xt

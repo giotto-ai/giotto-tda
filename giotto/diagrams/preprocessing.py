@@ -333,7 +333,7 @@ class Filtering(BaseEstimator, TransformerMixin):
         if self.homology_dimensions is None:
             self.homology_dimensions_ = [int(dim) for dim in set(X[0, :, 2])]
         else:
-            self.homology_dimensions_ = self.homology_dimensions
+            self.homology_dimensions_ = list(self.homology_dimensions)
 
         validate_params({**self.get_params(),
                          'homology_dimensions_': self.homology_dimensions_},
