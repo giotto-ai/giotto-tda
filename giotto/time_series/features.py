@@ -32,8 +32,6 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     def _permutation_entropy(self, X):
         Xo = np.argsort(X, axis=2)
-        print(Xo.shape)
-        print(Xo)
         Xo = np.stack([self._entropy(Xo[i]) for i in range(Xo.shape[0])])
         return Xo.reshape((-1, 1))
 
