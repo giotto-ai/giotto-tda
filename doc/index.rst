@@ -149,12 +149,12 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-   diagram.Stacking
+   diagram.ForgetDimension
    diagram.Scaler
    diagram.Filtering
 
-   diagram.DiagramDistance
-   diagram.DiagramAmplitude
+   diagram.PairwiseDistance
+   diagram.Amplitude
 
    diagram.PersistenceEntropy
    diagram.PersistenceLandscape

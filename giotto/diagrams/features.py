@@ -7,13 +7,13 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import gen_even_slices
 from ..utils.validation import check_diagram
 from ._utils import _subdiagrams, _discretize
-from giotto.diagram._metrics import betti_curves, landscapes, heats
+from giotto.diagrams._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """`Persistence entropies <LINK TO GLOSSARY>`_ of persistence diagrams.
 
-    Given a persistence diagram consisting of birth-death-dimension triples
+    Given a persistence diagrams consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
     calculated as the (base e) entropies of the collections of differences
@@ -21,7 +21,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -33,8 +33,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -121,9 +121,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately, and their respective Betti curves are
-    obtained by evenly sampling the `filtration parameter <LINK TO
-    GLOSSARY>`_.
+    considered separately, and their respective Betti curves are obtained by
+    evenly sampling the `filtration parameter <LINK TO GLOSSARY>`_.
 
     Parameters
     ----------
@@ -131,7 +130,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
@@ -148,8 +147,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -192,7 +191,9 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self.samplings_, _ = _discretize(X, n_values=self.n_values)
+        self._samplings, _ = _discretize(X, n_values=self.n_values)
+        self.samplings_ = {dim: s.flatten()
+                           for dim, s in self._samplings.items()}
         return self
 
     def transform(self, X, y=None):
@@ -226,7 +227,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
                 _subdiagrams(X, [dim], remove_dim=True)[s],
-                self.samplings_[dim])
+                self._samplings[dim])
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).\
@@ -241,8 +242,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and layers of their respective persistence
-    landscapes are obtained by evenly sampling the `filtration parameter <LINK
-    TO GLOSSARY>`_.
+    landscapes are obtained by evenly sampling the `filtration parameter
+    <LINK TO GLOSSARY>`_.
 
     Parameters
     ----------
@@ -250,7 +251,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -267,8 +268,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -314,7 +315,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self.samplings_, _ = _discretize(X, n_values=self.n_values)
+        self._samplings, _ = _discretize(X, n_values=self.n_values)
+        self.samplings_ = {dim: s.flatten()
+                           for dim, s in self._samplings.items()}
 
         self._is_fitted = True
         return self
@@ -351,7 +354,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
                 _subdiagrams(X, [dim], remove_dim=True)[s],
-                self.samplings_[dim],
+                self._samplings[dim],
                 self.n_layers)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
@@ -362,10 +365,17 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
 
 class HeatKernel(BaseEstimator, TransformerMixin):
-    """Transformer for the calculation of the persistence landscapes from a
-    collection of persistence diagrams. Given a generic persistence diagram
-    consisting of birth-death-dimension triples [b, d, q], their q-persistence
-    landscapes are TO DO.
+    """Convolution of persistence diagrams with a Gaussian kernel.
+
+    Based on ideas in [1]_. Given a persistence diagram consisting of
+    birth-death-dimension triples [b, d, q], subdiagrams corresponding to
+    distinct homology dimensions are considered separately and regarded as sums
+    of Dirac deltas. Then, the convolution with a Gaussian kernel is computed
+    over a rectangular grid of locations evenly sampled from appropriate
+    ranges of the `filtration parameter <LINK TO GLOSSARY>`_. The same is
+    done with the reflected images of the subdiagrams about the diagonal,
+    and the difference between the results of the two convolutions is
+    computed. The result can be thought of as a raster image.
 
     Parameters
     ----------
@@ -376,7 +386,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -393,8 +403,24 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, DiagramAmplitude, \
-    DiagramDistance, giotto.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
+    PairwiseDistance, giotto.homology.VietorisRipsPersistence
+
+    Notes
+    -----
+    The samplings in :attr:`samplings_` are in general different between
+    different homology dimensions. This means that the (i, j)-th pixel of a
+    persistence image in homology dimension q typically arises from a different
+    pair of parameter values to the (i, j)-th pixel of a persistence image in
+    dimension q'.
+
+    References
+    ----------
+    .. [1] J. Reininghaus, S. Huber, U. Bauer, R. Kwitt, "A Stable Multi-Scale
+           Kernel for Topological Machine Learning"; *2015 IEEE Conference on
+           Computer Vision and Pattern Recognition (CVPR)*, pp. 4741--4748,
+           2015, doi: `10.1109/CVPR.2015.7299106
+           <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
     def __init__(self, sigma, n_values=100, n_jobs=None):
@@ -431,13 +457,15 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self.samplings_, self._step_size = _discretize(
+        self._samplings, self._step_size = _discretize(
             X, n_values=self.n_values)
+        self.samplings_ = {dim: s.flatten()
+                           for dim, s in self._samplings.items()}
         return self
 
     def transform(self, X, y=None):
-        """For each persistence subdiagram corresponding to an homology
-        dimension k, compute that subdiagram's landscapes.
+        """Compute raster images obtained from diagrams in `X` by convolution
+        with a Gaussian kernel.
 
         Parameters
         ----------
@@ -454,7 +482,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values, \
             n_values)
-            Array of the persistence landscapes of the diagrams in `X`.
+            Raster images: one image per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
@@ -464,7 +494,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
-                   self.samplings_[dim], self._step_size[dim], self.sigma)
+                   self._samplings[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(n_samples, effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape((self._n_dimensions, n_samples,

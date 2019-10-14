@@ -21,7 +21,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -64,7 +64,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters

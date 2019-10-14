@@ -50,7 +50,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
-    n_jobs : int or None, optional, default: None
+    infinity_values : float or None, default : ``None``
+        Which death value to assign to features which are still alive at
+        filtration value `max_edge_length`. ``None`` has the same behaviour
+        as `max_edge_length`.
+
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
@@ -88,7 +93,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                      thresh=self.max_edge_length)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xds[0] = Xds[0][:-1, :]
+            Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
 
         Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
                                                        dtype=Xds[dim].dtype)])
@@ -97,7 +102,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
