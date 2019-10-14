@@ -119,22 +119,22 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    r"""Transformer returning a representation of a scalar-valued time
+    """Transformer returning a representation of a scalar-valued time
     series as a time series of point clouds.
 
     Based on the following time-delay embedding technique named after `F.
     Takens <https://doi.org/10.1007/BFb0091924>`_: given a time series
-    :math:`X(t)`, one extracts a set of vectors in :math:`\mathbb{R}^d`,
-    each of the form :math:`\Xi_i := [X(t_i), X(t_i + \tau), ..., X(t_i + (
-    d-1)\tau)]`. The set :math:`\{\Xi_i\}` is called the Takens embedding of
-    the time series, :math:`\tau` is called the embedding time delay,
-    :math:`d` is called the embedding dimension, and the difference between
-    :math:`t_i` and :math:`t_{i-1}` is called the embedding stride.
+    :math:`X(t)`, one extracts a set of vectors in :math:`\\mathbb{R}^d`,
+    each of the form :math:`\\Xi_i := [X(t_i), X(t_i + \\tau), ..., X(t_i + (
+    d-1)\\tau)]`. The set :math:`\\{\\Xi_i\\}` is called the Takens
+    embedding of the time series, :math:`\\tau` is called the embedding time
+    delay, :math:`d` is called the embedding dimension, and the difference
+    between :math:`t_i` and :math:`t_{i-1}` is called the embedding stride.
 
-    If :math:`d` and :math:`\tau` are not explicitly set by the user, suitable
+    If :math:`d` and :math:`\\tau` are not explicitly set by the user, suitable
     values are calculated during ``fit()``.
 
-    During ``transform()``, a Takens embedding procedure is applied on
+    During :meth:`transform`, a Takens embedding procedure is applied on
     intervals of the input time series called "outer windows",
     in a sliding-window fashion. This allows to track the evolution of the
     dynamics underlying the time series.
@@ -155,23 +155,23 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         out, but the final values are constrained to be not greater than the
         values initially set.
 
-    time_delay: int, default: 1
+    time_delay: int, default: ``1``
         Time delay between two consecutive values for constructing one
         embedded point. If ``parameters_type`` is 'search',
         it corresponds to the maximal embedding time delay that will be
         considered.
 
-    dimension: int, default: 5
+    dimension: int, default: ``5``
         Dimension of the embedding space. If ``parameters_type`` is
         'search', it corresponds to the maximum embedding dimension that will
         be considered.
 
-    stride: int, default: 1
+    stride: int, default: ``1``
         Stride duration between two consecutive embedded points. It defaults
         to 1 as this is the usual value in the statement of Takens's embedding
         theorem.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.

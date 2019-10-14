@@ -11,17 +11,18 @@ from ..utils.validation import validate_params
 
 
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
-    r"""Rescaling of distances between pairs of points by the geometric mean
+    """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
 
     Based on ideas in [1]_. The computation during :meth:`transform` depends on
     the nature of the array `X`. If each entry in `X` along axis 0 represents a
-    distance matrix :math:`D`, then the corresponding entry in the
-    transformed array is the distance matrix :math:`D'_{ij} = D_{ij}/\sqrt{
-    D_{ik_i}D_{jk_j}}`, where :math:`k_i` is the index of the :math:`k`-th
-    largest value in row :math:`i` (and similarly for :math:`j`). If the
-    entries in `X` represent point clouds, their distance matrices are first
-    computed, and then rescaled according to the same formula.
+    distance matrix :math:`D`, then the corresponding entry in the transformed
+    array is the distance matrix
+    :math:`D'_{ij} = D_{ij}/\\sqrt{D_{ik_i}D_{jk_j}}`, where :math:`k_i` is the
+    index of the :math:`k`-th largest value in row :math:`i` (and similarly
+    for :math:`j`). If the entries in `X` represent point clouds, their
+    distance matrices are first computed, and then rescaled according to the
+    same formula.
 
     Parameters
     ----------
@@ -43,11 +44,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
-    n_neighbor : int, optional, default: 1
+    n_neighbor : int, optional, default: ``1``
         Rank of the neighbors to be used to modify the metric structure
         according to the consistent rescaling procedure.
 
-    n_jobs : int or None, optional, default: None
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
@@ -69,8 +70,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     References
     ----------
     .. [1] T. Berry and T. Sauer, "Consistent manifold representation for
-           topological data analysis", *Foundations of data analysis*,
-           **1**, 1--38, 2019, doi: `10.3934/fods.2019001
+           topological data analysis"; *Foundations of data analysis*, **1**,
+           1--38, 2019, doi: `10.3934/fods.2019001
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
@@ -101,7 +102,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
-        This method is just there to implement the usual API and hence
+
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters

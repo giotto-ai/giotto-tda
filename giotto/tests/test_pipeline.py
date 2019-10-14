@@ -3,7 +3,7 @@
 import giotto as gt
 import giotto.time_series as ts
 import giotto.homology as hl
-import giotto.diagram as diag
+import giotto.diagrams as diag
 from giotto.pipeline import Pipeline
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -38,7 +38,7 @@ def get_steps():
         ('window', ts.SlidingWindow(width=5, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.Scaler()),
-        ('filter', diag.Filtering(delta=0.1)),
+        ('filter', diag.Filtering(epsilon=0.1)),
         ('entropy', diag.PersistenceEntropy()),
         ('scaling', skprep.MinMaxScaler(copy=True)),
    ]
