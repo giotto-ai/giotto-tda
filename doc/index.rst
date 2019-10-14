@@ -8,7 +8,7 @@
 
     glossary
     modules/compose.rst
-    modules/diagram.rst
+    modules/diagrams.rst
     modules/homology.rst
     modules/manifold.rst
     modules/model_selection.rst
@@ -136,10 +136,10 @@ Welcome to giotto's API reference!
    homology.ConsistentRescaling
 
 
-:mod:`giotto.diagram`: Persistence diagrams
-===========================================
+:mod:`giotto.diagrams`: Persistence diagrams
+============================================
 
-.. automodule:: giotto.diagram
+.. automodule:: giotto.diagrams
    :no-members:
    :no-inherited-members:
 
@@ -149,17 +149,17 @@ Welcome to giotto's API reference!
    :toctree: generated/
    :template: class.rst
 
-   diagram.ForgetDimension
-   diagram.Scaler
-   diagram.Filtering
+   diagrams.ForgetDimension
+   diagrams.Scaler
+   diagrams.Filtering
 
-   diagram.PairwiseDistance
-   diagram.Amplitude
+   diagrams.PairwiseDistance
+   diagrams.Amplitude
 
-   diagram.PersistenceEntropy
-   diagram.PersistenceLandscape
-   diagram.BettiCurve
-   diagram.HeatKernel
+   diagrams.PersistenceEntropy
+   diagrams.PersistenceLandscape
+   diagrams.BettiCurve
+   diagrams.HeatKernel
 
 :mod:`giotto.utils`: Validation
 ===============================
