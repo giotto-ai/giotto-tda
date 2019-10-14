@@ -6,7 +6,8 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _discretize
-from ..utils.validation import check_diagram, validate_metric_params
+from ..utils.validation import check_diagram, validate_params, \
+    validate_metric_params
 
 
 class PairwiseDistance(BaseEstimator, TransformerMixin):
@@ -98,6 +99,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     diagrams.
 
     """
+    _hyperparameters = {'order': [float, (1, np.inf)]}
+
     def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
         self.metric = metric
@@ -132,8 +135,18 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
+        hyperparameters = self.get_params().copy()
+        print(hyperparameters)
+        if self.order is not None:
+            if isinstance(self.order, int):
+                hyperparameters['order'] = float(self.order)
+        else:
+             hyperparameters['order'] = 1. # Automatically pass validate_params
+
+        validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
+
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
 
         if self.metric in ['landscape', 'heat', 'betti']:
@@ -268,6 +281,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     instance of :class:`ForgetDimension`.
 
     """
+    _hyperparameters = {'order': [float, (1, np.inf)]}
+
     def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
         self.metric = metric
@@ -302,6 +317,14 @@ class Amplitude(BaseEstimator, TransformerMixin):
         else:
             self.effective_metric_params_ = self.metric_params.copy()
 
+        hyperparameters = self.get_params().copy()
+        if self.order is not None:
+            if isinstance(self.order, int):
+                hyperparameters['order'] = float(self.order)
+        else:
+             hyperparameters['order'] = 1. # Automatically pass validate_params
+
+        validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
