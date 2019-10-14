@@ -14,47 +14,59 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
     constructed from the distances between their respective subdiagrams with
     constant homology dimension.
 
+    Given two collections of persistence diagrams consisting of
+    birth-death-dimension triples [b, d, q], a collection of distance
+    matrices or a single distance matrix between pairs of diagrams is
+    calculated according to the following steps:
+
+        1. All diagrams are partitioned into subdiagrams corresponding to
+           distinct homology dimensions.
+        2. Pairwise distances between subdiagrams of equal homology
+           dimension are calculated according to the parameters `metric` and
+           `metric_params`. This gives a collection of distance matrices,
+           :math:`\\mathbf{D} = (D_{q_1}, \\ldots, D_{q_n})`.
+        3. The final result is either :math:`\\mathbf{D}` itself as a
+           three-dimensional array, or a single distance matrix constructed
+           by taking norms of the vectors of distances between diagram pairs.
+
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
-        Which notion of distance between (sub)diagrams to use:
+        Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to a family of possible (:math:`L^p`-like)
-           distances between "persistence landscapes" obtained from persistence
-           (sub)diagrams.
-        - ``'betti'`` refers to a family of possible (:math:`L^p`-like)
-           distances between "Betti curves" obtained from persistence
-           (sub)diagrams. A Betti curve simply records the evolution in the
-           number of independent topological holes (technically, the number
-           of linearly independent homology classes) as can be read from a
-           persistence (sub)diagram.
-        - ``'heat'`` refers to a family of possible (:math:`L^p`-like)
-           distances between "Heat kernels"obtained from persistence
-           (sub)diagrams.
+        - ``'landscape'`` refers to the :math:`L^p` distance between
+          persistence landscapes.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
 
         - If ``metric == 'bottleneck'`` the only argument is `delta` (float,
-          default: `0.01`).
+          default: ``0.01``). When equal to ``0.``, an exact algorithm is
+          used; otherwise, a faster approximate algorithm is used.
         - If ``metric == 'wasserstein'`` the available arguments are `p`
-          (int, default: ``2``) and `delta` (float, default: ``0.``).
+          (int, default: ``2``) and `delta` (float, default: ``0.01``).
+          Unlike the case of ``'bottleneck'``, `delta` cannot be set to
+          ``0.`` and an exact algorithm is not available.
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_values` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
           (float, default: ``2.``), `n_values` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
-        - If ``metric == 'betti'`` the available arguments are `p`
-          (float, default: ``2.``) and `n_values` (int, default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``) and
           `n_values` (int, default: ``100``).
 
-    order : float, optional, default: ``2.``
-        Order of the norm used to combine subdiagrams distances into a single
-        distance. If set to ``None``, returns one distance matrix per homology
-        dimension.
+    order : float or None, optional, default: ``2.``
+        If ``None``, :meth:`transform` returns for each pair of diagrams a
+        vector of distances corresponding to the dimensions in
+        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
+        these vectors with :math:`p` equal to `order` is taken.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -101,7 +113,7 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray, shape (n_samples_fit, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -133,8 +145,8 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes the distance matrix between the diagrams in `X`, according to
-        the choice of `metric` and `metric_params`.
+        """Computes a distance or vector of distances between the diagrams in
+        `X` and the diagrams seen in :meth:`fit`.
 
         Parameters
         ----------
@@ -149,9 +161,13 @@ class DiagramDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_samples) if `order` is ``None``, \
-            else (n_samples, n_samples, n_dimensions).
-            Distance matrix between diagrams in `X`.
+        Xt : ndarray, shape (n_samples_fit, n_samples, \
+             n_homology_dimensions) if `order` is ``None``, \
+             else (n_samples_fit, n_samples).
+            Distance matrix or collection of distance matrices between
+            diagrams in `X` and diagrams seen in :meth:`fit`. In the
+            second case, index i along axis 2 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self, ['effective_metric_params_',
@@ -177,25 +193,24 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
     """`Amplitudes <LINK TO GLOSSARY>`_ of persistence diagrams, constructed
     from the amplitudes of their subdiagrams with constant homology dimension.
 
-    Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], a vector of amplitudes or a single scalar amplitude is
+    Given a single persistence diagram consisting of birth-death-dimension
+    triples [b, d, q], a vector of amplitudes or a single scalar amplitude is
     calculated according to the following steps:
 
-        1. Subdiagrams corresponding to distinct homology dimensions are
-           extracted.
+        1. All diagrams are partitioned into subdiagrams corresponding to
+           distinct homology dimensions.
         2. The amplitude of each subdiagram is calculated according to the
-           parameters `metric` and `metric_params`. The result is a vector of
+           parameters `metric` and `metric_params`. This gives a vector of
            amplitudes, :math:`\\mathbf{a} = (a_{q_1}, \\ldots, a_{q_n})`.
-        3. The final result  is either :math:`\\mathbf{a}` itself or
-           the `order`-`norm <GLOSSARY>`_ of :math:`\\mathbf{a}`.
+        3. The final result is either :math:`\\mathbf{a}` itself or
+           a norm of :math:`\\mathbf{a}`.
 
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
-
-        Distance function used to define the amplitude of subdiagrams as their
-        distance from the trivial (i.e. diagonal) diagram:
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the trivial (i.e. diagonal) diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
            perfect-matching--based notions of distance.
@@ -221,10 +236,10 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
           (int, default: ``100``).
 
     order : float or None, optional, default: ``2.``
-        If ``None``, :meth:`transform` returns for each persistence diagram
-        a vector of amplitudes corresponding to the homology dimensions in
-        :attr:`homology_dimensions_`. Otherwise, the vector `order`-norm of
-        these vectors is taken.
+        If ``None``, :meth:`transform` returns for each diagram a vector of
+        amplitudes corresponding to the dimensions in
+        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
+        these vectors with :math:`p` equal to `order` is taken.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -317,7 +332,7 @@ class DiagramAmplitude(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_homology_dimensions) if `order` is \
              ``None``, else (n_samples, 1)
             Amplitudes or amplitude vectors of the diagrams in `X`. In the
-            latter case, index i along axis 1 corresponds to the i-th
+            second case, index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
 
         """
