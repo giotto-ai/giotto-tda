@@ -241,8 +241,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and layers of their respective persistence
-    landscapes are obtained by evenly sampling the `filtration parameter <LINK TO
-    GLOSSARY>`_.
+    landscapes are obtained by evenly sampling the `filtration parameter <LINK
+    TO GLOSSARY>`_.
 
     Parameters
     ----------
