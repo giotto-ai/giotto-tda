@@ -4,7 +4,7 @@ from sklearn.utils.validation import check_is_fitted
 from giotto.pipeline import Pipeline
 from ..utils import validate_params, validate_metric_params
 from giotto import homology as hl
-from giotto import diagram as diag
+from giotto import diagrams as diag
 import numbers
 
 class EntropyGenerator(BaseEstimator, TransformerMixin):
