@@ -7,13 +7,11 @@ jobs:
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
-        image: quay.io/pypa/manylinux2010_x86_64
 #        python.architecture: x64
         python.version: '3.6'
       Python37:
         arch: x86_64
         plat: manylinux2010_x86_64
-        image: quay.io/pypa/manylinux2010_x86_64
 #        python.architecture: x64
         python.version: '3.7'
 
@@ -23,8 +21,8 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: |
-      set -ex
-      docker run -e PLAT=$(plat) -e package_name=$(package_name) --rm -v `pwd`:/io $(image) /io/.ci/build_manylinux2010.sh
+      docker pull pypywheels/manylinux2010-pypy_x86_64
+      docker run -e PLAT=$(plat) -e package_name=$(package_name) --rm -v `pwd`:/io manylinux2010-pypy_x86_64 /io/.ci/build_manylinux2010.sh
     displayName: 'Run the docker'
     
   - script: |
