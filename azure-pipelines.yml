@@ -29,6 +29,8 @@ jobs:
       docker ps
       docker exec manylinux10 ls
       docker exec manylinux10 pwd
+      docker exec manylinux10 cd io
+      docker exec manylinux10 ls
     displayName: 'Run the docker and open bash'
     
   - script: python -m pip install --upgrade pip setuptools
