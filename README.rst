@@ -11,6 +11,9 @@
 .. |Azure-test| image:: https://travis-ci.org/scikit-learn/scikit-learn.svg?branch=master
 .. _Azure-test: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=364&view=ms.vss-test-web.build-test-results-tab
 
+.. |binder| image:: https://mybinder.org/badge_logo.svg
+.. _binder: https://mybinder.org/v2/gh/giotto-learn/giotto-learn/master?filepath=examples
+
 giotto-learn
 ============
 
