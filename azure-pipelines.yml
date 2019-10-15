@@ -22,7 +22,7 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: docker run -e PLAT=$(plat) -e package_name='giotto-learn' --rm -v `pwd`:/io $(image) /io/.ci/build_manylinux2010.sh
+  - script: docker run -e PLAT=$(plat) --rm -v `pwd`:/io $(image) /io/.ci/build_manylinux2010.sh
     displayName: 'Run the docker'
     
   - script: |
