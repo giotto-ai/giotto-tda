@@ -27,10 +27,10 @@ jobs:
       docker exec manylinux10 ls
       docker exec manylinux10 pwd
       docker exec manylinux10 sh -c "ls /io"
-      docker exec sh -c "python --version"
-      docker exec python --version
-      docker exec sh -c "python3 --version"
-      docker exec sh -c "/io/.ci/build_manylinux2010.sh"
+      docker exec manylinux10 sh -c "python --version"
+      docker exec manylinux10 python --version
+      docker exec manylinux10 sh -c "python3 --version"
+      docker exec manylinux10 sh -c "/io/.ci/build_manylinux2010.sh"
     displayName: 'Run the docker and open bash'
     
   - script: python -m pip install --upgrade pip setuptools
