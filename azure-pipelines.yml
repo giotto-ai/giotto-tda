@@ -25,6 +25,8 @@ jobs:
   - task: Bash@3
     inputs:
       filePath: azure-ci/build_manylinux2010.sh
+    env:
+      python_ver: $(python_ver)
     displayName: 'Run the docker and open bash' 
  
   - script: |
