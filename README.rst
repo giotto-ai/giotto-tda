@@ -1,7 +1,4 @@
 .. -*- mode: rst -*-
-
-.. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/matteocao/giotto-learn/master?filepath=examples
  
 |Azure|_ |Azure-cov|_ |Azure-test|_ |binder|_
 
