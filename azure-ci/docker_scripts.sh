@@ -4,7 +4,7 @@ set -e -x
 
 echo 'folders: '
 ls
-echo PYTHON_VER
+echo $PYTHON_VER
 # update-alternatives --set python /opt/python/cp37-cp37m/
 /opt/python/cp37-cp37m/bin/pip install --upgrade pip setuptools
 which cmake
@@ -16,7 +16,7 @@ ln -sf ${CMAKE_BIN} /usr/bin/cmake
 # install boost
 # /usr/bin/wget / https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 # tar -zxvf /boost_1_69_0.tar.gz
-yum install boost-devel
+yum install -y boost.x86_64
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
