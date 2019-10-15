@@ -20,7 +20,9 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: azure-ci/build_manylinux2010.sh
+  - task: Bash@3
+    inputs:
+      filePath: azure-ci/build_manylinux2010.sh
     displayName: 'Run the docker and open bash' 
  
   - script: |
