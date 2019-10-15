@@ -1,7 +1,7 @@
 jobs:
 - job: 'manylinux2010'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'macOS-10.13' #'ubuntu-16.04'
   strategy:
     matrix:
       Python36:
@@ -24,7 +24,7 @@ jobs:
 
   - script: |
       set -ex
-      sudo docker run -e PLAT=$(plat) -e package_name=$(package_name) --rm -v `pwd`:/io $(image) /io/.ci/build_manylinux2010.sh
+      docker run -e PLAT=$(plat) -e package_name=$(package_name) --rm -v `pwd`:/io $(image) /io/.ci/build_manylinux2010.sh
     displayName: 'Run the docker'
     
   - script: |
