@@ -1,2 +1,2 @@
 __all__ = ['homology', 'time_series', 'graphs', 
-           'diagrams', 'externals']
+           'diagrams', 'externals', 'meta_transformers']
