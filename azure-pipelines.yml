@@ -1,18 +1,28 @@
 jobs:
-- job: 'ubuntu1604'
+- job: 'manylinux2010'
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
       Python36:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        image: quay.io/pypa/manylinux2010_x86_64
+        python.architecture: x64
         python.version: '3.6'
       Python37:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        image: quay.io/pypa/manylinux2010_x86_64
+        python.architecture: x64
         python.version: '3.7'
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+
+  - script: docker run -e PLAT=$(plat) -e package_name='giotto-learn' --rm -v `pwd`:/io $(image)
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
