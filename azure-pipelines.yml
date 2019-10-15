@@ -24,7 +24,6 @@ jobs:
       docker pull pypywheels/manylinux2010-pypy_x86_64
       docker images
       ls
-#      docker run -e PLAT=$(plat) -e package_name='giotto-learn' --rm -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /io/.ci/build_manylinux2010.sh
       docker run -i -t -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /bin/bash
       ls
       pwd
