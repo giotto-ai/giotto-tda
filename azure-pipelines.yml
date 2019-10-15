@@ -24,7 +24,7 @@ jobs:
       docker pull pypywheels/manylinux2010-pypy_x86_64
       docker images
       ls
-      docker run -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64
+      docker run -d -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64
       echo 'running dockers'
       docker ps
       docker exec pypywheels/manylinux2010-pypy_x86_64 ls
