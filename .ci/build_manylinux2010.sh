@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e -x
 
+echo 'folders: '
+ls
 python -m pip install --upgrade pip setuptools
 
-pip install -e "/io/.[tests,doc]"
+pip install -e /io/.['tests', 'doc']
 pip uninstall -y giotto-learn
 pip install wheel twine
 
