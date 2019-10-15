@@ -23,7 +23,7 @@ jobs:
   - script: |
       docker pull pypywheels/manylinux2010-pypy_x86_64
       docker images
-      docker run -e PLAT=$(plat) -e package_name=$(package_name) --rm -v `pwd`:/io docker.io/pypywheels/manylinux2010-pypy_x86_64:latest /io/.ci/build_manylinux2010.sh
+      docker run -e PLAT=$(plat) -e package_name=$(package_name) --rm -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /io/.ci/build_manylinux2010.sh
     displayName: 'Run the docker'
     
   - script: |
