@@ -24,9 +24,11 @@ jobs:
       docker pull pypywheels/manylinux2010-pypy_x86_64
       docker images
       ls
-      docker run -i -t -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /bin/bash
-      ls
-      pwd
+      docker run -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64
+      echo 'running dockers'
+      docker ps
+      docker exec pypywheels/manylinux2010-pypy_x86_64 ls
+      docker exec pypywheels/manylinux2010-pypy_x86_64 pwd
     displayName: 'Run the docker and open bash'
     
   - script: python -m pip install --upgrade pip setuptools
