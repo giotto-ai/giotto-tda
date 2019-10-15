@@ -1,0 +1,10 @@
+name: binder-examples
+channels:
+  - conda-forge
+dependencies:
+  - cmake
+  - git
+  - gcc
+  - python
+  - plotly
+  - matplotlib
