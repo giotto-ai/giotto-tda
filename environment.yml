@@ -2,9 +2,8 @@ name: binder-examples
 channels:
   - conda-forge
 dependencies:
-  - cmake
-  - git
   - pip
   - pip:
     - plotly
     - matplotlib
+    - giotto-learn
