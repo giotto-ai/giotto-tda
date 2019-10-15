@@ -6,8 +6,9 @@ echo 'folders: '
 ls
 # update-alternatives --set python /opt/python/cp37-cp37m/
 /opt/python/cp37-cp37m/bin/pip install --upgrade pip setuptools
-for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" uninstall cmake; done
+which cmake
 for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install cmake; done
+which cmake
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
 /opt/python/cp37-cp37m/bin/pip install wheel twine
