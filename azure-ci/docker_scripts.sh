@@ -6,9 +6,9 @@ echo 'folders: '
 ls
 /opt/python/cp37-cp37m/bin/pip install --upgrade pip setuptools
 
-pip install -e /io/.['tests', 'doc']
-pip uninstall -y giotto-learn
-pip install wheel twine
+/opt/python/cp37-cp37m/bin/pip install -e /io/.['tests', 'doc']
+/opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
+/opt/python/cp37-cp37m/bin/pip install wheel twine
 
 pytest --cov /io/giotto/ --cov-report xml
 flake8 --exit-zero /io/
