@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 
-|Azure|_ |Azure-cov|_ |Azure-test|_
+|Azure|_ |Azure-cov|_ |Azure-test|_ |binder|_
 
 .. |Azure| image:: https://dev.azure.com/giotto-learn/giotto-learn/_apis/build/status/giotto-learn.giotto-learn?branchName=master
 .. _Azure: https://dev.azure.com/giotto-learn/giotto-learn/
