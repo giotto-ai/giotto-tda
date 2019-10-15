@@ -7,7 +7,10 @@ ls
 # update-alternatives --set python /opt/python/cp37-cp37m/
 /opt/python/cp37-cp37m/bin/pip install --upgrade pip setuptools
 which cmake
+echo $CMAKE_BIN
+
 for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install cmake; done
+CMAKE_BIN=/opt/python/cp37-cp37m/bin/cmake 
 which cmake
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
