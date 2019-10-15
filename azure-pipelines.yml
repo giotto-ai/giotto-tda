@@ -20,8 +20,8 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: |
-
+  - script: sh -c .ci/build_manylinux2010.sh
+    displayName: 'Run the docker and open bash' 
  
   - script: |
       pip install dist/*.whl
