@@ -13,19 +13,3 @@ docker exec manylinux10 sh -c "sudo sh -c /io/.ci/build_manylinux2010.sh"
 docker exec manylinux10 sh -c "sudo sh /io/.ci/build_manylinux2010.sh"
 docker exec manylinux10 sh -c "sudo bash /io/.ci/build_manylinux2010.sh"
 
-
-set -e -x
-
-echo 'folders: '
-ls
-python -m pip install --upgrade pip setuptools
-
-pip install -e /io/.['tests', 'doc']
-pip uninstall -y giotto-learn
-pip install wheel twine
-
-pytest --cov /io/giotto/ --cov-report xml
-flake8 --exit-zero /io/
-displayName: 'Test with pytest and flake8'
-
-python /io/setup.py sdist bdist_wheel
