@@ -23,8 +23,10 @@ jobs:
       pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report xml
-    displayName: 'Test with pytest'
+  - script: |
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
@@ -32,7 +34,7 @@ jobs:
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest  --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*' 
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob="['**test_common.py', '*externals*']"
     displayName: 'install and test the wheels'
 
   - script: |
@@ -94,8 +96,10 @@ jobs:
       pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report xml
-    displayName: 'Test with pytest'
+  - script: |
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
@@ -103,7 +107,7 @@ jobs:
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*' 
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob="['**test_common.py', '*externals*']"
     displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
@@ -143,16 +147,18 @@ jobs:
       pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: pytest --cov giotto --cov-report xml
-    displayName: 'Test with pytest'
+  - script: |
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
     
-  - script: |
+  - bash: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*' 
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob="['**test_common.py', '*externals*']"
     displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
