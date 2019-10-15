@@ -23,9 +23,29 @@ jobs:
   - script: |
       docker pull pypywheels/manylinux2010-pypy_x86_64
       docker images
-      docker run -e PLAT=$(plat) -e package_name='giotto-learn' --rm -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /io/.ci/build_manylinux2010.sh
-    displayName: 'Run the docker'
+#      docker run -e PLAT=$(plat) -e package_name='giotto-learn' --rm -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /io/.ci/build_manylinux2010.sh
+      docker run -i -t -v `pwd`:/io pypywheels/manylinux2010-pypy_x86_64 /bin/bash
+      ls
+      pwd
+    displayName: 'Run the docker and open bash'
     
+   - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests,doc]"
+      pip uninstall -y giotto-learn
+      pip install wheel twine
+    displayName: 'Install dev environment'
+
+  - script: |
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest and flake8'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'   
+ 
   - script: |
       pip install dist/*.whl
       cd /tmp/
