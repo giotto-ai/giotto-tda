@@ -4,7 +4,7 @@ channels:
 dependencies:
   - cmake
   - git
-  - gcc
-  - python
-  - plotly
-  - matplotlib
+  - pip
+  - pip:
+    - plotly
+    - matplotlib
