@@ -6,7 +6,7 @@ echo 'folders: '
 ls
 /opt/python/cp37-cp37m/bin/pip install --upgrade pip setuptools
 
-/opt/python/cp37-cp37m/bin/pip install -e /io/.['tests', 'doc']
+/opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
 /opt/python/cp37-cp37m/bin/pip install wheel twine
 
