@@ -11,14 +11,14 @@
 .. |Azure-test| image:: https://travis-ci.org/scikit-learn/scikit-learn.svg?branch=master
 .. _Azure-test: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=364&view=ms.vss-test-web.build-test-results-tab
 
-
 giotto-learn
 ============
 
 C++ dependencies:
 -----------------
+
 -  C++14 compatible compiler
--  CMake >= 3.0
+-  CMake >= 3.9
 -  Boost >= 1.56
 
 To install:
@@ -41,4 +41,5 @@ To use:
 
 Contacts:
 ---------
+
 maintainers@giotto.ai
