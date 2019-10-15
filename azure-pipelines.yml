@@ -8,11 +8,13 @@ jobs:
         arch: x86_64
         plat: manylinux2010_x86_64
 #        python.architecture: x64
+        python.ver: '36'
         python.version: '3.6'
       Python37:
         arch: x86_64
         plat: manylinux2010_x86_64
 #        python.architecture: x64
+        python.ver: '37'
         python.version: '3.7'
 
   steps:
