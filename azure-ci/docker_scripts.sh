@@ -1,11 +1,10 @@
-
 #!/bin/bash
 
 set -e -x
 
 echo 'folders: '
 ls
-python -m pip install --upgrade pip setuptools
+/opt/python/*$(python.version)*/bin/pip install --upgrade pip setuptools
 
 pip install -e /io/.['tests', 'doc']
 pip uninstall -y giotto-learn
