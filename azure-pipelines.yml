@@ -34,7 +34,7 @@ jobs:
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob="['**test_common.py', '*externals*']"
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - script: |
@@ -107,7 +107,7 @@ jobs:
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob="['**test_common.py', '*externals*']"
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
@@ -158,7 +158,7 @@ jobs:
   - bash: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob="['**test_common.py', '*externals*']"
+      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
