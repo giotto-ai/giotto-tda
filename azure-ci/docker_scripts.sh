@@ -2,9 +2,9 @@
 
 set -e -x
 
-echo 'folders: '
+echo 'files and folders: '
 ls
-echo $(python_ver)
+echo $python_ver
 # update-alternatives --set python /opt/python/cp37-cp37m/
 /opt/python/cp37-cp37m/bin/pip install --upgrade pip setuptools
 which cmake
@@ -17,7 +17,8 @@ ln -sf ${CMAKE_BIN} /usr/bin/cmake
 # /usr/bin/wget / https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 # tar -zxvf /boost_1_69_0.tar.gz
 yum install -y wget tar
-wget / https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
+wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
+echo 'finish downloading boost.'
 tar -zxvf /boost_1_69_0.tar.gz
 which boost
 
