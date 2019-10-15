@@ -5,7 +5,7 @@ set -e -x
 echo 'folders: '
 ls
 # update-alternatives --set python /opt/python/cp37-cp37m/
-/opt/python/*$PYTHON_VER*/bin/pip install --upgrade pip setuptools
+"/opt/python/*${PYTHON_VER}*/bin/pip" install --upgrade pip setuptools
 which cmake
 for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install cmake; done
 ls /opt/python/cp37-cp37m/bin/
