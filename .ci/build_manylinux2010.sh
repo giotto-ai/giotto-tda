@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e -x
+
 python -m pip install --upgrade pip setuptools
 
 pip install -e "/io/.[tests,doc]"
