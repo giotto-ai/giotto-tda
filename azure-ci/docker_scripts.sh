@@ -13,8 +13,9 @@ CMAKE_BIN=/opt/python/cp37-cp37m/bin/cmake
 ln -sf ${CMAKE_BIN} /usr/bin/cmake
 
 # install boost
-/usr/bin/wget / https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
-tar -zxvf /boost_1_69_0.tar.gz
+# /usr/bin/wget / https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
+# tar -zxvf /boost_1_69_0.tar.gz
+apt install libboost-all-dev
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
