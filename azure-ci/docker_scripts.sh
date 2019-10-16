@@ -25,7 +25,6 @@ ln -sf ${CMAKE_BIN} /usr/bin/cmake
 #which boost
 
 yum install -y boost148.x86_64
-grep boost
 which boost
 
 
