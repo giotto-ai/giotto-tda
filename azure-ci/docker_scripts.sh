@@ -27,7 +27,7 @@ ln -sf ${CMAKE_BIN} /usr/bin/cmake
 yum install -y boost148.x86_64
 ls /usr/lib64/
 echo 'other command'
-Boost_INCLUDE_DIR=/usr/lib64/
+export Boost_INCLUDE_DIR=/usr/lib64/
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
