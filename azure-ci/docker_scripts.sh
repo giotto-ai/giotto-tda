@@ -6,8 +6,8 @@ echo 'files and folders: '
 ls
 # update-alternatives --set python /opt/python/cp37-cp37m/
 /opt/python/*${python_ver}*/bin/pip install --upgrade pip setuptools
-which cmake
-for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install cmake; done
+#for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install cmake; done
+/opt/python/*${python_ver}*/bin/pip install cmake
 ls /opt/python/*${python_ver}*/bin/
 CMAKE_BIN=/opt/python/*${python_ver}*/bin/cmake
 ln -sf ${CMAKE_BIN} /usr/bin/cmake
@@ -25,7 +25,9 @@ ln -sf ${CMAKE_BIN} /usr/bin/cmake
 #which boost
 
 yum install -y boost148.x86_64
-which boost
+ls /usr
+echo 'other command'
+ls /usr/include/boost
 
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
