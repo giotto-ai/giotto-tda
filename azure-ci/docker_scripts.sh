@@ -19,9 +19,9 @@ yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 echo 'finish downloading boost.'
 tar -zxvf /boost_1_69_0.tar.gz
-/boost_1_69_0/bootstrap.sh --prefix=/usr/local
-find
-/b2 install --with=all
+cd /boost_1_69_0
+./bootstrap.sh --prefix=/usr/local
+./b2
 ls /usr/local
 ls /usr/local/lib
 -sBOOST_ROOT=/usr/local/lib
