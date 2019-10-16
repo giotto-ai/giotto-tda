@@ -19,15 +19,17 @@ yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 echo 'finish downloading boost.'
 tar -zxvf /boost_1_69_0.tar.gz
-/boost_1_69_0/bootstrap.sh
--sBOOST_ROOT=/boost_1_69_0/
+/boost_1_69_0/bootstrap.sh --prefix=/usr/local
 /b2
+ls /usr/local
+ls /usr/local/lib
+-sBOOST_ROOT=/usr/local/lib
 find
 
 #yum install -y boost148.x86_64
 #ls /usr/lib64/
 #echo 'other command'
-#export Boost_INCLUDE_DIR=/usr/lib64/
+-sBoost_INCLUDE_DIR=/usr/local/lib
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
