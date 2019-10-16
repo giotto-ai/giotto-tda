@@ -7,13 +7,11 @@ jobs:
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
-#        python.architecture: x64
         python_ver: '36'
         python.version: '3.6'
       Python37:
         arch: x86_64
         plat: manylinux2010_x86_64
-#        python.architecture: x64
         python_ver: '37'
         python.version: '3.7'
 
@@ -31,26 +29,15 @@ jobs:
     displayName: 'Run the docker and open bash' 
  
   - script: |
+      python -m pip install --upgrade pip
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8
+    displayName: 'install pytest suite'
+    
+  - script: |
       pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
-
-  - script: |
-      cd doc/
-      make html
-      cd ..
-    displayName: 'Build sphinx doc'
-    
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: doc/build
-      includeRootFolder: true
-      archiveType: 'zip'
-      tarCompression: 'gz'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      replaceExistingArchive: true
-    displayName: 'archive doc'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -90,7 +77,7 @@ jobs:
     displayName: 'Install tools'
 
   - script: |
-      pip install -e ".[tests,doc]"
+      pip install -e ".[tests, doc]"
       pip uninstall -y giotto-learn
       pip install wheel twine
     displayName: 'Install dev environment'
@@ -108,6 +95,22 @@ jobs:
       cd /tmp/
       pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
+
+  - script: |
+      cd doc/
+      make html
+      cd ..
+    displayName: 'Build sphinx doc'
+    
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: doc/build
+      includeRootFolder: true
+      archiveType: 'zip'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+    displayName: 'archive doc'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -141,7 +144,7 @@ jobs:
     displayName: 'Install tools'
 
   - script: |
-      pip install -e ".[tests,doc]"
+      pip install -e ".[tests, doc]"
       pip uninstall -y giotto-learn
       pip install wheel twine
     displayName: 'Install dev environment'
