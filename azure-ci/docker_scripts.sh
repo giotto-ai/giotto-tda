@@ -21,8 +21,8 @@ cd /boost_1_69_0
 cd ..
 
 # helping cmake find boost
-export BOOST_ROOT=/boost_1_69_0
-export Boost_INCLUDE_DIR=/boost_1_69_0/include
+export BOOST_ROOT=/boost
+export Boost_INCLUDE_DIR=/boost/include
 
 # installing pybind11
 git clone https://github.com/pybind/pybind11.git
