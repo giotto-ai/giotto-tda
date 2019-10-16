@@ -16,15 +16,18 @@ ln -sf ${CMAKE_BIN} /usr/bin/cmake
 # install boost
 # /usr/bin/wget / https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 # tar -zxvf /boost_1_69_0.tar.gz
-yum list available
-yum install -y wget tar
-wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
-echo 'finish downloading boost.'
-tar -zxvf /boost_1_69_0.tar.gz
-/boost_1_69_0/bootstrap.sh
--sBOOST_ROOT=/boost_1_69_0
-/b2
-which boost
+
+#yum list available
+#yum install -y wget tar
+#wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
+#echo 'finish downloading boost.'
+#tar -zxvf /boost_1_69_0.tar.gz
+#/boost_1_69_0/bootstrap.sh
+#-sBOOST_ROOT=/boost_1_69_0
+#/b2
+#which boost
+
+yum install -y boost148.x86_64
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
 /opt/python/cp37-cp37m/bin/pip uninstall -y giotto-learn
