@@ -4,7 +4,7 @@ project(giotto_bindings LANGUAGES CXX)
 find_package(pybind11 REQUIRED)
 set(BINDINGS_DIR "giotto/externals/bindings")
 
-find_package(Boost 1.48 REQUIRED)
+find_package(Boost 1.56 REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 find_package(OpenMP)
