@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -x
 
 # upgrading pip and setuptools
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
@@ -17,7 +17,7 @@ tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install || true
+./b2 install
 cd ..
 
 # helping cmake find boost
@@ -25,16 +25,16 @@ export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
 # installing pybind11
-git clone https://github.com/pybind/pybind11.git
-cd pybind11
-mkdir build
-cd build
-cmake ..
-make install
+# git clone https://github.com/pybind/pybind11.git
+# cd pybind11
+# mkdir build
+# cd build
+# cmake .. -DPYBIND11_TEST=OFF
+# make install
 
 # installing and uninstalling giotto-learn
 cd /io
-pip install -e ".[tests]"
+pip install -e ".[doc, tests]"
 pip uninstall -y giotto-learn
 
 # testing, linting
