@@ -9,8 +9,8 @@ echo $python_ver
 /opt/python/*${python_ver}*/bin/pip install --upgrade pip setuptools
 which cmake
 for PYBIN in /opt/python/*/bin; do "${PYBIN}/pip" install cmake; done
-ls /opt/python/cp37-cp37m/bin/
-CMAKE_BIN=/opt/python/cp37-cp37m/bin/cmake
+ls /opt/python/*${python_ver}*/bin/
+CMAKE_BIN=/opt/python/*${python_ver}*/bin/cmake
 ln -sf ${CMAKE_BIN} /usr/bin/cmake
 
 # install boost
@@ -21,7 +21,7 @@ wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 echo 'finish downloading boost.'
 tar -zxvf /boost_1_69_0.tar.gz
 /boost_1_69_0/bootstrap.sh
-/boost_1_69_0/b2
+/b2
 which boost
 
 /opt/python/cp37-cp37m/bin/pip install -e "/io/.[tests, doc]"
