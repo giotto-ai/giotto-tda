@@ -17,7 +17,7 @@ tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install
+./b2 install || true
 cd ..
 
 # helping cmake find boost
