@@ -24,14 +24,6 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# installing pybind11
-# git clone https://github.com/pybind/pybind11.git
-# cd pybind11
-# mkdir build
-# cd build
-# cmake .. -DPYBIND11_TEST=OFF
-# make install
-
 # installing and uninstalling giotto-learn
 cd /io
 pip install -e ".[doc, tests]"
