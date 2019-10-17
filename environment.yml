@@ -7,3 +7,4 @@ dependencies:
     - plotly
     - matplotlib
     - giotto-learn
+    - openml
