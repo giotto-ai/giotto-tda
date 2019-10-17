@@ -40,15 +40,20 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
+    homology_dimensions : iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological features to be
+        detected.
+
+    coeff : int prime, optional, default: ``2``
+        Compute homology with coefficients in the prime field
+        :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
+        :math:`p` equals `coeff`.
+
     max_edge_length : float, optional, default: ``numpy.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
-
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
-        Dimensions (non-negative integers) of the topological features to be
-        detected.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
@@ -76,21 +81,23 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'max_edge_length': [numbers.Number],
                         'infinity_values_': [numbers.Number],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]]}
+                        '_homology_dimensions': [list, [int, (0, np.inf)]],
+                        'coeff': [int, (2, np.inf)]}
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), infinity_values=None,
+                 homology_dimensions=(0, 1), coeff=2, infinity_values=None,
                  n_jobs=None):
         self.metric = metric
+        self.homology_dimensions = homology_dimensions
+        self.coeff = coeff
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
-        self.homology_dimensions = homology_dimensions
         self.n_jobs = n_jobs
 
-    def _ripser_diagram(self, X, is_distance_matrix, metric):
-        Xds = ripser(X[X[:, 0] != np.inf], distance_matrix=is_distance_matrix,
-                     metric=metric, maxdim=self._max_homology_dimension,
-                     thresh=self.max_edge_length)['dgms']
+    def _ripser_diagram(self, X, is_distance_matrix, metric, coeff):
+        Xds = ripser(X[X[:, 0] != np.inf], maxdim=self._max_homology_dimension,
+                     thresh=self.max_edge_length, coeff=coeff,
+                     distance_matrix=is_distance_matrix, metric=metric)['dgms']
 
         if 0 in self._homology_dimensions:
             Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
@@ -117,8 +124,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             dimension `n_dimensions`.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -164,8 +171,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             dimension `n_dimensions`.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -187,7 +194,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         n_samples = len(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(
-                X[i], is_distance_matrix, self.metric)
+                X[i], is_distance_matrix, self.metric, self.coeff)
             for i in range(n_samples))
 
         max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
