@@ -26,7 +26,7 @@ C++ dependencies:
 To install:
 -----------
 
-.. code-block:: guess
+.. code-block::
 
    git clone https://github.com/giotto-learn/giotto-learn.git
    cd giotto-learn
