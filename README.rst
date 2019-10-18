@@ -4,11 +4,11 @@
 .. |Azure| image:: https://dev.azure.com/giotto-learn/giotto-learn/_apis/build/status/giotto-learn.giotto-learn?branchName=master
 .. _Azure: https://dev.azure.com/giotto-learn/giotto-learn/
 
-.. |Azure-cov| image:: https://coveralls.io/repos/neovim/neovim/badge.svg?branch=master
-.. _Azure-cov: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=364&view=codecoverage-tab
+.. |Azure-cov| image:: https://img.shields.io/badge/Coverage-93%25-passed
+.. _Azure-cov: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=342&view=codecoverage-tab
 
-.. |Azure-test| image:: https://travis-ci.org/scikit-learn/scikit-learn.svg?branch=master
-.. _Azure-test: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=364&view=ms.vss-test-web.build-test-results-tab
+.. |Azure-test| image:: https://img.shields.io/badge/Testing-Passed-brightgreen
+.. _Azure-test: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=342&view=ms.vss-test-web.build-test-results-tab
 
 .. |binder| image:: https://mybinder.org/badge_logo.svg
 .. _binder: https://mybinder.org/v2/gh/giotto-learn/giotto-learn/master?filepath=examples

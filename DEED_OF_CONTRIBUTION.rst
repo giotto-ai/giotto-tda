@@ -1,7 +1,7 @@
-L2F – Contributor Assignment Agreement
-======================================
+L2F – Contributor License Agreement
+===================================
 
-In order to clarify the intellectual property license granted with Contributions from any person or entity, L2F SA, Bâtiment D EPFL Innovation Park, 1015 Lausanne, Switzerland (**L2F**) must have a Contributor Assignment Agreement on file that has been signed by each Contributor, indicating agreement to the terms below. This agreement (the **Agreement**) is for Your protection as a contributor as well as the protection of L2F.
+In order to clarify the intellectual property license granted with Contributions from any person or entity, L2F SA, Bâtiment D EPFL Innovation Park, 1015 Lausanne, Switzerland (**L2F**) must have a Contributor License Agreement on file that has been signed by each Contributor, indicating agreement to the terms below. This agreement (the **Agreement**) is for Your protection as a contributor as well as the protection of L2F.
 
 You accept and agree to the following terms and conditions for Your present and future Contributions submitted to L2F. Except for the rights granted herein to L2F, and (at L2F’s discretion) recipients of software made available by L2F, You reserve all right, title, and interest in and to Your Contributions.
 
@@ -14,13 +14,11 @@ You accept and agree to the following terms and conditions for Your present and 
 
 **Your Essential Patent Claims** shall mean all patent claims owned or controlled by You, whether already acquired or hereafter acquired, that would be infringed by some manner of making, using, or selling Your Contribution, but do not include claims that would be infringed only as a consequence of further modification of Your Contribution. For purposes of this definition, "control" includes the right to grant patent sublicenses in a manner consistent with the requirements of this Agreement.
 
-2.	Copyrights 
+2.	Copyrights
 --------------
 
-(a)	At the time Your Contribution is Submitted, You assign to L2F all right, title, and interest worldwide in all rights of authorship and other copyrights covering Your Contribution.
-(b)	To the extent that any of the rights in Section 2.1 cannot be assigned by You to L2F, You grant to L2F a perpetual, worldwide, non-exclusive, no-charge, royalty-free, transferable, irrevocable license under such non-assigned rights, with rights to sublicense through multiple tiers of sublicensees, to practice such non-assigned rights, including, but not limited to, the right to reproduce, modify, prepare derivative works of, publicly display, publicly perform, propagate, sublicense, and distribute Your Contribution.
-(c)	To the extent that any of the rights in Section 2.1 can neither be assigned nor licensed by You to L2F, You irrevocably waive and agree never to assert such rights against L2F, any of L2F’s successors in interest, or any of L2F’s licensees, either direct or indirect. 
-(d)	Upon such transfer of rights to L2F, to the maximum extent possible, L2F immediately grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, transferable, irrevocable license under such rights covering Your Contribution, with rights to sublicense through multiple tiers of sublicensees, to reproduce, modify, prepare derivative works of, publicly display, publicly perform, propagate, sublicense, and distribute Your Contribution. The intention of the parties hereto is that this license will be as broad as possible and to provide You with rights as similar as possible to the owner of the rights that You transferred. This license back is limited to Your Contribution and does not provide any further rights to the Work.
+Subject to the terms and conditions of this Agreement, You hereby grant to L2F and to recipients of software distributed by L2F (at L2F’s discretion) a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, modify, prepare derivative works of, publicly display, publicly perform, propagate, sublicense, and distribute Your Contributions and such derivative works.
+To the extent that any of such rights cannot be licensed by You to L2F, You irrevocably waive and agree never to assert such rights against L2F, any of L2F’s successors in interest, or any of L2F’s licensees, either direct or indirect.
 
 3.	Patents
 -----------
@@ -40,7 +38,7 @@ You agree to notify L2F of any facts or circumstances of which You become aware 
 
 You are not expected to provide support for Your Contributions, except to the extent You desire to provide support. You may provide support for free, for a fee, or not at all. Unless required by applicable law or agreed to in writing, You provide Your Contributions on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON- INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE.
 
-6.	Submissions on behalf of others 
+6.	Submissions on behalf of others
 -----------------------------------
 
 Should You wish to submit work that is not Your original creation, You may submit it to L2F separately from any Contribution, identifying the complete details of its source and of any license or other restriction (including, but not limited to, related patents, trademarks, and license agreements) of which You are personally aware, and conspicuously marking the work as "Submitted on behalf of a third-party: [named here]".
@@ -48,10 +46,10 @@ Should You wish to submit work that is not Your original creation, You may submi
 7.	L2F’s Rights
 ----------------
 
-(a)	No Duty to Use. You acknowledge that L2F is not obligated to use Your Contribution as part of a Work and may decide to include any Contribution it considers appropriate. 
+(a)	No Duty to Use. You acknowledge that L2F is not obligated to use Your Contribution as part of a Work and may decide to include any Contribution it considers appropriate.
 (b)	Outbound License. If L2F includes Your Contribution in a Work, it may license Your Contribution under any license, including copyleft, permissive, commercial, or proprietary licenses.
 
-8.	Miscellaneous 
+8.	Miscellaneous
 -----------------
 
 (a)	*Severability*. If any provision of this Agreement is held to be invalid or unenforceable for any reason, the parties hereto shall replace it by a substitute provision that achieves to the fullest extent possible the same legal and economic purposes as those of the invalid or unenforceable provision. In any event, the remainder of this Agreement shall remain in full force and effect between the parties,

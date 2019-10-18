@@ -154,7 +154,9 @@ jobs:
       flake8 --exit-zero
     displayName: 'Test with pytest and flake8'
 
-  - script: python setup.py sdist bdist_wheel
+  - bash: |
+      sed -i $'s/\r$//' README.rst
+      python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
     
   - bash: |
