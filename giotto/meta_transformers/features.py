@@ -170,7 +170,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
             point cloud (i.e. the dimension of the point cloud space)
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -280,7 +280,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         self.n_values = n_values
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Do nothing and return the estimator unchanged. TODO CORRECT
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -334,7 +334,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
             the point cloud (i.e. the dimension of the point cloud space).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -451,7 +451,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         self.n_layers = n_layers
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Do nothing and return the estimator unchanged. TODO CORRECT
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -506,7 +506,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
             the point cloud (i.e. the dimension of the point cloud space).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns

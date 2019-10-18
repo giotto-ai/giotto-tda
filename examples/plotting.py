@@ -315,6 +315,7 @@ def plot_betti_surfaces(betti_curves, samplings=None, homology_dimensions=None):
         The Betti curves across time, sampled in ``n_samples`` samples.
         ``n_homology_dimension`` is the length
         of the ``homology_dimensions`` array and ``n_values``is the number of samples.
+
     homology_dimensions : list of ints, default ``None``
         The list of homology dimensions for which the Betti surface is plotted.
         None means that the Betti surface of

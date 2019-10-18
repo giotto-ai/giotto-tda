@@ -117,7 +117,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
             dimension `n_dimensions`.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -147,7 +147,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
             dimension `n_dimensions`.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns

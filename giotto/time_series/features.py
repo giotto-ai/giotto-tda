@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_is_fitted, check_array
 
 
 class PermutationEntropy(BaseEstimator, TransformerMixin):
-    """Transformer calculating the Shannon entropy of each array in a
+    """Permutation entropy Shannon entropy of each array in a
     collection, in the following sense: in each array, the set of distinct rows
     is regarded as a set of possible states, and the probability of each state
     is the relative frequency of that state within the array.
@@ -29,7 +29,8 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     def _entropy(self, X):
         Xo = np.unique(X, axis=0, return_counts=True)[1].reshape((-1, 1))
         Xo = Xo / np.sum(Xo, axis=0).reshape((-1, 1))
-        return -np.sum(np.nan_to_num(Xo * np.log(Xo)), axis=0).reshape((-1, 1))
+        return -np.sum(np.nan_to_num(Xo * np.log2(Xo)), axis=0).reshape((-1,
+                                                                         1))
 
     def _permutation_entropy(self, X):
         Xo = np.argsort(X, axis=2)
@@ -48,7 +49,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
             Input data.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -70,7 +71,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
             Input data.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns

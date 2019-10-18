@@ -109,7 +109,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Fit the estimator and return it.
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute
+        :attr:`effective_metric_params`. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -122,7 +124,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -130,6 +132,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        X = check_diagram(X)
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
@@ -145,9 +148,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
-        X = check_diagram(X)
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['samplings'], \
@@ -169,7 +171,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -291,7 +293,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Fit the estimator and return it.
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute
+        :attr:`effective_metric_params`. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -304,7 +308,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -327,7 +331,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['samplings'], \
@@ -347,7 +351,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns

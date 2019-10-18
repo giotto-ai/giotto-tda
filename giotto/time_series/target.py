@@ -69,13 +69,14 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
+        TODO CORRECT
 
         Parameters
         ----------
         X : array-like or sparse matrix of shape = [n_samples, n_features]
             The training input samples.
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Attributes
@@ -121,7 +122,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Input data. ``
 
         y : None
-            There is no need of a target, yet the pipeline API
+            There is no need for a target, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -150,7 +151,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Target.
 
         X : None
-            There is no need of input data,
+            There is no need for input data,
             yet the pipeline API requires this parameter.
 
         Returns

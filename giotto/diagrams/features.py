@@ -48,7 +48,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
 
     def fit(self, X, y=None):
-        """Store all distinct homology dimensions observed in
+        """Store all observed homology dimensions in
         :attr:`homology_dimensions_`. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
@@ -62,7 +62,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -72,7 +72,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._is_fitted = True
@@ -89,7 +89,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -164,7 +164,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Store all distinct homology dimensions observed in
+        """Store all observed homology dimensions in
         :attr:`homology_dimensions_` and, for each dimension separately,
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
@@ -180,7 +180,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -210,7 +210,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -291,7 +291,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Store all distinct homology dimensions observed in
+        """Store all observed homology dimensions in
         :attr:`homology_dimensions_` and, for each dimension separately,
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
@@ -307,7 +307,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -339,7 +339,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -421,10 +421,10 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    .. [1] J. Reininghaus, S. Huber, U. Bauer, R. Kwitt, "A Stable Multi-Scale
-           Kernel for Topological Machine Learning"; *2015 IEEE Conference on
-           Computer Vision and Pattern Recognition (CVPR)*, pp. 4741--4748,
-           2015; doi: `10.1109/CVPR.2015.7299106
+    .. [1] J. Reininghaus, S. Huber, U. Bauer, and R. Kwitt, "A Stable
+           Multi-Scale Kernel for Topological Machine Learning"; *2015 IEEE
+           Conference on Computer Vision and Pattern Recognition (CVPR)*,
+           pp. 4741--4748, 2015; doi: `10.1109/CVPR.2015.7299106
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
@@ -437,7 +437,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Store all distinct homology dimensions observed in
+        """Store all observed homology dimensions in
         :attr:`homology_dimensions_` and, for each dimension separately,
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
@@ -453,7 +453,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -485,7 +485,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns

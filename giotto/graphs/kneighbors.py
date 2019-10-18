@@ -107,7 +107,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         return A
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Do nothing and return the estimator unchanged. TODO CORRECT
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -119,7 +119,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             ndarray of n_points in Euclidean space of dimension n_features.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -148,7 +148,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             ndarray of n_points in Euclidean space of dimension n_features.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
