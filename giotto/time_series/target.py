@@ -138,7 +138,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         Xt = X[:-self.n_steps_future]
 
         if self.n_steps_future < self.width:
-            Xt = Xt[self.width - 1 - self.n_steps_future:]
+            Xt = Xt[self.width - self.n_steps_future:]
         return Xt
 
     def resample(self, y, X=None):
