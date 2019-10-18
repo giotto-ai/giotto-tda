@@ -5,9 +5,9 @@ Pull Request Checklist
 ----------------------
 
 Before sending your pull requests, make sure you followed this list.
-  - Read [contributing guidelines](GOVERNANCE.rst).
-  - Read [Code of Conduct](CODE_OF_CONDUCT.rst).
-  - Ensure you have signed the [Contributor License Agreement (CLA)](DEED_OF_CONTRIBUTIONS.rst).
+  - Read the `contributing guidelines <https://github.com/giotto-learn/giotto-learn/blob/master/GOVERNANCE.rst>`_.
+  - Read the `code of conduct <https://github.com/giotto-learn/giotto-learn/blob/master/CODE_OF_CONDUCT.rst>`_.
+  - Ensure you have signed the `contributor license agreement (CLA) <https://github.com/giotto-learn/giotto-learn/blob/master/DEED_OF_CONTRIBUTION.rst>`_.
   - Check if the changes are consistent with the guidelines.
   - Changes are consistent with the Coding Style.
   - Run Unit Tests.
@@ -19,8 +19,8 @@ Contributor License Agreements
 ------------------------------
 
 In order to become a contributor of Giotto, the first step is to fill out the
-[Contributor License Agreement (CLA)](DEED_OF_CONTRIBUTIONS.rst).
-Ican sign the document and send it to <maintainers@giotto.ai>. Once we receive
+`contributor license agreement (CLA) <https://github.com/giotto-learn/giotto-learn/blob/master/DEED_OF_CONTRIBUTION.rst>`_.
+You can sign the document and send it to <maintainers@giotto.ai>. Once we receive
 it, we'll be able to accept your pull requests.
 **NOTE**: Only original source code from you and other people that have signed
 the CLA can be accepted into the main repository.
@@ -34,7 +34,7 @@ The Giotto Team will review your pull requests. Once the pull requests are appro
 Giotto team will work on getting your pull request submitted to our GitHub
 repository. Eventually, your pull request will be merged automatically on GitHub.
 If you want to contribute, start working through the Giotto codebase,
-navigate to the [Github "issues" tab](https://github.com/giotto-learn/giotto-learn/issues)
+navigate to the `GitHub issue tab <https://github.com/giotto-learn/giotto-learn/issues`_
 and start looking through interesting issues. These are issues that we believe
 are particularly well suited for outside contributions, often because we
 probably won't get to them right now. If you decide to start on an issue, leave
@@ -69,15 +69,16 @@ Changes to Giotto C/C++ code should conform to [Google C++ Style Guide](https://
 Use `clang-tidy` to check your C/C++ changes. To install `clang-tidy` on
 ubuntu:16.04, do:
 
-.. code-block:: python
 
-    bashapt-get install -y clang-tidy
+.. code-block:: bash
+
+    apt-get install -y clang-tidy
 
 You can check a C/C++ file by doing:
 
-.. code-block:: python
+.. code-block:: bash
 
-    bashclang-format <my_cc_file> --style=google > /tmp/my_cc_file.ccdiff <my_cc_file> /tmp/my_cc_file.cc
+    clang-format <my_cc_file> --style=google > /tmp/my_cc_file.ccdiff <my_cc_file> /tmp/my_cc_file.cc
 
 Python coding style
 -------------------
@@ -90,6 +91,7 @@ Use `flake8` to check your Python changes. To install `flake8` just do
     pip install flake8
 
 You can use `flake8` on your python code via the following instructions:
+
 .. code-block:: python
 
     flake8 name_of_your_script.py
@@ -98,6 +100,17 @@ Running unit tests
 ------------------
 
 There are two ways to run Giotto unit tests.
-  1.  Using tools and libraries installed directly on your system. The election
-  tool is pytest.
-  2.  Using [Azure](azure-pipelines.yml) and Giotto's CI scripts.  
+
+1. Using tools and libraries installed directly on your system. The election tool is `pytest`. To install `pytest` just do
+
+.. code-block:: python
+
+    pip install pytest
+
+You can use `pytest` on your python code via the following instructions:
+
+.. code-block:: python
+
+    pytest name_of_your_script.py
+
+2. Using [Azure](azure-pipelines.yml) and Giotto's CI scripts.
