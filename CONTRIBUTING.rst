@@ -69,15 +69,15 @@ Changes to Giotto C/C++ code should conform to [Google C++ Style Guide](https://
 Use `clang-tidy` to check your C/C++ changes. To install `clang-tidy` on
 ubuntu:16.04, do:
 
-.. code-block:: python
+.. code-block:: bash
 
-    bashapt-get install -y clang-tidy
+    apt-get install -y clang-tidy
 
 You can check a C/C++ file by doing:
 
-.. code-block:: python
+.. code-block:: bash
 
-    bashclang-format <my_cc_file> --style=google > /tmp/my_cc_file.ccdiff <my_cc_file> /tmp/my_cc_file.cc
+    clang-format <my_cc_file> --style=google > /tmp/my_cc_file.ccdiff <my_cc_file> /tmp/my_cc_file.cc
 
 Python coding style
 -------------------
@@ -90,6 +90,7 @@ Use `flake8` to check your Python changes. To install `flake8` just do
     pip install flake8
 
 You can use `flake8` on your python code via the following instructions:
+
 .. code-block:: python
 
     flake8 name_of_your_script.py
@@ -98,6 +99,17 @@ Running unit tests
 ------------------
 
 There are two ways to run Giotto unit tests.
-  1.  Using tools and libraries installed directly on your system. The election
-  tool is pytest.
-  2.  Using [Azure](azure-pipelines.yml) and Giotto's CI scripts.  
+
+1. Using tools and libraries installed directly on your system. The election tool is `pytest`. To install `pytest` just do
+
+.. code-block:: python
+
+    pip install pytest
+
+You can use `pytest` on your python code via the following instructions:
+    
+.. code-block:: python
+
+    pytest name_of_your_script.py
+    
+2. Using [Azure](azure-pipelines.yml) and Giotto's CI scripts.  
