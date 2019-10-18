@@ -51,24 +51,21 @@ User installation
 ~~~~~~~~~~~~~~~~~
 
 If you already have a working installation of numpy and scipy,
-the easiest way to install scikit-learn is using ``pip``   ::
+the easiest way to install giotto-learn is using ``pip``   ::
 
     pip install -U giotto-learn
 
 Documentation
-~~~~~~~~~~~~~
+-------------
 
 - HTML documentation (stable release): http://www.giotto.ai/docs/
 
-Development
------------
+Contributing
+------------
 
 We welcome new contributors of all experience levels. The Giotto
-community goals are to be helpful, welcoming, and effective.
-
-
-To learn more about making a contribution to scikit-learn, please see the
-`CONTRIBUTING.rst
+community goals are to be helpful, welcoming, and effective. To learn more about 
+making a contribution to giotto-learn, please see the `CONTRIBUTING.rst
 <https://github.com/giotto-learn/giotto-learn/blob/master/CONTRIBUTING.rst>`_ file.
 
 Developer installation
@@ -97,6 +94,8 @@ To install:
    cd giotto-learn
    pip install -e .
 
+From there any change in the library files will be immediately available on your machine.
+
 Testing
 ~~~~~~~
 
@@ -106,19 +105,10 @@ source directory::
     pytest giotto
 
 
-Submitting a Pull Request
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Before opening a Pull Request, have a look at the
-full Contributing page to make sure your code complies
-with our guidelines: http://scikit-learn.org/stable/developers/index.html
-
-
-
 Changelog
 ---------
 
-See the `changelog <https://github.com/giotto-learn/giotto-learn/blob/master/RELEASE.rst>`__
+See the `RELEASE.rst <https://github.com/giotto-learn/giotto-learn/blob/master/RELEASE.rst>`__ file
 for a history of notable changes to giotto-learn.
 
 Important links
