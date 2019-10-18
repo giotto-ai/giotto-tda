@@ -17,7 +17,7 @@ giotto-learn
 ============
 
 
-giotto-learn is a Python module for topological data analysis in machine learning pipelines built on top of
+giotto-learn is a high performance topological toolbox for machine learning in Python built on top of
 scikit-learn and is distributed under the Apache 2.0 license. It is part of the Giotto open-source project.
 
 
