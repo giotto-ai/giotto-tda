@@ -33,7 +33,7 @@ Welcome to giotto's API reference!
 
    time_series.Resampler
    time_series.Stationarizer
-
+   time_series.SlidingWindow
    time_series.TakensEmbedding
 
 
