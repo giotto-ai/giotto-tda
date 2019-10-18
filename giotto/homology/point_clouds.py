@@ -94,10 +94,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
-    def _ripser_diagram(self, X, is_distance_matrix, metric, coeff):
+    def _ripser_diagram(self, X):
         Xds = ripser(X[X[:, 0] != np.inf], maxdim=self._max_homology_dimension,
-                     thresh=self.max_edge_length, coeff=coeff,
-                     distance_matrix=is_distance_matrix, metric=metric)['dgms']
+                     thresh=self.max_edge_length, coeff=self.coeff,
+                     metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
             Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
@@ -189,12 +189,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                '_max_homology_dimension'])
         X = check_array(X, allow_nd=True)
 
-        is_distance_matrix = (self.metric == 'precomputed')
-
         n_samples = len(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(
-                X[i], is_distance_matrix, self.metric, self.coeff)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
             for i in range(n_samples))
 
         max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
