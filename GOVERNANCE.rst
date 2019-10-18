@@ -1,4 +1,3 @@
-
 This file describe the governance of the Giotto project.
 
 Project owner:
