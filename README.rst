@@ -24,11 +24,11 @@ scikit-learn and is distributed under the Apache 2.0 license. It is part of the 
 Project Governance
 ------------------
 
-The project was started jointly by `Learn To Forecast - L2F <http://www.l2f.ch>`_, `EPFL Laboratory for topology and neuroscience <https://www.epfl.ch/labs/hessbellwald-lab/>`_ and the `Reconfigurable and Embedded Digital Systems <http://reds.heig-vd.ch/en>`_ at heig-vd. 
+The project was started jointly by `Learn To Forecast - L2F <http://www.l2f.ch>`_, `EPFL Laboratory for topology and neuroscience <https://www.epfl.ch/labs/hessbellwald-lab/>`_ and the `Reconfigurable and Embedded Digital Systems <http://reds.heig-vd.ch/en>`_ at heig-vd.
 
 The code is under active development and is maintained and developed by members of those three institutions. See the `GOVERNANCE.rst <https://github.com/giotto-learn/giotto-learn/blob/master/GOVERNANCE.rst>`_ file for a list of the Giotto team members.
 
-Website: http://ww.giotto.ai
+Website: http://www.giotto.ai
 
 
 Installation
@@ -64,7 +64,7 @@ Contributing
 ------------
 
 We welcome new contributors of all experience levels. The Giotto
-community goals are to be helpful, welcoming, and effective. To learn more about 
+community goals are to be helpful, welcoming, and effective. To learn more about
 making a contribution to giotto-learn, please see the `CONTRIBUTING.rst
 <https://github.com/giotto-learn/giotto-learn/blob/master/CONTRIBUTING.rst>`_ file.
 
