@@ -7,8 +7,8 @@ Welcome to giotto's API reference!
 ==================================
 
 
-:mod:`giotto.time_series`: Preprocessing for time series
-========================================================
+:mod:`giotto.time_series`: Time series
+======================================
 
 .. automodule:: giotto.time_series
    :no-members:
@@ -22,12 +22,11 @@ Welcome to giotto's API reference!
 
    time_series.Resampler
    time_series.Stationarizer
-
    time_series.TakensEmbedding
+   time_series.SlidingWindow
 
-
-:mod:`giotto.graphs`: Preprocessing for graphs
-==============================================
+:mod:`giotto.graphs`: Graphs
+============================
 
 .. automodule:: giotto.graphs
    :no-members:
@@ -45,8 +44,8 @@ Welcome to giotto's API reference!
 
 
 ..
-   :mod:`giotto.images`: Preprocessing for images
-   ==============================================
+   :mod:`giotto.images`: Images
+   ============================
 
 ..
    automodule:: giotto.images
@@ -187,63 +186,3 @@ Welcome to giotto's API reference!
    manifold.StatefulMDS
 
    manifold.Kinematics
-
-
-..
-   :mod:`giotto.compose`: Features and targets composition
-   =======================================================
-
-..
-   automodule:: giotto.compose
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: giotto
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   compose.FeatureAggregator
-
-
-..
-   :mod:`giotto.neural_network`: Neural network with Keras
-   =======================================================
-
-..
-   automodule:: giotto.neural_network
-   :no-members:
-   :no-inherited-members:
-..
-   currentmodule:: giotto
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   neural_network.KerasClassifierWrapper
-   neural_network.KerasRegressorWrapper
-
-..
-   :mod:`giotto.model_selection`: Hyper-parameter search extension
-   ===============================================================
-
-..
-   automodule:: giotto.model_selection
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: giotto
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   model_selection.GridSearchCV
-   model_selection.RandomizedSearchCV
