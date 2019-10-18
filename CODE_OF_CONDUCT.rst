@@ -45,11 +45,11 @@ Examples of representing a project or community include using an official projec
 Enforcement
 -----------
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at <m.caorsi@l2f.ch>. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances, Sanctions may include written warnings, expulsions from the project, project sponsored spaces, or project forums, or any other sanction which is deemed appropriate. [The project team] is obligated to maintain confidentiality with regard to the reporter of an incident. If the act is ongoing (such as someone engaging in harassment) or involves a threat to anyone's safety (e.g. threats of violence), the the project team may issue sanctions without notice. Further details of specific enforcement policies may be posted separately.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at <maintainers@giotto.ai>. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances, Sanctions may include written warnings, expulsions from the project, project sponsored spaces, or project forums, or any other sanction which is deemed appropriate. [The project team] is obligated to maintain confidentiality with regard to the reporter of an incident. If the act is ongoing (such as someone engaging in harassment) or involves a threat to anyone's safety (e.g. threats of violence), the the project team may issue sanctions without notice. Further details of specific enforcement policies may be posted separately.
 
-Project maintainers who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of the project’s leadership.
+Project maintainers who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by the project leader.
 
 Attribution
 -----------
 
-This Code of Conduct is adapted from the Contributor Covenant, version 1.4, available at <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>, and includes some aspects of the Giotto Code of Conduct, available at <https://github.com/giotto-learn/giotto-learn/blob/master/CODE_OF_CONDUCT.rst>
+This Code of Conduct is adapted from the Contributor Covenant, version 1.4, available at <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>, and includes some aspects of the TensorFlow Code of Conduct, available at <https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md>
