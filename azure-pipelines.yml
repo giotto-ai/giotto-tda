@@ -82,6 +82,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
+      pip install plotly matplotlib
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
@@ -150,6 +151,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
+      pip install plotly matplotlib
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
