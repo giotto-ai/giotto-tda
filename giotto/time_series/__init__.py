@@ -1,5 +1,6 @@
-"""The module :mod:`giotto.time_series` implements preprocessing techniques
-   useful to apply Topological Data Analysis techniques to time series.
+"""The module :mod:`giotto.time_series` implements transformers to
+preprocess time series or embed them in a higher dimensional space for
+persistent homology.
 """
 
 from .embedding import SlidingWindow, TakensEmbedding

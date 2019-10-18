@@ -15,7 +15,7 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
 
 def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
     print('DRFDMSparse')
-    ret = rips_dm_sparse(I, J, V, I.size, coeff, maxHomDim, thresh, do_cocycles)
+    ret = rips_dm_sparse(I, J, V, I.size, N, coeff, maxHomDim, thresh, do_cocycles)
     ret_rips = {}
     ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
     ret_rips.update({"num_edges": ret.num_edges})
@@ -41,16 +41,13 @@ def dpoint2pointcloud(X, i, metric):
     return ds
 
 
-def get_greedy_perm(X, n_perm=None, distance_matrix=False, metric="euclidean"):
+def get_greedy_perm(X, n_perm=None, metric="euclidean"):
     """
     Compute a furthest point sampling permutation of a set of points
     Parameters
     ----------
     X: ndarray (n_samples, n_features)
         A numpy array of either data or distance matrix
-    distance_matrix: bool
-        Indicator that X is a distance matrix, if not we compute
-        distances in X using the chosen metric.
     n_perm: int
         Number of points to take in the permutation
     metric: string or callable
@@ -72,7 +69,7 @@ def get_greedy_perm(X, n_perm=None, distance_matrix=False, metric="euclidean"):
     # first point in the permutation, but could be random
     idx_perm = np.zeros(n_perm, dtype=np.int64)
     lambdas = np.zeros(n_perm)
-    if distance_matrix:
+    if metric == 'precomputed':
         dpoint2all = lambda i: X[i, :]
     else:
         dpoint2all = lambda i: dpoint2pointcloud(X, i, metric)
@@ -89,8 +86,8 @@ def get_greedy_perm(X, n_perm=None, distance_matrix=False, metric="euclidean"):
     return (idx_perm, lambdas, dperm2all)
 
 
-def ripser(X, maxdim=1, thresh=np.inf, coeff=2, distance_matrix=False,
-           metric="euclidean", n_perm=None):
+def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
+           n_perm=None):
     """Compute persistence diagrams for X data array. If X is not a distance
     matrix, it will be converted to a distance matrix using the chosen metric.
 
@@ -108,9 +105,6 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, distance_matrix=False,
         If infinity, compute the entire filtration.
     coeff: int prime, default 2
         Compute homology with coefficients in the prime field Z/pZ for p=coeff.
-    distance_matrix: bool
-        Indicator that X is a distance matrix, if not we compute a
-        distance matrix from X using the chosen metric.
     metric: string or callable
         The metric to use when calculating distance between instances in a
         feature array. If metric is a string, it must be one of the options
@@ -157,12 +151,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, distance_matrix=False,
         dgms = ripser(data)['dgms']
         plot_dgms(dgms)
     """
-
-    if distance_matrix:
-        if not (X.shape[0] == X.shape[1]):
-            raise Exception("Distance matrix is not square")
-
-    if n_perm and distance_matrix and sparse.issparse(X):
+    if n_perm and sparse.issparse(X):
         raise Exception(
             "Greedy permutation is not supported for sparse distance matrices"
         )
@@ -180,15 +169,12 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, distance_matrix=False,
     r_cover = 0.0
     if n_perm:
         idx_perm, lambdas, dperm2all = get_greedy_perm(
-            X, n_perm=n_perm, distance_matrix=distance_matrix, metric=metric
+            X, n_perm=n_perm, metric=metric
         )
         r_cover = lambdas[-1]
         dm = dperm2all[:, idx_perm]
     else:
-        if distance_matrix:
-            dm = X
-        else:
-            dm = pairwise_distances(X, metric=metric)
+        dm = pairwise_distances(X, metric=metric)
         dperm2all = dm
 
     n_points = dm.shape[0]
