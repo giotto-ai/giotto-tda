@@ -84,8 +84,9 @@ jobs:
 
   - script: |
       pytest --cov giotto --cov-report xml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
       flake8 --exit-zero
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
@@ -151,8 +152,9 @@ jobs:
 
   - script: |
       pytest --cov giotto --cov-report xml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
       flake8 --exit-zero
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
