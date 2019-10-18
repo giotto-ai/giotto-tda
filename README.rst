@@ -4,7 +4,7 @@
 .. |Azure| image:: https://dev.azure.com/giotto-learn/giotto-learn/_apis/build/status/giotto-learn.giotto-learn?branchName=master
 .. _Azure: https://dev.azure.com/giotto-learn/giotto-learn/
 
-.. |Azure-cov| image:: https://img.shields.io/badge/Coverage-93%25-passed
+.. |Azure-cov| image:: https://img.shields.io/badge/Coverage-93%25-passed-green
 .. _Azure-cov: https://dev.azure.com/giotto-learn/giotto-learn/_build/results?buildId=342&view=codecoverage-tab
 
 .. |Azure-test| image:: https://img.shields.io/badge/Testing-Passed-brightgreen
