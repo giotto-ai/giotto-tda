@@ -3,17 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. toctree::
-    :maxdepth: 2
-
-    glossary
-    modules/compose.rst
-    modules/diagrams.rst
-    modules/homology.rst
-    modules/manifold.rst
-    modules/model_selection.rst
-    modules/time_series.rst
-
 Welcome to giotto's API reference!
 ==================================
 
