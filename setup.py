@@ -62,8 +62,7 @@ EXTRAS_REQUIRE = {
     'examples': [
         'jupyter',
         'matplotlib',
-        'plotly',
-        'pandas']
+        'plotly']
 }
 
 
