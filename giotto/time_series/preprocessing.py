@@ -87,9 +87,9 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X, ensure_2d=False)
+        X = check_array(X, ensure_2d=False)
 
-        return Xt[::self.period]
+        return X[::self.period]
 
     def resample(self, y, X=None):
         """Resample y.

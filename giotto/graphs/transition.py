@@ -8,6 +8,7 @@ from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed
 from sklearn.utils.validation import check_array, check_is_fitted
+from ..utils.validation import validate_params
 
 
 def _identity(X):
@@ -104,6 +105,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
+    _hyperparameters = {'func_': [types.FunctionType]}
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):
         self.func = func
@@ -154,6 +156,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
             self.effective_func_params_ = {}
         else:
             self.effective_func_params_ = self.func_params.copy()
+
+        validate_params({**self.get_params(), 'func_': self.func_},
+                        self._hyperparameters)
 
         return self
 

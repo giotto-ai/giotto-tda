@@ -51,14 +51,14 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         See the documentation for ``scipy.spatial.distance`` for details on
         these metrics.
 
+    metric_params : dict, optional, default: ``None``
+        Additional keyword arguments for the metric function.
+
     p : int, optional, default: ``2``
         Parameter for the Minkowski metric from
         sklearn.metrics.pairwise.pairwise_distances. When p = 1, this is
         equivalent to using manhattan_distance (l_1), and euclidean_distance
         (l_2) for p = 2. For arbitrary p, minkowski_distance (l_p) is used.
-
-    metric_params : dict, optional, default: ``None``
-        Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
@@ -88,14 +88,12 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, n_neighbors=5, metric='euclidean',
-                 p=2, n_jobs=None, metric_params=None):
-        if metric_params is None:
-            metric_params = {}
+                 metric_params=None, p=2, n_jobs=None):
         self.n_neighbors = n_neighbors
         self.metric = metric
+        self.metric_params = metric_params
         self.p = p
         self.n_jobs = n_jobs
-        self.metric_params = metric_params
 
     def _make_adjacency_matrix(self, X):
         A = self._nearest_neighbors(X)

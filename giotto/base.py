@@ -14,15 +14,16 @@ class TransformerResamplerMixin:
 
         Parameters
         ----------
-        X : numpy array of shape [n_samples, n_features]
-            Training set.
-        y : numpy array of shape [n_samples]
-            Target values.
+        X : ndarray of shape (n_samples, ...)
+            Input data.
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        X_new : numpy array of shape [n_samples, n_features_new]
-            Transformed array.
+        Xt : numpy array of shape (n_samples, ...)
+            Transformed input.
         """
         # non-optimized default implementation; override when a better
         # method is possible for a given clustering algorithm
@@ -40,33 +41,35 @@ class TransformerResamplerMixin:
 
         Parameters
         ----------
-        X : numpy array of shape [n_samples, n_features]
-            Training set.
-        y : numpy array of shape [n_samples]
-            Target values.
+        X : ndarray of shape (n_samples, ...)
+            Input data.
+        y : ndarray of shape (n_samples, )
+            Target data.
 
         Returns
         -------
-        X_new : numpy array of shape [n_samples, n_features_new]
-            Transformed array.
+        Xt : ndarray of shape (n_samples, ...)
+            Transformed input.
         """
         return self.transform(X), self.resample(y, X)
 
     def fit_transform_resample(self, X, y, **fit_params):
-        """Fit to data, then transform it.
+        """Fit to data, then transform the input and resample the target.
         Fits transformer to X and y with optional parameters fit_params
-        and returns a transformed version of X.
+        and returns a transformed version of X ans a resampled version of y.
 
         Parameters
         ----------
-        X : numpy array of shape [n_samples, n_features]
-            Training set.
-        y : numpy array of shape [n_samples]
-            Target values.
+        X : ndarray of shape (n_samples, ...)
+            Input data.
+        y : ndarray of shape (n_samples, )
+            Target data.
 
         Returns
         -------
-        X_new : numpy array of shape [n_samples, n_features_new]
-            Transformed array.
+        Xt : ndarray of shape (n_samples, ...)
+            Transformed input.
+        yr : ndarray of shape (n_samples, ...)
+            Resampled target.
         """
         return self.fit(X, y, **fit_params).transform_resample(X, y)
