@@ -1,5 +1,5 @@
-"""The module :mod:`giotto.graphs` implements preprocessing techniques
-   useful to apply Topological Data Analysis techniques to graphs.
+"""The module :mod:`giotto.graphs` implements transformers to create graphs or
+extract metric spaces from graphs.
 """
 
 from giotto.graphs.geodesic_distance import GraphGeodesicDistance
