@@ -20,6 +20,7 @@ We'd love to accept your patches! Before we can take them, we have to jump a cou
 Please fill out either the individual or corporate Contributor License Agreement (CLA).
   - If you are an individual writing original source code and you're sure you own the intellectual property, then you'll need to sign an [individual CLA](DEED_OF_CONTRIBUTIONS.rst).
   - If you work for a company that wants to allow you to contribute your work, then you'll need to sign a corporate CLA (please write at <business@l2f.ch>).
+  
 Follow either of the two links above to access the appropriate CLA and instructions for how to sign and return it. Once we receive it, we'll be able to accept your pull requests.
 
 **NOTE**: Only original source code from you and other people that have signed the CLA can be accepted into the main repository.
@@ -35,8 +36,9 @@ Before sending your pull request for review, make sure your changes are consiste
 
 General guidelines and philosophy for contribution
 ``````````````````````````````````````````````````
-  - Include unit tests when you contribute new features, as they help to a)    prove that your code works correctly, and b) guard against future breaking    changes to lower the maintenance cost.*   Bug fixes also generally require unit tests, because the presence of bugs    usually indicates insufficient test coverage.*   Keep API compatibility in mind when you change code in core Giotto. Reviewers of    your pull request will comment on any API compatibility issues.*   When you contribute a new feature to Giotto, the maintenance burden is    (by default) transferred to the Giotto team. This means that the benefit    of the contribution must be compared against the cost of maintaining the    feature.
-  - Full new features (e.g., a new op implementing a cutting-edge algorithm)    typically will live in    [giotto-learn/addons](https://github.com/giotto-learn/addons) to get some    airtime before a decision is made regarding whether they are to be migrated to the core.
+  - Include unit tests when you contribute new features, as they help to a) prove that your code works correctly, and b) guard against future breaking changes to lower the maintenance cost. *Bug fixes also generally require unit tests, because the presence of bugs usually indicates insufficient test coverage.*   
+  - Keep API compatibility in mind when you change code in core Giotto. Reviewers of your pull request will comment on any API compatibility issues.*   When you contribute a new feature to Giotto, the maintenance burden is (by default) transferred to the Giotto team. This means that the benefit of the contribution must be compared against the cost of maintaining the    feature.
+  - Full new features (e.g., a new op implementing a cutting-edge algorithm) typically will live in [giotto-learn/addons](https://github.com/giotto-learn/addons) to get some airtime before a decision is made regarding whether they are to be migrated to the core.
   
 C++ coding style
 ''''''''''''''''
