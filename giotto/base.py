@@ -1,4 +1,4 @@
-"""Base class for transforming and resampling"""
+"""Implements a TransformerResamplerMixin for transformers that have a resample method."""
 # License: Apache 2.0
 
 

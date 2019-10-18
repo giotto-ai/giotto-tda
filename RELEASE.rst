@@ -6,14 +6,14 @@ Major Features and Improvements
 
 The following submodules where added:
 
--  :mod:`giotto.homology` implements transformers to generate persistence diagrams.
--  :mod:`giotto.diagrams` implements transformers to preprocess diagrams and extract features from them.
--  :mod:`giotto.time_series` implements transformers to preprocess time series for persitent homology.
--  :mod:`giotto.graphs` implements preprocessing techniques useful to apply persistent homology to graphs.
--  :mod:`giotto.meta_transformers` implements meta transformers for direct topological feature generation..
--  :mod:`giotto.base` implements TransformerResamplerMixin for transformer that have a resample method.
--  :mod:`giotto.pipeline` extends sklearn's module for Pipelines that include TransformerResamplers.
+-  :mod:`giotto.homology` implements transformers to modify metric spaces or generate persistence diagrams.
+-  :mod:`giotto.diagrams` implements transformers to preprocess persistence diagrams or extract features from them.
+-  :mod:`giotto.time_series` implements transformers to preprocess time series or embed them in a higher dimensional space for persistent homology.
+-  :mod:`giotto.graphs` implements transformers to create graphs or extract metric spaces from graphs.
+-  :mod:`giotto.meta_transformers` implements convenience :class:`giotto.Pipeline` transformers for direct topological feature generation.
 -  :mod:`giotto.utils` implements hyperparameters and input validation functions.
+-  :mod:`giotto.base` implements a TransformerResamplerMixin for transformers that have a resample method.
+-  :mod:`giotto.pipeline` extends scikit-learn's module by defining Pipelines that include TransformerResamplers.
 
 
 Bug Fixes
