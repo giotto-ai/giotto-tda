@@ -148,7 +148,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         check_array(X, allow_nd=True)
         if self.func is None:
             self._func = _identity
-        self._func = self.func
+        else:
+            self._func = self.func
 
         if self.func_params is None:
             self.effective_func_params_ = {}
