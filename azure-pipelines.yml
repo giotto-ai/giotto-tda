@@ -84,9 +84,9 @@ jobs:
   - script: |
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
-      pip uninstall -y giotto-learn
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
@@ -153,9 +153,9 @@ jobs:
   - script: |
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
-      pip uninstall -y giotto-learn
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
