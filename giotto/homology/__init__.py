@@ -1,5 +1,5 @@
 """The module :mod:`giotto.homology` implements transformers
-to generate features from persistent homology.
+to modify metric spaces or generate persistence diagrams.
 """
 
 from .consistent import ConsistentRescaling
