@@ -1,6 +1,5 @@
-|giotto-learn|_
-
-.. |giotto-learn| image:: https://github.com/giotto-learn/giotto-learn/blob/master/doc/image/logo.svg
+.. image:: https://www.giotto.ai/static/vector/logo.svg
+   :width: 850
 
 |Azure|_ |Azure-cov|_ |Azure-test|_ |binder|_
 
