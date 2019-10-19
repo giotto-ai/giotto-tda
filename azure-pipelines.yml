@@ -16,12 +16,14 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib 
-      pip install -e openml
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -56,8 +58,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib
-      pip install -e openml
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -86,8 +87,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib
-      pip install -e openml
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
