@@ -78,11 +78,13 @@ jobs:
 
   - script: |
       pip install -e ".[tests, doc]"
-      pip uninstall -y giotto-learn
       pip install wheel twine
     displayName: 'Install dev environment'
 
   - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       flake8 --exit-zero
@@ -146,11 +148,13 @@ jobs:
 
   - script: |
       pip install -e ".[tests, doc]"
-      pip uninstall -y giotto-learn
       pip install wheel twine
     displayName: 'Install dev environment'
 
   - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       flake8 --exit-zero
