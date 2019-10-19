@@ -24,6 +24,7 @@ jobs:
   - script: |
       pip install plotly matplotlib openml giotto-learn
       pip install -r requirements.txt
+      git submodule update --init --recursive
     displayName: 'Install dependencies'
 
   - script: |
@@ -56,6 +57,7 @@ jobs:
   - script: |
       pip install plotly matplotlib openml giotto-learn
       pip install -r requirements.txt
+      git submodule update --init --recursive
     displayName: 'Install dependencies'
 
   - script: |
@@ -88,6 +90,7 @@ jobs:
   - script: |
       pip install plotly matplotlib openml giotto-learn
       pip install -r requirements.txt
+      git submodule update --init --recursive
     displayName: 'Install dependencies'
 
   - script: |
