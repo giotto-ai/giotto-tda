@@ -1,3 +1,6 @@
+|giotto-learn|_
+
+.. |giotto-learn| image:: https://github.com/giotto-learn/giotto-learn/blob/master/doc/image/logo.svg
 
 |Azure|_ |Azure-cov|_ |Azure-test|_ |binder|_
 
@@ -12,6 +15,7 @@
 
 .. |binder| image:: https://mybinder.org/badge_logo.svg
 .. _binder: https://mybinder.org/v2/gh/giotto-learn/giotto-learn/master?filepath=examples
+
 
 giotto-learn
 ============
