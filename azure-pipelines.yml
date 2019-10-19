@@ -1,6 +1,4 @@
 # these jobs are triggered automatically and they test the code and the examples.
-parameters:
-  buildCheck: $(build_check)
 
 jobs:
 - job: 'test_ubuntu1604'
@@ -98,7 +96,7 @@ jobs:
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq('${{ parameters.buildCheck }}', 'true')
+  condition: eq('$(build_check)', 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -152,7 +150,7 @@ jobs:
 
 
 - job: 'macOS1013'
-  condition: eq('${{ parameters.buildCheck }}', 'true')
+  condition: eq('$(build_check)', 'true')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -228,7 +226,7 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq('${{ parameters.buildCheck }}', 'true')
+  condition: eq('$(build_check)', 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
