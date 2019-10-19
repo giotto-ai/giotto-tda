@@ -15,19 +15,12 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
- 
-  - script: |
-      python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 jupyter-contrib-nbextensions
-    displayName: 'install pytest suite'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml giotto-learn
-      pip install -r requirements.txt
-      git submodule update --init --recursive
-    displayName: 'Install dependencies'
-
-  - script: |
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -50,17 +43,19 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: |
-      python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 jupyter-contrib-nbextensions
-    displayName: 'install pytest suite'
+      brew update
+      brew install boost
+      brew install gcc
+    displayName: 'install boost and gcc'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml giotto-learn
-      pip install -r requirements.txt
-      git submodule update --init --recursive
-    displayName: 'Install dependencies'
-
-  - script: |
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -82,25 +77,19 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: |
-      python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 jupyter-contrib-nbextensions
-    displayName: 'install pytest suite'
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml giotto-learn
-      pip install -r requirements.txt
-      git submodule update --init --recursive
-    displayName: 'Install dependencies'
-
-  - script: |
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
     displayName: 'Test with pytest, nbconvert and flake8'
     
-
-
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
