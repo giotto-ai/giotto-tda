@@ -12,47 +12,91 @@ from ..utils.validation import validate_params
 
 
 class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
-    """Concatenates results of multiple transformer objects.
-    This estimator applies a list of transformer objects in parallel to the
-    input data, then concatenates the results. This is useful to combine
-    several feature extraction mechanisms into a single transformer.
+    """Sliding windows onto the data.
+
+    Useful in time series analysis to convert a sequence of objects (scalar
+    or array-like) into a sequence of windows on the original sequence. Each
+    window stacks together consecutive objects, and consecutive windows are
+    separated by a constant stride.
 
     Parameters
     ----------
-    width : int, default: ``1``
-        Width of the sliding window.
+    width : int, optional, default: ``10``
+        Width of each sliding window. Each window contains ``width + 1``
+        objects from the original time series.
 
-    stride : int, default: ``1``
-        Stride of the sliding window.
+    stride : int, optional, default: ``1``
+        Stride between consecutive windows.
 
     Examples
     --------
+    >>> import numpy as np
     >>> from giotto.time_series import SlidingWindow
+    >>> # Create a time series of two-dimensional vectors, and a corresponding
+    >>> # time series of scalars
+    >>> X = np.arange(20).reshape(-1, 2)
+    >>> y = np.arange(10)
+    >>> windows = SlidingWindow(width=2, stride=3)
+    >>> # Fit and transform X
+    >>> X_windows = windows.fit_transform(X)
+    >>> print(X_windows)
+    [[[ 2  3]
+      [ 4  5]
+      [ 6  7]]
+     [[ 8  9]
+      [10 11]
+      [12 13]]
+     [[14 15]
+      [16 17]
+      [18 19]]]
+    >>> # Resample y
+    >>> yr = windows.resample(y)
+    >>> print(yr)
+    [3 6 9]
+
+    See also
+    --------
+    TakensEmbedding
+
+    Notes
+    -----
+    The current implementation favours the last entry over the first one,
+    in the sense that the last entry of the last window always equals the last
+    entry in the original time series. Hence, a number of initial entries
+    (depending on the remainder of the division between :math:`n_\\mathrm{
+    samples} - \\mathrm{width} - 1` and the stride) may be lost.
+
     """
     _hyperparameters = {'width': [int, (1, np.inf)],
                         'stride': [int, (1, np.inf)]}
 
-    def __init__(self, width=1, stride=1):
+    def __init__(self, width=10, stride=1):
         self.width = width
         self.stride = stride
 
     def _slice_windows(self, X):
-        n_windows = (X.shape[0] - self.width) // self.stride + 1
+        n_samples = X.shape[0]
+        n_windows = (n_samples - self.width - 1) // self.stride + 1
 
-        window_slices = [(i * self.stride, self.width + i * self.stride)
-                         for i in range(n_windows)]
+        window_slices = [(n_samples - i * self.stride - self.width - 1,
+                          n_samples - i * self.stride)
+                         for i in reversed(range(n_windows))]
+
         return window_slices
 
     def fit(self, X, y=None):
-        """Fit all transformers using X.
+        """Do nothing and return the estimator unchanged.
+
+        This method is there to implement the usual scikit-learn API and hence
+        work in pipelines.
 
         Parameters
         ----------
-        X : iterable or array-like, depending on transformers
-            Input data, used to fit transformers.
+        X : ndarray, shape (n_samples, ...)
+            Input data.
 
-        y : array-like, shape (n_samples, ...), optional
-            Targets for supervised learning.
+        y : None
+            Ignored.
 
         Returns
         -------
@@ -70,7 +114,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, [n_features, ])
+        X : ndarray, shape (n_samples, ...)
             Input data.
 
         y : None
@@ -78,8 +122,10 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_windows, n_samples_window, \
-             n_features)
+        Xt : ndarray, shape (n_windows, n_samples_window, ...)
+            Windows of consecutive entries of the original time series.
+            ``n_windows = (n_samples - width - 1) // stride  + 1``, and
+            ``n_samples_window = width + 1``.
 
         """
         # Check if fit had been called
@@ -92,29 +138,32 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return Xt
 
     def resample(self, y, X=None):
-        """Resample y.
+        """Resample `y` so that, for any i > 0, the minus i-th entry of the
+        resampled vector corresponds in time to the last entry of the minus
+        i-th window produced by :meth:`transform`.
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, n_features)
+        y : ndarray, shape (n_samples, 1) or (n_samples, )
             Target.
 
         X : None
-            There is no need of input data,
-            yet the pipeline API requires this parameter.
+            There is no need for input data, yet the pipeline API requires
+            this parameter.
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, 1)
-            The resampled target.
-            ``n_samples_new = n_samples - 1``.
+        yt : ndarray, shape (n_samples_new, )
+            The resampled target. ``n_samples_new = (n_samples - time_delay *
+            (dimension - 1) - 1) // stride + 1``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        y = column_or_1d(y)
+        yt = column_or_1d(y)
 
-        yt = y[self.width - 1:: self.stride]
+        yt = np.flip(yt)
+        yt = np.flip(yt[:-self.width:self.stride])
         return yt
 
 
@@ -122,44 +171,45 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a univariate time series as a time series of
     point clouds.
 
-    Based on the following time-delay embedding technique named after F.
-    Takens [1]_: given a time series :math:`X_t`, one extracts a list of
-    vectors in :math:`\\mathbb{R}^d`, each of the form
-    :math:`\\mathcal{X}_i := (X_{t_i}, X_{t_i + \\tau}, \\ldots , X_{t_i + (
-    d-1)\\tau})`. The set :math:`\\{\\mathcal{X}_i\\}_i` is called the `Takens
-    embedding <LINK TO GLOSSARY>`_ of the time series, :math:`\\tau` is
-    called the embedding time delay, :math:`d` is called the embedding
-    dimension, and the difference between :math:`t_i` and :math:`t_{i-1}` is
-    called the embedding stride.
+    Based on a time-delay embedding technique named after F. Takens [1]_.
+    Given a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence
+    of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
+    of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
+    \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
+    This set is called the `Takens embedding <LINK TO GLOSSARY>`_ of the
+    time series and can be interpreted as a point cloud.
+
+    The difference between :math:`t_{i+1}` and :math:`t_i` is called the
+    stride, :math:`\\tau` is called the time delay, and :math:`d` is called
+    the (embedding) dimension.
 
     If :math:`d` and :math:`\\tau` are not explicitly set, suitable values
-    are calculated during :meth:`fit`. [2]_
+    are searched for during :meth:`fit`. [2]_
 
     Parameters
     ----------
-    parameters_type : ``'search'`` | ``'fixed'``, default: ``'search'``
-        If set to ``'fixed'`` and if values for `embedding_time_delay` and
-        `dimension` are provided, these values are used in :meth:`transform`.
-        If set to ``'search'`` and if `embedding_time_delay` and `dimension`
-        are not set, optimal values are automatically found for those
-        parameters using criteria based on mutual information (`time_delay`)
-        and false nearest neighbors. [2]_
-        If set to 'search' and if `time_delay` and `dimension` are set,
-        a similar optimization is carried out, but the final values are
-        constrained to be not greater than the values initially set.
+    parameters_type : ``'search'`` | ``'fixed'``, optional, default: \
+                      ``'search'``
+        If set to ``'fixed'``, the values of `time_delay` and `dimension`
+        are used directly in :meth:`transform`. If set to ``'search'``,
+        those values are only used as upper bounds in a search as follows:
+        first, an optimal time delay is found by minimising the time delayed
+        mutual information; then, a heuristic is used to select an embedding
+        dimension which, when increased, does not reveal a large proportion
+        of "false nearest neighbors". See Section 2.4.2 in [2]_.
 
-    time_delay : int, default: ``1``
+    time_delay : int, optional, default: ``1``
         Time delay between two consecutive values for constructing one
         embedded point. If `parameters_type` is ``'search'``,
         it corresponds to the maximal embedding time delay that will be
         considered.
 
-    dimension : int, default: ``5``
+    dimension : int, optional, default: ``5``
         Dimension of the embedding space. If `parameters_type` is ``'search'``,
         it corresponds to the maximum embedding dimension that will be
         considered.
 
-    stride : int, default: ``1``
+    stride : int, optional, default: ``1``
         Stride duration between two consecutive embedded points. It defaults
         to 1 as this is the usual value in the statement of Takens's embedding
         theorem.
@@ -174,43 +224,49 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     time_delay_ : int
         Actual embedding time delay used to embed. If
         `parameters_type` is ``'search'``, it is the calculated optimal
-        embedding time delay. Otherwise it has the same value as `time_delay`.
+        embedding time delay and is less than or equal to `time_delay`.
+        Otherwise it is equal tp `time_delay`.
 
     dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
-        ``'search'``, it is the calculated optimal embedding dimension.
-        Otherwise it has the same value as `dimension`.
+        ``'search'``, it is the calculated optimal embedding dimension and
+        is less than or equal to `dimension`. Otherwise it is equal to
+        `dimension`.
 
     Examples
     --------
-    >>> import pandas as pd
     >>> import numpy as np
     >>> from giotto.time_series import TakensEmbedding
-    >>> # Create a noisy signal sampled
-    >>> signal_noise = np.asarray([np.sin(x /40) - 0.5 + np.random.random()
-    ...     for x in range(0, 1000)])
+    >>> # Create a noisy signal
+    >>> n_samples = 10000
+    >>> signal_noise = np.asarray([np.sin(x / 50) + 0.5 * np.random.random()
+    ...     for x in range(n_samples)])
     >>> # Set up the transformer
-    >>> outer_window_duration = 50
-    >>> outer_window_stride = 5
-    >>> embedder = TakensEmbedding(
-    >>>     outer_window_duration=outer_window_duration,
-    ...     outer_window_stride=outer_window_stride,
-    ...     parameters_type='search',
-    ...     dimension=5,
-    ...     time_delay=1, n_jobs=-1)
-    >>> # Fit and transform the DataFrame
-    >>> embedder.fit(signal_noise)
-    >>> embedded_noise = embedder.transform(signal_noise)
+    >>> embedder = TakensEmbedding(parameters_type='search', dimension=5,
+    ...                            time_delay=5, n_jobs=-1)
+    >>> # Fit and transform
+    >>> embedded_noise = embedder.fit_transform(signal_noise)
     >>> print('Optimal embedding time delay based on mutual information:',
     ...       embedder.time_delay_)
-    Optimal embedding time delay based on mutual information: 1
+    Optimal embedding time delay based on mutual information: 5
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
     ...       embedder.dimension_)
-    Optimal embedding dimension based on false nearest neighbors: 3
+    Optimal embedding dimension based on false nearest neighbors: 2
+    >>> print(embedded_noise.shape)
+    (9995, 2)
 
     See also
     --------
-    giotto.homology.VietorisRipsPersistence
+    SlidingWindow, giotto.homology.VietorisRipsPersistence
+
+    Notes
+    -----
+    The current implementation favours the last value over the first one,
+    in the sense that the last coordinate of the last vector in a Takens
+    embedded time series always equals the last value in the original time
+    series. Hence, a number of initial values (depending on the remainder of
+    the division between :math:`n_\\mathrm{samples} - d(\\tau - 1) - 1` and
+    the stride) may be lost.
 
     References
     ----------
@@ -240,12 +296,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     @staticmethod
     def _embed(X, time_delay, dimension, stride):
-        n_points = (X.shape[0] - time_delay * dimension) // stride + 1
+        n_points = (X.shape[0] - time_delay * (dimension - 1) - 1)\
+                   // stride + 1
 
         X = np.flip(X)
-        points_ = [X[j * stride:
-                     j * stride + time_delay * dimension:
-                     time_delay].flatten() for j in range(0, n_points)]
+        points_ = [X[j * stride:j * stride + time_delay * dimension:time_delay]
+                   .flatten() for j in range(n_points)]
         X_embedded = np.stack(points_)
 
         return np.flip(X_embedded).reshape((n_points, dimension))
@@ -293,19 +349,20 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         return n_false_neighbors
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """If necessary, compute the optimal time delay and embedding
+        dimension. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, 1)
+        X : ndarray, shape (n_samples, 1) or (n_samples, )
             Input data.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -317,25 +374,20 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
-                delayed(self._mutual_information)(X, time_delay,
-                                                  n_bins=100)
-                for time_delay in
-                range(1, self.time_delay + 1))
+                delayed(self._mutual_information)(X, time_delay, n_bins=100)
+                for time_delay in range(1, self.time_delay + 1))
             self.time_delay_ = mutual_information_list.index(
                 min(mutual_information_list)) + 1
 
             n_false_nbhrs_list = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._false_nearest_neighbors)(
-                    X, self.time_delay, dim,
-                    stride=1) for dim in
-                range(1, self.dimension + 3))
-
+                    X, self.time_delay_, dim, stride=1)
+                for dim in range(1, self.dimension + 3))
             variation_list = [np.abs(n_false_nbhrs_list[dim - 1]
                                      - 2 * n_false_nbhrs_list[dim] +
                                      n_false_nbhrs_list[dim + 1])
                               / (n_false_nbhrs_list[dim] + 1) / dim
                               for dim in range(2, self.dimension + 1)]
-
             self.dimension_ = variation_list.index(min(variation_list)) + 2
 
         else:
@@ -345,11 +397,11 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Computes the embedding of X.
+        """Compute the Takens embedding of `X`.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, 1)
+        X : ndarray, shape (n_samples, 1) or (n_samples, )
             Input data.
 
         y : None
@@ -358,10 +410,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_points, n_dimension)
-            Array of embedded point cloud per outer window.
-            ``n_outer_windows = (n_samples - outer_window_duration) //
-            outer_window_stride + 1``, and ``n_points = (
-            outer_window_duration - time_delay * dimension) // stride + 1``.
+            Output point cloud in Euclidean space of dimension given by
+            :attr:`dimension_`. ``n_points = (n_samples - time_delay *
+            (dimension - 1) - 1) // stride + 1``.
 
         """
         # Check if fit had been called
@@ -372,26 +423,31 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         return Xt
 
     def resample(self, y, X=None):
-        """Resample y.
+        """Resample `y` so that, for any i > 0, the minus i-th entry of the
+        resampled vector corresponds in time to the last coordinate of the
+        minus i-th embedding vector produced by :meth:`transform`.
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, n_features)
+        y : ndarray, shape (n_samples, 1) or (n_samples, )
             Target.
 
         X : None
-            There is no need of input data,
-            yet the pipeline API requires this parameter.
+            There is no need for input data, yet the pipeline API requires
+            this parameter.
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, 1)
-            The resampled target. ``n_samples_new = n_samples - 1``.
+        yt : ndarray, shape (n_samples_new, )
+            The resampled target. ``n_samples_new = (n_samples - time_delay *
+            (dimension - 1) - 1) // stride + 1``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
         yt = column_or_1d(y)
 
-        yt = y[self.time_delay_ * self.dimension_ - 1:: self.stride]
+        yt = np.flip(yt)
+        final_index = -self.time_delay_ * (self.dimension_ - 1)
+        yt = np.flip(yt[:final_index:self.stride])
         return yt
