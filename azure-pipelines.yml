@@ -1,4 +1,6 @@
 # these jobs are triggered automatically and they test the code and the examples.
+parameters:
+  buildCheck: $(build_check)
 
 jobs:
 - job: 'test_ubuntu1604'
@@ -23,7 +25,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install -e plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -58,7 +60,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install -e plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -87,7 +89,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install -e plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -96,7 +98,7 @@ jobs:
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables['$(build_check)'], 'true')
+  condition: eq('${{ parameters.buildCheck }}', 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -150,7 +152,7 @@ jobs:
 
 
 - job: 'macOS1013'
-  condition: eq(variables['$(build_check)'], 'true')
+  condition: eq('${{ parameters.buildCheck }}', 'true')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -226,7 +228,7 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq(variables['$(build_check)'], 'true')
+  condition: eq('${{ parameters.buildCheck }}', 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
