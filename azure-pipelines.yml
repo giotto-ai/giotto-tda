@@ -20,7 +20,8 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib 
+      pip install -e openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -55,7 +56,8 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib
+      pip install -e openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -84,7 +86,8 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib
+      pip install -e openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -147,7 +150,7 @@ jobs:
 
 
 - job: 'macOS1013'
-  condition: eq('$(build_check)', 'true')
+  condition: eq(variables['$(build_check)'], 'true')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
