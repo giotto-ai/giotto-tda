@@ -103,7 +103,7 @@ jobs:
 
 - job: 'manylinux2010'
   variables:
-    buildCheck: '$(build_check)'
+    buildCheck: $(build_check)
   condition: eq(variables['buildCheck'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
@@ -158,7 +158,9 @@ jobs:
 
 
 - job: 'macOS1013'
-  condition: eq(variables['{{ $(build_check) }}'], 'true')
+  variables:
+    buildCheck: $(build_check)
+  condition: eq(variables['buildCheck'], 'true')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -236,7 +238,7 @@ jobs:
 - job: 'win2016'
   variables:
     buildCheck: $(build_check)
-  condition: eq(variables['buildCheck'], 'true')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
