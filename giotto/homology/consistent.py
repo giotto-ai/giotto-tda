@@ -27,15 +27,15 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, each entry in `X` along axis 0 is
+        If set to ``'precomputed'``, each entry in `X` along axis 0 is
         interpreted to be a distance matrix. Otherwise, entries are
         interpreted as feature arrays, and `metric` determines a rule with
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
-        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including
-        "euclidean", "manhattan" or "cosine".
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
+        including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
         two arrays from the entry in `X` as input, and return a value
@@ -44,9 +44,9 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
-    n_neighbor : int, optional, default: ``1``
-        Rank of the neighbors to be used to modify the metric structure
-        according to the consistent rescaling procedure.
+    neighbor_rank : int, optional, default: ``1``
+        Rank of the neighbors used to modify the metric structure according
+        to the "consistent rescaling" procedure.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
@@ -70,25 +70,25 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     References
     ----------
     .. [1] T. Berry and T. Sauer, "Consistent manifold representation for
-           topological data analysis"; *Foundations of data analysis*, **1**,
-           1--38, 2019; doi: `10.3934/fods.2019001
+           topological data analysis"; *Foundations of data analysis* **1**,
+           pp. 1--38, 2019; doi: `10.3934/fods.2019001
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
-    _hyperparameters = {'n_neighbor': [int, (1, np.inf)]}
+    _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
 
-    def __init__(self, metric='euclidean', metric_params={}, n_neighbor=1,
+    def __init__(self, metric='euclidean', metric_params={}, neighbor_rank=1,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
-        self.n_neighbor = n_neighbor
+        self.neighbor_rank = neighbor_rank
         self.n_jobs = n_jobs
 
     def _consistent_homology_distance(self, X):
         Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
                                 **self.metric_params)
 
-        indices_k_neighbor = np.argsort(Xm)[:, self.n_neighbor]
+        indices_k_neighbor = np.argsort(Xm)[:, self.neighbor_rank]
         distance_k_neighbor = Xm[np.arange(X.shape[0]),
                                  indices_k_neighbor]
 
@@ -110,15 +110,15 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, \
             n_points, n_dimensions)
-            Input data. If `metric=='precomputed'`, the input should be an
+            Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
-            `(n_points, n_points)`. Otherwise, each such entry will be
-            interpreted as an ndarray of `n_points` in Euclidean space of
-            dimension `n_dimensions`.
+            ``(n_points, n_points)``. Otherwise, each such entry will be
+            interpreted as an array of ``n_points`` row vectors in
+            ``n_dimensions``-dimensional space.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -140,15 +140,15 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, \
             n_points, n_dimensions)
-            Input data. If `metric=='precomputed'`, the input should be an
+            Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
-            `(n_points, n_points)`. Otherwise, each such entry will be
-            interpreted as an ndarray of `n_points` in Euclidean space of
-            dimension `n_dimensions`.
+            ``(n_points, n_points)``. Otherwise, each such entry will be
+            interpreted as an array of ``n_points`` row vectors in
+            ``n_dimensions``-dimensional space.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
