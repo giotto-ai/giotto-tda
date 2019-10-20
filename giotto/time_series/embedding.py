@@ -144,7 +144,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, 1) or (n_samples, )
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
@@ -153,7 +153,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, )
+        yt : ndarray, shape (n_samples_new,)
             The resampled target. ``n_samples_new = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
 
@@ -176,7 +176,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
     of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
     \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
-    This set is called the `Takens embedding <LINK TO GLOSSARY>`_ of the
+    This set is called the `Takens embedding <https://giotto.ai/theory>`_ of the
     time series and can be interpreted as a point cloud.
 
     The difference between :math:`t_{i+1}` and :math:`t_i` is called the
@@ -184,7 +184,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     the (embedding) dimension.
 
     If :math:`d` and :math:`\\tau` are not explicitly set, suitable values
-    are searched for during :meth:`fit`. [2]_
+    are searched for during :meth:`fit`. [2]_ [3]_
 
     Parameters
     ----------
@@ -194,9 +194,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         are used directly in :meth:`transform`. If set to ``'search'``,
         those values are only used as upper bounds in a search as follows:
         first, an optimal time delay is found by minimising the time delayed
-        mutual information; then, a heuristic is used to select an embedding
-        dimension which, when increased, does not reveal a large proportion
-        of "false nearest neighbors". See Section 2.4.2 in [2]_.
+        mutual information; then, a heuristic based on an algorithm in [2]_ is
+        used to select an embedding dimension which, when increased, does not
+        reveal a large proportion of "false nearest neighbors".
 
     time_delay : int, optional, default: ``1``
         Time delay between two consecutive values for constructing one
@@ -272,11 +272,17 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     ----------
     .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
            D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
-           1980*. Lecture Notes in Mathematics, vol 898. Springer, 1981;
+           1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
            doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
-    .. [2] N. Sanderson, "Topological Data Analysis of Time Series using
-           Witness Complexes", PhD thesis, University of Colorado at
+    .. [2] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
+           embedding dimension for phase-space reconstruction using a
+           geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
+           1992; doi: `10.1103/PhysRevA.45.3403
+           <https://doi.org/10.1103/PhysRevA.45.3403>`_.
+
+    .. [3] N. Sanderson, "Topological Data Analysis of Time Series using
+           Witness Complexes"; PhD thesis, University of Colorado at
            Boulder, 2018; `https://scholar.colorado.edu/math_gradetds/67
            <https://scholar.colorado.edu/math_gradetds/67>`_.
 
@@ -304,7 +310,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
                    .flatten() for j in range(n_points)]
         X_embedded = np.stack(points_)
 
-        return np.flip(X_embedded).reshape((n_points, dimension))
+        return np.flip(X_embedded).reshape(n_points, dimension)
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
@@ -357,7 +363,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, 1) or (n_samples, )
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -370,7 +376,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        X = check_array(X.reshape(X.shape[0], 1), allow_nd=True)
+        X = check_array(X, ensure_2d=False)
+        if X.ndim == 1:
+            X = X[:, None]
 
         if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -401,7 +409,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, 1) or (n_samples, )
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -417,9 +425,11 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
-        X = check_array(X.reshape(X.shape[0], 1), allow_nd=True)
+        Xt = check_array(X, ensure_2d=False)
+        if Xt.ndim == 1:
+            Xt = Xt[:, None]
+        Xt = self._embed(Xt, self.time_delay_, self.dimension_, self.stride)
 
-        Xt = self._embed(X, self.time_delay_, self.dimension_, self.stride)
         return Xt
 
     def resample(self, y, X=None):
@@ -429,7 +439,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, 1) or (n_samples, )
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
@@ -438,7 +448,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, )
+        yt : ndarray, shape (n_samples_new,)
             The resampled target. ``n_samples_new = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
 
