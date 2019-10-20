@@ -30,9 +30,9 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     --------
     >>> import numpy as np
     >>> from giotto.graphs import TransitionGraph, GraphGeodesicDistance
-    >>> X = np.arange(4).reshape((1, -1, 1))
+    >>> X = np.arange(4).reshape(1, -1, 1)
     >>> tg = TransitionGraph(func=None).fit_transform(X)
-    >>> print(tg[0].todense())
+    >>> print(tg[0].toarray())
     [[False  True False False]
      [ True False  True False]
      [False  True False  True]
@@ -68,7 +68,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples, )
+        X : ndarray of sparse or dense arrays, shape (n_samples,)
             Input data, i.e. a collection of adjacency matrices of graphs.
 
         y : None
@@ -85,7 +85,6 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         self._is_fitted = True
         return self
 
-    # @jit
     def transform(self, X, y=None):
         """Use :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path`
         to compute the lengths of graph shortest paths between any two
@@ -93,7 +92,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples, )
+        X : ndarray of sparse or dense arrays, shape (n_samples,)
             Input data, i.e. a collection of adjacency matrices of graphs.
 
         y : None
@@ -101,10 +100,11 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of float, shape (n_samples, ) or \
+        Xt : ndarray, shape (n_samples,) or \
              (n_samples, n_vertices, n_vertices)
             Array of distance matrices. If the distance matrices have variable
-            size across samples, `Xt` is one-dimensional.
+            size across samples, `Xt` is a one-dimensional array of dense
+            arrays.
 
         """
         # Check if fit had been called

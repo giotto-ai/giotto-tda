@@ -11,7 +11,8 @@ from giotto.diagrams._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """`Persistence entropies <LINK TO GLOSSARY>`_ of persistence diagrams.
+    """`Persistence entropies <https://giotto.ai/theory>`_ of persistence
+    diagrams.
 
     Given a persistence diagrams consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
@@ -43,9 +44,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     def _persistence_entropy(self, X):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape((-1, 1))
+        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
         return - np.sum(np.nan_to_num(
-            X_normalized * np.log(X_normalized)), axis=1).reshape((-1, 1))
+            X_normalized * np.log(X_normalized)), axis=1).reshape(-1, 1)
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
@@ -62,8 +63,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -89,8 +90,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -111,17 +112,17 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
                 for s in gen_even_slices(
                     X.shape[0], effective_n_jobs(self.n_jobs))
             )
-        Xt = np.concatenate(Xt).reshape((self._n_dimensions, X.shape[0])).T
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
         return Xt
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """`Betti curves <LINK TO GLOSSARY>`_ of persistence diagrams.
+    """`Betti curves <https://giotto.ai/theory>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective Betti curves are obtained by
-    evenly sampling the `filtration parameter <LINK TO GLOSSARY>`_.
+    evenly sampling the `filtration parameter <https://giotto.ai/theory>`_.
 
     Parameters
     ----------
@@ -180,8 +181,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -210,8 +211,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -233,22 +234,26 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).\
-            reshape((self._n_dimensions, X.shape[0], -1)).\
+            reshape(self._n_dimensions, X.shape[0], -1).\
             transpose((1, 0, 2))
         return Xt
 
 
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
-    """`Persistence landscapes <LINK TO GLOSSARY>`_ of persistence diagrams.
+    """`Persistence landscapes <https://giotto.ai/theory>`_ of persistence
+    diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and layers of their respective persistence
     landscapes are obtained by evenly sampling the `filtration parameter
-    <LINK TO GLOSSARY>`_.
+    <https://giotto.ai/theory>`_.
 
     Parameters
     ----------
+    n_layers : int, optional, default: ``1``
+        How many layers to consider in the persistence landscape.
+
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
@@ -307,8 +312,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -339,8 +344,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -363,8 +368,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape((self._n_dimensions, X.shape[0],
-                                         self.n_layers, self.n_values)).\
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
+                                        self.n_layers, self.n_values).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -377,9 +382,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     distinct homology dimensions are considered separately and regarded as sums
     of Dirac deltas. Then, the convolution with a Gaussian kernel is computed
     over a rectangular grid of locations evenly sampled from appropriate
-    ranges of the `filtration parameter <LINK TO GLOSSARY>`_. The same is
-    done with the reflected images of the subdiagrams about the diagonal,
-    and the difference between the results of the two convolutions is
+    ranges of the `filtration parameter <https://giotto.ai/theory>`_. The
+    same is done with the reflected images of the subdiagrams about the
+    diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a raster image.
 
     Parameters
@@ -453,8 +458,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -485,8 +490,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -506,7 +511,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape((self._n_dimensions, X.shape[0],
-                                         self.n_values, self.n_values)).\
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
+                                        self.n_values, self.n_values).\
             transpose((1, 0, 2, 3))
         return Xt

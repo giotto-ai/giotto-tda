@@ -9,10 +9,12 @@ from sklearn.utils.validation import check_is_fitted, check_array
 
 
 class PermutationEntropy(BaseEstimator, TransformerMixin):
-    """Permutation entropy Shannon entropy of each array in a
-    collection, in the following sense: in each array, the set of distinct rows
-    is regarded as a set of possible states, and the probability of each state
-    is the relative frequency of that state within the array.
+    """Entropies from sets of permutations arg-sorting rows in arrays.
+
+    Given a two-dimensional array `A`, another array `A'` of the same size is
+    computed by arg-sorting each row in `A`. The permutation entropy [1]_ of
+    `A` is the Shannon entropy of the probability distribution given by
+    the relative frequencies of each arg-sorting permutation in `A'`.
 
     Parameters
     ----------
@@ -21,21 +23,31 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    See also
+    --------
+    TakensEmbedding, giotto.diagrams.PersistenceEntropy
+
+    References
+    ----------
+    .. [1] C. Bandt and B. Pompe, "Permutation Entropy: A Natural Complexity
+           Measure for Time Series"; *Phys. Rev. Lett.*, **88**.17, 2002;
+           `doi: 10.1103/physrevlett.88.174102
+           <https://doi.org/10.1103/physrevlett.88.174102>`_.
+
     """
 
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
     def _entropy(self, X):
-        Xo = np.unique(X, axis=0, return_counts=True)[1].reshape((-1, 1))
-        Xo = Xo / np.sum(Xo, axis=0).reshape((-1, 1))
-        return -np.sum(np.nan_to_num(Xo * np.log2(Xo)), axis=0).reshape((-1,
-                                                                         1))
+        Xo = np.unique(X, axis=0, return_counts=True)[1].reshape(-1, 1)
+        Xo = Xo / np.sum(Xo, axis=0).reshape(-1, 1)
+        return -np.sum(np.nan_to_num(Xo * np.log2(Xo)), axis=0).reshape(-1, 1)
 
     def _permutation_entropy(self, X):
         Xo = np.argsort(X, axis=2)
         Xo = np.stack([self._entropy(Xo[i]) for i in range(Xo.shape[0])])
-        return Xo.reshape((-1, 1))
+        return Xo.reshape(-1, 1)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -45,12 +57,12 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, d)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -63,21 +75,22 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Calculate the entropy of each array in `X`.
+        """Calculate the permutation entropy of each two-dimensional array in
+        `X`.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, d)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray of int, shape (n_samples, n_points)
-            Array of entropies (one per array in `X`).
+        Xt : ndarray of int, shape (n_samples, 1)
+            One permutation entropy per entry in `X` along axis 0.
 
         """
 

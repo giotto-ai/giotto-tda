@@ -1,4 +1,4 @@
-"""Persitence diagram preprocessing."""
+"""Persistence diagram preprocessing."""
 # License: Apache 2.0
 
 import types
@@ -14,11 +14,11 @@ from ..utils.validation import check_diagram, validate_params, \
 
 
 class ForgetDimension(BaseEstimator, TransformerMixin):
-    """Forget about the homology dimension of points in persistence diagrams
-    by replacing these dimensions with ``numpy.inf``.
+    """Replaces all homology dimensions in persistence diagrams with
+    ``numpy.inf``.
 
-    Useful if one wishes to use topological features all at once -- and not
-    separated between different homology dimensions -- in later processing.
+    Useful when downstream tasks require using topological features
+    all at once -- and not separated between different homology dimensions.
 
     See also
     --------
@@ -43,8 +43,8 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -67,8 +67,8 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -95,9 +95,9 @@ class Scaler(BaseEstimator, TransformerMixin):
     The value of the scale factor depends on two things:
 
         - A way of computing, for each homology dimension, the `amplitude
-          <LINK TO GLOSSARY>`_ in that dimension of a persistence diagram
-          consisting of birth-death-dimension triples [b, d, q]. Together,
-          `metric` and `metric_params` define this in the same way as
+          <https://giotto.ai/theory>`_ in that dimension of a persistence
+          diagram consisting of birth-death-dimension triples [b, d, q].
+          Together, `metric` and `metric_params` define this in the same way as
           in :class:`Amplitude`.
         - A scalar-valued function which is applied to the resulting
           two-dimensional array of amplitudes.
@@ -110,7 +110,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-           perfect-matching--based notions of distance.
+          perfect-matching--based notions of distance.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
@@ -187,8 +187,8 @@ class Scaler(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -230,8 +230,8 @@ class Scaler(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -323,8 +323,8 @@ class Filtering(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -359,8 +359,8 @@ class Filtering(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------

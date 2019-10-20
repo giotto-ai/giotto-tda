@@ -45,7 +45,7 @@ class Pipeline(pipeline.Pipeline):
         fit/transform) that are chained, in the order in which
         they are chained, with the last object an estimator.
 
-    memory : Instance of joblib.Memory or string, optional (default=None)
+    memory : Instance of joblib.Memory or string, optional (default: ``None``)
         Used to cache the fitted transformers of the pipeline. By default,
         no caching is performed. If a string is given, it is the path to
         the caching directory. Enabling caching triggers a clone of
@@ -173,7 +173,7 @@ class Pipeline(pipeline.Pipeline):
             Training data. Must fulfill input requirements of first step of the
             pipeline.
 
-        y : iterable, default=None
+        y : iterable or None, default: ``None``
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
 
@@ -206,7 +206,7 @@ class Pipeline(pipeline.Pipeline):
             Training data. Must fulfill input requirements of first step of the
             pipeline.
 
-        y : iterable, default=None
+        y : iterable, default: ``None``
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
 
@@ -217,7 +217,7 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
             Transformed samples
 
         """
@@ -242,9 +242,11 @@ class Pipeline(pipeline.Pipeline):
         X : iterable
             Training data. Must fulfill input requirements of first step of the
             pipeline.
-        y : iterable, default=None
+
+        y : iterable, default: ``None``
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
+
         **fit_params : dict of string -> object
             Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
@@ -252,10 +254,11 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
-            Transformed samples
-        yt : array-like, shape = [n_samples, n_transformed_features]
-            Transformed target
+        Xt : array-like, shape (n_samples, n_transformed_features)
+            Transformed samples.
+
+        yt : array-like, shape (n_samples, n_transformed_features)
+            Transformed target.
         """
         last_step = self._final_estimator
         Xt, yt, fit_params = self._fit(X, y, **fit_params)
@@ -280,7 +283,7 @@ class Pipeline(pipeline.Pipeline):
             Training data. Must fulfill input requirements of first step of
             the pipeline.
 
-        y : iterable, default=None
+        y : iterable or None, default: ``None``
             Training targets. Must fulfill label requirements for all steps
             of the pipeline.
 
@@ -312,7 +315,9 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
+            Resampled input array.
+
         """
         # _final_estimator is None or has transform, otherwise attribute error
         if self._final_estimator != 'passthrough':
@@ -342,7 +347,7 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
         """
         # _final_estimator is None or has transform, otherwise attribute error
         final_estimator = self._final_estimator
@@ -378,7 +383,7 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
         """
         # _final_estimator is None or has transform, otherwise attribute error
         if self._final_estimator != 'passthrough':
@@ -399,7 +404,7 @@ class Pipeline(pipeline.Pipeline):
 
         Parameters
         ----------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
             Data samples, where ``n_samples`` is the number of samples and
             ``n_features`` is the number of features. Must fulfill
             input requirements of last step of pipeline's
@@ -407,7 +412,7 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_features]
+        Xt : array-like, shape (n_samples, n_features)
         """
         # raise AttributeError if necessary for hasattr behaviour
         for _, _, transform in self._iter():
@@ -431,11 +436,11 @@ class Pipeline(pipeline.Pipeline):
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
 
-        y : iterable, default=None
+        y : iterable or None, default: ``None``
             Targets used for scoring. Must fulfill label requirements for all
             steps of the pipeline.
 
-        sample_weight : array-like, default=None
+        sample_weight : array-like or None, default: ``None``
             If not None, this argument is passed as ``sample_weight`` keyword
             argument to the ``score`` method of the final estimator.
 
@@ -544,24 +549,24 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
     transformer : object, required
         Transformer object to be applied to each subwindow of the data.
 
-    axes: list of int, optional (default=None)
+    axes: list of int or None, optional, default: ``None``
         Axes on which to slide the window.
 
-    width: list of int, optional (default=None)
+    width: list of int or None, optional, default: ``None``
         Width of the sliding window.
 
-    stride: list of int, default: None
+    stride: list of int or None, default: ``None``
         Stride of the sliding window.
 
-    padding: list of int, optional (default=None)
+    padding: list of int or None, optional, default: ``None``
         Padding applied to the input before sliding the window.
 
-    n_jobs : int or None, optional (default=None)
+    n_jobs : int or None, optional, default: ``None``
         Number of jobs to run in parallel.
         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
         ``-1`` means using all processors.
 
-    verbose : boolean, optional(default=False)
+    verbose : boolean, optional, default: ``False``
         If True, the time elapsed while fitting each transformer will be
         printed as it is completed.
 
@@ -730,5 +735,5 @@ class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
         if any(sparse.issparse(f) for f in Xs):
             Xs = sparse.hstack(Xs).tocsr()
         else:
-            Xs = np.hstack(Xs).reshape((n_samples, -1))
+            Xs = np.hstack(Xs).reshape(n_samples, -1)
         return Xs
