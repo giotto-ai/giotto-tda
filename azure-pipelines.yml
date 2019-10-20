@@ -16,17 +16,16 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: python -m pip install --upgrade pip setuptools
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
     displayName: 'Install tools'
 
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      echo 'variable: '
-      echo $(build_check) 
-      pip install plotly matplotlib
-      python -m pip install openml
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -54,15 +53,16 @@ jobs:
       brew install gcc
     displayName: 'install boost and gcc'
 
-  - script: python -m pip install --upgrade pip setuptools
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
     displayName: 'Install tools'
 
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib
-      python -m pip install openml
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -84,15 +84,16 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: python -m pip install --upgrade pip setuptools
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
     displayName: 'Install tools'
 
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib
-      pip install -e openml
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -101,7 +102,7 @@ jobs:
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables['$(build_check)'], 'true')
+  condition: eq(variables[$(build_check)], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -155,7 +156,7 @@ jobs:
 
 
 - job: 'macOS1013'
-  condition: eq(variables['$(build_check)'], 'true')
+  condition: eq(variables['{{ $(build_check) }}'], 'true')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -231,7 +232,7 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq(variables['$(build_check)'], 'true')
+  condition: eq(variables['${{ $(build_check) }}'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
