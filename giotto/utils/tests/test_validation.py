@@ -6,6 +6,7 @@ import pytest
 
 from ..validation import check_diagram
 from ..validation import validate_metric_params, validate_params
+from ..validation import check_graph
 
 
 # Testing for validate_params
