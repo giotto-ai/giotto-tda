@@ -116,3 +116,46 @@ def test_sigma_T():
 def test_validate():
     with pytest.raises(ValueError):
         validate_metric_params('heat', metric_params={'blah': 200})
+
+
+# Testing check_graph
+# Test for the dimension
+def test_check_graph_structure_V():
+    X = np.array([[0, 1, 3, 0, 0], [1, 0, 5, 0, 0], [3, 5, 0, 4, 0],
+                  [0, 0, 4, 0, 0], [0, 0, 0, 0, 0]])
+    with pytest.raises(ValueError, match="Graph structure dimension must "
+                       "be equal to 3."):
+        check_graph(X)
+
+# Test for the diagonal elements
+def test_check_graph_diagonal_V():
+    X = np.array([np.array([[-1, 1, 3, 0, 0], [1, 0, 5, 0, 0],
+                            [3, 5, 0, 4, 0], [0, 0, 4, 0, 0],
+                            [0, 0, 0, 0, 0]])])
+    with pytest.raises(ValueError, match="At least one matrix diagonal "
+                       "element is not 0"):
+        check_graph(X)
+
+# Test to check if matrices are square matrices
+def test_check_graph_square_T():
+    X = np.array([np.array([[0, 1, 3, 0, 0], [1, 0, 5, 0, 0], [0, 0, 4, 0, 0],
+                            [0, 0, 0, 0, 0]])])
+    with pytest.raises(TypeError, match="Matrix is not square"):
+        check_graph(X)
+
+# Test to check if matrices are symmetric
+def test_check_graph_symmetric_V():
+    X = np.array([np.array([[0, 1, 3, 0, 0], [1, 0, 5, 0, 0],
+                            [3, 5, 0, 4, 0], [0, 0, 4, 0, 0],
+                            [0, 8, 0, 0, 0]])])
+    with pytest.raises(ValueError, match="Matrix is not symmetric"):
+        check_graph(X)
+
+# Test to check if all the elements are greater than or equal to 0
+def test_check_graph_element_V():
+    X = np.array([np.array([[0, 1, 3, 0, -1], [1, 0, 5, 0, 0],
+                            [3, 5, 0, 4, 0], [0, 0, 4, 0, 0],
+                            [-1, 0, 0, 0, 0]])])
+    with pytest.raises(ValueError, match="At least one matrix element "
+                       "is smaller than 0"):
+        check_graph(X)
