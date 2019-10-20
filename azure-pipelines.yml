@@ -102,9 +102,7 @@ jobs:
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  variables:
-    buildCheck: $(build_check)
-  condition: eq(variables['buildCheck'], 'true')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -158,9 +156,7 @@ jobs:
 
 
 - job: 'macOS1013'
-  variables:
-    buildCheck: $(build_check)
-  condition: eq(variables['buildCheck'], 'true')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -236,8 +232,6 @@ jobs:
 
 
 - job: 'win2016'
-  variables:
-    buildCheck: $(build_check)
   condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
