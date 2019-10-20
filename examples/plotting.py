@@ -4,32 +4,33 @@ import numpy as np
 import plotly.graph_objs as gobj
 from giotto.diagrams._utils import _subdiagrams
 
-def plot_point_cloud(point_cloud, dimension = None):
-    """This functions plot the first 2 or 3 coordinates of the point cloud.
-    This function will not work for 1-dimensional arrays
-        
+
+def plot_point_cloud(point_cloud, dimension=None):
+    """Plot the first 2 or 3 coordinates of the point cloud.
+
+     This function will not work on 1-dimensional arrays.
+
     Parameters
     ----------
-    dimension : int , default : ``None``
-        This parameter sets the dimension of the resulting plot. If ``None``, the
-        dimension will be chosen between 2 and 3 depending on `n_features` (see
-        Input).
-        
-    Input
-    -----
-    point_cloud : ndarray of shape (n_samples, n_features)
-        the point cloud is the set of data points to be rapresented in a 2D or 3D
-        scatter plot. Only the first 2 or 3 dimensions will be consdered for plotting.
+    point_cloud : ndarray, shape (n_samples, n_dimensions)
+        Data points to be represented in a 2D or 3D scatter plot. Only the
+        first 2 or 3 dimensions will be considered for plotting.
+
+    dimension : int or None, default : ``None``
+        This parameter sets the dimension of the resulting plot. If ``None``,
+        the dimension will be chosen between 2 and 3 depending on
+        ``n_dimensions`` see Input).
+
     """
     if dimension is None:
         dimension = np.min((3, point_cloud.shape[1]))
 
     # Check consistency between point_cloud and dimension
-    if point_cloud.shape[1] < dimension :
-        raise ValueError("The `n_features` of the point cloud ìs less than the `dimension`")
+    if point_cloud.shape[1] < dimension:
+        raise ValueError("Not enough dimensions available in the input point"
+                         "cloud.")
 
     if dimension == 2:
-        
         layout = {
             "title": "Point Cloud",
             "width": 800,
@@ -43,7 +44,7 @@ def plot_point_cloud(point_cloud, dimension = None):
                 "showline": True,
                 "zeroline": True,
                 "showexponent": "all",
-                "exponentformat" : "e"
+                "exponentformat": "e"
             },
             "yaxis1": {
                 "title": "Second coordinate",
@@ -54,21 +55,25 @@ def plot_point_cloud(point_cloud, dimension = None):
                 "showline": True,
                 "zeroline": True,
                 "showexponent": "all",
-                "exponentformat" : "e"
+                "exponentformat": "e"
             },
             "plot_bgcolor": "white"
         }
     
         fig = gobj.Figure(layout=layout)
-        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
-        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
 
-        fig.add_trace(gobj.Scatter(x=point_cloud[:,0],
-                                   y=point_cloud[:,1],
+        fig.add_trace(gobj.Scatter(x=point_cloud[:, 0],
+                                   y=point_cloud[:, 1],
                                    mode='markers',
                                    marker=dict(size=4,
-                                               color=list(range(point_cloud.shape[0])),
-                                               colorscale='Viridis', opacity=0.8)))
+                                               color=list(range(
+                                                   point_cloud.shape[0])),
+                                               colorscale='Viridis',
+                                               opacity=0.8)))
         fig.show()
     elif dimension == 3:
         
@@ -77,57 +82,59 @@ def plot_point_cloud(point_cloud, dimension = None):
                 "title": "First coordinate",
                 "type": "linear",
                 "showexponent": "all",
-                "exponentformat" : "e"
+                "exponentformat": "e"
             },
             "yaxis": {
                 "title": "Second coordinate",
                 "type": "linear",
                 "showexponent": "all",
-                "exponentformat" : "e"
+                "exponentformat": "e"
             },
             "zaxis": {
                 "title": "Third coordinate",
                 "type": "linear",
                 "showexponent": "all",
-                "exponentformat" : "e"
+                "exponentformat": "e"
             }
         }
 
         fig = gobj.Figure()
-        fig.update_layout(scene=scene, title="Point Cloud")
+        fig.update_layout(scene=scene, title="Point cloud")
 
-        fig.add_trace(gobj.Scatter3d(x=point_cloud[:,0],
-                                     y=point_cloud[:,1],
-                                     z=point_cloud[:,2],
+        fig.add_trace(gobj.Scatter3d(x=point_cloud[:, 0],
+                                     y=point_cloud[:, 1],
+                                     z=point_cloud[:, 2],
                                      mode='markers',
                                      marker=dict(size=4,
-                                                 color=list(range(point_cloud.shape[0])),
-                                                 colorscale='Viridis', opacity=0.8)))
+                                                 color=list(range(
+                                                     point_cloud.shape[0])),
+                                                 colorscale='Viridis',
+                                                 opacity=0.8)))
 
         fig.show()
     else:
-        raise ValueError("The value of the parameter ´dimension´ is different from 2 or 3")
+        raise ValueError("The value of the dimension is different from 2 or 3")
 
                       
 def plot_diagram(diagram, homology_dimensions=None):
-    """Plots one persistence diagram.
+    """Plot a single persistence diagram.
 
     Parameters
     ----------
-    homology_dimensions : list of int, default: ``None``
-        The list of homology dimensions that will appear on the plot. None means that all the homology dimensions
-        contained in diagram will be plotted.
-        
-    Input
-    -----
-    diagram : ndarray of shape (n_points, 3)
-    The persistence diagram to plot, where the keys of the dict correspond to homology dimensions and each
-    entry is the collection of (birth,death) points in R^2 of the corresponding homology dimension.
+    diagram : ndarray, shape (n_points, 3)
+        The persistence diagram to plot, where the third dimension along axis 1
+        contains homology dimensions, and the other two contain (birth, death)
+        pairs to be used as coordinates in the two-dimensional plot.
+
+    homology_dimensions : list of int or None, default: ``None``
+        Homology dimensions which will appear on the plot. If ``None``, all
+        homology dimensions which appear in `diagram` will be plotted.
+
     """
     if homology_dimensions is None:
-        homology_dimensions = np.unique(diagram[:,2])
+        homology_dimensions = np.unique(diagram[:, 2])
     
-    maximum_persistence = np.where(np.isinf(diagram),-np.inf,diagram).max()
+    maximum_persistence = np.where(np.isinf(diagram), -np.inf, diagram).max()
 
     layout = {
         "title": "Persistence diagram", 
@@ -137,72 +144,80 @@ def plot_diagram(diagram, homology_dimensions=None):
             "title": "Birth",
             "side": "bottom", 
             "type": "linear", 
-            "range": [0, 1.1*maximum_persistence], 
+            "range": [0, 1.1 * maximum_persistence],
             "ticks": "outside", 
             "anchor": "y1",  
             "showline": True, 
             "zeroline": True,
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         }, 
         "yaxis1": {
             "title": "Death",
             "side": "left", 
             "type": "linear", 
-            "range": [0, 1.1*maximum_persistence], 
+            "range": [0, 1.1 * maximum_persistence],
             "ticks": "outside", 
             "anchor": "x1",  
             "showline": True, 
             "zeroline": True,
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         }, 
         "plot_bgcolor": "white"
     }
 
     fig = gobj.Figure(layout=layout)
-    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
-    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
+    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                     mirror=False)
+    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                     mirror=False)
 
-    fig.add_trace(gobj.Scatter(x=np.array([-100*maximum_persistence,100*maximum_persistence]),
-    y=np.array([-100*maximum_persistence,100*maximum_persistence]), mode='lines',
-    line=dict(dash='dash',width=1,color='black'), showlegend=False, hoverinfo='none'))
+    fig.add_trace(gobj.Scatter(x=np.array([-100 * maximum_persistence,
+                                           100 * maximum_persistence]),
+                               y=np.array([-100 * maximum_persistence,
+                                           100 * maximum_persistence]),
+                               mode='lines',
+                               line=dict(dash='dash', width=1, color='black'),
+                               showlegend=False, hoverinfo='none'))
     
     for i, dimension in enumerate(homology_dimensions):
-        name = 'H'+str(int(dimension))
-        subdiagram = _subdiagrams(np.asarray([diagram]),[dimension],remove_dim=True)[0]
+        name = f"H{int(dimension)}"
+        subdiagram = _subdiagrams(np.asarray([diagram]), [dimension],
+                                  remove_dim=True)[0]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
         subdiagram = subdiagram[diff]
-        fig.add_trace(gobj.Scatter(x=subdiagram[:,0], y=subdiagram[:,1], mode='markers', name=name))
+        fig.add_trace(gobj.Scatter(x=subdiagram[:, 0], y=subdiagram[:, 1],
+                                   mode='markers', name=name))
 
     fig.show()
 
 
-def plot_landscapes(landscape, samplings=None, homology_dimensions=None):
-    """Plots the landscapes by homology dimension.
+def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
+    """Plot landscapes by homology dimension.
 
     Parameters
     ----------
-    homology_dimensions : list of int, default: ``None``
-        The list of the homology group's ranks of which one wants to plot the landscape.
-        If no list of dimensions is passed, we assume that they start from H0 with step 1.
-        
-    Input
-    -----
-    landscape : ndarray of shape (n_homology_dimension, n_layers, n_values)
-        The values of the persistence landsacpe. ``n_homology_dimension`` is the length
-        of the ``homology_dimensions`` array; ``n_layers`` is the number of landscape
-        profiles and ``n_values``is the number of samples.
-    samplings : ndarray of shape (n_homology_dimension, n_layers, n_values), default: ```None``
-        The x axis of the persistence landscape. ``n_homology_dimension`` is the length
-        of the ``homology_dimensions`` array; ``n_layers`` is the number of landscape
-        profiles and ``n_values``is the number of samples.`If no value is input, the
-        samplings will start at 0 with step 1.
+    landscapes : ndarray, shape (n_homology_dimension, n_layers, n_values)
+        Collection of ``n_homology_dimension`` discretised persistence
+        landscapes. Each landscape contains ``n_layers`` layers. Entry i along
+        axis 0 should be the persistence landscape in homology dimension i.
+
+    homology_dimensions : list of int or None, default: ``None``
+        Homology dimensions for which the Betti curves should be plotted.
+        If ``None``, all available dimensions will be used.
+
+    samplings : ndarray, shape (n_homology_dimension, n_layers, n_values), \
+                default: ``None``
+        For each homology dimension, (filtration parameter) values to be used
+        on the x-axis against the corresponding values in `landscapes` on
+        the y-axis. If ``None``, the samplings will start at 0 with step 1.
+
     """
     if homology_dimensions is None:
-        homology_dimensions = np.arange(0,landscape.shape[0])
+        homology_dimensions = np.arange(0, landscapes.shape[0])
     if samplings is None:
-        samplings = np.arange(0,landscape.shape[2])
+        samplings = np.arange(0, landscapes.shape[2])
     layout = {
         "xaxis1": {
             "side": "bottom", 
@@ -212,7 +227,7 @@ def plot_landscapes(landscape, samplings=None, homology_dimensions=None):
             "showline": True, 
             "zeroline": True,
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         }, 
         "yaxis1": {
             "side": "left", 
@@ -222,45 +237,52 @@ def plot_landscapes(landscape, samplings=None, homology_dimensions=None):
             "showline": True, 
             "zeroline": True,
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         }, 
         "plot_bgcolor": "white"
     }
     
     for i, dimension in enumerate(homology_dimensions):
         layout_dim = layout.copy()
-        layout_dim['title'] = "Persistence landscape for homology dimension "+str(int(dimension))
+        layout_dim['title'] = f"Persistence landscape for homology dimension" \
+                              f"{int(dimension)}"
         fig = gobj.Figure(layout=layout_dim)
-        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
-        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
 
-        n_layers = landscape.shape[1]
+        n_layers = landscapes.shape[1]
         for layer in range(n_layers):
             fig.add_trace(gobj.Scatter(x=samplings,
-                                       y=landscape[i,layer,:],
-            mode='lines', showlegend=False, hoverinfo='none', name='layer '+str(layer+1)))
+                                       y=landscapes[i, layer, :],
+                                       mode='lines', showlegend=False,
+                                       hoverinfo='none',
+                                       name=f"layer {layer + 1}"))
 
         fig.show()
 
 
-def plot_betti_curves(betti_curves, samplings=None, homology_dimensions=None):
-    """Plots the landscapes by homology dimension.
+def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
+    """Plot the Betti curves of a single persistence diagram by homology
+    dimension.
         
     Parameters
     ----------
-    homology_dimensions : list of int, default: ``None``
-        The list of the homology group's ranks of which one wants to plot the landscape.
-        If no list of dimensions is passed, we assume that they start from H0 with step 1.
-        
-    Input
-    -----
-    betti_curves : ndarray of shape (n_homology_dimension, n_values)
-        The values of the Betti curves. ``n_homology_dimension`` is the length
-        of the ``homology_dimensions`` array and ``n_values``is the number of samples.
-    samplings : ndarray of shape (n_homology_dimension, n_values), default: ```None``
-        The x axis of the Betti curves. ``n_homology_dimension`` is the length
-        of the ``homology_dimensions`` array and ``n_values``is the number of samples.`If no value
-        is input, the samplings will start at 0 with step 1.
+    betti_curves : ndarray, shape (n_homology_dimension, n_values)
+        Collection of ``n_homology_dimension`` discretised Betti curves.
+        Entry i along axis 0 should be the Betti curve in homology dimension i.
+
+    homology_dimensions : list of int or None, default: ``None``
+        Homology dimensions for which the Betti curves should be plotted.
+        If ``None``, all available dimensions will be used.
+
+    samplings : ndarray, shape (n_homology_dimension, n_values), \
+                default: ``None``
+        For each homology dimension, (filtration parameter) values to be used
+        on the x-axis against the corresponding values in `betti_curves` on
+        the y-axis. If ``None``, the samplings will start at 0 with step 1.
+
     """
     if homology_dimensions is None:
         homology_dimensions = np.arange(0, betti_curves.shape[0])
@@ -277,7 +299,7 @@ def plot_betti_curves(betti_curves, samplings=None, homology_dimensions=None):
             "showline": True,
             "zeroline": True,
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         },
         "yaxis1": {
             "title": "Betti number",
@@ -288,76 +310,84 @@ def plot_betti_curves(betti_curves, samplings=None, homology_dimensions=None):
             "showline": True,
             "zeroline": True,
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         },
         "plot_bgcolor": "white"
     }
     fig = gobj.Figure(layout=layout)
-    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
-    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black', mirror=False)
+    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                     mirror=False)
+    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                     mirror=False)
 
     for i, dimension in enumerate(homology_dimensions):
         fig.add_trace(gobj.Scatter(x=samplings,
-                                   y=betti_curves[i,:],
+                                   y=betti_curves[i, :],
                                    mode='lines', showlegend=False,
                                    hoverinfo='none'))
         
     fig.show()
 
 
-def plot_betti_surfaces(betti_curves, samplings=None, homology_dimensions=None):
-    """
-    Plots the Betti surfaces (Betti number against time and epsilon) by homology dimension.
+def plot_betti_surfaces(betti_curves, samplings=None,
+                        homology_dimensions=None):
+    """Plots the Betti surfaces (Betti numbers against time and filtration
+    parameter) by homology dimension.
 
     Parameters
     ----------
-    betti_curves : ndarray of shape (n_samples, n_homology_dimensions, n_values)
-        The Betti curves across time, sampled in ``n_samples`` samples.
-        ``n_homology_dimension`` is the length
-        of the ``homology_dimensions`` array and ``n_values``is the number of samples.
+    betti_curves : ndarray, shape (n_samples, n_homology_dimensions, \
+                   n_values)
+        ``n_samples`` collections of discretised Betti curves. There are
+        ``n_homology_dimension`` curves in each collection. Index i along axis
+        1 should yield all Betti curves in homology dimension i.
 
-    homology_dimensions : list of ints, default ``None``
-        The list of homology dimensions for which the Betti surface is plotted.
-        None means that the Betti surface of
-        every homology dimension is plotted.
+    homology_dimensions : list of int or None, default: ``None``
+        Homology dimensions for which the Betti surfaces should be plotted.
+        If ``None``, all available dimensions will be used.
+
+    samplings : ndarray, shape (n_homology_dimension, n_values), \
+                default: ``None``
+        For each homology dimension, (filtration parameter) values to be used
+        on the x-axis against the corresponding values in `betti_curves` on the
+        y-axis. If ``None``, the samplings will start at 0 with step 1.
+
     """
     if homology_dimensions is None:
-        homology_dimensions = np.arange(0,betti_curves.shape[1])
+        homology_dimensions = np.arange(0, betti_curves.shape[1])
     if samplings is None:
-        samplings = np.arange(0,betti_curves.shape[2])
+        samplings = np.arange(0, betti_curves.shape[2])
 
     scene = {
         "xaxis": {
             "title": "Epsilon",
             "type": "linear",
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         }, 
         "yaxis": {
             "title": "Time",
             "type": "linear", 
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         },
         "zaxis": {
             "title": "Betti number",
             "type": "linear", 
             "showexponent": "all",
-            "exponentformat" : "e"
+            "exponentformat": "e"
         } 
     }
-    if betti_curves.shape[0]==1:
-        plot_betti_curves(betti_curves[0],samplings,homology_dimensions)
+    if betti_curves.shape[0] == 1:
+        plot_betti_curves(betti_curves[0], samplings, homology_dimensions)
     else:
         for i, dimension in enumerate(homology_dimensions):
             fig = gobj.Figure()
-            fig.update_layout(scene=scene, title="Betti surface for homology dimension "+str(dimension))
-            fig.add_trace(gobj.Surface(x=samplings, y=np.arange(betti_curves.shape[0]),
-                                       z=betti_curves[:,i,:],connectgaps=True, hoverinfo='none'))
+            fig.update_layout(scene=scene, title=f"Betti surface for homology"
+                                                 f"dimension {int(dimension)}")
+            fig.add_trace(gobj.Surface(x=samplings,
+                                       y=np.arange(betti_curves.shape[0]),
+                                       z=betti_curves[:, i, :],
+                                       connectgaps=True, hoverinfo='none'))
             
             fig.show()
-
-
-
-
-
