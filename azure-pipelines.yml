@@ -23,7 +23,10 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install -e plotly matplotlib openml
+      echo 'variable: '
+      echo $(build_check) 
+      pip install plotly matplotlib
+      python -m pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -58,7 +61,8 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install -e plotly matplotlib openml
+      pip install plotly matplotlib
+      python -m pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
@@ -87,7 +91,8 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install -e plotly matplotlib openml
+      pip install plotly matplotlib
+      pip install -e openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
