@@ -4,7 +4,7 @@ method."""
 
 
 class TransformerResamplerMixin:
-    """Mixin class for all transformers-resamplers in giotto."""
+    """Mixin class for all transformers-resamplers in giotto-learn."""
 
     _estimator_type = 'transformer_resampler'
 
@@ -19,7 +19,7 @@ class TransformerResamplerMixin:
         X : ndarray, shape (n_samples, n_features)
             Training set.
 
-        y : ndarray, shape (n_samples, 1) TODO CHECK
+        y : ndarray, shape (n_samples,)
             Target values.
 
         Returns
@@ -48,7 +48,7 @@ class TransformerResamplerMixin:
         X : ndarray, shape (n_samples, n_features)
             Training set.
 
-        y : ndarray, shape (n_samples, 1) TODO CHECK
+        y : ndarray, shape (n_samples,)
             Target values.
 
         Returns
@@ -70,7 +70,7 @@ class TransformerResamplerMixin:
         X : ndarray, shape (n_samples, n_features)
             Training set.
 
-        y : ndarray, shape (n_samples, 1) TODO CHECK
+        y : ndarray, shape (n_samples,)
             Target values.
 
         Returns
