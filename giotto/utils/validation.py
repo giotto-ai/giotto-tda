@@ -61,6 +61,18 @@ def check_diagram(X):
 
 
 def check_graph(X):
+    if len(X.shape) != 3:
+        raise ValueError("Graph structure dimension error: {}. "
+                         "Graph structure dimension must be equal "
+                         "to 3.".format(len(X.shape)))
+    if X.shape[1] != X.shape[2]:
+        raise TypeError("Matrix is not square")
+    if np.sum(np.diagonal(X, axis1=1, axis2=2)) != 0:
+        raise ValueError("At least one matrix diagonal element is not 0")
+    if not np.allclose(X, np.transpose(X, (0, 2, 1))):
+        raise ValueError("Matrix is not symmetric")
+    if np.sum(X < 0) > 0:
+        raise ValueError("At least one matrix element is smaller than 0")
     return X
 
 
