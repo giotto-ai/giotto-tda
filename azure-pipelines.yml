@@ -102,7 +102,9 @@ jobs:
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables[$(build_check)], 'true')
+  variables:
+    build_check: '$(build_check)'
+  condition: eq(variables['${{ build_check }}'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
