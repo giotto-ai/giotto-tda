@@ -103,8 +103,8 @@ jobs:
 
 - job: 'manylinux2010'
   variables:
-    build_check: '$(build_check)'
-  condition: eq(variables['${{ build_check }}'], 'true')
+    buildCheck: '$(build_check)'
+  condition: eq(variables['buildCheck'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -234,7 +234,9 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq(variables['${{ $(build_check) }}'], 'true')
+  variables:
+    buildCheck: $(build_check)
+  condition: eq(variables['buildCheck'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
