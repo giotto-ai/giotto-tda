@@ -8,12 +8,11 @@ from sklearn.utils.validation import check_is_fitted, check_array
 
 
 class PearsonDissimilarity(BaseEstimator, TransformerMixin):
-    """Pearson dissimilarities from multivariate time series or other
-    samples of several variables.
+    """Pearson dissimilarities from collections of multivariate time series.
 
-    The sample Pearson correlation coefficients between pairs of variables
-    in a sample of :math:`N` variables form an :math:`N \\times N` matrix
-    :math:`R` with entries
+    The sample Pearson correlation coefficients between pairs of
+    components of an :math:`N`-variate time series form an :math:`N
+    \\times N` matrix :math:`R` with entries
 
     .. math:: R_{ij} = \\frac{ C_{ij} }{ \\sqrt{ C_{ii} C_{jj} } },
 
@@ -21,9 +20,9 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     (1 - R_{ij})/2` or :math:`D_{ij} = 1 - |R_{ij}|` we obtain a
     dissimilarity matrix with entries between 0 and 1.
 
-    This transformer computes one such matrix per multivariate sample in
-    a collection. Often, such samples are multivariate time series or windows
-    over a common multivariate time series.
+    This transformer computes one dissimilarity matrix per multivariate time
+    series in a collection. Examples of such collections are the outputs of
+    :class:`SlidingWindow`.
 
     Parameters
     ----------
