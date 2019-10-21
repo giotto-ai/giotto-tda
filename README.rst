@@ -20,7 +20,7 @@ giotto-learn
 ============
 
 
-giotto-learn is a high performance topological toolbox for machine learning in Python built on top of
+giotto-learn is a high performance topological machine learning toolbox in Python built on top of
 scikit-learn and is distributed under the Apache 2.0 license. It is part of the Giotto open-source project.
 
 Website: http://www.giotto.ai
@@ -53,7 +53,7 @@ the easiest way to install giotto-learn is using ``pip``   ::
 Documentation
 -------------
 
-- HTML documentation (stable release): https://www.docs.giotto.ai
+- HTML documentation (stable release): https://docs.giotto.ai
 
 Contributing
 ------------

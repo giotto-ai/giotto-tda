@@ -52,6 +52,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         See the documentation for :obj:`scipy.spatial.distance` for details on
         these metrics.
 
+    metric_params : dict, optional, default: ``{}``
+        Additional keyword arguments for the metric function.
+
     p : int, optional, default: ``2``
         Parameter for the Minkowski (i.e. :math:`\\ell^p`) metric from
         :obj:`sklearn.metrics.pairwise.pairwise_distances`. `p` = 1 is the
