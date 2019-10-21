@@ -92,7 +92,7 @@ class Pipeline(pipeline.Pipeline):
     >>> ]
     >>> pipeline = Pipeline(steps)
     >>>
-    >>> Xt_train, yr_train = pipeline.\
+    >>> Xt_train, yr_train = pipeline.\\
     >>>     fit_transform_resample(X_train, y_train)
     >>>
     >>> print(X_train_final.shape, y_train_final.shape)
