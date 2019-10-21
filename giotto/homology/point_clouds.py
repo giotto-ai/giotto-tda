@@ -13,14 +13,14 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
+    """`Persistence diagrams <https://www.giotto.ai/theory>`_ resulting from
+    `Vietoris-Rips filtrations <https://www.giotto.ai/theory>`_.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space, or an
-    abstract `metric space <https://giotto.ai/theory>`_ encoded by a
+    Given a `point cloud <https://www.giotto.ai/theory>`_ in Euclidean space,
+    or an abstract `metric space <https://www.giotto.ai/theory>`_ encoded by a
     distance matrix, information about the appearance and disappearance of
     topological features (technically, `homology classes
-    <https://giotto.ai/theory>`_) of various dimensions and at different
+    <https://www.giotto.ai/theory>`_) of various dimensions and at different
     scales is summarised in the corresponding persistence diagram.
 
     Parameters

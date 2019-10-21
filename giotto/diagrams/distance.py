@@ -11,7 +11,7 @@ from ..utils.validation import check_diagram, validate_params, \
 
 
 class PairwiseDistance(BaseEstimator, TransformerMixin):
-    """`Distances <https://giotto.ai/theory>`_ between pairs of persistence
+    """`Distances <https://www.giotto.ai/theory>`_ between pairs of persistence
     diagrams, constructed from the distances between their respective
     subdiagrams with constant homology dimension.
 
@@ -204,7 +204,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
 
 class Amplitude(BaseEstimator, TransformerMixin):
-    """`Amplitudes <https://giotto.ai/theory>`_ of persistence diagrams,
+    """`Amplitudes <https://www.giotto.ai/theory>`_ of persistence diagrams,
     constructed from the amplitudes of their subdiagrams with constant
     homology dimension.
 
