@@ -2,6 +2,7 @@
 
 import warnings
 
+import types
 import numpy as np
 from scipy import sparse as sp
 from scipy.sparse import SparseEfficiencyWarning
