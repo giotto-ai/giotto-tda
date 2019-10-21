@@ -33,10 +33,10 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
-- job: 'test_macOS1013'
+- job: 'test_macOS1014'
   condition: eq(variables['build_check'], 'false')
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-10.14'
   strategy:
     matrix:
       Python36:
