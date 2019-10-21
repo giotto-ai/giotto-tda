@@ -262,7 +262,7 @@ class Pipeline(pipeline.Pipeline):
         Xt : array-like, shape (n_samples, n_transformed_features)
             Transformed samples.
 
-        yt : array-like, shape (n_samples, n_transformed_features)
+        yr : array-like, shape (n_samples, n_transformed_features)
             Transformed target.
 >>>>>>> 9141480634c250990ae1247907cfa9dcc40bef93
         """
