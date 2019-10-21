@@ -153,18 +153,18 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new,)
+        yr : ndarray, shape (n_samples_new,)
             The resampled target. ``n_samples_new = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        yt = column_or_1d(y)
+        yr = column_or_1d(y)
 
-        yt = np.flip(yt)
-        yt = np.flip(yt[:-self.width:self.stride])
-        return yt
+        yr = np.flip(yr)
+        yr = np.flip(yr[:-self.width:self.stride])
+        return yr
 
 
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
@@ -448,16 +448,16 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new,)
+        yr : ndarray, shape (n_samples_new,)
             The resampled target. ``n_samples_new = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['time_delay_', 'dimension_'])
-        yt = column_or_1d(y)
+        yr = column_or_1d(y)
 
-        yt = np.flip(yt)
+        yr = np.flip(yr)
         final_index = -self.time_delay_ * (self.dimension_ - 1)
-        yt = np.flip(yt[:final_index:self.stride])
-        return yt
+        yr = np.flip(yr[:final_index:self.stride])
+        return yr

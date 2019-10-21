@@ -188,9 +188,9 @@ class Pipeline(pipeline.Pipeline):
             This estimator
 
         """
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
         if self._final_estimator != 'passthrough':
-            self._final_estimator.fit(Xt, yt, **fit_params)
+            self._final_estimator.fit(Xt, yr, **fit_params)
         return self
 
     def fit_transform(self, X, y=None, **fit_params):
@@ -222,13 +222,13 @@ class Pipeline(pipeline.Pipeline):
 
         """
         last_step = self._final_estimator
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
         if last_step == 'passthrough':
             return Xt
         elif hasattr(last_step, 'fit_transform'):
-            return last_step.fit_transform(Xt, yt, **fit_params)
+            return last_step.fit_transform(Xt, yr, **fit_params)
         else:
-            return last_step.fit(Xt, yt, **fit_params).transform(Xt)
+            return last_step.fit(Xt, yr, **fit_params).transform(Xt)
 
     def fit_transform_resample(self, X, y=None, **fit_params):
         """Fit the model and sample with the final estimator.
@@ -257,17 +257,17 @@ class Pipeline(pipeline.Pipeline):
         Xt : array-like, shape (n_samples, n_transformed_features)
             Transformed samples.
 
-        yt : array-like, shape (n_samples, n_transformed_features)
+        yr : array-like, shape (n_samples, n_transformed_features)
             Transformed target.
         """
         last_step = self._final_estimator
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
         if last_step == 'passthrough':
-            return Xt, yt
+            return Xt, yr
         elif hasattr(last_step, 'fit_transform_resample'):
-            return last_step.fit_transform_resample(Xt, yt, **fit_params)
+            return last_step.fit_transform_resample(Xt, yr, **fit_params)
         elif hasattr(last_step, 'fit_transform'):
-            return last_step.fit_transform(Xt, yt, **fit_params), yt
+            return last_step.fit_transform(Xt, yr, **fit_params), yr
 
     @if_delegate_has_method(delegate='_final_estimator')
     def fit_predict(self, X, y=None, **fit_params):
@@ -296,8 +296,8 @@ class Pipeline(pipeline.Pipeline):
         -------
         y_pred : array-like
         """
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
-        return self.steps[-1][-1].fit_predict(Xt, yt, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
+        return self.steps[-1][-1].fit_predict(Xt, yr, **fit_params)
 
     @property
     def resample(self):
@@ -325,10 +325,10 @@ class Pipeline(pipeline.Pipeline):
         return self._resample
 
     def _resample(self, X, y=None):
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter():
-            yt =  transform.resample(yt)
-        return yt
+            yr =  transform.resample(yr)
+        return yr
 
 
     @property
@@ -359,13 +359,13 @@ class Pipeline(pipeline.Pipeline):
         return self._transform_resample
 
     def _transform_resample(self, X, y):
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter():
             if hasattr(transform, 'transform_resample'):
-                Xt, yt = transform.transform_resample(Xt, yt)
+                Xt, yr = transform.transform_resample(Xt, yr)
             else:
                 Xt = transform.transform(Xt)
-        return Xt, yt
+        return Xt, yr
 
     @property
     def transform(self):
@@ -391,7 +391,7 @@ class Pipeline(pipeline.Pipeline):
         return self._transform
 
     def _transform(self, X, y=None):
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter():
             Xt =  transform.transform(Xt)
         return Xt
@@ -420,10 +420,10 @@ class Pipeline(pipeline.Pipeline):
         return self._inverse_transform
 
     def _inverse_transform(self, X, y=None):
-        Xt, yt = X, y
+        Xt, yr = X, y
         reverse_iter = reversed(list(self._iter()))
         for _, _, transform in self._iter():
-            Xt = transform.inverse_transform(Xt, yt)
+            Xt = transform.inverse_transform(Xt, yr)
         return Xt
 
     @if_delegate_has_method(delegate='_final_estimator')
@@ -448,17 +448,17 @@ class Pipeline(pipeline.Pipeline):
         -------
         score : float
         """
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter(with_final=False):
             if (hasattr(transform, "transform_resample")):
-                Xt, yt = transform.transform_resample(Xt, yt)
+                Xt, yr = transform.transform_resample(Xt, yr)
             else:
                 Xt = transform.transform(Xt)
 
         score_params = {}
         if sample_weight is not None:
             score_params['sample_weight'] = sample_weight
-        return self.steps[-1][-1].score(Xt, yt, **score_params)
+        return self.steps[-1][-1].score(Xt, yr, **score_params)
 
 
 def _fit_transform_one(transformer, weight, X, y, **fit_params):
