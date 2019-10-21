@@ -105,7 +105,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
-    _hyperparameters = {'func_': [types.FunctionType]}
+    _hyperparameters = {'_func': [types.FunctionType]}
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):
         self.func = func
@@ -157,7 +157,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         else:
             self.effective_func_params_ = self.func_params.copy()
 
-        validate_params({**self.get_params(), 'func_': self.func_},
+        validate_params({**self.get_params(), '_func': self._func},
                         self._hyperparameters)
 
         return self
