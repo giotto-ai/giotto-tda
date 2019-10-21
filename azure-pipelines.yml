@@ -2,6 +2,7 @@
 
 jobs:
 - job: 'test_ubuntu1604'
+  condition: eq(variables['build_check'], 'false')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -33,6 +34,7 @@ jobs:
 
 
 - job: 'test_macOS1013'
+  condition: eq(variables['build_check'], 'false')
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -70,6 +72,7 @@ jobs:
 
 
 - job: 'test_win2016'
+  condition: eq(variables['build_check'], 'false')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
