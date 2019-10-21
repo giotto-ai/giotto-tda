@@ -8,9 +8,7 @@ from sklearn.utils.validation import check_is_fitted, check_array
 
 
 class PearsonCorrelation(BaseEstimator, TransformerMixin):
-    """Transformer performing an argsort of each row in each array in a
-    collection. Based on ideas in `arXiv:1904.07403
-    <https://arxiv.org/abs/1904.07403>`_.
+    """TODO
 
     Parameters
     ----------
@@ -35,7 +33,7 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
             Input data.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -58,7 +56,7 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
             Input data.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
+            There is no need for a target in a transformer, yet the pipeline API
             requires this parameter.
 
         Returns

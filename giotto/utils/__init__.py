@@ -1,5 +1,5 @@
-"""The module :mod:`giotto.utils` implements hyperparameters and input validation
-functions."""
+"""The module :mod:`giotto.utils` implements hyperparameter and input
+validation functions."""
 
 from .validation import check_diagram, check_graph
 from .validation import validate_metric_params, validate_params

@@ -13,15 +13,15 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <LINK TO GLOSSARY>`_ resulting from
-    `Vietoris-Rips filtrations <LINK TO GLOSSARY>`_.
+    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
+    `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
 
-    Given a `point cloud <LINK TO GLOSSARY>`_ in Euclidean space, or an
-    abstract `metric space <LINK TO GLOSSARY>`_ encoded by a distance matrix,
-    information about the appearance and disappearance of topological features
-    (technically, `homology classes <LINK TO GLOSSARY>`_) of various
-    dimensions and at different scales is summarised in the corresponding
-    persistence diagram.
+    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space, or an
+    abstract `metric space <https://giotto.ai/theory>`_ encoded by a
+    distance matrix, information about the appearance and disappearance of
+    topological features (technically, `homology classes
+    <https://giotto.ai/theory>`_) of various dimensions and at different
+    scales is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
@@ -32,8 +32,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         and `metric` determines a rule with which to calculate distances
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
-        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``,
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
@@ -119,9 +119,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be
-            interpreted as an ndarray of `n_points` in Euclidean space of
-            dimension `n_dimensions`.
+            ``(n_points, n_points)``. Otherwise, each such entry will be
+            interpreted as an ndarray of ``n_points`` row vectors in
+            ``n_dimensions``-dimensional space.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -166,9 +166,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
-            (n_points, n_points). Otherwise, each such entry will be
-            interpreted as an ndarray of `n_points` in Euclidean space of
-            dimension `n_dimensions`.
+            ``(n_points, n_points)``. Otherwise, each such entry will be
+            interpreted as an ndarray of ``n_points`` row vectors in
+            ``n_dimensions``-dimensional space.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -178,9 +178,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
-            distance matrices in `X`. `n_features` equals :math:`\\sum_q n_q`,
-            where :math:`n_q` is the maximum number of topological features
-            in dimension :math:`q` across all samples in `X`.
+            distance matrices in `X`. ``n_features`` equals
+            :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
+            topological features in dimension :math:`q` across all samples in
+            `X`.
 
         """
         # Check if fit had been called
@@ -192,7 +193,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         n_samples = len(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
-            for i in range(n_samples))
+                                          for i in range(n_samples))
 
         max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
                                             for i in range(n_samples)]))
