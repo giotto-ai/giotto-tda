@@ -1,3 +1,4 @@
+"""Resampling and stationarization of time series data."""
 # License: Apache 2.0
 
 from sklearn.utils.validation import check_is_fitted
@@ -9,31 +10,27 @@ import numpy as np
 
 
 class Resampler(BaseEstimator, TransformerResamplerMixin):
-    """Data sampling transformer that returns a sampled numpy.ndarray.
+    """Time series resampling at regular intervals.
 
     Parameters
     ----------
-    period : int, default: 2
+    period : int, default: ``2``
         The sampling period, i.e. one point every period will be kept.
 
     Examples
     --------
-    >>> import pandas as pd
     >>> import numpy as np
-    >>> import matplotlib.pyplot as plt
     >>> from giotto.time_series import Resampler
-    >>> # Create a noisy signal sampled
+    >>> # Create a noisy signal
     >>> signal = np.asarray([np.sin(x /40) + np.random.random()
-    ... for x in range(0, 300)])
-    >>> plt.plot(signal)
-    >>> plt.show()
+    ...                      for x in range(0, 300)])
     >>> # Set up the Resampler
     >>> period = 10
     >>> periodic_sampler = Resampler(period=period)
-    >>> # Fit and transform the DataFrame
-    >>> periodic_sampler.fit(signal)
-    >>> signal_resampled = periodic_sampler.transform(signal)
-    >>> plt.plot(signal_resampled)
+    >>> # Fit and transform the signal
+    >>> signal_resampled = periodic_sampler.fit_transform(signal)
+    >>> print(signal_resampled.shape)
+    (30,)
 
     """
     _hyperparameters = {'period': [int, (1, np.inf)]}
@@ -49,7 +46,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -61,69 +58,75 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X, ensure_2d=False)
+        check_array(X, ensure_2d=False, allow_nd=True)
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """Transform/resample X.
+        """Resample `X`.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
-            Input data. ``
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
+            Input data.
 
         y : None
-            There is no need of a target, yet the pipeline API
+            There is no need for a target, yet the pipeline API
             requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_new, n_features)
-            The transformed/resampled input array. ``n_samples_new =
-            n_samples // period``.
+        Xt : ndarray, shape (n_samples_new, ...)
+            Resampled array. ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        X = check_array(X, ensure_2d=False)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True)
+        if Xt.ndim == 1:
+            Xt = Xt[: None]
+        Xt = Xt[::self.period]
 
-        return X[::self.period]
+        return Xt
 
     def resample(self, y, X=None):
         """Resample y.
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, n_features)
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
-            There is no need of input data,
+            There is no need for input data,
             yet the pipeline API requires this parameter.
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, 1)
-            The resampled target. ``n_samples_new = n_samples // period``.
+        yt : ndarray, shape (n_samples_new,)
+            Resampled target. ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        y = column_or_1d(y)
+        yt = column_or_1d(y)
+        yt = yt[::self.period]
 
-        return y[::self.period]
+        return yt
 
 
 class Stationarizer(BaseEstimator, TransformerResamplerMixin):
-    """Data sampling transformer that returns numpy.ndarray.
+    """Methods for stationarizing time series data.
+
+    Time series may be stationarized to remove or reduce linear or exponential
+    trends.
 
     Parameters
     ----------
     operation : ``'return'`` | ``'log-return'``, default: ``'return'``
-        The type of stationarization operation with which to stationarize
-        the time series. It can have two values:
+        The type of stationarization operation to perform. It can have two
+        values:
 
         - ``'return'``:
           This option transforms the time series :math:`{X_t}_t` into the
@@ -138,18 +141,16 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> import matplotlib.pyplot as plt
     >>> from giotto.time_series import Stationarizer
-    >>> # Create a noisy signal sampled
+    >>> # Create a noisy signal
     >>> signal = np.asarray([np.sin(x /40) + 5 + np.random.random()
-    >>> for x in range(0, 300)]).reshape(-1, 1)
-    >>> plt.plot(signal)
-    >>> plt.show()
+    >>>                      for x in range(0, 300)]).reshape(-1, 1)
     >>> # Initialize the stationarizer
-    >>> stationarizer = Stationarizer(stationarization_type='return')
-    >>> stationarizer.fit(signal)
-    >>> signal_stationarized = stationarizer.transform(signal)
-    >>> plt.plot(signal_stationarized)
+    >>> stationarizer = Stationarizer(operation='return')
+    >>> # Fit and transform the signal
+    >>> signal_stationarized = stationarizer.fit_transform(signal)
+    >>> print(signal_stationarized.shape)
+    (299,)
 
     """
     _hyperparameters = {'operation': [str, ['return', 'log-return']]}
@@ -165,7 +166,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -177,55 +178,56 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X, ensure_2d=False)
+        check_array(X, ensure_2d=False, allow_nd=True)
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """Transform/resample X.
+        """Stationarize `X` by applying the procedure given by `operation`.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
-            There is no need of a target, yet the pipeline API
+            There is no need for a target, yet the pipeline API
             requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_new, n_features)
-            The transformed/resampled input array. ``n_samples_new =
-            n_samples - 1``.
+        Xt : ndarray, shape (n_samples_new, ...)
+            Stationarized array. ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        X = check_array(X, ensure_2d=False)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True)
+        if Xt.ndim == 1:
+            Xt = Xt[:, None]
 
         if self.operation == 'return':
-            return np.diff(X, n=1, axis=0) / X[1:]
-        else:  # 'log-return' operation
-            return np.diff(np.log(X), n=1, axis=0)
+            return np.diff(Xt, n=1, axis=0) / Xt[1:]
+        else:  # Assumes 'log-return' operation
+            return np.diff(np.log(Xt), n=1, axis=0)
 
     def resample(self, y, X=None):
-        """Resample y.
+        """Resample `y`.
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, n_features)
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
-            There is no need of input data,
+            There is no need for input data,
             yet the pipeline API requires this parameter.
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, 1)
-            The resampled target. ``n_samples_new = n_samples - 1``.
+        yt : ndarray, shape (n_samples_new,)
+            Resampled target. ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called

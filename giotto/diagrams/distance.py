@@ -11,9 +11,9 @@ from ..utils.validation import check_diagram, validate_params, \
 
 
 class PairwiseDistance(BaseEstimator, TransformerMixin):
-    """`Distances <LINK TO GLOSSARY>`_ between pairs of persistence diagrams,
-    constructed from the distances between their respective subdiagrams with
-    constant homology dimension.
+    """`Distances <https://www.giotto.ai/theory>`_ between pairs of persistence
+    diagrams, constructed from the distances between their respective
+    subdiagrams with constant homology dimension.
 
     Given two collections of persistence diagrams consisting of
     birth-death-dimension triples [b, d, q], a collection of distance
@@ -37,7 +37,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-           perfect-matching--based notions of distance.
+          perfect-matching--based notions of distance.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
@@ -109,7 +109,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Fit the estimator and return it.
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute
+        :attr:`effective_metric_params`. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -122,14 +124,15 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
         self : object
 
         """
+        X = check_diagram(X)
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
@@ -145,9 +148,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
-        X = check_diagram(X)
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['samplings'], \
@@ -169,15 +171,14 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_fit, n_samples, \
-             n_homology_dimensions) if `order` is ``None``, \
-             else (n_samples_fit, n_samples).
-            PairwiseDistance matrix or collection of distance matrices between
+        Xt : ndarray, shape (n_samples_fit, n_samples, n_homology_dimensions) \
+             if `order` is ``None``, else (n_samples_fit, n_samples)
+            Distance matrix or collection of distance matrices between
             diagrams in `X` and diagrams seen in :meth:`fit`. In the
             second case, index i along axis 2 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -203,8 +204,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
 
 class Amplitude(BaseEstimator, TransformerMixin):
-    """`Amplitudes <LINK TO GLOSSARY>`_ of persistence diagrams, constructed
-    from the amplitudes of their subdiagrams with constant homology dimension.
+    """`Amplitudes <https://www.giotto.ai/theory>`_ of persistence diagrams,
+    constructed from the amplitudes of their subdiagrams with constant
+    homology dimension.
 
     Given a single persistence diagram consisting of birth-death-dimension
     triples [b, d, q], a vector of amplitudes or a single scalar amplitude is
@@ -226,7 +228,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-           perfect-matching--based notions of distance.
+          perfect-matching--based notions of distance.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
@@ -291,7 +293,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Fit the estimator and return it.
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute
+        :attr:`effective_metric_params`. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -304,8 +308,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -327,7 +331,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         validate_params(hyperparameters, self._hyperparameters)
         validate_metric_params(self.metric, self.effective_metric_params_)
         X = check_diagram(X)
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         if self.metric in ['landscape', 'heat', 'betti']:
             self.effective_metric_params_['samplings'], \
@@ -347,13 +351,13 @@ class Amplitude(BaseEstimator, TransformerMixin):
             through their birth (b), death (d) and homology dimension (q).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions) if `order` is \
-             ``None``, else (n_samples, 1)
+        Xt : ndarray, shape (n_samples, n_homology_dimensions) if `order` \
+             is ``None``, else (n_samples, 1)
             Amplitudes or amplitude vectors of the diagrams in `X`. In the
             second case, index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -369,5 +373,5 @@ class Amplitude(BaseEstimator, TransformerMixin):
                                  self.n_jobs)
         if self.order is None:
             return Xt
-        Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape((-1, 1))
+        Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
         return Xt

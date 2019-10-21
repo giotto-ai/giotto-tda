@@ -6,7 +6,7 @@ persistent homology.
 from .embedding import SlidingWindow, TakensEmbedding
 from .features import PermutationEntropy
 from .preprocessing import Resampler, Stationarizer
-from .multivariate import PearsonCorrelation
+from .multivariate import PearsonDissimilarity
 from .target import Labeller
 
 __all__ = [
@@ -16,5 +16,5 @@ __all__ = [
     'TakensEmbedding',
     'SlidingWindow',
     'Labeller',
-    'PearsonCorrelation'
+    'PearsonDissimilarity'
 ]

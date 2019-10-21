@@ -1,16 +1,18 @@
-"""Implements a TransformerResamplerMixin for transformers that have a resample method."""
+"""Implements a TransformerResamplerMixin for transformers that have a resample
+method."""
 # License: Apache 2.0
 
 
 class TransformerResamplerMixin:
-    """Mixin class for all transformers resamplers in giotto."""
+    """Mixin class for all transformers-resamplers in giotto-learn."""
 
     _estimator_type = 'transformer_resampler'
 
     def fit_transform(self, X, y=None, **fit_params):
         """Fit to data, then transform it.
-        Fits transformer to X and y with optional parameters fit_params
-        and returns a transformed version of X.
+
+        Fits transformer to `X` and `y` with optional parameters `fit_params`
+        and returns a transformed version of `X`.
 
         Parameters
         ----------
@@ -36,8 +38,9 @@ class TransformerResamplerMixin:
 
     def transform_resample(self, X, y):
         """Fit to data, then transform it.
-        Fits transformer to X and y with optional parameters fit_params
-        and returns a transformed version of X.
+
+        Fits transformer to `X` and `y` with optional parameters `fit_params`
+        and returns a transformed version of `X`.
 
         Parameters
         ----------

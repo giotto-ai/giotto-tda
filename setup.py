@@ -52,6 +52,7 @@ EXTRAS_REQUIRE = {
         'pytest-cov',
         'pytest-azurepipelines',
         'pytest-benchmark',
+        'jupyter_contrib_nbextensions',
         'flake8'],
     'doc': [
         'sphinx',

@@ -8,40 +8,55 @@ from giotto import diagrams as diag
 
 
 class EntropyGenerator(BaseEstimator, TransformerMixin):
-    r"""Meta transformer that returns the persistent entropy.
+    """Persistence entropies directly from point clouds.
+
+    Implements a feature generation pipeline which computes persistence
+    diagrams, scales and filters them, and then computes their persistence
+    entropies.
 
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to ``'precomputed'``, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and ``metric`` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
-        If ``metric`` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
-        "manhattan", or "cosine".
-        If ``metric`` is a callable function, it is called on each pair of
+        If set to ``'precomputed'``, each entry in `X` along axis 0 is
+        interpreted to be a distance matrix. Otherwise, entries are
+        interpreted as feature arrays, and `metric` determines a rule with
+        which to calculate distances between pairs of instances (i.e. rows)
+        in these arrays.
+        If `metric` is a string, it must be one of the options allowed by
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
+        including "euclidean", "manhattan" or "cosine".
+        If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value indicating
-        the distance between them.
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    max_edge_length : float, optional, default: ``numpy.inf``
+        Upper bound on the maximum value of the Vietoris-Rips filtration
+        parameter. Points whose distance is greater than this value will
+        never be connected by an edge, and topological features at scales
+        larger than this value will not be detected.
+
+    homology_dimensions : iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological features to be
+        detected.
 
     scaler_metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
                     ``'betti'`` | ``'heat'``, optional, default: \
                     ``'bottleneck'``
-        Which notion of distance between (sub)diagrams to use:
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-           perfect-matching--based notions of distance.
+          perfect-matching--based notions of distance.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
 
-    scaler_metric_params : dict, optional, default: {'n_samples': 200}
-        Additional keyword arguments for the norm function:
+    scaler_metric_params : dict or None, optional, default: ``None``
+        Additional keyword arguments for `scaler_metric`:
 
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
@@ -55,64 +70,43 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
 
-    max_edge_length : float, optional, default: np.inf
-        Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter.
-        Points whose distance is greater than this value will never be
-        connected by an edge, and topological features at scales larger than
-        this value will not be detected.
-
-    function : callable, optional, default: numpy.max
+    scaler_function : callable, optional, default: ``numpy.max``
         Function used to extract a single positive scalar from the collection
         of norms of diagrams.
 
-    n_jobs : int or None, optional, default: None
+    filter_epsilon : float, optional, default: ``0.``
+        The cutoff value controlling the amount of filtering.
+
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
-
-    homology_dimensions : list or None, optional, default: None
-        When set to ``None``, all available (sub)diagrams will be filtered.
-        When set to a list, it is interpreted as the list of those homology
-        dimensions for which (sub)diagrams should be filtered.
-
-    epsilon : float, optional, default: 0.
-        The cutoff value controlling the amount of filtering.
-
-    len_vector : int, optional, default: 8
-        Used for performance optimization by exploiting numpy's vectorization
-        capabilities.
-
-    Attributes
-    ----------
-    _n_features : int
-        Number of features (i.e. number of time series) passed as an input
-        of the resampler.
 
     Examples
     --------
     >>> from giotto.meta_transformers import EntropyGenerator as eg
     >>> import numpy as np
     >>> ent = eg()
-    >>> X = np.asarray([[[1,2],[2,1],[1,1]]])
-    >>> X_tr = ent.fit_transform(X)
-    >>> X_tr
-    ... array([[ 0.69314718, -0.        ]])
+    >>> X = np.asarray([[[1, 2], [2, 1], [1, 1]]])
+    >>> Xt = ent.fit_transform(X)
+    >>> print(Xt)
+    [[0.69314718, -0.]]
 
     """
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
                  homology_dimensions=(0, 1), scaler_metric='bottleneck',
-                 scaler_metric_params=None, epsilon=0., n_jobs=None,
-                 function=np.max):
+                 scaler_metric_params=None,
+                 scaler_function=np.max, filter_epsilon=0.,
+                 n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
-        self.n_jobs = n_jobs
-        self.epsilon = epsilon
-        self.function = function
         self.scaler_metric = scaler_metric
         self.scaler_metric_params = scaler_metric_params
+        self.scaler_function = scaler_function
+        self.filter_epsilon = filter_epsilon
+        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -122,7 +116,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape: (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -134,7 +128,6 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
 
@@ -144,14 +137,13 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
                 max_edge_length=self.max_edge_length,
                 homology_dimensions=self.homology_dimensions,
                 n_jobs=self.n_jobs)),
-            ('rescaler', diag.Scaler(
+            ('scaler', diag.Scaler(
                 metric=self.scaler_metric,
                 metric_params=self.scaler_metric_params,
-                function=self.function,
+                function=self.scaler_function,
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
-                epsilon=self.epsilon,
-                homology_dimensions=self.homology_dimensions)),
+                epsilon=self.filter_epsilon)),
             ('entropy', diag.PersistenceEntropy(n_jobs=self.n_jobs))]
 
         self._pipeline = Pipeline(steps).fit(X)
@@ -159,27 +151,25 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Extract the persistent entropy from X.
+        """Extract persistence entropies from the sample point clouds in `X`.
 
         Parameters
         ----------
-        X : ndarray, shape: (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
-            point cloud (i.e. the dimension of the point cloud space)
+            point cloud (i.e. the dimension of the point cloud space).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape: (n_samples, n_homology_dimensions)
-            The Persistent Entropy. ``n_samples`` is not modified by the
-            algorithm: the Persistent Entropy is computed per point cloud.
-            ``n_homology_dimensions`` is the number of homology
-            dimensions considered, i.e. the length of ``homology_dimensions``.
+        Xt : ndarray, shape (n_samples, n_homology_dimensions)
+            For each point cloud in `X`, one persistence entropy per homology
+            dimension in `homology_dimensions`.
 
         """
 
@@ -188,40 +178,54 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
 
 class BettiCurveGenerator(BaseEstimator, TransformerMixin):
-    """Meta_transformer that returns the sampled Betti curves.
+    """Meta transformer returning Betti curves directly from point clouds.
+
+    Implements a feature generation pipeline which computes persistence
+    diagrams, scales and filters them, and then computes their Betti curves.
 
     Parameters
     ----------
-    metric : string or callable, optional, default: 'euclidean'
-        If set to ``'precomputed'``, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and ``metric`` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
-        If ``metric`` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
-        "manhattan", or "cosine".
-        If ``metric`` is a callable function, it is called on each pair of
+    metric : string or callable, optional, default: ``'euclidean'``
+        If set to ``'precomputed'``, each entry in `X` along axis 0 is
+        interpreted to be a distance matrix. Otherwise, entries are
+        interpreted as feature arrays, and `metric` determines a rule with
+        which to calculate distances between pairs of instances (i.e. rows)
+        in these arrays.
+        If `metric` is a string, it must be one of the options allowed by
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
+        including "euclidean", "manhattan" or "cosine".
+        If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value indicating
-        the distance between them.
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    max_edge_length : float, optional, default: ``numpy.inf``
+        Upper bound on the maximum value of the Vietoris-Rips filtration
+        parameter. Points whose distance is greater than this value will
+        never be connected by an edge, and topological features at scales
+        larger than this value will not be detected.
+
+    homology_dimensions : iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological features to be
+        detected.
 
     scaler_metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
                     ``'betti'`` | ``'heat'``, optional, default: \
                     ``'bottleneck'``
-        Which notion of distance between (sub)diagrams to use:
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-           perfect-matching--based notions of distance.
+          perfect-matching--based notions of distance.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
 
-    scaler_metric_params : dict, optional, default: {'n_samples': 200}
-        Additional keyword arguments for the metric function:
+    scaler_metric_params : dict or None, optional, default: ``None``
+        Additional keyword arguments for `scaler_metric`:
 
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
@@ -235,59 +239,47 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
 
-    max_edge_length : float, optional, default: np.inf
-        Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter.
-        Points whose distance is greater than this value will never be
-        connected by an edge, and topological features at scales larger than
-        this value will not be detected.
-
-    function : callable, optional, default: numpy.max
+    scaler_function : callable, optional, default: ``numpy.max``
         Function used to extract a single positive scalar from the collection
         of norms of diagrams.
 
-    n_jobs : int or None, optional, default: None
+    filter_epsilon : float, optional, default: ``0.``
+        The cutoff value controlling the amount of filtering.
+
+    n_values : int, optional, default: ``100``
+        Length of array used to sample the continuous Betti curves.
+
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
-
-    homology_dimensions : list or None, optional, default: None
-        When set to ``None``, all available (sub)diagrams will be filtered.
-        When set to a list, it is interpreted as the list of those homology
-        dimensions for which (sub)diagrams should be filtered.
-
-    epsilon : float, optional, default: 0.
-        The cutoff value controlling the amount of filtering.
-
-    n_values : int, optional, default: 100
-        Used to sample the Betti curves to extract a finite dimensional
-        array.
 
     """
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
                  homology_dimensions=(0, 1), scaler_metric='bottleneck',
-                 scaler_metric_params=None, epsilon=0., n_jobs=None,
-                 function=np.max, n_values=100):
+                 scaler_metric_params=None, scaler_function=np.max,
+                 filter_epsilon=0., n_values=100, n_jobs=None):
         self.metric = 'euclidean'
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
         self.scaler_metric_params = scaler_metric_params
         self.scaler_metric = scaler_metric
-        self.n_jobs = n_jobs
-        self.epsilon = epsilon
-        self.function = function
+        self.scaler_function = scaler_function
+        self.filter_epsilon = filter_epsilon
         self.n_values = n_values
+        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Create a giotto :class:`Pipeline` object and fit it. Then, return
+        the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape: (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -299,7 +291,6 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
 
@@ -309,44 +300,39 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
                 max_edge_length=self.max_edge_length,
                 homology_dimensions=self.homology_dimensions,
                 n_jobs=self.n_jobs)),
-            ('rescaler', diag.Scaler(
+            ('scaler', diag.Scaler(
                 metric=self.scaler_metric,
                 metric_params=self.scaler_metric_params,
-                function=self.function,
+                function=self.scaler_function,
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
-                epsilon=self.epsilon,
-                homology_dimensions=self.homology_dimensions)),
+                epsilon=self.filter_epsilon)),
             ('betticurve', diag.BettiCurve(n_values=self.n_values))]
 
         self._pipeline = Pipeline(steps).fit(X)
         return self
 
     def transform(self, X, y=None):
-        """Extract the persistent entropy from X.
+        """Extract Betti curves from the sample point clouds in `X`.
 
         Parameters
         ----------
-        X : ndarray, shape: (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
             the point cloud (i.e. the dimension of the point cloud space).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape: (n_samples, n_homology_dimensions, \
-                        n_sampled_values)
-            The Betti Curves. ``n_samples`` is not modified by the
-            algorithm: the Bettiv curves are computed per point cloud.
-            ``n_homology_dimensions`` is the number of homology
-            dimensions considered, i.e. the length of ``homology_dimensions``.
-            The parameter ``n_sampled_values`` is the number of points
-            used to sample the continuous Betti Curves into arrays.
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+             n_values)
+            For each point cloud in `X`, one discretised Betti curve
+            per homology dimension in `homology_dimensions`.
 
         """
 
@@ -355,40 +341,56 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
 
 class LandscapeGenerator(BaseEstimator, TransformerMixin):
-    """Meta_transformer that returns the sampled Persistence Landscape.
+    """Meta transformer returning persistence landscapes directly from point
+    clouds.
+
+    Implements a feature generation pipeline which computes persistence
+    diagrams, scales and filters them, and then computes their persistence
+    landscapes.
 
     Parameters
     ----------
-    metric : string or callable, optional, default: 'euclidean'
-        If set to ``'precomputed'``, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and ``metric`` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
-        If ``metric`` is a string, it must be one of the options allowed by
-        scipy.spatial.distance.pdist for its metric parameter, or a metric
-        listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS, including "euclidean",
-        "manhattan", or "cosine".
-        If ``metric`` is a callable function, it is called on each pair of
+    metric : string or callable, optional, default: ``'euclidean'``
+        If set to ``'precomputed'``, each entry in `X` along axis 0 is
+        interpreted to be a distance matrix. Otherwise, entries are
+        interpreted as feature arrays, and `metric` determines a rule with
+        which to calculate distances between pairs of instances (i.e. rows)
+        in these arrays.
+        If `metric` is a string, it must be one of the options allowed by
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
+        including "euclidean", "manhattan" or "cosine".
+        If `metric` is a callable function, it is called on each pair of
         instances and the resulting value recorded. The callable should take
-        two arrays from the entry in X as input, and return a value indicating
-        the distance between them.
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    max_edge_length : float, optional, default: ``numpy.inf``
+        Upper bound on the maximum value of the Vietoris-Rips filtration
+        parameter. Points whose distance is greater than this value will
+        never be connected by an edge, and topological features at scales
+        larger than this value will not be detected.
+
+    homology_dimensions : iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological features to be
+        detected.
 
     scaler_metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
                     ``'betti'`` | ``'heat'``, optional, default: \
                     ``'bottleneck'``
-        Which notion of distance between (sub)diagrams to use:
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-           perfect-matching--based notions of distance.
+          perfect-matching--based notions of distance.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
 
-    scaler_metric_params : dict, optional, default: {'n_samples': 200}
-        Additional keyword arguments for the metric function:
+    scaler_metric_params : dict or None, optional, default: ``None``
+        Additional keyword arguments for `scaler_metric`:
 
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
@@ -402,63 +404,51 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
 
-    max_edge_length : float, optional, default: np.inf
-        Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter.
-        Points whose distance is greater than this value will never be
-        connected by an edge, and topological features at scales larger than
-        this value will not be detected.
-
-    function : callable, optional, default: numpy.max
+    scaler_function : callable, optional, default: ``numpy.max``
         Function used to extract a single positive scalar from the collection
         of norms of diagrams.
 
-    n_jobs : int or None, optional, default: None
+    filter_epsilon : float, optional, default: ``0.``
+        The cutoff value controlling the amount of filtering.
+
+    n_layers : int, optional, default: ``1``
+        How many layers to consider in the persistence landscape.
+
+    n_values : int, optional, default: ``100``
+        Length of array used to sample the continuous persistence landscapes.
+
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
-
-    homology_dimensions : list or None, optional, default: None
-        When set to ``None``, all available (sub)diagrams will be filtered.
-        When set to a list, it is interpreted as the list of those homology
-        dimensions for which (sub)diagrams should be filtered.
-
-    epsilon : float, optional, default: 0.
-        The cutoff value controlling the amount of filtering.
-
-    n_sampled_values : int, optional, default: 100
-        Used to sample the Betti curves to extract a finite dimensional array.
-
-    n_layers : int, optional, default: 1
-        Used to specify which of the persistence landscape profiles to
-        consider.
 
     """
 
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
                  homology_dimensions=(0, 1), scaler_metric='bottleneck',
-                 scaler_metric_params=None, epsilon=0., n_jobs=None,
-                 function=np.max, n_values=100, n_layers=1):
-        self.metric = 'euclidean'
+                 scaler_metric_params=None, scaler_function=np.max,
+                 filter_epsilon=0., n_layers=1, n_values=100, n_jobs=None):
+        self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
-        self.scaler_metric_params = scaler_metric_params
         self.scaler_metric = scaler_metric
-        self.n_jobs = n_jobs
-        self.epsilon = epsilon
-        self.function = function
-        self.n_values = n_values
+        self.scaler_metric_params = scaler_metric_params
+        self.scaler_function = scaler_function
+        self.filter_epsilon = filter_epsilon
         self.n_layers = n_layers
+        self.n_values = n_values
+        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Create a giotto :class:`Pipeline` object and fit it. Then, return
+        the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape: (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -470,7 +460,6 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
-            Returns self.
 
         """
 
@@ -480,14 +469,13 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
                 max_edge_length=self.max_edge_length,
                 homology_dimensions=self.homology_dimensions,
                 n_jobs=self.n_jobs)),
-            ('rescaler', diag.Scaler(
+            ('scaler', diag.Scaler(
                 metric=self.scaler_metric,
                 metric_params=self.scaler_metric_params,
-                function=self.function,
+                function=self.scaler_function,
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
-                epsilon=self.epsilon,
-                homology_dimensions=self.homology_dimensions)),
+                epsilon=self.filter_epsilon)),
             ('landscape', diag.PersistenceLandscape(
                 n_values=self.n_values, n_layers=self.n_layers))]
 
@@ -495,30 +483,27 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Extract the persistent entropy from X.
+        """Extract persistence landscapes from the sample point clouds in `X`.
 
         Parameters
         ----------
-        X : ndarray, shape: (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
             the point cloud (i.e. the dimension of the point cloud space).
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape: (n_samples, n_homology_dimensions, \
-                        n_values)
-            The Persistence Landscape. ``n_samples`` is not modified by the
-            algorithm: the Betti curves are computed per point cloud.
-            ``n_homology_dimensions`` is the number of homology
-            dimensions considered, i.e. the length of ``homology_dimensions``.
-            The parameter ``n_values`` is the number of points
-            used to sample the continuous persistence landscape into arrays.
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+             n_layers, n_values)
+            For each point cloud in `X`, one discretised persistence landscape
+            per homology dimension in `homology_dimensions`, consisting of
+            `n_layers` layers.
 
         """
 

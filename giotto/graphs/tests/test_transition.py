@@ -31,8 +31,8 @@ def test_transition_graph_transform():
     tg = TransitionGraph()
     Xt = tg.fit_transform(X_tg)
 
-    assert np.array_equal(Xt[0].todense(), X_tg_res[0].todense())
-    assert np.array_equal(Xt[1].todense(), X_tg_res[1].todense())
+    assert np.array_equal(Xt[0].toarray(), X_tg_res[0].toarray())
+    assert np.array_equal(Xt[1].toarray(), X_tg_res[1].toarray())
 
 
 def test_parallel_transition_graph_transform():
@@ -42,5 +42,5 @@ def test_parallel_transition_graph_transform():
     Xt = tg.fit_transform(X_tg)
     Xt_parallel = tg_parallel.fit_transform(X_tg)
 
-    assert np.array_equal(Xt[0].todense(), Xt_parallel[0].todense())
-    assert np.array_equal(Xt[1].todense(), Xt_parallel[1].todense())
+    assert np.array_equal(Xt[0].toarray(), Xt_parallel[0].toarray())
+    assert np.array_equal(Xt[1].toarray(), Xt_parallel[1].toarray())

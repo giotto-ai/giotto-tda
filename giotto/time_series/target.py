@@ -18,7 +18,7 @@ def _derivation_function(function, X, time_delta=1, **function_params):
     duration_ = (partial_window_end - partial_window_begin)
     derivative = duration_ / partial_window_begin / time_delta
     derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
-    return derivative.reshape((-1, 1))
+    return derivative.reshape(-1, 1)
 
 
 def _variation_function(function, X, time_delta=1, **function_params):
@@ -26,23 +26,38 @@ def _variation_function(function, X, time_delta=1, **function_params):
     partial_window = function(X[:, :-time_delta], axis=1, **function_params)
     variation = (full_window - partial_window) / partial_window / time_delta
     variation[(partial_window == 0) & (full_window == 0)] = 0
-    return variation.reshape((-1, 1))
+    return variation.reshape(-1, 1)
 
 
 def _application_function(function, X, time_delta=0, **function_params):
-    return function(X, axis=1, **function_params).reshape((-1, 1))
+    return function(X, axis=1, **function_params).reshape(-1, 1)
 
 
 class Labeller(BaseEstimator, TransformerResamplerMixin):
-    """
-    Target transformer.
+    """Target transformer.
 
     Parameters
     ----------
+    width
+
+    stride
+
+    labelling
+
+    time_delta
+
+    function
+
+    function_params
+
+    percentiles
+
+    n_steps_future
 
     Attributes
     ----------
     thresholds_ : list of floats
+
     """
     implemented_labelling_recipes = {'application': _application_function,
                                      'variation': _variation_function,
@@ -69,18 +84,16 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
+        TODO CORRECT
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
+        X : ndarray, shape (n_samples, n_features)
             The training input samples.
-        y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
 
-        Attributes
-        __________
-        thresholds_ :
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -105,23 +118,22 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                             **self.effective_function_params_)
 
         if self.percentiles is not None:
-            self.thresholds_ = [
-                np.percentile(np.abs(_X.flatten()), percentile)
-                for percentile in self.percentiles]
+            self.thresholds_ = [np.percentile(np.abs(_X.flatten()), percentile)
+                                for percentile in self.percentiles]
         else:
             self.thresholds_ = None
         return self
 
     def transform(self, X, y=None):
-        """Transform X.
+        """Transform `X`.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_features)
-            Input data. ``
+            Input data.
 
         y : None
-            There is no need of a target, yet the pipeline API
+            There is no need for a target, yet the pipeline API
             requires this parameter.
 
         Returns
@@ -138,24 +150,24 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         Xt = X[:-self.n_steps_future]
 
         if self.n_steps_future < self.width:
-            Xt = Xt[self.width - 1 - self.n_steps_future:]
+            Xt = Xt[self.width - self.n_steps_future:]
         return Xt
 
     def resample(self, y, X=None):
-        """Resample y.
+        """Resample `y`.
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, n_features)
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
-            There is no need of input data,
+            There is no need for input data,
             yet the pipeline API requires this parameter.
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, 1)
+        yt : ndarray, shape (n_samples_new,)
             The resampled target.
             ``n_samples_new = n_samples - 1``.
 
@@ -176,9 +188,9 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                  (yt < self.thresholds_[i + 1]) for i in range(
                     len(self.thresholds_) - 1)] +
                 [1 * (yt >= self.thresholds_[-1])], axis=1)
-            yt = np.nonzero(yt)[1].reshape((yt.shape[0], 1))
+            yt = np.nonzero(yt)[1].reshape(yt.shape[0], 1)
 
         if self.n_steps_future >= self.width:
             yt = yt[self.n_steps_future - self.width + 1:]
 
-        return yt.reshape((yt.shape[0], ))
+        return yt.reshape(-1)

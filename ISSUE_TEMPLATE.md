@@ -3,31 +3,13 @@ If your issue is a usage question, submit it here instead:
 - Mailing List: https://mail.python.org/mailman/listinfo/scikit-learn
 -->
 
-<!-- Instructions For Filing a Bug: https://github.com/giotto-learn/giotto-learn/blob/master/CONTRIBUTING.md#filing-bugs -->
+<!-- Instructions For Filing a Bug: https://github.com/giotto-learn/giotto-learn/blob/master/CONTRIBUTING.md -->
 
 #### Description
 <!-- Example: Joblib Error thrown when calling fit on LatentDirichletAllocation with evaluate_every > 0-->
 
 #### Steps/Code to Reproduce
 <!--
-Example:
-```python
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-
-docs = ["Help I have a bug" for i in range(1000)]
-
-vectorizer = CountVectorizer(input=docs, analyzer='word')
-lda_features = vectorizer.fit_transform(docs)
-
-lda_model = LatentDirichletAllocation(
-    n_topics=10,
-    learning_method='online',
-    evaluate_every=10,
-    n_jobs=4,
-)
-model = lda_model.fit(lda_features)
-```
 If the code is too long, feel free to put it in a public gist and link
 it in the issue: https://gist.github.com
 -->

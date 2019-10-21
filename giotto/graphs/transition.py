@@ -45,7 +45,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         compatible with :mod:`numpy.apply_along_axis`. If ``None``, this
         function is the identity (no preprocessing). The default is
         ``numpy.argsort``, which makes the final transition graphs
-        *ordinal partition networks* [1]_, [2]_, [3]_.
+        *ordinal partition networks* [1]_ [2]_ [3]_.
 
     func_params : None or dict, optional, default: ``None``
         Additional keyword arguments for `func`.
@@ -150,7 +150,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         check_array(X, allow_nd=True)
         if self.func is None:
             self._func = _identity
-        self._func = self.func
+        else:
+            self._func = self.func
 
         if self.func_params is None:
             self.effective_func_params_ = {}
@@ -179,7 +180,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : array of sparse boolean matrices, shape (n_samples, )
+        Xt : array of sparse boolean matrices, shape (n_samples,)
             The collection of ``n_samples`` transition graphs. Each transition
             graph is encoded by a sparse matrix of boolean type.
 

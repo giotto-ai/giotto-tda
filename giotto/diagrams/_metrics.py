@@ -73,17 +73,17 @@ def landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
-        ls_1 = landscapes(diagrams_1, sampling, n_layers_1).reshape((
-            n_samples_1, -1))
+        ls_1 = landscapes(diagrams_1, sampling, n_layers_1).reshape(
+            n_samples_1, -1)
         unnorm_dist = squareform(pdist(ls_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
     n_samples_2, n_points_2 = diagrams_2.shape[:2]
     n_layers_2 = min(n_layers, n_points_2)
     n_layers = max(n_layers_1, n_layers_2)
-    ls_1 = landscapes(diagrams_1, sampling, n_layers).reshape((
-        n_samples_1, -1))
-    ls_2 = landscapes(diagrams_2, sampling, n_layers).reshape((
-        n_samples_2, -1))
+    ls_1 = landscapes(diagrams_1, sampling, n_layers).reshape(
+        n_samples_1, -1)
+    ls_2 = landscapes(diagrams_2, sampling, n_layers).reshape(
+        n_samples_2, -1)
     unnorm_dist = cdist(ls_1, ls_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
@@ -108,12 +108,12 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01,
 def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
                    sigma=1., p=2., **kwargs):
     heat_1 = heats(diagrams_1, sampling, step_size, sigma).\
-        reshape((diagrams_1.shape[0], -1))
+        reshape(diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, 'minkowski', p=p))
         return (step_size ** (1 / p)) * unnorm_dist
     heat_2 = heats(diagrams_2, sampling, step_size, sigma).\
-        reshape((diagrams_2.shape[0], -1))
+        reshape(diagrams_2.shape[0], -1)
     unnorm_dist = cdist(heat_1, heat_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 

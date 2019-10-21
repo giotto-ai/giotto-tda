@@ -9,10 +9,15 @@ from ..utils.validation import check_graph
 
 
 class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
-    """Given a collection of graphs presented as sparse adjacency matrices,
-    this transformer calculates for each graph the length of the shortest
-    path between any of its two vertices. The result is a collection of
-    dense distance matrices of variable size.
+    """Distance matrices arising from geodesic distances on graphs.
+
+    For each (possibly weighted and/or directed) graph in a collection, this
+    transformer calculates the length of the shortest (directed or undirected)
+    path between any two of its vertices, setting it to ``numpy.inf`` when two
+    vertices cannot be connected by a path.
+
+    The graphs are encoded as sparse adjacency matrices, while the outputs
+    are dense distance matrices of variable size.
 
     Parameters
     ----------
@@ -24,22 +29,24 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from giotto.graphs import GraphGeodesicDistance
-    >>> X = np.array([
-    ...         np.array([
-    ...             [0, 1, 3, 0, 0],
-    ...             [1, 0, 5, 0, 0],
-    ...             [3, 5, 0, 4, 0],
-    ...             [0, 0, 4, 0, 0],
-    ...             [0, 0, 0, 0, 0]])])
-    >>> ggd = GraphGeodesicDistance()
-    >>> ggd = ggd.fit(X)
-    >>> print(ggd.transform(X)[0])
-    [[ 0.  1.  3.  7. inf]
-     [ 1.  0.  4.  8. inf]
-     [ 3.  4.  0.  4. inf]
-     [ 7.  8.  4.  0. inf]
-     [inf inf inf inf  0.]]
+    >>> from giotto.graphs import TransitionGraph, GraphGeodesicDistance
+    >>> X = np.arange(4).reshape(1, -1, 1)
+    >>> tg = TransitionGraph(func=None).fit_transform(X)
+    >>> print(tg[0].toarray())
+    [[False  True False False]
+     [ True False  True False]
+     [False  True False  True]
+     [False False  True False]]
+    >>> ggd = GraphGeodesicDistance().fit_transform(tg)
+    >>> print(ggd[0])
+    [[0. 1. 2. 3.]
+     [1. 0. 1. 2.]
+     [2. 1. 0. 1.]
+     [3. 2. 1. 0.]]
+
+    See also
+    --------
+    TransitionGraph, KNeighborsGraph, giotto.homology.VietorisRipsPersistence
 
     """
 
@@ -50,7 +57,6 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         X_distance = graph_shortest_path(X)
         X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a
         # float64 array, so inserting np.inf does not change the type.
-        # Ideally however, graph_shortest_path would return an int array!
         np.fill_diagonal(X_distance, 0)
         return X_distance
 
@@ -62,11 +68,11 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples, )
+        X : ndarray of sparse or dense arrays, shape (n_samples,)
             Input data, i.e. a collection of adjacency matrices of graphs.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline
+            There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
 
         Returns
@@ -79,16 +85,14 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         self._is_fitted = True
         return self
 
-    # @jit
     def transform(self, X, y=None):
-        """For each adjancency matrix in `X`, compute the lenghts of the graph
-        shortest path between any two vertices, and arrange them in a
-        distance matrix. The method
-        :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path` is used.
+        """Use :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path`
+        to compute the lengths of graph shortest paths between any two
+        vertices.
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples, )
+        X : ndarray of sparse or dense arrays, shape (n_samples,)
             Input data, i.e. a collection of adjacency matrices of graphs.
 
         y : None
@@ -96,10 +100,11 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of float, shape (n_samples, ) or
-        (n_samples, n_vertices, n_vertices)
-            Resulting array of distance matrices. If the distance matrices
-            have variable size across samples, X is one-dimensional.
+        Xt : ndarray, shape (n_samples,) or \
+             (n_samples, n_vertices, n_vertices)
+            Array of distance matrices. If the distance matrices have variable
+            size across samples, `Xt` is a one-dimensional array of dense
+            arrays.
 
         """
         # Check if fit had been called
