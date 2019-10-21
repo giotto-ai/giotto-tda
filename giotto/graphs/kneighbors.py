@@ -52,7 +52,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         See the documentation for :obj:`scipy.spatial.distance` for details on
         these metrics.
 
-    metric_params : dict, optional, default: ``None``
+    metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
     p : int, optional, default: ``2``
@@ -90,8 +90,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
                  p=2, metric_params={}, n_jobs=None):
         self.n_neighbors = n_neighbors
         self.metric = metric
-        self.metric_params = metric_params
         self.p = p
+        self.metric_params = metric_params
         self.n_jobs = n_jobs
 
     def _make_adjacency_matrix(self, X):
