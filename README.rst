@@ -23,14 +23,6 @@ giotto-learn
 giotto-learn is a high performance topological toolbox for machine learning in Python built on top of
 scikit-learn and is distributed under the Apache 2.0 license. It is part of the Giotto open-source project.
 
-
-Project Governance
-------------------
-
-The project was started jointly by `Learn To Forecast - L2F <http://www.l2f.ch>`_, `EPFL Laboratory for topology and neuroscience <https://www.epfl.ch/labs/hessbellwald-lab/>`_ and the `Reconfigurable and Embedded Digital Systems <http://reds.heig-vd.ch/en>`_ at heig-vd.
-
-The code is under active development and is maintained and developed by members of those three institutions. See the `GOVERNANCE.rst <https://github.com/giotto-learn/giotto-learn/blob/master/GOVERNANCE.rst>`_ file for a list of the Giotto team members.
-
 Website: http://www.giotto.ai
 
 
@@ -61,7 +53,7 @@ the easiest way to install giotto-learn is using ``pip``   ::
 Documentation
 -------------
 
-- HTML documentation (stable release): http://www.giotto.ai/docs/
+- HTML documentation (stable release): https://www.docs.giotto.ai
 
 Contributing
 ------------
