@@ -104,16 +104,16 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new,)
+        yr : ndarray, shape (n_samples_new,)
             Resampled target. ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        yt = column_or_1d(y)
-        yt = yt[::self.period]
+        yr = column_or_1d(y)
+        yr = yr[::self.period]
 
-        return yt
+        return yr
 
 
 class Stationarizer(BaseEstimator, TransformerResamplerMixin):
@@ -226,7 +226,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new,)
+        yr : ndarray, shape (n_samples_new,)
             Resampled target. ``n_samples_new = n_samples - 1``.
 
         """
