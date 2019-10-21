@@ -53,7 +53,7 @@ the easiest way to install giotto-learn is using ``pip``   ::
 Documentation
 -------------
 
-- HTML documentation (stable release): https://www.docs.giotto.ai
+- HTML documentation (stable release): https://docs.giotto.ai
 
 Contributing
 ------------
