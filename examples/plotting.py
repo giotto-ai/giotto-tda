@@ -258,7 +258,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
                                        y=landscapes[i, layer, :],
                                        mode='lines', showlegend=False,
                                        hoverinfo='none',
-                                       name="layer {}".format(layer + 1))
+                                       name="layer {}".format(layer + 1)))
 
         fig.show()
 
