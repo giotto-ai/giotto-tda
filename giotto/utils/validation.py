@@ -55,7 +55,7 @@ def check_diagram(X):
     if n_points_above_diag != n_points_global:
         raise ValueError("All points of all n_samples persistent diagrams "
                          "should be above the diagonal, X[:,:,1] > =X[:,:,0]."
-                         f" {n_points_global - n_points_above_diag} points in "
+                         " {n_points_global - n_points_above_diag} points in "
                          "all n_samples diagrams are under the diagonal.")
     return X
 
