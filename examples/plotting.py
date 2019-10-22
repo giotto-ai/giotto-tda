@@ -182,7 +182,7 @@ def plot_diagram(diagram, homology_dimensions=None):
                                showlegend=False, hoverinfo='none'))
     
     for i, dimension in enumerate(homology_dimensions):
-        name = f"H{int(dimension)}"
+        name = "H{}".format(int(dimension))
         subdiagram = _subdiagrams(np.asarray([diagram]), [dimension],
                                   remove_dim=True)[0]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
