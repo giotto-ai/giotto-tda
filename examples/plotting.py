@@ -244,7 +244,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
     
     for i, dimension in enumerate(homology_dimensions):
         layout_dim = layout.copy()
-        layout_dim['title'] = "Persistence landscape for homology dimension" + \
+        layout_dim['title'] = "Persistence landscape for homology dimension " + \
                               "{}".format(int(dimension))
         fig = gobj.Figure(layout=layout_dim)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
