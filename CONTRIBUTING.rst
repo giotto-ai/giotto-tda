@@ -29,7 +29,7 @@ Contributing code
 -----------------
 
 If you have improvements to Giotto, do not hesitate to send us pull requests!
-Please follow the Github [how to](https://help.github.com/articles/using-pull-requests/).
+Please follow the Github how to (https://help.github.com/articles/using-pull-requests/).
 The Giotto Team will review your pull requests. Once the pull requests are approved and pass continuous integration checks, the
 Giotto team will work on getting your pull request submitted to our GitHub
 repository. Eventually, your pull request will be merged automatically on GitHub.
@@ -44,7 +44,7 @@ help out, but not alone, use the issue comment thread to coordinate.
 Contribution guidelines and standards
 -------------------------------------
 
-Before sending you pull request for review, make sure your changes are
+Before sending your pull request for review, make sure your changes are
 consistent with the guidelines and follow the coding style below.
 
 General guidelines and philosophy for contribution
@@ -113,4 +113,4 @@ You can use `pytest` on your python code via the following instructions:
 
     pytest name_of_your_script.py
 
-2. Using [Azure](azure-pipelines.yml) and Giotto's CI scripts.
+2. Using Azure (azure-pipelines.yml) and Giotto's CI scripts.
