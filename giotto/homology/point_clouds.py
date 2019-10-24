@@ -13,14 +13,14 @@ from ..externals.python import ripser
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://www.giotto.ai/theory>`_ resulting from
-    `Vietoris-Rips filtrations <https://www.giotto.ai/theory>`_.
+    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
+    `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
 
-    Given a `point cloud <https://www.giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://www.giotto.ai/theory>`_ encoded by a
+    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
+    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
     distance matrix, information about the appearance and disappearance of
     topological features (technically, `homology classes
-    <https://www.giotto.ai/theory>`_) of various dimensions and at different
+    <https://giotto.ai/theory>`_) of various dimensions and at different
     scales is summarised in the corresponding persistence diagram.
 
     Parameters
@@ -72,11 +72,19 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     Notes
     -----
     `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris-Rips persistent homology.
+    for computing Vietoris-Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
+    <https://github.com/scikit-tda/ripser.py>`_ package.
 
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
     See :meth:`transform` for additional information.
+
+    References
+    ----------
+    [1] U. Bauer, "Ripser: efficient computation of Vietoris-Rips persistence \
+        barcodes", 2019; `arXiv:1908.02518 \
+        <https://arxiv.org/abs/1908.02518>`_.
 
     """
     _hyperparameters = {'max_edge_length': [numbers.Number],
