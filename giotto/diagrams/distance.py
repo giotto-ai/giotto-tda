@@ -139,7 +139,6 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             self.effective_metric_params_ = self.metric_params.copy()
 
         hyperparameters = self.get_params().copy()
-        print(hyperparameters)
         if self.order is not None:
             if isinstance(self.order, int):
                 hyperparameters['order'] = float(self.order)
