@@ -7,7 +7,7 @@ Pull Request Checklist
 Before sending your pull requests, make sure you followed this list.
   - Read the `contributing guidelines <https://github.com/giotto-learn/giotto-learn/blob/master/GOVERNANCE.rst>`_.
   - Read the `code of conduct <https://github.com/giotto-learn/giotto-learn/blob/master/CODE_OF_CONDUCT.rst>`_.
-  - Ensure you have signed the `contributor license agreement (CLA) <https://github.com/giotto-learn/giotto-learn/blob/master/DEED_OF_CONTRIBUTION.rst>`_.
+  - Ensure you have signed the `contributor license agreement (CLA) <https://cla-assistant.io/giotto-learn/giotto-learn>`_.
   - Check if the changes are consistent with the guidelines.
   - Changes are consistent with the Coding Style.
   - Run Unit Tests.
@@ -18,10 +18,8 @@ How to become a contributor and submit your own code
 Contributor License Agreements
 ------------------------------
 
-In order to become a contributor of Giotto, the first step is to fill out the
-`contributor license agreement (CLA) <https://github.com/giotto-learn/giotto-learn/blob/master/DEED_OF_CONTRIBUTION.rst>`_.
-You can sign the document and send it to <maintainers@giotto.ai>. Once we receive
-it, we'll be able to accept your pull requests.
+In order to become a contributor of Giotto, the first step is to sign the
+`contributor license agreement (CLA) <https://cla-assistant.io/giotto-learn/giotto-learn>`_.
 **NOTE**: Only original source code from you and other people that have signed
 the CLA can be accepted into the main repository.
 
