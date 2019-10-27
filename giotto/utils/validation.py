@@ -59,7 +59,7 @@ def check_diagram(X):
                          "all n_samples diagrams are under the diagonal.")
     return X
 
-
+# Chech graph input matrices
 def check_graph(X):
     if len(X.shape) != 3:
         raise ValueError("Graph structure dimension error: {}. "
