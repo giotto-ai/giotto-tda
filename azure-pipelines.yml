@@ -196,7 +196,7 @@ jobs:
       flake8 --exit-zero
     displayName: 'Test with pytest, nbconvert and flake8'
 
-  - bash: python setup.py sdist bdist_wheel
+  - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
     
   - script: |
