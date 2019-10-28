@@ -1,8 +1,8 @@
 /******************************************************************************
-* Author:           Julián Burella Pérez
-* Description:      gudhi's persistent cohomology interfacing with pybind11
-* License:          TBD
-*****************************************************************************/
+ * Author:           Julián Burella Pérez
+ * Description:      gudhi's persistent cohomology interfacing with pybind11
+ * License:          TBD
+ *****************************************************************************/
 
 #ifndef INCLUDE_PERSISTENT_COHOMOLOGY_INTERFACE_H_
 #define INCLUDE_PERSISTENT_COHOMOLOGY_INTERFACE_H_
@@ -10,8 +10,8 @@
 #include <gudhi/Persistent_cohomology.h>
 #include <iostream>
 
-#include <algorithm> // for sort
-#include <utility>   // for std::pair
+#include <algorithm>  // for sort
+#include <utility>    // for std::pair
 #include <vector>
 
 #include <pybind11/pybind11.h>
@@ -23,40 +23,40 @@ template <class FilteredComplex>
 class Persistent_cohomology_interface
     : public persistent_cohomology::Persistent_cohomology<
           FilteredComplex, persistent_cohomology::Field_Zp> {
-private:
+ private:
   /*
    * Compare two intervals by dimension, then by length.
    */
   struct cmp_intervals_by_dim_then_length {
-    explicit cmp_intervals_by_dim_then_length(FilteredComplex *sc) : sc_(sc) {}
+    explicit cmp_intervals_by_dim_then_length(FilteredComplex* sc) : sc_(sc) {}
 
     template <typename Persistent_interval>
-    bool operator()(const Persistent_interval &p1,
-                    const Persistent_interval &p2) {
+    bool operator()(const Persistent_interval& p1,
+                    const Persistent_interval& p2) {
       if (sc_->dimension(get<0>(p1)) == sc_->dimension(get<0>(p2)))
         return (sc_->filtration(get<1>(p1)) - sc_->filtration(get<0>(p1)) >
                 sc_->filtration(get<1>(p2)) - sc_->filtration(get<0>(p2)));
       else
         return (sc_->dimension(get<0>(p1)) > sc_->dimension(get<0>(p2)));
     }
-    FilteredComplex *sc_;
+    FilteredComplex* sc_;
   };
 
-public:
-  Persistent_cohomology_interface(FilteredComplex *stptr)
+ public:
+  Persistent_cohomology_interface(FilteredComplex* stptr)
       : persistent_cohomology::Persistent_cohomology<
             FilteredComplex, persistent_cohomology::Field_Zp>(*stptr),
         stptr_(stptr) {}
 
-  Persistent_cohomology_interface(FilteredComplex *stptr,
+  Persistent_cohomology_interface(FilteredComplex* stptr,
                                   bool persistence_dim_max)
       : persistent_cohomology::Persistent_cohomology<
             FilteredComplex, persistent_cohomology::Field_Zp>(
             *stptr, persistence_dim_max),
         stptr_(stptr) {}
 
-  std::vector<std::pair<int, std::pair<double, double>>>
-  get_persistence(int homology_coeff_field, double min_persistence) {
+  std::vector<std::pair<int, std::pair<double, double>>> get_persistence(
+      int homology_coeff_field, double min_persistence) {
     persistent_cohomology::Persistent_cohomology<
         FilteredComplex, persistent_cohomology::Field_Zp>::
         init_coefficients(homology_coeff_field);
@@ -110,11 +110,11 @@ public:
     return persistence_pairs;
   }
 
-private:
+ private:
   // A copy
-  FilteredComplex *stptr_;
+  FilteredComplex* stptr_;
 };
 
-} // namespace Gudhi
+}  // namespace Gudhi
 
 #endif
