@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+File: cubical_complex_interface.py
+Description: This file re-implements in python the CubicalComplex class done
+    in `GUDHI` (https://github.com/GUDHI/gudhi-devel).
+"""
+
+__author__ = "Julian Burella Perez"
+__email__ = "julian.burellaperez@heig-vd.ch"
+__credits__ = ["Vincent Rouvreau"]
+
 import os
 import numpy as np
 from giotto_cubical_complex \
@@ -133,7 +146,6 @@ class CubicalComplex:
         """
         pbn_result = []
         if self.pcohptr is not None:
-            # pbn_result = self.pcohptr.persistent_betti_numbers(<double>from_value, <double>to_value)
             pbn_result = self.pcohptr.persistent_betti_numbers(from_value,
                                                                to_value)
         return pbn_result
