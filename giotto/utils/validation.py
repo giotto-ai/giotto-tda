@@ -60,6 +60,10 @@ def check_diagram(X):
     return X
 
 # Chech graph input matrices
+''' This function check the input adjacency matrices values: in particular check that the X shape
+has three dimension and that every NxN adjancency matrix is a square matrix, every diagonal
+element of every matrix is zero and every matrix is symmetric.
+'''
 def check_graph(X):
     if len(X.shape) != 3:
         raise ValueError("Graph structure dimension error: {}. "
