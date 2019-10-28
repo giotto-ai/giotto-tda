@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+File: simplex_tree_interface.py
+Description: This file re-implements in python the SimplexTree class done
+    in `GUDHI` (https://github.com/GUDHI/gudhi-devel).
+"""
+
+__author__ = "Julian Burella Perez"
+__email__ = "julian.burellaperez@heig-vd.ch"
+__credits__ = ["Vincent Rouvreau"]
+
 import numpy as np
 from giotto_simplex_tree import *
 
@@ -227,7 +240,8 @@ class SimplexTree:
         :type simplex: list of int.
         .. note::
             Be aware that removing is shifting data in a flat_map
-            (:func:`initialize_filtration()<gudhi.SimplexTree.initialize_filtration>` to be done).
+            (:func:`initialize_filtration()<gudhi.SimplexTree.initialize_filtration>`
+            to be done).
         .. note::
             The dimension of the simplicial complex may be lower after calling
             remove_maximal_simplex than it was before. However,
@@ -300,7 +314,7 @@ class SimplexTree:
         return self.thisptr.make_filtration_non_decreasing()
 
     def persistence(self, homology_coeff_field=11, min_persistence=0,
-                    persistence_dim_max = False):
+                    persistence_dim_max=False):
         """This function returns the persistence of the simplicial complex.
         :param homology_coeff_field: The homology coefficient field. Must be a
             prime number. Default value is 11.
@@ -364,8 +378,8 @@ class SimplexTree:
             pbn_result = self.pcohptr.persistent_betti_numbers(from_value,
                                                                to_value)
         else:
-            print("persistent_betti_numbers function requires persistence function"
-                  " to be launched first.")
+            print("persistent_betti_numbers function requires persistence "
+                  "function to be launched first.")
         return pbn_result
 
     def persistence_intervals_in_dimension(self, dimension):
@@ -388,7 +402,8 @@ class SimplexTree:
         return np.array(intervals_result)
 
     def persistence_pairs(self):
-        """This function returns a list of persistence birth and death simplices pairs.
+        """This function returns a list of persistence birth and death
+            simplices pairs.
         :returns: A list of persistence simplices intervals.
         :rtype:  list of pair of list of int
         :note: persistence_pairs function requires
@@ -457,15 +472,16 @@ class RipsComplex:
             else:
                 if points is None:
                     # Empty Rips construction
-                    points=[]
-                self.thisref.init_points_sparse(points, max_edge_length, sparse)
+                    points = []
+                self.thisref.init_points_sparse(points, max_edge_length,
+                                                sparse)
         else:
             if distance_matrix is not None:
                 self.thisref.init_matrix(distance_matrix, max_edge_length)
             else:
                 if points is None:
                     # Empty Rips construction
-                    points=[]
+                    points = []
                 self.thisref.init_points(points, max_edge_length)
 
     def create_simplex_tree(self, max_dimension=1):
@@ -476,7 +492,6 @@ class RipsComplex:
         :returns: A simplex tree created from the Delaunay Triangulation.
         :rtype: SimplexTree
         """
-        import gudhi
         simplex_tree = SimplexTree()
         self.thisref.create_simplex_tree(simplex_tree.thisptr, max_dimension)
         return simplex_tree
