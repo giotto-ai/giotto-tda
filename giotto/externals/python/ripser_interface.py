@@ -1,3 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+File: ripser_interface.py
+Email: julian.burellaperez@heig-vd.ch
+Description: This file copy paste the python interface implemented in library
+    https://ripser.scikit-tda.org/. Because `giotto-learn` interface C++
+    code with `pybind11`, I updated DRFDM and DRFDMSpare functions to behave
+    the same way as with Cython. Otherwise the implementation of the file was
+    not changed.
+"""
+__maintainer__ = "Julian Burella Perez"
+__email__ = "julian.burellaperez@heig-vd.ch"
+__credits__ = ["Christopher Tralie", "Nathaniel Saul", "Rann Bar-On"]
+
 import warnings
 from scipy import sparse
 import numpy as np
