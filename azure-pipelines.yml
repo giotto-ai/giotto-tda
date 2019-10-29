@@ -1,5 +1,111 @@
+# these jobs are triggered automatically and they test the code and the examples.
+
 jobs:
+- job: 'test_ubuntu1604'
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+
+- job: 'test_macOS1014'
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      brew update
+      brew install boost
+      brew install gcc
+    displayName: 'install boost and gcc'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+
+- job: 'test_win2016'
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pytest --cov giotto --cov-report xml
+      flake8 --exit-zero
+    displayName: 'Test with pytest, nbconvert and flake8'
+    
+# these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
+
 - job: 'manylinux2010'
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -52,9 +158,10 @@ jobs:
       artifactName: 'wheel_and_doc'
 
 
-- job: 'macOS1013'
+- job: 'macOS1014'
+  condition: eq(variables['build_check'], 'true')
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-10.14'
   strategy:
     matrix:
       Python36:
@@ -78,14 +185,16 @@ jobs:
 
   - script: |
       pip install -e ".[tests, doc]"
-      pip uninstall -y giotto-learn
       pip install wheel twine
     displayName: 'Install dev environment'
 
   - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
@@ -126,6 +235,7 @@ jobs:
 
 
 - job: 'win2016'
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
@@ -145,14 +255,16 @@ jobs:
 
   - script: |
       pip install -e ".[tests, doc]"
-      pip uninstall -y giotto-learn
       pip install wheel twine
     displayName: 'Install dev environment'
 
   - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       flake8 --exit-zero
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
       sed -i $'s/\r$//' README.rst

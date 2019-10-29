@@ -28,7 +28,7 @@ MAINTAINER = 'Guillaume Tauzin'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-learn/giotto-learn'
 LICENSE = 'Apache 2.0'
-DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn/tarball/v0.1a.0'
+DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn/tarball/v0.1.1'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
@@ -52,6 +52,7 @@ EXTRAS_REQUIRE = {
         'pytest-cov',
         'pytest-azurepipelines',
         'pytest-benchmark',
+        'jupyter_contrib_nbextensions',
         'flake8'],
     'doc': [
         'sphinx',
@@ -62,8 +63,7 @@ EXTRAS_REQUIRE = {
     'examples': [
         'jupyter',
         'matplotlib',
-        'plotly',
-        'pandas']
+        'plotly']
 }
 
 

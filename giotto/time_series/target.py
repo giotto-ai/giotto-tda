@@ -11,174 +11,179 @@ from .embedding import SlidingWindow
 from ..utils.validation import validate_params
 
 
-def _derivation_function(function, X, time_delta=1, **function_params):
-    partial_window_begin = function(X[:, :-time_delta], axis=1,
-                                    **function_params)
-    partial_window_end = function(X[:, time_delta:], axis=1, **function_params)
-    duration_ = (partial_window_end - partial_window_begin)
-    derivative = duration_ / partial_window_begin / time_delta
-    derivative[(partial_window_begin == 0) & (partial_window_end == 0)] = 0
-    return derivative.reshape((-1, 1))
-
-
-def _variation_function(function, X, time_delta=1, **function_params):
-    full_window = function(X, axis=1, **function_params)
-    partial_window = function(X[:, :-time_delta], axis=1, **function_params)
-    variation = (full_window - partial_window) / partial_window / time_delta
-    variation[(partial_window == 0) & (full_window == 0)] = 0
-    return variation.reshape((-1, 1))
-
-
-def _application_function(function, X, time_delta=0, **function_params):
-    return function(X, axis=1, **function_params).reshape((-1, 1))
-
-
 class Labeller(BaseEstimator, TransformerResamplerMixin):
-    """
-    Target transformer.
+    """Target creation from sliding windows over a time series.
+
+    Useful to define a time series forecasting task in which labels are
+    obtained from future values of the input time series, via the
+    application of a function to time windows.
 
     Parameters
     ----------
+    width : int, optional, default: ``10``
+        Width of each sliding window. Each window contains ``width + 1``
+        objects from the original time series.
+
+    func : callable, optional, default: ``numpy.std``
+        Function to be applied to each window.
+
+    func_params : dict, optional, default: ``{}``
+        Additional keyword arguments for `func`.
+
+    percentiles : list of ordered floats between 0 and 1 or None, optional, \
+                  default: ``None``
+        If ``None``, creates a target for a regression task. Otherwise,
+        creates a target for an n-class classification task where
+        ``n = len(percentiles) + 1``.
+
+    n_steps_future : int, optional, default: ``1``
+        Number of steps in the future for the predictive task.
 
     Attributes
     ----------
-    thresholds_ : list of floats
+    thresholds_ : list of floats or ``None`` if percentiles is ``None``
+        Values corresponding to each percentile, based on data seen in
+        :meth:`fit`.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from giotto.time_series import Labeller
+    >>> # Create a time series
+    >>> X = np.arange(10).reshape(-1, 1)
+    >>> labeller = Labeller(width=2)
+    >>> # Fit and transform X
+    >>> X, y = labeller.fit_transform_resample(X, X)
+    >>> print(X)
+    [[1]
+     [2]
+     [3]
+     [4]
+     [5]
+     [6]
+     [7]
+     [8]]
+    >>> print(y)
+    [0.81649658 0.81649658 0.81649658 0.81649658 0.81649658 0.81649658
+     0.81649658 0.81649658]
+
     """
-    implemented_labelling_recipes = {'application': _application_function,
-                                     'variation': _variation_function,
-                                     'derivation': _derivation_function}
+
     _hyperparameters = {
-        'labelling':
-            [str, ['application', 'variation', 'derivation']],
-        'time_delta': [int, (1, np.inf)],
-        'function': [types.FunctionType],
-        'percentiles': [list, [numbers.Number, (0., 1.)]],
+        'func': [types.FunctionType],
+        '_percentiles': [list, [numbers.Number, (0., 1.)]],
         'n_steps_future': [int, [1, np.inf]]}
 
-    def __init__(self, width=2, stride=1, labelling='application',
-                 time_delta=1, function=np.std, function_params=None,
-                 percentiles=None, n_steps_future=1):
+    def __init__(self, width=10, func=np.std,
+                 func_params={}, percentiles=None, n_steps_future=1):
         self.width = width
-        self.stride = stride
-        self.labelling = labelling
-        self.time_delta = time_delta
-        self.function = function
-        self.function_params = function_params
+        self.func = func
+        self.func_params = func_params
         self.percentiles = percentiles
         self.n_steps_future = n_steps_future
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Compute :attr:`thresholds_` and return the estimator.
 
         Parameters
         ----------
-        X : array-like or sparse matrix of shape = [n_samples, n_features]
-            The training input samples.
-        y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
+            Time series to build a target for.
 
-        Attributes
-        __________
-        thresholds_ :
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
+        if self.percentiles is None:
+            _percentiles = [0.]
+        else:
+            _percentiles = self.percentiles
+
+        validate_params({**self.get_params(), '_percentiles': _percentiles},
+                         self._hyperparameters)
         X = column_or_1d(X)
 
-        if self.function_params is None:
-            self.effective_function_params_ = {}
-        else:
-            self.effective_function_params_ = self.function_params.copy()
-
-        self._labeller = self.implemented_labelling_recipes[self.labelling]
-
-        self._sliding_window = SlidingWindow(width=self.width,
-                                             stride=self.stride).fit(X)
+        self._sliding_window = SlidingWindow(width=self.width, stride=1).fit(X)
 
         _X = self._sliding_window.transform(X)
-        _X = self._labeller(self.function, _X, self.time_delta,
-                            **self.effective_function_params_)
+        _X = self.func(_X, axis=1, **self.func_params).reshape(-1, 1)
 
         if self.percentiles is not None:
-            self.thresholds_ = [
-                np.percentile(np.abs(_X.flatten()), percentile)
-                for percentile in self.percentiles]
+            self.thresholds_ = [np.percentile(np.abs(_X.flatten()), percentile)
+                                for percentile in self.percentiles]
         else:
             self.thresholds_ = None
         return self
 
     def transform(self, X, y=None):
-        """Transform X.
+        """Cuts `X` so it is aligned with `y`.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
-            Input data. ``
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
+            Time series to build a target for.
 
         y : None
-            There is no need of a target, yet the pipeline API
+            There is no need for a target, yet the pipeline API
             requires this parameter.
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_new, n_features)
-            The transformed/resampled input array.
-            ``n_samples_new = n_samples // period``.
+        Xt : ndarray, shape (n_samples_new, 1)
+            The cut input time series.
 
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_labeller', '_sliding_window', 'thresholds_'])
+        check_is_fitted(self, ['_sliding_window', 'thresholds_'])
         X = column_or_1d(X)
 
         Xt = X[:-self.n_steps_future]
 
         if self.n_steps_future < self.width:
-            Xt = Xt[self.width - 1 - self.n_steps_future:]
-        return Xt
+            Xt = Xt[self.width - self.n_steps_future:]
+        return Xt.reshape(-1, 1)
 
     def resample(self, y, X=None):
-        """Resample y.
+        """Resample `y`.
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples, n_features)
-            Target.
+        y : ndarray, shape (n_samples,)
+            Time series to build a target for.
 
         X : None
-            There is no need of input data,
-            yet the pipeline API requires this parameter.
+            There is no need for `X`, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
-        yt : ndarray, shape (n_samples_new, 1)
-            The resampled target.
-            ``n_samples_new = n_samples - 1``.
+        yr : ndarray, shape (n_samples_new,)
+            Target for the prediction task.
 
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_labeller', '_sliding_window', 'thresholds_'])
+        check_is_fitted(self, ['_sliding_window', 'thresholds_'])
         y = column_or_1d(y)
 
-        yt = self._sliding_window.transform(y)
-        yt = self._labeller(self.function, yt, self.time_delta,
-                            **self.effective_function_params_)
+        yr = self._sliding_window.transform(y)
+        yr = self.func(yr, axis=1, **self.func_params).reshape(-1, 1)
 
         if self.thresholds_ is not None:
-            yt = np.abs(yt)
-            yt = np.concatenate(
-                [1 * (yt >= 0) * (yt < self.thresholds_[0])] +
-                [1 * (yt >= self.thresholds_[i]) *
-                 (yt < self.thresholds_[i + 1]) for i in range(
+            yr = np.abs(yr)
+            yr = np.concatenate(
+                [1 * (yr >= 0) * (yr < self.thresholds_[0])] +
+                [1 * (yr >= self.thresholds_[i]) *
+                 (yr < self.thresholds_[i + 1]) for i in range(
                     len(self.thresholds_) - 1)] +
-                [1 * (yt >= self.thresholds_[-1])], axis=1)
-            yt = np.nonzero(yt)[1].reshape((yt.shape[0], 1))
+                [1 * (yr >= self.thresholds_[-1])], axis=1)
+            yr = np.nonzero(yr)[1].reshape(yr.shape[0], 1)
 
         if self.n_steps_future >= self.width:
-            yt = yt[self.n_steps_future - self.width + 1:]
+            yr = yr[self.n_steps_future - self.width + 1:]
 
-        return yt.reshape((yt.shape[0], ))
+        return yr.reshape(-1)

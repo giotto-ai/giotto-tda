@@ -1,10 +1,5 @@
-"""
-The module :mod:`giotto.pipeline` is an extension of scikit-learn's
-and implements utilities to build a composite transformer by applying
-a transformer pipeline to sliding subwindows of the input data in the
-spirit of a pooling layer in a convolutional neural network.
-"""
-# Adapted from scikit-learn and imbalanced-learn
+"""The module :mod:`giotto.pipeline` extends scikit-learn's module by defining
+Pipelines that include TransformerResamplers."""
 # License: Apache 2.0
 
 import numpy as np
@@ -45,7 +40,7 @@ class Pipeline(pipeline.Pipeline):
         fit/transform) that are chained, in the order in which
         they are chained, with the last object an estimator.
 
-    memory : Instance of joblib.Memory or string, optional (default=None)
+    memory : Instance of joblib.Memory or string, optional (default: ``None``)
         Used to cache the fitted transformers of the pipeline. By default,
         no caching is performed. If a string is given, it is the path to
         the caching directory. Enabling caching triggers a clone of
@@ -68,39 +63,40 @@ class Pipeline(pipeline.Pipeline):
 
     Examples
     --------
-
-    >>> from collections import Counter
-    >>> from sklearn.datasets import make_classification
-    >>> from sklearn.model_selection import train_test_split as tts
-    >>> from sklearn.decomposition import PCA
-    >>> from sklearn.neighbors import KNeighborsClassifier as KNN
-    >>> from sklearn.metrics import classification_report
-    >>> from imblearn.over_sampling import SMOTE
-    >>> from imblearn.pipeline import Pipeline # doctest: +NORMALIZE_WHITESPACE
-    >>> X, y = make_classification(n_classes=2, class_sep=2,
-    ... weights=[0.1, 0.9], n_informative=3, n_redundant=1, flip_y=0,
-    ... n_features=20, n_clusters_per_class=1, n_samples=1000, random_state=10)
-    >>> print('Original dataset shape {}'.format(Counter(y)))
-    Original dataset shape Counter({1: 900, 0: 100})
-    >>> pca = PCA()
-    >>> smt = SMOTE(random_state=42)
-    >>> knn = KNN()
-    >>> pipeline = Pipeline([('smt', smt), ('pca', pca), ('knn', knn)])
-    >>> X_train, X_test, y_train, y_test = tts(X, y, random_state=42)
-    >>> pipeline.fit(X_train, y_train) # doctest: +ELLIPSIS
-    Pipeline(...)
-    >>> y_hat = pipeline.predict(X_test)
-    >>> print(classification_report(y_test, y_hat))
-                  precision    recall  f1-score   support
-    <BLANKLINE>
-               0       0.87      1.00      0.93        26
-               1       1.00      0.98      0.99       224
-    <BLANKLINE>
-        accuracy                           0.98       250
-       macro avg       0.93      0.99      0.96       250
-    weighted avg       0.99      0.98      0.98       250
-    <BLANKLINE>
-
+    >>> import numpy as np
+    >>> import giotto.time_series as ts
+    >>> import giotto.homology as hl
+    >>> import giotto.diagrams as diag
+    >>> from giotto.pipeline import Pipeline
+    >>> import sklearn.preprocessing as skprep
+    >>>
+    >>> X = np.random.rand(600, 1)
+    >>> n_train, n_test = 400, 200
+    >>>
+    >>> labeller = ts.Labeller(width=5, percentiles=[80],
+    >>>                        n_steps_future=1)
+    >>> X_train = X[:n_train]
+    >>> y_train = X_train
+    >>> X_train, y_train = labeller.fit_transform_resample(X_train, y_train)
+    >>>
+    >>> print(X_train.shape, y_train.shape)
+    (395, 1) (395,)
+    >>> steps = [
+    >>>     ('embedding', ts.TakensEmbedding()),
+    >>>     ('window', ts.SlidingWindow(width=5, stride=1)),
+    >>>     ('diagram', hl.VietorisRipsPersistence()),
+    >>>     ('rescaler', diag.Scaler()),
+    >>>     ('filter', diag.Filtering(epsilon=0.1)),
+    >>>     ('entropy', diag.PersistenceEntropy()),
+    >>>     ('scaling', skprep.MinMaxScaler(copy=True)),
+    >>> ]
+    >>> pipeline = Pipeline(steps)
+    >>>
+    >>> Xt_train, yr_train = pipeline.\\
+    >>>     fit_transform_resample(X_train, y_train)
+    >>>
+    >>> print(X_train_final.shape, y_train_final.shape)
+    (389, 2) (389,)
     """
 
     def _fit(self, X, y=None, **fit_params):
@@ -161,7 +157,7 @@ class Pipeline(pipeline.Pipeline):
         return X, y, fit_params_steps[self.steps[-1][0]]
 
     def fit(self, X, y=None, **fit_params):
-        """Fit the model
+        """Fit the model.
 
         Fit all the transforms/samplers one after the other and
         transform/sample the data, then fit the transformed/sampled
@@ -173,7 +169,7 @@ class Pipeline(pipeline.Pipeline):
             Training data. Must fulfill input requirements of first step of the
             pipeline.
 
-        y : iterable, default=None
+        y : iterable or None, default: ``None``
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
 
@@ -188,13 +184,13 @@ class Pipeline(pipeline.Pipeline):
             This estimator
 
         """
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
         if self._final_estimator != 'passthrough':
-            self._final_estimator.fit(Xt, yt, **fit_params)
+            self._final_estimator.fit(Xt, yr, **fit_params)
         return self
 
     def fit_transform(self, X, y=None, **fit_params):
-        """Fit the model and transform with the final estimator
+        """Fit the model and transform with the final estimator.
 
         Fits all the transformers/samplers one after the other and
         transform/sample the data, then uses fit_transform on
@@ -206,7 +202,7 @@ class Pipeline(pipeline.Pipeline):
             Training data. Must fulfill input requirements of first step of the
             pipeline.
 
-        y : iterable, default=None
+        y : iterable, default: ``None``
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
 
@@ -217,21 +213,22 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
             Transformed samples
 
         """
         last_step = self._final_estimator
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
         if last_step == 'passthrough':
             return Xt
         elif hasattr(last_step, 'fit_transform'):
-            return last_step.fit_transform(Xt, yt, **fit_params)
+            return last_step.fit_transform(Xt, yr, **fit_params)
         else:
-            return last_step.fit(Xt, yt, **fit_params).transform(Xt)
+            return last_step.fit(Xt, yr, **fit_params).transform(Xt)
 
     def fit_transform_resample(self, X, y=None, **fit_params):
-        """Fit the model and sample with the final estimator
+        """Fit the model and sample with the final estimator.
+
         Fits all the transformers/samplers one after the other and
         transform/sample the data, then uses fit_resample on transformed
         data with the final estimator.
@@ -241,9 +238,11 @@ class Pipeline(pipeline.Pipeline):
         X : iterable
             Training data. Must fulfill input requirements of first step of the
             pipeline.
-        y : iterable, default=None
+
+        y : iterable, default: ``None``
             Training targets. Must fulfill label requirements for all steps of
             the pipeline.
+
         **fit_params : dict of string -> object
             Parameters passed to the :meth:`fit` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
@@ -251,19 +250,20 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
-            Transformed samples
-        yt : array-like, shape = [n_samples, n_transformed_features]
-            Transformed target
+        Xt : array-like, shape (n_samples, n_transformed_features)
+            Transformed samples.
+
+        yr : array-like, shape (n_samples, n_transformed_features)
+            Transformed target.
         """
         last_step = self._final_estimator
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
         if last_step == 'passthrough':
-            return Xt, yt
+            return Xt, yr
         elif hasattr(last_step, 'fit_transform_resample'):
-            return last_step.fit_transform_resample(Xt, yt, **fit_params)
+            return last_step.fit_transform_resample(Xt, yr, **fit_params)
         elif hasattr(last_step, 'fit_transform'):
-            return last_step.fit_transform(Xt, yt, **fit_params), yt
+            return last_step.fit_transform(Xt, yr, **fit_params), yr
 
     @if_delegate_has_method(delegate='_final_estimator')
     def fit_predict(self, X, y=None, **fit_params):
@@ -279,7 +279,7 @@ class Pipeline(pipeline.Pipeline):
             Training data. Must fulfill input requirements of first step of
             the pipeline.
 
-        y : iterable, default=None
+        y : iterable or None, default: ``None``
             Training targets. Must fulfill label requirements for all steps
             of the pipeline.
 
@@ -292,8 +292,8 @@ class Pipeline(pipeline.Pipeline):
         -------
         y_pred : array-like
         """
-        Xt, yt, fit_params = self._fit(X, y, **fit_params)
-        return self.steps[-1][-1].fit_predict(Xt, yt, **fit_params)
+        Xt, yr, fit_params = self._fit(X, y, **fit_params)
+        return self.steps[-1][-1].fit_predict(Xt, yr, **fit_params)
 
     @property
     def resample(self):
@@ -305,13 +305,13 @@ class Pipeline(pipeline.Pipeline):
 
         Parameters
         ----------
-        X : iterable
-            Data to transform. Must fulfill input requirements of first step
+        y : array-like, shape = (n_samples, )
+            Data to resample. Must fulfill input requirements of first step
             of the pipeline.
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        yr : array-like, shape = (n_samples_new, )
         """
         # _final_estimator is None or has transform, otherwise attribute error
         if self._final_estimator != 'passthrough':
@@ -319,10 +319,10 @@ class Pipeline(pipeline.Pipeline):
         return self._resample
 
     def _resample(self, X, y=None):
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter():
-            yt =  transform.resample(yt)
-        return yt
+            yr =  transform.resample(yr)
+        return yr
 
 
     @property
@@ -341,7 +341,8 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape = (n_samples_new, n_transformed_features)
+        yr : array-like, shape = (n_samples_new, )
         """
         # _final_estimator is None or has transform, otherwise attribute error
         final_estimator = self._final_estimator
@@ -353,13 +354,13 @@ class Pipeline(pipeline.Pipeline):
         return self._transform_resample
 
     def _transform_resample(self, X, y):
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter():
             if hasattr(transform, 'transform_resample'):
-                Xt, yt = transform.transform_resample(Xt, yt)
+                Xt, yr = transform.transform_resample(Xt, yr)
             else:
                 Xt = transform.transform(Xt)
-        return Xt, yt
+        return Xt, yr
 
     @property
     def transform(self):
@@ -377,7 +378,7 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+        Xt : array-like, shape (n_samples, n_transformed_features)
         """
         # _final_estimator is None or has transform, otherwise attribute error
         if self._final_estimator != 'passthrough':
@@ -385,7 +386,7 @@ class Pipeline(pipeline.Pipeline):
         return self._transform
 
     def _transform(self, X, y=None):
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter():
             Xt =  transform.transform(Xt)
         return Xt
@@ -398,7 +399,8 @@ class Pipeline(pipeline.Pipeline):
 
         Parameters
         ----------
-        Xt : array-like, shape = [n_samples, n_transformed_features]
+
+        Xt : array-like, shape (n_samples, n_transformed_features)
             Data samples, where ``n_samples`` is the number of samples and
             ``n_features`` is the number of features. Must fulfill
             input requirements of last step of pipeline's
@@ -406,7 +408,7 @@ class Pipeline(pipeline.Pipeline):
 
         Returns
         -------
-        Xt : array-like, shape = [n_samples, n_features]
+        Xt : array-like, shape (n_samples, n_features)
         """
         # raise AttributeError if necessary for hasattr behaviour
         for _, _, transform in self._iter():
@@ -414,10 +416,10 @@ class Pipeline(pipeline.Pipeline):
         return self._inverse_transform
 
     def _inverse_transform(self, X, y=None):
-        Xt, yt = X, y
+        Xt, yr = X, y
         reverse_iter = reversed(list(self._iter()))
         for _, _, transform in self._iter():
-            Xt = transform.inverse_transform(Xt, yt)
+            Xt = transform.inverse_transform(Xt, yr)
         return Xt
 
     @if_delegate_has_method(delegate='_final_estimator')
@@ -430,11 +432,11 @@ class Pipeline(pipeline.Pipeline):
             Data to predict on. Must fulfill input requirements of first step
             of the pipeline.
 
-        y : iterable, default=None
+        y : iterable or None, default: ``None``
             Targets used for scoring. Must fulfill label requirements for all
             steps of the pipeline.
 
-        sample_weight : array-like, default=None
+        sample_weight : array-like or None, default: ``None``
             If not None, this argument is passed as ``sample_weight`` keyword
             argument to the ``score`` method of the final estimator.
 
@@ -442,17 +444,17 @@ class Pipeline(pipeline.Pipeline):
         -------
         score : float
         """
-        Xt, yt = X, y
+        Xt, yr = X, y
         for _, _, transform in self._iter(with_final=False):
             if (hasattr(transform, "transform_resample")):
-                Xt, yt = transform.transform_resample(Xt, yt)
+                Xt, yr = transform.transform_resample(Xt, yr)
             else:
                 Xt = transform.transform(Xt)
 
         score_params = {}
         if sample_weight is not None:
             score_params['sample_weight'] = sample_weight
-        return self.steps[-1][-1].score(Xt, yt, **score_params)
+        return self.steps[-1][-1].score(Xt, yr, **score_params)
 
 
 def _fit_transform_one(transformer, weight, X, y, **fit_params):
@@ -528,206 +530,3 @@ def make_pipeline(*steps, **kwargs):
         raise TypeError('Unknown keyword arguments: "{}"'
                         .format(list(kwargs.keys())[0]))
     return Pipeline(pipeline._name_estimators(steps), memory=memory)
-
-
-class SlidingWindowFeatureUnion(BaseEstimator, TransformerResamplerMixin):
-    """Concatenates results of multiple transformer objects.
-    This estimator applies a list of transformer objects in parallel to the
-    input data, then concatenates the results. This is useful to combine
-    several feature extraction mechanisms into a single transformer.
-    Parameters of the transformer may be set using the parameter
-    name after 'transformer__'.
-
-    Parameters
-    ----------
-    transformer : object, required
-        Transformer object to be applied to each subwindow of the data.
-
-    axes: list of int, optional (default=None)
-        Axes on which to slide the window.
-
-    width: list of int, optional (default=None)
-        Width of the sliding window.
-
-    stride: list of int, default: None
-        Stride of the sliding window.
-
-    padding: list of int, optional (default=None)
-        Padding applied to the input before sliding the window.
-
-    n_jobs : int or None, optional (default=None)
-        Number of jobs to run in parallel.
-        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
-        ``-1`` means using all processors.
-
-    verbose : boolean, optional(default=False)
-        If True, the time elapsed while fitting each transformer will be
-        printed as it is completed.
-
-    Attributes
-    ----------
-    transformer_list_ : list of transformer
-        List of transformer objects to be applied to the data.
-
-    slice_list_ : list of transformer
-        List of transformer objects to be applied to the data.
-
-    Examples
-    --------
-    >>> from giotto.pipeline import SlidingWindowFeatureUnion
-    """
-    def __init__(self, transformer, axes=[0], width=None, stride=None,
-                 padding=None, n_jobs=None):
-        self.transformer = transformer
-        self.axes = axes
-        self.width = width
-        self.stride = stride
-        self.padding = padding
-        self.n_jobs = n_jobs
-
-    def _validate_params(self):
-        """A class method that checks whether the hyperparameters and the input
-        parameters of the :meth:`fit` are valid.
-
-        """
-        try:
-            assert self._dimension == len(self.width_)
-            assert self._dimension == len(self.stride_)
-            assert self._dimension == len(self.padding_)
-        except AssertionError:
-            raise ValueError("axes, width, stride, and padding do not have the same"
-                             " length.")
-
-        if len(self.axes) != 1 or self.axes[0] != 0:
-            raise NotImplementedError("This transformer has only been"
-                                      " implemented for time series"
-                                      " for which axes = [0]")
-
-    def _pad(self, X, axis):
-        return X
-
-    def _view_X(X, begin, end, axis):
-        return np.roll(X, shift=-begin, axis=axis)[:end]
-
-    def _view_y(y, begin, end, axis):
-        return np.roll(y, shift=-begin, axis=axis)[:end]
-
-    def _parallel_func(self, X, y, fit_params, func, window_slices):
-        """Runs func in parallel on X and y"""
-        return Parallel(n_jobs=self.n_jobs)(
-            delayed(func)(transformer, self._view_X(_X, begin, end, axis),
-                          self._view_y(y, axis, begin, end, axis))
-            for begin, end in window_slices)
-
-    def _slice_windows(self):
-        n_windows = [
-            (X.shape[self.axes[dimension]] - 2*self.width_[dimension]+1) \
-            // self._stride[dimension] + 1
-            for dimension in range(self._dimension)
-            ]
-
-        window_slices = [
-            tuple(i*self.stride_[dimension],
-                  2*self.width_[dimension]+1 + i*self.stride_[dimension])
-            for i in range(n_windows[dimension])
-        ]
-        return window_slices
-
-    def fit(self, X, y=None):
-        """Fit all transformers using X.
-
-        Parameters
-        ----------
-        X : iterable or array-like, depending on transformers
-            Input data, used to fit transformers.
-
-        y : array-like, shape (n_samples, ...), optional
-            Targets for supervised learning.
-
-        Returns
-        -------
-        self
-
-        """
-        self._dimension = len(axes)
-
-        if self.width is None:
-            self.width_ = self._dimension * [1]
-        else:
-            self.width_ = self.width
-
-        if self.stride is None:
-            self.stride_ = self._dimension * [1]
-        else:
-            self.stride_ = self.stride
-
-        if self.padding is None:
-            self.padding_ =self._dimension * [0]
-        else:
-            self.width_ = self.width
-
-        self._validate_params()
-        _X = self._pad(X)
-
-        window_slices = self._slice_windows()
-        window_transformers = [clone(self.transformer) for _ in range(2)]
-        fit = self._parallel_func(_X, y, {}, fit, window_slices)
-        return self
-
-    def fit_transform(self, X, y=None, **fit_params):
-        """Fit all transformers, transform the data and concatenate results.
-
-        Parameters
-        ----------
-
-        X : iterable or array-like, depending on transformers
-            Input data to be transformed.
-
-        y : array-like, shape (n_samples, ...), optional
-            Targets for supervised learning.
-
-        Returns
-        -------
-        X_t : array-like or sparse matrix, shape (n_samples, sum_n_components)
-            hstack of results of transformers. sum_n_components is the
-            sum of n_components (output dimension) over transformers.
-
-        """
-        _X = self._pad(X)
-
-        fit = self._parallel_func(_X, y, {}, fit)
-
-        Xs, transformers = zip(*results)
-        self._update_transformer_list(transformers)
-
-        if any(sparse.issparse(f) for f in Xs):
-            Xs = sparse.hstack(Xs).tocsr()
-        else:
-            Xs = np.hstack(Xs)
-        return Xs
-
-    def transform(self, X):
-        """Transform X separately by each transformer, concatenate results.
-
-        Parameters
-        ----------
-        X : iterable or array-like, depending on transformers
-            Input data to be transformed.
-
-        Returns
-        -------
-        X_t : array-like or sparse matrix, shape (n_samples, sum_n_components)
-            hstack of results of transformers. sum_n_components is the
-            sum of n_components (output dimension) over transformers.
-
-        """
-        n_samples = X.shape[0]
-        Xs = Parallel(n_jobs=self.n_jobs)(
-            delayed(self.transformer_list_[i].transform)(X[:, unzip(self.slice_list_[i])], y)
-            for i in range(self.n_windows_))
-
-        if any(sparse.issparse(f) for f in Xs):
-            Xs = sparse.hstack(Xs).tocsr()
-        else:
-            Xs = np.hstack(Xs).reshape((n_samples, -1))
-        return Xs

@@ -1,4 +1,4 @@
-"""Embedding of multivariate time-series."""
+"""Processing of multivariate time series."""
 # License: Apache 2.0
 
 import numpy as np
@@ -7,20 +7,44 @@ from ..utils import validate_params
 from sklearn.utils.validation import check_is_fitted, check_array
 
 
-class PearsonCorrelation(BaseEstimator, TransformerMixin):
-    """Transformer performing an argsort of each row in each array in a
-    collection. Based on ideas in `arXiv:1904.07403
-    <https://arxiv.org/abs/1904.07403>`_.
+class PearsonDissimilarity(BaseEstimator, TransformerMixin):
+    """Pearson dissimilarities from collections of multivariate time series.
+
+    The sample Pearson correlation coefficients between pairs of
+    components of an :math:`N`-variate time series form an :math:`N
+    \\times N` matrix :math:`R` with entries
+
+    .. math:: R_{ij} = \\frac{ C_{ij} }{ \\sqrt{ C_{ii} C_{jj} } },
+
+    where :math:`C` is the covariance matrix. Setting :math:`D_{ij} =
+    (1 - R_{ij})/2` or :math:`D_{ij} = 1 - |R_{ij}|` we obtain a
+    dissimilarity matrix with entries between 0 and 1.
+
+    This transformer computes one dissimilarity matrix per multivariate time
+    series in a collection. Examples of such collections are the outputs of
+    :class:`SlidingWindow`.
 
     Parameters
     ----------
-    positive_definite : bool, default: True
-        Whether the correlation should be output as a positive definite matrix.
-    """
-    _hyperparameters = {'positive_definite': [bool, (0, 1)]}
+    absolute_value : bool, default: ``False``
+        Whether absolute values of the Pearson correlation coefficients
+        should be taken. Doing so makes pairs of strongly anti-correlated
+        variables as similar as pairs of strongly correlated ones.
 
-    def __init__(self, positive_definite=True, n_jobs=None):
-        self.positive_definite = positive_definite
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
+
+    See also
+    --------
+    SlidingWindow, giotto.homology.VietorisRipsPersistence
+
+    """
+    _hyperparameters = {'absolute_value': [bool, (0, 1)]}
+
+    def __init__(self, absolute_value=False, n_jobs=None):
+        self.absolute_value = absolute_value
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -31,12 +55,13 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, d)
-            Input data.
+        X : ndarray, shape (n_samples, n_observations, n_features)
+            Input data. Each entry along axis 0 is a sample of ``n_features``
+            different variables, of size ``n_observations``.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
@@ -44,35 +69,37 @@ class PearsonCorrelation(BaseEstimator, TransformerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X)
+        check_array(X, allow_nd=True)
 
         self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """For each array in `X`, argsort each row in ascending order.
+        """Compute Pearson dissimilarities.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, d)
-            Input data.
+        X : ndarray, shape (n_samples, n_observations, n_features)
+            Input data. Each entry along axis 0 is a sample of ``n_features``
+            different variables, of size ``n_observations``.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
 
         Returns
         -------
-        Xt : ndarray of int, shape (n_samples, n_points, d)
-            The transformed array.
+        Xt : ndarray, shape (n_samples, n_features, n_features)
+            Array of Pearson dissimilarities.
 
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
-        X = check_array(X)
+        check_array(X, allow_nd=True)
 
-        Xt = np.corrcoef(X.T)
-        if self.positive_definite:
-            Xt = 1.0 - np.abs(Xt)
+        Xt = np.empty((X.shape[0], X.shape[2], X.shape[2]))
+        for i, sample in enumerate(X):
+            Xt[i, :, :] = np.corrcoef(sample, rowvar=False)
+        Xt = 0.5 - Xt/2 if not self.absolute_value else 1 - np.abs(Xt)
 
         return Xt
