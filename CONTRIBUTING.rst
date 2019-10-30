@@ -32,7 +32,7 @@ The Giotto Team will review your pull requests. Once the pull requests are appro
 Giotto team will work on getting your pull request submitted to our GitHub
 repository. Eventually, your pull request will be merged automatically on GitHub.
 If you want to contribute, start working through the Giotto codebase,
-navigate to the `GitHub issue tab <https://github.com/giotto-learn/giotto-learn/issues`_
+navigate to the `GitHub issue tab <https://github.com/giotto-learn/giotto-learn/issues>`_
 and start looking through interesting issues. These are issues that we believe
 are particularly well suited for outside contributions, often because we
 probably won't get to them right now. If you decide to start on an issue, leave
