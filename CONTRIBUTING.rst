@@ -63,7 +63,7 @@ General guidelines and philosophy for contribution
 C++ coding style
 ----------------
 
-Changes to Giotto C/C++ code should conform to [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).
+Changes to Giotto C/C++ code should conform to `Google C++ Style Guide <https://google.github.io/styleguide/cppguide.html>`_.
 Use `clang-tidy` to check your C/C++ changes. To install `clang-tidy` on
 ubuntu:16.04, do:
 
