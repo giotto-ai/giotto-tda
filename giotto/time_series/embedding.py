@@ -225,7 +225,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         Actual embedding time delay used to embed. If
         `parameters_type` is ``'search'``, it is the calculated optimal
         embedding time delay and is less than or equal to `time_delay`.
-        Otherwise it is equal tp `time_delay`.
+        Otherwise it is equal to `time_delay`.
 
     dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
