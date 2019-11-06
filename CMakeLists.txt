@@ -42,6 +42,7 @@ if(OpenMP_FOUND)
 endif()
 target_link_libraries(giotto_cubical_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_include_directories(giotto_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/Bitmap_cubical_complex/include")
+target_include_directories(giotto_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_compile_options(giotto_cubical_complex PUBLIC -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math)
 target_compile_options(giotto_cubical_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 
