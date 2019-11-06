@@ -4,9 +4,11 @@
  * License:          TBD
  *****************************************************************************/
 
-#include "persistent_cohomology.h"
+
+#include <iostream>
+#include <Persistent_cohomology_interface.h>
+#include <Simplex_tree_interface.h>
 #include "rips_complex.h"
-#include "simplex_tree.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>

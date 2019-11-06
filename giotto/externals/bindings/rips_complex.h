@@ -16,7 +16,6 @@
 #include <string>
 #include <utility>  // std::pair
 #include <vector>
-#include "simplex_tree.h"
 
 #include <boost/optional.hpp>
 
