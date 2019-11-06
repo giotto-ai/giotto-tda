@@ -1,7 +1,6 @@
 /******************************************************************************
- * Author:           Julián Burella Pérez
  * Description:      hera's wasserstein distance interfacing with pybind11
- * License:          TBD
+ * License:          Apache 2.0
  *****************************************************************************/
 
 #include "../hera/wasserstein/wasserstein.h"

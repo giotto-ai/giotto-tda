@@ -1,8 +1,7 @@
 /******************************************************************************
- * Author:           Julián Burella Pérez
  * Created:          09/04/19
  * Description:      hera's bottleneck distance interfacing with pybind11
- * License:          TBD
+ * License:          Apache 2.0
  *****************************************************************************/
 
 #include "../hera/bottleneck/bottleneck.h"
