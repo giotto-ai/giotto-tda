@@ -1,7 +1,6 @@
 /******************************************************************************
- * Author:           Julián Burella Pérez
  * Description:      gudhi's simplex tree interfacing with pybind11
- * License:          TBD
+ * License:          Apache 2.0
  *****************************************************************************/
 
 

@@ -1,7 +1,6 @@
 /******************************************************************************
- * Author:           Julián Burella Pérez
  * Description:      gudhi's cubical complex interfacing with pybind11
- * License:          TBD
+ * License:          Apache 2.0
  *****************************************************************************/
 
 #include <gudhi/Bitmap_cubical_complex.h>
