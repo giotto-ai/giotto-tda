@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
 
+from numpy.testing import assert_almost_equal
+
 from giotto.diagrams import PairwiseDistance, Amplitude
 
 X_1 = np.array([
@@ -208,6 +210,26 @@ X_2 = np.array([
      [0., 0., 2],
      [0., 0., 2]]])
 
+X_bottleneck = np.array([
+    [[0, 1, 0.],
+     [0, 0, 0.],
+     [0, 4, 1.]],  # Expected bottleneck ampl: [sqrt(2)/2, 2*sqrt(2)]
+
+    [[0, 2, 0.],
+     [0, 1, 0.],
+     [0, 0, 1.]],  # Expected bottleneck ampl: [sqrt(2), 0]
+
+    [[3, 3.5, 0.],
+     [0, 0, 0.],
+     [5, 9, 1.]]  # Expected bottleneck ampl: [0.5*sqrt(2)/2, 2*sqrt(2)]
+])
+
+X_bottleneck_res_exp = np.array([
+ [np.sqrt(2)/2, 2*np.sqrt(2)],
+ [np.sqrt(2), 0],
+ [np.sqrt(2)/4, 2*np.sqrt(2)]
+])
+
 
 def test_not_fitted():
     dd = PairwiseDistance()
@@ -266,3 +288,13 @@ def test_da_transform(metric, metric_params, n_jobs):
                    n_jobs=n_jobs)
     X_res = da.fit(X_1).transform(X_2)
     assert X_res.shape == (X_2.shape[0], 1)
+
+
+@pytest.mark.parametrize(('metric', 'metric_params', 'order'),
+                         [('bottleneck', None, None)])
+@pytest.mark.parametrize('n_jobs', [1, 2, 4])
+def test_da_transform_bottleneck(metric, metric_params, order, n_jobs):
+    da = Amplitude(metric=metric, metric_params=metric_params,
+                   order=order, n_jobs=n_jobs)
+    X_bottleneck_res = da.fit_transform(X_bottleneck)
+    assert_almost_equal(X_bottleneck_res, X_bottleneck_res_exp)
