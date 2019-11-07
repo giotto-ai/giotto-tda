@@ -21,4 +21,4 @@ algorithms in a machine learning framework.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
 
-__version__ = '0.1.1'
+__version__ = '0.1.3'

@@ -176,7 +176,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
     of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
     \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
-    This set is called the `Takens embedding <https://www.giotto.ai/theory>`_
+    This set is called the `Takens embedding <https://giotto.ai/theory>`_
     of the time series and can be interpreted as a point cloud.
 
     The difference between :math:`t_{i+1}` and :math:`t_i` is called the
@@ -225,7 +225,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         Actual embedding time delay used to embed. If
         `parameters_type` is ``'search'``, it is the calculated optimal
         embedding time delay and is less than or equal to `time_delay`.
-        Otherwise it is equal tp `time_delay`.
+        Otherwise it is equal to `time_delay`.
 
     dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
@@ -285,6 +285,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
            Witness Complexes"; PhD thesis, University of Colorado at
            Boulder, 2018; `https://scholar.colorado.edu/math_gradetds/67
            <https://scholar.colorado.edu/math_gradetds/67>`_.
+
+    [4] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
+        Application of Topological Methods to Signal Analysis"; \
+        *Foundations of Computational Mathematics*, **15**, \
+        pp. 799--838; `doi:10.1007/s10208-014-9206-z \
+        <https://doi.org/10.1007/s10208-014-9206-z>`_.
 
     """
     _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],

@@ -204,10 +204,10 @@ def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
     amplitude_arrays = Parallel(n_jobs=n_jobs)(delayed(amplitude_func)(
         _subdiagrams(X, [dim], remove_dim=True)[s], sampling=samplings[dim],
         step_size=step_sizes[dim], **effective_metric_params)
-        for s in gen_even_slices(_num_samples(X), effective_n_jobs(n_jobs))
-        for dim in homology_dimensions)
+        for dim in homology_dimensions
+        for s in gen_even_slices(_num_samples(X), effective_n_jobs(n_jobs)))
 
     amplitude_arrays = np.concatenate(amplitude_arrays).reshape(
-        X.shape[0], len(homology_dimensions))
+        len(homology_dimensions), X.shape[0]).T
 
     return amplitude_arrays

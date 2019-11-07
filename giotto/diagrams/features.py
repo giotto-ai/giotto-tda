@@ -11,7 +11,7 @@ from giotto.diagrams._metrics import betti_curves, landscapes, heats
 
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """`Persistence entropies <https://www.giotto.ai/theory>`_ of persistence
+    """`Persistence entropies <https://giotto.ai/theory>`_ of persistence
     diagrams.
 
     Given a persistence diagrams consisting of birth-death-dimension triples
@@ -117,12 +117,12 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """`Betti curves <https://www.giotto.ai/theory>`_ of persistence diagrams.
+    """`Betti curves <https://giotto.ai/theory>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective Betti curves are obtained by
-    evenly sampling the `filtration parameter <https://www.giotto.ai/theory>`_.
+    evenly sampling the `filtration parameter <https://giotto.ai/theory>`_.
 
     Parameters
     ----------
@@ -240,14 +240,14 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
 
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
-    """`Persistence landscapes <https://www.giotto.ai/theory>`_ of persistence
+    """`Persistence landscapes <https://giotto.ai/theory>`_ of persistence
     diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and layers of their respective persistence
     landscapes are obtained by evenly sampling the `filtration parameter
-    <https://www.giotto.ai/theory>`_.
+    <https://giotto.ai/theory>`_.
 
     Parameters
     ----------
@@ -382,7 +382,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     distinct homology dimensions are considered separately and regarded as sums
     of Dirac deltas. Then, the convolution with a Gaussian kernel is computed
     over a rectangular grid of locations evenly sampled from appropriate
-    ranges of the `filtration parameter <https://www.giotto.ai/theory>`_. The
+    ranges of the `filtration parameter <https://giotto.ai/theory>`_. The
     same is done with the reflected images of the subdiagrams about the
     diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a raster image.

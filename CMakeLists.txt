@@ -42,6 +42,7 @@ if(OpenMP_FOUND)
 endif()
 target_link_libraries(giotto_cubical_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_include_directories(giotto_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/Bitmap_cubical_complex/include")
+target_include_directories(giotto_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_compile_options(giotto_cubical_complex PUBLIC -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math)
 target_compile_options(giotto_cubical_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 
@@ -61,6 +62,7 @@ target_link_libraries(giotto_persistent_cohomology LINK_PUBLIC ${Boost_LIBRARIES
 target_include_directories(giotto_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(giotto_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/common/include")
 target_include_directories(giotto_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/Bitmap_cubical_complex/include")
+target_include_directories(giotto_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_compile_options(giotto_persistent_cohomology PUBLIC -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing
   -frounding-math)
 target_compile_options(giotto_persistent_cohomology PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
@@ -83,6 +85,7 @@ target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Cech_co
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Rips_complex/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Subsampling/include")
+target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_compile_options(giotto_simplex_tree PUBLIC -Ofast -shared -pthread -fPIC
   -fwrapv -Wall -fno-strict-aliasing -frounding-math)
 target_compile_options(giotto_simplex_tree PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
