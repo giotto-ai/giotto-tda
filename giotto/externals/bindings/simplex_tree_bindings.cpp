@@ -7,7 +7,6 @@
 #include <iostream>
 #include <Persistent_cohomology_interface.h>
 #include <Simplex_tree_interface.h>
-#include "rips_complex.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -72,19 +71,5 @@ PYBIND11_MODULE(giotto_simplex_tree, m) {
            &Persistent_cohomology_interface_inst::persistence_pairs)
       .def("write_output_diagram",
            &Persistent_cohomology_interface_inst::write_output_diagram);
-
-  py::class_<Gudhi::rips_complex::Rips_complex_interface>(
-      m, "Rips_complex_interface")
-      .def(py::init<>())
-      .def("init_points",
-           &Gudhi::rips_complex::Rips_complex_interface::init_points)
-      .def("init_matrix",
-           &Gudhi::rips_complex::Rips_complex_interface::init_matrix)
-      .def("init_points_sparse",
-           &Gudhi::rips_complex::Rips_complex_interface::init_points_sparse)
-      .def("init_matrix_sparse",
-           &Gudhi::rips_complex::Rips_complex_interface::init_matrix_sparse)
-      .def("create_simplex_tree",
-           &Gudhi::rips_complex::Rips_complex_interface::create_simplex_tree);
   m.doc() = "GUDHI Simplex Tree functions interfacing";
 }

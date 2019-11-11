@@ -83,7 +83,6 @@ target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Simplex
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/common/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Cech_complex/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
-target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Rips_complex/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Subsampling/include")
 target_include_directories(giotto_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_compile_options(giotto_simplex_tree PUBLIC -Ofast -shared -pthread -fPIC
