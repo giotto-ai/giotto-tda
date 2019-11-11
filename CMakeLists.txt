@@ -115,3 +115,25 @@ endif()
 
 target_compile_definitions(giotto_periodic_cubical_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
+pybind11_add_module(giotto_witness_complex "${BINDINGS_DIR}/witness_complex_bindings.cpp")
+if(OpenMP_FOUND)
+  target_link_libraries(giotto_witness_complex PRIVATE OpenMP::OpenMP_CXX)
+endif()
+target_link_libraries(giotto_witness_complex LINK_PUBLIC ${Boost_LIBRARIES})
+target_include_directories(giotto_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Witness_complex/include")
+target_include_directories(giotto_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Simplex_tree/include")
+target_include_directories(giotto_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Cech_complex/include")
+target_include_directories(giotto_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
+target_include_directories(giotto_witness_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
+target_include_directories(giotto_witness_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
+target_compile_options(giotto_witness_complex PUBLIC -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math)
+target_compile_options(giotto_witness_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
+
+# Cannot have two inlined namespace !
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_options(giotto_witness_complex PUBLIC -march=native -D_GLIBCXX_PARALLEL)
+  target_link_libraries(giotto_witness_complex PRIVATE)
+endif()
+
+target_compile_definitions(giotto_witness_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+
