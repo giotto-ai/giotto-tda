@@ -1,4 +1,7 @@
-
+/******************************************************************************
+ * Description:      gudhi's cubical complex interfacing with pybind11
+ * License:          Apache 2.0
+ *****************************************************************************/
 
 #include <Rips_complex_interface.h>
 
