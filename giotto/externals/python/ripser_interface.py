@@ -14,7 +14,6 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
 
 
 def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
-    print('DRFDMSparse')
     ret = rips_dm_sparse(I, J, V, I.size, N, coeff, maxHomDim, thresh, do_cocycles)
     ret_rips = {}
     ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
