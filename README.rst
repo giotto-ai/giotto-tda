@@ -32,7 +32,7 @@ Project genesis
 giotto-learn is the result of a collaborative effort between `L2F SA
 <https://www.l2f.ch/>`_, the `Laboratory for Topology and Neuroscience
 <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
-<https://heig-vd.ch/en/research/reds>`_ of HEIG-VD. The initial thrust and bulk of the architectural decisions leading to the first release are due to Guillaume Tauzin (EPFL), with substantial help from actors at L2F Research (Umberto Lupo, Matteo Caorsi, Philippe Nguyen) and at the REDS Institute (Julian Burella Pérez, Roberto Rigamonti, David Truan).
+<https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
 
 Installation
 ------------
