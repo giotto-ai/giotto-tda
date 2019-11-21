@@ -1,5 +1,6 @@
 # License: Apache 2.0
 
+import numbers
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
@@ -433,7 +434,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
-    _hyperparameters = {'sigma': [float, (1e-16, np.inf)],
+    _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
     def __init__(self, sigma, n_values=100, n_jobs=None):
