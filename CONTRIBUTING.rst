@@ -94,6 +94,15 @@ You can use `flake8` on your python code via the following instructions:
 
     flake8 name_of_your_script.py
 
+Git pre-commit hook
+-------------------
+We provide a pre-commit git hook to prevent accidental commits to the master branch. To activate, run
+
+.. code-block:: bash
+
+    cd .git/hooks
+    ln -s ../../tools/git-pre-commit pre-commit
+
 Running unit tests
 ------------------
 
