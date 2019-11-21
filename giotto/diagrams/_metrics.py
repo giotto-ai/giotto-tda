@@ -25,7 +25,7 @@ def landscapes(diagrams, sampling, n_layers):
     midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) / 2.
     heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
-    top_pos = range(n_points - n_layers, n_points)
+    top_pos = range(-min(n_layers, n_points), 0)
     fibers.partition(top_pos, axis=2)
     fibers = np.flip(fibers[:, :, -n_layers:], axis=2)
     fibers = np.transpose(fibers, (1, 2, 0))
