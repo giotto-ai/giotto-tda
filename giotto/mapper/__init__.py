@@ -1,4 +1,4 @@
-from .filter_utils import Eccentricity
+from .filter import Eccentricity
 
 __all__ = [
     'Eccentricity'
