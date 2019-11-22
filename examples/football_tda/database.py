@@ -11,6 +11,8 @@ import wget
 url = 'https://storage.googleapis.com/l2f-open-models/football_tda/database.sqlite'
 if not os.path.isfile('database.sqlite'):
     filename = wget.download(url)
+else:
+    filename = 'database.sqlite'
 
 class Database:
     pl_players = 0
@@ -201,7 +203,7 @@ class Database:
 
         print(players[['player_name', 'appearance', ('overall_rating', 'mean')]].to_string(index=False))
 
-    def insert_messi(self):
+    def hire_player(self):
         league_input = str.lower(input('Choose one league between "serie a" and "Premier League".\n'))
 
         flag = True
@@ -224,7 +226,7 @@ class Database:
         self.calculate_ranking()
         print(self.pl_team.to_string(index=False))
         first_player = input('Which player do you want to insert? Please insert the name and surname \n')
-        team = input('Which team? Please, mind to insert the short name \n ')
+        team = input('Which team? Please, mind to insert the full name \n ')
         self.select_player_from_team(team)
         second_player = input('Which player? Please insert the name and surname \n')
         # self.switch_players_by_name('Messi', second_player)
@@ -232,4 +234,4 @@ class Database:
         # self.select_player_from_team(team)
         first_player_id = self.find_player_id_by_name(first_player)
         second_player_id = self.find_player_id_by_name(second_player)
-        return replace_player_with_messi(self.league, second_player_id, messi_id=first_player_id)
+        return replace_player_with_chosen_one(self.league, second_player_id, hired_player_id=first_player_id)

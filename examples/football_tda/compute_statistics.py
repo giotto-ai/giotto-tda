@@ -312,8 +312,8 @@ def _load_players():
     return players_df
 
 
-def replace_player_with_messi(league, replaced_player_id, messi_id=30981):
-    """Replace the player with id 'replaced_player_id' with the id of messi for all the matches
+def replace_player_with_chosen_one(league, replaced_player_id, hired_player_id=30981):
+    """Replace the player with id 'replaced_player_id' with the id of the chosen champion for all the matches
 
     Parameters
     ----------
@@ -321,13 +321,13 @@ def replace_player_with_messi(league, replaced_player_id, messi_id=30981):
         The string corresponding to the name of the league
     replaced_player_id: int
         The id of the player to be replaced
-    messi_id: int
-        The id of messi
+    hired_player_id: int
+        The id of the chosen player
 
     Returns
     -------
-    df_matches_with_messi: pd.DataFrame
-        The matches with Messi
+    df_matches_with_new_player: pd.DataFrame
+        The matches with the new player
     """
 
     df_matches = _load_matches(league)
@@ -335,12 +335,12 @@ def replace_player_with_messi(league, replaced_player_id, messi_id=30981):
 
     df_players_with_stats = add_aggregate_player_stats(df_players)
 
-    df_matches_with_messi = df_matches.replace(replaced_player_id, messi_id)
+    df_matches_with_new_player = df_matches.replace(replaced_player_id, hired_player_id)
 
-    df_matches_stats_with_messi = _insert_player_stats(df_matches_with_messi, df_players_with_stats)
+    df_matches_stats_with_new_player = _insert_player_stats(df_matches_with_new_player, df_players_with_stats)
 
-    df_matches_full_stats_with_messi = compute_aggregate_stats_per_team(df_matches_stats_with_messi)
+    df_matches_full_stats_with_new_player = compute_aggregate_stats_per_team(df_matches_stats_with_new_player)
 
-    df_matches_useful_stats_with_messi = df_matches_full_stats_with_messi
+    df_matches_useful_stats_with_new_player = df_matches_full_stats_with_new_player
 
-    return df_matches_useful_stats_with_messi
+    return df_matches_useful_stats_with_new_player
