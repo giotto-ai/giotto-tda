@@ -2,12 +2,10 @@
 # License : Apache 2.0
 
 import numpy as np
-import pytest
-from numpy.testing import assert_almost_equal
-from sklearn.exceptions import NotFittedError
 from giotto.mapper import Eccentricity
 from hypothesis import given
-from hypothesis.extra.numpy import arrays, array_shapes
+from hypothesis.extra.numpy import array_shapes, arrays
+from numpy.testing import assert_almost_equal
 from scipy.spatial.distance import pdist, squareform
 
 
