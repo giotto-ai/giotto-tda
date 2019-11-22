@@ -29,7 +29,7 @@ MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-learn/giotto-learn'
 LICENSE = 'Apache 2.0'
 DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn/tarball/v0.1.3'
-VERSION = __version__ # noqa
+VERSION = __version__  # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
@@ -54,7 +54,8 @@ EXTRAS_REQUIRE = {
         'pytest-azurepipelines',
         'pytest-benchmark',
         'jupyter_contrib_nbextensions',
-        'flake8'],
+        'flake8',
+        'hypothesis'],
     'doc': [
         'sphinx',
         'sphinx-gallery',
@@ -119,7 +120,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call(cmake_cmd1, cwd=dir_build)
         try:
             subprocess.check_call(cmake_cmd2, cwd=dir_build)
-        except: # noqa
+        except:  # noqa
             subprocess.check_call(cmake_cmd2_sudo, cwd=dir_build)
         os.chdir(dir_start)
 
