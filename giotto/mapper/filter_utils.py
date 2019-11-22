@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Eccentricity(BaseEstimator, TransformerMixin):
-    def __init__(self, exponent=2, metric='euclidean', metric_params={}):
+    def __init__(self, exponent=np.inf, metric='euclidean', metric_params={}):
         self.exponent = exponent
         self.metric = metric
         self.metric_params = metric_params
