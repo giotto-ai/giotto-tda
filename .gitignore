@@ -37,4 +37,8 @@ giotto/externals/pybind11
 # External
 *.DS_Store
 .idea/*
+.vscode/*
 *~
+
+# Unit test
+.pytest_cache/
