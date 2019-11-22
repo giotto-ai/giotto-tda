@@ -4,10 +4,10 @@ import numpy as np
 
 
 class Eccentricity(BaseEstimator, TransformerMixin):
-    def __init__(self, exponent=np.inf, metric='euclidean', metric_params={}):
+    def __init__(self, exponent=np.inf, metric='euclidean', metric_params=None):
         self.exponent = exponent
         self.metric = metric
-        self.metric_params = metric_params
+        self.metric_params = metric_params if metric_params is not None else dict()
 
     def fit(self, X, y=None):
         return self
