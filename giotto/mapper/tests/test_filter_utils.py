@@ -5,17 +5,9 @@ import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
-
 from giotto.mapper import Eccentricity
 
 X = np.array([[0, 0], [1, 2], [5, 6]])
-
-
-# def test_rescaling_not_fitted():
-#     cr = ConsistentRescaling()
-# 
-#     with pytest.raises(NotFittedError):
-#         cr.transform(X_cr)
 
 
 def test_eccentricity_transform():
