@@ -1,4 +1,4 @@
-from .filter import Eccentricity
+from .lens import Eccentricity
 
 __all__ = [
     'Eccentricity'

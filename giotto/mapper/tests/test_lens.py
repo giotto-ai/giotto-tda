@@ -1,6 +1,3 @@
-"""Testing for filter utils."""
-# License : Apache 2.0
-
 import numpy as np
 from giotto.mapper import Eccentricity
 from hypothesis import given
