@@ -6,12 +6,12 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 from giotto.mapper import Eccentricity
+from hypothesis import given
+from hypothesis.extra.numpy import arrays, array_shapes
 
-X = np.array([[0, 0], [1, 2], [5, 6]])
 
-
-def test_eccentricity_transform():
+@given(X=arrays(dtype=np.float, shape=array_shapes(min_dims=2, max_dims=2)))
+def test_eccentricity_transform_shape_equals_number_of_samples(X):
     ecc = Eccentricity()
     X_ecc = ecc.fit_transform(X)
-
-    assert X_ecc.shape == (X.shape[0],)
+    assert X_ecc.shape == (len(X),)

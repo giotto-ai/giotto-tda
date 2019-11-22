@@ -42,3 +42,4 @@ giotto/externals/pybind11
 
 # Unit test
 .pytest_cache/
+.hypothesis/
