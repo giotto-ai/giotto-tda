@@ -1,6 +1,6 @@
-from sklearn.base import BaseEstimator, TransformerMixin
-from scipy.spatial.distance import pdist, squareform
 import numpy as np
+from scipy.spatial.distance import pdist, squareform
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class Eccentricity(BaseEstimator, TransformerMixin):
@@ -19,10 +19,10 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         Additional keyword arguments for the metric function.
     """
 
-    def __init__(self, exponent=np.inf, metric='euclidean', metric_params=None):
+    def __init__(self, exponent=2, metric='euclidean', metric_params=None):
         self.exponent = exponent
         self.metric = metric
-        self.metric_params = metric_params if metric_params is not None else dict()
+        self.metric_params = metric_params
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -43,10 +43,15 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         -------
         self : object
         """
+        if self.metric_params is None:
+            self.effective_metric_params_ = dict()
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
         return self
 
     def transform(self, X, y=None):
-        """Apply the eccentricity filter function to each row in the distance matrix derived from `X`.
+        """Apply the eccentricity filter function to each row in the distance
+        matrix derived from `X`.
 
         Parameters
         ----------
@@ -62,7 +67,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples,)
         """
         distance_matrix = squareform(
-            pdist(X, metric=self.metric, **self.metric_params)
+            pdist(X, metric=self.metric, **self.effective_metric_params_)
         )
         Xt = np.linalg.norm(distance_matrix, axis=1, ord=self.exponent)
         return Xt
