@@ -516,3 +516,110 @@ class HeatKernel(BaseEstimator, TransformerMixin):
                                         self.n_values, self.n_values).\
             transpose((1, 0, 2, 3))
         return Xt
+
+
+class RelevantHoles(BaseEstimator, TransformerMixin):
+    """
+    Given peristence diagrams consisting of birth-death-dimension triples
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately. For each, the number of relevant holes is found.
+    A hole is relevant if its lifetimes d - b is larger than a given threshold
+
+    Parameters
+    ----------
+    typ : ``'rel'`` | ``'abs'``, optional, default: ``rel``
+        - If ``typ == 'rel'`` the threshold for relevance is relative to
+          the maximum lifetime within a persistence diagram and dimension
+        - If ``typ == 'abs'`` the parameter ``frac`` defines an absolute
+          threshold
+
+    frac : float, optional, default: ``0.``
+        The fraction of the maximum lifetime or threshold (depends on
+        parameter ``typ``) above which holes are considered to be relevant
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+    """
+
+    def __init__(self, typ='rel', frac=0., n_jobs=None):
+        self.typ = typ
+        self.frac = frac
+        self.n_jobs = n_jobs
+
+    def _get_n_holes(self, X):
+        X_lifespan = X[:, :, 1] - X[:, :, 0]
+        if self.typ == 'rel':
+            X_out = np.sum(X_lifespan > self.frac * X_lifespan.max(axis=1)
+                           .reshape(-1, 1),
+                           axis=1)
+            return X_out
+        elif self.typ == 'abs':
+            return np.sum(X_lifespan >= self.frac, axis=1)
+
+    def fit(self, X, y=None):
+        """
+        Parameters
+        ----------
+        X : ndarray, shape (n_sample, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+        """
+        X = check_diagram(X)
+
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        self._n_dimensions = len(self.homology_dimensions_)
+
+        self._is_fitted = True
+
+        return self
+
+    def transform(self, X):
+        """Compute the amplitudes or amplitude vectors of diagrams in `X`.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray, shape (n_samples, n_homology_dimensions)
+             statistics over holes in each dimension of each persistence
+             diagram
+        """
+        # Check if fit had been called
+        check_is_fitted(self, ['_is_fitted'])
+        X = check_diagram(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._get_n_holes)(_subdiagrams(X, [dim])[s])
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(
+                X.shape[0], effective_n_jobs(self.n_jobs))
+        )
+
+        Xt = np.vstack(Xt).T
+
+        return Xt
