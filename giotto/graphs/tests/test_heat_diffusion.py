@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 from sklearn.exceptions import NotFittedError
-from create_clique_complex import CreateCliqueComplex, CreateBoundaryMatrices, CreateLaplacianMatrices
-from heat_diffusion import HeatDiffusion
+from giotto.graphs.create_clique_complex import CreateCliqueComplex, CreateLaplacianMatrices
+from giotto.graphs.heat_diffusion import HeatDiffusion
 
 taus = np.linspace(0, 5, 20)
 

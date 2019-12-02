@@ -12,10 +12,10 @@ from giotto.graphs.graph_entropy import GraphEntropy
 __all__ = [
     'TransitionGraph',
     'KNeighborsGraph',
-    'GraphGeodesicDistance'
-    'CreateCliqueComplex'
-    'CreateBoundaryMatrices'
-    'CreateLaplacianMatrices'
-    'HeatDiffusion'
+    'GraphGeodesicDistance',
+    'CreateCliqueComplex',
+    'CreateBoundaryMatrices',
+    'CreateLaplacianMatrices',
+    'HeatDiffusion',
     'GraphEntropy'
 ]

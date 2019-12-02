@@ -4,7 +4,7 @@ import networkx as nx
 
 
 from sklearn.exceptions import NotFittedError
-from create_clique_complex import CreateCliqueComplex, CreateBoundaryMatrices, CreateLaplacianMatrices
+from giotto.graphs.create_clique_complex import CreateCliqueComplex, CreateLaplacianMatrices, CreateBoundaryMatrices
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
@@ -12,7 +12,6 @@ X = np.random.random((10, 2))
 alpha = 0.4
 cc = CreateCliqueComplex(data=X, alpha=alpha, data_type='cloud')
 cd = cc.create_complex_from_graph()
-heat_node = HeatDiffusion().fit(lap_node, taus).transform(lap_node)
 
 
 def test_graph_input_with_data_type():
