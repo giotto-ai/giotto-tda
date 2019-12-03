@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 from sklearn.exceptions import NotFittedError
-from giotto.graphs.create_clique_complex import CreateCliqueComplex,\
-    CreateLaplacianMatrices
+from giotto.graphs.create_clique_complex import CreateCliqueComplex
+from giotto.graphs.create_clique_complex import CreateLaplacianMatrices
 from giotto.graphs.heat_diffusion import HeatDiffusion
 
 taus = np.linspace(0, 5, 20)
@@ -36,4 +36,5 @@ def test_heat_diffusion_initial_condition_shape():
         lap_node, taus, initial_condition=ic).transform(lap_node)
 
     assert heat_node.shape == (lap_node.shape[0], ic.shape[1], len(taus))
+
 
