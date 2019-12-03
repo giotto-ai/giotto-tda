@@ -44,7 +44,7 @@ giotto-learn requires:
 
 - Python (>= 3.5)
 - scikit-learn (>= 0.21.3)
-- NumPy (>= 1.11.0)
+- NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
 - joblib (>= 0.11)
 
