@@ -3,7 +3,7 @@ import pytest
 
 from sklearn.exceptions import NotFittedError
 from giotto.graphs.create_clique_complex import (CreateCliqueComplex,
-    CreateLaplacianMatrices)
+    CreateLaplacianMatrices, CreateBoundaryMatrices)
 from giotto.graphs.heat_diffusion import HeatDiffusion
 
 taus = np.linspace(0, 5, 20)
