@@ -3,7 +3,7 @@ import pytest
 
 from sklearn.exceptions import NotFittedError
 from giotto.graphs.create_clique_complex import (CreateCliqueComplex,
-    CreateLaplacianMatrices, CreateBoundaryMatrices)
+    CreateLaplacianMatrices)
 from giotto.graphs.heat_diffusion import HeatDiffusion
 
 taus = np.linspace(0, 5, 20)
@@ -32,6 +32,7 @@ def test_heat_vectors_shape():
 def test_heat_diffusion_initial_condition_shape():
     # Check with 5 random initial conditions
     ic = np.random.random((20, 5))
+
     heat_node = HeatDiffusion().fit(
         lap_node, taus, initial_condition=ic).transform(lap_node)
 

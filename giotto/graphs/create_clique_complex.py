@@ -7,7 +7,8 @@ import networkx as nx
 from scipy.spatial import distance_matrix
 from scipy.sparse import csr_matrix, lil_matrix
 from itertools import combinations
-from sklearn.utils.validation import check_symmetric, check_is_fitted, check_array
+from sklearn.utils.validation import check_symmetric, check_is_fitted,\
+    check_array
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -41,7 +42,7 @@ class CreateCliqueComplex:
         Type of raw data to be preprocessed. If set to 'graph'
         the Input 'graph' has to be a netowrkx graph object.
         If set to 'cloud' the data is to be interpreted as a collection
-        of points where row index represents sample ID and columns the features.
+        of points where row index represents sample ID and columns the features
         If set to 'matrix' the data is to be interpreted as a
         distance matrix (symmetric) collecting element-wise distances
         between the elements.
@@ -101,19 +102,22 @@ class CreateCliqueComplex:
     def _find_lists(self):
 
         """
-        Collect all cliques of a graph and create dictionary with all simplices.
+        Collect all cliques of a graph and create dictionary with all simplices
         """
 
         # Index for edges and nodes, arbitrary id to edges
         sim_complex = dict()
 
-        sim_complex[1] = dict(zip(np.arange(nx.number_of_edges(self.graph)), self.graph.edges))
+        sim_complex[1] = dict(zip(np.arange(
+            nx.number_of_edges(self.graph)), self.graph.edges))
         sim_complex[0] = dict(zip(self.graph.nodes, self.graph.nodes))
 
-        # Dictionary containing simplexes orders as indexes, list of tuplas with node id forming the simplexes
+        # Dictionary containing simplexes orders as indexes,
+        # list of tuplas with node id forming the simplexes
         cliques = list(nx.enumerate_all_cliques(self.graph))
 
-        for x in range(nx.number_of_nodes(self.graph) + nx.number_of_edges(self.graph), len(cliques)):
+        for x in range(nx.number_of_nodes(self.graph) +
+                       nx.number_of_edges(self.graph), len(cliques)):
             if sim_complex.get(len(cliques[x]) - 1) is None:
                 i = 0
                 sim_complex[(len(cliques[x]) - 1)] = dict()
@@ -126,15 +130,18 @@ class CreateCliqueComplex:
         self.complex_dict = sim_complex
 
     def _create_graph(self):
-        distance_to_adjacent = np.vectorize(lambda x: 1 if x < self.alpha else 0)
+        distance_to_adjacent = np.vectorize(lambda x:
+                                            1 if x < self.alpha else 0)
 
         if self.data_type == 'cloud':
-            self.adjacent_matrix = distance_to_adjacent(distance_matrix(self.data, self.data, p=2))
+            self.adjacent_matrix = distance_to_adjacent(
+                distance_matrix(self.data, self.data, p=2))
         else:
             check_symmetric(self.data)
             self.adjacent_matrix = distance_to_adjacent(self.data)
 
-        self.adjacent_matrix = self.adjacent_matrix - np.identity(self.data.shape[0])
+        self.adjacent_matrix = self.adjacent_matrix - np.identity(
+            self.data.shape[0])
         return nx.from_numpy_matrix(self.adjacent_matrix)
 
     def get_adjacent_matrix(self):
@@ -182,10 +189,10 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        self.sizes = dict()
+        self.sizes_ = dict()
         for ele in X:
-            self.sizes[ele] = len(X[ele])
-        self.orders = sorted(orders)
+            self.sizes_[ele] = len(X[ele])
+        self.orders_ = sorted(orders)
 
         return self
 
@@ -211,17 +218,19 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
             List containing the boundary matrices for all orders specified
             in tuple 'orders'.
         """
-        check_is_fitted(self, ['sizes', 'orders'])
+        check_is_fitted(self, ['sizes_', 'orders_'])
         boundaries = list()
         incidence = self._create_incidence_from_dict(X)
 
         for order, order_inc in incidence.items():
-            if isinstance(self.orders, int):
-                orders = [self.orders]
-            if order in self.orders:
-                # Temporary sparse matrix, useful for dynamic creation of sparse matrices
+            if isinstance(self.orders_, int):
+                orders = [self.orders_]
+            if order in self.orders_:
+                # Temporary sparse matrix, useful for dynamic
+                # creation of sparse matrices
                 # This is the boundary matrix from order to order-1 simplexes
-                temp_mat = lil_matrix((self.sizes[order - 1], self.sizes[order]))
+                temp_mat = lil_matrix(
+                    (self.sizes_[order - 1], self.sizes_[order]))
                 for k, v in order_inc.items():
                     for x in v:
                         temp_mat[k, x[0]] = np.sign(x[1])
@@ -254,15 +263,17 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
         for order, order_list in complex_dict.items():
             if order > 1:
 
-                # To check if this simplex has been already put into the dictionary
-                compare = dict((tuple(np.sort(y)), x) for x, y in complex_dict[order - 1].items())
+                # To check if this simplex has been already
+                # put into the dictionary
+                compare = dict((tuple(np.sort(y)), x) for x, y in
+                               complex_dict[order - 1].items())
                 # Create new dict for incidence from order-1 to order simplexes
                 incidence[order] = dict()
                 # Start from zero to label simplexes
                 idx = 0
 
                 for y, c in order_list.items():
-                    # Order the set of vertices to impose the right orientations
+                    # Order the set of vertices to impose the orientations
                     c = np.sort(c)
                     complex_dict[order][idx] = tuple(c)
                     # Keep track of the (-1) exponent
@@ -270,7 +281,8 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
                     # Find all faces of c (c contains order+1 vertices)
                     for x in combinations(c, order):
                         if incidence[order].get(compare[x]) is not None:
-                            incidence[order][compare[x]].append((idx, (-1) ** i))
+                            incidence[order][compare[x]].append(
+                                (idx, (-1) ** i))
                         else:
                             incidence[order][compare[x]] = [(idx, (-1) ** i)]
                         i += 1
@@ -316,22 +328,23 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
         """
         # Check if there is only one index
         if isinstance(orders, int):
-            self.orders = [orders]
+            self.orders_ = [orders]
         else:
-            self.orders = sorted(orders)
+            self.orders_ = sorted(orders)
 
-        self.bound_orders = tuple(sorted((set(self.orders) - {0}).union(set([x + 1 for x in self.orders]))))
-        self.order_id = dict()
-        for x, y in enumerate(self.bound_orders):
-            self.order_id[y] = x
+        self.bound_orders_ = tuple(sorted((set(self.orders_) - {0}).union(
+            set([x + 1 for x in self.orders_]))))
+        self.order_id_ = dict()
+        for x, y in enumerate(self.bound_orders_):
+            self.order_id_[y] = x
 
         return self
 
     def transform(self, X, y=None):
         """Compute laplacians of complex.
 
-        Compute laplacians starting from a Graph Object up to certain order applying the formula
-        from the boundary matrices
+        Compute laplacians starting from a Graph Object up to certain
+        order applying the formula from the boundary matrices
 
         Parameters
         ----------
@@ -350,20 +363,24 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
             in tuple 'orders'.
 
         """
-        check_is_fitted(self, ['orders', 'bound_orders', 'order_id'])
+        check_is_fitted(self, ['orders_', 'bound_orders_', 'order_id_'])
         laplacians = list()
 
-        cb = CreateBoundaryMatrices().fit(X, self.bound_orders)
+        cb = CreateBoundaryMatrices().fit(X, self.bound_orders_)
         boundaries = cb.transform(X)
 
-        for x in self.orders:
-            # if maximal order, don't use the x+1 boundary, if minimal don't use 0 boundaries
+        for x in self.orders_:
+            # if maximal order, don't use the x+1 boundary,
+            # if minimal don't use 0 boundaries
             if x > 0:
-                lap = csr_matrix.transpose(boundaries[self.order_id[x]]) * boundaries[self.order_id[x]]
+                lap = csr_matrix.transpose(boundaries[self.order_id_[x]]) *\
+                      boundaries[self.order_id_[x]]
                 if x < len(X)-1:
-                    lap += boundaries[self.order_id[x+1]] * csr_matrix.transpose(boundaries[self.order_id[x+1]])
+                    lap += boundaries[self.order_id_[x+1]] *\
+                        csr_matrix.transpose(boundaries[self.order_id_[x+1]])
             else:
-                lap = boundaries[self.order_id[x+1]] * csr_matrix.transpose(boundaries[self.order_id[x+1]])
+                lap = boundaries[self.order_id_[x+1]] *\
+                      csr_matrix.transpose(boundaries[self.order_id_[x+1]])
 
             laplacians.append(lap)
 

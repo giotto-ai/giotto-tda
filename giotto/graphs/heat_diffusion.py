@@ -63,9 +63,9 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         else:
             self.initial_condition = np.identity(X.shape[0])
 
-        self.taus = taus
-        self.proc = proc
-        self.order = order
+        self.taus_ = taus
+        self.proc_ = proc
+        self.order_ = order
 
         return self
 
@@ -96,7 +96,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
 
         """
 
-        check_is_fitted(self, ['taus', 'proc', 'order', 'initial_condition'])
+        check_is_fitted(self, ['taus_', 'proc_', 'order_'])
 
         heat = np.squeeze(np.asarray(self._compute_heat_diffusion(X)))
         heat = np.swapaxes(np.swapaxes(heat, 0, 2), 0, 1)
@@ -109,29 +109,29 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         n_simplices = csr_matrix.get_shape(lap)[0]
 
         norm = np.vectorize(lambda x: 0 if float(x) < eps else x)
-        n_filters = len(self.taus)
+        n_filters = len(self.taus_)
 
-        if self.proc == 'exact':
+        if self.proc_ == 'exact':
             eigenvals, U = self._get_eigens(lap)
 
             heat = list()
             for i in range(n_filters):
                 heat.append(norm(U.dot(np.diagflat(
-                    np.exp(- self.taus[i] * eigenvals).flatten())).dot
+                    np.exp(- self.taus_[i] * eigenvals).flatten())).dot
                                  (U.T).dot(self.initial_condition)))
         else:
             heat = [sp.sparse.csc_matrix((n_simplices, n_simplices)) for i in
                     range(n_filters)]
             monome = {0: sp.sparse.eye(n_simplices),
                       1: lap - sp.sparse.eye(n_simplices)}
-            for k in range(2, self.order + 1):
+            for k in range(2, self.order_ + 1):
                 monome[k] = 2 * (lap - sp.sparse.eye(n_simplices)).dot(
                     monome[k - 1]) - monome[k - 2]
             for i in range(n_filters):
                 coeffs = self._compute_cheb_coeff_basis(
-                    self.taus[i], self.order)
+                    self.taus_[i], self.order_)
                 temp = sp.sum([coeffs[k] * monome[k] for k in
-                               range(0, self.order + 1)])
+                               range(0, self.order_ + 1)])
                 heat[i] = norm(temp.A)  # cleans up the small coefficients
         return heat
 

@@ -44,7 +44,7 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
 
         """
         check_array(X)
-        self.is_fitted = True
+        self.is_fitted_ = True
 
         return self
 
@@ -67,7 +67,7 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
         entropies : ndarray
             Entropies of diffusion vectors, shape (n_simplices, n_times).
         """
-        check_is_fitted(self, ['is_fitted'])
+        check_is_fitted(self, ['is_fitted_'])
         entropies = entropy(np.abs(X), base=2)
 
         return np.nan_to_num(entropies, 0)
