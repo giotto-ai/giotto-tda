@@ -53,8 +53,9 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray
-            Input containing the diffusion vectors for n_simplices with different
-            initial condition and times, shape (n_simplices, n_initial_conditions, n_times).
+            Input containing the diffusion vectors for n_simplices with
+            different initial condition and times, shape
+            (n_simplices, n_initial_conditions, n_times).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline

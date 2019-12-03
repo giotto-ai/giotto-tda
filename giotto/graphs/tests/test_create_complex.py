@@ -4,7 +4,8 @@ import networkx as nx
 
 
 from sklearn.exceptions import NotFittedError
-from giotto.graphs.create_clique_complex import CreateCliqueComplex, CreateLaplacianMatrices, CreateBoundaryMatrices
+from giotto.graphs.create_clique_complex import CreateCliqueComplex,\
+    CreateLaplacianMatrices, CreateBoundaryMatrices
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
@@ -17,7 +18,8 @@ cd = cc.create_complex_from_graph()
 def test_graph_input_with_data_type():
 
     with pytest.raises(ValueError):
-        cc_ = CreateCliqueComplex(graph=nx.barbell_graph(10, 10), data_type='cloud')
+        cc_ = CreateCliqueComplex(
+            graph=nx.barbell_graph(10, 10), data_type='cloud')
 
 
 def test_data_input_with__graph_data_type():
@@ -33,7 +35,8 @@ def test_input_distance_matrix():
     cd_ = cc_.create_complex_from_graph()
 
     lap_cc = CreateLaplacianMatrices().fit(cd, (0)).transform(cd)[0].todense()
-    lap_cc_ = CreateLaplacianMatrices().fit(cd_, (0)).transform(cd_)[0].todense()
+    lap_cc_ = CreateLaplacianMatrices().fit(
+        cd_, (0)).transform(cd_)[0].todense()
 
     assert_almost_equal(lap_cc, lap_cc_)
 
@@ -43,7 +46,8 @@ def test_adjacency_matrix():
     cc_ = CreateCliqueComplex(g)
     adjacency = nx.adjacency_matrix(g)
 
-    assert_almost_equal(adjacency.todense(), cc_.get_adjacent_matrix().todense())
+    assert_almost_equal(adjacency.todense(),
+                        cc_.get_adjacent_matrix().todense())
 
 
 def test_create_boundary_matrices_not_fitted():

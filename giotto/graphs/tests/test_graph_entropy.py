@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 
 from sklearn.exceptions import NotFittedError
-from giotto.graphs.create_clique_complex import CreateCliqueComplex, CreateLaplacianMatrices
+from giotto.graphs.create_clique_complex import CreateCliqueComplex,\
+    CreateLaplacianMatrices
 from giotto.graphs.graph_entropy import GraphEntropy
 from giotto.graphs.heat_diffusion import HeatDiffusion
 
