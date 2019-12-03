@@ -38,10 +38,10 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         initial_condition : ndarray, optional, default "None"
             Initial condition for the diffusion process. If "None",
             the diffusion will be computed by using the identity matrix with
-            shape (n_simplices, n_simplices). If the initial condiditions are not
-            deltas placed on one simplex, the absolute values of diffusion vectors
-            depend on the orientation given to the simplices (in K-order
-            diffusion with K>0 ).
+            shape (n_simplices, n_simplices). If the initial condiditions are
+            not deltas placed on one simplex, the absolute values of diffusion
+            vectors depend on the orientation given to the simplices
+            (in K-order diffusion with K>0 ).
 
         order : int, optional, default "30"
             Order of the polynomial approximation.
@@ -116,16 +116,22 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
 
             heat = list()
             for i in range(n_filters):
-                heat.append(norm(U.dot(np.diagflat(np.exp(- self.taus[i] * eigenvals).flatten())).dot
+                heat.append(norm(U.dot(np.diagflat(
+                    np.exp(- self.taus[i] * eigenvals).flatten())).dot
                                  (U.T).dot(self.initial_condition)))
         else:
-            heat = [sp.sparse.csc_matrix((n_simplices, n_simplices)) for i in range(n_filters)]
-            monome = {0: sp.sparse.eye(n_simplices), 1: lap - sp.sparse.eye(n_simplices)}
+            heat = [sp.sparse.csc_matrix((n_simplices, n_simplices)) for i in
+                    range(n_filters)]
+            monome = {0: sp.sparse.eye(n_simplices),
+                      1: lap - sp.sparse.eye(n_simplices)}
             for k in range(2, self.order + 1):
-                monome[k] = 2 * (lap - sp.sparse.eye(n_simplices)).dot(monome[k - 1]) - monome[k - 2]
+                monome[k] = 2 * (lap - sp.sparse.eye(n_simplices)).dot(
+                    monome[k - 1]) - monome[k - 2]
             for i in range(n_filters):
-                coeffs = self._compute_cheb_coeff_basis(self.taus[i], self.order)
-                temp = sp.sum([coeffs[k] * monome[k] for k in range(0, self.order + 1)])
+                coeffs = self._compute_cheb_coeff_basis(
+                    self.taus[i], self.order)
+                temp = sp.sum([coeffs[k] * monome[k] for k in
+                               range(0, self.order + 1)])
                 heat[i] = norm(temp.A)  # cleans up the small coefficients
         return heat
 
