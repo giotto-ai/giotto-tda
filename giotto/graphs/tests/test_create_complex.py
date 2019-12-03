@@ -4,8 +4,9 @@ import networkx as nx
 
 
 from sklearn.exceptions import NotFittedError
-from giotto.graphs.create_clique_complex import CreateCliqueComplex,\
-    CreateLaplacianMatrices, CreateBoundaryMatrices
+from giotto.graphs.create_clique_complex import (CreateCliqueComplex,
+    CreateLaplacianMatrices, CreateBoundaryMatrices)
+
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
