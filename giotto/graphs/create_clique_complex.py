@@ -296,7 +296,6 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
     This step computes the Laplacian matrices that can be used both to
     analyse the complex and compute the heat diffusion.
 
-
     """
     def __init__(self):
         return

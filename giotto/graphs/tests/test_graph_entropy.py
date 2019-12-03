@@ -13,11 +13,12 @@ X = np.random.random((10, 2))
 alpha = 0.4
 cc = CreateCliqueComplex(data=X, alpha=alpha, data_type='cloud')
 cd = cc.create_complex_from_graph()
-lap_node = CreateLaplacianMatrices().fit(cd, (0)).transform(cd)[0]
-heat_vectors = HeatDiffusion().fit(lap_node, taus=taus).transform(lap_node)
 
 
 def test_graph_entropy_fitted():
+    lap_node = CreateLaplacianMatrices().fit(cd, (0)).transform(cd)[0]
+    heat_vectors = HeatDiffusion().fit(lap_node, taus=taus).transform(lap_node)
+
     entropy = GraphEntropy()
 
     with pytest.raises(NotFittedError):
