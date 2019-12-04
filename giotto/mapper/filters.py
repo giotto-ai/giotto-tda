@@ -64,10 +64,11 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples,)
+        Xt : ndarray, shape (n_samples, 1)
         """
         distance_matrix = squareform(
             pdist(X, metric=self.metric, **self.effective_metric_params_)
         )
-        Xt = np.linalg.norm(distance_matrix, axis=1, ord=self.exponent)
+        Xt = np.linalg.norm(distance_matrix, axis=1,
+                            ord=self.exponent).reshape(-1, 1)
         return Xt

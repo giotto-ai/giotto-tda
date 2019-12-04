@@ -15,7 +15,7 @@ from giotto.mapper import Eccentricity
 def test_eccentricity_shape_equals_number_of_samples(X, exponent):
     eccentricity = Eccentricity(exponent=exponent)
     Xt = eccentricity.fit_transform(X)
-    assert Xt.shape == (len(X),)
+    assert Xt.shape == (len(X), 1)
 
 
 @given(X=arrays(dtype=np.float, shape=array_shapes(min_dims=2, max_dims=2)))
@@ -23,4 +23,4 @@ def test_eccentricity_values_with_infinity_norm_equals_max_row_values(X):
     eccentricity = Eccentricity(exponent=np.inf)
     Xt = eccentricity.fit_transform(X)
     distance_matrix = squareform(pdist(X))
-    assert_almost_equal(Xt, np.max(distance_matrix, axis=1))
+    assert_almost_equal(Xt, np.max(distance_matrix, axis=1).reshape(-1, 1))
