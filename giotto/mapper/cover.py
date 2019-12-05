@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils import check_array
 from itertools import product
 
 
@@ -12,6 +13,13 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
+        X = check_array(X, ensure_2d=False)
+        if X.ndim == 1:
+            X = X[:, None]
+
+        if X.size == 1:
+            return np.array([[True]])
+
         M, m = np.max(X), np.min(X)
         L = M - m
         # Let the length of each interval be l. The equation to solve for
