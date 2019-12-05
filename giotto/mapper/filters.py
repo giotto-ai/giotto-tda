@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
+
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
 
 class Eccentricity(BaseEstimator, TransformerMixin):
@@ -66,9 +68,11 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, 1)
         """
-        distance_matrix = squareform(
-            pdist(X, metric=self.metric, **self.effective_metric_params_)
-        )
-        Xt = np.linalg.norm(distance_matrix, axis=1,
-                            ord=self.exponent).reshape(-1, 1)
+        check_is_fitted(self, ['effective_metric_params_'])
+        if self.metric == 'precomputed':
+            Xt = X
+        else:
+            Xt = squareform(
+                pdist(X, metric=self.metric, **self.effective_metric_params_))
+        Xt = np.linalg.norm(Xt, axis=1, ord=self.exponent).reshape(-1, 1)
         return Xt

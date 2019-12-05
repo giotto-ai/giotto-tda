@@ -28,39 +28,66 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
 
     def fit(self, X, y=None, sample_weight=None):
         self._validate_clusterer()
-        X_tot, masks = X
+        X_orig, masks = X
         if sample_weight is not None:
             sample_weights = [sample_weight[masks[:, i]]
                               for i in range(masks.shape[1])]
         else:
             sample_weights = [None] * masks.shape[1]
 
-        self.clusterers_ = Parallel(n_jobs=self.n_jobs_outer,
-                                    prefer=self.prefer)(
-            delayed(self._fit_single)(X_tot[mask],
-                                      np.argwhere(mask).squeeze(axis=1),
-                                      k, sample_weight=sample_weights[k])
-            for k, mask in enumerate(masks.T))
-        self._is_fitted = True
+        if self.clusterer_.metric == 'precomputed':
+            single_fitter = self._fit_single_abs_labels_precomputed
+        else:
+            single_fitter = self._fit_single_abs_labels
+
+        self.clusterers_ = Parallel(
+            n_jobs=self.n_jobs_outer, prefer=self.prefer)(
+            delayed(single_fitter)(
+                X_orig, np.flatnonzero(mask),
+                mask_num, sample_weight=sample_weights[mask_num])
+            for mask_num, mask in enumerate(masks.T))
         return self
 
-    def _fit_single(self, X, relative_indices, mask_num,
-                    sample_weight=None):
-        cloned_clusterer = clone(self.clusterer_)
-        fit_params = signature(cloned_clusterer.fit).parameters
-        if 'sample_weight' in fit_params:
-            cloned_clusterer.fit(X, sample_weight=sample_weight)
-        else:
-            cloned_clusterer.fit(X)
-        unique_cluster_labels, inv = np.unique(cloned_clusterer.labels_,
-                                               return_inverse=True)
-        cloned_clusterer.abs_labels_ = [
-            (mask_num, label, relative_indices[inv == i])
-            for i, label in enumerate(unique_cluster_labels)]
+    def _fit_single_abs_labels(self, X, relative_indices, mask_num,
+                               sample_weight=None):
+        cloned_clusterer, unique_labels, unique_labels_inverse = \
+            self._fit_single(X, relative_indices, sample_weight)
+        self._create_abs_labels(cloned_clusterer, relative_indices, mask_num,
+                                unique_labels, unique_labels_inverse)
         return cloned_clusterer
 
+    def _fit_single_abs_labels_precomputed(self, X, relative_indices, mask_num,
+                                           sample_weight=None):
+        relative_2d_indices = np.ix_(relative_indices, relative_indices)
+        cloned_clusterer, unique_labels, unique_labels_inverse = \
+            self._fit_single(X, relative_2d_indices, sample_weight)
+        self._create_abs_labels(cloned_clusterer, relative_indices, mask_num,
+                                unique_labels, unique_labels_inverse)
+        return cloned_clusterer
+
+    def _fit_single(self, X, relative_indices, sample_weight):
+        cloned_clusterer = clone(self.clusterer_)
+        X_sub = X[relative_indices]
+
+        fit_params = signature(cloned_clusterer.fit).parameters
+        if 'sample_weight' in fit_params:
+            cloned_clusterer.fit(X_sub, sample_weight=sample_weight)
+        else:
+            cloned_clusterer.fit(X_sub)
+
+        unique_labels, unique_labels_inverse = np.unique(
+            cloned_clusterer.labels_, return_inverse=True)
+        return cloned_clusterer, unique_labels, unique_labels_inverse
+
+    @staticmethod
+    def _create_abs_labels(cloned_clusterer, relative_indices, mask_num,
+                           unique_labels, inv):
+        cloned_clusterer.abs_labels_ = [
+            (mask_num, label, relative_indices[inv == i])
+            for i, label in enumerate(unique_labels)]
+
     def transform(self, X, y=None, sample_weight=None):
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self, ['clusterers_'])
         Xt = [clusterer.abs_labels_ for clusterer in self.clusterers_]
         return Xt
 
@@ -68,3 +95,4 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
         self.fit(X, sample_weight=sample_weight)
         Xt = [clusterer.abs_labels_ for clusterer in self.clusterers_]
         return Xt
+
