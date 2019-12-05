@@ -29,7 +29,7 @@ jobs:
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
@@ -67,7 +67,7 @@ jobs:
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
@@ -99,7 +99,7 @@ jobs:
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
     
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
@@ -193,7 +193,7 @@ jobs:
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
@@ -263,7 +263,7 @@ jobs:
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
