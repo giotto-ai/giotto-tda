@@ -13,6 +13,8 @@
 import os
 import sys
 
+from giotto import __version__
+
 sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +24,6 @@ copyright = '2019, L2F'
 author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina'
 
 # The full version, including alpha/beta/rc tags
-from giotto import __version__
 release = __version__
 
 # -- General configuration ---------------------------------------------------

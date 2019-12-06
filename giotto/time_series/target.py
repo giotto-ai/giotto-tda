@@ -105,7 +105,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             _percentiles = self.percentiles
 
         validate_params({**self.get_params(), '_percentiles': _percentiles},
-                         self._hyperparameters)
+                        self._hyperparameters)
         X = column_or_1d(X)
 
         self._sliding_window = SlidingWindow(width=self.width, stride=1).fit(X)
