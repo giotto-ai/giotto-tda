@@ -21,7 +21,8 @@ class Nerve(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         check_is_fitted(self, ['_is_fitted'])
         G = nx.Graph()
-        G.add_nodes_from([x[:2] for V in X for x in V])
+        G.add_nodes_from([(x[:2], dict(elements=x[2]))
+                          for V in X for x in V])
         G.add_edges_from([edge['node_indices'] for edge in self.edges_])
         return G
 
