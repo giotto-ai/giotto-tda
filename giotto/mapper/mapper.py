@@ -1,9 +1,9 @@
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 
-from ._utils import ListFeatureUnion, identity
+from ._utils import ListFeatureUnion, func_from_callable_on_rows, identity
 from .cover import CubicalCover
 from .cluster import ParallelClustering
 from .nerve import Nerve
@@ -76,9 +76,18 @@ def make_mapper_pipeline(scaler=MinMaxScaler(),
         raise TypeError('Unknown keyword arguments: "{}"'
                         .format(list(pipeline_kwargs.keys())[0]))
 
+    # If filter_func is not a scikit-learn transformer, hope it as a
+    # callable to be applied on each row separately. Then attempt to create a
+    # FunctionTransformer object to implement this behaviour.
+    if not hasattr(filter_func, 'transform'):
+        ft_func = func_from_callable_on_rows(filter_func)
+        _filter_func = FunctionTransformer(func=ft_func, validate=True)
+    else:
+        _filter_func = filter_func
+
     map_and_cover = Pipeline(
         steps=[('scaler', scaler if scaler is not None else identity()),
-               ('filter_func', filter_func), ('cover', cover)],
+               ('filter_func', _filter_func), ('cover', cover)],
         verbose=verbose)
     all_steps = [
         ('pullback_cover', ListFeatureUnion(
