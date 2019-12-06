@@ -7,8 +7,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -31,7 +29,7 @@ jobs:
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
@@ -41,8 +39,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -71,7 +67,7 @@ jobs:
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
@@ -81,8 +77,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -105,7 +99,7 @@ jobs:
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
     
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
@@ -116,11 +110,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
@@ -175,8 +164,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -206,7 +193,7 @@ jobs:
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
@@ -253,8 +240,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -278,7 +263,7 @@ jobs:
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
