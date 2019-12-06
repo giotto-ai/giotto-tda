@@ -10,30 +10,26 @@ X_rh = np.array([[[0, 1, 0], [0, 4, 0], [2, 3, 1], [0, 0, 2]],
                  [[0, 3, 0], [0, 2, 0], [1, 2, 1], [0, 0, 2]]])
 
 
-def test_rh_not_fitted():
+def test_throw_exception_when_not_fitted():
     rh = RelevantHoles()
 
     with pytest.raises(NotFittedError):
         rh.transform(X_rh)
 
 
-def test_rh_rel_transform():
-    # instantiation
+def test_output_for_relative_theshold():
     rh_rel = RelevantHoles(typ='rel', frac=0.3)
 
     # ground truth
-    X_rh_rel_res = np.array([[1, 1, 0], [2, 1, 0]])
+    X_rel_res = np.array([[1, 1, 0], [2, 1, 0]])
 
-    # assert function
-    assert (rh_rel.fit_transform(X_rh) == X_rh_rel_res).all()
+    assert (rh_rel.fit_transform(X_rh) == X_rel_res).all()
 
 
-def test_rh_abs_transform():
-    # instantiation
+def test_output_for_absolute_threshold():
     rh_abs = RelevantHoles(typ='abs', frac=0.3)
 
     # ground truth
-    X_rh_abs_res = np.array([[2, 1, 0], [2, 1, 0]])
+    X_abs_res = np.array([[2, 1, 0], [2, 1, 0]])
 
-    # assert function
-    assert (rh_abs.fit_transform(X_rh) == X_rh_abs_res).all()
+    assert (rh_abs.fit_transform(X_rh) == X_abs_res).all()

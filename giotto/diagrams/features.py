@@ -520,22 +520,25 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 class RelevantHoles(BaseEstimator, TransformerMixin):
     """
-    Given peristence diagrams consisting of birth-death-dimension triples
+    Given persistence diagrams consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately. For each, the number of relevant holes is found.
-    A hole is relevant if its lifetimes d - b is larger than a given threshold
+    considered separately. For each subdiagram, the number of relevant holes is
+    found. A hole is relevant if its lifetime d - b is larger than a given
+    threshold.
 
     Parameters
     ----------
-    typ : ``'rel'`` | ``'abs'``, optional, default: ``rel``
-        - If ``typ == 'rel'`` the threshold for relevance is relative to
-          the maximum lifetime within a persistence diagram and dimension
-        - If ``typ == 'abs'`` the parameter ``frac`` defines an absolute
-          threshold
+    threshold_type : ``'rel'`` | ``'abs'``, optional, default: ``rel``
+        - If ``threshold_type == 'rel'`` the threshold for relevance is
+          relative to the maximum lifetime within a persistence diagram and
+          dimension.
+        - If ``threshold_type == 'abs'`` the parameter ``frac`` defines an
+          absolute threshold.
 
-    frac : float, optional, default: ``0.``
+    threshold_fraction : float, optional, default: ``0.``
         The fraction of the maximum lifetime or threshold (depends on
-        parameter ``typ``) above which holes are considered to be relevant
+        parameter ``threshold_type``) above which holes are considered to be
+        relevant.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -548,20 +551,25 @@ class RelevantHoles(BaseEstimator, TransformerMixin):
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
     """
 
-    def __init__(self, typ='rel', frac=0., n_jobs=None):
-        self.typ = typ
-        self.frac = frac
+    def __init__(self, threshold_type='rel', threshold_fraction=0.,
+                 n_jobs=None):
+        self.threshold_type = threshold_type
+        self.threshold_fraction = threshold_fraction
         self.n_jobs = n_jobs
 
     def _get_n_holes(self, X):
+        # the lifespan of point is given by the difference between its
+        # disappearance and appearance
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        if self.typ == 'rel':
-            X_out = np.sum(X_lifespan > self.frac * X_lifespan.max(axis=1)
-                           .reshape(-1, 1),
-                           axis=1)
-            return X_out
-        elif self.typ == 'abs':
-            return np.sum(X_lifespan >= self.frac, axis=1)
+        if self.threshold_type == 'rel':
+            # return the number of points having a lifespan longer than
+            # a fraction of the maximum lifetime of all holes
+            return np.sum(X_lifespan > self.threshold_fraction *
+                          X_lifespan.max(axis=1)
+                          .reshape(-1, 1),
+                          axis=1)
+        elif self.threshold_type == 'abs':
+            return np.sum(X_lifespan >= self.threshold_fraction, axis=1)
 
     def fit(self, X, y=None):
         """
@@ -606,8 +614,8 @@ class RelevantHoles(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, n_homology_dimensions)
-             statistics over holes in each dimension of each persistence
-             diagram
+             Statistics over holes in each dimension of each persistence
+             diagram.
         """
         # Check if fit had been called
         check_is_fitted(self, ['_is_fitted'])
@@ -620,6 +628,10 @@ class RelevantHoles(BaseEstimator, TransformerMixin):
                 X.shape[0], effective_n_jobs(self.n_jobs))
         )
 
+        # From the precious calculation, Xt is a list of arrays per dimension
+        # in the persistence diagram. The vstack and transposition stacks them
+        # such that we return a numpy ndarry of size
+        # (n_samples, n_homology_dimensions)
         Xt = np.vstack(Xt).T
 
         return Xt
