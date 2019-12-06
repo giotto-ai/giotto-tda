@@ -1,18 +1,19 @@
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 
 from ._utils import ListFeatureUnion, identity
-from .cover import OneDimensionalCover
+from .cover import CubicalCover
 from .cluster import ParallelClustering
 from .nerve import Nerve
 
 
 global_pipeline_params = ('memory', 'verbose')
-nodes_params = ('filter_func', 'cover')
+nodes_params = ('scaler', 'filter_func', 'cover')
 clust_params = ('clusterer',)
 nerve_params = ('min_intersection',)
-nodes_params_prefix = 'pullback_cover__filter_cover__'
+nodes_params_prefix = 'pullback_cover__map_and_cover__'
 clust_params_prefix = 'clustering__'
 nerve_params_prefix = 'nerve__'
 
@@ -62,8 +63,9 @@ class MapperPipeline(Pipeline):
             if key.startswith(prefix) and not key.startswith(prefix + 'steps')}
 
 
-def make_mapper_pipeline(filter_func=PCA(n_components=1),
-                         cover=OneDimensionalCover(),
+def make_mapper_pipeline(scaler=MinMaxScaler(),
+                         filter_func=PCA(n_components=2),
+                         cover=CubicalCover(),
                          clusterer=DBSCAN(),
                          min_intersection=1,
                          n_jobs_outer=None,
@@ -74,12 +76,13 @@ def make_mapper_pipeline(filter_func=PCA(n_components=1),
         raise TypeError('Unknown keyword arguments: "{}"'
                         .format(list(pipeline_kwargs.keys())[0]))
 
-    filter_cover = Pipeline(
-        steps=[('filter_func', filter_func), ('cover', cover)],
+    map_and_cover = Pipeline(
+        steps=[('scaler', scaler if scaler is not None else identity()),
+               ('filter_func', filter_func), ('cover', cover)],
         verbose=verbose)
     all_steps = [
         ('pullback_cover', ListFeatureUnion(
-            [('identity', identity()), ('filter_cover', filter_cover)])),
+            [('identity', identity()), ('map_and_cover', map_and_cover)])),
         ('clustering', ParallelClustering(
             clusterer=clusterer, n_jobs_outer=n_jobs_outer)),
         ('nerve', Nerve(min_intersection=min_intersection))]
