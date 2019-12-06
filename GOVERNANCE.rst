@@ -13,7 +13,7 @@ Authors:
 Giotto Project Team:
 --------------------
 
-- Guillaume Tauzin guillaume.tauzin@epfl.ch (Creator, Maintainer & Developer)
+- Guillaume Tauzin guillaume.tauzin@epfl.ch (Developer)
 - Umberto Lupo u.lupo@l2f.ch (Maintainer & Developer)
 - Matteo Caorsi m.caorsi@l2f.ch (Project Leader)
 - Philippe Nguyen p.nguyen@l2f.ch (Developer)

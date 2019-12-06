@@ -11,7 +11,7 @@ from ..utils.validation import check_diagram, validate_params, \
 
 
 class PairwiseDistance(BaseEstimator, TransformerMixin):
-    """`Distances <https://www.giotto.ai/theory>`_ between pairs of persistence
+    """`Distances <https://giotto.ai/theory>`_ between pairs of persistence
     diagrams, constructed from the distances between their respective
     subdiagrams with constant homology dimension.
 
@@ -33,7 +33,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
+        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
         Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -96,7 +96,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
     `Hera <https://bitbucket.org/grey_narn/hera>`_ is used as a C++ backend
     for computing bottleneck and Wasserstein distances between persistence
-    diagrams.
+    diagrams. Python bindings were modified for performance from the
+    `Dyonisus 2 <https://mrzv.org/software/dionysus2/>`_ package.
 
     """
     _hyperparameters = {'order': [float, (1, np.inf)]}
@@ -203,7 +204,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
 
 class Amplitude(BaseEstimator, TransformerMixin):
-    """`Amplitudes <https://www.giotto.ai/theory>`_ of persistence diagrams,
+    """`Amplitudes <https://giotto.ai/theory>`_ of persistence diagrams,
     constructed from the amplitudes of their subdiagrams with constant
     homology dimension.
 
@@ -222,7 +223,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
+        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 

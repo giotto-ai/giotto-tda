@@ -91,7 +91,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         return Xt
 
     def resample(self, y, X=None):
-        """Resample y.
+        """Resample `y`.
 
         Parameters
         ----------

@@ -26,9 +26,9 @@ with codecs.open('README.rst', encoding='utf-8-sig') as f:
 LONG_DESCRIPTION_TYPE = 'text/x-rst'
 MAINTAINER = 'Guillaume Tauzin'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
-URL = 'https://github.com/giotto-learn/giotto-learn'
+URL = 'https://github.com/giotto-ai/giotto-learn'
 LICENSE = 'Apache 2.0'
-DOWNLOAD_URL = 'https://github.com/giotto-learn/giotto-learn/tarball/v0.1.1'
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-learn/tarball/v0.1.3'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
@@ -41,6 +41,7 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Operating System :: POSIX',
                'Operating System :: Unix',
                'Operating System :: MacOS',
+               'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
                'Programming Language :: Python :: 3.7']
 KEYWORDS = 'machine learning topological data analysis persistent ' + \

@@ -260,7 +260,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
                  homology_dimensions=(0, 1), scaler_metric='bottleneck',
                  scaler_metric_params=None, scaler_function=np.max,
                  filter_epsilon=0., n_values=100, n_jobs=None):
-        self.metric = 'euclidean'
+        self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
         self.scaler_metric_params = scaler_metric_params
