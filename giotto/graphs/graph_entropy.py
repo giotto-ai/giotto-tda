@@ -43,7 +43,7 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X)
+        check_array(X, allow_nd=True)
         self.is_fitted_ = True
 
         return self

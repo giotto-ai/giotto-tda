@@ -108,7 +108,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         eps = 1e-9
         n_simplices = csr_matrix.get_shape(lap)[0]
 
-        norm = np.vectorize(lambda x: 0 if float(x) < eps else x)
+        norm = np.vectorize(lambda x: 0 if np.abs(x) < eps else x)
         n_filters = len(self.taus_)
 
         if self.proc_ == 'exact':
@@ -116,9 +116,10 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
 
             heat = list()
             for i in range(n_filters):
-                heat.append(norm(U.dot(np.diagflat(
-                    np.exp(- self.taus_[i] * eigenvals).flatten())).dot
-                                 (U.T).dot(self.initial_condition)))
+                temp = U.dot(np.diagflat(
+                    np.exp(- self.taus_[i] * eigenvals).flatten())).dot(U.T).\
+                    dot(self.initial_condition)
+                heat.append((norm(temp)))
         else:
             heat = [sp.sparse.csc_matrix((n_simplices, n_simplices)) for i in
                     range(n_filters)]

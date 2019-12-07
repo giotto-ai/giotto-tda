@@ -226,8 +226,6 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
             if isinstance(self.orders_, int):
                 orders = [self.orders_]
             if order in self.orders_:
-                # Temporary sparse matrix, useful for dynamic
-                # creation of sparse matrices
                 # This is the boundary matrix from order to order-1 simplexes
                 temp_mat = lil_matrix(
                     (self.sizes_[order - 1], self.sizes_[order]))
@@ -332,9 +330,11 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
         else:
             self.orders_ = sorted(orders)
 
-        self.bound_orders_ = tuple(sorted((set(self.orders_) - {0}).union(
-            set([x + 1 for x in self.orders_]))))
+        self.bound_orders_ = set(self.orders_).union(
+            set([x + 1 for x in self.orders_]))
+        self.bound_orders_ = tuple(sorted(self.bound_orders_ - {0}))
         self.order_id_ = dict()
+
         for x, y in enumerate(self.bound_orders_):
             self.order_id_[y] = x
 
@@ -375,7 +375,7 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
             if x > 0:
                 lap = csr_matrix.transpose(boundaries[self.order_id_[x]]) *\
                       boundaries[self.order_id_[x]]
-                if x < len(X)-1:
+                if x < len(X):
                     lap += boundaries[self.order_id_[x+1]] *\
                         csr_matrix.transpose(boundaries[self.order_id_[x+1]])
             else:
