@@ -375,7 +375,7 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
             if x > 0:
                 lap = csr_matrix.transpose(boundaries[self.order_id_[x]]) *\
                       boundaries[self.order_id_[x]]
-                if x < len(X):
+                if x < len(X)-1:
                     lap += boundaries[self.order_id_[x+1]] *\
                         csr_matrix.transpose(boundaries[self.order_id_[x+1]])
             else:
