@@ -23,6 +23,7 @@ data/*
 examples/*
 !examples/README.rst
 !examples/Lorenz_Attractor.ipynb
+!examples/Graph_classification.ipynb
 
 # Built docs
 doc/build
