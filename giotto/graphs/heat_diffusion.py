@@ -19,9 +19,6 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self):
-        return
-
     def fit(self, X, taus, initial_condition=None, order=50, proc="exact"):
         """Compute heat diffusion throughout the complex.
 
@@ -77,7 +74,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray
+        X : csr_matrix
             Laplacian matrix to be used to compute the diffusion process,
             shape (n_simplices, n_simpices).
 

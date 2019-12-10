@@ -162,9 +162,6 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self):
-        return
-
     def fit(self, X, orders, y=None):
         """Do nothing and return the estimator unchanged.
 
@@ -297,8 +294,6 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
 
 
     """
-    def __init__(self):
-        return
 
     def fit(self, X, orders, y=None):
         """Set the orders paramteres.
