@@ -1,6 +1,6 @@
 import numpy as np
 from hypothesis import given
-from hypothesis.extra.numpy import arrays
+from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from functools import reduce
@@ -16,10 +16,12 @@ from giotto.mapper.cover import OneDimensionalCover
     n_intervals=integers(min_value=1, max_value=100)
 )
 def test_one_dimensional_cover_shape(filter_values, n_intervals):
+    # TODO extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     n_samples, n_intervals = len(filter_values), cover.n_intervals
-    interval_masks = cover.fit_transform(filter_values)
-    assert (n_samples, n_intervals) == interval_masks.shape
+    unique_interval_masks = cover.fit_transform(filter_values)
+    assert n_samples == unique_interval_masks.shape[0]
+    assert n_intervals >= unique_interval_masks.shape[1]
 
 
 @given(
@@ -31,6 +33,7 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
                          )
 )
 def test_filter_values_covered_by_single_interval(filter_values):
+    # TODO extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=1)
     interval_masks = cover.fit_transform(filter_values)
     # TODO: generate filter_values with desired shape
@@ -43,11 +46,13 @@ def test_filter_values_covered_by_single_interval(filter_values):
                          elements=floats(allow_nan=False,
                                          allow_infinity=False,
                                          max_value=1e3),
-                         shape=integers(min_value=1, max_value=100),
+                         shape=array_shapes(min_dims=1, max_dims=1,
+                                            min_side=2),
                          unique=True),
     n_intervals=integers(min_value=1, max_value=10)
 )
 def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
+    # TODO extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     interval_masks = cover.fit_transform(filter_values)
     intervals = [filter_values[interval_masks[:, i]]
