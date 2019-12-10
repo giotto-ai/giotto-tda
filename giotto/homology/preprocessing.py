@@ -1,8 +1,6 @@
 """Local point cloud extractor"""
 # License: Apache 2.0
 
-__author__ = "Alessio Baccelli, Diego Fiori"
-
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -152,11 +150,11 @@ class LocalNeighborhood(BaseEstimator, TransformerMixin):
     def _extract_point_clouds(self, X, matrix_distances, ind_x):
         target_vector_dist = matrix_distances[ind_x]
         max_dist = np.max(target_vector_dist) * self.dist_percentage
-        indexes = target_vector_dist <= max_dist
+        indices = target_vector_dist <= max_dist
 
-        if np.sum(indexes) > self.k_max:
-            indexes = np.argsort(target_vector_dist)[: self.k_max]
-        elif np.sum(indexes) < self.k_min:
-            indexes = np.argsort(target_vector_dist)[: self.k_min]
+        if np.sum(indices) > self.k_max:
+            indices = np.argsort(target_vector_dist)[: self.k_max]
+        elif np.sum(indices) < self.k_min:
+            indices = np.argsort(target_vector_dist)[: self.k_min]
 
-        return X[indexes]
+        return X[indices]
