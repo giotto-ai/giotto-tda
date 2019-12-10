@@ -591,7 +591,6 @@ class RelevantHoles(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
-        self._n_dimensions = len(self.homology_dimensions_)
 
         self._is_fitted = True
 
@@ -628,7 +627,7 @@ class RelevantHoles(BaseEstimator, TransformerMixin):
                 X.shape[0], effective_n_jobs(self.n_jobs))
         )
 
-        # From the precious calculation, Xt is a list of arrays per dimension
+        # From the previous calculation, Xt is a list of arrays per dimension
         # in the persistence diagram. The vstack and transposition stacks them
         # such that we return a numpy ndarry of size
         # (n_samples, n_homology_dimensions)
