@@ -1,6 +1,6 @@
 """Local point cloud extractor"""
 # License: Apache 2.0
-
+import numbers
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
+
 from ..utils import validate_params
 
 
@@ -19,14 +20,19 @@ def _check_k_min_max(k_min, k_max):
 
 
 class LocalNeighborhood(BaseEstimator, TransformerMixin):
-    """For each entry of ``X``, compute the (local) point cloud associated to
-    it by considering the neighborhood points according to the chosen
-    ``metric``.
+    """Compute local neighborhoods of each point in a point cloud, constraining
+    their radius to be a fraction of the point cloud's diameter.
+
     The number of points per (local) point cloud is affected by three
     parameters: ``k_min`` and ``k_max`` represent respectively the minimum and
     maximum number of points, while the ``dist_percentage`` is the percentage
     of the diameter of the total point cloud that is equivalent to the radius
-    in which the (local) point cloud is contained.
+    in which the (local) point cloud is contained. First, the points within
+    the sphere with radius given by ``dist_percentage`` are considered. Then,
+    if there are less then ``k_min`` points the radius is increased in order to
+    reach ``k_min`` number of points. Otherwise, if more than ``k_max`` points
+    are present in the sphere, only the closest ``k_max`` ones are considered.
+
     Since this class is thought as a pre-process step before the persistence
     diagrams creation, in order to have (local) point clouds of the same
     length, all of them are padded with the last value in order to have length
@@ -66,7 +72,7 @@ class LocalNeighborhood(BaseEstimator, TransformerMixin):
     (10, 2, 7)
 
     """
-    _hyperparameters = {'dist_percentage': [float, (0, 1)],
+    _hyperparameters = {'dist_percentage': [numbers.Number, (0, 1)],
                         'k_min': [int, (1, np.inf)],
                         'k_max': [int, (1, np.inf)]
                         }
@@ -142,13 +148,13 @@ class LocalNeighborhood(BaseEstimator, TransformerMixin):
         Xt = np.empty(Xt_dims)
 
         for i, point_cloud in enumerate(local_point_clouds):
-            Xt[i, : len(point_cloud[0])] = point_cloud[0]
-            Xt[i, len(point_cloud[0]):] = point_cloud[0][-1]
+            Xt[i, : len(point_cloud)] = point_cloud
+            Xt[i, len(point_cloud):] = point_cloud[-1]
 
         return Xt
 
-    def _extract_point_clouds(self, X, matrix_distances, ind_x):
-        target_vector_dist = matrix_distances[ind_x]
+    def _extract_point_clouds(self, X, distance_matrix, ind_x):
+        target_vector_dist = distance_matrix[ind_x]
         max_dist = np.max(target_vector_dist) * self.dist_percentage
         indices = target_vector_dist <= max_dist
 
