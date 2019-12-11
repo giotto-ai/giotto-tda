@@ -1,17 +1,17 @@
 from .filter import Eccentricity, Entropy, Projection
-from ._utils import ListFeatureUnion
-from .cluster import ParallelClustering, FirstGapAgglomerativeClustering
-from .cover import OneDimensionalCover
-from .mapper import MapperPipeline
+from .cluster import FirstSimpleGap, FirstHistogramGap
+from .cover import OneDimensionalCover, CubicalCover
+from .nerve import Nerve
+from .mapper import make_mapper_pipeline
 
 __all__ = [
     'Eccentricity',
     'Entropy',
     'Projection',
     'OneDimensionalCover',
-    'ParallelClustering',
-    'FirstGapAgglomerativeClustering',
-    'ListFeatureUnion',
-    'MapperPipeline',
-    'Nerve'
+    'CubicalCover',
+    'FirstSimpleGap',
+    'FirstHistogramGap',
+    'Nerve',
+    'make_mapper_pipeline'
 ]
