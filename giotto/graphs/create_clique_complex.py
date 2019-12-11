@@ -22,17 +22,17 @@ class CreateCliqueComplex:
     Parameters
     ----------
     graph : nx.graph, optional, default: ``None``
-        Graph of which computing the clique complex.
+        Graph from which to compute the clique complex
 
     data : ndarray, shape (n_points, n_dimensions) or \
         (n_points, n_points)
         If ``data_type == 'cloud'``, the input should be an
-        ndarray whose each entry along axis 0 is a vector with
+        ndarray, where each entry along axis 0 is a vector with
         the features of the relative point. Otherwise when
         'matrix' is passed as data_type the object should be a symmetric
         square matrix with distances between points.
 
-    alpha : float
+    alpha : float, optional, default: ``None``
         Real value to be used as a threshold while constructing
         the alpha-neighboring graph. For a point 'x' there will be an edge
         to each point 'y' if dist(x,y) < alpha, where here the
@@ -67,9 +67,8 @@ class CreateCliqueComplex:
         self.complex_dict = dict()
 
         if data_type == 'graph':
-            # check type graph
             if not isinstance(graph, nx.Graph):
-                raise ValueError("The parameter graph should be "
+                raise ValueError("The parameter 'graph' should be "
                                 "a networkx Graph object")
             self.graph = graph
             self.adjacent_matrix = nx.adjacency_matrix(self.graph)
@@ -77,29 +76,29 @@ class CreateCliqueComplex:
             check_array(data)
             if self.alpha is None:
                 raise ValueError("If 'data_type' is not 'graph' the parameter"
-                                "alpha must be a float number.")
+                                "alpha must be a float.")
             self.graph = self._create_graph()
             self.adjacent_matrix = csr_matrix(self.adjacent_matrix)
 
     def create_complex_from_graph(self):
         """
-        Functions that computes the Cliques Complex starting from
-        the related networkx graph object.
+        Function that computes the Clique complex from the associated
+        networkx Graph object.
 
         Returns
         -------
-        self.complex_dict : dictionary
+        self.complex_dict : dict
             Dictionary containing all simplices of the clique
             complex identified with arbitrary ID. Each entry 'K' of the
-            dictionary is again a dictionary contaning all K-simplexes.
+            dictionary is a dictionary contaning all K-simplexes.
 
         """
 
-        self._find_lists()
+        self._create_cliques_dict()
 
         return self.complex_dict
 
-    def _find_lists(self):
+    def _create_cliques_dict(self):
 
         """
         Collect all cliques of a graph and create dictionary with all simplices
