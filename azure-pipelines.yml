@@ -7,6 +7,8 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
+      Python35:
+        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -39,6 +41,8 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
+      Python35:
+        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -77,6 +81,8 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
+      Python35:
+        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -110,6 +116,11 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
+      Python35:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '35'
+        python.version: '3.5'
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
@@ -157,6 +168,14 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
+  - bash: |
+      cd dist
+      for f in giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
+      for f in *linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
+      twine upload -u giotto-learn -p $PYPI_PSW *.whl
+      cd ..
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Rename nightly wheels and upload them to PyPI'
 
 - job: 'macOS1014'
   condition: eq(variables['build_check'], 'true')
@@ -164,6 +183,8 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
+      Python35:
+        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -233,6 +254,15 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
+  - bash: |
+      cd dist
+      for f in giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
+      for f in *linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
+      twine upload -u giotto-learn -p $PYPI_PSW *.whl
+      cd ..
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Rename nightly wheels and upload them to PyPI'
+
 
 - job: 'win2016'
   condition: eq(variables['build_check'], 'true')
@@ -240,6 +270,8 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
+      Python35:
+        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -288,3 +320,12 @@ jobs:
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
+ 
+  - bash: |
+      cd dist
+      for f in giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
+      for f in *linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
+      twine upload -u giotto-learn -p $PYPI_PSW *.whl
+      cd ..
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Rename nightly wheels and upload them to PyPI'
