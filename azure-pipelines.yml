@@ -140,11 +140,13 @@ jobs:
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       echo "changing name of the repo:"
-      cd ..
-      mv giotto-learn giotto-learn-nightly
-      cd giotto-learn-nightly
-      echo "current PWD:"
       pwd
+      cd ..
+      pwd
+      rename giotto-learn giotto-learn-nightly
+      pwd
+      ls
+      cd giotto-learn-nightly
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
