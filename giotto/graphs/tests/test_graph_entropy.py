@@ -16,9 +16,9 @@ cd = cc.create_complex_from_graph()
 
 
 def test_graph_entropy_fitted():
-    l_n = CreateLaplacianMatrices().fit(cd, (0)).transform(cd)[0]
+    l_n = CreateLaplacianMatrices().fit(cd, (0,)).transform(cd)[0]
     heat_vectors = HeatDiffusion().fit(l_n, taus=taus).transform(l_n)
     entropy = GraphEntropy()
 
     with pytest.raises(NotFittedError):
-        embs = entropy.transform(heat_vectors)
+        entropy.transform(heat_vectors)

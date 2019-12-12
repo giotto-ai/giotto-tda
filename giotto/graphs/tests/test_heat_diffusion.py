@@ -18,7 +18,7 @@ def test_heat_diffusion_not_fitted():
     diffusor = HeatDiffusion()
 
     with pytest.raises(NotFittedError):
-        heat = diffusor.transform(lap_node)
+        diffusor.transform(lap_node)
 
 
 def test_heat_vectors_shape():

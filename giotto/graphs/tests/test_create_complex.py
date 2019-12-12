@@ -19,14 +19,14 @@ cd = cc.create_complex_from_graph()
 def test_graph_input_with_data_type():
 
     with pytest.raises(ValueError):
-        cc_ = CreateCliqueComplex(
+        CreateCliqueComplex(
             graph=nx.barbell_graph(10, 10), data_type='cloud')
 
 
 def test_data_input_with__graph_data_type():
 
     with pytest.raises(ValueError):
-        cc_ = CreateCliqueComplex(data=X, alpha=alpha)
+        CreateCliqueComplex(data=X, alpha=alpha)
 
 
 def test_input_distance_matrix():
@@ -35,9 +35,9 @@ def test_input_distance_matrix():
     cc_ = CreateCliqueComplex(data=dist, alpha=alpha, data_type='matrix')
     cd_ = cc_.create_complex_from_graph()
 
-    lap_cc = CreateLaplacianMatrices().fit(cd, (0)).transform(cd)[0].todense()
+    lap_cc = CreateLaplacianMatrices().fit(cd, (0,)).transform(cd)[0].todense()
     lap_cc_ = CreateLaplacianMatrices().fit(
-        cd_, (0)).transform(cd_)[0].todense()
+        cd_, (0,)).transform(cd_)[0].todense()
 
     assert_almost_equal(lap_cc, lap_cc_)
 
@@ -66,6 +66,6 @@ def test_create_laplacian_matrices_not_fitted():
 
 
 def test_create_laplacian_matrices_symmetry():
-    lap = CreateLaplacianMatrices().fit(cd, (0)).transform(cd)
+    lap = CreateLaplacianMatrices().fit(cd, (0,)).transform(cd)
 
     assert_almost_equal(lap[0].todense(), lap[0].todense().T)
