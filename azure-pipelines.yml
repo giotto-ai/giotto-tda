@@ -139,6 +139,8 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      mv ../{giotto-learn,giotto-learn-nightly}
+      pwd -P
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -175,7 +177,6 @@ jobs:
 
   - bash: |
       pip install twine
-      for f in dist/giotto_learn* ; do sudo mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
       twine upload -u giotto-learn -p $PYPI_PSW dist
     condition: eq(variables['nightly_check'], 'true')
@@ -202,9 +203,8 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      mkdir ../giotto-learn-nightly
-      mv ../giotto-learn ../giotto-learn-nightly
-      cd ../giotto-learn-nightly
+      mv ../{giotto-learn,giotto-learn-nightly}
+      pwd -P
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -303,6 +303,8 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      mv ../{giotto-learn,giotto-learn-nightly}
+      pwd -P
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
