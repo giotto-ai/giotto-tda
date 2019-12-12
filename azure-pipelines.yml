@@ -139,8 +139,12 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      mv ../{giotto-learn,giotto-learn-nightly}
-      pwd -P
+      echo "changing name of the repo:"
+      cd ..
+      mv giotto-learn giotto-learn-nightly
+      cd giotto-learn-nightly
+      echo "current PWD:"
+      pwd
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -180,7 +184,7 @@ jobs:
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
       twine upload -u giotto-learn -p $PYPI_PSW dist
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Rename nightly wheels and upload them to PyPI'
+    displayName: 'Upload wheels to PyPI'
 
 
 - job: 'macOS1014'
@@ -203,8 +207,12 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      mv ../{giotto-learn,giotto-learn-nightly}
-      pwd -P
+      echo "changing name of the repo:"
+      cd ..
+      mv giotto-learn giotto-learn-nightly
+      cd giotto-learn-nightly
+      echo "current PWD:"
+      pwd
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -280,7 +288,7 @@ jobs:
   - bash: |
       twine upload -u giotto-learn -p $PYPI_PSW dist
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Rename nightly wheels and upload them to PyPI'
+    displayName: 'Upload wheels to PyPI'
 
 
 - job: 'win2016'
@@ -303,8 +311,12 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      mv ../{giotto-learn,giotto-learn-nightly}
-      pwd -P
+      echo "changing name of the repo:"
+      cd ..
+      mv giotto-learn giotto-learn-nightly
+      cd giotto-learn-nightly
+      echo "current PWD:"
+      pwd
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -358,7 +370,6 @@ jobs:
       artifactName: 'wheel_and_doc'
  
   - bash: |
-      for f in dist/giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
       twine upload -u giotto-learn -p $PYPI_PSW dist
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Rename nightly wheels and upload them to PyPI'
+    displayName: 'Upload wheels to PyPI'
