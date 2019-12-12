@@ -203,7 +203,8 @@ jobs:
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       mkdir ../giotto-learn-nightly
-      mv ../giotto-learn ../giotto-learn-nightly 
+      mv ../giotto-learn ../giotto-learn-nightly
+      cd ../giotto-learn-nightly
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
