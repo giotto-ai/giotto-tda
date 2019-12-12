@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # License: Apache 2.0
 
 import numpy as np
@@ -69,14 +68,14 @@ class CreateCliqueComplex:
         if data_type == 'graph':
             if not isinstance(graph, nx.Graph):
                 raise ValueError("The parameter 'graph' should be "
-                                "a networkx Graph object")
+                                 "a networkx Graph object")
             self.graph = graph
             self.adjacent_matrix = nx.adjacency_matrix(self.graph)
         else:
             check_array(data)
             if self.alpha is None:
                 raise ValueError("If 'data_type' is not 'graph' the parameter"
-                                "alpha must be a float.")
+                                 "alpha must be a float.")
             self.graph = self._create_graph()
             self.adjacent_matrix = csr_matrix(self.adjacent_matrix)
 
@@ -90,7 +89,7 @@ class CreateCliqueComplex:
         self.complex_dict : dict
             Dictionary containing all simplices of the clique
             complex identified with arbitrary ID. Each entry 'K' of the
-            dictionary is a dictionary contaning all K-simplexes.
+            dictionary is a dictionary containing all K-simplexes.
 
         """
 
@@ -221,7 +220,9 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
         for order, order_inc in incidence.items():
             if isinstance(self.orders_, int):
                 orders = [self.orders_]
-            if order in self.orders_:
+            else:
+                orders = self.orders_
+            if order in orders:
                 # This is the boundary matrix from order to order-1 simplexes
                 temp_mat = lil_matrix(
                     (self.sizes_[order - 1], self.sizes_[order]))
@@ -286,7 +287,7 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
 
 
 class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
-    """Compute laplacian matrices.
+    """Compute Laplacian matrices.
 
     This step computes the Laplacian matrices that can be used both to
     analyse the complex and compute the heat diffusion.
@@ -295,19 +296,19 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
     """
 
     def fit(self, X, orders, y=None):
-        """Set the orders paramteres.
+        """Set the orders parameters.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
-        Paraneter
-        ---------
+        Parameters
+        ----------
         X : dictionary
             Dictionary containing information on the Clique Complex of which
             computing the boundary matrices.
 
         orders : tuple
-            Tuple containing the orders of Laplcian matrices to be computed
+            Tuple containing the orders of Laplacian matrices to be computed
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -335,9 +336,9 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute laplacians of complex.
+        """Compute Laplacians of complex.
 
-        Compute laplacians starting from a Graph Object up to certain
+        Compute Laplacians starting from a Graph Object up to certain
         order applying the formula from the boundary matrices
 
         Parameters
@@ -353,7 +354,7 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
         Returns
         -------
         laplacians : list
-            List containing the laplacian matrices for all orders specified
+            List containing the Laplacian matrices for all orders specified
             in tuple 'orders'.
 
         """
@@ -379,8 +380,3 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
             laplacians.append(lap)
 
         return laplacians
-
-
-
-
-

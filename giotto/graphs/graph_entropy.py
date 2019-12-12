@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# License: Apache 2.0
 
 import numpy as np
 
@@ -15,7 +14,7 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
     each point in time is calculated. The entropy values will be
     used as features to perform the embedding. In order to compute
     the entropy the absolute values of the diffusion vectors are taken.
-    In order to preserve the invarince of the entropy calcuation with
+    In order to preserve the invariance of the entropy calculation with
     respect to the orientation of the simplices in the complex the
     initial condition has to be a delta (all energy placed in one simplex).
 
@@ -72,4 +71,3 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
         entropies = entropy(np.abs(X), base=2)
 
         return np.nan_to_num(entropies, 0)
-

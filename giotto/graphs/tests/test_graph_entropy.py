@@ -3,7 +3,7 @@ import pytest
 
 from sklearn.exceptions import NotFittedError
 from giotto.graphs.create_clique_complex import (CreateCliqueComplex,
-    CreateLaplacianMatrices)
+                                                 CreateLaplacianMatrices)
 from giotto.graphs.graph_entropy import GraphEntropy
 from giotto.graphs.heat_diffusion import HeatDiffusion
 
@@ -22,5 +22,3 @@ def test_graph_entropy_fitted():
 
     with pytest.raises(NotFittedError):
         embs = entropy.transform(heat_vectors)
-
-

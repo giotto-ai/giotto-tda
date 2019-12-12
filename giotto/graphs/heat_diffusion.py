@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # License: Apache 2.0
 
 import numpy as np
@@ -13,12 +12,11 @@ from sklearn.utils.validation import check_is_fitted, check_array
 class HeatDiffusion(BaseEstimator, TransformerMixin):
     """Compute heat diffusion.
 
-    Module that copmutes heat diffusion evolution at different
+    Module that computes heat diffusion evolution at different
     points in time. The initial condition and sampling times are
     taken as input.
 
     """
-
     def fit(self, X, taus, initial_condition=None, order=50, proc="exact"):
         """Compute heat diffusion throughout the complex.
 
@@ -26,7 +24,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray
             Laplacian matrix to be used to compute the diffusion process,
-            shape (n_simplices, n_simpices).
+            shape (n_simplices, n_simplices).
 
         taus : ndarray
             Array contaning the points in time at which sampling
@@ -35,7 +33,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         initial_condition : ndarray, optional, default "None"
             Initial condition for the diffusion process. If "None",
             the diffusion will be computed by using the identity matrix with
-            shape (n_simplices, n_simplices). If the initial condiditions are
+            shape (n_simplices, n_simplices). If the initial conditions are
             not deltas placed on one simplex, the absolute values of diffusion
             vectors depend on the orientation given to the simplices (K-order
             diffusion with K>0 ).
@@ -76,7 +74,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         ----------
         X : csr_matrix
             Laplacian matrix to be used to compute the diffusion process,
-            shape (n_simplices, n_simpices).
+            shape (n_simplices, n_simplices).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -88,7 +86,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         heat : ndarray
             3D-array containing the diffusion vectors. The shape is
             (n_simplices, n_initial_condition, n_times) where the initial
-            condition placed as input have been tranformed by solving the heat
+            condition placed as input have been transformed by solving the heat
             equation in time.
 
         """
@@ -149,7 +147,3 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
     def _get_eigens(self, lap):
         vals, vecs = np.linalg.eigh(lap.todense())
         return np.real(vals), vecs
-
-
-
-
