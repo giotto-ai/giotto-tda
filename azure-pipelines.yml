@@ -175,7 +175,6 @@ jobs:
 
   - bash: |
       pip install twine
-#      sudo for f in dist/giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
       sudo for f in dist/*linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
       twine upload -u giotto-learn -p $PYPI_PSW dist/*.whl
     condition: eq(variables['nightly_check'], 'true')
@@ -274,9 +273,7 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
-#      for f in dist/giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
       twine upload -u giotto-learn -p $PYPI_PSW dist/*.whl
-      cd ..
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Rename nightly wheels and upload them to PyPI'
 
@@ -354,7 +351,6 @@ jobs:
       artifactName: 'wheel_and_doc'
  
   - bash: |
-#      for f in dist/giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
       twine upload -u giotto-learn -p $PYPI_PSW dist/*.whl
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Rename nightly wheels and upload them to PyPI'
