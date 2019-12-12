@@ -139,14 +139,15 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      echo "changing name of the repo:"
       pwd
       cd ..
       pwd
+      ls
       rename giotto-learn giotto-learn-nightly
       pwd
       ls
       cd giotto-learn-nightly
+      pwd
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -209,11 +210,14 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      echo "changing name of the repo:"
+      pwd
       cd ..
+      pwd
+      ls
       mv giotto-learn giotto-learn-nightly
+      pwd
+      ls
       cd giotto-learn-nightly
-      echo "current PWD:"
       pwd
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
@@ -313,11 +317,14 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      echo "changing name of the repo:"
+      pwd
       cd ..
-      mv giotto-learn giotto-learn-nightly
+      pwd
+      ls
+      rename giotto-learn giotto-learn-nightly
+      pwd
+      ls
       cd giotto-learn-nightly
-      echo "current PWD:"
       pwd
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
