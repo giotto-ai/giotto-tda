@@ -141,13 +141,20 @@ jobs:
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       echo 'var'
       echo $night
+      echo 'bla'
+      echo $NIGHT
+      echo 'bla2'
+      echo $day
+      echo 'bla1'
+      echo $DAY
       echo 'rav'
       sed -i "s/__version__.*/__version__ = 'dev.$NIGHT'/1" giotto/_version.py
       echo $NIGHT
       cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
     env:
-      night: $(Date:yyyyMMdd)
+      night: $(foo)
+      day: $('day')
     displayName: 'change name to giotto-learn-nightly'
 
   - task: Bash@3
