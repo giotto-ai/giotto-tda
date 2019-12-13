@@ -92,3 +92,33 @@ def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
     decimals = 10
     assert len(set(np.floor((upper_limits - lower_limits) *
                             decimals).tolist())) == 1
+
+
+@given(
+    filter_values=arrays(dtype=np.float,
+                         elements=floats(allow_nan=False,
+                                         allow_infinity=False,
+                                         min_value=-1e10,
+                                         max_value=1e10),
+                         shape=array_shapes(min_dims=1, max_dims=1,
+                                            min_side=2),
+                         unique=True),
+    n_intervals=integers(min_value=4, max_value=50),
+    overlap_frac=floats(allow_nan=False,
+                        allow_infinity=False,
+                        min_value=0,
+                        max_value=1)
+)
+def test_overlap_fraction(filter_values, n_intervals, overlap_frac):
+    cover = OneDimensionalCover(n_intervals=n_intervals,
+                                overlap_frac=overlap_frac)
+    cover.fit(filter_values)
+
+    lower_limits,\
+        upper_limits = np.array(list(map(tuple,
+                                         zip(*cover.fitted_intervals()[1:-1]))
+                                     ))
+
+    assert len(set(np.round((upper_limits[:-1] - lower_limits[1:]) /
+                            (upper_limits[:-1] - lower_limits[:-1]) /
+                            overlap_frac).tolist())) == 1
