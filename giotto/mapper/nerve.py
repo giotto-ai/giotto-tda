@@ -1,6 +1,5 @@
 import numpy as np
-
-import networkx as nx
+import igraph as ig
 
 from functools import partial
 from itertools import product, combinations
@@ -15,16 +14,20 @@ class Nerve(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         self.edges_ = list(self._generate_edges(X))
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        check_is_fitted(self, ['_is_fitted'])
-        G = nx.Graph()
-        G.add_nodes_from([(x[:2], dict(elements=x[2]))
-                          for V in X for x in V])
-        G.add_edges_from([edge['node_indices'] for edge in self.edges_])
-        return G
+        check_is_fitted(self, ['edges_'])
+        graph = ig.Graph()
+        # TODO: improve dummy variable names in list comprehension
+        graph.add_vertices([x[:2] for V in X for x in V])
+        graph.add_edges([
+            (edge['node_indices'][0][0], edge['node_indices'][1][0])
+            for edge in self.edges_
+        ])
+        # add cluster member indices to each node
+        graph.vs['elements'] = [x[2] for V in X for x in V]
+        return graph
 
     @staticmethod
     def _unpack_product(tup):
