@@ -138,7 +138,7 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       cat setup.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
@@ -201,9 +201,8 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       cat setup.py
-      grep -r "giotto-learn" * .*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -301,9 +300,8 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       cat setup.py
-      grep -r "giotto-learn" * .*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
