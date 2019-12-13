@@ -152,6 +152,8 @@ jobs:
       echo 'bla 500'
       echo $python_ver
       echo 'bbb '
+      echo $bbb
+      echo 'BBB'
       echo $BBB
       echo 'big'
       echo $PYTHON_VER
