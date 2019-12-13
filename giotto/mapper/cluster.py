@@ -275,5 +275,3 @@ def _zero_bins(hist):
 
 def _bins_below_threshold(freq_threshold, hist):
     return np.flatnonzero(hist < freq_threshold)
-
-

@@ -45,11 +45,12 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         # l is (n_intervals - 1) * l * (1 - overlap_frac) + l = L.
         # The maximum left endpoint is at
         # m + (n_intervals - 1) * (1 - overlap_frac) * l
-        l = L / (self.n_intervals * (1 - self.overlap_frac) +
-                 self.overlap_frac)
-        last = m + (self.n_intervals - 1) * (1 - self.overlap_frac) * l
+        interval_length = L / (self.n_intervals * (1 - self.overlap_frac) +
+                               self.overlap_frac)
+        last = m + (self.n_intervals - 1) * (1 - self.overlap_frac) *\
+            interval_length
         left_limits = np.linspace(m, last, num=self.n_intervals, endpoint=True)
-        right_limits = left_limits + l
+        right_limits = left_limits + interval_length
         left_limits[0] = -np.inf
         right_limits[-1] = np.inf
         return left_limits, right_limits
