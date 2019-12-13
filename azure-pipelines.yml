@@ -139,7 +139,7 @@ jobs:
 
   - bash: |
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = 'dev.$(Date:yyyyMMdd)'/1" giotto/_version.py
+      sed -i "s/__version__.*/__version__ = 'dev.${$(Date:yyyyMMdd)}'/1" giotto/_version.py
       cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
@@ -204,7 +204,7 @@ jobs:
   - bash: |
       sed -i.bak "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       rm setup.py.bak
-      sed -i.bak "s/__version__.*/__version__ = 'dev.$(Date:yyyyMMdd)'/1" giotto/_version.py
+      sed -i.bak "s/__version__.*/__version__ = 'dev.${$(Date:yyyyMMdd)}'/1" giotto/_version.py
       cat giotto/_version.py
       rm giotto/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
@@ -304,7 +304,7 @@ jobs:
 
   - bash: |
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = 'dev.$(Date:yyyyMMdd)'/1" giotto/_version.py
+      sed -i "s/__version__.*/__version__ = 'dev.${$(Date:yyyyMMdd)}'/1" giotto/_version.py
       cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
