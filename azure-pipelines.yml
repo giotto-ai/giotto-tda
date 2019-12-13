@@ -139,33 +139,9 @@ jobs:
 
   - bash: |
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      echo 'var'
-      echo $night
-      echo 'bla'
-      echo $NIGHT
-      echo 'bla2'
-      echo $day
-      echo 'bla1'
-      echo $DAY
-      echo 'rav'
-      echo $(Date:yyyyMMdd)
-      echo 'bla 500'
-      echo $python_ver
-      echo 'bbb '
-      echo $bbb
-      echo 'BBB'
-      echo $BBB
-      echo 'big'
-      echo $PYTHON_VER
-      echo $(python_ver)
       sed -i "s/__version__.*/__version__ = 'dev.$(Build.BuildNumber)'/1" giotto/_version.py
-      echo $NIGHT
       cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    env:
-      night: $(foo)
-      day: $('day')
-      bbb: $(Build.BuildNumber)
     displayName: 'change name to giotto-learn-nightly'
 
   - task: Bash@3
@@ -228,12 +204,10 @@ jobs:
   - bash: |
       sed -i.bak "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       rm setup.py.bak
-      sed -i.bak "s/__version__.*/__version__ = 'dev.$NIGHT'/1" giotto/_version.py
+      sed -i.bak "s/__version__.*/__version__ = 'dev.$(Build.BuildNumber)'/1" giotto/_version.py
       cat giotto/_version.py
       rm giotto/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
-    env:
-      night: $(Date:yyyyMMdd)
     displayName: 'change name to giotto-learn-nightly'
 
   - script: |
@@ -330,11 +304,9 @@ jobs:
 
   - bash: |
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = 'dev.$NIGHT'/1" giotto/_version.py
+      sed -i "s/__version__.*/__version__ = 'dev.$(Build.BuildNumber)'/1" giotto/_version.py
       cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    env:
-      night: $(Date:yyyyMMdd)
     displayName: 'change name to giotto-learn-nightly'
 
   - script: python -m pip install --upgrade pip setuptools
