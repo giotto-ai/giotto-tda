@@ -37,6 +37,8 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return Xt
 
     def _find_interval_limits(self, X):
+        # TODO: either raise warning or add in docs a message about reasonable
+        # filter ranges (e.g. 10^240 is not reasonable)
         if X.shape[0] == 1:
             return np.array([-np.inf]), np.array([np.inf])
         M, m = np.max(X), np.min(X)

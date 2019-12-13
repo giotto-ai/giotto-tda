@@ -61,3 +61,34 @@ def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
     filter_values_union = filter_values[np.in1d(
         filter_values, intervals_union)]
     assert_almost_equal(filter_values_union, filter_values)
+
+
+@given(
+    filter_values=arrays(dtype=np.float,
+                         elements=floats(allow_nan=False,
+                                         allow_infinity=False,
+                                         min_value=-1e10,
+                                         max_value=1e10),
+                         shape=array_shapes(min_dims=1, max_dims=1,
+                                            min_side=2),
+                         unique=True),
+    n_intervals=integers(min_value=3, max_value=50),
+    overlap_frac=floats(allow_nan=False,
+                        allow_infinity=False,
+                        min_value=0,
+                        max_value=1)
+)
+def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
+    cover = OneDimensionalCover(n_intervals=n_intervals,
+                                overlap_frac=overlap_frac)
+    cover = cover.fit(filter_values)
+
+    lower_limits,\
+        upper_limits = np.array(list(map(tuple,
+                                         zip(*cover.fitted_intervals()[1:-1]))
+                                     ))
+
+    # rounding precision
+    decimals = 10
+    assert len(set(np.floor((upper_limits - lower_limits) *
+                            decimals).tolist())) == 1
