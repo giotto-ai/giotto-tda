@@ -137,7 +137,10 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+  - bash: |
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/__version__.*/__version__ = 'dev.$(Date:yyyyMMdd)'/1" giotto/_version.py
+      cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -175,7 +178,7 @@ jobs:
   - bash: |
       pip install twine
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-learn -p $(pypi_psw) dist/*
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'
 
@@ -201,6 +204,9 @@ jobs:
   - bash: |
       sed -i.bak "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       rm setup.py.bak
+      sed -i.bak "s/__version__.*/__version__ = 'dev.$(Date:yyyyMMdd)'/1" giotto/_version.py
+      cat giotto/_version.py
+      rm giotto/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -273,7 +279,7 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-  - bash: twine upload -u giotto-learn -p $(pypi_psw) dist/*
+  - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'
 
@@ -296,7 +302,10 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+  - bash: |
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/__version__.*/__version__ = 'dev.$(Date:yyyyMMdd)'/1" giotto/_version.py
+      cat giotto/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -349,6 +358,6 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
  
-  - bash: twine upload -u giotto-learn -p $(pypi_psw) dist/*
+  - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'
