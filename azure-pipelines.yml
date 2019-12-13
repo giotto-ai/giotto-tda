@@ -143,7 +143,7 @@ jobs:
       cd ..
       pwd
       ls
-      rename giotto-learn giotto-learn-nightly
+      rename s giotto-learn-nightly
       pwd
       ls
       cd giotto-learn-nightly
@@ -210,11 +210,12 @@ jobs:
 
   - bash: |
       sed "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      grep -r "giotto-learn" *
       pwd
       cd ..
       pwd
       ls
-      mv giotto-learn giotto-learn-nightly
+      mv s giotto-learn-nightly
       pwd
       ls
       cd giotto-learn-nightly
@@ -321,7 +322,7 @@ jobs:
       cd ..
       pwd
       ls
-      rename giotto-learn giotto-learn-nightly
+      rename s giotto-learn-nightly
       pwd
       ls
       cd giotto-learn-nightly
