@@ -1,12 +1,46 @@
+import logging
 import operator
+import traceback
 from functools import reduce
 
 import numpy as np
 import plotly.graph_objects as go
 from IPython.display import display
-from ipywidgets import widgets
+from ipywidgets import Layout, widgets
 from matplotlib.cm import get_cmap
 from matplotlib.colors import rgb2hex
+
+
+class OutputWidgetHandler(logging.Handler):
+    """Custom logging handler sending logs to an output widget"""
+
+    def __init__(self, *args, **kwargs):
+        super(OutputWidgetHandler, self).__init__(*args, **kwargs)
+        layout = {
+            'width': '100%',
+            'height': '160px',
+            'border': '1px solid black',
+            'overflow_y': 'auto'
+        }
+        self.out = widgets.Output(layout=layout)
+
+    def emit(self, record):
+        """Overload of logging.Handler method"""
+        formatted_record = self.format(record)
+        new_output = {
+            'name': 'stdout',
+            'output_type': 'stream',
+            'text': formatted_record+'\n'
+        }
+        self.out.outputs = (new_output, ) + self.out.outputs
+
+    def show_logs(self):
+        """Show the logs"""
+        display(self.out)
+
+    def clear_logs(self):
+        """Clear the current logs"""
+        self.out.clear_output()
 
 
 def get_node_size(node_elements):
@@ -360,53 +394,88 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
         return create_network_2d(graph, node_pos, node_color, **plotly_kwargs)
 
     def response_numeric(change):
-        # TODO: raise exception when input not valid
         # TODO: remove hardcoding of keys and mimic what is done with clusterer
-        pipe.set_mapper_params(
-            cover__n_intervals=cover_params_widgets['cover__n_intervals']
-            .value)
-        pipe.set_mapper_params(
-            cover__overlap_frac=cover_params_widgets['cover__overlap_frac']
-            .value)
+        handler.clear_logs()
+        try:
+            pipe.set_mapper_params(
+                cover__n_intervals=cover_params_widgets['cover__n_intervals']
+                .value)
+            pipe.set_mapper_params(
+                cover__overlap_frac=cover_params_widgets['cover__overlap_frac']
+                .value)
 
-        for param, value in cluster_params.items():
-            if isinstance(value, (int, float)):
-                pipe.set_mapper_params(
-                    **{param: cluster_params_widgets[param].value}
-                )
+            for param, value in cluster_params.items():
+                if isinstance(value, (int, float)):
+                    pipe.set_mapper_params(
+                        **{param: cluster_params_widgets[param].value}
+                    )
 
-        # TODO check this alternative:
-        #
-        # num_params = {param: value for param, value in cluster_params.items()
-        #               if isinstance(value, (int, float))}
-        #
-        # pipe.set_mapper_params(
-        #     **{param: cluster_params_widgets[param].value for param in
-        #        num_params}
-        # )
+            # TODO check this alternative:
+            #
+            # num_params = {param: value for param, value in cluster_params.items()
+            #               if isinstance(value, (int, float))}
+            #
+            # pipe.set_mapper_params(
+            #     **{param: cluster_params_widgets[param].value for param in
+            #        num_params}
+            # )
 
-        new_fig = get_figure(pipe, data, node_pos, node_color, summary_stat)
-        with fig.batch_update():
-            update_figure(fig, new_fig)
-        valid.value = True
+            new_fig = get_figure(pipe, data, node_pos,
+                                 node_color, summary_stat)
+
+            logger.info("Updating figure ...")
+            with fig.batch_update():
+                update_figure(fig, new_fig)
+            valid.value = True
+        except Exception:
+            exception_data = traceback.format_exc().splitlines()
+            logger.exception(exception_data[-1])
+            valid.value = False
 
     def response_text(text):
-        # TODO: raise exception when input not valid
-        for param, value in cluster_params.items():
-            if isinstance(value, str):
-                pipe.set_mapper_params(
-                    **{param: cluster_params_widgets[param].value}
-                )
+        handler.clear_logs()
+        try:
+            for param, value in cluster_params.items():
+                if isinstance(value, str):
+                    pipe.set_mapper_params(
+                        **{param: cluster_params_widgets[param].value}
+                    )
 
-        new_fig = get_figure(pipe, data, node_pos, node_color, summary_stat)
-        with fig.batch_update():
-            update_figure(fig, new_fig)
-        valid.value = True
+            new_fig = get_figure(pipe, data, node_pos,
+                                 node_color, summary_stat)
+
+            logger.info("Updating figure ...")
+            with fig.batch_update():
+                update_figure(fig, new_fig)
+            valid.value = True
+        except Exception:
+            exception_data = traceback.format_exc().splitlines()
+            logger.exception(exception_data[-1])
+            valid.value = False
 
     def observe_numeric_widgets(params, widgets):
         for param, value in params.items():
             if isinstance(value, (int, float)):
                 widgets[param].observe(response_numeric, names='value')
+
+    # define output widget to capture logs
+    out = widgets.Output()
+
+    @out.capture()
+    def click_box(change):
+        if logs_box.value:
+            out.clear_output()
+            handler.show_logs()
+        else:
+            out.clear_output()
+
+    # initialise logging
+    logger = logging.getLogger(__name__)
+    handler = OutputWidgetHandler()
+    handler.setFormatter(logging.Formatter(
+        '%(asctime)s  - [%(levelname)s] %(message)s'))
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
     # initialise cover and cluster dictionaries of parameters and widgets
     cover_params = dict(filter(lambda x: x[0].startswith('cover'),
@@ -424,19 +493,30 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
     submit_button = widgets.Button(description="Submit")
     submit_button.on_click(response_text)
 
+    # initialise widgets for validating input parameters of pipeline
+    valid = widgets.Valid(
+        value=True,
+        description='Valid parameters',
+        style={'description_width': '100px'},
+    )
+
+    # initialise widget for showing the logs
+    logs_box = widgets.Checkbox(
+        description='Show logs: ',
+        value=False,
+        indent=False
+    )
+
     # initialise figure with initial pipeline and config
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
     fig = get_figure(pipe, data, node_pos, node_color, summary_stat)
 
-    valid = widgets.Valid(
-        value=True,
-        description='Valid params',
-    )
-
     observe_numeric_widgets(cover_params, cover_params_widgets)
     observe_numeric_widgets(cluster_params, cluster_params_widgets)
+
+    logs_box.observe(click_box, names='value')
 
     # define containers for input widgets
     container_cover = widgets.HBox(children=list(
@@ -446,12 +526,15 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
         children=list(v for k, v in cluster_params_widgets.items()
                       if isinstance(cluster_params[k], str)) + [submit_button])
 
+    container_cluster_layout = Layout(display='flex', flex_flow='row wrap')
+
     container_cluster_numeric = widgets.HBox(
         children=list(v for k, v in cluster_params_widgets.items()
                       if isinstance(cluster_params[k], (int, float))
-                      )
+                      ), layout=container_cluster_layout
     )
 
     box = widgets.VBox([container_cover, container_cluster_text,
-                        container_cluster_numeric, fig, valid])
-    display(box)
+                        container_cluster_numeric, fig,
+                        valid, logs_box])
+    display(box, out)
