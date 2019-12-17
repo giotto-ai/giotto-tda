@@ -17,19 +17,11 @@ def test_throw_exception_when_not_fitted():
         rh.transform(X_rh)
 
 
-def test_output_for_relative_theshold():
-    rh_rel = RelevantHoles(threshold_type='rel', threshold_fraction=0.3)
+@pytest.mark.parametrize(('threshold_type', 'threshold_fraction', 'X_res'),
+                         [('rel', 0.3, np.array([[1, 1, 0], [2, 1, 0]])),
+                          ('abs', 0.3, np.array([[2, 1, 0], [2, 1, 0]]))])
+def test_output(threshold_type, threshold_fraction, X_res):
+    rh = RelevantHoles(threshold_type=threshold_type,
+                       threshold_fraction=threshold_fraction)
 
-    # ground truth
-    X_rel_res = np.array([[1, 1, 0], [2, 1, 0]])
-
-    assert (rh_rel.fit_transform(X_rh) == X_rel_res).all()
-
-
-def test_output_for_absolute_threshold():
-    rh_abs = RelevantHoles(threshold_type='abs', threshold_fraction=0.3)
-
-    # ground truth
-    X_abs_res = np.array([[2, 1, 0], [2, 1, 0]])
-
-    assert (rh_abs.fit_transform(X_rh) == X_abs_res).all()
+    assert (rh.fit_transform(X_rh) == X_res).all()
