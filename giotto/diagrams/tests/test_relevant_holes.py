@@ -18,7 +18,7 @@ def test_throw_exception_when_not_fitted():
 
 
 def test_output_for_relative_theshold():
-    rh_rel = RelevantHoles(typ='rel', frac=0.3)
+    rh_rel = RelevantHoles(threshold_type='rel', threshold_fraction=0.3)
 
     # ground truth
     X_rel_res = np.array([[1, 1, 0], [2, 1, 0]])
@@ -27,7 +27,7 @@ def test_output_for_relative_theshold():
 
 
 def test_output_for_absolute_threshold():
-    rh_abs = RelevantHoles(typ='abs', frac=0.3)
+    rh_abs = RelevantHoles(threshold_type='abs', threshold_fraction=0.3)
 
     # ground truth
     X_abs_res = np.array([[2, 1, 0], [2, 1, 0]])
