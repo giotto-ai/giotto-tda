@@ -520,7 +520,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 class RelevantHoles(BaseEstimator, TransformerMixin):
     """
-    Given persistence diagrams consisting of birth-death-dimension triples
+    Given persistence diagrams consisting of birth-death-dimension triplets
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately. For each subdiagram, the number of relevant holes is
     found. A hole is relevant if its lifetime d - b is larger than a given
