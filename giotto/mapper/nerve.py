@@ -1,11 +1,13 @@
 import numpy as np
 import igraph as ig
 
-from functools import partial
-from itertools import product, combinations
+from itertools import combinations
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
+
+from functools import reduce
+from operator import iconcat
 
 
 class Nerve(BaseEstimator, TransformerMixin):
@@ -13,39 +15,41 @@ class Nerve(BaseEstimator, TransformerMixin):
         self.min_intersection = min_intersection
 
     def fit(self, X, y=None):
-        self.edges_ = list(self._generate_edges(X))
+        # X is a list of lists where each sublist corresponds to a filter
+        # interval. The sublists contain tuples, one for each cluster found
+        # within the interval.
+        self.X_ = reduce(iconcat, X, [])
+        # preprocesses X by 1) flattening and 2) extending each tuple
+        self.X_ = [(node_info[0], *node_info[1])
+                   for node_info in zip(range(len(self.X_)), self.X_)]
+        self.edges_ = list(self._generate_edges(self.X_))
         return self
 
     def transform(self, X, y=None):
         check_is_fitted(self, ['edges_'])
         graph = ig.Graph()
-        # TODO: improve dummy variable names in list comprehension
-        graph.add_vertices([x[:2] for V in X for x in V])
+        graph.add_vertices([vertex[0] for vertex in self.X_])
         graph.add_edges([
             (edge['node_indices'][0][0], edge['node_indices'][1][0])
             for edge in self.edges_
         ])
-        # add cluster member indices to each node
-        graph.vs['elements'] = [x[2] for V in X for x in V]
+        graph['node_metadata'] = dict(
+            zip(['node_id', 'interval_id', 'cluster_id', 'node_elements'],
+                zip(*self.X_)))
         return graph
 
     @staticmethod
-    def _unpack_product(tup):
-        return product(*tup)
-
-    @staticmethod
-    def _pairwise_intersections(min_intersection, element):
-        for tup in element:
-            data = dict()
-            tuple_1, tuple_2 = tup
-            data['node_indices'] = tuple((tuple_1[:2], tuple_2[:2]))
-            data['intersection'] = np.intersect1d(tuple_1[2], tuple_2[2])
-            if data['intersection'].size >= min_intersection:
-                yield data
+    def _pairwise_intersections(min_intersection, node_pair):
+        data = dict()
+        node_1, node_2 = node_pair
+        data['node_indices'] = tuple((node_1[0:3], node_2[0:3]))
+        data['intersection'] = np.intersect1d(node_1[3], node_2[3])
+        if data['intersection'].size >= min_intersection:
+            yield data
 
     def _generate_edges(self, nodes):
-        valid_intersections = partial(self._pairwise_intersections,
-                                      self.min_intersection)
-        for pair in map(self._unpack_product, combinations(nodes, 2)):
-            for intersection in valid_intersections(pair):
+        node_tuples = combinations(nodes, 2)
+        for pair in node_tuples:
+            for intersection in\
+             self._pairwise_intersections(self.min_intersection, pair):
                 yield intersection

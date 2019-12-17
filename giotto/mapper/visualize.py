@@ -49,13 +49,16 @@ def get_node_size(node_elements):
 
 
 def get_node_text(graph):
-    return graph.vs.get_attribute_values('name')
+    return ['Node Id: {}<br>Node size {}'.format(node_id, len(node_elements))
+            for node_id, node_elements in
+            zip(graph['node_metadata']['node_id'],
+                graph['node_metadata']['node_elements'])]
 
 
 def create_network_2d(graph, node_pos, node_color, node_scale=12,
                       custom_plot_options=None):
     # TODO: allow custom size reference
-    node_elements = graph.vs.get_attribute_values('elements')
+    node_elements = graph['node_metadata']['node_elements']
     plot_options = {
         'edge_trace_line': dict(width=0.5, color='#888'),
         'edge_trace_hoverinfo': 'none',
@@ -196,7 +199,7 @@ def create_network_2d(graph, node_pos, node_color, node_scale=12,
 
 def create_network_3d(graph, node_pos, node_color, node_scale=12,
                       custom_plot_options=None):
-    node_elements = graph.vs.get_attribute_values('elements')
+    node_elements = graph['node_metadata']['node_elements']
     plot_options = {
         'edge_trace_mode': 'lines',
         'edge_trace_line': dict(color='rgb(125,125,125)',
@@ -383,7 +386,7 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
 
     def get_figure(pipe, data, node_pos, node_color, summary_stat):
         graph = pipe.fit_transform(data)
-        node_elements = graph.vs.get_attribute_values('elements')
+        node_elements = graph['node_metadata']['node_elements']
         if node_pos is None:
             node_pos = graph.layout('kamada_kawai')
 
@@ -412,7 +415,8 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
 
             # TODO check this alternative:
             #
-            # num_params = {param: value for param, value in cluster_params.items()
+            # num_params = {param: value for param, value in
+            #               cluster_params.items()
             #               if isinstance(value, (int, float))}
             #
             # pipe.set_mapper_params(
