@@ -71,6 +71,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
                  infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
+        self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
