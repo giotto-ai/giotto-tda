@@ -2,9 +2,10 @@
 # License: Apache 2.0
 
 import numpy as np
+import numbers
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted
 from ._utils import _pad_diagram
 from ..utils.validation import validate_params
 
