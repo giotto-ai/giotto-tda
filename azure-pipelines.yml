@@ -137,6 +137,13 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
+  - bash: |
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" giotto/_version.py
+      cat giotto/_version.py
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'change name to giotto-learn-nightly'
+
   - task: Bash@3
     inputs:
       filePath: azure-ci/build_manylinux2010.sh
@@ -169,13 +176,12 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
-      cd dist
-      for f in giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
-      for f in *linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-learn -p $PYPI_PSW *.whl
-      cd ..
+      pip install twine
+      for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Rename nightly wheels and upload them to PyPI'
+    displayName: 'Upload wheels to PyPI'
+
 
 - job: 'macOS1014'
   condition: eq(variables['build_check'], 'true')
@@ -194,6 +200,15 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+
+  - bash: |
+      sed -i.bak "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      rm setup.py.bak
+      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" giotto/_version.py
+      cat giotto/_version.py
+      rm giotto/_version.py.bak
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'change name to giotto-learn-nightly'
 
   - script: |
       brew update
@@ -215,6 +230,16 @@ jobs:
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       flake8
+    condition: eq(variables['nightly_check'], 'false')
+    displayName: 'Test with pytest, nbconvert and flake8'
+    
+  - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn-nightly
+      pytest --cov giotto --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'true')
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
@@ -254,14 +279,9 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-  - bash: |
-      cd dist
-      for f in giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
-      for f in *linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-learn -p $PYPI_PSW *.whl
-      cd ..
+  - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Rename nightly wheels and upload them to PyPI'
+    displayName: 'Upload wheels to PyPI'
 
 
 - job: 'win2016'
@@ -282,6 +302,13 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
+  - bash: |
+      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" giotto/_version.py
+      cat giotto/_version.py
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'change name to giotto-learn-nightly'
+
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
 
@@ -296,6 +323,16 @@ jobs:
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
       flake8
+    condition: eq(variables['nightly_check'], 'false')
+    displayName: 'Test with pytest, nbconvert and flake8'
+    
+  - script: |
+      pip install plotly matplotlib openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-learn-nightly
+      pytest --cov giotto --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'true')
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
@@ -321,11 +358,6 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
  
-  - bash: |
-      cd dist
-      for f in giotto_learn* ; do mv "$f" "${f/giotto_learn/giotto_learn_nightly}"; done
-      for f in *linux* ; do mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-learn -p $PYPI_PSW *.whl
-      cd ..
+  - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Rename nightly wheels and upload them to PyPI'
+    displayName: 'Upload wheels to PyPI'
