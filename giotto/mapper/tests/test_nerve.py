@@ -5,17 +5,17 @@ from hypothesis.strategies import floats
 from giotto.mapper import mapper as mp
 
 
-@given(
-    X=arrays(dtype=np.float,
-             elements=floats(allow_nan=False,
-                             allow_infinity=False,
-                             min_value=-1e10,
-                             max_value=1e10),
-             shape=array_shapes(min_dims=2, max_dims=2, min_side=2),
-             unique=True)
-)
+@given(X=arrays(dtype=np.float, unique=True,
+                elements=floats(allow_nan=False,
+                                allow_infinity=False,
+                                min_value=-1e10,
+                                max_value=1e10
+                                ),
+                shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
 def test_node_intersection(X):
     # TODO: replace pipe and graph by Nerve transformer
+    # TODO: improve the Hypothesis strategy to avoid needing to hardcode the
+    # min_side to be greater than n_intervals (10 by default).
     pipe = mp.make_mapper_pipeline()
     graph = pipe.fit_transform(X)
 
