@@ -11,7 +11,8 @@ from giotto.mapper.cover import OneDimensionalCover
 @given(
     filter_values=arrays(
         dtype=np.float,
-        elements=floats(allow_nan=False, allow_infinity=False),
+        elements=floats(min_value=-1e100, allow_nan=False,
+                        allow_infinity=False),
         shape=integers(min_value=2, max_value=1e3)),
     n_intervals=integers(min_value=1, max_value=100)
 )
@@ -19,9 +20,14 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
     # TODO extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     n_samples, n_intervals = len(filter_values), cover.n_intervals
-    unique_interval_masks = cover.fit_transform(filter_values)
-    assert n_samples == unique_interval_masks.shape[0]
-    assert n_intervals >= unique_interval_masks.shape[1]
+    try:
+        unique_interval_masks = cover.fit_transform(filter_values)
+        assert n_samples == unique_interval_masks.shape[0]
+        assert n_intervals >= unique_interval_masks.shape[1]
+    except ValueError as ve:
+        assert ve.args[0] == "Only one unique filter value found, cannot " \
+                             "fit {} > 1 intervals.".format(n_intervals)
+        assert (n_intervals > 1) and (len(np.unique(filter_values)) == 1)
 
 
 @given(
@@ -79,7 +85,8 @@ def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
                         max_value=1)
 )
 def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
-    cover = OneDimensionalCover(n_intervals=n_intervals,
+    cover = OneDimensionalCover(kind='uniform',
+                                n_intervals=n_intervals,
                                 overlap_frac=overlap_frac)
     cover = cover.fit(filter_values)
 
@@ -110,15 +117,16 @@ def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
                         max_value=1)
 )
 def test_overlap_fraction(filter_values, n_intervals, overlap_frac):
-    cover = OneDimensionalCover(n_intervals=n_intervals,
+    cover = OneDimensionalCover(kind='uniform',
+                                n_intervals=n_intervals,
                                 overlap_frac=overlap_frac)
     cover.fit(filter_values)
 
-    lower_limits,\
-        upper_limits = np.array(list(map(tuple,
-                                         zip(*cover.fitted_intervals()[1:-1]))
-                                     ))
+    lower_limits = cover.left_limits_[1:-1]
+    upper_limits = cover.right_limits_[1:-1]
+    lengths = (upper_limits[:-1] - lower_limits[:-1])
 
-    assert len(set(np.round((upper_limits[:-1] - lower_limits[1:]) /
-                            (upper_limits[:-1] - lower_limits[:-1]) /
-                            overlap_frac).tolist())) == 1
+    overlap_array = (upper_limits[:-1] - lower_limits[1:]) / lengths
+    expected_overlap_array = np.array([overlap_frac] * (n_intervals - 3))
+
+    assert_almost_equal(overlap_array, expected_overlap_array)
