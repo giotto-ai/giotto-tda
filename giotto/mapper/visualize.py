@@ -69,19 +69,21 @@ def get_node_text(graph):
             graph['node_metadata']['cluster_id'])]
 
 
-def get_column_color_buttons(data, columns_to_color=None, ):
+def get_column_color_buttons(data, node_elements, columns_to_color=None):
     if columns_to_color is None:
         return None
     else:
         column_color_buttons = []
         for column_name, column_index in columns_to_color.items():
             column_values = data[:, column_index]
+            node_color = get_node_summary(node_elements, column_values)
+
             column_color_buttons.append(
                 dict(
                     args=[{
-                        'marker.color': [None, column_values],
-                        'marker.cmin': [None, np.min(column_values)],
-                        'marker.cmax': [None, np.max(column_values)]
+                        'marker.color': [None, node_color],
+                        'marker.cmin': [None, np.min(node_color)],
+                        'marker.cmax': [None, np.max(node_color)]
                     }],
                     label=column_name,
                     method='restyle'
@@ -212,7 +214,8 @@ def create_network_2d(graph, data, node_pos, node_color,
     fig.update_layout(template='simple_white', autosize=False)
 
     # Add dropdown for colorscale of nodes
-    column_color_buttons = get_column_color_buttons(data, columns_to_color)
+    column_color_buttons = get_column_color_buttons(data, node_elements,
+                                                    columns_to_color)
     colorscale_buttons = get_colorscale_buttons(get_colorscales())
 
     button_height = 1.1
@@ -371,7 +374,8 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
     fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
 
     # Add dropdown for colorscale of nodes
-    column_color_buttons = get_column_color_buttons(data, columns_to_color)
+    column_color_buttons = get_column_color_buttons(data, node_elements,
+                                                    columns_to_color)
     colorscale_buttons = get_colorscale_buttons(get_colorscales())
 
     button_height = 1.1
