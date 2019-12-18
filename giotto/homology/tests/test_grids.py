@@ -14,6 +14,7 @@ X = np.array([[[2., 2.47942554],
                [2.79848711, 2.41211849],
                [2.41211849, 1.92484888]]])
 
+
 def test_cp_not_fitted():
     cp = CubicalPersistence()
 
