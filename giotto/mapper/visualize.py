@@ -12,6 +12,7 @@ from matplotlib.colors import rgb2hex
 
 
 class OutputWidgetHandler(logging.Handler):
+    # TODO: Move to _utils.py
     """Custom logging handler sending logs to an output widget"""
 
     def __init__(self, *args, **kwargs):
@@ -43,25 +44,81 @@ class OutputWidgetHandler(logging.Handler):
         self.out.clear_output()
 
 
+def get_colorscales():
+    # TODO: move this to utils
+    return ['Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens',
+            'Greys', 'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu',
+            'Reds', 'Viridis', 'YlGnBu', 'YlOrRd']
+
+
 def get_node_size(node_elements):
     # TODO: add doc strings to all functions
     return list(map(len, node_elements))
 
 
 def get_node_text(graph):
-    return ['Node Id: {}<br>Node size {}'.format(node_id, len(node_elements))
-            for node_id, node_elements in
-            zip(graph['node_metadata']['node_id'],
-                graph['node_metadata']['node_elements'])]
+    return [
+        'Node Id:{}<br>Node size:{}<br>Pullback Id:{}<br>Cluster label:{}'
+        .format(
+            node_id, len(node_elements), interval_id, cluster_id,
+        )
+        for node_id, node_elements, interval_id, cluster_id in
+        zip(graph['node_metadata']['node_id'],
+            graph['node_metadata']['node_elements'],
+            graph['node_metadata']['interval_id'],
+            graph['node_metadata']['cluster_id'])]
 
 
-def create_network_2d(graph, node_pos, node_color, node_scale=12,
-                      custom_plot_options=None):
+def get_column_color_buttons(data, columns_to_color=None, ):
+    if columns_to_color is None:
+        return None
+    else:
+        column_color_buttons = []
+        for column_name, column_index in columns_to_color.items():
+            column_values = data[:, column_index]
+            column_color_buttons.append(
+                dict(
+                    args=[{
+                        'marker.color': [None, column_values],
+                        'marker.cmin': [None, np.min(column_values)],
+                        'marker.cmax': [None, np.max(column_values)]
+                    }],
+                    label=column_name,
+                    method='restyle'
+                )
+            )
+        return column_color_buttons
+
+
+def get_colorscale_buttons(colorscales):
+    colorscale_buttons = []
+    for colorscale in colorscales:
+        colorscale_buttons.append(
+            dict(
+                args=[{'marker.colorscale': [None, colorscale]}],
+                label=colorscale,
+                method='restyle'
+            )
+        )
+    return colorscale_buttons
+
+
+def set_node_sizeref(node_elements, node_scale=12):
+    # Formula from Plotly https://plot.ly/python/bubble-charts/
+    return 2. * max(get_node_size(node_elements)) / (node_scale ** 2)
+
+
+def get_node_summary(node_elements, data, summary_stat=np.mean):
+    return list(map(summary_stat, [data[itr] for itr in node_elements]))
+
+
+def create_network_2d(graph, data, node_pos, node_color,
+                      columns_to_color=None, plotly_kwargs=None):
     # TODO: allow custom size reference
     node_elements = graph['node_metadata']['node_elements']
     plot_options = {
         'edge_trace_line': dict(width=0.5, color='#888'),
-        'edge_trace_hoverinfo': 'none',
+        'edge_trace_hoverinfo': None,
         'edge_trace_mode': 'lines',
         'node_trace_mode': 'markers',
         'node_trace_hoverinfo': 'text',
@@ -72,8 +129,7 @@ def create_network_2d(graph, node_pos, node_color, node_scale=12,
         'node_trace_marker_color': node_color,
         'node_trace_marker_size': get_node_size(node_elements),
         'node_trace_marker_sizemode': 'area',
-        'node_trace_marker_sizeref':
-            2. * max(get_node_size(node_elements)) / (node_scale ** 2),
+        'node_trace_marker_sizeref': set_node_sizeref(node_elements),
         'node_trace_marker_sizemin': 4,
         'node_trace_marker_cmin': 0,
         'node_trace_marker_cmax': 1,
@@ -96,10 +152,8 @@ def create_network_2d(graph, node_pos, node_color, node_scale=12,
         'layout_yaxis_title': ""
     }
 
-    if custom_plot_options is None:
-        plot_options.update({})
-    else:
-        plot_options.update(custom_plot_options)
+    if plotly_kwargs is not None:
+        plot_options.update(plotly_kwargs)
 
     # TODO check we are not losing performance by using map + lambda
     edge_x = list(reduce(operator.iconcat,
@@ -127,6 +181,7 @@ def create_network_2d(graph, node_pos, node_color, node_scale=12,
         y=node_y,
         mode=plot_options['node_trace_mode'],
         hoverinfo=plot_options['node_trace_hoverinfo'],
+        hovertext=plot_options['node_trace_text'],
         marker=dict(
             showscale=plot_options['node_trace_marker_showscale'],
             colorscale=plot_options['node_trace_marker_colorscale'],
@@ -154,51 +209,57 @@ def create_network_2d(graph, node_pos, node_color, node_scale=12,
             xaxis_title=plot_options['layout_xaxis_title'],
             yaxis_title=plot_options['layout_yaxis_title'])
     )
-    fig.update_layout(template='simple_white')
+    fig.update_layout(template='simple_white', autosize=False)
 
     # Add dropdown for colorscale of nodes
-    # TODO consider fishing available colorscales from plotly and generating
-    #  all possibilities via a list comprehension
-    button_height = 1.
+    column_color_buttons = get_column_color_buttons(data, columns_to_color)
+    colorscale_buttons = get_colorscale_buttons(get_colorscales())
+
+    button_height = 1.1
     fig.update_layout(
         updatemenus=[
             go.layout.Updatemenu(
-                buttons=list([
-                    dict(
-                        args=[
-                            {"marker.colorscale": [None, 'Viridis']}],
-                        label="Viridis",
-                        method="restyle"
-                    ),
-                    dict(
-                        args=[{"marker.colorscale": [None, "Cividis"]}],
-                        label="Cividis",
-                        method="restyle"
-                    ),
-                    dict(
-                        args=[{"marker.colorscale": [None, "Blues"]}],
-                        label="Blues",
-                        method="restyle"
-                    ),
-                    dict(
-                        args=[{"marker.colorscale": [None, "Greens"]}],
-                        label="Greens",
-                        method="restyle"
-                    ),
-                ]),
+                buttons=colorscale_buttons,
                 direction="down",
                 pad={"r": 10, "t": 10},
                 showactive=True,
-                x=0,
+                x=0.12,
+                xanchor='left',
                 y=button_height,
                 yanchor="top"
-            )])
+            ),
+            go.layout.Updatemenu(
+                buttons=column_color_buttons,
+                direction="down",
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.42,
+                xanchor='left',
+                y=button_height,
+                yanchor="top"
+            ),
+        ])
+
+    fig.update_layout(
+        annotations=[
+            go.layout.Annotation(text="Colorscale:", x=0, xref="paper",
+                                 y=button_height - 0.045, yref="paper",
+                                 align="left", showarrow=False)
+        ])
+
+    if columns_to_color is not None:
+        fig.add_annotation(
+            go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
+                                 y=button_height - 0.045,
+                                 yref="paper", align="left", showarrow=False)
+
+        )
 
     return fig
 
 
-def create_network_3d(graph, node_pos, node_color, node_scale=12,
-                      custom_plot_options=None):
+def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
+                      plotly_kwargs=None):
     node_elements = graph['node_metadata']['node_elements']
     plot_options = {
         'edge_trace_mode': 'lines',
@@ -217,8 +278,7 @@ def create_network_3d(graph, node_pos, node_color, node_scale=12,
         'node_trace_marker_color': node_color,
         'node_trace_marker_size': get_node_size(node_elements),
         'node_trace_marker_sizemode': 'area',
-        'node_trace_marker_sizeref':
-            2. * max(get_node_size(node_elements)) / (node_scale ** 2),
+        'node_trace_marker_sizeref': set_node_sizeref(node_elements),
         'node_trace_marker_sizemin': 4,
         'node_trace_marker_cmin': 0,
         'node_trace_marker_cmax': 1,
@@ -235,8 +295,8 @@ def create_network_3d(graph, node_pos, node_color, node_scale=12,
                      showticklabels=False,
                      title=''),
         'layout_title': "",
-        'layout_width': 1000,
-        'layout_height': 1000,
+        'layout_width': 750,
+        'layout_height': 750,
         'layout_showlegend': False,
         'layout_margin': dict(t=100),
         'layout_hovermode': 'closest',
@@ -247,10 +307,8 @@ def create_network_3d(graph, node_pos, node_color, node_scale=12,
                                         yaxis=dict(plot_options['axis']),
                                         zaxis=dict(plot_options['axis']))
 
-    if custom_plot_options is None:
-        plot_options.update({})
-    else:
-        plot_options.update(custom_plot_options)
+    if plotly_kwargs is not None:
+        plot_options.update(plotly_kwargs)
 
     edge_x = list(reduce(operator.iconcat,
                          map(lambda x: [node_pos[x[0]][0],
@@ -310,23 +368,63 @@ def create_network_3d(graph, node_pos, node_color, node_scale=12,
         hovermode=plot_options['layout_hovermode'],
         annotations=plot_options['layout_annotations'])
 
-    data = [edge_trace, node_trace]
-    fig = go.Figure(data=data, layout=layout)
+    fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
+
+    # Add dropdown for colorscale of nodes
+    column_color_buttons = get_column_color_buttons(data, columns_to_color)
+    colorscale_buttons = get_colorscale_buttons(get_colorscales())
+
+    button_height = 1.1
+    fig.update_layout(
+        updatemenus=[
+            go.layout.Updatemenu(
+                buttons=colorscale_buttons,
+                direction="down",
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.12,
+                xanchor='left',
+                y=button_height,
+                yanchor="top"
+            ),
+            go.layout.Updatemenu(
+                buttons=column_color_buttons,
+                direction="down",
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.42,
+                xanchor='left',
+                y=button_height,
+                yanchor="top"
+            ),
+        ])
+
+    fig.update_layout(
+        annotations=[
+            go.layout.Annotation(text="Colorscale:", x=0, xref="paper",
+                                 y=button_height - 0.03, yref="paper",
+                                 align="left", showarrow=False)
+        ],
+        autosize=False
+    )
+
+    if columns_to_color is not None:
+        fig.add_annotation(
+            go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
+                                 y=button_height - 0.03,
+                                 yref="paper", align="left", showarrow=False)
+        )
 
     return fig
 
 
-def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
-                               node_color=None, summary_stat=np.mean, dim=2):
+def create_interactive_network(pipe, data, node_pos=None, node_color=None,
+                               columns_to_color=None, plotly_kwargs=None,
+                               summary_stat=np.mean, dim=2):
     # TODO could abstract away common patterns in get_cover_params_widgets and
     #  get_cluster_params_widgets
 
     # TODO allow dimension to be passed as either 2 or 3 as an arg or kwarg
-
-    def get_node_summary(node_elements, data, summary_stat=np.mean):
-        return list(map(lambda x: summary_stat(data[x]),
-                        node_elements))
-
     def get_cover_params_widgets(param, value):
         if isinstance(value, float):
             return (param, widgets.FloatSlider(
@@ -384,7 +482,8 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
         old_figure.data[1].marker.color = new_figure.data[1].marker.color
         old_figure.data[1].marker.sizeref = new_figure.data[1].marker.sizeref
 
-    def get_figure(pipe, data, node_pos, node_color, summary_stat):
+    def get_figure(pipe, data, node_pos, node_color, columns_to_color,
+                   summary_stat):
         graph = pipe.fit_transform(data)
         node_elements = graph['node_metadata']['node_elements']
         if node_pos is None:
@@ -394,7 +493,8 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
             node_color = get_node_summary(node_elements, data,
                                           summary_stat=summary_stat)
 
-        return create_network_2d(graph, node_pos, node_color, **plotly_kwargs)
+        return create_network_2d(graph, data, node_pos, node_color,
+                                 columns_to_color, plotly_kwargs)
 
     def response_numeric(change):
         # TODO: remove hardcoding of keys and mimic what is done with clusterer
@@ -425,7 +525,7 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
             # )
 
             new_fig = get_figure(pipe, data, node_pos,
-                                 node_color, summary_stat)
+                                 node_color, columns_to_color, summary_stat)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
@@ -446,7 +546,7 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
                     )
 
             new_fig = get_figure(pipe, data, node_pos,
-                                 node_color, summary_stat)
+                                 node_color, columns_to_color, summary_stat)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
@@ -515,7 +615,8 @@ def create_interactive_network(pipe, data, plotly_kwargs=None, node_pos=None,
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
-    fig = get_figure(pipe, data, node_pos, node_color, summary_stat)
+    fig = get_figure(pipe, data, node_pos, node_color,
+                     columns_to_color, summary_stat)
 
     observe_numeric_widgets(cover_params, cover_params_widgets)
     observe_numeric_widgets(cluster_params, cluster_params_widgets)
