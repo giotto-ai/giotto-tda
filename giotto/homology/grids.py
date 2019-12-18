@@ -80,6 +80,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             top_dimensional_cells=X.flatten(order="F"))
         Xds = cubical_complex.persistence(homology_coeff_field=self.coeff,
                                           min_persistence=0)
+        Xds = {dim: np.array([Xds[i][1] for i in range(len(Xds))
+                              if Xds[i][0] == dim]).reshape((-1, 2))
+               for dim in self.homology_dimensions}
         Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
                                                        dtype=Xds[dim].dtype)])
                for dim in self._homology_dimensions}
