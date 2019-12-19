@@ -6,7 +6,7 @@ from numpy.testing import assert_almost_equal
 from scipy.spatial.distance import pdist, squareform
 
 from giotto.mapper import Eccentricity, Entropy, Projection
-from giotto.mapper.filter import method_to_transform
+from giotto.mapper.utils.decorators import method_to_transform
 
 from sklearn.neighbors import KernelDensity
 

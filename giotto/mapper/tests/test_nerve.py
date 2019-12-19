@@ -2,7 +2,7 @@ import numpy as np
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats
-from giotto.mapper import mapper as mp
+from giotto.mapper.pipeline import make_mapper_pipeline
 
 
 @given(X=arrays(dtype=np.float, unique=True,
@@ -16,7 +16,7 @@ def test_node_intersection(X):
     # TODO: replace pipe and graph by Nerve transformer
     # TODO: improve the Hypothesis strategy to avoid needing to hardcode the
     # min_side to be greater than n_intervals (10 by default).
-    pipe = mp.make_mapper_pipeline()
+    pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X)
 
     # Check if the elements of nodes defining an edge are disjoint or not:

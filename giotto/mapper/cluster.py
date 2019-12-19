@@ -1,16 +1,14 @@
-from functools import partial
 from inspect import signature
 
 import numpy as np
-
 from joblib import Parallel, delayed
-
 from sklearn.base import BaseEstimator, ClusterMixin, TransformerMixin, clone
+from sklearn.cluster import DBSCAN
+from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted, check_memory
 
-from sklearn.cluster import DBSCAN
-from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
+from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 
 
 class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
@@ -145,6 +143,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     produced by a linkage algorithm.
 
     """
+
     def __init__(self, relative_gap_size=0.3, affinity='euclidean',
                  memory=None, linkage='single'):
         self.relative_gap_size = relative_gap_size
@@ -192,6 +191,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     produced by a linkage algorithm.
 
     """
+
     def __init__(self, freq_threshold=0, n_bins_start=5, affinity='euclidean',
                  memory=None, linkage='single'):
         self.freq_threshold = freq_threshold
@@ -233,45 +233,3 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         self.labels_ = _hc_cut(self.n_clusters_, self.children_,
                                self.n_leaves_)
         return self
-
-
-def _num_clusters_simple(distances, min_gap_size):
-    # Differences between subsequent elements (padding by the first
-    # distance)
-    diff = np.ediff1d(distances, to_begin=distances[0])
-    gap_indices = np.flatnonzero(diff >= min_gap_size)
-    if gap_indices.size:
-        num_clust = distances.size + 1 - gap_indices[0]
-        return num_clust
-    # No big enough gaps -> one cluster
-    return 1
-
-
-def _num_clusters_histogram(distances, freq_threshold, n_bins_start):
-    if distances.size == 1:
-        return 1
-
-    if not freq_threshold:
-        threshold_func = _zero_bins
-    else:
-        threshold_func = partial(_bins_below_threshold, freq_threshold)
-    zero_bins = False
-    i = 0
-    while not zero_bins:
-        hist, edges = np.histogram(distances, bins=n_bins_start + i)
-        zero_bins_indices = threshold_func(hist)
-        zero_bins = zero_bins_indices.size
-        i += 1
-    first_gap = zero_bins_indices[0]
-    left_bin_edge_first_gap = edges[first_gap]
-    gap_idx = (distances <= left_bin_edge_first_gap).sum()
-    num_clust = distances.size + 1 - gap_idx
-    return num_clust
-
-
-def _zero_bins(hist):
-    return np.flatnonzero(~hist.astype(bool))
-
-
-def _bins_below_threshold(freq_threshold, hist):
-    return np.flatnonzero(hist < freq_threshold)

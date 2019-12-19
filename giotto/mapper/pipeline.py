@@ -1,13 +1,13 @@
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
-from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
 
-from ._utils import ListFeatureUnion, func_from_callable_on_rows, identity
-from .cover import CubicalCover
 from .cluster import ParallelClustering
+from .cover import CubicalCover
 from .nerve import Nerve
-
+from .utils._list_feature_union import ListFeatureUnion
+from .utils.pipeline import func_from_callable_on_rows, identity
 
 global_pipeline_params = ('memory', 'verbose')
 nodes_params = ('scaler', 'filter_func', 'cover')

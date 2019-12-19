@@ -1,13 +1,11 @@
-import numpy as np
-import igraph as ig
-
+from functools import reduce
 from itertools import combinations
+from operator import iconcat
 
+import igraph as ig
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
-
-from functools import reduce
-from operator import iconcat
 
 
 class Nerve(BaseEstimator, TransformerMixin):

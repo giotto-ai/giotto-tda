@@ -4,29 +4,13 @@ from itertools import product
 import numpy as np
 from scipy.stats import rankdata
 from sklearn.base import BaseEstimator, TransformerMixin, clone
-from sklearn.exceptions import NotFittedError, DataDimensionalityWarning
+from sklearn.exceptions import DataDimensionalityWarning, NotFittedError
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-
-def _validate_kind(kind):
-    if kind not in ['uniform', 'balanced']:
-        raise ValueError("'kind' must be one of 'uniform' or 'balanced'")
-
-
-def _check_has_one_column(X):
-    if X.shape[1] > 1:
-        raise ValueError("X cannot have more than one column.")
-
-
-def _remove_empty_and_duplicate_intervals(X_masks):
-    # Remove any mask which contains only False
-    X_masks = X_masks[:, np.any(X_masks, axis=0)]
-    # Avoid repeating the same boolean masks (columns)
-    X_masks_unique, indices = np.unique(X_masks, axis=1, return_index=True)
-    # Respect the original relative column ordering
-    X_masks_unique = X_masks_unique[:, np.argsort(indices)]
-    return X_masks_unique
+from .utils._cover import (_check_has_one_column,
+                           _remove_empty_and_duplicate_intervals,
+                           _validate_kind)
 
 
 class OneDimensionalCover(BaseEstimator, TransformerMixin):
@@ -92,6 +76,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
     CubicalCover
 
     """
+
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals

@@ -10,108 +10,11 @@ from ipywidgets import Layout, widgets
 from matplotlib.cm import get_cmap
 from matplotlib.colors import rgb2hex
 
-
-class OutputWidgetHandler(logging.Handler):
-    # TODO: Move to _utils.py
-    """Custom logging handler sending logs to an output widget"""
-
-    def __init__(self, *args, **kwargs):
-        super(OutputWidgetHandler, self).__init__(*args, **kwargs)
-        layout = {
-            'width': '100%',
-            'height': '160px',
-            'border': '1px solid black',
-            'overflow_y': 'auto'
-        }
-        self.out = widgets.Output(layout=layout)
-
-    def emit(self, record):
-        """Overload of logging.Handler method"""
-        formatted_record = self.format(record)
-        new_output = {
-            'name': 'stdout',
-            'output_type': 'stream',
-            'text': formatted_record+'\n'
-        }
-        self.out.outputs = (new_output, ) + self.out.outputs
-
-    def show_logs(self):
-        """Show the logs"""
-        display(self.out)
-
-    def clear_logs(self):
-        """Clear the current logs"""
-        self.out.clear_output()
-
-
-def get_colorscales():
-    # TODO: move this to utils
-    return ['Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens',
-            'Greys', 'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu',
-            'Reds', 'Viridis', 'YlGnBu', 'YlOrRd']
-
-
-def get_node_size(node_elements):
-    # TODO: add doc strings to all functions
-    return list(map(len, node_elements))
-
-
-def get_node_text(graph):
-    return [
-        'Node Id:{}<br>Node size:{}<br>Pullback Id:{}<br>Cluster label:{}'
-        .format(
-            node_id, len(node_elements), interval_id, cluster_id,
-        )
-        for node_id, node_elements, interval_id, cluster_id in
-        zip(graph['node_metadata']['node_id'],
-            graph['node_metadata']['node_elements'],
-            graph['node_metadata']['interval_id'],
-            graph['node_metadata']['cluster_id'])]
-
-
-def get_column_color_buttons(data, node_elements, columns_to_color=None):
-    if columns_to_color is None:
-        return None
-    else:
-        column_color_buttons = []
-        for column_name, column_index in columns_to_color.items():
-            column_values = data[:, column_index]
-            node_color = get_node_summary(node_elements, column_values)
-
-            column_color_buttons.append(
-                dict(
-                    args=[{
-                        'marker.color': [None, node_color],
-                        'marker.cmin': [None, np.min(node_color)],
-                        'marker.cmax': [None, np.max(node_color)]
-                    }],
-                    label=column_name,
-                    method='restyle'
-                )
-            )
-        return column_color_buttons
-
-
-def get_colorscale_buttons(colorscales):
-    colorscale_buttons = []
-    for colorscale in colorscales:
-        colorscale_buttons.append(
-            dict(
-                args=[{'marker.colorscale': [None, colorscale]}],
-                label=colorscale,
-                method='restyle'
-            )
-        )
-    return colorscale_buttons
-
-
-def set_node_sizeref(node_elements, node_scale=12):
-    # Formula from Plotly https://plot.ly/python/bubble-charts/
-    return 2. * max(get_node_size(node_elements)) / (node_scale ** 2)
-
-
-def get_node_summary(node_elements, data, summary_stat=np.mean):
-    return list(map(summary_stat, [data[itr] for itr in node_elements]))
+from .utils._logging import OutputWidgetHandler
+from .utils.visualization import (_get_colorscale_buttons, _get_colorscales,
+                                  _get_column_color_buttons, _get_node_size,
+                                  get_node_summary, _get_node_text,
+                                  set_node_sizeref)
 
 
 def create_network_2d(graph, data, node_pos, node_color,
@@ -129,7 +32,7 @@ def create_network_2d(graph, data, node_pos, node_color,
         'node_trace_marker_reversescale': False,
         'node_trace_marker_line': dict(width=.5, color='#888'),
         'node_trace_marker_color': node_color,
-        'node_trace_marker_size': get_node_size(node_elements),
+        'node_trace_marker_size': _get_node_size(node_elements),
         'node_trace_marker_sizemode': 'area',
         'node_trace_marker_sizeref': set_node_sizeref(node_elements),
         'node_trace_marker_sizemin': 4,
@@ -140,7 +43,7 @@ def create_network_2d(graph, data, node_pos, node_color,
                                            xanchor='left',
                                            titleside='right'),
         'node_trace_marker_line_width': 2,
-        'node_trace_text': get_node_text(graph),
+        'node_trace_text': _get_node_text(graph),
         'layout_showlegend': False,
         'layout_hovermode': 'closest',
         'layout_margin': {'b': 20, 'l': 5, 'r': 5, 't': 40},
@@ -214,9 +117,9 @@ def create_network_2d(graph, data, node_pos, node_color,
     fig.update_layout(template='simple_white', autosize=False)
 
     # Add dropdown for colorscale of nodes
-    column_color_buttons = get_column_color_buttons(data, node_elements,
-                                                    columns_to_color)
-    colorscale_buttons = get_colorscale_buttons(get_colorscales())
+    column_color_buttons = _get_column_color_buttons(data, node_elements,
+                                                     columns_to_color)
+    colorscale_buttons = _get_colorscale_buttons(_get_colorscales())
 
     button_height = 1.1
     fig.update_layout(
@@ -279,7 +182,7 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
         'node_trace_marker_reversescale': False,
         'node_trace_marker_line': dict(width=.5, color='#888'),
         'node_trace_marker_color': node_color,
-        'node_trace_marker_size': get_node_size(node_elements),
+        'node_trace_marker_size': _get_node_size(node_elements),
         'node_trace_marker_sizemode': 'area',
         'node_trace_marker_sizeref': set_node_sizeref(node_elements),
         'node_trace_marker_sizemin': 4,
@@ -290,7 +193,7 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
                                            xanchor='left',
                                            titleside='right'),
         'node_trace_marker_line_width': 2,
-        'node_trace_text': get_node_text(graph),
+        'node_trace_text': _get_node_text(graph),
         'axis': dict(showbackground=False,
                      showline=False,
                      zeroline=False,
@@ -374,9 +277,9 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
     fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
 
     # Add dropdown for colorscale of nodes
-    column_color_buttons = get_column_color_buttons(data, node_elements,
-                                                    columns_to_color)
-    colorscale_buttons = get_colorscale_buttons(get_colorscales())
+    column_color_buttons = _get_column_color_buttons(data, node_elements,
+                                                     columns_to_color)
+    colorscale_buttons = _get_colorscale_buttons(_get_colorscales())
 
     button_height = 1.1
     fig.update_layout(

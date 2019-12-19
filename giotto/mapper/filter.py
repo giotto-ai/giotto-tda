@@ -1,10 +1,10 @@
 import warnings
+
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from scipy.special import entr
-
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 
 class Eccentricity(BaseEstimator, TransformerMixin):
@@ -188,18 +188,3 @@ class Projection(BaseEstimator, TransformerMixin):
         """
         Xt = X[:, self.column_indices].reshape(X.shape[0], -1)
         return Xt
-
-
-def method_to_transform(wrapped, method_name):
-    """TODO: add documentation to this decorator
-    """
-    def wrapper(wrapped):
-        class ExtendedEstimator(wrapped, TransformerMixin):
-            def transform(self, X, y=None):
-                has_transform = hasattr(wrapped, 'transform')
-                has_method = hasattr(self, method_name)
-                if (not has_transform) and has_method:
-                    return getattr(self, method_name)(X)
-        ExtendedEstimator.__name__ = 'Extended' + wrapped.__name__
-        return ExtendedEstimator
-    return wrapper(wrapped)
