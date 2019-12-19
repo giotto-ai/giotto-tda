@@ -5,4 +5,4 @@ joblib >= 0.11
 networkx >= 2.4
 python-igraph >= 0.7.1
 plotly >= 4.3.0
-matplotlib >= 3.1.2
+matplotlib >= 3.1
