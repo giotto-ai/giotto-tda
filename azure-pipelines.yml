@@ -101,9 +101,9 @@ jobs:
       pip install wheel twine
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       choco install -y wget
-      wget https://www.lfd.uci.edu/~gohlke/pythonlibs/%23pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
+      wget -O pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl "https://www.lfd.uci.edu/~gohlke/pythonlibs/%23pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl"
       pip install pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
-      wget https://www.lfd.uci.edu/~gohlke/pythonlibs/%23python-igraph/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
+      wget -O python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl "https://www.lfd.uci.edu/~gohlke/pythonlibs/%23python-igraph/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl"
       pip install python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
     displayName: 'Install tools'
 
