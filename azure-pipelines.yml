@@ -28,7 +28,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib openml python-igraph
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8
@@ -68,7 +68,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib openml python-igraph
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8
@@ -82,10 +82,13 @@ jobs:
   strategy:
     matrix:
       Python35:
+        python_ver: '35'
         python.version: '3.5'
       Python36:
+        python_ver: '36'
         python.version: '3.6'
       Python37:
+        python_ver: '37'
         python.version: '3.7'
 
   steps:
@@ -96,6 +99,8 @@ jobs:
   - script: |
       python -m pip install --upgrade pip setuptools
       pip install wheel twine
+      pip install pycairo
+      pip install https://www.lfd.uci.edu/~gohlke/pythonlibs/#python-igraph/python_igraph‑0.7.1.post6‑cp$(python_ver)‑cp$(python_ver)m‑win_amd64.whl
     displayName: 'Install tools'
 
   - script: pip install -e ".[tests, doc]"
