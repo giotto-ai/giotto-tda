@@ -99,10 +99,7 @@ jobs:
   - script: |
       python -m pip install --upgrade pip setuptools
       pip install wheel twine
-      @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile
-      -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object
-      System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-      && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+      Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       choco install -y wget
       wget https://www.lfd.uci.edu/~gohlke/pythonlibs/%23pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       pip install pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
