@@ -2,5 +2,6 @@ numpy >= 1.17.0
 scipy >= 0.17.0
 scikit-learn >= 0.22
 joblib >= 0.11
+networkx >= 2.4
 python-igraph >= 0.7.1
 plotly >= 4.3.0

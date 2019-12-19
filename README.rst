@@ -26,6 +26,14 @@ scikit-learn and is distributed under the Apache 2.0 license. It is part of the 
 Website: https://giotto.ai
 
 
+Project genesis
+---------------
+
+giotto-learn is the result of a collaborative effort between `L2F SA
+<https://www.l2f.ch/>`_, the `Laboratory for Topology and Neuroscience
+<https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
+<https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
+
 Installation
 ------------
 
@@ -36,7 +44,7 @@ giotto-learn requires:
 
 - Python (>= 3.5)
 - scikit-learn (>= 0.21.3)
-- NumPy (>= 1.11.0)
+- NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
 - joblib (>= 0.11)
 
