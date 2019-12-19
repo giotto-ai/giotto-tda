@@ -87,6 +87,10 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
     :math:`b_k`) is the value of any entry in `X` ranked as the floor (
     resp. ceiling) of :math:`\\alpha_k` (resp. :math:`\\beta_k`).
 
+    See also
+    --------
+    CubicalCover
+
     """
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
@@ -148,7 +152,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         """Compute a cover of `X` according to the cover of the real line
         computed in :meth:`fit`, and return it as a two-dimensional boolean
-        array whose each column indicates the location of entries in `X`
+        array. Each column indicates the location of entries in `X`
         belonging to a common cover interval.
 
         Parameters
@@ -162,8 +166,10 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_intervals)
-            An encoding of the resulting cover of `X` as a boolean array.
+        Xt : ndarray, shape (n_samples, n_cover_sets)
+            Encoding of the cover of `X` as a boolean array. In general,
+            ``n_cover_sets`` is less than or equal to `n_intervals` as empty
+            or duplicated cover sets are removed.
 
         """
         check_is_fitted(self)
@@ -222,8 +228,10 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_intervals)
-            An encoding of the resulting cover of `X` as a boolean array.
+        Xt : ndarray, shape (n_samples, n_cover_sets)
+            Encoding of the cover of `X` as a boolean array. In general,
+            ``n_cover_sets`` is less than or equal to `n_intervals` as empty
+            or duplicated cover sets are removed.
 
         """
         _validate_kind(self.kind)
@@ -324,11 +332,42 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
 
 class CubicalCover(BaseEstimator, TransformerMixin):
-    """Calculates the cover of an n-dimensional hypercube by taking products
-    of intervals of the covers of [min_n, max_n] for each of the n lenses.
+    """Covers of multi-dimensional data coming from overlapping hypercubes
+    (technically, parallelopipeds) given by taking products of one-dimensional
+    intervals.
+
+    In :meth:`fit`, :class:`OneDimensionalCover` objects are fitted
+    independently on each column of the input array, according to the same
+    parameters passed to the constructor. For example, if the
+    :class:`CubicalCover` object is instantiated with ``kind='uniform'``,
+    ``n_intervals=10`` and ``overlap_frac=0.1``, then each column of the
+    input array is used to construct a cover of the real line by 10
+    equal-length intervals with fractional overlap of 0.1. Each element of the
+    resulting multi-dimensional cover of Euclidean space is of the form
+    :math:`I_{i, \\ldots, k} = I^{(0)}_i \\times \\cdots \\times
+    I^{(d-1)}_k` where :math:`d` is the number of columns in the input
+    array, and :math:`I^{(l)}_j` is the :math:`j`th cover interval
+    constructed for feature dimension :math:`l`. In :meth:`transform`,
+    the cover is applied to a new array `X'` to yield a cover of `X'`.
+
+    Parameters
+    ----------
+    kind : str, optional, default: ``'uniform'``
+        The kind of cover to use.
+
+    n_intervals : int, optional, default: ``10``
+        The number of intervals in the covers of each feature dimension
+        calculated in :meth:`fit`.
+
+    overlap_frac : float, optional, default: ``0.1``
+        The fractional overlap between consecutive intervals in the covers of
+        each feature dimension calculated in :meth:`fit`.
+
+    See also
+    --------
+    OneDimensionalCover
 
     """
-
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
@@ -363,6 +402,27 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         return self
 
     def fit(self, X, y=None):
+        """Compute all open cover parallelopipeds according to `X`,
+        as products of one-dimensional intervals covering each feature
+        dimension separately. Then, return the estimator.
+
+        This method is there to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
         _validate_kind(self.kind)
         X = check_array(X)
 
@@ -377,6 +437,28 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         return Xt
 
     def transform(self, X, y=None):
+        """Compute a cover of `X` according to the cover of Euclidean space
+        computed in :meth:`fit`, and return it as a two-dimensional boolean
+        array whose each column indicates the location of entries in `X`
+        belonging to a common cover interval.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray, shape (n_samples, n_cover_sets)
+            Encoding of the cover of `X` as a boolean array. In general,
+            ``n_cover_sets`` is less than or equal to n_intervals *
+            n_features` as empty or duplicated cover sets are removed.
+
+        """
         check_is_fitted(self)
         X = check_array(X)
         n_features_fit = self._n_features_fit
@@ -395,6 +477,25 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         return Xt
 
     def fit_transform(self, X, y=None, **fit_params):
+        """Fit to the data, then transform it.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray, shape (n_samples, n_cover_sets)
+            Encoding of the cover of `X` as a boolean array. In general,
+            ``n_cover_sets`` is less than or equal to `n_intervals *
+            n_features` as empty or duplicated cover sets are removed.
+
+        """
         _validate_kind(self.kind)
         X = check_array(X)
 
