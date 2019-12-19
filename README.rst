@@ -81,6 +81,13 @@ C++ dependencies:
 -  CMake >= 3.9
 -  Boost >= 1.56
 
+The CMake and Boost dependencies can be installed in using Anaconda as follows:
+
+.. code-block:: bash
+
+    conda install -c anaconda cmake
+    conda install -c anaconda boost
+
 Source code
 '''''''''''
 
