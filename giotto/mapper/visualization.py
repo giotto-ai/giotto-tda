@@ -19,6 +19,37 @@ from .utils.visualization import (_get_colorscale_buttons, _get_colorscales,
 
 def create_network_2d(graph, data, node_pos, node_color,
                       columns_to_color=None, plotly_kwargs=None):
+    """
+    Parameters
+    ----------
+    graph : igraph.Graph
+        The nerve of the refined pullback cover. Nodes correspond to cluster
+        sets, and an edge exists between two nodes if they share at least one
+        point in common.
+
+    data : ndarray, shape (n_samples, n_features)
+        The point cloud data used to generate the nerve.
+
+    node_pos : igraph.Graph.layout or ndarray, shape (n_nodes, n_dims)
+        Encodes the layout of the graph according to a layout algorithm or
+        pre-defined array of coordinates in an n-dimensional space.
+
+    node_color : ndarray, shape (n_nodes,)
+        The numerical values to color each node of the graph by.
+
+    columns_to_color : dict, optional, default: ``None``
+        Key-value pairs (column_name, column_index) to specify which columns of
+        :attr:`data` to color the graph by. Generates a dropdown widget to
+        select the columns to color by.
+
+    plotly_kwargs : dict, optional, default: ``None``
+        Keyword arguments to configure the Plotly Figure.
+
+    Returns
+    -------
+    fig : ploty.graph_objs.Figure
+        The figure representing the nerve (topological graph).
+    """
     # TODO: allow custom size reference
     node_elements = graph['node_metadata']['node_elements']
     plot_options = {
@@ -166,6 +197,37 @@ def create_network_2d(graph, data, node_pos, node_color,
 
 def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
                       plotly_kwargs=None):
+    """
+    Parameters
+    ----------
+    graph : igraph.Graph
+        The nerve of the refined pullback cover. Nodes correspond to cluster
+        sets, and an edge exists between two nodes if they share at least one
+        point in common.
+
+    data : ndarray, shape (n_samples, n_features)
+        The point cloud data used to generate the nerve.
+
+    node_pos : igraph.Graph.layout or ndarray, shape (n_nodes, n_dims)
+        Encodes the layout of the graph according to a layout algorithm or
+        pre-defined array of coordinates in an n-dimensional space.
+
+    node_color : ndarray, shape (n_nodes,)
+        The numerical values to color each node of the graph by.
+
+    columns_to_color : dict, optional, default: ``None``
+        Key-value pairs (column_name, column_index) to specify which columns of
+        :attr:`data` to color the graph by. Generates a dropdown widget to
+        select the columns to color by.
+
+    plotly_kwargs : dict, optional, default: ``None``
+        Keyword arguments to configure the Plotly Figure.
+
+    Returns
+    -------
+    fig : ploty.graph_objs.Figure
+        The figure representing the nerve (topological graph).
+    """
     node_elements = graph['node_metadata']['node_elements']
     plot_options = {
         'edge_trace_mode': 'lines',
@@ -327,7 +389,37 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
 
 def create_interactive_network(pipe, data, node_pos=None, node_color=None,
                                columns_to_color=None, plotly_kwargs=None,
-                               summary_stat=np.mean, dim=2):
+                               summary_stat=np.mean):
+    """
+    Parameters
+    ----------
+    pipe : MapperPipeline
+        The nerve of the refined pullback cover. Nodes correspond to cluster
+        sets, and an edge exists between two nodes if they share at least one
+        point in common.
+
+    data : ndarray, shape (n_samples, n_features)
+        The point cloud data used to generate the nerve.
+
+    node_pos : igraph.Graph.layout or ndarray, shape (n_nodes, n_dims)
+        Encodes the layout of the graph according to a layout algorithm or
+        pre-defined array of coordinates in an n-dimensional space.
+
+    node_color : ndarray, shape (n_nodes,)
+        The numerical values to color each node of the graph by.
+
+    columns_to_color : dict, optional, default: ``None``
+        Key-value pairs (column_name, column_index) to specify which columns of
+        :attr:`data` to color the graph by. Generates a dropdown widget to
+        select the columns to color by.
+
+    plotly_kwargs : dict, optional, default: ``None``
+        Keyword arguments to configure the Plotly Figure.
+
+    summary_stat : callable, default ``np.mean``
+        Summary statistic to apply to the elements in each node of the 
+        topological graph.
+    """
     # TODO could abstract away common patterns in get_cover_params_widgets and
     #  get_cluster_params_widgets
 
