@@ -99,8 +99,8 @@ jobs:
   - script: |
       python -m pip install --upgrade pip setuptools
       pip install wheel twine
-      pip install https://www.lfd.uci.edu/~gohlke/pythonlibs/%23pycairo/pycairo‑1.18.2‑cp$(python_ver)‑cp$(python_ver)m‑win_amd64.whl
-      pip install https://www.lfd.uci.edu/~gohlke/pythonlibs/%23python-igraph/python_igraph‑0.7.1.post6‑cp$(python_ver)‑cp$(python_ver)m‑win_amd64.whl
+      pip install https://www.lfd.uci.edu/~gohlke/pythonlibs/%23pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
+      pip install https://www.lfd.uci.edu/~gohlke/pythonlibs/%23python-igraph/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
     displayName: 'Install tools'
 
   - script: pip install -e ".[tests, doc]"
