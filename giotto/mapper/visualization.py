@@ -336,8 +336,8 @@ def create_interactive_network(pipe, data, node_pos=None, node_color=None,
         if isinstance(value, float):
             return (param, widgets.FloatSlider(
                 value=value,
-                step=0.1,
-                min=0.1,
+                step=0.05,
+                min=0.05,
                 max=1.0,
                 description=param.split('__')[1],
                 disabled=False
@@ -346,7 +346,7 @@ def create_interactive_network(pipe, data, node_pos=None, node_color=None,
             return (param, widgets.IntSlider(
                 value=value,
                 min=1,
-                max=50,
+                max=100,
                 step=1,
                 description=param.split('__')[1],
                 disabled=False
