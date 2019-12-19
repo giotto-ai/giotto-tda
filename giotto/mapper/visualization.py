@@ -417,7 +417,7 @@ def create_interactive_network(pipe, data, node_pos=None, node_color=None,
         Keyword arguments to configure the Plotly Figure.
 
     summary_stat : callable, default ``np.mean``
-        Summary statistic to apply to the elements in each node of the 
+        Summary statistic to apply to the elements in each node of the
         topological graph.
     """
     # TODO could abstract away common patterns in get_cover_params_widgets and
