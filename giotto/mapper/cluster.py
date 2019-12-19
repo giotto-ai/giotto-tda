@@ -242,8 +242,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         By default, no caching is done. If a string is given, it is the
         path to the caching directory.
 
-
-    linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``,
+    linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``, \
         optional, default: ``'single'``)
         Which linkage criterion to use. The linkage criterion determines which
         distance to use between sets of observation. The algorithm will merge
@@ -278,6 +277,10 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     distances_ : ndarray, shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
+
+    See also
+    --------
+    FirstHistogramGap
 
     """
     def __init__(self, relative_gap_size=0.3, affinity='euclidean',
@@ -359,8 +362,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         By default, no caching is done. If a string is given, it is the
         path to the caching directory.
 
-
-    linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``,
+    linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``, \
         optional, default: ``'single'``)
         Which linkage criterion to use. The linkage criterion determines which
         distance to use between sets of observation. The algorithm will merge
@@ -395,6 +397,10 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     distances_ : ndarray, shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
+
+    See also
+    --------
+    FirstSimpleGap
 
     """
     def __init__(self, freq_threshold=0, n_bins_start=5, affinity='euclidean',
