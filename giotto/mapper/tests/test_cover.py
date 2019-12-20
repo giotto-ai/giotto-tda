@@ -113,8 +113,8 @@ def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
     n_intervals=integers(min_value=4, max_value=50),
     overlap_frac=floats(allow_nan=False,
                         allow_infinity=False,
-                        min_value=0,
-                        max_value=1)
+                        min_value=0.01,
+                        max_value=1.)
 )
 def test_overlap_fraction(filter_values, n_intervals, overlap_frac):
     cover = OneDimensionalCover(kind='uniform',
