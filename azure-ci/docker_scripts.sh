@@ -26,6 +26,7 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # installing and uninstalling giotto-learn
 cd /io
+pip install python-igraph
 pip install -e ".[doc, tests]"
 pip uninstall -y giotto-learn
 
