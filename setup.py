@@ -54,7 +54,8 @@ EXTRAS_REQUIRE = {
         'pytest-azurepipelines',
         'pytest-benchmark',
         'jupyter_contrib_nbextensions',
-        'flake8'],
+        'flake8',
+        'hypothesis'],
     'doc': [
         'sphinx',
         'sphinx-gallery',
@@ -119,7 +120,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call(cmake_cmd1, cwd=dir_build)
         try:
             subprocess.check_call(cmake_cmd2, cwd=dir_build)
-        except: # noqa
+        except:  # noqa
             subprocess.check_call(cmake_cmd2_sudo, cwd=dir_build)
         os.chdir(dir_start)
 

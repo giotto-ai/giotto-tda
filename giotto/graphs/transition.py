@@ -187,7 +187,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_func', 'effective_func_params_'])
+        check_is_fitted(self)
         Xt = check_array(X, copy=True, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(

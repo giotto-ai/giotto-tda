@@ -77,7 +77,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         Xt = X.copy()
@@ -239,8 +239,7 @@ class Scaler(BaseEstimator, TransformerMixin):
             Rescaled diagrams.
 
         """
-        check_is_fitted(self, ['scale_', 'homology_dimensions_',
-                               'effective_metric_params_'])
+        check_is_fitted(self)
 
         Xs = check_diagram(X)
         Xs[:, :, :2] /= self.scale_
@@ -261,7 +260,7 @@ class Scaler(BaseEstimator, TransformerMixin):
             Rescaled diagrams.
 
         """
-        check_is_fitted(self, ['effective_metric_params_'])
+        check_is_fitted(self)
 
         Xs = check_diagram(X)
         Xs[:, :, :2] *= self.scale_
@@ -372,7 +371,7 @@ class Filtering(BaseEstimator, TransformerMixin):
         """
 
         # Check if fit had been called
-        check_is_fitted(self, ['homology_dimensions_'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         X = _sort(X)

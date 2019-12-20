@@ -94,7 +94,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self)
         check_array(X, allow_nd=True)
 
         Xt = np.empty((X.shape[0], X.shape[2], X.shape[2]))

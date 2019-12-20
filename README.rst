@@ -47,8 +47,11 @@ giotto-learn requires:
 - NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
 - joblib (>= 0.11)
+- python-igraph (>= 0.7.1.post6)
+- plotly (>= 4.4.1)
+- matplotlib (>= 3.1.2)
 
-For running the examples jupyter, matplotlib and plotly are required.
+To run the examples, jupyter is required.
 
 User installation
 ~~~~~~~~~~~~~~~~~
@@ -80,6 +83,13 @@ C++ dependencies:
 -  C++14 compatible compiler
 -  CMake >= 3.9
 -  Boost >= 1.56
+
+The CMake and Boost dependencies can be installed in using Anaconda as follows:
+
+.. code-block:: bash
+
+    conda install -c anaconda cmake
+    conda install -c anaconda boost
 
 Source code
 '''''''''''

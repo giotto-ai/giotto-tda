@@ -153,7 +153,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_nearest_neighbors'])
+        check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(

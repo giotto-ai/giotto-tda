@@ -139,7 +139,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_sliding_window', 'thresholds_'])
+        check_is_fitted(self)
         X = column_or_1d(X)
 
         Xt = X[:-self.n_steps_future]
@@ -167,7 +167,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check is fit had been called
-        check_is_fitted(self, ['_sliding_window', 'thresholds_'])
+        check_is_fitted(self)
         y = column_or_1d(y)
 
         yr = self._sliding_window.transform(y)

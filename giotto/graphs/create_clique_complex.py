@@ -213,7 +213,7 @@ class CreateBoundaryMatrices(BaseEstimator, TransformerMixin):
             List containing the boundary matrices for all orders specified
             in tuple 'orders'.
         """
-        check_is_fitted(self, ['sizes_', 'orders_'])
+        check_is_fitted(self)
         boundaries = list()
         incidence = self._create_incidence_from_dict(X)
 
@@ -358,7 +358,7 @@ class CreateLaplacianMatrices(BaseEstimator, TransformerMixin):
             in tuple 'orders'.
 
         """
-        check_is_fitted(self, ['orders_', 'bound_orders_', 'order_id_'])
+        check_is_fitted(self)
         laplacians = list()
 
         cb = CreateBoundaryMatrices().fit(X, self.bound_orders_)

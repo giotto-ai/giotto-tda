@@ -10,6 +10,10 @@ pip install --upgrade pip setuptools
 # installing cmake
 pip install cmake
 
+# install dependencies for python-igraph
+yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
+pip install python-igraph
+
 # installing boost
 yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz

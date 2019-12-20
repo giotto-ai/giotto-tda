@@ -19,12 +19,6 @@ examples/.ipynb_checkpoints
 *.pqt
 data/*
 
-# Examples
-examples/*
-!examples/README.rst
-!examples/Lorenz_Attractor.ipynb
-!examples/Graph_classification.ipynb
-
 # Built docs
 doc/build
 doc/generated
@@ -38,4 +32,12 @@ giotto/externals/pybind11
 # External
 *.DS_Store
 .idea/*
+.vscode/*
 *~
+
+# Unit test
+.pytest_cache/
+.hypothesis/
+
+# development
+giotto/mapper/scratch/*
