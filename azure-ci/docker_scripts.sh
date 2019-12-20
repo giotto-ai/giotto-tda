@@ -24,6 +24,9 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
+# install C,C++ compiler and make for python-igraph
+yum install -y build-essential
+
 # installing and uninstalling giotto-learn
 cd /io
 pip install python-igraph
