@@ -10,6 +10,12 @@ pip install --upgrade pip setuptools
 # installing cmake
 pip install cmake
 
+# install C/C++ compiler and make for python-igraph
+yum install -y gcc gcc-c++ make
+cd /io
+pip install python-igraph
+cd ..
+
 # installing boost
 yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
@@ -24,12 +30,8 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# install C,C++ compiler and make for python-igraph
-yum install -y build-essential
-
 # installing and uninstalling giotto-learn
 cd /io
-pip install python-igraph
 pip install -e ".[doc, tests]"
 pip uninstall -y giotto-learn
 
