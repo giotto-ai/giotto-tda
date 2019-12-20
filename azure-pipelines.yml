@@ -27,7 +27,7 @@ jobs:
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
-  - script: |
+  - bash: |
       yum -y install autotools cmake
       git clone https://github.com/igraph/python-igraph.git
       cd python-igraph
