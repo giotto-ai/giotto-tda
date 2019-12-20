@@ -28,7 +28,16 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml python-igraph
+      yum -y install autotools cmake
+      git clone https://github.com/igraph/python-igraph.git
+      cd python-igraph
+      python setup.py build --c-core-url https://github.com/igraph/igraph/archive/master.tar.gz --no-pkg-config
+      cd ..
+      PYTHONPATH=$(pwd)/python-igraph/build/lib.linux-x86_64-3.7:$PYTHONPATH
+    displayName: 'install python-graph'
+
+  - script: |
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giotto --cov-report xml
       flake8
