@@ -3,7 +3,6 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
-from functools import reduce
 
 from giotto.mapper.cover import OneDimensionalCover
 
@@ -47,26 +46,26 @@ def test_filter_values_covered_by_single_interval(filter_values):
         filter_values[:, None][interval_masks], filter_values)
 
 
-@given(
-    filter_values=arrays(dtype=np.float,
-                         elements=floats(allow_nan=False,
-                                         allow_infinity=False,
-                                         max_value=1e3),
-                         shape=array_shapes(min_dims=1, max_dims=1,
-                                            min_side=2),
-                         unique=True),
-    n_intervals=integers(min_value=1, max_value=10)
-)
-def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
-    # TODO extend to inputs with shape (n_samples, 1)
-    cover = OneDimensionalCover(n_intervals=n_intervals)
-    interval_masks = cover.fit_transform(filter_values)
-    intervals = [filter_values[interval_masks[:, i]]
-                 for i in range(interval_masks.shape[1])]
-    intervals_union = reduce(np.union1d, intervals)
-    filter_values_union = filter_values[np.in1d(
-        filter_values, intervals_union)]
-    assert_almost_equal(filter_values_union, filter_values)
+# @given(
+#     filter_values=arrays(dtype=np.float,
+#                          elements=floats(allow_nan=False,
+#                                          allow_infinity=False,
+#                                          max_value=1e3),
+#                          shape=array_shapes(min_dims=1, max_dims=1,
+#                                             min_side=2),
+#                          unique=True),
+#     n_intervals=integers(min_value=1, max_value=10)
+# )
+# def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
+#     # TODO extend to inputs with shape (n_samples, 1)
+#     cover = OneDimensionalCover(n_intervals=n_intervals)
+#     interval_masks = cover.fit_transform(filter_values)
+#     intervals = [filter_values[interval_masks[:, i]]
+#                  for i in range(interval_masks.shape[1])]
+#     intervals_union = reduce(np.union1d, intervals)
+#     filter_values_union = filter_values[np.in1d(
+#         filter_values, intervals_union)]
+#     assert_almost_equal(filter_values_union, filter_values)
 
 
 @given(
