@@ -1,8 +1,8 @@
 import numpy as np
-from hypothesis import given, example
+from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
-from numpy.testing import assert_almost_equal, assert_allclose
+from numpy.testing import assert_almost_equal
 from functools import reduce
 
 from giotto.mapper.cover import OneDimensionalCover
