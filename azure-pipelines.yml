@@ -166,7 +166,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis python-igraph
     displayName: 'install pytest suite'
 
   - script: |
@@ -237,7 +237,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib openml python-igraph
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
@@ -246,7 +246,7 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install plotly matplotlib openml python-igraph
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn-nightly
       pytest --cov giotto --cov-report xml
