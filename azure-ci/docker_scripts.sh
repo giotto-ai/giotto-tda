@@ -11,7 +11,7 @@ pip install --upgrade pip setuptools
 pip install cmake
 
 # install C/C++ compiler and make for python-igraph
-sudo apt install build-essential python-dev libxml2 libxml2-dev zlib1g-dev bison flex
+apt install build-essential python-dev libxml2 libxml2-dev zlib1g-dev bison flex
 cd /io
 pip install python-igraph
 cd ..
