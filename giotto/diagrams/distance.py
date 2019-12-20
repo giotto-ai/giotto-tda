@@ -184,8 +184,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             homology dimension in :attr:`homology_dimensions_`.
 
         """
-        check_is_fitted(self, ['effective_metric_params_',
-                               'homology_dimensions_'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         if np.array_equal(X, self._X):
@@ -363,8 +362,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
             homology dimension in :attr:`homology_dimensions_`.
 
         """
-        check_is_fitted(self, ['effective_metric_params_',
-                               'homology_dimensions_'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         Xt = _parallel_amplitude(X, self.metric,

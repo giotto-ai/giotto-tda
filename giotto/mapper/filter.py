@@ -70,7 +70,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray, shape (n_samples, 1)
         """
-        check_is_fitted(self, ['effective_metric_params_'])
+        check_is_fitted(self)
         if self.metric == 'precomputed':
             Xt = X
         else:

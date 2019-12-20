@@ -193,9 +193,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['infinity_values_',
-                               '_homology_dimensions',
-                               '_max_homology_dimension'])
+        check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
         n_samples = len(X)

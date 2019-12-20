@@ -157,7 +157,7 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
 
     def transform(self, X, y=None, sample_weight=None):
         # TODO consider whether this is better implemented using decorators
-        check_is_fitted(self, ['clusterers_'])
+        check_is_fitted(self)
         Xt = [clusterer.abs_labels_ for clusterer in self.clusterers_]
         return Xt
 

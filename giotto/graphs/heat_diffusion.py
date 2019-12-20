@@ -91,7 +91,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
 
         """
 
-        check_is_fitted(self, ['taus_', 'proc_', 'order_'])
+        check_is_fitted(self)
         check_array(X, accept_sparse=True)
         heat = np.squeeze(np.asarray(self._compute_heat_diffusion(X)))
         heat = np.swapaxes(np.swapaxes(heat, 0, 2), 0, 1)

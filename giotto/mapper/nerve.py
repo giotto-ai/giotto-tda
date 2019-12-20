@@ -24,7 +24,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        check_is_fitted(self, ['edges_'])
+        check_is_fitted(self)
         graph = ig.Graph()
         graph.add_vertices([vertex[0] for vertex in self.X_])
         graph.add_edges([

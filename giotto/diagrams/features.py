@@ -103,7 +103,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         with np.errstate(divide='ignore', invalid='ignore'):
@@ -225,7 +225,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
@@ -359,7 +359,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             dimension in :attr:`homology_dimensions_`.
 
         """
-        check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
@@ -503,7 +503,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             homology dimension in :attr:`homology_dimensions_`.
 
         """
-        check_is_fitted(self, ['homology_dimensions_', 'samplings_'])
+        check_is_fitted(self)
         X = check_diagram(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
