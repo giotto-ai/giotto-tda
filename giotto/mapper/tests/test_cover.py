@@ -1,5 +1,5 @@
 import numpy as np
-from hypothesis import given
+from hypothesis import given, example
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal, assert_allclose
@@ -129,4 +129,4 @@ def test_overlap_fraction(filter_values, n_intervals, overlap_frac):
     overlap_array = (upper_limits[:-1] - lower_limits[1:]) / lengths
     expected_overlap_array = np.array([overlap_frac] * (n_intervals - 3))
 
-    assert_allclose(overlap_array, expected_overlap_array)
+    assert_allclose(overlap_array, expected_overlap_array, rtol=1e-5)
