@@ -101,25 +101,9 @@ jobs:
       pip install wheel twine
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       choco install -y wget
-      wget --header="Host: download.lfd.uci.edu" --header="User-Agent:
-      Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML,
-      like Gecko) Chrome/79.0.3945.79 Safari/537.36" --header="Accept:
-      text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
-      --header="Accept-Language: en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7"
-      --header="Referer: https://www.lfd.uci.edu/~gohlke/pythonlibs/"
-      "https://download.lfd.uci.edu/pythonlibs/t7epjj8p/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl"
-      -O "pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -c
+      wget --header="Host: download.lfd.uci.edu" --header="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" --header="Accept-Language: en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7" --header="Referer: https://www.lfd.uci.edu/~gohlke/pythonlibs/" "https://download.lfd.uci.edu/pythonlibs/t7epjj8p/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -O "python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -c
       pip install pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
-      wget --header="Host: download.lfd.uci.edu" --header="User-Agent:
-      Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML,
-      like Gecko) Chrome/79.0.3945.79 Safari/537.36" --header="Accept:
-      text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
-      --header="Accept-Language: en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7"
-      --header="Referer: https://www.lfd.uci.edu/~gohlke/pythonlibs/"
-      "https://download.lfd.uci.edu/pythonlibs/t7epjj8p/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl"
-      -O
-      "python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl"
-      -c
+      wget --header="Host: download.lfd.uci.edu" --header="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" --header="Accept-Language: en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7" --header="Referer: https://www.lfd.uci.edu/~gohlke/pythonlibs/" "https://download.lfd.uci.edu/pythonlibs/t7epjj8p/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -O "pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -c
       pip install python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
     displayName: 'Install tools'
 
