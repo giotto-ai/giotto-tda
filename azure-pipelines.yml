@@ -119,7 +119,7 @@ jobs:
       pytest --cov giotto --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
-    
+
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
@@ -162,13 +162,13 @@ jobs:
       failOnStderr: false
     env:
       python_ver: $(python_ver)
-    displayName: 'Run the docker and open bash' 
- 
+    displayName: 'Run the docker and open bash'
+
   - script: |
       python -m pip install --upgrade pip
       pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8
     displayName: 'install pytest suite'
-    
+
   - script: |
       pip install dist/*.whl
       cd /tmp/
@@ -244,7 +244,7 @@ jobs:
       flake8
     condition: eq(variables['nightly_check'], 'false')
     displayName: 'Test with pytest, nbconvert and flake8'
-    
+
   - script: |
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
@@ -256,7 +256,7 @@ jobs:
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
-    
+
   - script: |
       pip install dist/*.whl
       cd /tmp/
@@ -268,7 +268,7 @@ jobs:
       make html
       cd ..
     displayName: 'Build sphinx doc'
-    
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: doc/build
@@ -303,10 +303,13 @@ jobs:
   strategy:
     matrix:
       Python35:
+        python_ver: '35'
         python.version: '3.5'
       Python36:
+        python_ver: '36'
         python.version: '3.6'
       Python37:
+        python_ver: '37'
         python.version: '3.7'
 
   steps:
@@ -325,6 +328,15 @@ jobs:
     displayName: 'Install tools'
 
   - script: |
+    Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    choco install -y wget
+    wget --header="Host: download.lfd.uci.edu" --header="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" --header="Accept-Language: en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7" --header="Referer: https://www.lfd.uci.edu/~gohlke/pythonlibs/" "https://download.lfd.uci.edu/pythonlibs/t7epjj8p/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -O "pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -c
+    pip install pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
+    wget --header="Host: download.lfd.uci.edu" --header="User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" --header="Accept-Language: en-GB,en;q=0.9,en-US;q=0.8,es;q=0.7" --header="Referer: https://www.lfd.uci.edu/~gohlke/pythonlibs/" "https://download.lfd.uci.edu/pythonlibs/t7epjj8p/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -O "python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl" -c
+    pip install python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
+  displayName: 'Install pycairo and python-igraph'
+
+  - script: |
       pip install -e ".[tests, doc]"
       pip install wheel twine
     displayName: 'Install dev environment'
@@ -337,7 +349,7 @@ jobs:
       flake8
     condition: eq(variables['nightly_check'], 'false')
     displayName: 'Test with pytest, nbconvert and flake8'
-    
+
   - script: |
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
@@ -351,7 +363,7 @@ jobs:
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
-    
+
   - bash: |
       pip install dist/*.whl
       cd /tmp/
@@ -369,7 +381,7 @@ jobs:
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
- 
+
   - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'
