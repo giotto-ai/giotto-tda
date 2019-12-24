@@ -9,11 +9,12 @@ from IPython.display import display
 from ipywidgets import Layout, widgets
 from matplotlib.cm import get_cmap
 from matplotlib.colors import rgb2hex
+from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
 from .utils.visualization import (_get_colorscale_buttons, _get_colorscales,
                                   _get_column_color_buttons, _get_node_size,
-                                  get_node_summary, _get_node_text,
+                                  _get_node_text, get_node_summary,
                                   set_node_sizeref)
 
 
@@ -387,13 +388,13 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
     return fig
 
 
-def create_interactive_network(pipe, data, node_pos=None, node_color=None,
+def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
                                columns_to_color=None, plotly_kwargs=None,
                                summary_stat=np.mean):
     """
     Parameters
     ----------
-    pipe : MapperPipeline
+    pipeline : MapperPipeline
         The nerve of the refined pullback cover. Nodes correspond to cluster
         sets, and an edge exists between two nodes if they share at least one
         point in common.
@@ -424,6 +425,11 @@ def create_interactive_network(pipe, data, node_pos=None, node_color=None,
     #  get_cluster_params_widgets
 
     # TODO allow dimension to be passed as either 2 or 3 as an arg or kwarg
+
+    # clone input pipeline to catch scenarios where user selects invalid
+    # configuration of parameters and re-executes cell in Jupyter notebook
+    pipe = clone(pipeline)
+
     def get_cover_params_widgets(param, value):
         if isinstance(value, float):
             return (param, widgets.FloatSlider(
