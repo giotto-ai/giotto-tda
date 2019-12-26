@@ -3,15 +3,19 @@ from .cover import CubicalCover, OneDimensionalCover
 from .filter import Eccentricity, Entropy, Projection
 from .nerve import Nerve
 from .pipeline import make_mapper_pipeline
+from .visualization import (create_network_2d, create_network_3d,
+                            create_interactive_network)
 
 __all__ = [
+    'Projection',
     'Eccentricity',
     'Entropy',
-    'Projection',
     'OneDimensionalCover',
     'CubicalCover',
     'FirstSimpleGap',
     'FirstHistogramGap',
-    'Nerve',
-    'make_mapper_pipeline'
+    'make_mapper_pipeline',
+    'create_network_2d',
+    'create_network_3d',
+    'create_interactive_network'
 ]
