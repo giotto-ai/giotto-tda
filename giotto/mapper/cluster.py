@@ -321,6 +321,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         Which linkage criterion to use. The linkage criterion determines which
         distance to use between sets of observation. The algorithm will merge
         the pairs of cluster that minimize this criterion.
+
         - ``'ward'`` minimizes the variance of the clusters being merged.
         - ``'average'`` uses the average of the distances of each observation
           of the two sets.
@@ -442,6 +443,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         Which linkage criterion to use. The linkage criterion determines which
         distance to use between sets of observation. The algorithm will merge
         the pairs of cluster that minimize this criterion.
+
         - ``'ward'`` minimizes the variance of the clusters being merged.
         - ``'average'`` uses the average of the distances of each observation
           of the two sets.
