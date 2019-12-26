@@ -21,8 +21,8 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
-    """
 
+    """
     def __init__(self, exponent=2, metric='euclidean', metric_params=None):
         self.exponent = exponent
         self.metric = metric
@@ -46,7 +46,9 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
+
         """
+        check_array(X)
         if self.metric_params is None:
             self.effective_metric_params_ = dict()
         else:
@@ -69,8 +71,10 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, 1)
+
         """
         check_is_fitted(self)
+        X = check_array(X)
         if self.metric == 'precomputed':
             Xt = X
         else:
@@ -82,8 +86,8 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
 class Entropy(BaseEstimator, TransformerMixin):
     """Maps dataset to reals using the entropy filter function.
-    """
 
+    """
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
@@ -102,7 +106,10 @@ class Entropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
+
         """
+        check_array(X)
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -121,15 +128,17 @@ class Entropy(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, 1)
+
         """
         # TODO: the following is a crude method to ensure each row vector
-        # consists of "probabilities" that sum to one. Consider normalisation
-        # in terms of bin counts?
+        #  consists of "probabilities" that sum to one. Consider normalisation
+        #  in terms of bin counts?
+        check_is_fitted(self)
         X = check_array(X)
 
         if np.any(X < 0):
-            warnings.warn("Negative values detected in X! Taking absolute value to \
-                          calculate probabilities.")
+            warnings.warn("Negative values detected in X! Taking absolute "
+                          "value to calculate probabilities.")
             X = np.abs(X)
 
         probs = X / X.sum(axis=1, keepdims=True)
@@ -144,8 +153,8 @@ class Projection(BaseEstimator, TransformerMixin):
     ----------
     column_indices : int or list of ints, default: `0`
                      The column indices of the array to project onto.
-    """
 
+    """
     def __init__(self, column_indices=0):
         self.column_indices = column_indices
 
@@ -167,7 +176,10 @@ class Projection(BaseEstimator, TransformerMixin):
         Returns
         -------
         self : object
+
         """
+        check_array(X)
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -185,6 +197,9 @@ class Projection(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray, shape (n_samples, 1)
+
         """
+        check_is_fitted(self)
+        X = check_array(X)
         Xt = X[:, self.column_indices].reshape(X.shape[0], -1)
         return Xt
