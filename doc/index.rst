@@ -54,15 +54,16 @@ Pipeline
 
 .. autosummary::
    :toctree: generated/
-   :template: class.rst
-
-   mapper.pipeline.MapperPipeline
-
-.. autosummary::
-   :toctree: generated/
    :template: function.rst
 
    mapper.pipeline.make_mapper_pipeline
+
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   mapper.pipeline.MapperPipeline
 
 Visualization
 -------------
