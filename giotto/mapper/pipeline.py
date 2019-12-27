@@ -1,10 +1,7 @@
-from sklearn.cluster import DBSCAN
-from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
+from sklearn.preprocessing import FunctionTransformer
 
 from .cluster import ParallelClustering
-from .cover import CubicalCover
 from .nerve import Nerve
 from .utils._list_feature_union import ListFeatureUnion
 from .utils.pipeline import func_from_callable_on_rows, identity
@@ -49,6 +46,7 @@ class MapperPipeline(Pipeline):
     make_mapper_pipeline
 
     """
+
     # TODO abstract away common logic behind if statements in set_mapper_params
     def get_mapper_params(self, deep=True):
         pipeline_params = super().get_params(deep=True)
@@ -93,13 +91,15 @@ class MapperPipeline(Pipeline):
             if key.startswith(prefix) and not key.startswith(prefix + 'steps')}
 
 
-def make_mapper_pipeline(scaler=MinMaxScaler(),
-                         filter_func=PCA(n_components=2),
-                         cover=CubicalCover(),
-                         clusterer=DBSCAN(),
+def make_mapper_pipeline(scaler=None,
+                         filter_func=None,
+                         cover=None,
+                         clusterer=None,
+                         parallel_clustering_n_jobs=None,
+                         parallel_clustering_prefer='threads',
                          min_intersection=1,
-                         n_jobs_outer=None,
-                         **pipeline_kwargs):
+                         memory=None,
+                         verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
     steps.
 
@@ -114,28 +114,52 @@ def make_mapper_pipeline(scaler=MinMaxScaler(),
 
     Parameters
     ----------
-    scaler : object, default: :class:`sklearn.preprocessing.MinMaxScaler`
-        Scaling transformer.
+    scaler : object or None, optional, default: ``None``
+        Scaling transformer. If ``None``, no scaling is performed.
 
-    filter_func : object or callable, default: \
-        :meth:`sklearn.decomposition.PCA`
-        Filter function to apply to the scaled data.
+    filter_func : object, callable or None, optional, default: ``None``
+        Filter function to apply to the scaled data. ``None`` means using PCA
+        (:meth:`sklearn.decomposition.PCA`) with 2 components.
 
-    cover : object
-        Covering transformer.
+    cover : object or None, optional, default: ``None``
+        Covering transformer.``None`` means using a cubical cover
+        (:meth:`giotto.mapper.CubicalCover`) with its default parameters.
 
-    clusterer : object
-        Clustering object.
+    clusterer : object or None, optional, default: ``None``
+        Clustering object. ``None`` means using DBSCAN
+        (:meth:`sklearn.cluster.DBSCAN`) with its default parameters.
+
+    parallel_clustering_n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use in a joblib-parallel application of the
+        clustering step across pullback cover sets. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    parallel_clustering_prefer : ``'processes'`` | ``'threads'``, optional, \
+        default: ``'threads'``
+        Selects the default joblib backend to use in a joblib-parallel
+        application of the clustering step across pullback cover sets.
+        The default process-based backend is 'loky' and the default
+        thread-based backend is 'threading'. See [1]_.
 
     min_intersection : int, optional, default: 1
         Minimum size of the intersection between clusters required for
         creating an edge in the final Mapper graph.
 
-    n_jobs_outer : int or None, optional, default: ``None``
-        The number of jobs to use in a joblib-parallel application of the
-        clustering step to each pullback cover element. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+    memory : None, str or object with the joblib.Memory interface, \
+        optional, default: ``None``
+        Used to cache the fitted transformers of the pipeline. By default, no
+        caching is performed. If a string is given, it is the path to the
+        caching directory. Enabling caching triggers a clone of the
+        transformers before fitting. Therefore, the transformer instance
+        given to the pipeline cannot be inspected directly. Use the attribute
+        ``named_steps`` or ``steps`` to inspect estimators within the
+        pipeline. Caching the transformers is advantageous when fitting is
+        time consuming.
+
+    verbose : bool, optional, default: ``False``
+        If True, the time elapsed while fitting each step will be printed as it
+        is completed.
 
     Returns
     -------
@@ -144,13 +168,14 @@ def make_mapper_pipeline(scaler=MinMaxScaler(),
 
     Examples
     --------
-    >>> from giotto.mapper import make_mapper_pipeline, Projection, \
-    ... OneDimensionalCover, FirstHistogramGap
-    >>> scaler = None
+    >>> from sklearn.preprocessing import MinMaxScaler
+    >>> from giotto.mapper import (make_mapper_pipeline, Projection,
+    ...                            OneDimensionalCover, FirstHistogramGap)
+    >>> scaler = MinMaxScaler()
     >>> filter_func = Projection()
     >>> cover = OneDimensionalCover()
     >>> clusterer = FirstHistogramGap()
-    >>> mapper = make_mapper_pipeline(scaler=None,
+    >>> mapper = make_mapper_pipeline(scaler=scaler,
     ...                               filter_func=filter_func,
     ...                               cover=cover,
     ...                               clusterer=clusterer)
@@ -159,35 +184,60 @@ def make_mapper_pipeline(scaler=MinMaxScaler(),
 
     See also
     --------
-    MapperPipeline, giotto.mapper.method_to_transform, \
-    giotto.mapper.cluster.ParallelClustering
+    MapperPipeline, giotto.mapper.utils.decorators.method_to_transform
+
+    References
+    ----------
+    .. [1] "Thread-based parallelism vs process-based parallelism", in
+           `joblib documentation
+           <https://joblib.readthedocs.io/en/latest/parallel.html>`_.
 
     """
-    memory = pipeline_kwargs.pop('memory', None)
-    verbose = pipeline_kwargs.pop('verbose', False)
-    if pipeline_kwargs:
-        raise TypeError('Unknown keyword arguments: "{}"'
-                        .format(list(pipeline_kwargs.keys())[0]))
+
+    if scaler is None:
+        _scaler = identity()
+    else:
+        _scaler = scaler
 
     # If filter_func is not a scikit-learn transformer, hope it as a
     # callable to be applied on each row separately. Then attempt to create a
     # FunctionTransformer object to implement this behaviour.
-    if not hasattr(filter_func, 'transform'):
-        ft_func = func_from_callable_on_rows(filter_func)
-        _filter_func = FunctionTransformer(func=ft_func, validate=True)
+    if filter_func is None:
+        from sklearn.decomposition import PCA
+        _filter_func = PCA(n_components=2)
+    elif not hasattr(filter_func, 'fit_transform'):
+        _filter_func = func_from_callable_on_rows(filter_func)
+        _filter_func = FunctionTransformer(func=_filter_func, validate=True)
     else:
         _filter_func = filter_func
 
+    if cover is None:
+        from .cover import CubicalCover
+        _cover = CubicalCover()
+    else:
+        _cover = cover
+
+    if clusterer is None:
+        from sklearn.cluster import DBSCAN
+        _clusterer = DBSCAN()
+    else:
+        _clusterer = clusterer
+
     map_and_cover = Pipeline(
-        steps=[('scaler', scaler if scaler is not None else identity()),
-               ('filter_func', _filter_func), ('cover', cover)],
+        steps=[('scaler', _scaler),
+               ('filter_func', _filter_func),
+               ('cover', _cover)],
         verbose=verbose)
+
     all_steps = [
         ('pullback_cover', ListFeatureUnion(
             [('identity', identity()), ('map_and_cover', map_and_cover)])),
         ('clustering', ParallelClustering(
-            clusterer=clusterer, n_jobs_outer=n_jobs_outer)),
+            clusterer=_clusterer,
+            n_jobs_outer=parallel_clustering_n_jobs,
+            prefer=parallel_clustering_prefer)),
         ('nerve', Nerve(min_intersection=min_intersection))]
+
     mapper_pipeline = MapperPipeline(
         steps=all_steps, memory=memory, verbose=verbose)
     return mapper_pipeline
