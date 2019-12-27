@@ -103,7 +103,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         in :attr:`left_limits_` and :attr:`right_limits_`. Then, return the
         estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -391,7 +391,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         as products of one-dimensional intervals covering each feature
         dimension separately. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters

@@ -105,7 +105,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters

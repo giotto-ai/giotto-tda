@@ -111,7 +111,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -274,7 +274,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         """Create a giotto :class:`Pipeline` object and fit it. Then, return
         the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -443,7 +443,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         """Create a giotto :class:`Pipeline` object and fit it. Then, return
         the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
