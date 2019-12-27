@@ -1,7 +1,5 @@
-"""
-``giotto`` is a set of python methods to apply Topological Data Analysis
-algorithms in a machine learning framework.
-"""
+"""``giotto-learn`` is a Python library implementing algorithms from
+Topological Data Analysis in a machine learning framework."""
 # License: Apache 2.0
 
 # PEP0440 compatible formatted version, see:
