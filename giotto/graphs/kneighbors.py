@@ -110,7 +110,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. Each entry in `X` along axis 0 is an array of
             ``n_points`` row vectors in ``n_dimensions``-dimensional space.
 
@@ -138,7 +138,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. Each entry in `X` along axis 0 is an array of
             ``n_points`` row vectors in ``n_dimensions``-dimensional space.
 

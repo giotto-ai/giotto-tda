@@ -246,7 +246,7 @@ class Agglomerative:
 
     Attributes
     ----------
-    children_ : ndarray, shape (n_nodes - 1, 2)
+    children_ : ndarray of shape (n_nodes - 1, 2)
         The children of each non-leaf node. Values less than ``n_samples``
         correspond to leaves of the tree which are the original samples.
         A node ``i`` greater than or equal to ``n_samples`` is a non-leaf
@@ -257,7 +257,7 @@ class Agglomerative:
     n_leaves_ : int
         Number of leaves in the hierarchical tree.
 
-    distances_ : ndarray, shape (n_nodes - 1,)
+    distances_ : ndarray of shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
 
@@ -335,10 +335,10 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_clusters_ : int
         The number of clusters found by the algorithm.
 
-    labels_ : ndarray, shape (n_samples,)
+    labels_ : ndarray of shape (n_samples,)
         Cluster labels for each sample.
 
-    children_ : ndarray, shape (n_nodes - 1, 2)
+    children_ : ndarray of shape (n_nodes - 1, 2)
         The children of each non-leaf node. Values less than ``n_samples``
         correspond to leaves of the tree which are the original samples.
         A node ``i`` greater than or equal to ``n_samples`` is a non-leaf
@@ -349,7 +349,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_leaves_ : int
         Number of leaves in the hierarchical tree.
 
-    distances_ : ndarray, shape (n_nodes - 1,)
+    distances_ : ndarray of shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
 
@@ -374,7 +374,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
+        X : ndarray of shape (n_samples, n_features) or (n_samples, n_samples)
             Training instances to cluster, or distances between instances if
             ``affinity='precomputed'``.
 
@@ -457,10 +457,10 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_clusters_ : int
         The number of clusters found by the algorithm.
 
-    labels_ : ndarray, shape (n_samples,)
+    labels_ : ndarray of shape (n_samples,)
         Cluster labels for each sample.
 
-    children_ : ndarray, shape (n_nodes - 1, 2)
+    children_ : ndarray of shape (n_nodes - 1, 2)
         The children of each non-leaf node. Values less than ``n_samples``
         correspond to leaves of the tree which are the original samples.
         A node ``i`` greater than or equal to ``n_samples`` is a non-leaf
@@ -471,7 +471,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_leaves_ : int
         Number of leaves in the hierarchical tree.
 
-    distances_ : ndarray, shape (n_nodes - 1,)
+    distances_ : ndarray of shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
 
@@ -497,7 +497,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
+        X : ndarray of shape (n_samples, n_features) or (n_samples, n_samples)
             Training instances to cluster, or distances between instances if
             ``affinity='precomputed'``.
 

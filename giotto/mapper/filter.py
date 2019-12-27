@@ -61,7 +61,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -70,7 +70,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1)
+        Xt : ndarray of shape (n_samples, 1)
 
         """
         check_is_fitted(self)
@@ -118,7 +118,7 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -127,7 +127,7 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1)
+        Xt : ndarray of shape (n_samples, 1)
 
         """
         # TODO: the following is a crude method to ensure each row vector
@@ -187,7 +187,7 @@ class Projection(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -196,7 +196,7 @@ class Projection(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1)
+        Xt : ndarray of shape (n_samples, 1)
 
         """
         check_is_fitted(self)

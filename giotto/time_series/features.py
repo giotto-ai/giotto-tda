@@ -57,7 +57,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data.
 
         y : None
@@ -80,7 +80,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data.
 
         y : None

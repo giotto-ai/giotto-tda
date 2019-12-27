@@ -68,8 +68,10 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples,)
+        X : ndarray of shape (n_samples,) or \
+            (n_samples, n_vertices, n_vertices)
             Input data, i.e. a collection of adjacency matrices of graphs.
+            Each adjacency matrix may be a dense or a sparse array.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -92,15 +94,17 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples,)
+        X : ndarray of shape (n_samples,) or \
+            (n_samples, n_vertices, n_vertices)
             Input data, i.e. a collection of adjacency matrices of graphs.
+            Each adjacency matrix may be a dense or a sparse array.
 
         y : None
             Ignored.
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples,) or \
+        Xt : ndarray of shape (n_samples,) or \
              (n_samples, n_vertices, n_vertices)
             Array of distance matrices. If the distance matrices have variable
             size across samples, `Xt` is a one-dimensional array of dense

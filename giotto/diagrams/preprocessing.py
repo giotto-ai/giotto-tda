@@ -37,7 +37,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -61,7 +61,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -72,7 +72,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Output persistence diagram.
 
         """
@@ -181,7 +181,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -224,7 +224,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -235,7 +235,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xs : ndarray, shape (n_samples, n_features, 3)
+        Xs : ndarray of shape (n_samples, n_features, 3)
             Rescaled diagrams.
 
         """
@@ -251,12 +251,12 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Data to apply the inverse transform to.
 
         Returns
         -------
-        Xs : ndarray, shape (n_samples, n_features, 3)
+        Xs : ndarray of shape (n_samples, n_features, 3)
             Rescaled diagrams.
 
         """
@@ -316,7 +316,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -352,7 +352,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -363,7 +363,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Filtered persistence diagrams. Only the subdiagrams corresponding
             to dimensions in :attr:`homology_dimensions_` are filtered.
             Discarded points are replaced by points on the diagonal.

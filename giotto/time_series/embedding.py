@@ -92,7 +92,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, ...)
+        X : ndarray of shape (n_samples, ...)
             Input data.
 
         y : None
@@ -114,7 +114,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, ...)
+        X : ndarray of shape (n_samples, ...)
             Input data.
 
         y : None
@@ -122,7 +122,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_windows, n_samples_window, ...)
+        Xt : ndarray of shape (n_windows, n_samples_window, ...)
             Windows of consecutive entries of the original time series.
             ``n_windows = (n_samples - width - 1) // stride  + 1``, and
             ``n_samples_window = width + 1``.
@@ -144,7 +144,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples,)
+        y : ndarray of shape (n_samples,)
             Target.
 
         X : None
@@ -153,7 +153,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray, shape (n_samples_new,)
+        yr : ndarray of shape (n_samples_new,)
             The resampled target. ``n_samples_new = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
 
@@ -369,7 +369,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -415,7 +415,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -423,7 +423,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_points, n_dimension)
+        Xt : ndarray of shape (n_points, n_dimension)
             Output point cloud in Euclidean space of dimension given by
             :attr:`dimension_`. ``n_points = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
@@ -445,7 +445,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples,)
+        y : ndarray of shape (n_samples,)
             Target.
 
         X : None
@@ -454,7 +454,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray, shape (n_samples_new,)
+        yr : ndarray of shape (n_samples_new,)
             The resampled target. ``n_samples_new = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
 

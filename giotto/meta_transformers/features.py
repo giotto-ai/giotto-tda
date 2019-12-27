@@ -116,7 +116,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -155,7 +155,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -167,7 +167,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions)
             For each point cloud in `X`, one persistence entropy per homology
             dimension in `homology_dimensions`.
 
@@ -279,7 +279,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -317,7 +317,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -329,7 +329,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
              n_values)
             For each point cloud in `X`, one discretised Betti curve
             per homology dimension in `homology_dimensions`.
@@ -448,7 +448,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -487,7 +487,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_dimensions)
+        X : ndarray of shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -499,7 +499,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
              n_layers, n_values)
             For each point cloud in `X`, one discretised persistence landscape
             per homology dimension in `homology_dimensions`, consisting of

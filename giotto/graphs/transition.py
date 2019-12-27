@@ -136,7 +136,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_time_steps, n_features)
+        X : ndarray of shape (n_samples, n_time_steps, n_features)
             Input data.
 
         y : None
@@ -172,7 +172,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_time_steps, n_features)
+        X : ndarray of shape (n_samples, n_time_steps, n_features)
             Input data.
 
         y : None

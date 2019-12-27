@@ -87,7 +87,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Time series to build a target for.
 
         y : None
@@ -125,7 +125,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Time series to build a target for.
 
         y : None
@@ -134,7 +134,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_new, 1)
+        Xt : ndarray of shape (n_samples_new, 1)
             The cut input time series.
 
         """
@@ -153,7 +153,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples,)
+        y : ndarray of shape (n_samples,)
             Time series to build a target for.
 
         X : None
@@ -162,7 +162,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray, shape (n_samples_new,)
+        yr : ndarray of shape (n_samples_new,)
             Target for the prediction task.
 
         """
