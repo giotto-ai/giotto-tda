@@ -114,7 +114,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         :attr:`homology_dimensions_` and compute
         :attr:`effective_metric_params`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -296,7 +296,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         :attr:`homology_dimensions_` and compute
         :attr:`effective_metric_params`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters

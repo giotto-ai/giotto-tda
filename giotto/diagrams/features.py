@@ -53,7 +53,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         """Store all observed homology dimensions in
         :attr:`homology_dimensions_`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -171,7 +171,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -302,7 +302,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
@@ -448,7 +448,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
