@@ -49,11 +49,11 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    left_limits_ : ndarray, shape (n_intervals,)
+    left_limits_ : ndarray of shape (n_intervals,)
         Left limits of the cover intervals computed in :meth:`fit`. See the
         Notes.
 
-    right_limits_ : ndarray, shape (n_intervals,)
+    right_limits_ : ndarray of shape (n_intervals,)
         Right limits of the cover intervals computed in :meth:`fit`. See the
         Notes.
 
@@ -108,7 +108,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -142,7 +142,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -151,7 +151,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_cover_sets)
+        Xt : ndarray of shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to `n_intervals` as empty
             or duplicated cover sets are removed.
@@ -204,7 +204,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, 1)
+        X : ndarray of shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -213,7 +213,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_cover_sets)
+        Xt : ndarray of shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to `n_intervals` as empty
             or duplicated cover sets are removed.
@@ -396,7 +396,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -429,7 +429,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -438,7 +438,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_cover_sets)
+        Xt : ndarray of shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to n_intervals *
             n_features` as empty or duplicated cover sets are removed.
@@ -466,7 +466,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : ndarray of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -475,7 +475,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_cover_sets)
+        Xt : ndarray of shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to `n_intervals *
             n_features` as empty or duplicated cover sets are removed.

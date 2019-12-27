@@ -55,7 +55,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_observations, n_features)
+        X : ndarray of shape (n_samples, n_observations, n_features)
             Input data. Each entry along axis 0 is a sample of ``n_features``
             different variables, of size ``n_observations``.
 
@@ -79,7 +79,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_observations, n_features)
+        X : ndarray of shape (n_samples, n_observations, n_features)
             Input data. Each entry along axis 0 is a sample of ``n_features``
             different variables, of size ``n_observations``.
 
@@ -89,7 +89,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, n_features)
+        Xt : ndarray of shape (n_samples, n_features, n_features)
             Array of Pearson dissimilarities.
 
         """

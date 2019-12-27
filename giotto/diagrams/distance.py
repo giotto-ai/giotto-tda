@@ -119,7 +119,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples_fit, n_features, 3)
+        X : ndarray of shape (n_samples_fit, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -165,7 +165,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -176,7 +176,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_fit, n_samples, n_homology_dimensions) \
+        Xt : ndarray of shape (n_samples_fit, n_samples, n_homology_dimensions) \
              if `order` is ``None``, else (n_samples_fit, n_samples)
             Distance matrix or collection of distance matrices between
             diagrams in `X` and diagrams seen in :meth:`fit`. In the
@@ -301,7 +301,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -344,7 +344,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -355,7 +355,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions) if `order` \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions) if `order` \
              is ``None``, else (n_samples, 1)
             Amplitudes or amplitude vectors of the diagrams in `X`. In the
             second case, index i along axis 1 corresponds to the i-th

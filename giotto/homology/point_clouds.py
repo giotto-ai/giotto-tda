@@ -123,7 +123,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or \
+        X : ndarray of shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -170,7 +170,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or \
+        X : ndarray of shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -184,7 +184,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. ``n_features`` equals
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of

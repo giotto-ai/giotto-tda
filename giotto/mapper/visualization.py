@@ -28,14 +28,14 @@ def create_network_2d(graph, data, node_pos, node_color,
         sets, and an edge exists between two nodes if they share at least one
         point in common.
 
-    data : ndarray, shape (n_samples, n_features)
+    data : ndarray of shape (n_samples, n_features)
         The point cloud data used to generate the nerve.
 
-    node_pos : igraph.Graph.layout or ndarray, shape (n_nodes, n_dims)
+    node_pos : igraph.Graph.layout or ndarray of shape (n_nodes, n_dims)
         Encodes the layout of the graph according to a layout algorithm or
         pre-defined array of coordinates in an n-dimensional space.
 
-    node_color : ndarray, shape (n_nodes,)
+    node_color : ndarray of shape (n_nodes,)
         The numerical values to color each node of the graph by.
 
     columns_to_color : dict, optional, default: ``None``
@@ -206,14 +206,14 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
         sets, and an edge exists between two nodes if they share at least one
         point in common.
 
-    data : ndarray, shape (n_samples, n_features)
+    data : ndarray of shape (n_samples, n_features)
         The point cloud data used to generate the nerve.
 
-    node_pos : igraph.Graph.layout or ndarray, shape (n_nodes, n_dims)
+    node_pos : igraph.Graph.layout or ndarray of shape (n_nodes, n_dims)
         Encodes the layout of the graph according to a layout algorithm or
         pre-defined array of coordinates in an n-dimensional space.
 
-    node_color : ndarray, shape (n_nodes,)
+    node_color : ndarray of shape (n_nodes,)
         The numerical values to color each node of the graph by.
 
     columns_to_color : dict, optional, default: ``None``
@@ -399,14 +399,14 @@ def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
         sets, and an edge exists between two nodes if they share at least one
         point in common.
 
-    data : ndarray, shape (n_samples, n_features)
+    data : ndarray of shape (n_samples, n_features)
         The point cloud data used to generate the nerve.
 
-    node_pos : igraph.Graph.layout or ndarray, shape (n_nodes, n_dims)
+    node_pos : igraph.Graph.layout or ndarray of shape (n_nodes, n_dims)
         Encodes the layout of the graph according to a layout algorithm or
         pre-defined array of coordinates in an n-dimensional space.
 
-    node_color : ndarray, shape (n_nodes,)
+    node_color : ndarray of shape (n_nodes,)
         The numerical values to color each node of the graph by.
 
     columns_to_color : dict, optional, default: ``None``

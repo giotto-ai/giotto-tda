@@ -15,7 +15,7 @@ def plot_point_cloud(point_cloud, dimension=None):
 
     Parameters
     ----------
-    point_cloud : ndarray, shape (n_samples, n_dimensions)
+    point_cloud : ndarray of shape (n_samples, n_dimensions)
         Data points to be represented in a 2D or 3D scatter plot. Only the
         first 2 or 3 dimensions will be considered for plotting.
 
@@ -124,7 +124,7 @@ def plot_diagram(diagram, homology_dimensions=None):
 
     Parameters
     ----------
-    diagram : ndarray, shape (n_points, 3)
+    diagram : ndarray of shape (n_points, 3)
         The persistence diagram to plot, where the third dimension along axis 1
         contains homology dimensions, and the other two contain (birth, death)
         pairs to be used as coordinates in the two-dimensional plot.
@@ -201,7 +201,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
 
     Parameters
     ----------
-    landscapes : ndarray, shape (n_homology_dimension, n_layers, n_values)
+    landscapes : ndarray of shape (n_homology_dimension, n_layers, n_values)
         Collection of ``n_homology_dimension`` discretised persistence
         landscapes. Each landscape contains ``n_layers`` layers. Entry i along
         axis 0 should be the persistence landscape in homology dimension i.
@@ -210,7 +210,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray, shape (n_homology_dimension, n_layers, n_values), \
+    samplings : ndarray of shape (n_homology_dimension, n_layers, n_values), \
                 default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `landscapes` on
@@ -272,7 +272,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
         
     Parameters
     ----------
-    betti_curves : ndarray, shape (n_homology_dimension, n_values)
+    betti_curves : ndarray of shape (n_homology_dimension, n_values)
         Collection of ``n_homology_dimension`` discretised Betti curves.
         Entry i along axis 0 should be the Betti curve in homology dimension i.
 
@@ -280,7 +280,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray, shape (n_homology_dimension, n_values), \
+    samplings : ndarray of shape (n_homology_dimension, n_values), \
                 default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on
@@ -339,7 +339,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
 
     Parameters
     ----------
-    betti_curves : ndarray, shape (n_samples, n_homology_dimensions, \
+    betti_curves : ndarray of shape (n_samples, n_homology_dimensions, \
                    n_values)
         ``n_samples`` collections of discretised Betti curves. There are
         ``n_homology_dimension`` curves in each collection. Index i along axis
@@ -349,7 +349,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         Homology dimensions for which the Betti surfaces should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray, shape (n_homology_dimension, n_values), \
+    samplings : ndarray of shape (n_homology_dimension, n_values), \
                 default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on the

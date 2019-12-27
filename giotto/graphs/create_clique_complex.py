@@ -23,7 +23,7 @@ class CreateCliqueComplex:
     graph : nx.graph, optional, default: ``None``
         Graph from which to compute the clique complex
 
-    data : ndarray, shape (n_points, n_dimensions) or \
+    data : ndarray of shape (n_points, n_dimensions) or \
         (n_points, n_points)
         If ``data_type == 'cloud'``, the input should be an
         ndarray, where each entry along axis 0 is a vector with

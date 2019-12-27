@@ -58,7 +58,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -85,7 +85,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -96,7 +96,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions)
             Persistence entropies: one value per sample and per homology
             dimension seen in :meth:`fit`. Index i along axis 1 corresponds
             to the i-th homology dimension in :attr:`homology_dimensions_`.
@@ -176,7 +176,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -206,7 +206,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -217,7 +217,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
             Betti curves: one curve (represented as a one-dimensional array
             of integer values) per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
@@ -307,7 +307,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -339,7 +339,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -350,7 +350,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
             n_layers, n_values)
             Persistence lanscapes: one landscape (represented as a
             two-dimensional array) per sample and per homology dimension seen
@@ -453,7 +453,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -485,7 +485,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -496,7 +496,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values, \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values, \
             n_values)
             Raster images: one image per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th

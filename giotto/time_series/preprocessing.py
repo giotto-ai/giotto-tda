@@ -46,7 +46,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, ...)
+        X : ndarray of shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -68,7 +68,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, ...)
+        X : ndarray of shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -77,7 +77,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_new, ...)
+        Xt : ndarray of shape (n_samples_new, ...)
             Resampled array. ``n_samples_new = n_samples // period``.
 
         """
@@ -95,7 +95,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples,)
+        y : ndarray of shape (n_samples,)
             Target.
 
         X : None
@@ -104,7 +104,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray, shape (n_samples_new,)
+        yr : ndarray of shape (n_samples_new,)
             Resampled target. ``n_samples_new = n_samples // period``.
 
         """
@@ -166,7 +166,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, ...)
+        X : ndarray of shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -188,7 +188,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples,) or (n_samples, ...)
+        X : ndarray of shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -197,7 +197,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_new, ...)
+        Xt : ndarray of shape (n_samples_new, ...)
             Stationarized array. ``n_samples_new = n_samples - 1``.
 
         """
@@ -217,7 +217,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray, shape (n_samples,)
+        y : ndarray of shape (n_samples,)
             Target.
 
         X : None
@@ -226,7 +226,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray, shape (n_samples_new,)
+        yr : ndarray of shape (n_samples_new,)
             Resampled target. ``n_samples_new = n_samples - 1``.
 
         """
