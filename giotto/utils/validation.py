@@ -1,4 +1,4 @@
-"""Utilities for input validation"""
+"""Utilities for input validation."""
 # License : Apache 2.0
 
 import numbers
