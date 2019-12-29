@@ -1,14 +1,17 @@
+"""Construct transition graphs from dynamical systems."""
 # License: Apache 2.0
 
+import types
 import warnings
 
-import types
 import numpy as np
+from joblib import Parallel, delayed
 from scipy import sparse as sp
 from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
-from joblib import Parallel, delayed
 from sklearn.utils.validation import check_array, check_is_fitted
+
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
@@ -18,6 +21,7 @@ def _identity(X):
     return X
 
 
+@adapt_fit_transform_docs
 class TransitionGraph(BaseEstimator, TransformerMixin):
     """Undirected transition graphs from arrays of time-evolving states.
 
@@ -106,6 +110,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
+
     _hyperparameters = {'_func': [types.FunctionType]}
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):
