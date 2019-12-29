@@ -1,3 +1,6 @@
+"""Covering schemes for one or several dimensions."""
+# License: Apache 2.0
+
 from functools import partial
 from itertools import product
 
@@ -11,8 +14,10 @@ from sklearn.utils.validation import check_is_fitted
 from .utils._cover import (_check_has_one_column,
                            _remove_empty_and_duplicate_intervals,
                            _validate_kind)
+from ..utils._docs import adapt_fit_transform_docs
 
 
+@adapt_fit_transform_docs
 class OneDimensionalCover(BaseEstimator, TransformerMixin):
     """Covers of one-dimensional data coming from open overlapping intervals.
 
@@ -316,6 +321,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return left_limits, right_limits
 
 
+@adapt_fit_transform_docs
 class CubicalCover(BaseEstimator, TransformerMixin):
     """Covers of multi-dimensional data coming from overlapping hypercubes
     (technically, parallelopipeds) given by taking products of one-dimensional
@@ -353,6 +359,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
     OneDimensionalCover
 
     """
+
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
