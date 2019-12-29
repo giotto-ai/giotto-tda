@@ -3,10 +3,13 @@
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from ..utils import validate_params
 from sklearn.utils.validation import check_is_fitted, check_array
 
+from ..utils import validate_params
+from ..utils._docs import adapt_fit_transform_docs
 
+
+@adapt_fit_transform_docs
 class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     """Pearson dissimilarities from collections of multivariate time series.
 
@@ -41,6 +44,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     SlidingWindow, giotto.homology.VietorisRipsPersistence
 
     """
+
     _hyperparameters = {'absolute_value': [bool, (0, 1)]}
 
     def __init__(self, absolute_value=False, n_jobs=None):
