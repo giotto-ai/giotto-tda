@@ -1,6 +1,5 @@
 """The module :mod:`giotto.diagrams` implements transformers to
-preprocess persistence diagrams or extract features from them.
-"""
+preprocess persistence diagrams or extract features from them."""
 
 from .preprocessing import ForgetDimension, Scaler, Filtering
 from .distance import PairwiseDistance, Amplitude
