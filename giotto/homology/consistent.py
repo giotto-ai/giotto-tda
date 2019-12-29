@@ -2,14 +2,18 @@
 # License: Apache 2.0
 
 import itertools
+
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
-from joblib import Parallel, delayed
 from sklearn.utils.validation import check_array, check_is_fitted
+
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
+@adapt_fit_transform_docs
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
     """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
@@ -33,7 +37,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -75,8 +79,10 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
+
     _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
 
+    # TODO: consider using an immutable default value for metric_params.
     def __init__(self, metric='euclidean', metric_params={}, neighbor_rank=1,
                  n_jobs=None):
         self.metric = metric
