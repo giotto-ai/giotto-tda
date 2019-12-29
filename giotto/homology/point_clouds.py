@@ -1,17 +1,20 @@
 """Persistent homology on point clouds or finite metric spaces."""
 # License: Apache 2.0
 
-import numpy as np
 import numbers
-from sklearn.base import BaseEstimator, TransformerMixin
+
+import numpy as np
 from joblib import Parallel, delayed
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
+
 from ._utils import _pad_diagram
+from ..externals.python import ripser
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
-from ..externals.python import ripser
 
-
+@adapt_fit_transform_docs
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
@@ -32,7 +35,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         and `metric` determines a rule with which to calculate distances
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -87,6 +90,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         <https://arxiv.org/abs/1908.02518>`_.
 
     """
+
     _hyperparameters = {'max_edge_length': [numbers.Number],
                         'infinity_values_': [numbers.Number],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
