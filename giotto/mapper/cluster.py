@@ -49,7 +49,7 @@ class ParallelClustering(BaseEstimator):
         Otherwise, clones of a default instance of
         :class:`sklearn.cluster.DBSCAN`, fitted in the same way.
 
-    clusters_ : list of list of triple
+    clusters_ : list of list of tuple
        Labels and indices of each cluster found in :meth:`fit`. The i-th
        entry corresponds to the i-th portion of the data; it is a list
        of triples of the form ``(i, label, indices)``, where ``label`` is a
@@ -201,12 +201,32 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        clusters : list of list of triple
+        clusters : list of list of tuple
             See :attr:`clusters_`.
 
         """
         self.fit(X, sample_weight=sample_weight)
         return self.clusters_
+
+    def transform(self, X, y=None):
+        """Not implemented.
+
+        Only present so that the class is a valid step in a scikit-learn
+        pipeline.
+
+        Parameters
+        ----------
+        X : Ignored
+            Ignored.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        """
+        raise NotImplementedError(
+            "Transforming new data with a fitted ParallelClustering object "
+            "not yet implemented, use fit_transform instead.")
 
     def fit_transform(self, X, y=None, **fit_params):
         """Alias for :meth:`fit_predict`.
@@ -229,7 +249,7 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        Xt : list of list of triple
+        Xt : list of list of tuple
             See :attr:`clusters_`.
 
         """
