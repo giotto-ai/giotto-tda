@@ -2,15 +2,18 @@
 # License: Apache 2.0
 
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator
-from ..base import TransformerResamplerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
-from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
+
+from ..base import TransformerResamplerMixin
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
+@adapt_fit_transform_docs
 class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """Sliding windows onto the data.
 
@@ -67,6 +70,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     samples} - \\mathrm{width} - 1` and the stride) may be lost.
 
     """
+
     _hyperparameters = {'width': [int, (1, np.inf)],
                         'stride': [int, (1, np.inf)]}
 
@@ -167,6 +171,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return yr
 
 
+@adapt_fit_transform_docs
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a univariate time series as a time series of
     point clouds.
@@ -293,6 +298,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         <https://doi.org/10.1007/s10208-014-9206-z>`_.
 
     """
+
     _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
                         'time_delay': [int, (1, np.inf)],
                         'dimension': [int, (1, np.inf)],
