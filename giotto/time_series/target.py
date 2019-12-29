@@ -1,16 +1,20 @@
 """Time series labelling."""
 # License : Apache 2.0
 
-import types
-import numpy as np
 import numbers
+import types
+
+import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted, column_or_1d
-from ..base import TransformerResamplerMixin
+
 from .embedding import SlidingWindow
+from ..base import TransformerResamplerMixin
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
+@adapt_fit_transform_docs
 class Labeller(BaseEstimator, TransformerResamplerMixin):
     """Target creation from sliding windows over a time series.
 
@@ -138,7 +142,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             The cut input time series.
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self)
         X = column_or_1d(X)
 
@@ -166,7 +170,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Target for the prediction task.
 
         """
-        # Check is fit had been called
+        # Check if fit had been called
         check_is_fitted(self)
         y = column_or_1d(y)
 
