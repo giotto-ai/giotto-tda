@@ -1,6 +1,6 @@
 """The module :mod:`giotto.pipeline` extends scikit-learn's module by defining
 Pipelines that include TransformerResamplers."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 

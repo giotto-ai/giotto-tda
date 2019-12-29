@@ -1,5 +1,5 @@
 """kNN graphs from point cloud data."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import warnings
 from functools import partial

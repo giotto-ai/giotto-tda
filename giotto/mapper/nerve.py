@@ -1,5 +1,5 @@
 """Construct the nerve of a Mapper cover."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 from functools import reduce
 from itertools import combinations

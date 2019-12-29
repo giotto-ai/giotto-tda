@@ -1,5 +1,5 @@
 """Resampling and stationarization of time series data."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 from sklearn.base import BaseEstimator

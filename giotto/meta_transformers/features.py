@@ -1,5 +1,5 @@
 """Feature generation using meta transformers."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin

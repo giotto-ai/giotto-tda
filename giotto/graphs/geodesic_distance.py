@@ -1,5 +1,5 @@
 """Graph geodesic distance calculations."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 from joblib import Parallel, delayed

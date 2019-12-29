@@ -1,13 +1,14 @@
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
-from scipy.spatial.distance import cdist, pdist, squareform
 from giotto_bottleneck import bottleneck_distance
 from giotto_wasserstein import wasserstein_distance
-from scipy.ndimage import gaussian_filter
 from joblib import Parallel, delayed, effective_n_jobs
-from sklearn.utils.validation import _num_samples
+from scipy.ndimage import gaussian_filter
+from scipy.spatial.distance import cdist, pdist, squareform
 from sklearn.utils import gen_even_slices
+from sklearn.utils.validation import _num_samples
+
 from ._utils import _subdiagrams
 
 

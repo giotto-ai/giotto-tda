@@ -1,6 +1,6 @@
 """``giotto-learn`` is a Python library implementing algorithms from
 Topological Data Analysis in a machine learning framework."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/
