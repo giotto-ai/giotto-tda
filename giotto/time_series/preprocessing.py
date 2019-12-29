@@ -1,14 +1,17 @@
 """Resampling and stationarization of time series data."""
 # License: Apache 2.0
 
-from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator
-from ..base import TransformerResamplerMixin
-from ..utils.validation import validate_params
-from sklearn.utils.validation import check_array, column_or_1d
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_array, column_or_1d
+from sklearn.utils.validation import check_is_fitted
+
+from ..base import TransformerResamplerMixin
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import validate_params
 
 
+@adapt_fit_transform_docs
 class Resampler(BaseEstimator, TransformerResamplerMixin):
     """Time series resampling at regular intervals.
 
@@ -33,6 +36,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     (30,)
 
     """
+
     _hyperparameters = {'period': [int, (1, np.inf)]}
 
     def __init__(self, period=2):
@@ -153,6 +157,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     (299,)
 
     """
+
     _hyperparameters = {'operation': [str, ['return', 'log-return']]}
 
     def __init__(self, operation='return'):
