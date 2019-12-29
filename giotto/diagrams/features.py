@@ -1,16 +1,21 @@
+"""Feature extraction from persistence diagrams."""
 # License: Apache 2.0
 
 import numbers
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
-from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from ..utils.validation import validate_params, check_diagram
+from sklearn.utils.validation import check_is_fitted
+
+from ._metrics import betti_curves, landscapes, heats
 from ._utils import _subdiagrams, _discretize
-from giotto.diagrams._metrics import betti_curves, landscapes, heats
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import validate_params, check_diagram
 
 
+@adapt_fit_transform_docs
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """`Persistence entropies <https://giotto.ai/theory>`_ of persistence
     diagrams.
@@ -77,7 +82,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -117,6 +121,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class BettiCurve(BaseEstimator, TransformerMixin):
     """`Betti curves <https://giotto.ai/theory>`_ of persistence diagrams.
 
@@ -159,6 +164,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     values to the j-th entry of a curve in dimension q'.
 
     """
+
     _hyperparameters = {'n_values': [int, (1, np.inf)]}
 
     def __init__(self, n_values=100, n_jobs=None):
@@ -240,6 +246,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """`Persistence landscapes <https://giotto.ai/theory>`_ of persistence
     diagrams.
@@ -288,6 +295,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     dimension q'.
 
     """
+
     _hyperparameters = {'n_layers': [int, (1, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
@@ -375,6 +383,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class HeatKernel(BaseEstimator, TransformerMixin):
     """Convolution of persistence diagrams with a Gaussian kernel.
 
@@ -434,6 +443,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
+
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
