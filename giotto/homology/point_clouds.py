@@ -1,5 +1,5 @@
 """Persistent homology on point clouds or finite metric spaces."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numbers
 

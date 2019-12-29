@@ -1,5 +1,5 @@
 """Covering schemes for one or several dimensions."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 from functools import partial
 from itertools import product

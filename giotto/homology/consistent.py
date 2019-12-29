@@ -1,5 +1,5 @@
 """Rescaling method for persistent homology."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import itertools
 

@@ -1,5 +1,5 @@
 """Clustering methods."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 from inspect import signature
 

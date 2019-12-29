@@ -1,5 +1,5 @@
 """Filter functions commonly used with Mapper."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import warnings
 

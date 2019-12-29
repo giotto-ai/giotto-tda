@@ -1,5 +1,5 @@
 """Persistence diagram preprocessing."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numbers
 import types
