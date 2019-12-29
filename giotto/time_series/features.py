@@ -2,12 +2,15 @@
 # License: Apache 2.0
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 
+from ..utils._docs import adapt_fit_transform_docs
 
+
+@adapt_fit_transform_docs
 class PermutationEntropy(BaseEstimator, TransformerMixin):
     """Entropies from sets of permutations arg-sorting rows in arrays.
 
@@ -93,7 +96,6 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
             One permutation entropy per entry in `X` along axis 0.
 
         """
-
         # Check if fit had been called
         check_is_fitted(self)
         X = check_array(X, allow_nd=True)
