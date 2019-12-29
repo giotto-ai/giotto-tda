@@ -1,12 +1,16 @@
 """Feature generation using meta transformers."""
+# License: Apache 2.0
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from giotto.pipeline import Pipeline
-from giotto import homology as hl
-from giotto import diagrams as diag
+
+from .. import diagrams as diag
+from .. import homology as hl
+from ..pipeline import Pipeline
+from ..utils._docs import adapt_fit_transform_docs
 
 
+@adapt_fit_transform_docs
 class EntropyGenerator(BaseEstimator, TransformerMixin):
     """Persistence entropies directly from point clouds.
 
@@ -23,7 +27,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -130,7 +134,6 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         self : object
 
         """
-
         steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
@@ -172,11 +175,11 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
             dimension in `homology_dimensions`.
 
         """
-
         Xt = self._pipeline.transform(X)
         return Xt
 
 
+@adapt_fit_transform_docs
 class BettiCurveGenerator(BaseEstimator, TransformerMixin):
     """Meta transformer returning Betti curves directly from point clouds.
 
@@ -192,7 +195,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -293,7 +296,6 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         self : object
 
         """
-
         steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
@@ -335,11 +337,11 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
             per homology dimension in `homology_dimensions`.
 
         """
-
         Xt = self._pipeline.transform(X)
         return Xt
 
 
+@adapt_fit_transform_docs
 class LandscapeGenerator(BaseEstimator, TransformerMixin):
     """Meta transformer returning persistence landscapes directly from point
     clouds.
@@ -357,7 +359,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -462,7 +464,6 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         self : object
 
         """
-
         steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
@@ -506,6 +507,5 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
             `n_layers` layers.
 
         """
-
         Xt = self._pipeline.transform(X)
         return Xt
