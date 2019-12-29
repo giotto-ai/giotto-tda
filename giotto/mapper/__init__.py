@@ -1,7 +1,6 @@
 from .cluster import FirstHistogramGap, FirstSimpleGap
 from .cover import CubicalCover, OneDimensionalCover
 from .filter import Eccentricity, Entropy, Projection
-from .nerve import Nerve
 from .pipeline import make_mapper_pipeline
 from .visualization import (create_network_2d, create_network_3d,
                             create_interactive_network)
