@@ -1,13 +1,17 @@
+"""Graph geodesic distance calculations."""
 # License: Apache 2.0
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
+
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import check_graph
 
 
+@adapt_fit_transform_docs
 class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     """Distance matrices arising from geodesic distances on graphs.
 
