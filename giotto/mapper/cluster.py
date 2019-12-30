@@ -32,12 +32,13 @@ class ParallelClustering(BaseEstimator):
         :class:`sklearn.base.ClusterMixin`. ``None`` means that the default
         :class:`sklearn.cluster.DBSCAN` is used.
 
-    n_jobs_outer : int or None, optional, default: ``None``
+    parallel_clustering_n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
-    prefer : ``'processes'`` | ``'threads'``, optional, default: ``'threads'``
+    parallel_clustering_prefer : ``'processes'`` | ``'threads'``, optional, \
+        default: ``'threads'``
         Selects the default joblib backend. The default process-based backend
         is 'loky' and the default thread-based backend is 'threading'.
 
@@ -58,10 +59,12 @@ class ParallelClustering(BaseEstimator):
 
     """
 
-    def __init__(self, clusterer=None, n_jobs_outer=None, prefer='threads'):
+    def __init__(self, clusterer=None,
+                 parallel_clustering_n_jobs=None,
+                 parallel_clustering_prefer='threads'):
         self.clusterer = clusterer
-        self.n_jobs_outer = n_jobs_outer
-        self.prefer = prefer
+        self.parallel_clustering_n_jobs = parallel_clustering_n_jobs
+        self.parallel_clustering_prefer = parallel_clustering_prefer
 
     def _validate_clusterer(self, default=DBSCAN()):
         """Set :attr:`clusterer_` depending on the value of  `clusterer`.
@@ -129,8 +132,8 @@ class ParallelClustering(BaseEstimator):
         else:
             single_fitter = self._fit_single_abs_labels
 
-        self.clusterers_ = Parallel(
-            n_jobs=self.n_jobs_outer, prefer=self.prefer)(
+        self.clusterers_ = Parallel(n_jobs=self.parallel_clustering_n_jobs,
+                                    prefer=self.parallel_clustering_prefer)(
             delayed(single_fitter)(
                 X_tot, np.flatnonzero(mask),
                 mask_num, sample_weight=sample_weights[mask_num])
