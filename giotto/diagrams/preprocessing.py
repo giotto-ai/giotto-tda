@@ -20,7 +20,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
     """Replaces all homology dimensions in persistence diagrams with
     ``numpy.inf``.
 
-    Useful when downstream tasks require using topological features all at
+    Useful when downstream tasks require the use of topological features all at
     once -- and not separated between different homology dimensions.
 
     See also
