@@ -1,5 +1,5 @@
 """Utilities for docstring building."""
-# License : Apache 2.0
+# License: GNU AGPLv3
 
 import re
 from functools import wraps

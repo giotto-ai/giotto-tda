@@ -19,7 +19,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
     Let `D` be a square matrix representing distances between points in a
     point cloud, or directly defining an abstract metric (or metric-like)
     space. The eccentricity of point `i` in the point cloud or abstract
-    metric space is the `p` -norm (for some `p`) of row `i` in `D`.
+    metric space is the `p`-norm (for some `p`) of row `i` in `D`.
 
     Parameters
     ----------

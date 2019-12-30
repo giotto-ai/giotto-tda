@@ -19,7 +19,7 @@ from ..utils._docs import adapt_fit_transform_docs
 
 @adapt_fit_transform_docs
 class OneDimensionalCover(BaseEstimator, TransformerMixin):
-    """Covers of one-dimensional data coming from open overlapping intervals.
+    """Cover of one-dimensional data coming from open overlapping intervals.
 
     In :meth:`fit`, given a training array `X` representing a collection of
     real numbers, a cover of the real line by open intervals
@@ -323,7 +323,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class CubicalCover(BaseEstimator, TransformerMixin):
-    """Covers of multi-dimensional data coming from overlapping hypercubes
+    """Cover of multi-dimensional data coming from overlapping hypercubes
     (technically, parallelopipeds) given by taking products of one-dimensional
     intervals.
 
