@@ -169,7 +169,7 @@ def make_mapper_pipeline(scaler=None,
 
     min_intersection : int, optional, default: ``1``
         Minimum size of the intersection between clusters required for
-        creating an edge in the final Mapper graph.
+        creating an edge in the Mapper graph.
 
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
