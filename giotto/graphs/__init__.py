@@ -1,6 +1,5 @@
 """The module :mod:`giotto.graphs` implements transformers to create graphs or
-extract metric spaces from graphs.
-"""
+extract metric spaces from graphs."""
 
 from .geodesic_distance import GraphGeodesicDistance
 from .kneighbors import KNeighborsGraph
