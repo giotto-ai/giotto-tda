@@ -183,13 +183,13 @@ class Projection(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    column_indices : int or list of int, optional, default: ``0``
+    columns : int or list of int, optional, default: ``0``
         The column indices of the array to project onto.
 
     """
 
-    def __init__(self, column_indices=0):
-        self.column_indices = column_indices
+    def __init__(self, columns=0):
+        self.columns = columns
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -230,12 +230,16 @@ class Projection(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_columns)
-            Output array, where ``n_columns = len(column_indices)``.
+            Output array, where ``n_columns = len(columns)``.
 
         """
         check_is_fitted(self)
-        # TODO: extend functionality to pandas dataframes so column names
-        #  can be passed directly
-        X = check_array(X)
-        Xt = X[:, self.column_indices].reshape(X.shape[0], -1)
+        # Simple duck typing to handle case of pandas dataframe input
+        if hasattr(X, 'columns'):
+            # NB in this case we do not check the health of other columns
+            Xt = check_array(X[self.columns], ensure_2d=False)
+        else:
+            X = check_array(X)
+            Xt = X[:, self.columns]
+        Xt = Xt.reshape(len(X), -1)
         return Xt
