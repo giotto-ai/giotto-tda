@@ -1,3 +1,6 @@
+"""Static and interactive visualisation functions for Mapper graphs."""
+# License: GNU AGPLv3
+
 import logging
 import operator
 import traceback
