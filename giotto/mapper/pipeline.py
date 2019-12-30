@@ -279,7 +279,7 @@ def make_mapper_pipeline(scaler=None,
     """
 
     if scaler is None:
-        _scaler = identity()
+        _scaler = identity(validate=False)
     else:
         _scaler = scaler
 
@@ -315,7 +315,8 @@ def make_mapper_pipeline(scaler=None,
 
     all_steps = [
         ('pullback_cover', ListFeatureUnion(
-            [('identity', identity()), ('map_and_cover', map_and_cover)])),
+            [('identity', identity(validate=True)),
+             ('map_and_cover', map_and_cover)])),
         ('clustering', ParallelClustering(
             clusterer=_clusterer,
             parallel_clustering_n_jobs=parallel_clustering_n_jobs,
