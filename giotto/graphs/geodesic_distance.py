@@ -101,7 +101,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         X : ndarray of shape (n_samples,) or \
             (n_samples, n_vertices, n_vertices)
             Input data, i.e. a collection of adjacency matrices of graphs.
-            Each adjacency matrix may be a dense or a sparse array.
+            Each adjacency matrix may be a dense or sparse array.
 
         y : None
             Ignored.
