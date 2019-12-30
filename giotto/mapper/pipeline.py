@@ -215,7 +215,7 @@ def make_mapper_pipeline(scaler=None,
     >>> from sklearn.preprocessing import MinMaxScaler
     >>> from giotto.mapper import Projection, FirstHistogramGap
     >>> scaler = MinMaxScaler()
-    >>> filter_func = Projection(column_indices=[0, 1])
+    >>> filter_func = Projection(columns=[0, 1])
     >>> clusterer = FirstHistogramGap()
     >>> mapper = make_mapper_pipeline(scaler=scaler,
     ...                               filter_func=filter_func,

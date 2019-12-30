@@ -65,10 +65,10 @@ def test_entropy_values_for_positive_inputs(X):
 
 @given(X=arrays(dtype=np.float, shape=array_shapes(min_dims=2, max_dims=2)))
 def test_projection_values_equal_slice(X):
-    column_indices = np.random.choice(
+    columns = np.random.choice(
         X.shape[1], 1 + np.random.randint(X.shape[1]))
-    Xt = Projection(column_indices=column_indices).fit_transform(X)
-    assert_almost_equal(Xt, X[:, column_indices])
+    Xt = Projection(columns=columns).fit_transform(X)
+    assert_almost_equal(Xt, X[:, columns])
 
 
 @given(X=arrays(
