@@ -8,7 +8,8 @@ from .utils.pipeline import func_from_callable_on_rows, identity
 
 global_pipeline_params = ('memory', 'verbose')
 nodes_params = ('scaler', 'filter_func', 'cover')
-clust_params = ('clusterer',)
+clust_params = ('clusterer', 'parallel_clustering_n_jobs',
+                'parallel_clustering_prefer')
 nerve_params = ('min_intersection',)
 nodes_params_prefix = 'pullback_cover__map_and_cover__'
 clust_params_prefix = 'clustering__'
@@ -192,19 +193,78 @@ def make_mapper_pipeline(scaler=None,
 
     Examples
     --------
+    >>> # Example of basic usage with default parameters
+    >>> from giotto.mapper import make_mapper_pipeline
+    >>> mapper = make_mapper_pipeline()
+    >>> print(mapper.__class__)
+    <class 'giotto.mapper.pipeline.MapperPipeline'>
+    >>> mapper_params = mapper.get_mapper_params()
+    >>> print(mapper_params['filter_func'].__class__)
+    <class 'sklearn.decomposition._pca.PCA'>
+    >>> print(mapper_params['cover'].__class__)
+    <class 'giotto.mapper.cover.CubicalCover'>
+    >>> print(mapper_params['clusterer'].__class__)
+    <class 'sklearn.cluster._dbscan.DBSCAN'>
+    >>> X = np.random.random((10000, 4))  # 10000 points in 4-dimensional space
+    >>> mapper_graph = mapper.fit_transform(X)  # Create the mapper graph
+    >>> print(type(mapper_graph))
+    igraph.Graph
+    >>> #######################################################################
+    >>> # Example using a scaler from scikit-learn, a filter function from
+    >>> # giotto.mapper.filter, and a clusterer from giotto.mapper.cluster
     >>> from sklearn.preprocessing import MinMaxScaler
-    >>> from giotto.mapper import (make_mapper_pipeline, Projection,
-    ...                            OneDimensionalCover, FirstHistogramGap)
+    >>> from giotto.mapper import Projection, FirstHistogramGap
     >>> scaler = MinMaxScaler()
-    >>> filter_func = Projection()
-    >>> cover = OneDimensionalCover()
+    >>> filter_func = Projection(column_indices=[0, 1])
     >>> clusterer = FirstHistogramGap()
     >>> mapper = make_mapper_pipeline(scaler=scaler,
     ...                               filter_func=filter_func,
-    ...                               cover=cover,
     ...                               clusterer=clusterer)
-    >>> X = np.random.random((100, 2))
+    >>> #######################################################################
+    >>> # Example using a callable acting on each row of X separately
+    >>> import numpy as np
+    >>> from giotto.mapper import OneDimensionalCover
+    >>> cover = OneDimensionalCover()
+    >>> mapper.set_mapper_params(scaler=None, filter_func=np.sum, cover=cover)
+    >>> #######################################################################
+    >>> # Example setting the memory parameter to cache each step and avoid
+    >>> # recomputation of early steps
+    >>> from tempfile import mkdtemp
+    >>> from shutil import rmtree
+    >>> cachedir = mkdtemp()
+    >>> mapper.set_mapper_params(memory=cachedir, verbose=True)
     >>> mapper_graph = mapper.fit_transform(X)
+    [Pipeline] ............ (step 1 of 3) Processing scaler, total=   0.0s
+    [Pipeline] ....... (step 2 of 3) Processing filter_func, total=   0.0s
+    [Pipeline] ............. (step 3 of 3) Processing cover, total=   0.0s
+    [Pipeline] .... (step 1 of 3) Processing pullback_cover, total=   0.0s
+    [Pipeline] ........ (step 2 of 3) Processing clustering, total=   0.3s
+    [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.0s
+    >>> mapper.set_mapper_params(min_intersection=3)
+    >>> mapper_graph = mapper.fit_transform(X)
+    [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.0s
+    >>> # Clear the cache directory when you don't need it anymore
+    >>> rmtree(cachedir)
+    >>> #######################################################################
+    >>> # Example using a large dataset for which parallelism in
+    >>> # clustering across the pullback cover sets can be beneficial
+    >>> from sklearn.cluster import DBSCAN
+    >>> mapper = make_mapper_pipeline(clusterer=DBSCAN(),
+    ...                               parallel_clustering_n_jobs=6,
+    ...                               memory=mkdtemp(),
+    ...                               verbose=True)
+    >>> X = np.random.random((100000, 4))
+    >>> mapper.fit_transform(X)
+    [Pipeline] ............ (step 1 of 3) Processing scaler, total=   0.0s
+    [Pipeline] ....... (step 2 of 3) Processing filter_func, total=   0.1s
+    [Pipeline] ............. (step 3 of 3) Processing cover, total=   0.6s
+    [Pipeline] .... (step 1 of 3) Processing pullback_cover, total=   0.7s
+    [Pipeline] ........ (step 2 of 3) Processing clustering, total=   1.9s
+    [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.3s
+    >>> mapper.set_mapper_params(parallel_clustering_n_jobs=1)
+    >>> mapper.fit_transform(X)
+    [Pipeline] ........ (step 2 of 3) Processing clustering, total=   5.3s
+    [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.3s
 
     See also
     --------
@@ -258,8 +318,8 @@ def make_mapper_pipeline(scaler=None,
             [('identity', identity()), ('map_and_cover', map_and_cover)])),
         ('clustering', ParallelClustering(
             clusterer=_clusterer,
-            n_jobs_outer=parallel_clustering_n_jobs,
-            prefer=parallel_clustering_prefer)),
+            parallel_clustering_n_jobs=parallel_clustering_n_jobs,
+            parallel_clustering_prefer=parallel_clustering_prefer)),
         ('nerve', Nerve(min_intersection=min_intersection))]
 
     mapper_pipeline = MapperPipeline(
