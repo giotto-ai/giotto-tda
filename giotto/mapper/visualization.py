@@ -53,7 +53,9 @@ def create_network_2d(graph, data, node_pos, node_color,
     -------
     fig : ploty.graph_objs.Figure
         The figure representing the nerve (topological graph).
+
     """
+
     # TODO: allow custom size reference
     node_elements = graph['node_metadata']['node_elements']
     plot_options = {
@@ -231,7 +233,9 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
     -------
     fig : ploty.graph_objs.Figure
         The figure representing the nerve (topological graph).
+
     """
+
     node_elements = graph['node_metadata']['node_elements']
     plot_options = {
         'edge_trace_mode': 'lines',
@@ -423,7 +427,9 @@ def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
     summary_stat : callable, default ``np.mean``
         Summary statistic to apply to the elements in each node of the
         topological graph.
+
     """
+
     # TODO could abstract away common patterns in get_cover_params_widgets and
     #  get_cluster_params_widgets
 
