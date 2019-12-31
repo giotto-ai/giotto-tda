@@ -40,27 +40,46 @@ def _get_colorscales():
             'Reds', 'Viridis', 'YlGnBu', 'YlOrRd']
 
 
-def _get_column_color_buttons(data, node_elements, columns_to_color=None):
-    if columns_to_color is None:
-        return None
+def _get_column_color_buttons(data, is_data_dataframe, node_elements,
+                              node_colors_color_variable):
+    # TODO: Consider opting for on-demand computation instead of precomputing
+    #  all node summary values when this is called by viz functions
+    if is_data_dataframe:
+        columns_to_color = data.columns
     else:
-        column_color_buttons = []
-        for column_name, column_index in columns_to_color.items():
-            column_values = data[:, column_index]
-            node_color = get_node_summary(node_elements, column_values)
+        columns_to_color = range(data.shape[1])
 
-            column_color_buttons.append(
-                dict(
-                    args=[{
-                        'marker.color': [None, node_color],
-                        'marker.cmin': [None, np.min(node_color)],
-                        'marker.cmax': [None, np.max(node_color)]
-                    }],
-                    label=column_name,
-                    method='restyle'
-                )
+    column_color_buttons = [
+        dict(
+            args=[{
+                'marker.color': [None, node_colors_color_variable],
+                'marker.cmin': [None, np.min(node_colors_color_variable)],
+                'marker.cmax': [None, np.max(node_colors_color_variable)]
+            }],
+            label='color_variable',
+            method='restyle'
+        )
+    ]
+
+    for column in columns_to_color:
+        if is_data_dataframe:
+            column_values = data[column].to_numpy()
+        else:
+            column_values = data[:, column]
+        node_colors = get_node_summary(node_elements, column_values)
+
+        column_color_buttons.append(
+            dict(
+                args=[{
+                    'marker.color': [None, node_colors],
+                    'marker.cmin': [None, np.min(node_colors)],
+                    'marker.cmax': [None, np.max(node_colors)]
+                }],
+                label='Column {}'.format(column),
+                method='restyle'
             )
-        return column_color_buttons
+        )
+    return column_color_buttons
 
 
 def _get_colorscale_buttons(colorscales):
