@@ -12,7 +12,10 @@ from sklearn.neighbors import KernelDensity
 
 
 @given(
-    X=arrays(dtype=np.float, shape=array_shapes(min_dims=2, max_dims=2)),
+    X=arrays(dtype=np.float,
+             elements=floats(allow_nan=False,
+                             allow_infinity=False),
+             shape=array_shapes(min_dims=2, max_dims=2)),
     exponent=integers(min_value=1, max_value=100)
 )
 def test_eccentricity_shape_equals_number_of_samples(X, exponent):
@@ -21,7 +24,10 @@ def test_eccentricity_shape_equals_number_of_samples(X, exponent):
     assert Xt.shape == (len(X), 1)
 
 
-@given(X=arrays(dtype=np.float, shape=array_shapes(min_dims=2, max_dims=2)))
+@given(X=arrays(dtype=np.float,
+                elements=floats(allow_nan=False,
+                                allow_infinity=False),
+                shape=array_shapes(min_dims=2, max_dims=2)))
 def test_eccentricity_values_with_infinity_norm_equals_max_row_values(X):
     eccentricity = Eccentricity(exponent=np.inf)
     Xt = eccentricity.fit_transform(X)
@@ -63,7 +69,10 @@ def test_entropy_values_for_positive_inputs(X):
     assert_almost_equal(Xt, entropies[:, None])
 
 
-@given(X=arrays(dtype=np.float, shape=array_shapes(min_dims=2, max_dims=2)))
+@given(X=arrays(dtype=np.float,
+                elements=floats(allow_nan=False,
+                                allow_infinity=False),
+                shape=array_shapes(min_dims=2, max_dims=2)))
 def test_projection_values_equal_slice(X):
     column_indices = np.random.choice(
         X.shape[1], 1 + np.random.randint(X.shape[1]))
