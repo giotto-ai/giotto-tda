@@ -111,14 +111,14 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
         color_variable_kind = 'columns'
 
     # Determine whether node_colors is an array of node colours
-    is_node_colors_ndadday = hasattr(node_color_statistic, 'dtype')
-    if (not is_node_colors_ndadday) and (not callable(node_color_statistic)):
+    is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
+    if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
         raise ValueError("node_colors must be a callable or ndarray.")
 
     # Determine whether layout is an array of node positions
     is_layout_ndarray = hasattr(layout, 'dtype')
 
-    if is_node_colors_ndadday:
+    if is_node_colors_ndarray:
         _node_colors = node_color_statistic
     else:
         if color_variable_kind == 'scalars':
