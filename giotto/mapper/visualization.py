@@ -51,8 +51,8 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
         to generate the quantity of interest. Otherwise, it must be a column
         or subset of columns to be selected from `data`.
 
-    node_color_statistic : callable, or ndarray of shape (n_nodes,) or (n_nodes, 1), \
-        optional, default: ``numpy.mean``
+    node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``numpy.mean``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
         the Mapper graph, and its values are used directly for node
@@ -294,42 +294,117 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
     return fig
 
 
-def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
-                      plotly_kwargs=None):
+def create_network_3d(pipeline, data, layout='kamada_kawai',
+                      color_variable=None, node_color_statistic=np.mean,
+                      color_by_columns_dropdown=True, plotly_kwargs=None):
     """
     Parameters
     ----------
-    graph : igraph.Graph
-        The nerve of the refined pullback cover. Nodes correspond to cluster
-        sets, and an edge exists between two nodes if they share at least one
-        point in common.
+    pipeline : :class:`MapperPipeline` object
+        Mapper pipeline to act on to data.
 
-    data : ndarray of shape (n_samples, n_features)
-        The point cloud data used to generate the nerve.
+    data : array-like of shape (n_samples, n_features)
+        Data used to generate the Mapper graph. Can be a pandas dataframe.
 
-    node_pos : igraph.Graph.layout or ndarray of shape (n_nodes, n_dims)
-        Encodes the layout of the graph according to a layout algorithm or
-        pre-defined array of coordinates in an n-dimensional space.
+    layout : None, str or callable, optional, default: ``'kamada-kawai'``
+        Layout algorithm for the graph. Can be any accepted value for the
+        ``layout`` parameter in the :meth:`layout` method of
+        :class:`igraph.Graph`. [1]_
 
-    node_color : ndarray of shape (n_nodes,)
-        The numerical values to color each node of the graph by.
+    color_variable : column index or name, or list of such, \
+        or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
+        or (fit-)transformer object, or None, optional, default: ``None``
+        Specifies which quantity is to be used for node colouring. When it is
+        a numpy ndarray or pandas dataframe, it must have the same length as
+        `data` and is interpreted as a quantity of interest according to
+        which each node of the Mapper graph is to be coloured (see
+        :attr:`node_colors`). ``None`` is equivalent to passing `data`. If an
+        object implementing :meth:`transform` or :meth:`fit_transform`,
+        e.g. a scikit-learn estimator or pipeline, it is applied to `data`
+        to generate the quantity of interest. Otherwise, it must be a column
+        or subset of columns to be selected from `data`.
 
-    columns_to_color : dict, optional, default: ``None``
-        Key-value pairs (column_name, column_index) to specify which columns of
-        :attr:`data` to color the graph by. Generates a dropdown widget to
-        select the columns to color by.
+    node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``numpy.mean``
+        Specifies how to determine the colors of each node. If a
+        numpy array, it must have the same length as the number of nodes in
+        the Mapper graph, and its values are used directly for node
+        coloring, ignoring `color_variable`. Otherwise, it must be a
+        callable object and is used to obtain a summary statistic within
+        each Mapper node of the quantity specified by :attr:`node_colors`.
+
+    color_by_columns_dropdown : bool, optional, default: ``True``
+        If ``True``, a dropdown widget is generated which allows the user to
+        colour Mapper nodes according to any column in `data`.
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
 
-    Returns
-    -------
-    fig : ploty.graph_objs.Figure
-        The figure representing the nerve (topological graph).
-
     """
 
+    # Compute the graph and fetch the indices of points in each node
+    graph = pipeline.fit_transform(data)
+    # TODO: allow custom size reference
     node_elements = graph['node_metadata']['node_elements']
+
+    # Simple duck typing to determine whether data is a pandas dataframe
+    is_data_dataframe = hasattr(data, 'columns')
+
+    # Determine whether color_variable is an array or pandas series/dataframe
+    # containing scalar values
+    if hasattr(color_variable, 'dtype') or hasattr(color_variable, 'dtypes'):
+        if len(color_variable) != len(data):
+            raise ValueError(
+                "color_variable and data must have the same length.")
+        color_variable_kind = 'scalars'
+    elif hasattr(color_variable, 'transform'):
+        color_variable_kind = 'transformer'
+    elif hasattr(color_variable, 'fit_transform'):
+        color_variable_kind = 'fit_transformer'
+    elif callable(color_variable):
+        color_variable_kind = 'callable'
+    elif color_variable is None:
+        color_variable_kind = 'data'
+    else:  # Assume color_variable is a selection of columns
+        color_variable_kind = 'columns'
+
+    # Determine whether node_colors is an array of node colours
+    is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
+    if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
+        raise ValueError("node_colors must be a callable or ndarray.")
+
+    # Determine whether layout is an array of node positions
+    is_layout_ndarray = hasattr(layout, 'dtype')
+
+    if is_node_colors_ndarray:
+        _node_colors = node_color_statistic
+    else:
+        if color_variable_kind == 'scalars':
+            color_data = color_variable
+        elif color_variable_kind == 'transformer':
+            color_data = color_variable.transform(data)
+        elif color_variable_kind == 'fit_transformer':
+            color_data = color_variable.fit_transform(data)
+        elif color_variable_kind == 'callable':
+            color_data = color_variable(data)
+        elif color_variable_kind == 'data':
+            if is_data_dataframe:
+                color_data = data.to_numpy()
+            else:
+                color_data = data
+        else:
+            if is_data_dataframe:
+                color_data = data[color_variable].to_numpy()
+            else:
+                color_data = data[:, color_variable]
+        _node_colors = get_node_summary(node_elements, color_data,
+                                        summary_stat=node_color_statistic)
+
+    if is_layout_ndarray:
+        node_pos = layout
+    else:
+        node_pos = graph.layout(layout, dim=3)
+
     plot_options = {
         'edge_trace_mode': 'lines',
         'edge_trace_line': dict(color='rgb(125,125,125)',
@@ -337,14 +412,14 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
         'edge_trace_hoverinfo': 'none',
         'node_trace_mode': 'markers',
         'node_trace_hoverinfo': 'text',
-        'node_trace_hoverlabel': dict(
-            bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
-                             node_color))),
+        # 'node_trace_hoverlabel': dict(
+        #     bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
+        #                      node_color_statistic))),
         'node_trace_marker_showscale': True,
         'node_trace_marker_colorscale': 'viridis',
         'node_trace_marker_reversescale': False,
         'node_trace_marker_line': dict(width=.5, color='#888'),
-        'node_trace_marker_color': node_color,
+        'node_trace_marker_color': node_color_statistic,
         'node_trace_marker_size': _get_node_size(node_elements),
         'node_trace_marker_sizemode': 'area',
         'node_trace_marker_sizeref': set_node_sizeref(node_elements),
@@ -410,7 +485,7 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
         z=node_z,
         mode=plot_options['node_trace_mode'],
         hoverinfo=plot_options['node_trace_hoverinfo'],
-        hoverlabel=plot_options['node_trace_hoverlabel'],
+        # hoverlabel=plot_options['node_trace_hoverlabel'],
         marker=dict(
             showscale=plot_options['node_trace_marker_showscale'],
             colorscale=plot_options['node_trace_marker_colorscale'],
@@ -440,9 +515,14 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
     fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
 
     # Add dropdown for colorscale of nodes
-    column_color_buttons = _get_column_color_buttons(data, node_elements,
-                                                     columns_to_color)
     colorscale_buttons = _get_colorscale_buttons(_get_colorscales())
+
+    # Compute node colours according to data columns only if necessary
+    if color_by_columns_dropdown:
+        column_color_buttons = _get_column_color_buttons(
+            data, is_data_dataframe, node_elements, _node_colors)
+    else:
+        column_color_buttons = None
 
     button_height = 1.1
     fig.update_layout(
@@ -478,12 +558,12 @@ def create_network_3d(graph, data, node_pos, node_color, columns_to_color=None,
         autosize=False
     )
 
-    if columns_to_color is not None:
-        fig.add_annotation(
-            go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
-                                 y=button_height - 0.03,
-                                 yref="paper", align="left", showarrow=False)
-        )
+    # if columns_to_color is not None:
+    #     fig.add_annotation(
+    #         go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
+    #                              y=button_height - 0.03,
+    #                              yref="paper", align="left", showarrow=False)
+    #     )
 
     return fig
 
