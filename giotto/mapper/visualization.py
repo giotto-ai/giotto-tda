@@ -22,7 +22,7 @@ from .utils.visualization import (_get_colorscale_buttons, _get_colorscales,
 
 
 def create_network_2d(pipeline, data, layout='kamada_kawai',
-                      color_variable=None, node_colors=np.mean,
+                      color_variable=None, node_color_statistic=np.mean,
                       color_by_columns_dropdown=True, plotly_kwargs=None):
     """
     Parameters
@@ -51,7 +51,7 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
         to generate the quantity of interest. Otherwise, it must be a column
         or subset of columns to be selected from `data`.
 
-    node_colors : callable, or ndarray of shape (n_nodes,) or (n_nodes, 1), \
+    node_color_statistic : callable, or ndarray of shape (n_nodes,) or (n_nodes, 1), \
         optional, default: ``numpy.mean``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
@@ -111,15 +111,15 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
         color_variable_kind = 'columns'
 
     # Determine whether node_colors is an array of node colours
-    is_node_colors_ndadday = hasattr(node_colors, 'dtype')
-    if (not is_node_colors_ndadday) and (not callable(node_colors)):
+    is_node_colors_ndadday = hasattr(node_color_statistic, 'dtype')
+    if (not is_node_colors_ndadday) and (not callable(node_color_statistic)):
         raise ValueError("node_colors must be a callable or ndarray.")
 
     # Determine whether layout is an array of node positions
     is_layout_ndarray = hasattr(layout, 'dtype')
 
     if is_node_colors_ndadday:
-        _node_colors = node_colors
+        _node_colors = node_color_statistic
     else:
         if color_variable_kind == 'scalars':
             color_data = color_variable
@@ -140,7 +140,7 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
             else:
                 color_data = data[:, color_variable]
         _node_colors = get_node_summary(node_elements, color_data,
-                                        summary_stat=node_colors)
+                                        summary_stat=node_color_statistic)
 
     if is_layout_ndarray:
         node_pos = layout
