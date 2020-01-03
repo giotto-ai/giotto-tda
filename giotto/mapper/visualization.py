@@ -412,20 +412,20 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
         'edge_trace_hoverinfo': 'none',
         'node_trace_mode': 'markers',
         'node_trace_hoverinfo': 'text',
-        # 'node_trace_hoverlabel': dict(
-        #     bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
-        #                      node_color_statistic))),
+        'node_trace_hoverlabel': dict(
+            bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
+                             _node_colors))),
         'node_trace_marker_showscale': True,
         'node_trace_marker_colorscale': 'viridis',
         'node_trace_marker_reversescale': False,
         'node_trace_marker_line': dict(width=.5, color='#888'),
-        'node_trace_marker_color': node_color_statistic,
+        'node_trace_marker_color': list(map(lambda x: rgb2hex(get_cmap('viridis')(x)), _node_colors)),
         'node_trace_marker_size': _get_node_size(node_elements),
         'node_trace_marker_sizemode': 'area',
         'node_trace_marker_sizeref': set_node_sizeref(node_elements),
         'node_trace_marker_sizemin': 4,
-        'node_trace_marker_cmin': 0,
-        'node_trace_marker_cmax': 1,
+        'node_trace_marker_cmin': np.min(_node_colors),
+        'node_trace_marker_cmax': np.max(_node_colors),
         'node_trace_marker_colorbar': dict(thickness=15,
                                            title='',
                                            xanchor='left',
@@ -485,7 +485,7 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
         z=node_z,
         mode=plot_options['node_trace_mode'],
         hoverinfo=plot_options['node_trace_hoverinfo'],
-        # hoverlabel=plot_options['node_trace_hoverlabel'],
+        hoverlabel=plot_options['node_trace_hoverlabel'],
         marker=dict(
             showscale=plot_options['node_trace_marker_showscale'],
             colorscale=plot_options['node_trace_marker_colorscale'],
@@ -557,13 +557,6 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
         ],
         autosize=False
     )
-
-    # if columns_to_color is not None:
-    #     fig.add_annotation(
-    #         go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
-    #                              y=button_height - 0.03,
-    #                              yref="paper", align="left", showarrow=False)
-    #     )
 
     return fig
 

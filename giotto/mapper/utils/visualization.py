@@ -1,4 +1,6 @@
 import numpy as np
+from matplotlib.cm import get_cmap
+from matplotlib.colors import rgb2hex
 
 """Graph layout functions"""
 
@@ -27,7 +29,7 @@ def set_node_sizeref(node_elements, node_scale=12):
 
 
 def get_node_summary(node_elements, data, summary_stat=np.mean):
-    return list(map(summary_stat, [data[itr] for itr in node_elements]))
+    return np.asarray(list(map(summary_stat, [data[itr] for itr in node_elements])))
 
 
 """Plotly layout functions"""
@@ -52,9 +54,10 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
     column_color_buttons = [
         dict(
             args=[{
-                'marker.color': [None, node_colors_color_variable],
+                'marker.color': [None, list(map(lambda x: rgb2hex(get_cmap('viridis')(x)), node_colors_color_variable))],
                 'marker.cmin': [None, np.min(node_colors_color_variable)],
-                'marker.cmax': [None, np.max(node_colors_color_variable)]
+                'marker.cmax': [None, np.max(node_colors_color_variable)],
+                'hoverlabel.bgcolor': [None, list(map(lambda x: rgb2hex(get_cmap('viridis')(x)), node_colors_color_variable))]
             }],
             label='color_variable',
             method='restyle'
@@ -71,9 +74,10 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
         column_color_buttons.append(
             dict(
                 args=[{
-                    'marker.color': [None, node_colors],
+                    'marker.color': [None, list(map(lambda x: rgb2hex(get_cmap('viridis')(x)), node_colors))],
                     'marker.cmin': [None, np.min(node_colors)],
-                    'marker.cmax': [None, np.max(node_colors)]
+                    'marker.cmax': [None, np.max(node_colors)],
+                    'hoverlabel.bgcolor': [None, list(map(lambda x: rgb2hex(get_cmap('viridis')(x)), node_colors))]
                 }],
                 label='Column {}'.format(column),
                 method='restyle'
