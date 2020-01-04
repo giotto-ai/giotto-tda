@@ -227,7 +227,8 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
             cmax=plot_options['node_trace_marker_cmax'],
             colorbar=plot_options['node_trace_marker_colorbar'],
             line_width=plot_options['node_trace_marker_line_width']),
-        text=plot_options['node_trace_text'])
+        text=plot_options['node_trace_text'],
+        opacity=0.99)
 
     fig = go.FigureWidget(
         data=[edge_trace, node_trace],
@@ -562,38 +563,51 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
     return fig
 
 
-def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
-                               columns_to_color=None, plotly_kwargs=None,
-                               summary_stat=np.mean):
+def create_interactive_network(pipeline, data, layout='kamada_kawai',
+                               color_variable=None, node_color_statistic=np.mean,
+                               color_by_columns_dropdown=True, plotly_kwargs=None):
     """
     Parameters
     ----------
-    pipeline : MapperPipeline
-        The nerve of the refined pullback cover. Nodes correspond to cluster
-        sets, and an edge exists between two nodes if they share at least one
-        point in common.
+    pipeline : :class:`MapperPipeline` object
+        Mapper pipeline to act on to data.
 
-    data : ndarray of shape (n_samples, n_features)
-        The point cloud data used to generate the nerve.
+    data : array-like of shape (n_samples, n_features)
+        Data used to generate the Mapper graph. Can be a pandas dataframe.
 
-    node_pos : igraph.Graph.layout or ndarray of shape (n_nodes, n_dims)
-        Encodes the layout of the graph according to a layout algorithm or
-        pre-defined array of coordinates in an n-dimensional space.
+    layout : None, str or callable, optional, default: ``'kamada-kawai'``
+        Layout algorithm for the graph. Can be any accepted value for the
+        ``layout`` parameter in the :meth:`layout` method of
+        :class:`igraph.Graph`. [1]_
 
-    node_color : ndarray of shape (n_nodes,)
-        The numerical values to color each node of the graph by.
+    color_variable : column index or name, or list of such, \
+        or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
+        or (fit-)transformer object, or None, optional, default: ``None``
+        Specifies which quantity is to be used for node colouring. When it is
+        a numpy ndarray or pandas dataframe, it must have the same length as
+        `data` and is interpreted as a quantity of interest according to
+        which each node of the Mapper graph is to be coloured (see
+        :attr:`node_colors`). ``None`` is equivalent to passing `data`. If an
+        object implementing :meth:`transform` or :meth:`fit_transform`,
+        e.g. a scikit-learn estimator or pipeline, it is applied to `data`
+        to generate the quantity of interest. Otherwise, it must be a column
+        or subset of columns to be selected from `data`.
 
-    columns_to_color : dict, optional, default: ``None``
-        Key-value pairs (column_name, column_index) to specify which columns of
-        :attr:`data` to color the graph by. Generates a dropdown widget to
-        select the columns to color by.
+    node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``numpy.mean``
+        Specifies how to determine the colors of each node. If a
+        numpy array, it must have the same length as the number of nodes in
+        the Mapper graph, and its values are used directly for node
+        coloring, ignoring `color_variable`. Otherwise, it must be a
+        callable object and is used to obtain a summary statistic within
+        each Mapper node of the quantity specified by :attr:`node_colors`.
+
+    color_by_columns_dropdown : bool, optional, default: ``True``
+        If ``True``, a dropdown widget is generated which allows the user to
+        colour Mapper nodes according to any column in `data`.
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
-
-    summary_stat : callable, default ``np.mean``
-        Summary statistic to apply to the elements in each node of the
-        topological graph.
 
     """
 
@@ -663,19 +677,12 @@ def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
         old_figure.data[1].marker.color = new_figure.data[1].marker.color
         old_figure.data[1].marker.sizeref = new_figure.data[1].marker.sizeref
 
-    def get_figure(pipe, data, node_pos, node_color, columns_to_color,
-                   summary_stat):
-        graph = pipe.fit_transform(data)
-        node_elements = graph['node_metadata']['node_elements']
-        if node_pos is None:
-            node_pos = graph.layout('kamada_kawai')
+    def get_figure(pipe, data, layout, color_variable, node_color_statistic,
+                   color_by_columns_dropdown, plotly_kwargs):
 
-        if node_color is None:
-            node_color = get_node_summary(node_elements, data,
-                                          summary_stat=summary_stat)
-
-        return create_network_2d(graph, data, node_pos, node_color,
-                                 columns_to_color, plotly_kwargs)
+        return create_network_2d(pipe, data, layout, color_variable,
+                                 node_color_statistic,
+                                 color_by_columns_dropdown, plotly_kwargs)
 
     def response_numeric(change):
         # TODO: remove hardcoding of keys and mimic what is done with clusterer
@@ -705,8 +712,9 @@ def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
             #        num_params}
             # )
 
-            new_fig = get_figure(pipe, data, node_pos,
-                                 node_color, columns_to_color, summary_stat)
+            new_fig = get_figure(pipe, data, layout, color_variable,
+                                 node_color_statistic,
+                                 color_by_columns_dropdown, plotly_kwargs)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
@@ -726,8 +734,9 @@ def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
                         **{param: cluster_params_widgets[param].value}
                     )
 
-            new_fig = get_figure(pipe, data, node_pos,
-                                 node_color, columns_to_color, summary_stat)
+            new_fig = get_figure(pipe, data, layout, color_variable,
+                                 node_color_statistic,
+                                 color_by_columns_dropdown, plotly_kwargs)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
@@ -796,8 +805,9 @@ def create_interactive_network(pipeline, data, node_pos=None, node_color=None,
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
-    fig = get_figure(pipe, data, node_pos, node_color,
-                     columns_to_color, summary_stat)
+    fig = get_figure(pipe, data, layout, color_variable,
+                     node_color_statistic,
+                     color_by_columns_dropdown, plotly_kwargs)
 
     observe_numeric_widgets(cover_params, cover_params_widgets)
     observe_numeric_widgets(cluster_params, cluster_params_widgets)
