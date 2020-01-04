@@ -564,8 +564,10 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
 
 
 def create_interactive_network(pipeline, data, layout='kamada_kawai',
-                               color_variable=None, node_color_statistic=np.mean,
-                               color_by_columns_dropdown=True, plotly_kwargs=None):
+                               color_variable=None,
+                               node_color_statistic=np.mean,
+                               color_by_columns_dropdown=True,
+                               plotly_kwargs=None):
     """
     Parameters
     ----------
