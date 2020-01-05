@@ -560,6 +560,13 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
         autosize=False
     )
 
+    if color_by_columns_dropdown:
+        fig.add_annotation(
+            go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
+                                 y=button_height - 0.03,
+                                 yref="paper", align="left", showarrow=False)
+        )
+
     return fig
 
 
