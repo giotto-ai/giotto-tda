@@ -39,9 +39,9 @@ def get_node_summary(node_elements, data, summary_stat=np.mean):
 
 def _get_colorscales():
     # TODO: move this to utils
-    return ['Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens',
+    return ['Viridis', 'Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens',
             'Greys', 'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu',
-            'Reds', 'Viridis', 'YlGnBu', 'YlOrRd']
+            'Reds', 'YlGnBu', 'YlOrRd']
 
 
 def _get_column_color_buttons(data, is_data_dataframe, node_elements,
