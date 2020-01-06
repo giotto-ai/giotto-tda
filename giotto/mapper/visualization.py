@@ -21,6 +21,389 @@ from .utils.visualization import (_get_colorscale_buttons, _get_colorscales,
                                   set_node_sizeref)
 
 
+def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
+                          color_variable=None, node_color_statistic=np.mean,
+                          color_by_columns_dropdown=True, plotly_kwargs=None):
+    """
+    Parameters
+    ----------
+    pipeline : :class:`MapperPipeline` object
+        Mapper pipeline to act on to data.
+
+    data : array-like of shape (n_samples, n_features)
+        Data used to generate the Mapper graph. Can be a pandas dataframe.
+
+    layout : None, str or callable, optional, default: ``'kamada-kawai'``
+        Layout algorithm for the graph. Can be any accepted value for the
+        ``layout`` parameter in the :meth:`layout` method of
+        :class:`igraph.Graph`. [1]_
+
+    color_variable : column index or name, or list of such, \
+        or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
+        or (fit-)transformer object, or None, optional, default: ``None``
+        Specifies which quantity is to be used for node colouring. When it is
+        a numpy ndarray or pandas dataframe, it must have the same length as
+        `data` and is interpreted as a quantity of interest according to
+        which each node of the Mapper graph is to be coloured (see
+        :attr:`node_colors`). ``None`` is equivalent to passing `data`. If an
+        object implementing :meth:`transform` or :meth:`fit_transform`,
+        e.g. a scikit-learn estimator or pipeline, it is applied to `data`
+        to generate the quantity of interest. Otherwise, it must be a column
+        or subset of columns to be selected from `data`.
+
+    node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``numpy.mean``
+        Specifies how to determine the colors of each node. If a
+        numpy array, it must have the same length as the number of nodes in
+        the Mapper graph, and its values are used directly for node
+        coloring, ignoring `color_variable`. Otherwise, it must be a
+        callable object and is used to obtain a summary statistic within
+        each Mapper node of the quantity specified by :attr:`node_colors`.
+
+    color_by_columns_dropdown : bool, optional, default: ``True``
+        If ``True``, a dropdown widget is generated which allows the user to
+        colour Mapper nodes according to any column in `data`.
+
+    plotly_kwargs : dict, optional, default: ``None``
+        Keyword arguments to configure the Plotly Figure.
+
+    Returns
+    -------
+    fig : ploty.graph_objs.Figure
+        The figure representing the nerve (topological graph).
+
+    Examples
+    --------
+    Include example showing that color_variable can be filter_func? Also can we
+    have a figure in the sphinx generated html?
+
+    References
+    ----------
+    .. [1] `igraph.Graph.layout
+            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_.
+
+    """
+
+    # Compute the graph and fetch the indices of points in each node
+    graph = pipeline.fit_transform(data)
+    # TODO: allow custom size reference
+    node_elements = graph['node_metadata']['node_elements']
+
+    # Simple duck typing to determine whether data is a pandas dataframe
+    is_data_dataframe = hasattr(data, 'columns')
+
+    # Determine whether color_variable is an array or pandas series/dataframe
+    # containing scalar values
+    if hasattr(color_variable, 'dtype') or hasattr(color_variable, 'dtypes'):
+        if len(color_variable) != len(data):
+            raise ValueError(
+                "color_variable and data must have the same length.")
+        color_variable_kind = 'scalars'
+    elif hasattr(color_variable, 'transform'):
+        color_variable_kind = 'transformer'
+    elif hasattr(color_variable, 'fit_transform'):
+        color_variable_kind = 'fit_transformer'
+    elif callable(color_variable):
+        color_variable_kind = 'callable'
+    elif color_variable is None:
+        color_variable_kind = 'data'
+    else:  # Assume color_variable is a selection of columns
+        color_variable_kind = 'columns'
+
+    # Determine whether node_colors is an array of node colours
+    is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
+    if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
+        raise ValueError("node_colors must be a callable or ndarray.")
+
+    # Determine whether layout is an array of node positions
+    is_layout_ndarray = hasattr(layout, 'dtype')
+
+    if is_node_colors_ndarray:
+        _node_colors = node_color_statistic
+    else:
+        if color_variable_kind == 'scalars':
+            color_data = color_variable
+        elif color_variable_kind == 'transformer':
+            color_data = color_variable.transform(data)
+        elif color_variable_kind == 'fit_transformer':
+            color_data = color_variable.fit_transform(data)
+        elif color_variable_kind == 'callable':
+            color_data = color_variable(data)
+        elif color_variable_kind == 'data':
+            if is_data_dataframe:
+                color_data = data.to_numpy()
+            else:
+                color_data = data
+        else:
+            if is_data_dataframe:
+                color_data = data[color_variable].to_numpy()
+            else:
+                color_data = data[:, color_variable]
+        _node_colors = get_node_summary(node_elements, color_data,
+                                        summary_stat=node_color_statistic)
+
+    if is_layout_ndarray:
+        node_pos = layout
+    else:
+        node_pos = graph.layout(layout, dim=dim)
+
+    if dim == 2:
+        plot_options = {
+            'edge_trace_line': dict(width=0.5, color='#888'),
+            'edge_trace_hoverinfo': None,
+            'edge_trace_mode': 'lines',
+            'node_trace_mode': 'markers',
+            'node_trace_hoverinfo': 'text',
+            'node_trace_marker_showscale': True,
+            'node_trace_marker_colorscale': 'viridis',
+            'node_trace_marker_reversescale': False,
+            'node_trace_marker_line': dict(width=.5, color='#888'),
+            'node_trace_marker_color': _node_colors,
+            'node_trace_marker_size': _get_node_size(node_elements),
+            'node_trace_marker_sizemode': 'area',
+            'node_trace_marker_sizeref': set_node_sizeref(node_elements),
+            'node_trace_marker_sizemin': 4,
+            'node_trace_marker_cmin': np.min(_node_colors),
+            'node_trace_marker_cmax': np.max(_node_colors),
+            'node_trace_marker_colorbar': dict(thickness=15,
+                                               title='',
+                                               xanchor='left',
+                                               titleside='right'),
+            'node_trace_marker_line_width': 2,
+            'node_trace_text': _get_node_text(graph),
+            'layout_showlegend': False,
+            'layout_hovermode': 'closest',
+            'layout_margin': {'b': 20, 'l': 5, 'r': 5, 't': 40},
+            'layout_xaxis': dict(showgrid=False, zeroline=False,
+                                 showticklabels=False, ticks="",
+                                 showline=False),
+            'layout_yaxis': dict(showgrid=False, zeroline=False,
+                                 showticklabels=False, ticks="",
+                                 showline=False),
+            'layout_xaxis_title': "",
+            'layout_yaxis_title': ""
+        }
+    elif dim == 3:
+        plot_options = {
+            'edge_trace_mode': 'lines',
+            'edge_trace_line': dict(color='rgb(125,125,125)',
+                                    width=1),
+            'edge_trace_hoverinfo': 'none',
+            'node_trace_mode': 'markers',
+            'node_trace_hoverinfo': 'text',
+            'node_trace_hoverlabel': dict(
+                bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
+                                 _node_colors))),
+            'node_trace_marker_showscale': True,
+            'node_trace_marker_colorscale': 'viridis',
+            'node_trace_marker_reversescale': False,
+            'node_trace_marker_line': dict(width=.5, color='#888'),
+            'node_trace_marker_color': list(
+                map(lambda x: rgb2hex(get_cmap('viridis')(x)), _node_colors)),
+            'node_trace_marker_size': _get_node_size(node_elements),
+            'node_trace_marker_sizemode': 'area',
+            'node_trace_marker_sizeref': set_node_sizeref(node_elements),
+            'node_trace_marker_sizemin': 4,
+            'node_trace_marker_cmin': np.min(_node_colors),
+            'node_trace_marker_cmax': np.max(_node_colors),
+            'node_trace_marker_colorbar': dict(thickness=15,
+                                               title='',
+                                               xanchor='left',
+                                               titleside='right'),
+            'node_trace_marker_line_width': 2,
+            'node_trace_text': _get_node_text(graph),
+            'axis': dict(showbackground=False,
+                         showline=False,
+                         zeroline=False,
+                         showgrid=False,
+                         showticklabels=False,
+                         title=''),
+            'layout_title': "",
+            'layout_width': 750,
+            'layout_height': 750,
+            'layout_showlegend': False,
+            'layout_margin': dict(t=100),
+            'layout_hovermode': 'closest',
+            'layout_annotations': []
+        }
+        plot_options['layout_scene'] = dict(xaxis=dict(plot_options['axis']),
+                                            yaxis=dict(plot_options['axis']),
+                                            zaxis=dict(plot_options['axis']))
+
+    if plotly_kwargs is not None:
+        plot_options.update(plotly_kwargs)
+
+    # TODO check we are not losing performance by using map + lambda
+    edge_x = list(reduce(operator.iconcat,
+                         map(lambda x: [node_pos[x[0]][0],
+                                        node_pos[x[1]][0], None],
+                             graph.get_edgelist()), []))
+    edge_y = list(reduce(operator.iconcat,
+                         map(lambda x: [node_pos[x[0]][1],
+                                        node_pos[x[1]][1], None],
+                             graph.get_edgelist()), []))
+
+    node_x = [node_pos[k][0] for k in range(graph.vcount())]
+    node_y = [node_pos[k][1] for k in range(graph.vcount())]
+
+    if dim == 2:
+        edge_trace = go.Scatter(
+            x=edge_x,
+            y=edge_y,
+            line=plot_options['edge_trace_line'],
+            hoverinfo=plot_options['edge_trace_hoverinfo'],
+            mode=plot_options['edge_trace_mode'])
+
+        node_trace = go.Scatter(
+            x=node_x,
+            y=node_y,
+            mode=plot_options['node_trace_mode'],
+            hoverinfo=plot_options['node_trace_hoverinfo'],
+            hovertext=plot_options['node_trace_text'],
+            marker=dict(
+                showscale=plot_options['node_trace_marker_showscale'],
+                colorscale=plot_options['node_trace_marker_colorscale'],
+                reversescale=plot_options['node_trace_marker_reversescale'],
+                line=plot_options['node_trace_marker_line'],
+                color=plot_options['node_trace_marker_color'],
+                size=plot_options['node_trace_marker_size'],
+                sizemode=plot_options['node_trace_marker_sizemode'],
+                sizeref=plot_options['node_trace_marker_sizeref'],
+                sizemin=plot_options['node_trace_marker_sizemin'],
+                cmin=plot_options['node_trace_marker_cmin'],
+                cmax=plot_options['node_trace_marker_cmax'],
+                colorbar=plot_options['node_trace_marker_colorbar'],
+                line_width=plot_options['node_trace_marker_line_width']),
+            text=plot_options['node_trace_text'])
+
+    elif dim == 3:
+        edge_z = list(reduce(operator.iconcat,
+                             map(lambda x: [node_pos[x[0]][2],
+                                            node_pos[x[1]][2], None],
+                                 graph.get_edgelist()), []))
+
+        node_z = [node_pos[k][2] for k in range(graph.vcount())]
+
+        edge_trace = go.Scatter3d(x=edge_x,
+                                  y=edge_y,
+                                  z=edge_z,
+                                  mode=plot_options['edge_trace_mode'],
+                                  line=plot_options['edge_trace_line'],
+                                  hoverinfo=plot_options['edge_trace_hoverinfo'])
+
+        node_trace = go.Scatter3d(
+            x=node_x,
+            y=node_y,
+            z=node_z,
+            mode=plot_options['node_trace_mode'],
+            hoverinfo=plot_options['node_trace_hoverinfo'],
+            hoverlabel=plot_options['node_trace_hoverlabel'],
+            marker=dict(
+                showscale=plot_options['node_trace_marker_showscale'],
+                colorscale=plot_options['node_trace_marker_colorscale'],
+                reversescale=plot_options['node_trace_marker_reversescale'],
+                line=plot_options['node_trace_marker_line'],
+                color=plot_options['node_trace_marker_color'],
+                size=plot_options['node_trace_marker_size'],
+                sizemode=plot_options['node_trace_marker_sizemode'],
+                sizeref=plot_options['node_trace_marker_sizeref'],
+                sizemin=plot_options['node_trace_marker_sizemin'],
+                cmin=plot_options['node_trace_marker_cmin'],
+                cmax=plot_options['node_trace_marker_cmax'],
+                colorbar=plot_options['node_trace_marker_colorbar'],
+                line_width=plot_options['node_trace_marker_line_width']),
+            text=plot_options['node_trace_text'])
+
+    layout = go.Layout(
+        # title=plot_options['layout_title'],
+        # width=plot_options['layout_width'],
+        # height=plot_options['layout_height'],
+        showlegend=plot_options['layout_showlegend'],
+        # scene=plot_options['layout_scene'],
+        margin=plot_options['layout_margin'],
+        hovermode=plot_options['layout_hovermode'],
+        # annotations=plot_options['layout_annotations']
+    )
+
+    if dim == 2:
+        fig = go.FigureWidget(
+            data=[edge_trace, node_trace],
+            layout=go.Layout(
+                showlegend=plot_options['layout_showlegend'],
+                hovermode=plot_options['layout_hovermode'],
+                margin=plot_options['layout_margin'],
+                xaxis=plot_options['layout_xaxis'],
+                yaxis=plot_options['layout_yaxis'],
+                xaxis_title=plot_options['layout_xaxis_title'],
+                yaxis_title=plot_options['layout_yaxis_title'])
+        )
+        fig.update_layout(template='simple_white', autosize=False)
+    elif dim == 3:
+        layout = go.Layout(
+            title=plot_options['layout_title'],
+            width=plot_options['layout_width'],
+            height=plot_options['layout_height'],
+            showlegend=plot_options['layout_showlegend'],
+            scene=plot_options['layout_scene'],
+            margin=plot_options['layout_margin'],
+            hovermode=plot_options['layout_hovermode'],
+            annotations=plot_options['layout_annotations'])
+
+        fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
+
+    # Add dropdown for colorscale of nodes
+    colorscale_buttons = _get_colorscale_buttons(_get_colorscales())
+
+    # Compute node colours according to data columns only if necessary
+    if color_by_columns_dropdown:
+        column_color_buttons = _get_column_color_buttons(
+            data, is_data_dataframe, node_elements, _node_colors,
+            plot_options['node_trace_marker_colorscale'])
+    else:
+        column_color_buttons = None
+
+    button_height = 1.1
+    fig.update_layout(
+        updatemenus=[
+            go.layout.Updatemenu(
+                buttons=colorscale_buttons,
+                direction="down",
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.12,
+                xanchor='left',
+                y=button_height,
+                yanchor="top"
+            ),
+            go.layout.Updatemenu(
+                buttons=column_color_buttons,
+                direction="down",
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.42,
+                xanchor='left',
+                y=button_height,
+                yanchor="top"
+            ),
+        ])
+
+    fig.update_layout(
+        annotations=[
+            go.layout.Annotation(text="Colorscale:", x=0, xref="paper",
+                                 y=button_height - 0.045, yref="paper",
+                                 align="left", showarrow=False)
+        ])
+
+    if color_by_columns_dropdown:
+        fig.add_annotation(
+            go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
+                                 y=button_height - 0.045,
+                                 yref="paper", align="left", showarrow=False)
+        )
+
+    return fig
+
+
 def create_network_2d(pipeline, data, layout='kamada_kawai',
                       color_variable=None, node_color_statistic=np.mean,
                       color_by_columns_dropdown=True, plotly_kwargs=None):
@@ -249,7 +632,8 @@ def create_network_2d(pipeline, data, layout='kamada_kawai',
     # Compute node colours according to data columns only if necessary
     if color_by_columns_dropdown:
         column_color_buttons = _get_column_color_buttons(
-            data, is_data_dataframe, node_elements, _node_colors)
+            data, is_data_dataframe, node_elements, _node_colors,
+            plot_options['node_trace_marker_colorscale'])
     else:
         column_color_buttons = None
 
@@ -522,7 +906,8 @@ def create_network_3d(pipeline, data, layout='kamada_kawai',
     # Compute node colours according to data columns only if necessary
     if color_by_columns_dropdown:
         column_color_buttons = _get_column_color_buttons(
-            data, is_data_dataframe, node_elements, _node_colors)
+            data, is_data_dataframe, node_elements, _node_colors,
+            plot_options['node_trace_marker_colorscale'])
     else:
         column_color_buttons = None
 
