@@ -186,16 +186,14 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         'layout_annotations': list()
     }
 
-    if dim == 2:
-        plot_options.update({
-            'layout_xaxis': dict(showgrid=False, zeroline=False,
-                                 showticklabels=False, ticks="",
-                                 showline=False),
-            'layout_yaxis': dict(showgrid=False, zeroline=False,
-                                 showticklabels=False, ticks="",
-                                 showline=False),
-        })
-    elif dim == 3:
+    layout_options_common = go.Layout(
+        showlegend=plot_options['layout_showlegend'],
+        hovermode=plot_options['layout_hovermode'],
+        margin=plot_options['layout_margin'],
+        autosize=False
+    )
+
+    if dim == 3:
         plot_options.update({
             'axis': dict(showbackground=False,
                          showline=False,
@@ -225,6 +223,14 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
     node_y = [node_pos[k][1] for k in range(graph.vcount())]
 
     if dim == 2:
+        plot_options.update({
+            'layout_xaxis': dict(showgrid=False, zeroline=False,
+                                 showticklabels=False, ticks="",
+                                 showline=False),
+            'layout_yaxis': dict(showgrid=False, zeroline=False,
+                                 showticklabels=False, ticks="",
+                                 showline=False),
+        })
         edge_trace = go.Scatter(
             x=edge_x,
             y=edge_y,
@@ -253,6 +259,17 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                 colorbar=plot_options['node_trace_marker_colorbar'],
                 line_width=plot_options['node_trace_marker_line_width']),
             text=plot_options['node_trace_text'])
+
+        layout_options_2d = {
+            'layout_xaxis': plot_options['layout_xaxis'],
+            'layout_xaxis_title': plot_options['layout_xaxis_title'],
+            'layout_yaxis': plot_options['layout_yaxis'],
+            'layout_yaxis_title': plot_options['layout_yaxis_title'],
+            'layout_template': 'simple_white',
+        }
+        fig = go.FigureWidget(data=[edge_trace, node_trace],
+                              layout=layout_options_common)
+        fig.update(layout_options_2d)
 
     elif dim == 3:
         edge_z = list(reduce(operator.iconcat,
@@ -292,26 +309,6 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                 line_width=plot_options['node_trace_marker_line_width']),
             text=plot_options['node_trace_text'])
 
-    layout_options_common = go.Layout(
-        showlegend=plot_options['layout_showlegend'],
-        hovermode=plot_options['layout_hovermode'],
-        margin=plot_options['layout_margin'],
-        autosize=False
-    )
-
-    if dim == 2:
-        layout_options_2d = {
-            'layout_xaxis': plot_options['layout_xaxis'],
-            'layout_xaxis_title': plot_options['layout_xaxis_title'],
-            'layout_yaxis': plot_options['layout_yaxis'],
-            'layout_yaxis_title': plot_options['layout_yaxis_title'],
-            'layout_template': 'simple_white',
-        }
-        fig = go.FigureWidget(data=[edge_trace, node_trace],
-                              layout=layout_options_common)
-        fig.update(layout_options_2d)
-
-    elif dim == 3:
         layout_options_3d = {
             'layout_scene': plot_options['layout_scene'],
             'layout_annotations': plot_options['layout_annotations'],
@@ -337,7 +334,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                 direction="down",
                 pad={"r": 10, "t": 10},
                 showactive=True,
-                x=0.12,
+                x=0.11,
                 xanchor='left',
                 y=button_height,
                 yanchor="top"
