@@ -86,8 +86,9 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
 
     """
 
-    # Compute the graph and fetch the indices of points in each node
-    graph = pipeline.fit_transform(data)
+    # Compute the graph and fetch the indices of points in each nodeclone
+    pipe = clone(pipeline)
+    graph = pipe.fit_transform(data)
     # TODO: allow custom size reference
     node_elements = graph['node_metadata']['node_elements']
 
