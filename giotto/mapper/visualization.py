@@ -38,6 +38,9 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         ``layout`` parameter in the :meth:`layout` method of
         :class:`igraph.Graph`. [1]_
 
+    dim : int, default: ``2``
+        The number of dimensions for the layout. Can be 2 or 3.
+
     color_variable : column index or name, or list of such, \
         or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
         or (fit-)transformer object, or None, optional, default: ``None``
