@@ -962,7 +962,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
 
     def get_cover_params_widgets(param, value):
         if isinstance(value, float):
-            return (param, widgets.FloatSlider(
+            return (param, widgets.BoundedFloatText(
                 value=value,
                 step=0.05,
                 min=0.05,
@@ -971,7 +971,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
                 disabled=False
             ))
         elif isinstance(value, int):
-            return (param, widgets.IntSlider(
+            return (param, widgets.BoundedIntText(
                 value=value,
                 min=1,
                 max=100,
