@@ -186,6 +186,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         'layout_annotations': list()
     }
 
+    # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
         showlegend=plot_options['layout_showlegend'],
         hovermode=plot_options['layout_hovermode'],
@@ -193,19 +194,6 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         autosize=False
     )
 
-    if dim == 3:
-        plot_options.update({
-            'axis': dict(showbackground=False,
-                         showline=False,
-                         zeroline=False,
-                         showgrid=False,
-                         showticklabels=False,
-                         title='')
-        })
-        plot_options['layout_scene'] = dict(xaxis=dict(plot_options['axis']),
-                                            yaxis=dict(plot_options['axis']),
-                                            zaxis=dict(plot_options['axis'])
-                                            )
     if plotly_kwargs is not None:
         plot_options.update(plotly_kwargs)
 
@@ -272,6 +260,19 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         fig.update(layout_options_2d)
 
     elif dim == 3:
+        plot_options.update({
+            'axis': dict(showbackground=False,
+                         showline=False,
+                         zeroline=False,
+                         showgrid=False,
+                         showticklabels=False,
+                         title='')
+        })
+        plot_options['layout_scene'] = dict(xaxis=dict(plot_options['axis']),
+                                            yaxis=dict(plot_options['axis']),
+                                            zaxis=dict(plot_options['axis'])
+                                            )
+
         edge_z = list(reduce(operator.iconcat,
                              map(lambda x: [node_pos[x[0]][2],
                                             node_pos[x[1]][2], None],
