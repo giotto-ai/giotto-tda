@@ -1,5 +1,4 @@
 """Persistent homology on point clouds or finite metric spaces."""
-# License: Apache 2.0
 
 import numpy as np
 import numbers
@@ -68,6 +67,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     See also
     --------
     ConsistentRescaling
+    CubicalPersistence
 
     Notes
     -----
@@ -103,17 +103,19 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xds = ripser(X[X[:, 0] != np.inf], maxdim=self._max_homology_dimension,
+        Xdgms = ripser(X[X[:, 0] != np.inf], maxdim=self._max_homology_dimension,
                      thresh=self.max_edge_length, coeff=self.coeff,
                      metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
 
-        Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
-                                                       dtype=Xds[dim].dtype)])
+        # Add dimension as the third elements of each (b, d) tuple
+        Xdgms = {dim: np.hstack([Xdgms[dim],
+                                 dim * np.ones((Xdgms[dim].shape[0], 1),
+                                               dtype=Xdgms[dim].dtype)])
                for dim in self._homology_dimensions}
-        return Xds
+        return Xdgms
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -157,7 +159,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each point cloud or distance matrix in `X`, the
+        """For each point cloud or distance matrix in `X`, compute the
         relevant persistence diagram as an array of triples [b, d, q]. Each
         triple represents a persistent topological feature in dimension q
         (belonging to `homology_dimensions`) which is born at b and dies at d.

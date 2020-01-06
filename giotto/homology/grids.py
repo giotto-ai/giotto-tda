@@ -1,5 +1,4 @@
 """Persistent homology on grids."""
-# License: Apache 2.0
 
 import numpy as np
 import numbers
@@ -78,15 +77,20 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         cubical_complex = CubicalComplex(
             dimensions=X.shape,
             top_dimensional_cells=X.flatten(order="F"))
-        Xds = cubical_complex.persistence(homology_coeff_field=self.coeff,
-                                          min_persistence=0)
-        Xds = {dim: np.array([Xds[i][1] for i in range(len(Xds))
-                              if Xds[i][0] == dim]).reshape((-1, 2))
-               for dim in self.homology_dimensions}
-        Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
-                                                       dtype=Xds[dim].dtype)])
+        Xdgms = cubical_complex.persistence(homology_coeff_field=self.coeff,
+                                            min_persistence=0)
+
+        # Separate diagrams by homology dimensions
+        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xds))
+                                if Xdgms[i][0] == dim]).reshape((-1, 2))
+                 for dim in self.homology_dimensions}
+
+        # Add dimension as the third elements of each (b, d) tuple
+        Xdgms = {dim: np.hstack([Xdgms[dim],
+                                 dim * np.ones((Xdgms[dim].shape[0], 1),
+                                               dtype=Xdgms[dim].dtype)])
                for dim in self._homology_dimensions}
-        return Xds
+        return Xdgms
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -125,7 +129,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each image in `X`, the relevant persistence diagram
+        """For each image in `X`, compute the relevant persistence diagram
         as an array of triples [b, d, q]. Each triple represents a persistent
         topological feature in dimension q (belonging to `homology_dimensions`)
         which is born at b and dies at d. Only triples in which b < d are
@@ -134,9 +138,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         purposes, since the number of non-trivial persistent topological
         features is typically not constant across samples. They carry no
         information and hence should be effectively ignored by any further
-        computation. (b, d) -- one per persistent topological hole -- where b
-        is the scale at which the topological hole first appears, and d the
-        scale at which the same hole disappears.
+        computation.
 
         Parameters
         ----------
@@ -156,7 +158,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             topological features in dimension :math:`q` across all samples in
             `X`.
         """
-        # Check if fit had been called
         check_is_fitted(self, ['_homology_dimensions',
                                '_max_homology_dimension'])
 
