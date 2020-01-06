@@ -147,32 +147,36 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
     else:
         node_pos = graph.layout(layout, dim=dim)
 
+    plot_options = {
+        'edge_trace_mode': 'lines',
+        'edge_trace_line': dict(color='#888', width=1),
+        'edge_trace_hoverinfo': None,
+        'node_trace_mode': 'markers',
+        'node_trace_hoverinfo': 'text',
+        'node_trace_marker_colorscale': 'viridis',
+        'node_trace_marker_showscale': True,
+        'node_trace_marker_reversescale': False,
+        'node_trace_marker_line': dict(width=.5, color='#888'),
+        'node_trace_marker_size': _get_node_size(node_elements),
+        'node_trace_marker_sizemode': 'area',
+        'node_trace_marker_sizeref': set_node_sizeref(node_elements),
+        'node_trace_marker_sizemin': 4,
+        'node_trace_marker_cmin': np.min(_node_colors),
+        'node_trace_marker_cmax': np.max(_node_colors),
+        'node_trace_marker_colorbar': dict(thickness=15,
+                                           title='',
+                                           xanchor='left',
+                                           titleside='right'),
+        'node_trace_marker_line_width': 2,
+        'node_trace_text': _get_node_text(graph),
+        'layout_showlegend': False,
+        'layout_hovermode': 'closest',
+
+    }
+
     if dim == 2:
-        plot_options = {
-            'edge_trace_line': dict(width=0.5, color='#888'),
-            'edge_trace_hoverinfo': None,
-            'edge_trace_mode': 'lines',
-            'node_trace_mode': 'markers',
-            'node_trace_hoverinfo': 'text',
-            'node_trace_marker_showscale': True,
-            'node_trace_marker_colorscale': 'viridis',
-            'node_trace_marker_reversescale': False,
-            'node_trace_marker_line': dict(width=.5, color='#888'),
+        plot_options.update({
             'node_trace_marker_color': _node_colors,
-            'node_trace_marker_size': _get_node_size(node_elements),
-            'node_trace_marker_sizemode': 'area',
-            'node_trace_marker_sizeref': set_node_sizeref(node_elements),
-            'node_trace_marker_sizemin': 4,
-            'node_trace_marker_cmin': np.min(_node_colors),
-            'node_trace_marker_cmax': np.max(_node_colors),
-            'node_trace_marker_colorbar': dict(thickness=15,
-                                               title='',
-                                               xanchor='left',
-                                               titleside='right'),
-            'node_trace_marker_line_width': 2,
-            'node_trace_text': _get_node_text(graph),
-            'layout_showlegend': False,
-            'layout_hovermode': 'closest',
             'layout_margin': {'b': 20, 'l': 5, 'r': 5, 't': 40},
             'layout_xaxis': dict(showgrid=False, zeroline=False,
                                  showticklabels=False, ticks="",
@@ -182,36 +186,14 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                                  showline=False),
             'layout_xaxis_title': "",
             'layout_yaxis_title': ""
-        }
+        })
     elif dim == 3:
-        plot_options = {
-            'edge_trace_mode': 'lines',
-            'edge_trace_line': dict(color='rgb(125,125,125)',
-                                    width=1),
-            'edge_trace_hoverinfo': 'none',
-            'node_trace_mode': 'markers',
-            'node_trace_hoverinfo': 'text',
+        plot_options.update({
             'node_trace_hoverlabel': dict(
                 bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
                                  _node_colors))),
-            'node_trace_marker_showscale': True,
-            'node_trace_marker_colorscale': 'viridis',
-            'node_trace_marker_reversescale': False,
-            'node_trace_marker_line': dict(width=.5, color='#888'),
             'node_trace_marker_color': list(
                 map(lambda x: rgb2hex(get_cmap('viridis')(x)), _node_colors)),
-            'node_trace_marker_size': _get_node_size(node_elements),
-            'node_trace_marker_sizemode': 'area',
-            'node_trace_marker_sizeref': set_node_sizeref(node_elements),
-            'node_trace_marker_sizemin': 4,
-            'node_trace_marker_cmin': np.min(_node_colors),
-            'node_trace_marker_cmax': np.max(_node_colors),
-            'node_trace_marker_colorbar': dict(thickness=15,
-                                               title='',
-                                               xanchor='left',
-                                               titleside='right'),
-            'node_trace_marker_line_width': 2,
-            'node_trace_text': _get_node_text(graph),
             'axis': dict(showbackground=False,
                          showline=False,
                          zeroline=False,
@@ -221,15 +203,13 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
             'layout_title': "",
             'layout_width': 750,
             'layout_height': 750,
-            'layout_showlegend': False,
             'layout_margin': dict(t=100),
-            'layout_hovermode': 'closest',
             'layout_annotations': []
-        }
+        })
         plot_options['layout_scene'] = dict(xaxis=dict(plot_options['axis']),
                                             yaxis=dict(plot_options['axis']),
-                                            zaxis=dict(plot_options['axis']))
-
+                                            zaxis=dict(plot_options['axis'])
+                                            )
     if plotly_kwargs is not None:
         plot_options.update(plotly_kwargs)
 
@@ -352,7 +332,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
 
     # Add dropdown for colorscale of nodes
-    colorscale_buttons = _get_colorscale_buttons(_get_colorscales())
+    # colorscale_buttons = _get_colorscale_buttons(_get_colorscales())
 
     # Compute node colours according to data columns only if necessary
     if color_by_columns_dropdown:
@@ -366,7 +346,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
     fig.update_layout(
         updatemenus=[
             go.layout.Updatemenu(
-                buttons=colorscale_buttons,
+                buttons=column_color_buttons,
                 direction="down",
                 pad={"r": 10, "t": 10},
                 showactive=True,
@@ -375,28 +355,11 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                 y=button_height,
                 yanchor="top"
             ),
-            go.layout.Updatemenu(
-                buttons=column_color_buttons,
-                direction="down",
-                pad={"r": 10, "t": 10},
-                showactive=True,
-                x=0.42,
-                xanchor='left',
-                y=button_height,
-                yanchor="top"
-            ),
-        ])
-
-    fig.update_layout(
-        annotations=[
-            go.layout.Annotation(text="Colorscale:", x=0, xref="paper",
-                                 y=button_height - 0.045, yref="paper",
-                                 align="left", showarrow=False)
         ])
 
     if color_by_columns_dropdown:
         fig.add_annotation(
-            go.layout.Annotation(text="Color by:", x=0.37, xref="paper",
+            go.layout.Annotation(text="Color by:", x=0, xref="paper",
                                  y=button_height - 0.045,
                                  yref="paper", align="left", showarrow=False)
         )
@@ -1074,9 +1037,11 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     def get_figure(pipe, data, layout, color_variable, node_color_statistic,
                    color_by_columns_dropdown, plotly_kwargs):
 
-        return create_network_2d(pipe, data, layout, color_variable,
-                                 node_color_statistic,
-                                 color_by_columns_dropdown, plotly_kwargs)
+        return create_static_network(pipe, data, layout, dim=2,
+                                     color_variable=color_variable,
+                                     node_color_statistic=node_color_statistic,
+                                     color_by_columns_dropdown=color_by_columns_dropdown,
+                                     plotly_kwargs=plotly_kwargs)
 
     def response_numeric(change):
         # TODO: remove hardcoding of keys and mimic what is done with clusterer
