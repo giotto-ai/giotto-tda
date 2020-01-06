@@ -15,8 +15,7 @@ from matplotlib.colors import rgb2hex
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
-from .utils.visualization import (_get_colorscale_buttons, _get_colorscales,
-                                  _get_column_color_buttons, _get_node_size,
+from .utils.visualization import (_get_column_color_buttons, _get_node_size,
                                   _get_node_text, get_node_summary,
                                   set_node_sizeref)
 
@@ -186,6 +185,9 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         'layout_annotations': list()
     }
 
+    if plotly_kwargs is not None:
+        plot_options.update(plotly_kwargs)
+
     # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
         showlegend=plot_options['layout_showlegend'],
@@ -193,9 +195,6 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         margin=plot_options['layout_margin'],
         autosize=False
     )
-
-    if plotly_kwargs is not None:
-        plot_options.update(plotly_kwargs)
 
     # TODO check we are not losing performance by using map + lambda
     edge_x = list(reduce(operator.iconcat,
@@ -237,7 +236,11 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                 colorscale=plot_options['node_trace_marker_colorscale'],
                 reversescale=plot_options['node_trace_marker_reversescale'],
                 line=plot_options['node_trace_marker_line'],
-                color=plot_options['node_trace_marker_color'],
+                color=list(
+                    map(lambda x: rgb2hex(
+                        get_cmap(
+                            plot_options['node_trace_marker_colorscale']
+                        )(x)), _node_colors)),
                 size=plot_options['node_trace_marker_size'],
                 sizemode=plot_options['node_trace_marker_sizemode'],
                 sizeref=plot_options['node_trace_marker_sizeref'],
@@ -280,12 +283,13 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
 
         node_z = [node_pos[k][2] for k in range(graph.vcount())]
 
-        edge_trace = go.Scatter3d(x=edge_x,
-                                  y=edge_y,
-                                  z=edge_z,
-                                  mode=plot_options['edge_trace_mode'],
-                                  line=plot_options['edge_trace_line'],
-                                  hoverinfo=plot_options['edge_trace_hoverinfo'])
+        edge_trace = go.Scatter3d(
+            x=edge_x,
+            y=edge_y,
+            z=edge_z,
+            mode=plot_options['edge_trace_mode'],
+            line=plot_options['edge_trace_line'],
+            hoverinfo=plot_options['edge_trace_hoverinfo'])
 
         node_trace = go.Scatter3d(
             x=node_x,
@@ -315,8 +319,8 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
             'layout_annotations': plot_options['layout_annotations'],
         }
 
-        fig = go.Figure(data=[edge_trace, node_trace],
-                        layout=layout_options_common)
+        fig = go.FigureWidget(data=[edge_trace, node_trace],
+                              layout=layout_options_common)
         fig.update(layout_options_3d)
 
     # Compute node colours according to data columns only if necessary
@@ -352,7 +356,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
     return fig
 
 
-def create_interactive_network(pipeline, data, layout='kamada_kawai',
+def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
                                color_variable=None,
                                node_color_statistic=np.mean,
                                color_by_columns_dropdown=True,
@@ -370,6 +374,9 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         Layout algorithm for the graph. Can be any accepted value for the
         ``layout`` parameter in the :meth:`layout` method of
         :class:`igraph.Graph`. [1]_
+
+    dim : int, default: ``2``
+        The number of dimensions for the layout. Can be 2 or 3.
 
     color_variable : column index or name, or list of such, \
         or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
@@ -457,25 +464,33 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         else:
             return None
 
-    def update_figure(old_figure, new_figure):
+    def update_figure(old_figure, new_figure, dim):
         # TODO could this be abstracted to node and edge traces and metadata
         #  information without need for creating a full new figure object
         old_figure.data[0].x = new_figure.data[0].x
         old_figure.data[0].y = new_figure.data[0].y
         old_figure.data[1].x = new_figure.data[1].x
         old_figure.data[1].y = new_figure.data[1].y
+
+        if dim == 3:
+            old_figure.data[0].z = new_figure.data[0].z
+            old_figure.data[1].z = new_figure.data[1].z
+
         old_figure.data[1].marker.size = new_figure.data[1].marker.size
         old_figure.data[1].marker.color = new_figure.data[1].marker.color
         old_figure.data[1].marker.sizeref = new_figure.data[1].marker.sizeref
 
-    def get_figure(pipe, data, layout, color_variable, node_color_statistic,
-                   color_by_columns_dropdown, plotly_kwargs):
+    def get_figure(pipe, data, layout, dim, color_variable,
+                   node_color_statistic, color_by_columns_dropdown,
+                   plotly_kwargs):
 
-        return create_static_network(pipe, data, layout, dim=2,
-                                     color_variable=color_variable,
-                                     node_color_statistic=node_color_statistic,
-                                     color_by_columns_dropdown=color_by_columns_dropdown,
-                                     plotly_kwargs=plotly_kwargs)
+        return create_static_network(
+            pipe, data, layout, dim,
+            color_variable=color_variable,
+            node_color_statistic=node_color_statistic,
+            color_by_columns_dropdown=color_by_columns_dropdown,
+            plotly_kwargs=plotly_kwargs
+        )
 
     def response_numeric(change):
         # TODO: remove hardcoding of keys and mimic what is done with clusterer
@@ -505,13 +520,13 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
             #        num_params}
             # )
 
-            new_fig = get_figure(pipe, data, layout, color_variable,
+            new_fig = get_figure(pipe, data, layout, dim, color_variable,
                                  node_color_statistic,
                                  color_by_columns_dropdown, plotly_kwargs)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                update_figure(fig, new_fig)
+                update_figure(fig, new_fig, dim)
             valid.value = True
         except Exception:
             exception_data = traceback.format_exc().splitlines()
@@ -527,13 +542,13 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
                         **{param: cluster_params_widgets[param].value}
                     )
 
-            new_fig = get_figure(pipe, data, layout, color_variable,
+            new_fig = get_figure(pipe, data, layout, dim, color_variable,
                                  node_color_statistic,
                                  color_by_columns_dropdown, plotly_kwargs)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                update_figure(fig, new_fig)
+                update_figure(fig, new_fig, dim)
             valid.value = True
         except Exception:
             exception_data = traceback.format_exc().splitlines()
@@ -598,7 +613,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
-    fig = get_figure(pipe, data, layout, color_variable,
+    fig = get_figure(pipe, data, layout, dim, color_variable,
                      node_color_statistic,
                      color_by_columns_dropdown, plotly_kwargs)
 

@@ -36,13 +36,6 @@ def get_node_summary(node_elements, data, summary_stat=np.mean):
 """Plotly layout functions"""
 
 
-def _get_colorscales():
-    # TODO: move this to utils
-    return ['Viridis', 'Blackbody', 'Bluered', 'Blues', 'Earth', 'Electric', 'Greens',
-            'Greys', 'Hot', 'Jet', 'Picnic', 'Portland', 'Rainbow', 'RdBu',
-            'Reds', 'YlGnBu', 'YlOrRd']
-
-
 def _get_column_color_buttons(data, is_data_dataframe, node_elements,
                               node_colors_color_variable, colorscale):
     # TODO: Consider opting for on-demand computation instead of precomputing
