@@ -12,14 +12,13 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        'Node Id:{}<br>Node size:{}<br>Pullback Id:{}<br>Cluster label:{}'
+        'Node Id:{}<br>Node size:{}<br>Cluster label:{}'
         .format(
-            node_id, len(node_elements), interval_id, cluster_id,
+            interval_id, len(node_elements), cluster_id,
         )
-        for node_id, node_elements, interval_id, cluster_id in
-        zip(graph['node_metadata']['node_id'],
+        for interval_id, node_elements, cluster_id in
+        zip(graph['node_metadata']['interval_id'],
             graph['node_metadata']['node_elements'],
-            graph['node_metadata']['interval_id'],
             graph['node_metadata']['cluster_id'])]
 
 
