@@ -179,7 +179,8 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         'layout_xaxis_title': "",
         'layout_yaxis_title': "",
         'layout_title': "",
-        'layout_margin': {'b': 20, 'l': 5, 'r': 5, 't': 40}
+        'layout_margin': {'b': 20, 'l': 5, 'r': 5, 't': 40},
+        'layout_annotations': list()
     }
 
     if dim == 2:
@@ -198,8 +199,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                          zeroline=False,
                          showgrid=False,
                          showticklabels=False,
-                         title=''),
-            'layout_annotations': [],
+                         title='')
         })
         plot_options['layout_scene'] = dict(xaxis=dict(plot_options['axis']),
                                             yaxis=dict(plot_options['axis']),
@@ -289,33 +289,34 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                 line_width=plot_options['node_trace_marker_line_width']),
             text=plot_options['node_trace_text'])
 
-    if dim == 2:
-        layout_options = go.Layout(
-            showlegend=plot_options['layout_showlegend'],
-            hovermode=plot_options['layout_hovermode'],
-            margin=plot_options['layout_margin'],
-            xaxis=plot_options['layout_xaxis'],
-            yaxis=plot_options['layout_yaxis'],
-            xaxis_title=plot_options['layout_xaxis_title'],
-            yaxis_title=plot_options['layout_yaxis_title'],
-            template='simple_white',
-            autosize=False
-        )
-        fig = go.FigureWidget(
-            data=[edge_trace, node_trace],
-            layout=layout_options
-        )
-    elif dim == 3:
-        layout_options = go.Layout(
-            title=plot_options['layout_title'],
-            showlegend=plot_options['layout_showlegend'],
-            scene=plot_options['layout_scene'],
-            margin=plot_options['layout_margin'],
-            hovermode=plot_options['layout_hovermode'],
-            annotations=plot_options['layout_annotations'],
-            autosize=False)
+    layout_options_common = go.Layout(
+        showlegend=plot_options['layout_showlegend'],
+        hovermode=plot_options['layout_hovermode'],
+        margin=plot_options['layout_margin'],
+        autosize=False
+    )
 
-        fig = go.Figure(data=[edge_trace, node_trace], layout=layout_options)
+    if dim == 2:
+        layout_options_2d = {
+            'layout_xaxis': plot_options['layout_xaxis'],
+            'layout_xaxis_title': plot_options['layout_xaxis_title'],
+            'layout_yaxis': plot_options['layout_yaxis'],
+            'layout_yaxis_title': plot_options['layout_yaxis_title'],
+            'layout_template': 'simple_white',
+        }
+        fig = go.FigureWidget(data=[edge_trace, node_trace],
+                              layout=layout_options_common)
+        fig.update(layout_options_2d)
+
+    elif dim == 3:
+        layout_options_3d = {
+            'layout_scene': plot_options['layout_scene'],
+            'layout_annotations': plot_options['layout_annotations'],
+        }
+
+        fig = go.Figure(data=[edge_trace, node_trace],
+                        layout=layout_options_common)
+        fig.update(layout_options_3d)
 
     # Compute node colours according to data columns only if necessary
     if color_by_columns_dropdown:
