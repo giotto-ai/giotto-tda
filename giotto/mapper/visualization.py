@@ -100,7 +100,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     if is_layout_ndarray:
         node_pos = layout
     else:
-        node_pos = graph.layout(layout, layout_dim=layout_dim)
+        node_pos = graph.layout(layout, dim=layout_dim)
 
     # Determine whether color_variable is an array or pandas series/dataframe
     # containing scalar values
