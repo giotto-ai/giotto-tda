@@ -16,11 +16,12 @@ from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
 from .utils.visualization import (_get_column_color_buttons, _get_node_size,
-                                  _get_node_text, get_node_summary,
-                                  set_node_sizeref)
+                                  _get_node_text,
+                                  set_node_sizeref, _is_array_or_dataframe,
+                                  _get_node_colors)
 
 
-def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
+def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
                           color_variable=None, node_color_statistic=np.mean,
                           color_by_columns_dropdown=True, plotly_kwargs=None):
     """
@@ -37,7 +38,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
         ``layout`` parameter in the :meth:`layout` method of
         :class:`igraph.Graph`. [1]_
 
-    dim : int, default: ``2``
+    layout_dim : int, default: ``2``
         The number of dimensions for the layout. Can be 2 or 3.
 
     color_variable : column index or name, or list of such, \
@@ -86,69 +87,34 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
 
     """
 
-    # Compute the graph and fetch the indices of points in each nodeclone
+    # Compute the graph and fetch the indices of points in each node
     pipe = clone(pipeline)
     graph = pipe.fit_transform(data)
-    # TODO: allow custom size reference
     node_elements = graph['node_metadata']['node_elements']
 
     # Simple duck typing to determine whether data is a pandas dataframe
     is_data_dataframe = hasattr(data, 'columns')
 
+    # Determine whether layout is an array of node positions
+    is_layout_ndarray = hasattr(layout, 'dtype')
+    if is_layout_ndarray:
+        node_pos = layout
+    else:
+        node_pos = graph.layout(layout, layout_dim=layout_dim)
+
     # Determine whether color_variable is an array or pandas series/dataframe
     # containing scalar values
-    if hasattr(color_variable, 'dtype') or hasattr(color_variable, 'dtypes'):
-        if len(color_variable) != len(data):
-            raise ValueError(
-                "color_variable and data must have the same length.")
-        color_variable_kind = 'scalars'
-    elif hasattr(color_variable, 'transform'):
-        color_variable_kind = 'transformer'
-    elif hasattr(color_variable, 'fit_transform'):
-        color_variable_kind = 'fit_transformer'
-    elif callable(color_variable):
-        color_variable_kind = 'callable'
-    elif color_variable is None:
-        color_variable_kind = 'data'
-    else:  # Assume color_variable is a selection of columns
-        color_variable_kind = 'columns'
+    color_variable_kind = _is_array_or_dataframe(color_variable, data)
 
     # Determine whether node_colors is an array of node colours
     is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
     if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
-        raise ValueError("node_colors must be a callable or ndarray.")
+        raise ValueError("node_color_statistic must be a callable or ndarray.")
 
-    # Determine whether layout is an array of node positions
-    is_layout_ndarray = hasattr(layout, 'dtype')
-
-    if is_node_colors_ndarray:
-        _node_colors = node_color_statistic
-    else:
-        if color_variable_kind == 'scalars':
-            color_data = color_variable
-        elif color_variable_kind == 'transformer':
-            color_data = color_variable.transform(data)
-        elif color_variable_kind == 'fit_transformer':
-            color_data = color_variable.fit_transform(data)
-        elif color_variable_kind == 'callable':
-            color_data = color_variable(data)
-        elif color_variable_kind == 'data':
-            if is_data_dataframe:
-                color_data = data.to_numpy()
-            else:
-                color_data = data
-        else:
-            if is_data_dataframe:
-                color_data = data[color_variable].to_numpy()
-            else:
-                color_data = data[:, color_variable]
-        _node_colors = get_node_summary(node_elements, color_data,
-                                        summary_stat=node_color_statistic)
-
-    if is_layout_ndarray:
-        node_pos = layout
-    else:
-        node_pos = graph.layout(layout, dim=dim)
+    _node_colors = _get_node_colors(
+        data, is_data_dataframe, node_elements,
+        is_node_colors_ndarray, node_color_statistic,
+        color_variable, color_variable_kind)
 
     plot_options = {
         'edge_trace_mode': 'lines',
@@ -210,7 +176,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
     node_x = [node_pos[k][0] for k in range(graph.vcount())]
     node_y = [node_pos[k][1] for k in range(graph.vcount())]
 
-    if dim == 2:
+    if layout_dim == 2:
         plot_options.update({
             'layout_xaxis': dict(showgrid=False, zeroline=False,
                                  showticklabels=False, ticks="",
@@ -263,7 +229,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
                               layout=layout_options_common)
         fig.update(layout_options_2d)
 
-    elif dim == 3:
+    elif layout_dim == 3:
         plot_options.update({
             'axis': dict(showbackground=False,
                          showline=False,
@@ -357,8 +323,8 @@ def create_static_network(pipeline, data, layout='kamada_kawai', dim=2,
     return fig
 
 
-def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
-                               color_variable=None,
+def create_interactive_network(pipeline, data, layout='kamada_kawai',
+                               layout_dim=2, color_variable=None,
                                node_color_statistic=np.mean,
                                color_by_columns_dropdown=True,
                                plotly_kwargs=None):
@@ -376,7 +342,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
         ``layout`` parameter in the :meth:`layout` method of
         :class:`igraph.Graph`. [1]_
 
-    dim : int, default: ``2``
+    layout_dim : int, default: ``2``
         The number of dimensions for the layout. Can be 2 or 3.
 
     color_variable : column index or name, or list of such, \
@@ -412,11 +378,6 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
 
     # TODO could abstract away common patterns in get_cover_params_widgets and
     #  get_cluster_params_widgets
-
-    # TODO allow dimension to be passed as either 2 or 3 as an arg or kwarg
-
-    # clone input pipeline to catch scenarios where user selects invalid
-    # configuration of parameters and re-executes cell in Jupyter notebook
     pipe = clone(pipeline)
 
     def get_cover_params_widgets(param, value):
@@ -467,7 +428,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
 
     def update_figure(old_figure, new_figure, dim):
         # TODO could this be abstracted to node and edge traces and metadata
-        #  information without need for creating a full new figure object
+        # information without need for creating a full new figure object
         old_figure.data[0].x = new_figure.data[0].x
         old_figure.data[0].y = new_figure.data[0].y
         old_figure.data[1].x = new_figure.data[1].x
@@ -521,13 +482,13 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
             #        num_params}
             # )
 
-            new_fig = get_figure(pipe, data, layout, dim, color_variable,
-                                 node_color_statistic,
+            new_fig = get_figure(pipe, data, layout, layout_dim,
+                                 color_variable, node_color_statistic,
                                  color_by_columns_dropdown, plotly_kwargs)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                update_figure(fig, new_fig, dim)
+                update_figure(fig, new_fig, layout_dim)
             valid.value = True
         except Exception:
             exception_data = traceback.format_exc().splitlines()
@@ -543,13 +504,13 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
                         **{param: cluster_params_widgets[param].value}
                     )
 
-            new_fig = get_figure(pipe, data, layout, dim, color_variable,
-                                 node_color_statistic,
+            new_fig = get_figure(pipe, data, layout, layout_dim,
+                                 color_variable, node_color_statistic,
                                  color_by_columns_dropdown, plotly_kwargs)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                update_figure(fig, new_fig, dim)
+                update_figure(fig, new_fig, layout_dim)
             valid.value = True
         except Exception:
             exception_data = traceback.format_exc().splitlines()
@@ -614,7 +575,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai', dim=2,
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
-    fig = get_figure(pipe, data, layout, dim, color_variable,
+    fig = get_figure(pipe, data, layout, layout_dim, color_variable,
                      node_color_statistic,
                      color_by_columns_dropdown, plotly_kwargs)
 

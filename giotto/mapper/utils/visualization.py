@@ -96,3 +96,55 @@ def _get_colorscale_buttons(colorscales):
             )
         )
     return colorscale_buttons
+
+
+def _is_array_or_dataframe(color_variable, data):
+    """Determines whether color_variable is array or pandas dataframe."""
+    if hasattr(color_variable, 'dtype') or hasattr(color_variable, 'dtypes'):
+        if len(color_variable) != len(data):
+            raise ValueError(
+                "color_variable and data must have the same length.")
+        color_variable_kind = 'scalars'
+    elif hasattr(color_variable, 'transform'):
+        color_variable_kind = 'transformer'
+    elif hasattr(color_variable, 'fit_transform'):
+        color_variable_kind = 'fit_transformer'
+    elif callable(color_variable):
+        color_variable_kind = 'callable'
+    elif color_variable is None:
+        color_variable_kind = 'data'
+    else:  # Assume color_variable is a selection of columns
+        color_variable_kind = 'columns'
+
+    return color_variable_kind
+
+
+def _get_node_colors(data, is_data_dataframe, node_elements,
+                     is_node_colors_ndarray, node_color_statistic,
+                     color_variable, color_variable_kind):
+    """Calculate node colors"""
+    if is_node_colors_ndarray:
+        node_colors = node_color_statistic
+    else:
+        if color_variable_kind == 'scalars':
+            color_data = color_variable
+        elif color_variable_kind == 'transformer':
+            color_data = color_variable.transform(data)
+        elif color_variable_kind == 'fit_transformer':
+            color_data = color_variable.fit_transform(data)
+        elif color_variable_kind == 'callable':
+            color_data = color_variable(data)
+        elif color_variable_kind == 'data':
+            if is_data_dataframe:
+                color_data = data.to_numpy()
+            else:
+                color_data = data
+        else:
+            if is_data_dataframe:
+                color_data = data[color_variable].to_numpy()
+            else:
+                color_data = data[:, color_variable]
+        node_colors = get_node_summary(node_elements, color_data,
+                                       summary_stat=node_color_statistic)
+
+    return node_colors
