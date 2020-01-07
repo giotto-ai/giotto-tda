@@ -89,7 +89,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         Xdgms = {dim: np.hstack([Xdgms[dim],
                                  dim * np.ones((Xdgms[dim].shape[0], 1),
                                                dtype=Xdgms[dim].dtype)])
-               for dim in self._homology_dimensions}
+                 for dim in self._homology_dimensions}
         return Xdgms
 
     def fit(self, X, y=None):
