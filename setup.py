@@ -24,7 +24,7 @@ DESCRIPTION = 'Toolbox for Machine Learning using Topological Data Analysis.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = 'text/x-rst'
-MAINTAINER = 'Umberto Lupo, Lewis Tunstall, Philippe Nguyen'
+MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-learn'
 LICENSE = 'Apache 2.0'
@@ -45,7 +45,7 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Programming Language :: Python :: 3.6',
                'Programming Language :: Python :: 3.7']
 KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
-    'homology, persistence diagrams'
+    'homology, persistence diagrams, Mapper'
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
     'tests': [
