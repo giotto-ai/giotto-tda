@@ -81,7 +81,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
                                             min_persistence=0)
 
         # Separate diagrams by homology dimensions
-        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xds))
+        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
                                 if Xdgms[i][0] == dim]).reshape((-1, 2))
                  for dim in self.homology_dimensions}
 
