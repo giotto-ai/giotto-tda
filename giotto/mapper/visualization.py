@@ -15,10 +15,9 @@ from matplotlib.colors import rgb2hex
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
-from .utils.visualization import (_get_column_color_buttons, _get_node_size,
-                                  _get_node_text,
-                                  set_node_sizeref, _is_array_or_dataframe,
-                                  _get_node_colors)
+from .utils.visualization import (_get_column_color_buttons, _get_node_colors,
+                                  _get_node_size, _get_node_text,
+                                  _is_array_or_dataframe, set_node_sizeref)
 
 
 def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
