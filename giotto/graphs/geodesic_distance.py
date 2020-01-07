@@ -116,7 +116,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(

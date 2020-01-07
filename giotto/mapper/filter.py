@@ -161,7 +161,7 @@ class Entropy(BaseEstimator, TransformerMixin):
         # TODO: the following is a crude method to ensure each row vector
         #  consists of "probabilities" that sum to one. Consider normalisation
         #  in terms of bin counts?
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         X = check_array(X)
 
         if np.any(X < 0):
@@ -233,7 +233,7 @@ class Projection(BaseEstimator, TransformerMixin):
             Output array, where ``n_columns = len(columns)``.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         # Simple duck typing to handle case of pandas dataframe input
         if hasattr(X, 'columns'):
             # NB in this case we do not check the health of other columns

@@ -133,7 +133,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         X = check_array(X, ensure_2d=False, allow_nd=True)
 
         window_slices = self._slice_windows(X)
@@ -163,7 +163,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         yr = column_or_1d(y)
 
         yr = np.flip(yr)

@@ -6,8 +6,8 @@ import networkx as nx
 from scipy.spatial import distance_matrix
 from scipy.sparse import csr_matrix, lil_matrix
 from itertools import combinations
-from sklearn.utils.validation import check_symmetric, check_is_fitted,\
-    check_array
+from sklearn.utils.validation import (check_symmetric, check_is_fitted,
+                                      check_array)
 from sklearn.base import BaseEstimator, TransformerMixin
 
 

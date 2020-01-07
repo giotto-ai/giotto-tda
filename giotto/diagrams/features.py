@@ -339,7 +339,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):

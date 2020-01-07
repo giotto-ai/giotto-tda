@@ -86,7 +86,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
         if Xt.ndim == 1:
             Xt = Xt[: None]
@@ -113,7 +113,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         yr = column_or_1d(y)
         yr = yr[::self.period]
 
@@ -207,7 +207,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
         if Xt.ndim == 1:
             Xt = Xt[:, None]
@@ -236,7 +236,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         y = column_or_1d(y)
 
         return y[1:]

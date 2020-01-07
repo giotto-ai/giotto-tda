@@ -80,7 +80,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         X = check_diagram(X)
 
         Xt = X.copy()
