@@ -161,7 +161,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute, for each point cloud or distance matrix in `X`, the
+        """For each point cloud or distance matrix in `X`, compute the
         relevant persistence diagram as an array of triples [b, d, q]. Each
         triple represents a persistent topological feature in dimension q
         (belonging to `homology_dimensions`) which is born at b and dies at d.
