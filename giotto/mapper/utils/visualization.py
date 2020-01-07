@@ -85,19 +85,6 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
     return column_color_buttons
 
 
-def _get_colorscale_buttons(colorscales):
-    colorscale_buttons = []
-    for colorscale in colorscales:
-        colorscale_buttons.append(
-            dict(
-                args=[{'marker.colorscale': [None, colorscale]}],
-                label=colorscale,
-                method='restyle'
-            )
-        )
-    return colorscale_buttons
-
-
 def _is_array_or_dataframe(color_variable, data):
     """Determines whether color_variable is array or pandas dataframe."""
     if hasattr(color_variable, 'dtype') or hasattr(color_variable, 'dtypes'):
