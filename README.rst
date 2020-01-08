@@ -53,7 +53,7 @@ Additionally, developer or pre-release versions require
 - python-igraph (>= 0.7.1.post6)
 - matplotlib (>= 3.1.2)
 - networkx (>= 2.4)
-- plotly (>= 4.3.0)
+- plotly (>= 4.4.1)
 - ipywidgets
 
 To run the examples, jupyter is required.
