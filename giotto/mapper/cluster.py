@@ -7,7 +7,11 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, ClusterMixin, clone
 from sklearn.cluster import DBSCAN
-from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
+
+try:  # scikit-learn >= 0.22.1
+    from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
+except ModuleNotFoundError:
+    from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
 
