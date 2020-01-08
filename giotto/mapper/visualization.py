@@ -351,11 +351,11 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         a numpy ndarray or pandas dataframe, it must have the same length as
         `data` and is interpreted as a quantity of interest according to
         which each node of the Mapper graph is to be coloured (see
-        :attr:`node_colors`). ``None`` is equivalent to passing `data`. If an
-        object implementing :meth:`transform` or :meth:`fit_transform`,
-        e.g. a scikit-learn estimator or pipeline, it is applied to `data`
-        to generate the quantity of interest. Otherwise, it must be a column
-        or subset of columns to be selected from `data`.
+        :attr:`node_color_statistic`). ``None`` is equivalent to passing
+        `data`. If an object implementing :meth:`transform` or
+        :meth:`fit_transform`, e.g. a scikit-learn estimator or pipeline, it is
+        applied to `data` to generate the quantity of interest. Otherwise, it
+        must be a column or subset of columns to be selected from `data`.
 
     node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``numpy.mean``
@@ -364,7 +364,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         the Mapper graph, and its values are used directly for node
         coloring, ignoring `color_variable`. Otherwise, it must be a
         callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by :attr:`node_colors`.
+        each Mapper node of the quantity specified by :attr:`_node_colors`.
 
     color_by_columns_dropdown : bool, optional, default: ``True``
         If ``True``, a dropdown widget is generated which allows the user to
