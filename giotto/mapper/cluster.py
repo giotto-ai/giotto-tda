@@ -10,7 +10,7 @@ from sklearn.cluster import DBSCAN
 
 try:  # scikit-learn >= 0.22.1
     from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
-except ModuleNotFoundError:
+except ImportError:
     from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
