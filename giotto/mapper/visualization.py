@@ -43,15 +43,15 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     color_variable : column index or name, or list of such, \
         or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
         or (fit-)transformer object, or None, optional, default: ``None``
-        Specifies which quantity is to be used for node colouring. When it is
+        Specifies which quantity is to be used for node coloring. When it is
         a numpy ndarray or pandas dataframe, it must have the same length as
         `data` and is interpreted as a quantity of interest according to
-        which each node of the Mapper graph is to be coloured (see
-        :attr:`node_colors`). ``None`` is equivalent to passing `data`. If an
-        object implementing :meth:`transform` or :meth:`fit_transform`,
-        e.g. a scikit-learn estimator or pipeline, it is applied to `data`
-        to generate the quantity of interest. Otherwise, it must be a column
-        or subset of columns to be selected from `data`.
+        which each node of the Mapper graph is to be colored (see
+        :attr:`node_color_statistic`). ``None`` is equivalent to passing
+        `data`. If an object implementing :meth:`transform` or
+        :meth:`fit_transform`, e.g. a scikit-learn estimator or pipeline, it is
+        applied to `data` to generate the quantity of interest. Otherwise, it
+        must be a column or subset of columns to be selected from `data`.
 
     node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``numpy.mean``
@@ -60,11 +60,11 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
         the Mapper graph, and its values are used directly for node
         coloring, ignoring `color_variable`. Otherwise, it must be a
         callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by :attr:`node_colors`.
+        each Mapper node of the quantity specified by :attr:`color_variable`.
 
     color_by_columns_dropdown : bool, optional, default: ``True``
         If ``True``, a dropdown widget is generated which allows the user to
-        colour Mapper nodes according to any column in `data`.
+        color Mapper nodes according to any column in `data`.
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
@@ -105,7 +105,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     # containing scalar values
     color_variable_kind = _infer_color_variable_kind(color_variable, data)
 
-    # Determine whether node_colors is an array of node colours
+    # Determine whether node_colors is an array of node colors
     is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
     if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
         raise ValueError("node_color_statistic must be a callable or ndarray.")
@@ -289,7 +289,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
                               layout=layout_options_common)
         fig.update(layout_options_3d)
 
-    # Compute node colours according to data columns only if necessary
+    # Compute node colors according to data columns only if necessary
     if color_by_columns_dropdown:
         column_color_buttons = _get_column_color_buttons(
             data, is_data_dataframe, node_elements, _node_colors,
@@ -347,10 +347,10 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     color_variable : column index or name, or list of such, \
         or ndarray/pandas dataframe of shape (n_samples, n_target_features), \
         or (fit-)transformer object, or None, optional, default: ``None``
-        Specifies which quantity is to be used for node colouring. When it is
+        Specifies which quantity is to be used for node coloring. When it is
         a numpy ndarray or pandas dataframe, it must have the same length as
         `data` and is interpreted as a quantity of interest according to
-        which each node of the Mapper graph is to be coloured (see
+        which each node of the Mapper graph is to be colored (see
         :attr:`node_color_statistic`). ``None`` is equivalent to passing
         `data`. If an object implementing :meth:`transform` or
         :meth:`fit_transform`, e.g. a scikit-learn estimator or pipeline, it is
@@ -364,11 +364,11 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         the Mapper graph, and its values are used directly for node
         coloring, ignoring `color_variable`. Otherwise, it must be a
         callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by :attr:`_node_colors`.
+        each Mapper node of the quantity specified by :attr:`color_variable`.
 
     color_by_columns_dropdown : bool, optional, default: ``True``
         If ``True``, a dropdown widget is generated which allows the user to
-        colour Mapper nodes according to any column in `data`.
+        color Mapper nodes according to any column in `data`.
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
