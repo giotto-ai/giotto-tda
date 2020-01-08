@@ -86,8 +86,9 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
     return column_color_buttons
 
 
-def _is_array_or_dataframe(color_variable, data):
-    """Determines whether color_variable is array or pandas dataframe."""
+def _infer_color_variable_kind(color_variable, data):
+    """Determines whether color_variable is array, pandas dataframe, callable,
+    or scikit-learn transformer or fit_transformer."""
     if hasattr(color_variable, 'dtype') or hasattr(color_variable, 'dtypes'):
         if len(color_variable) != len(data):
             raise ValueError(
@@ -100,9 +101,9 @@ def _is_array_or_dataframe(color_variable, data):
     elif callable(color_variable):
         color_variable_kind = 'callable'
     elif color_variable is None:
-        color_variable_kind = 'data'
+        color_variable_kind = 'none'
     else:  # Assume color_variable is a selection of columns
-        color_variable_kind = 'columns'
+        color_variable_kind = 'else'
 
     return color_variable_kind
 
@@ -122,7 +123,7 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
             color_data = color_variable.fit_transform(data)
         elif color_variable_kind == 'callable':
             color_data = color_variable(data)
-        elif color_variable_kind == 'data':
+        elif color_variable_kind == 'none':
             if is_data_dataframe:
                 color_data = data.to_numpy()
             else:

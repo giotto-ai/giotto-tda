@@ -17,7 +17,7 @@ from sklearn.base import clone
 from .utils._logging import OutputWidgetHandler
 from .utils.visualization import (_get_column_color_buttons, _get_node_colors,
                                   _get_node_size, _get_node_text,
-                                  _is_array_or_dataframe, set_node_sizeref)
+                                  _infer_color_variable_kind, set_node_sizeref)
 
 
 def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
@@ -103,7 +103,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
 
     # Determine whether color_variable is an array or pandas series/dataframe
     # containing scalar values
-    color_variable_kind = _is_array_or_dataframe(color_variable, data)
+    color_variable_kind = _infer_color_variable_kind(color_variable, data)
 
     # Determine whether node_colors is an array of node colours
     is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
