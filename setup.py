@@ -100,6 +100,7 @@ class CMakeBuild(build_ext):
         dir_pybind11 = os.path.join(dir_start,
                                     'giotto', 'externals', 'pybind11')
         if os.path.exists(dir_pybind11):
+            print("Exiting pybind11 installation")
             return 0
         os.mkdir(dir_pybind11)
         subprocess.check_call(['git', 'clone',
@@ -128,6 +129,7 @@ class CMakeBuild(build_ext):
                                '--init', '--recursive'])
 
         if platform.system() == "Windows":
+            print("Windows installation of igraph")
             dir_igraph = os.path.join(dir_start, 'giotto', 'externals',
                                       'python-igraph_win')
             python_version = sys.version_info
