@@ -127,6 +127,20 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['git', 'submodule', 'update',
                                '--init', '--recursive'])
 
+        if platform.system() == "Windows":
+            dir_igraph = os.path.join(dir_start, 'giotto', 'externals',
+                                      'python-igraph_win')
+            if os.path.exists(dir_igraph):
+                return 0
+            os.mkdir(dir_igraph)
+            python_version = sys.version_info
+            python_version = str(python_version.major) + str(python_version.minor)
+            igraph_whl = 'python_igraph-0.7.1.post6-cp{}-cp{}m-win_amd64.whl'.format(python_version, python_version)
+            os.chdir(dir_igraph)
+            subprocess.check_call(['pip', 'install', igraph_whl])
+        else:
+            subprocess.check_call(['pip', 'install', '"python-igraph>=0.7.1.post6"'])
+
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(
             self.get_ext_fullpath(ext.name)))
