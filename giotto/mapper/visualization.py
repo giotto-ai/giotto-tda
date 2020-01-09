@@ -400,6 +400,12 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
                 description=param.split('__')[1],
                 disabled=False
             ))
+        elif isinstance(value, str):
+            return (param, widgets.Text(
+                value=value,
+                description=param.split('__')[1],
+                disabled=False
+            ))
         else:
             return None
 
@@ -484,6 +490,10 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
                 if isinstance(value, str):
                     pipe.set_mapper_params(
                         **{param: cluster_params_widgets[param].value})
+            for param, value in cover_params.items():
+                if isinstance(value, str):
+                    pipe.set_mapper_params(
+                        **{param: cover_params_widgets[param].value})
 
             new_fig = create_static_network(
                 pipe, data, layout, layout_dim, color_variable,
@@ -567,19 +577,19 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     logs_box.observe(click_box, names='value')
 
     # define containers for input widgets
-    container_cover = widgets.HBox(children=list(
-        cover_params_widgets.values()))
+    container_cover = widgets.HBox(
+        children=list(cover_params_widgets.values()))
 
     container_cluster_text = widgets.HBox(
         children=list(v for k, v in cluster_params_widgets.items()
-                      if isinstance(cluster_params[k], str)) + [submit_button])
+                      if isinstance(cluster_params[k], str)))
 
     container_cluster_layout = Layout(display='flex', flex_flow='row wrap')
 
     container_cluster_numeric = widgets.HBox(
         children=list(v for k, v in cluster_params_widgets.items()
                       if isinstance(cluster_params[k], (int, float))
-                      ), layout=container_cluster_layout
+                      ) + [submit_button], layout=container_cluster_layout
     )
 
     box = widgets.VBox([container_cover, container_cluster_text,
