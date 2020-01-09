@@ -21,7 +21,7 @@ giotto-learn
 
 
 giotto-learn is a high performance topological machine learning toolbox in Python built on top of
-scikit-learn and is distributed under the AGPLv3 license. It is part of the Giotto open-source project.
+scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the Giotto open-source project.
 
 Website: https://giotto.ai
 
