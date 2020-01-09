@@ -1,5 +1,5 @@
 """Testing for multivariate time series embedding."""
-# License : Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 from numpy.testing import assert_almost_equal
