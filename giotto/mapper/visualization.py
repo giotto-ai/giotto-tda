@@ -456,32 +456,12 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         )
 
     def response_numeric(change):
-        # TODO: remove hardcoding of keys and mimic what is done with clusterer
         handler.clear_logs()
         try:
-            pipe.set_mapper_params(
-                cover__n_intervals=cover_params_widgets['cover__n_intervals']
-                .value)
-            pipe.set_mapper_params(
-                cover__overlap_frac=cover_params_widgets['cover__overlap_frac']
-                .value)
-
-            for param, value in cluster_params.items():
+            for param, value in cover_params.items():
                 if isinstance(value, (int, float)):
                     pipe.set_mapper_params(
-                        **{param: cluster_params_widgets[param].value}
-                    )
-
-            # TODO check this alternative:
-            #
-            # num_params = {param: value for param, value in
-            #               cluster_params.items()
-            #               if isinstance(value, (int, float))}
-            #
-            # pipe.set_mapper_params(
-            #     **{param: cluster_params_widgets[param].value for param in
-            #        num_params}
-            # )
+                        **{param: cover_params_widgets[param].value})
 
             new_fig = create_static_network(
                 pipe, data, layout, layout_dim, color_variable,
@@ -503,8 +483,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
             for param, value in cluster_params.items():
                 if isinstance(value, str):
                     pipe.set_mapper_params(
-                        **{param: cluster_params_widgets[param].value}
-                    )
+                        **{param: cluster_params_widgets[param].value})
 
             new_fig = create_static_network(
                 pipe, data, layout, layout_dim, color_variable,
