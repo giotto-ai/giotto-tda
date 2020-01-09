@@ -96,6 +96,7 @@ class CMakeBuild(build_ext):
             self.build_extension(ext)
 
     def install_dependencies(self):
+        print("INSTALLING DEPENDENCIES")
         dir_start = os.getcwd()
         dir_pybind11 = os.path.join(dir_start,
                                     'giotto', 'externals', 'pybind11')
