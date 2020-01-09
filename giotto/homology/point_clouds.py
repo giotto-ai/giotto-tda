@@ -71,6 +71,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     See also
     --------
     ConsistentRescaling
+    CubicalPersistence
 
     Notes
     -----
@@ -107,17 +108,20 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xds = ripser(X[X[:, 0] != np.inf], maxdim=self._max_homology_dimension,
-                     thresh=self.max_edge_length, coeff=self.coeff,
-                     metric=self.metric)['dgms']
+        Xdgms = ripser(X[X[:, 0] != np.inf],
+                       maxdim=self._max_homology_dimension,
+                       thresh=self.max_edge_length, coeff=self.coeff,
+                       metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
 
-        Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
-                                                       dtype=Xds[dim].dtype)])
-               for dim in self._homology_dimensions}
-        return Xds
+        # Add dimension as the third elements of each (b, d) tuple
+        Xdgms = {dim: np.hstack([Xdgms[dim],
+                                 dim * np.ones((Xdgms[dim].shape[0], 1),
+                                               dtype=Xdgms[dim].dtype)])
+                 for dim in self._homology_dimensions}
+        return Xdgms
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
