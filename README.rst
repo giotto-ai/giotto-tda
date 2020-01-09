@@ -147,8 +147,12 @@ Important links
 - Download releases: https://pypi.org/project/giotto-learn/
 - Issue tracker: https://github.com/giotto-ai/giotto-learn/issues
 
-
-Contacts:
+Community
 ---------
+
+giotto-ai Slack workspace: https://slack.giotto.ai/
+
+Contacts
+--------
 
 maintainers@giotto.ai
