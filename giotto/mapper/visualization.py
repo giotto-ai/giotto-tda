@@ -380,9 +380,6 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         Keyword arguments to configure the Plotly Figure.
 
     """
-
-    # TODO could abstract away common patterns in get_cover_params_widgets and
-    #  get_cluster_params_widgets
     pipe = clone(pipeline)
 
     def get_widgets_per_param(param, value):
@@ -411,59 +408,6 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
             ))
         else:
             return None
-
-    # def get_cover_params_widgets(param, value):
-    #     if isinstance(value, float):
-    #         return (param, widgets.BoundedFloatText(
-    #             value=value,
-    #             step=0.05,
-    #             min=0.05,
-    #             max=1.0,
-    #             description=param.split('__')[1],
-    #             disabled=False
-    #         ))
-    #     elif isinstance(value, int):
-    #         return (param, widgets.BoundedIntText(
-    #             value=value,
-    #             min=1,
-    #             max=100,
-    #             step=1,
-    #             description=param.split('__')[1],
-    #             disabled=False
-    #         ))
-    #     elif isinstance(value, str):
-    #         return (param, widgets.Text(
-    #             value=value,
-    #             description=param.split('__')[1],
-    #             continuous_update=False,
-    #             disabled=False
-    #         ))
-    #     else:
-    #         return None
-
-    # def get_cluster_params_widgets(param, value):
-    #     if isinstance(value, float):
-    #         return (param, widgets.FloatText(
-    #                 value=value,
-    #                 step=0.1,
-    #                 description=param.split('__')[1],
-    #                 disabled=False
-    #                 ))
-    #     elif isinstance(value, int):
-    #         return (param, widgets.IntText(
-    #             value=value,
-    #             step=1,
-    #             description=param.split('__')[1],
-    #             disabled=False
-    #         ))
-    #     elif isinstance(value, str):
-    #         return (param, widgets.Text(
-    #             value=value,
-    #             description=param.split('__')[1],
-    #             disabled=False
-    #         ))
-    #     else:
-    #         return None
 
     def update_figure(old_figure, new_figure, dim):
         # TODO could this be abstracted to node and edge traces and metadata
@@ -507,54 +451,6 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
             logger.exception(exception_data[-1])
             valid.value = False
 
-    # def response_numeric(change):
-    #     handler.clear_logs()
-    #     try:
-    #         for param, value in cover_params.items():
-    #             if isinstance(value, (int, float, str)):
-    #                 pipe.set_mapper_params(
-    #                     **{param: cover_params_widgets[param].value})
-
-    #         new_fig = create_static_network(
-    #             pipe, data, layout, layout_dim, color_variable,
-    #             node_color_statistic, color_by_columns_dropdown, plotly_kwargs,
-    #             clone_pipeline=False)
-
-    #         logger.info("Updating figure ...")
-    #         with fig.batch_update():
-    #             update_figure(fig, new_fig, layout_dim)
-    #         valid.value = True
-    #     except Exception:
-    #         exception_data = traceback.format_exc().splitlines()
-    #         logger.exception(exception_data[-1])
-    #         valid.value = False
-
-    # def response_text(text):
-    #     handler.clear_logs()
-    #     try:
-    #         for param, value in cluster_params.items():
-    #             if isinstance(value, str):
-    #                 pipe.set_mapper_params(
-    #                     **{param: cluster_params_widgets[param].value})
-    #         # for param, value in cover_params.items():
-    #         #     if isinstance(value, str):
-    #         #         pipe.set_mapper_params(
-    #         #             **{param: cover_params_widgets[param].value})
-
-    #         new_fig = create_static_network(
-    #             pipe, data, layout, layout_dim, color_variable,
-    #             node_color_statistic, color_by_columns_dropdown, plotly_kwargs,
-    #             clone_pipeline=False)
-
-    #         logger.info("Updating figure ...")
-    #         with fig.batch_update():
-    #             update_figure(fig, new_fig, layout_dim)
-    #         valid.value = True
-    #     except Exception:
-    #         exception_data = traceback.format_exc().splitlines()
-    #         logger.exception(exception_data[-1])
-    #         valid.value = False
-
     def observe_widgets(params, widgets):
         for param, value in params.items():
             if isinstance(value, (int, float, str)):
@@ -591,10 +487,6 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         filter(None, map(lambda x: get_widgets_per_param(*x),
                          cluster_params.items())))
 
-    # create button for text inputs
-    # submit_button = widgets.Button(description="Submit")
-    # submit_button.on_click(response_text)
-
     # initialise widgets for validating input parameters of pipeline
     valid = widgets.Valid(
         value=True,
@@ -626,19 +518,12 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     container_cover = widgets.HBox(
         children=list(cover_params_widgets.values()))
 
-    # container_cluster_text = widgets.HBox(
-    #     children=list(v for k, v in cluster_params_widgets.items()
-    #                   if isinstance(cluster_params[k], str)))
-
     container_cluster_layout = Layout(display='flex', flex_flow='row wrap')
 
-    container_cluster_numeric = widgets.HBox(
-        children=list(v for k, v in cluster_params_widgets.items()
-                      if isinstance(cluster_params[k], (int, float, str))
-                      ), layout=container_cluster_layout
-    )
+    container_cluster = widgets.HBox(
+        children=list(cluster_params_widgets.values()),
+        layout=container_cluster_layout)
 
-    box = widgets.VBox([container_cover,
-                        container_cluster_numeric, fig,
-                        valid, logs_box])
+    box = widgets.VBox(
+        [container_cover, container_cluster, fig, valid, logs_box])
     display(box, out)
