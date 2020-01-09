@@ -380,6 +380,8 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         Keyword arguments to configure the Plotly Figure.
 
     """
+
+    # clone pipeline to avoid side effects from in-place parameter changes
     pipe = clone(pipeline)
 
     def get_widgets_per_param(param, value):
