@@ -22,7 +22,8 @@ from .utils.visualization import (_get_column_color_buttons, _get_node_colors,
 
 def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
                           color_variable=None, node_color_statistic=np.mean,
-                          color_by_columns_dropdown=True, plotly_kwargs=None):
+                          color_by_columns_dropdown=True, plotly_kwargs=None,
+                          clone_pipeline=True):
     """
     Parameters
     ----------
@@ -69,6 +70,11 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
 
+    clone_pipeline : bool, default: ``True``
+        If ``True``, the input :class:`pipeline` is cloned before computing the
+        Mapper graph to prevent unexepected side effects from in-place
+        parameter updates.
+
     Returns
     -------
     fig : ploty.graph_objs.Figure
@@ -87,7 +93,10 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     """
 
     # Compute the graph and fetch the indices of points in each node
-    pipe = clone(pipeline)
+    if clone_pipeline:
+        pipe = clone(pipeline)
+    else:
+        pipe = pipeline
     graph = pipe.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 
@@ -481,9 +490,10 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
             #        num_params}
             # )
 
-            new_fig = get_figure(pipe, data, layout, layout_dim,
-                                 color_variable, node_color_statistic,
-                                 color_by_columns_dropdown, plotly_kwargs)
+            new_fig = create_static_network(
+                pipe, data, layout, layout_dim, color_variable,
+                node_color_statistic, color_by_columns_dropdown, plotly_kwargs,
+                clone_pipeline=False)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
@@ -503,9 +513,10 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
                         **{param: cluster_params_widgets[param].value}
                     )
 
-            new_fig = get_figure(pipe, data, layout, layout_dim,
-                                 color_variable, node_color_statistic,
-                                 color_by_columns_dropdown, plotly_kwargs)
+            new_fig = create_static_network(
+                pipe, data, layout, layout_dim, color_variable,
+                node_color_statistic, color_by_columns_dropdown, plotly_kwargs,
+                clone_pipeline=False)
 
             logger.info("Updating figure ...")
             with fig.batch_update():
@@ -574,9 +585,9 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
-    fig = get_figure(pipe, data, layout, layout_dim, color_variable,
-                     node_color_statistic,
-                     color_by_columns_dropdown, plotly_kwargs)
+    fig = create_static_network(
+        pipe, data, layout, layout_dim, color_variable, node_color_statistic,
+        color_by_columns_dropdown, plotly_kwargs, clone_pipeline=False)
 
     observe_numeric_widgets(cover_params, cover_params_widgets)
     observe_numeric_widgets(cluster_params, cluster_params_widgets)
