@@ -139,7 +139,7 @@ class CMakeBuild(build_ext):
             os.chdir(dir_igraph)
             subprocess.check_call(['pip', 'install', igraph_whl])
         else:
-            subprocess.check_call(['pip', 'install', '"python-igraph>=0.7.1.post6"'])
+            subprocess.check_call(['pip', 'install', 'python-igraph'])
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(
