@@ -48,7 +48,8 @@ The latest stable version of giotto-learn requires:
 - joblib (>= 0.11)
 - scikit-learn (>= 0.21.3)
 
-Additionally, developer or pre-release versions require
+Additionally, developer or pre-release versions require:
+
 - scikit-learn (>= 0.22.0)
 - python-igraph (>= 0.7.1.post6)
 - matplotlib (>= 3.1.2)
