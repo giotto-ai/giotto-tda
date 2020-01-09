@@ -28,7 +28,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: pip install python-igraph
-    displayName: 'Install python-graph'
+    displayName: 'Install python-igraph'
 
   - script: |
       pip install plotly matplotlib openml
