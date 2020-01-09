@@ -42,8 +42,8 @@ def get_node_summary(node_elements, data, summary_stat=np.mean):
 def _get_column_color_buttons(data, is_data_dataframe, node_elements,
                               node_colors_color_variable, colorscale):
     # TODO: Consider opting for just-in-time computation instead of computing
-    #  all node summary values ahead-of-time. Solution should preserve scroll
-    #  zoom functionality of 2D static visualisation.
+    # all node summary values ahead-of-time. Solution should preserve scroll
+    # zoom functionality of 2D static visualisation.
     if is_data_dataframe:
         columns_to_color = data.columns
     else:
