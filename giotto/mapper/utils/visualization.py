@@ -300,6 +300,7 @@ def _calculate_graph_data(
             mode=plot_options['node_trace_mode'],
             hoverinfo=plot_options['node_trace_hoverinfo'],
             hoverlabel=plot_options['node_trace_hoverlabel'],
+            hovertext=plot_options['node_trace_text'],
             marker=dict(
                 showscale=plot_options['node_trace_marker_showscale'],
                 colorscale=plot_options['node_trace_marker_colorscale'],
