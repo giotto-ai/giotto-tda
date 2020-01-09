@@ -281,14 +281,14 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                node_trace, edge_trace, node_elements, node_colors, plot_options = \
-                    _calculate_graph_data(
-                        pipe, data, layout, layout_dim,
-                        color_variable, node_color_statistic,  plotly_kwargs
-                    )
+                (node_trace, edge_trace, node_elements, node_colors,
+                 plot_options) = _calculate_graph_data(
+                    pipe, data, layout, layout_dim,
+                    color_variable, node_color_statistic, plotly_kwargs
+                )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
 
-                # update color by column buttons
+                # Update color by column buttons
                 is_data_dataframe = hasattr(data, 'columns')
                 if color_by_columns_dropdown:
                     column_color_buttons = _get_column_color_buttons(
