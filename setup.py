@@ -130,9 +130,6 @@ class CMakeBuild(build_ext):
         if platform.system() == "Windows":
             dir_igraph = os.path.join(dir_start, 'giotto', 'externals',
                                       'python-igraph_win')
-            if os.path.exists(dir_igraph):
-                return 0
-            os.mkdir(dir_igraph)
             python_version = sys.version_info
             python_version = str(python_version.major) + str(python_version.minor)
             igraph_whl = 'python_igraph-0.7.1.post6-cp{}-cp{}m-win_amd64.whl'.format(python_version, python_version)
