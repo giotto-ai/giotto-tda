@@ -12,7 +12,7 @@ pip install cmake
 
 # install dependencies for python-igraph
 yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
-pip install python-igraph
+# pip install python-igraph
 
 # installing boost
 yum install -y wget tar
