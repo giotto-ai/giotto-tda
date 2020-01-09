@@ -1,4 +1,5 @@
 """Persistent homology on point clouds or finite metric spaces."""
+# License: Apache 2.0
 
 import numpy as np
 import numbers
