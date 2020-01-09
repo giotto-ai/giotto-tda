@@ -133,8 +133,11 @@ class CMakeBuild(build_ext):
             dir_igraph = os.path.join(dir_start, 'giotto', 'externals',
                                       'python-igraph_win')
             python_version = sys.version_info
-            python_version = str(python_version.major) + str(python_version.minor)
-            igraph_whl = 'python_igraph-0.7.1.post6-cp{}-cp{}m-win_amd64.whl'.format(python_version, python_version)
+            python_version = str(python_version.major) + \
+                             str(python_version.minor)
+            igraph_whl = \
+                'python_igraph-0.7.1.post6-cp{}-cp{}m-win_amd64.whl'.\
+                    format(python_version, python_version)
             os.chdir(dir_igraph)
             subprocess.check_call(['pip', 'install', igraph_whl])
         else:
