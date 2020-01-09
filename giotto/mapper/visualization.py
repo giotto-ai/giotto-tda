@@ -184,26 +184,26 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     color_variable : object or None, optional, default: ``None``
         Specifies which quantity is to be used for node coloring.
 
-            1. If a numpy ndarray or pandas dataframe, :attr:`color_variable`
-               must have the same length as :attr:`data` and is interpreted as
+            1. If a numpy ndarray or pandas dataframe, `color_variable`
+               must have the same length as `data` and is interpreted as
                a quantity of interest according to which node of the Mapper
-               graph is to be colored (see :attr:`node_color_statistic`).
-            2. If ``None`` then equivalent to passing :attr:`data`.
+               graph is to be colored (see `node_color_statistic`).
+            2. If ``None`` then equivalent to passing `data`.
             3. If an object implementing :meth:`transform` or
                :meth:`fit_transform`, e.g. a scikit-learn estimator or
-               pipeline, it is applied to :attr:`data` to generate the quantity
+               pipeline, it is applied to `data` to generate the quantity
                of interest.
             4. If an index or string, or list of indices / strings, equivalent
-               to selecting a column or subset of columns from :attr:`data`.
+               to selecting a column or subset of columns from `data`.
 
     node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``numpy.mean``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
         the Mapper graph, and its values are used directly for node
-        coloring, ignoring :attr:`color_variable`. Otherwise, it must be a
+        coloring, ignoring `color_variable`. Otherwise, it must be a
         callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by :attr:`color_variable`.
+        each Mapper node of the quantity specified by `color_variable`.
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
@@ -211,6 +211,11 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
+
+    References
+    ----------
+    .. [1] `igraph.Graph.layout
+            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_.
 
     """
 
