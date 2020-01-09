@@ -453,18 +453,6 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         old_figure.data[1].marker.color = new_figure.data[1].marker.color
         old_figure.data[1].marker.sizeref = new_figure.data[1].marker.sizeref
 
-    def get_figure(pipe, data, layout, dim, color_variable,
-                   node_color_statistic, color_by_columns_dropdown,
-                   plotly_kwargs):
-
-        return create_static_network(
-            pipe, data, layout, dim,
-            color_variable=color_variable,
-            node_color_statistic=node_color_statistic,
-            color_by_columns_dropdown=color_by_columns_dropdown,
-            plotly_kwargs=plotly_kwargs
-        )
-
     def response_numeric(change):
         handler.clear_logs()
         try:
