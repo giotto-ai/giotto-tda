@@ -142,7 +142,7 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
     return node_colors
 
 
-def _calculate_node_and_edge_traces(
+def _calculate_graph_data(
         pipeline, data, layout, layout_dim,
         color_variable, node_color_statistic,  plotly_kwargs):
     graph = pipeline.fit_transform(data)

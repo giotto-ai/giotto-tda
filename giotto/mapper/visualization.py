@@ -11,7 +11,7 @@ from ipywidgets import Layout, widgets
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
-from .utils.visualization import (_calculate_node_and_edge_traces,
+from .utils.visualization import (_calculate_graph_data,
                                   _get_column_color_buttons)
 
 
@@ -94,7 +94,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     is_data_dataframe = hasattr(data, 'columns')
 
     node_trace, edge_trace, node_elements, _node_colors, plot_options = \
-        _calculate_node_and_edge_traces(
+        _calculate_graph_data(
             pipe, data, layout, layout_dim,
             color_variable, node_color_statistic,  plotly_kwargs)
 
@@ -273,7 +273,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
             logger.info("Updating figure ...")
             with fig.batch_update():
                 node_trace, edge_trace, _, _, _ = \
-                    _calculate_node_and_edge_traces(
+                    _calculate_graph_data(
                         pipe, data, layout, layout_dim,
                         color_variable, node_color_statistic,  plotly_kwargs
                     )
