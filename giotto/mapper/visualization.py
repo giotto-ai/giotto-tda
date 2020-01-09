@@ -22,7 +22,7 @@ from .utils.visualization import (_get_column_color_buttons, _get_node_colors,
 
 def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
                           color_variable=None, node_color_statistic=np.mean,
-                          color_by_columns_dropdown=True, plotly_kwargs=None,
+                          color_by_columns_dropdown=False, plotly_kwargs=None,
                           clone_pipeline=True):
     """
     Parameters
@@ -327,7 +327,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
 def create_interactive_network(pipeline, data, layout='kamada_kawai',
                                layout_dim=2, color_variable=None,
                                node_color_statistic=np.mean,
-                               color_by_columns_dropdown=True,
+                               color_by_columns_dropdown=False,
                                plotly_kwargs=None):
     """
     Parameters
