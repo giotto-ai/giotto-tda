@@ -165,7 +165,7 @@ def _calculate_node_and_edge_traces(
     if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
         raise ValueError("node_color_statistic must be a callable or ndarray.")
 
-    _node_colors = _get_node_colors(
+    node_colors = _get_node_colors(
         data, is_data_dataframe, node_elements,
         is_node_colors_ndarray, node_color_statistic,
         color_variable, color_variable_kind)
@@ -178,9 +178,9 @@ def _calculate_node_and_edge_traces(
         'node_trace_hoverinfo': 'text',
         'node_trace_hoverlabel': dict(
             bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
-                             _node_colors))),
+                             node_colors))),
         'node_trace_marker_color': list(
-            map(lambda x: rgb2hex(get_cmap('viridis')(x)), _node_colors)),
+            map(lambda x: rgb2hex(get_cmap('viridis')(x)), node_colors)),
         'node_trace_marker_colorscale': 'viridis',
         'node_trace_marker_showscale': True,
         'node_trace_marker_reversescale': False,
@@ -189,8 +189,8 @@ def _calculate_node_and_edge_traces(
         'node_trace_marker_sizemode': 'area',
         'node_trace_marker_sizeref': set_node_sizeref(node_elements),
         'node_trace_marker_sizemin': 4,
-        'node_trace_marker_cmin': np.min(_node_colors),
-        'node_trace_marker_cmax': np.max(_node_colors),
+        'node_trace_marker_cmin': np.min(node_colors),
+        'node_trace_marker_cmax': np.max(node_colors),
         'node_trace_marker_colorbar': dict(thickness=15,
                                            title='',
                                            xanchor='left',
@@ -252,7 +252,7 @@ def _calculate_node_and_edge_traces(
                     map(lambda x: rgb2hex(
                         get_cmap(
                             plot_options['node_trace_marker_colorscale']
-                        )(x)), _node_colors)),
+                        )(x)), node_colors)),
                 size=plot_options['node_trace_marker_size'],
                 sizemode=plot_options['node_trace_marker_sizemode'],
                 sizeref=plot_options['node_trace_marker_sizeref'],
@@ -316,4 +316,4 @@ def _calculate_node_and_edge_traces(
                 line_width=plot_options['node_trace_marker_line_width']),
             text=plot_options['node_trace_text'])
 
-    return node_trace, edge_trace, plot_options
+    return node_trace, edge_trace, node_elements, node_colors, plot_options

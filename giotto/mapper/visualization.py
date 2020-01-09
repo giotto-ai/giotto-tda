@@ -2,22 +2,17 @@
 # License: GNU AGPLv3
 
 import logging
-import operator
 import traceback
-from functools import reduce
 
 import numpy as np
 import plotly.graph_objects as go
 from IPython.display import display
 from ipywidgets import Layout, widgets
-from matplotlib.cm import get_cmap
-from matplotlib.colors import rgb2hex
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
-from .utils.visualization import (_get_column_color_buttons, _get_node_colors,
-                                  _get_node_size, _get_node_text, _calculate_node_and_edge_traces,
-                                  _infer_color_variable_kind, set_node_sizeref)
+from .utils.visualization import (_calculate_node_and_edge_traces,
+                                  _get_column_color_buttons)
 
 
 def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
@@ -94,27 +89,14 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
         pipe = clone(pipeline)
     else:
         pipe = pipeline
-    graph = pipeline.fit_transform(data)
-    node_elements = graph['node_metadata']['node_elements']
 
     # Simple duck typing to determine whether data is a pandas dataframe
     is_data_dataframe = hasattr(data, 'columns')
 
-    color_variable_kind = _infer_color_variable_kind(color_variable, data)
-
-    # Determine whether node_colors is an array of node colors
-    is_node_colors_ndarray = hasattr(node_color_statistic, 'dtype')
-    if (not is_node_colors_ndarray) and (not callable(node_color_statistic)):
-        raise ValueError("node_color_statistic must be a callable or ndarray.")
-
-    _node_colors = _get_node_colors(
-        data, is_data_dataframe, node_elements,
-        is_node_colors_ndarray, node_color_statistic,
-        color_variable, color_variable_kind)
-
-    node_trace, edge_trace, plot_options = _calculate_node_and_edge_traces(
-        pipe, data, layout, layout_dim,
-        color_variable, node_color_statistic,  plotly_kwargs)
+    node_trace, edge_trace, node_elements, _node_colors, plot_options = \
+        _calculate_node_and_edge_traces(
+            pipe, data, layout, layout_dim,
+            color_variable, node_color_statistic,  plotly_kwargs)
 
     # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
@@ -290,10 +272,11 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                node_trace, edge_trace, _ = _calculate_node_and_edge_traces(
-                    pipe, data, layout, layout_dim,
-                    color_variable, node_color_statistic,  plotly_kwargs
-                )
+                node_trace, edge_trace, _, _, _ = \
+                    _calculate_node_and_edge_traces(
+                        pipe, data, layout, layout_dim,
+                        color_variable, node_color_statistic,  plotly_kwargs
+                    )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
             valid.value = True
         except Exception:
