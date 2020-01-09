@@ -60,7 +60,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
         callable object and is used to obtain a summary statistic within
         each Mapper node of the quantity specified by `color_variable`.
 
-    color_by_columns_dropdown : bool, optional, default: ``True``
+    color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
         color Mapper nodes according to any column in `data`.
 
