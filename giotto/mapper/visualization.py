@@ -16,7 +16,7 @@ from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
 from .utils.visualization import (_get_column_color_buttons, _get_node_colors,
-                                  _get_node_size, _get_node_text,
+                                  _get_node_size, _get_node_text, _calculate_node_and_edge_traces,
                                   _infer_color_variable_kind, set_node_sizeref)
 
 
@@ -44,26 +44,26 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     color_variable : object or None, optional, default: ``None``
         Specifies which quantity is to be used for node coloring.
 
-            1. If a numpy ndarray or pandas dataframe, :attr:`color_variable`
-               must have the same length as :attr:`data` and is interpreted as
+            1. If a numpy ndarray or pandas dataframe, `color_variable`
+               must have the same length as `data` and is interpreted as
                a quantity of interest according to which node of the Mapper
-               graph is to be colored (see :attr:`node_color_statistic`).
-            2. If ``None`` then equivalent to passing :attr:`data`.
+               graph is to be colored (see `node_color_statistic`).
+            2. If ``None`` then equivalent to passing `data`.
             3. If an object implementing :meth:`transform` or
                :meth:`fit_transform`, e.g. a scikit-learn estimator or
-               pipeline, it is applied to :attr:`data` to generate the quantity
+               pipeline, it is applied to `data` to generate the quantity
                of interest.
             4. If an index or string, or list of indices / strings, equivalent
-               to selecting a column or subset of columns from :attr:`data`.
+               to selecting a column or subset of columns from `data`.
 
     node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``numpy.mean``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
         the Mapper graph, and its values are used directly for node
-        coloring, ignoring :attr:`color_variable`. Otherwise, it must be a
+        coloring, ignoring `color_variable`. Otherwise, it must be a
         callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by :attr:`color_variable`.
+        each Mapper node of the quantity specified by `color_variable`.
 
     color_by_columns_dropdown : bool, optional, default: ``True``
         If ``True``, a dropdown widget is generated which allows the user to
@@ -72,7 +72,7 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
 
-    clone_pipeline : bool, default: ``True``
+    clone_pipeline : bool, optional, default: ``True``
         If ``True``, the input :class:`pipeline` is cloned before computing the
         Mapper graph to prevent unexepected side effects from in-place
         parameter updates.
@@ -94,18 +94,11 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
         pipe = clone(pipeline)
     else:
         pipe = pipeline
-    graph = pipe.fit_transform(data)
+    graph = pipeline.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 
     # Simple duck typing to determine whether data is a pandas dataframe
     is_data_dataframe = hasattr(data, 'columns')
-
-    # Determine whether layout is an array of node positions
-    is_layout_ndarray = hasattr(layout, 'dtype')
-    if is_layout_ndarray:
-        node_pos = layout
-    else:
-        node_pos = graph.layout(layout, dim=layout_dim)
 
     color_variable_kind = _infer_color_variable_kind(color_variable, data)
 
@@ -119,44 +112,9 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
         is_node_colors_ndarray, node_color_statistic,
         color_variable, color_variable_kind)
 
-    plot_options = {
-        'edge_trace_mode': 'lines',
-        'edge_trace_line': dict(color='#888', width=1),
-        'edge_trace_hoverinfo': 'none',
-        'node_trace_mode': 'markers',
-        'node_trace_hoverinfo': 'text',
-        'node_trace_hoverlabel': dict(
-            bgcolor=list(map(lambda x: rgb2hex(get_cmap('viridis')(x)),
-                             _node_colors))),
-        'node_trace_marker_color': list(
-            map(lambda x: rgb2hex(get_cmap('viridis')(x)), _node_colors)),
-        'node_trace_marker_colorscale': 'viridis',
-        'node_trace_marker_showscale': True,
-        'node_trace_marker_reversescale': False,
-        'node_trace_marker_line': dict(width=.5, color='#888'),
-        'node_trace_marker_size': _get_node_size(node_elements),
-        'node_trace_marker_sizemode': 'area',
-        'node_trace_marker_sizeref': set_node_sizeref(node_elements),
-        'node_trace_marker_sizemin': 4,
-        'node_trace_marker_cmin': np.min(_node_colors),
-        'node_trace_marker_cmax': np.max(_node_colors),
-        'node_trace_marker_colorbar': dict(thickness=15,
-                                           title='',
-                                           xanchor='left',
-                                           titleside='right'),
-        'node_trace_marker_line_width': 2,
-        'node_trace_text': _get_node_text(graph),
-        'layout_showlegend': False,
-        'layout_hovermode': 'closest',
-        'layout_xaxis_title': "",
-        'layout_yaxis_title': "",
-        'layout_title': "",
-        'layout_margin': {'b': 20, 'l': 5, 'r': 5, 't': 40},
-        'layout_annotations': list()
-    }
-
-    if plotly_kwargs is not None:
-        plot_options.update(plotly_kwargs)
+    node_trace, edge_trace, plot_options = _calculate_node_and_edge_traces(
+        pipe, data, layout, layout_dim,
+        color_variable, node_color_statistic,  plotly_kwargs)
 
     # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
@@ -166,61 +124,10 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
         autosize=False
     )
 
-    # TODO check we are not losing performance by using map + lambda
-    edge_x = list(reduce(operator.iconcat,
-                         map(lambda x: [node_pos[x[0]][0],
-                                        node_pos[x[1]][0], None],
-                             graph.get_edgelist()), []))
-    edge_y = list(reduce(operator.iconcat,
-                         map(lambda x: [node_pos[x[0]][1],
-                                        node_pos[x[1]][1], None],
-                             graph.get_edgelist()), []))
-
-    node_x = [node_pos[k][0] for k in range(graph.vcount())]
-    node_y = [node_pos[k][1] for k in range(graph.vcount())]
+    fig = go.FigureWidget(data=[edge_trace, node_trace],
+                          layout=layout_options_common)
 
     if layout_dim == 2:
-        plot_options.update({
-            'layout_xaxis': dict(showgrid=False, zeroline=False,
-                                 showticklabels=False, ticks="",
-                                 showline=False),
-            'layout_yaxis': dict(showgrid=False, zeroline=False,
-                                 showticklabels=False, ticks="",
-                                 showline=False),
-        })
-        edge_trace = go.Scatter(
-            x=edge_x,
-            y=edge_y,
-            line=plot_options['edge_trace_line'],
-            hoverinfo=plot_options['edge_trace_hoverinfo'],
-            mode=plot_options['edge_trace_mode'])
-
-        node_trace = go.Scatter(
-            x=node_x,
-            y=node_y,
-            mode=plot_options['node_trace_mode'],
-            hoverinfo=plot_options['node_trace_hoverinfo'],
-            hovertext=plot_options['node_trace_text'],
-            marker=dict(
-                showscale=plot_options['node_trace_marker_showscale'],
-                colorscale=plot_options['node_trace_marker_colorscale'],
-                reversescale=plot_options['node_trace_marker_reversescale'],
-                line=plot_options['node_trace_marker_line'],
-                color=list(
-                    map(lambda x: rgb2hex(
-                        get_cmap(
-                            plot_options['node_trace_marker_colorscale']
-                        )(x)), _node_colors)),
-                size=plot_options['node_trace_marker_size'],
-                sizemode=plot_options['node_trace_marker_sizemode'],
-                sizeref=plot_options['node_trace_marker_sizeref'],
-                sizemin=plot_options['node_trace_marker_sizemin'],
-                cmin=plot_options['node_trace_marker_cmin'],
-                cmax=plot_options['node_trace_marker_cmax'],
-                colorbar=plot_options['node_trace_marker_colorbar'],
-                line_width=plot_options['node_trace_marker_line_width']),
-            text=plot_options['node_trace_text'])
-
         layout_options_2d = {
             'layout_xaxis': plot_options['layout_xaxis'],
             'layout_xaxis_title': plot_options['layout_xaxis_title'],
@@ -228,69 +135,13 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
             'layout_yaxis_title': plot_options['layout_yaxis_title'],
             'layout_template': 'simple_white',
         }
-        fig = go.FigureWidget(data=[edge_trace, node_trace],
-                              layout=layout_options_common)
         fig.update(layout_options_2d)
 
     elif layout_dim == 3:
-        plot_options.update({
-            'axis': dict(showbackground=False,
-                         showline=False,
-                         zeroline=False,
-                         showgrid=False,
-                         showticklabels=False,
-                         title='')
-        })
-        plot_options['layout_scene'] = dict(xaxis=dict(plot_options['axis']),
-                                            yaxis=dict(plot_options['axis']),
-                                            zaxis=dict(plot_options['axis'])
-                                            )
-
-        edge_z = list(reduce(operator.iconcat,
-                             map(lambda x: [node_pos[x[0]][2],
-                                            node_pos[x[1]][2], None],
-                                 graph.get_edgelist()), []))
-
-        node_z = [node_pos[k][2] for k in range(graph.vcount())]
-
-        edge_trace = go.Scatter3d(
-            x=edge_x,
-            y=edge_y,
-            z=edge_z,
-            mode=plot_options['edge_trace_mode'],
-            line=plot_options['edge_trace_line'],
-            hoverinfo=plot_options['edge_trace_hoverinfo'])
-
-        node_trace = go.Scatter3d(
-            x=node_x,
-            y=node_y,
-            z=node_z,
-            mode=plot_options['node_trace_mode'],
-            hoverinfo=plot_options['node_trace_hoverinfo'],
-            hoverlabel=plot_options['node_trace_hoverlabel'],
-            marker=dict(
-                showscale=plot_options['node_trace_marker_showscale'],
-                colorscale=plot_options['node_trace_marker_colorscale'],
-                reversescale=plot_options['node_trace_marker_reversescale'],
-                line=plot_options['node_trace_marker_line'],
-                color=plot_options['node_trace_marker_color'],
-                size=plot_options['node_trace_marker_size'],
-                sizemode=plot_options['node_trace_marker_sizemode'],
-                sizeref=plot_options['node_trace_marker_sizeref'],
-                sizemin=plot_options['node_trace_marker_sizemin'],
-                cmin=plot_options['node_trace_marker_cmin'],
-                cmax=plot_options['node_trace_marker_cmax'],
-                colorbar=plot_options['node_trace_marker_colorbar'],
-                line_width=plot_options['node_trace_marker_line_width']),
-            text=plot_options['node_trace_text'])
-
         layout_options_3d = {
             'layout_scene': plot_options['layout_scene'],
             'layout_annotations': plot_options['layout_annotations'],
         }
-
-        fig = go.FigureWidget(data=[edge_trace, node_trace],
-                              layout=layout_options_common)
         fig.update(layout_options_3d)
 
     # Compute node colors according to data columns only if necessary
@@ -411,21 +262,19 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
         else:
             return None
 
-    def update_figure(old_figure, new_figure, dim):
-        # TODO could this be abstracted to node and edge traces and metadata
-        # information without need for creating a full new figure object
-        old_figure.data[0].x = new_figure.data[0].x
-        old_figure.data[0].y = new_figure.data[0].y
-        old_figure.data[1].x = new_figure.data[1].x
-        old_figure.data[1].y = new_figure.data[1].y
+    def update_figure(figure, edge_trace, node_trace, layout_dim):
+        figure.data[0].x = edge_trace.x
+        figure.data[0].y = edge_trace.y
+        figure.data[1].x = node_trace.x
+        figure.data[1].y = node_trace.y
 
-        if dim == 3:
-            old_figure.data[0].z = new_figure.data[0].z
-            old_figure.data[1].z = new_figure.data[1].z
+        if layout_dim == 3:
+            figure.data[0].z = edge_trace.z
+            figure.data[1].z = node_trace.z
 
-        old_figure.data[1].marker.size = new_figure.data[1].marker.size
-        old_figure.data[1].marker.color = new_figure.data[1].marker.color
-        old_figure.data[1].marker.sizeref = new_figure.data[1].marker.sizeref
+        figure.data[1].marker.size = node_trace.marker.size
+        figure.data[1].marker.color = node_trace.marker.color
+        figure.data[1].marker.sizeref = node_trace.marker.sizeref
 
     def on_parameter_change(change):
         handler.clear_logs()
@@ -439,14 +288,13 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
                     pipe.set_mapper_params(
                         **{param: cluster_params_widgets[param].value})
 
-            new_fig = create_static_network(
-                pipe, data, layout, layout_dim, color_variable,
-                node_color_statistic, color_by_columns_dropdown, plotly_kwargs,
-                clone_pipeline=False)
-
             logger.info("Updating figure ...")
             with fig.batch_update():
-                update_figure(fig, new_fig, layout_dim)
+                node_trace, edge_trace, _ = _calculate_node_and_edge_traces(
+                    pipe, data, layout, layout_dim,
+                    color_variable, node_color_statistic,  plotly_kwargs
+                )
+                update_figure(fig, edge_trace, node_trace, layout_dim)
             valid.value = True
         except Exception:
             exception_data = traceback.format_exc().splitlines()
