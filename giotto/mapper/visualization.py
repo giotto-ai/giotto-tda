@@ -80,11 +80,6 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     fig : ploty.graph_objs.Figure
         The figure representing the nerve (topological graph).
 
-    Examples
-    --------
-    Include example showing that color_variable can be filter_func? Also can we
-    have a figure in the sphinx generated html?
-
     References
     ----------
     .. [1] `igraph.Graph.layout
@@ -110,8 +105,6 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     else:
         node_pos = graph.layout(layout, dim=layout_dim)
 
-    # Determine whether color_variable is an array or pandas series/dataframe
-    # containing scalar values
     color_variable_kind = _infer_color_variable_kind(color_variable, data)
 
     # Determine whether node_colors is an array of node colors
