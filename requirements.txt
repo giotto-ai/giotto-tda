@@ -6,3 +6,4 @@ matplotlib
 networkx >= 2.4
 plotly >= 4.4.1
 ipywidgets
+python-igraph

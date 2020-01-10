@@ -12,6 +12,7 @@ from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
+
 version_file = os.path.join('giotto', '_version.py')
 with open(version_file) as f:
     exec(f.read())
@@ -47,8 +48,6 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
 KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
     'homology, persistence diagrams, Mapper'
 INSTALL_REQUIRES = requirements
-if platform.system() != "Windows":
-    requirements.append('python-igraph')
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
@@ -69,6 +68,27 @@ EXTRAS_REQUIRE = {
         'matplotlib',
         'plotly']
 }
+is_system_win = platform.system() == 'Windows'
+if is_system_win:
+    python_ver = sys.version_info
+    python_ver_1 = str(python_ver.major) + str(python_ver.minor)
+    python_ver_2 = python_ver_1 if int(python_ver_1) < 38 else
+    if python_ver_1 == '38':
+        python_ver_2 = python_ver_1
+    else:
+        python_ver_2 = python_ver_1 + 'm'
+    pycairo_whl_url = \
+        'https://storage.googleapis.com/l2f-open-models/giotto' \
+        '-learn/windows-binaries/pycairo/pycairo-1.18.2-cp{}' \
+        '-cp{}-win_amd64.whl'.format(python_ver_1, python_ver_2)
+    igraph_whl_url = \
+        'https://storage.googleapis.com/l2f-open-models/giotto' \
+        '-learn/windows-binaries/python-igraph/python_igraph-' \
+        '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
+        format(python_ver_1, python_ver_2)
+    DEPENDENCY_LINKS = [pycairo_whl_url, igraph_whl_url]
+else:
+    DEPENDENCY_LINKS = []
 
 
 class CMakeExtension(Extension):
@@ -175,5 +195,6 @@ setup(name=DISTNAME,
       keywords=KEYWORDS,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
+      dependency_links=DEPENDENCY_LINKS,
       ext_modules=[CMakeExtension('giotto')],
       cmdclass=dict(build_ext=CMakeBuild))
