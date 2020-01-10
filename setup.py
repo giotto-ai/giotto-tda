@@ -72,7 +72,6 @@ is_system_win = platform.system() == 'Windows'
 if is_system_win:
     python_ver = sys.version_info
     python_ver_1 = str(python_ver.major) + str(python_ver.minor)
-    python_ver_2 = python_ver_1 if int(python_ver_1) < 38 else
     if python_ver_1 == '38':
         python_ver_2 = python_ver_1
     else:
