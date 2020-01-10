@@ -27,9 +27,6 @@ jobs:
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
-  - script: pip install python-igraph
-    displayName: 'Install python-igraph'
-
   - script: |
       pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
@@ -69,9 +66,6 @@ jobs:
 
   - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
-
-  - script: pip install python-igraph
-    displayName: 'Install python-graph'
 
   - script: |
       pip install plotly matplotlib openml
@@ -168,7 +162,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis python-igraph
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
     displayName: 'Install pytest suite'
 
   - script: |
@@ -239,7 +233,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml python-igraph
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
       pytest --cov giotto --cov-report xml
@@ -248,7 +242,7 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: |
-      pip install plotly matplotlib openml python-igraph
+      pip install plotly matplotlib openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn-nightly
       pytest --cov giotto --cov-report xml

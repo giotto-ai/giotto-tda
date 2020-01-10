@@ -47,6 +47,8 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
 KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
     'homology, persistence diagrams, Mapper'
 INSTALL_REQUIRES = requirements
+if platform.system() != "Windows":
+    requirements.append('python-igraph')
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
