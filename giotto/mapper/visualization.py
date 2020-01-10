@@ -261,7 +261,11 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
 
         figure.data[1].marker.size = node_trace.marker.size
         figure.data[1].marker.color = node_trace.marker.color
+        figure.data[1].marker.cmin = node_trace.marker.cmin
+        figure.data[1].marker.cmax = node_trace.marker.cmax
         figure.data[1].marker.sizeref = node_trace.marker.sizeref
+        figure.data[1].hoverlabel = node_trace.hoverlabel
+        figure.data[1].hovertext = node_trace.hovertext
 
     def on_parameter_change(change):
         handler.clear_logs()
@@ -277,12 +281,37 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
 
             logger.info("Updating figure ...")
             with fig.batch_update():
-                node_trace, edge_trace, _, _, _ = \
-                    _calculate_graph_data(
-                        pipe, data, layout, layout_dim,
-                        color_variable, node_color_statistic,  plotly_kwargs
-                    )
+                (node_trace, edge_trace, node_elements, node_colors,
+                 plot_options) = _calculate_graph_data(
+                    pipe, data, layout, layout_dim,
+                    color_variable, node_color_statistic, plotly_kwargs
+                )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
+
+                # Update color by column buttons
+                is_data_dataframe = hasattr(data, 'columns')
+                if color_by_columns_dropdown:
+                    column_color_buttons = _get_column_color_buttons(
+                        data, is_data_dataframe, node_elements, node_colors,
+                        plot_options['node_trace_marker_colorscale'])
+                else:
+                    column_color_buttons = None
+
+                button_height = 1.1
+                fig.update_layout(
+                    updatemenus=[
+                        go.layout.Updatemenu(
+                            buttons=column_color_buttons,
+                            direction="down",
+                            pad={"r": 10, "t": 10},
+                            showactive=True,
+                            x=0.11,
+                            xanchor='left',
+                            y=button_height,
+                            yanchor="top"
+                        ),
+                    ])
+
             valid.value = True
         except Exception:
             exception_data = traceback.format_exc().splitlines()
