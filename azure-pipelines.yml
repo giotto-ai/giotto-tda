@@ -110,7 +110,7 @@ jobs:
   - script: |
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       choco install -y wget
-      wget https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)-win_amd64.whl -O pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)-win_amd64.whl
+      wget https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl -O pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       pip install pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       wget https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/python-igraph/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl -O python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       pip install python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
@@ -336,7 +336,7 @@ jobs:
   - script: |
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       choco install -y wget
-      wget https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)-win_amd64.whl -O pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)-win_amd64.whl
+      wget https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl -O pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       pip install pycairo-1.18.2-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       wget https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/python-igraph/python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl -O python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
       pip install python_igraph-0.7.1.post6-cp$(python_ver)-cp$(python_ver)m-win_amd64.whl
