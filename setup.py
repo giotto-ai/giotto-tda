@@ -65,10 +65,10 @@ if is_system_win:
         '-learn/windows-binaries/python-igraph/python_igraph-' \
         '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
         format(python_ver_1, python_ver_2)
-    DEPENDENCY_LINKS = [pycairo_whl_url, igraph_whl_url]
+    INSTALL_REQUIRES.append('pycairo @ {}'.format(pycairo_whl_url))
+    INSTALL_REQUIRES.append('python-igraph @ {}'.format(igraph_whl_url))
 else:
-    INSTALL_REQUIRES.append('python-igraph >= 0.7.1.post6')
-    DEPENDENCY_LINKS = []
+    INSTALL_REQUIRES.append('python-igraph')
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
@@ -195,6 +195,5 @@ setup(name=DISTNAME,
       keywords=KEYWORDS,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
-      dependency_links=DEPENDENCY_LINKS,
       ext_modules=[CMakeExtension('giotto')],
       cmdclass=dict(build_ext=CMakeBuild))
