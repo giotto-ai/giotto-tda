@@ -48,6 +48,27 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
 KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
     'homology, persistence diagrams, Mapper'
 INSTALL_REQUIRES = requirements
+is_system_win = platform.system() == 'Windows'
+if is_system_win:
+    python_ver = sys.version_info
+    python_ver_1 = str(python_ver.major) + str(python_ver.minor)
+    if python_ver_1 == '38':
+        python_ver_2 = python_ver_1
+    else:
+        python_ver_2 = python_ver_1 + 'm'
+    pycairo_whl_url = \
+        'https://storage.googleapis.com/l2f-open-models/giotto' \
+        '-learn/windows-binaries/pycairo/pycairo-1.18.2-cp{}' \
+        '-cp{}-win_amd64.whl'.format(python_ver_1, python_ver_2)
+    igraph_whl_url = \
+        'https://storage.googleapis.com/l2f-open-models/giotto' \
+        '-learn/windows-binaries/python-igraph/python_igraph-' \
+        '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
+        format(python_ver_1, python_ver_2)
+    DEPENDENCY_LINKS = [pycairo_whl_url, igraph_whl_url]
+else:
+    INSTALL_REQUIRES.append('python-igraph >= 0.7.1.post6')
+    DEPENDENCY_LINKS = []
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
@@ -68,26 +89,6 @@ EXTRAS_REQUIRE = {
         'matplotlib',
         'plotly']
 }
-is_system_win = platform.system() == 'Windows'
-if is_system_win:
-    python_ver = sys.version_info
-    python_ver_1 = str(python_ver.major) + str(python_ver.minor)
-    if python_ver_1 == '38':
-        python_ver_2 = python_ver_1
-    else:
-        python_ver_2 = python_ver_1 + 'm'
-    pycairo_whl_url = \
-        'https://storage.googleapis.com/l2f-open-models/giotto' \
-        '-learn/windows-binaries/pycairo/pycairo-1.18.2-cp{}' \
-        '-cp{}-win_amd64.whl'.format(python_ver_1, python_ver_2)
-    igraph_whl_url = \
-        'https://storage.googleapis.com/l2f-open-models/giotto' \
-        '-learn/windows-binaries/python-igraph/python_igraph-' \
-        '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
-        format(python_ver_1, python_ver_2)
-    DEPENDENCY_LINKS = [pycairo_whl_url, igraph_whl_url]
-else:
-    DEPENDENCY_LINKS = []
 
 
 class CMakeExtension(Extension):
