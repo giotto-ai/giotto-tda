@@ -347,23 +347,23 @@ jobs:
       pip install wheel twine
     displayName: 'Install dev environment'
 
-  - script: |
-      pip install plotly matplotlib openml
-      jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn
-      pytest --cov giotto --cov-report xml
-      flake8
-    condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Test with pytest, nbconvert and flake8'
-
-  - script: |
-      pip install plotly matplotlib openml
-      jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn-nightly
-      pytest --cov giotto --cov-report xml
-      flake8
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Test with pytest, nbconvert and flake8'
+#  - script: |
+#      pip install plotly matplotlib openml
+#      jupyter nbconvert --to notebook --execute examples/*.ipynb
+#      pip uninstall -y giotto-learn
+#      pytest --cov giotto --cov-report xml
+#      flake8
+#    condition: eq(variables['nightly_check'], 'false')
+#    displayName: 'Test with pytest, nbconvert and flake8'
+#
+#  - script: |
+#      pip install plotly matplotlib openml
+#      jupyter nbconvert --to notebook --execute examples/*.ipynb
+#      pip uninstall -y giotto-learn-nightly
+#      pytest --cov giotto --cov-report xml
+#      flake8
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
