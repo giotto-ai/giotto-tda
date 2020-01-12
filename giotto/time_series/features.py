@@ -1,16 +1,13 @@
 """Features from time series."""
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import numpy as np
-from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
+from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 
-from ..utils._docs import adapt_fit_transform_docs
 
-
-@adapt_fit_transform_docs
 class PermutationEntropy(BaseEstimator, TransformerMixin):
     """Entropies from sets of permutations arg-sorting rows in arrays.
 
@@ -55,12 +52,12 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data.
 
         y : None
@@ -83,7 +80,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data.
 
         y : None
@@ -96,8 +93,9 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
             One permutation entropy per entry in `X` along axis 0.
 
         """
+
         # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(

@@ -1,16 +1,12 @@
 """Feature generation using meta transformers."""
-# License: GNU AGPLv3
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-
-from .. import diagrams as diag
-from .. import homology as hl
-from ..pipeline import Pipeline
-from ..utils._docs import adapt_fit_transform_docs
+from giotto.pipeline import Pipeline
+from giotto import homology as hl
+from giotto import diagrams as diag
 
 
-@adapt_fit_transform_docs
 class EntropyGenerator(BaseEstimator, TransformerMixin):
     """Persistence entropies directly from point clouds.
 
@@ -27,7 +23,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -115,12 +111,12 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -134,6 +130,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         self : object
 
         """
+
         steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
@@ -158,7 +155,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -170,16 +167,16 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions)
+        Xt : ndarray, shape (n_samples, n_homology_dimensions)
             For each point cloud in `X`, one persistence entropy per homology
             dimension in `homology_dimensions`.
 
         """
+
         Xt = self._pipeline.transform(X)
         return Xt
 
 
-@adapt_fit_transform_docs
 class BettiCurveGenerator(BaseEstimator, TransformerMixin):
     """Meta transformer returning Betti curves directly from point clouds.
 
@@ -195,7 +192,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -277,12 +274,12 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         """Create a giotto :class:`Pipeline` object and fit it. Then, return
         the estimator.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of the
@@ -296,6 +293,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         self : object
 
         """
+
         steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
@@ -319,7 +317,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -331,17 +329,17 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
              n_values)
             For each point cloud in `X`, one discretised Betti curve
             per homology dimension in `homology_dimensions`.
 
         """
+
         Xt = self._pipeline.transform(X)
         return Xt
 
 
-@adapt_fit_transform_docs
 class LandscapeGenerator(BaseEstimator, TransformerMixin):
     """Meta transformer returning persistence landscapes directly from point
     clouds.
@@ -359,7 +357,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -445,12 +443,12 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         """Create a giotto :class:`Pipeline` object and fit it. Then, return
         the estimator.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -464,6 +462,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         self : object
 
         """
+
         steps = [
             ('diagram', hl.VietorisRipsPersistence(
                 metric=self.metric,
@@ -488,7 +487,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. ``n_samples`` is the number of point clouds,
             ``n_points`` is the number of points per point cloud and
             ``n_dimensions`` is the number of features for each point of
@@ -500,12 +499,13 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
+        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
              n_layers, n_values)
             For each point cloud in `X`, one discretised persistence landscape
             per homology dimension in `homology_dimensions`, consisting of
             `n_layers` layers.
 
         """
+
         Xt = self._pipeline.transform(X)
         return Xt

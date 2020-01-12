@@ -12,7 +12,6 @@ from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
-
 version_file = os.path.join('giotto', '_version.py')
 with open(version_file) as f:
     exec(f.read())
@@ -25,16 +24,16 @@ DESCRIPTION = 'Toolbox for Machine Learning using Topological Data Analysis.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = 'text/x-rst'
-MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
+MAINTAINER = 'Guillaume Tauzin'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-learn'
-LICENSE = 'GNU AGPLv3'
+LICENSE = 'Apache 2.0'
 DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-learn/tarball/v0.1.3'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
-               'Programming Language :: C++',
+               'Programming Language :: C',
                'Programming Language :: Python',
                'Topic :: Software Development',
                'Topic :: Scientific/Engineering',
@@ -45,30 +44,9 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
                'Programming Language :: Python :: 3.7']
-KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
-    'homology, persistence diagrams, Mapper'
+KEYWORDS = 'machine learning topological data analysis persistent ' + \
+    'homology, persistence diagrams'
 INSTALL_REQUIRES = requirements
-is_system_win = platform.system() == 'Windows'
-if is_system_win:
-    python_ver = sys.version_info
-    python_ver_1 = str(python_ver.major) + str(python_ver.minor)
-    if python_ver_1 == '38':
-        python_ver_2 = python_ver_1
-    else:
-        python_ver_2 = python_ver_1 + 'm'
-    pycairo_whl_url = \
-        'https://storage.googleapis.com/l2f-open-models/giotto' \
-        '-learn/windows-binaries/pycairo/pycairo-1.18.2-cp{}' \
-        '-cp{}-win_amd64.whl'.format(python_ver_1, python_ver_2)
-    igraph_whl_url = \
-        'https://storage.googleapis.com/l2f-open-models/giotto' \
-        '-learn/windows-binaries/python-igraph/python_igraph-' \
-        '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
-        format(python_ver_1, python_ver_2)
-    INSTALL_REQUIRES.append('pycairo @ {}'.format(pycairo_whl_url))
-    INSTALL_REQUIRES.append('python-igraph @ {}'.format(igraph_whl_url))
-else:
-    INSTALL_REQUIRES.append('python-igraph')
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',

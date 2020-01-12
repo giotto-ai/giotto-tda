@@ -1,11 +1,13 @@
 """The module :mod:`giotto.pipeline` extends scikit-learn's module by defining
 Pipelines that include TransformerResamplers."""
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import numpy as np
 
 from sklearn import pipeline
 from sklearn.base import clone
+from sklearn.base import BaseEstimator
+from .base import TransformerResamplerMixin
 from sklearn.utils.metaestimators import if_delegate_has_method
 from sklearn.utils.validation import check_memory
 

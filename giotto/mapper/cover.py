@@ -1,6 +1,3 @@
-"""Covering schemes for one or several dimensions."""
-# License: GNU AGPLv3
-
 from functools import partial
 from itertools import product
 
@@ -14,12 +11,10 @@ from sklearn.utils.validation import check_is_fitted
 from .utils._cover import (_check_has_one_column,
                            _remove_empty_and_duplicate_intervals,
                            _validate_kind)
-from ..utils._docs import adapt_fit_transform_docs
 
 
-@adapt_fit_transform_docs
 class OneDimensionalCover(BaseEstimator, TransformerMixin):
-    """Cover of one-dimensional data coming from open overlapping intervals.
+    """Covers of one-dimensional data coming from open overlapping intervals.
 
     In :meth:`fit`, given a training array `X` representing a collection of
     real numbers, a cover of the real line by open intervals
@@ -54,11 +49,11 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    left_limits_ : ndarray of shape (n_intervals,)
+    left_limits_ : ndarray, shape (n_intervals,)
         Left limits of the cover intervals computed in :meth:`fit`. See the
         Notes.
 
-    right_limits_ : ndarray of shape (n_intervals,)
+    right_limits_ : ndarray, shape (n_intervals,)
         Right limits of the cover intervals computed in :meth:`fit`. See the
         Notes.
 
@@ -108,12 +103,12 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         in :attr:`left_limits_` and :attr:`right_limits_`. Then, return the
         estimator.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, 1)
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -147,7 +142,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, 1)
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -156,7 +151,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_cover_sets)
+        Xt : ndarray, shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to `n_intervals` as empty
             or duplicated cover sets are removed.
@@ -209,7 +204,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, 1)
+        X : ndarray, shape (n_samples,) or (n_samples, 1)
             Input data.
 
         y : None
@@ -218,7 +213,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_cover_sets)
+        Xt : ndarray, shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to `n_intervals` as empty
             or duplicated cover sets are removed.
@@ -321,9 +316,8 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return left_limits, right_limits
 
 
-@adapt_fit_transform_docs
 class CubicalCover(BaseEstimator, TransformerMixin):
-    """Cover of multi-dimensional data coming from overlapping hypercubes
+    """Covers of multi-dimensional data coming from overlapping hypercubes
     (technically, parallelopipeds) given by taking products of one-dimensional
     intervals.
 
@@ -359,7 +353,6 @@ class CubicalCover(BaseEstimator, TransformerMixin):
     OneDimensionalCover
 
     """
-
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
@@ -398,12 +391,12 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         as products of one-dimensional intervals covering each feature
         dimension separately. Then, return the estimator.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_features)
+        X : ndarray, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -436,7 +429,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_features)
+        X : ndarray, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -445,7 +438,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_cover_sets)
+        Xt : ndarray, shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to n_intervals *
             n_features` as empty or duplicated cover sets are removed.
@@ -473,7 +466,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_features)
+        X : ndarray, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -482,7 +475,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_cover_sets)
+        Xt : ndarray, shape (n_samples, n_cover_sets)
             Encoding of the cover of `X` as a boolean array. In general,
             ``n_cover_sets`` is less than or equal to `n_intervals *
             n_features` as empty or duplicated cover sets are removed.

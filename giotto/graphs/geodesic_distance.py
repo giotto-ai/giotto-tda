@@ -1,17 +1,13 @@
-"""Graph geodesic distance calculations."""
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import numpy as np
-from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
+from joblib import Parallel, delayed
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
-
-from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import check_graph
 
 
-@adapt_fit_transform_docs
 class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     """Distance matrices arising from geodesic distances on graphs.
 
@@ -67,15 +63,13 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or \
-            (n_samples, n_vertices, n_vertices)
+        X : ndarray of sparse or dense arrays, shape (n_samples,)
             Input data, i.e. a collection of adjacency matrices of graphs.
-            Each adjacency matrix may be a dense or a sparse array.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -98,17 +92,15 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or \
-            (n_samples, n_vertices, n_vertices)
+        X : ndarray of sparse or dense arrays, shape (n_samples,)
             Input data, i.e. a collection of adjacency matrices of graphs.
-            Each adjacency matrix may be a dense or sparse array.
 
         y : None
             Ignored.
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples,) or \
+        Xt : ndarray, shape (n_samples,) or \
              (n_samples, n_vertices, n_vertices)
             Array of distance matrices. If the distance matrices have variable
             size across samples, `Xt` is a one-dimensional array of dense
@@ -116,7 +108,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(

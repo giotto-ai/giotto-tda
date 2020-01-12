@@ -1,4 +1,4 @@
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import numpy as np
 
@@ -43,7 +43,7 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
 
         """
         check_array(X, allow_nd=True)
-        self._is_fitted = True
+        self.is_fitted_ = True
 
         return self
 
@@ -66,7 +66,7 @@ class GraphEntropy(BaseEstimator, TransformerMixin):
         entropies : ndarray
             Entropies of diffusion vectors, shape (n_simplices, n_times).
         """
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         check_array(X, allow_nd=True)
         entropies = entropy(np.abs(X), base=2)
 

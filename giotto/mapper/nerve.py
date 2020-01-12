@@ -1,6 +1,3 @@
-"""Construct the nerve of a Mapper cover."""
-# License: GNU AGPLv3
-
 from functools import reduce
 from itertools import combinations
 from operator import iconcat
@@ -12,17 +9,10 @@ from sklearn.utils.validation import check_is_fitted
 
 
 class Nerve(BaseEstimator, TransformerMixin):
-    """TODO
-
-    """
-
     def __init__(self, min_intersection=1):
         self.min_intersection = min_intersection
 
     def fit(self, X, y=None):
-        """TODO
-
-        """
         # X is a list of lists where each sublist corresponds to a filter
         # interval. The sublists contain tuples, one for each cluster found
         # within the interval.
@@ -34,9 +24,6 @@ class Nerve(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """TODO
-
-        """
         check_is_fitted(self)
         graph = ig.Graph()
         graph.add_vertices([vertex[0] for vertex in self.X_])

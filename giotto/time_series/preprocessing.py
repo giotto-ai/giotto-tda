@@ -1,17 +1,14 @@
 """Resampling and stationarization of time series data."""
-# License: GNU AGPLv3
+# License: Apache 2.0
 
-import numpy as np
-from sklearn.base import BaseEstimator
-from sklearn.utils.validation import check_array, column_or_1d
 from sklearn.utils.validation import check_is_fitted
-
+from sklearn.base import BaseEstimator
 from ..base import TransformerResamplerMixin
-from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
+from sklearn.utils.validation import check_array, column_or_1d
+import numpy as np
 
 
-@adapt_fit_transform_docs
 class Resampler(BaseEstimator, TransformerResamplerMixin):
     """Time series resampling at regular intervals.
 
@@ -36,7 +33,6 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     (30,)
 
     """
-
     _hyperparameters = {'period': [int, (1, np.inf)]}
 
     def __init__(self, period=2):
@@ -45,12 +41,12 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, ...)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -72,7 +68,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, ...)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -81,12 +77,12 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples_new, ...)
+        Xt : ndarray, shape (n_samples_new, ...)
             Resampled array. ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
         if Xt.ndim == 1:
             Xt = Xt[: None]
@@ -99,7 +95,7 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray of shape (n_samples,)
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
@@ -108,12 +104,12 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray of shape (n_samples_new,)
+        yr : ndarray, shape (n_samples_new,)
             Resampled target. ``n_samples_new = n_samples // period``.
 
         """
         # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         yr = column_or_1d(y)
         yr = yr[::self.period]
 
@@ -157,7 +153,6 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     (299,)
 
     """
-
     _hyperparameters = {'operation': [str, ['return', 'log-return']]}
 
     def __init__(self, operation='return'):
@@ -166,12 +161,12 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, ...)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -193,7 +188,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or (n_samples, ...)
+        X : ndarray, shape (n_samples,) or (n_samples, ...)
             Input data.
 
         y : None
@@ -202,12 +197,12 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples_new, ...)
+        Xt : ndarray, shape (n_samples_new, ...)
             Stationarized array. ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
         if Xt.ndim == 1:
             Xt = Xt[:, None]
@@ -222,7 +217,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        y : ndarray of shape (n_samples,)
+        y : ndarray, shape (n_samples,)
             Target.
 
         X : None
@@ -231,12 +226,12 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        yr : ndarray of shape (n_samples_new,)
+        yr : ndarray, shape (n_samples_new,)
             Resampled target. ``n_samples_new = n_samples - 1``.
 
         """
         # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         y = column_or_1d(y)
 
         return y[1:]

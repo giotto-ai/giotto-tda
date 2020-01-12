@@ -18,5 +18,5 @@ def func_from_callable_on_rows(func):
     return make_func_apply_along_axis_1(func)
 
 
-def identity(validate=False):
-    return FunctionTransformer(validate=validate)
+def identity():
+    return FunctionTransformer(validate=True)

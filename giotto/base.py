@@ -1,6 +1,6 @@
 """Implements a TransformerResamplerMixin for transformers that have a resample
 method."""
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 
 class TransformerResamplerMixin:

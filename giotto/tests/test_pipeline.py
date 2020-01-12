@@ -1,4 +1,4 @@
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import giotto as gt
 import giotto.time_series as ts

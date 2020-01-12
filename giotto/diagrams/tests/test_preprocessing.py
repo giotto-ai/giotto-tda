@@ -1,5 +1,5 @@
 """Testing for ForgetDimension and Scaler"""
-# License: GNU AGPLv3
+# License : Apache 2.0
 
 import numpy as np
 import pytest

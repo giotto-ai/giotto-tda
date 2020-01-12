@@ -1,4 +1,4 @@
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import numpy as np
 import scipy as sp
@@ -17,7 +17,6 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
     taken as input.
 
     """
-
     def fit(self, X, taus, initial_condition=None, order=50, proc="exact"):
         """Compute heat diffusion throughout the complex.
 
@@ -52,6 +51,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
         self : object
 
         """
+
         if initial_condition is not None:
             check_array(initial_condition)
             self.initial_condition = initial_condition
@@ -90,6 +90,7 @@ class HeatDiffusion(BaseEstimator, TransformerMixin):
             equation in time.
 
         """
+
         check_is_fitted(self)
         check_array(X, accept_sparse=True)
         heat = np.squeeze(np.asarray(self._compute_heat_diffusion(X)))

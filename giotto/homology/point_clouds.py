@@ -1,20 +1,17 @@
 """Persistent homology on point clouds or finite metric spaces."""
-# License: GNU AGPLv3
-
-import numbers
+# License: Apache 2.0
 
 import numpy as np
-from joblib import Parallel, delayed
+import numbers
 from sklearn.base import BaseEstimator, TransformerMixin
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_array, check_is_fitted
-
 from ._utils import _pad_diagram
-from ..externals.python import ripser
-from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
+from ..externals.python import ripser
 
-@adapt_fit_transform_docs
+
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
@@ -35,7 +32,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         and `metric` determines a rule with which to calculate distances
         between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan", or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -71,7 +68,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     See also
     --------
     ConsistentRescaling
-    CubicalPersistence
 
     Notes
     -----
@@ -91,7 +87,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         <https://arxiv.org/abs/1908.02518>`_.
 
     """
-
     _hyperparameters = {'max_edge_length': [numbers.Number],
                         'infinity_values_': [numbers.Number],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
@@ -108,30 +103,27 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xdgms = ripser(X[X[:, 0] != np.inf],
-                       maxdim=self._max_homology_dimension,
-                       thresh=self.max_edge_length, coeff=self.coeff,
-                       metric=self.metric)['dgms']
+        Xds = ripser(X[X[:, 0] != np.inf], maxdim=self._max_homology_dimension,
+                     thresh=self.max_edge_length, coeff=self.coeff,
+                     metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
+            Xds[0] = Xds[0][:-1, :]  # Remove final death at np.inf
 
-        # Add dimension as the third elements of each (b, d) tuple
-        Xdgms = {dim: np.hstack([Xdgms[dim],
-                                 dim * np.ones((Xdgms[dim].shape[0], 1),
-                                               dtype=Xdgms[dim].dtype)])
-                 for dim in self._homology_dimensions}
-        return Xdgms
+        Xds = {dim: np.hstack([Xds[dim], dim * np.ones((Xds[dim].shape[0], 1),
+                                                       dtype=Xds[dim].dtype)])
+               for dim in self._homology_dimensions}
+        return Xds
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -165,7 +157,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each point cloud or distance matrix in `X`, compute the
+        """Compute, for each point cloud or distance matrix in `X`, the
         relevant persistence diagram as an array of triples [b, d, q]. Each
         triple represents a persistent topological feature in dimension q
         (belonging to `homology_dimensions`) which is born at b and dies at d.
@@ -178,7 +170,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
+        X : ndarray, shape (n_samples, n_points, n_points) or \
             (n_samples, n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -192,7 +184,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_features, 3)
+        Xt : ndarray, shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. ``n_features`` equals
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of

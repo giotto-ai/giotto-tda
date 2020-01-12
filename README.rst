@@ -21,7 +21,7 @@ giotto-learn
 
 
 giotto-learn is a high performance topological machine learning toolbox in Python built on top of
-scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
+scikit-learn and is distributed under the AGPLv3 license. It is part of the Giotto open-source project.
 
 Website: https://giotto.ai
 
@@ -40,22 +40,16 @@ Installation
 Dependencies
 ~~~~~~~~~~~~
 
-The latest stable version of giotto-learn requires:
+giotto-learn requires:
 
 - Python (>= 3.5)
+- scikit-learn (>= 0.21.3)
 - NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
 - joblib (>= 0.11)
-- scikit-learn (>= 0.21.3)
-
-Additionally, developer or pre-release versions require:
-
-- scikit-learn (>= 0.22.0)
 - python-igraph (>= 0.7.1.post6)
-- matplotlib (>= 3.1.2)
-- networkx (>= 2.4)
 - plotly (>= 4.4.1)
-- ipywidgets
+- matplotlib (>= 3.1.2)
 
 To run the examples, jupyter is required.
 
@@ -63,19 +57,9 @@ User installation
 ~~~~~~~~~~~~~~~~~
 
 If you already have a working installation of numpy and scipy,
-the easiest way to install the latest stable release of giotto-learn
-is using ``pip``   ::
+the easiest way to install giotto-learn is using ``pip``   ::
 
     pip install -U giotto-learn
-
-Pre-release, experimental builds containing recently added features and/or
-bug fixes can be installed by running   ::
-
-    pip install -U giotto-learn-nightly
-
-The main difference between ``giotto-learn-nightly`` and the developer
-installation (see below) is that the former is shipped with pre-compiled wheels
-(similarly to the stable release) and hence does not require any C++ dependencies.
 
 Documentation
 -------------
@@ -147,12 +131,8 @@ Important links
 - Download releases: https://pypi.org/project/giotto-learn/
 - Issue tracker: https://github.com/giotto-ai/giotto-learn/issues
 
-Community
+
+Contacts:
 ---------
-
-giotto-ai Slack workspace: https://slack.giotto.ai/
-
-Contacts
---------
 
 maintainers@giotto.ai

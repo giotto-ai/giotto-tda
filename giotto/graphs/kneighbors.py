@@ -1,20 +1,16 @@
-"""kNN graphs from point cloud data."""
-# License: GNU AGPLv3
+# License: Apache 2.0
 
 import warnings
 from functools import partial
 
 import numpy as np
-from joblib import Parallel, delayed
 from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors import kneighbors_graph
+from joblib import Parallel, delayed
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..utils._docs import adapt_fit_transform_docs
 
-
-@adapt_fit_transform_docs
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
     """Adjacency matrices of k-nearest neighbor graphs.
 
@@ -25,7 +21,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     corresponding vector is among the k nearest neighbors of the
     second, or vice-versa.
 
-    :func:`sklearn.neighbors.kneighbors_graph` is used to compute the
+    :obj:`sklearn.neighbors.kneighbors_graph` is used to compute the
     adjacency matrices of kNN graphs.
 
     Parameters
@@ -35,7 +31,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     metric : string or callable, default ``'minkowski'``
         Metric to use for distance computation. Any metric from scikit-learn
-        or :mod:`scipy.spatial.distance` can be used.
+        or :obj:`scipy.spatial.distance` can be used.
         If metric is a callable function, it is called on each
         pair of instances (rows) and the resulting value recorded. The callable
         should take two arrays as input and return one value indicating the
@@ -46,14 +42,14 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         - from scikit-learn: [``'cityblock'``, ``'cosine'``, ``'euclidean'``,
           ``'l1'``, ``'l2'``, ``'manhattan'``]
-        - from :mod:`scipy.spatial.distance`: [``'braycurtis'``,
+        - from :obj:`scipy.spatial.distance`: [``'braycurtis'``,
           ``'canberra'``, ``'chebyshev'``, ``'correlation'``, ``'dice'``,
           ``'hamming'``, ``'jaccard'``, ``'kulsinski'``, ``'mahalanobis'``,
           ``'minkowski'``, ``'rogerstanimoto'``, ``'russellrao'``,
           ``'seuclidean'``, ``'sokalmichener'``, ``'sokalsneath'``,
           ``'sqeuclidean'``, ``'yule'``]
 
-        See the documentation for :mod:`scipy.spatial.distance` for details on
+        See the documentation for :obj:`scipy.spatial.distance` for details on
         these metrics.
 
     metric_params : dict, optional, default: ``{}``
@@ -61,7 +57,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     p : int, optional, default: ``2``
         Parameter for the Minkowski (i.e. :math:`\\ell^p`) metric from
-        :func:`sklearn.metrics.pairwise.pairwise_distances`. `p` = 1 is the
+        :obj:`sklearn.metrics.pairwise.pairwise_distances`. `p` = 1 is the
         Manhattan distance and `p` = 2 is the Euclidean distance.
 
     metric_params : dict, optional, default: ``{}``
@@ -90,7 +86,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    # TODO: consider using an immutable default value for metric_params.
     def __init__(self, n_neighbors=4, metric='euclidean',
                  p=2, metric_params={}, n_jobs=None):
         self.n_neighbors = n_neighbors
@@ -110,12 +105,12 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is here to implement the usual scikit-learn API and hence
+        This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. Each entry in `X` along axis 0 is an array of
             ``n_points`` row vectors in ``n_dimensions``-dimensional space.
 
@@ -143,7 +138,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray, shape (n_samples, n_points, n_dimensions)
             Input data. Each entry in `X` along axis 0 is an array of
             ``n_points`` row vectors in ``n_dimensions``-dimensional space.
 
@@ -158,7 +153,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        check_is_fitted(self, '_nearest_neighbors')
+        check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
