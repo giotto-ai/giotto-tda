@@ -73,8 +73,8 @@ Visualization
    :toctree: generated/
    :template: function.rst
 
-   mapper.visualization.create_static_network
-   mapper.visualization.create_interactive_network
+   mapper.visualization.plot_static_mapper_graph
+   mapper.visualization.plot_interactive_mapper_graph
 
 Utilities
 ---------

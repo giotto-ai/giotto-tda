@@ -15,10 +15,11 @@ from .utils.visualization import (_calculate_graph_data,
                                   _get_column_color_buttons)
 
 
-def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
-                          color_variable=None, node_color_statistic=np.mean,
-                          color_by_columns_dropdown=False, plotly_kwargs=None,
-                          clone_pipeline=True):
+def plot_static_mapper_graph(
+        pipeline, data, layout='kamada_kawai', layout_dim=2,
+        color_variable=None, node_color_statistic=np.mean,
+        color_by_columns_dropdown=False, plotly_kwargs=None,
+        clone_pipeline=True):
     """
     Parameters
     ----------
@@ -159,11 +160,11 @@ def create_static_network(pipeline, data, layout='kamada_kawai', layout_dim=2,
     return fig
 
 
-def create_interactive_network(pipeline, data, layout='kamada_kawai',
-                               layout_dim=2, color_variable=None,
-                               node_color_statistic=np.mean,
-                               color_by_columns_dropdown=False,
-                               plotly_kwargs=None):
+def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
+                                  layout_dim=2, color_variable=None,
+                                  node_color_statistic=np.mean,
+                                  color_by_columns_dropdown=False,
+                                  plotly_kwargs=None):
     """
     Parameters
     ----------
@@ -372,7 +373,7 @@ def create_interactive_network(pipeline, data, layout='kamada_kawai',
     if plotly_kwargs is None:
         plotly_kwargs = dict()
 
-    fig = create_static_network(
+    fig = plot_static_mapper_graph(
         pipe, data, layout, layout_dim, color_variable, node_color_statistic,
         color_by_columns_dropdown, plotly_kwargs, clone_pipeline=False)
 
