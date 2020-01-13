@@ -56,8 +56,7 @@ To run the examples, jupyter is required.
 User installation
 ~~~~~~~~~~~~~~~~~
 
-If you already have a working installation of numpy and scipy,
-the easiest way to install giotto-learn is using ``pip``   ::
+The simplest way to install giotto-learn is using ``pip``   ::
 
     pip install -U giotto-learn
 
@@ -77,6 +76,12 @@ making a contribution to giotto-learn, please see the `CONTRIBUTING.rst
 Developer installation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+To simplify the installation of the C++ dependencies, we recommend using
+`Conda <https://www.anaconda.com/distribution/>`_ to install giotto-learn from source.
+
+Installing both the PyPI release and source of giotto-learn in the same
+environment is not recommended since it is known to cause conflicts with the C++ bindings.
+
 C++ dependencies:
 '''''''''''''''''
 
@@ -84,7 +89,7 @@ C++ dependencies:
 -  CMake >= 3.9
 -  Boost >= 1.56
 
-The CMake and Boost dependencies can be installed in using Anaconda as follows:
+The CMake and Boost dependencies can be installed using Conda as follows:
 
 .. code-block:: bash
 
