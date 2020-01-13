@@ -367,7 +367,6 @@ jobs:
 
   - bash: |
       sed -i $'s/\r$//' README.rst
-      set LIBPATH="C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\Shared\Python$(python.version)_64\libs"
       python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
 
