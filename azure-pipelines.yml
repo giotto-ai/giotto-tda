@@ -302,10 +302,10 @@ jobs:
 #    displayName: 'Upload wheels to PyPI'
 
 
-- job: 'win2016'
+- job: 'win2019'
   condition: eq(variables['build_check'], 'true')
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-2019'
   strategy:
     matrix:
 #      Python35:
