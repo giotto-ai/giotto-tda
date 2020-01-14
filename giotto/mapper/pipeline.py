@@ -11,9 +11,11 @@ from .utils.pipeline import func_from_callable_on_rows, identity
 
 global_pipeline_params = ('memory', 'verbose')
 nodes_params = ('scaler', 'filter_func', 'cover')
+clust_prepr_params = ('clustering_preprocessing',)
 clust_params = ('clusterer', 'parallel_clustering_n_jobs',
                 'parallel_clustering_prefer')
 nerve_params = ('min_intersection',)
+clust_prepr_params_prefix = 'pullback_cover__'
 nodes_params_prefix = 'pullback_cover__map_and_cover__'
 clust_params_prefix = 'clustering__'
 nerve_params_prefix = 'nerve__'
@@ -72,6 +74,8 @@ class MapperPipeline(Pipeline):
         return {**{param: pipeline_params[param]
                    for param in global_pipeline_params},
                 **self._clean_dict_keys(pipeline_params, nodes_params_prefix),
+                **self._clean_dict_keys(
+                    pipeline_params, clust_prepr_params_prefix),
                 **self._clean_dict_keys(pipeline_params, clust_params_prefix),
                 **self._clean_dict_keys(pipeline_params, nerve_params_prefix)}
 
@@ -86,6 +90,8 @@ class MapperPipeline(Pipeline):
 
         """
         mapper_nodes_kwargs = self._subset_kwargs(kwargs, nodes_params)
+        mapper_clust_prepr_kwargs = \
+            self._subset_kwargs(kwargs, clust_prepr_params)
         mapper_clust_kwargs = self._subset_kwargs(kwargs, clust_params)
         mapper_nerve_kwargs = self._subset_kwargs(kwargs, nerve_params)
         if mapper_nodes_kwargs:
@@ -93,6 +99,12 @@ class MapperPipeline(Pipeline):
                 **{nodes_params_prefix + key: mapper_nodes_kwargs[key]
                    for key in mapper_nodes_kwargs})
             [kwargs.pop(key) for key in mapper_nodes_kwargs]
+        if mapper_clust_prepr_kwargs:
+            super().set_params(
+                **{clust_prepr_params_prefix + key:
+                    mapper_clust_prepr_kwargs[key] for key in
+                   mapper_clust_kwargs})
+            [kwargs.pop(key) for key in mapper_clust_prepr_kwargs]
         if mapper_clust_kwargs:
             super().set_params(
                 **{clust_params_prefix + key: mapper_clust_kwargs[key]
@@ -122,6 +134,7 @@ class MapperPipeline(Pipeline):
 def make_mapper_pipeline(scaler=None,
                          filter_func=None,
                          cover=None,
+                         clustering_preprocessing=None,
                          clusterer=None,
                          parallel_clustering_n_jobs=None,
                          parallel_clustering_prefer='threads',
@@ -152,6 +165,12 @@ def make_mapper_pipeline(scaler=None,
     cover : object or None, optional, default: ``None``
         Covering transformer.``None`` means using a cubical cover
         (:meth:`giotto.mapper.CubicalCover`) with its default parameters.
+
+    clustering_preprocessing : object or None, optional, default: ``None``
+        If not ``None``, it is a transformer which is applied to the
+        data independently to the `scaler` -> `filter_func` -> cover` pipeline.
+        Clustering is then performed on portions (determined by the `scaler`
+        -> `filter_func` -> cover` pipeline) of the transformed data.
 
     clusterer : object or None, optional, default: ``None``
         Clustering object. ``None`` means using DBSCAN
@@ -304,6 +323,11 @@ def make_mapper_pipeline(scaler=None,
     else:
         _cover = cover
 
+    if clustering_preprocessing is None:
+        _clustering_preprocessing = identity(validate=True)
+    else:
+        _clustering_preprocessing = clustering_preprocessing
+
     if clusterer is None:
         from sklearn.cluster import DBSCAN
         _clusterer = DBSCAN()
@@ -318,7 +342,7 @@ def make_mapper_pipeline(scaler=None,
 
     all_steps = [
         ('pullback_cover', ListFeatureUnion(
-            [('identity', identity(validate=True)),
+            [('clustering_preprocessing', _clustering_preprocessing),
              ('map_and_cover', map_and_cover)])),
         ('clustering', ParallelClustering(
             clusterer=_clusterer,
