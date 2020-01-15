@@ -153,7 +153,7 @@ def make_mapper_pipeline(scaler=None,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
-    steps.
+    steps. [1]_
 
     All steps may be arbitrary scikit-learn Pipeline objects. The scaling
     and cover steps must be transformers implementing a ``fit_transform``
@@ -198,7 +198,7 @@ def make_mapper_pipeline(scaler=None,
         Selects the default joblib backend to use in a joblib-parallel
         application of the clustering step across pullback cover sets.
         The default process-based backend is 'loky' and the default
-        thread-based backend is 'threading'. See [1]_.
+        thread-based backend is 'threading'. See [2]_.
 
     min_intersection : int, optional, default: ``1``
         Minimum size of the intersection between clusters required for
@@ -305,7 +305,11 @@ def make_mapper_pipeline(scaler=None,
 
     References
     ----------
-    .. [1] "Thread-based parallelism vs process-based parallelism", in
+    .. [1] G. Singh, F. Mémoli, and G. Carlsson, "Topological methods for the
+           analysis of high dimensional data sets and 3D object recognition";
+           in *SPBG*, pp. 91--100, 2007.
+
+    .. [2] "Thread-based parallelism vs process-based parallelism", in
            `joblib documentation
            <https://joblib.readthedocs.io/en/latest/parallel.html>`_.
 
