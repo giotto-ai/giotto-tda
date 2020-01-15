@@ -5,6 +5,7 @@ import numbers
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
+from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 from ..utils.validation import validate_params
 
@@ -30,10 +31,12 @@ class Binarizer(BaseEstimator, TransformerMixin):
         processors.
 
     """
-    _hyperparameters = {'threshold': [numbers.Number, (1e-16, 1)]}
+    _hyperparameters = {'threshold': [numbers.Number, (1e-16, 1)],
+                        'normalize': [bool, [False, True]]}
 
     def __init__(self, threshold=0.5, normalize=False, n_jobs=None):
         self.threshold = threshold
+        self.normalize = normalize
         self.n_jobs = n_jobs
 
     def _binarize(self, X):
