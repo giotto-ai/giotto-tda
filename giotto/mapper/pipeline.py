@@ -149,6 +149,7 @@ def make_mapper_pipeline(scaler=None,
                          clusterer=None,
                          parallel_clustering_n_jobs=None,
                          parallel_clustering_prefer='threads',
+                         graph_step=True,
                          min_intersection=1,
                          memory=None,
                          verbose=False):
@@ -200,9 +201,14 @@ def make_mapper_pipeline(scaler=None,
         The default process-based backend is 'loky' and the default
         thread-based backend is 'threading'. See [2]_.
 
+    graph_step : bool, optional, default: ``True``
+        Whether the resulting pipeline should stop at the calculation of the
+        Mapper cover, or include the construction of the Mapper graph.
+
     min_intersection : int, optional, default: ``1``
-        Minimum size of the intersection between clusters required for
-        creating an edge in the Mapper graph.
+        Minimum size of the intersection between clusters required for creating
+        an edge in the Mapper graph. Ignored if `graph_step` is set to
+        ``False``.
 
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
@@ -315,6 +321,8 @@ def make_mapper_pipeline(scaler=None,
 
     """
 
+    # TODO: Implement parameter validation
+
     if scaler is None:
         _scaler = identity(validate=False)
     else:
@@ -362,9 +370,11 @@ def make_mapper_pipeline(scaler=None,
         ('clustering', ParallelClustering(
             clusterer=_clusterer,
             parallel_clustering_n_jobs=parallel_clustering_n_jobs,
-            parallel_clustering_prefer=parallel_clustering_prefer)),
-        ('nerve', Nerve(min_intersection=min_intersection))
+            parallel_clustering_prefer=parallel_clustering_prefer))
     ]
+
+    if graph_step:
+        all_steps.append(('nerve', Nerve(min_intersection=min_intersection)))
 
     mapper_pipeline = MapperPipeline(
         steps=all_steps, memory=memory, verbose=verbose)
