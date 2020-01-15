@@ -110,7 +110,7 @@ To install:
 .. code-block:: bash
 
    cd giotto-learn
-   pip install -e .
+   pip install -e ".[tests, doc]"
 
 From there any change in the library files will be immediately available on your machine.
 
