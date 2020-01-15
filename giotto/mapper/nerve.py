@@ -28,9 +28,19 @@ class Nerve(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    X_ : TODO: Write
+    X_ : list of tuple
+        Nodes of the Mapper graph obtained from the input data for
+        :meth:`fit`. It is a flattened version of the input Mapper cover,
+        with the addition of a globally unique node ID as the first entry in
+        each tuple. Created only when :meth:`fit` is called.
 
-    edges_ : TODO: Write
+    edges_ : list of dict
+        Edges of the Mapper graph obtained from the input data for
+        :meth:`fit`. Each edge is a dictionary with two keys:
+        ``'node_indices'`` is mapped to a pair of triples characterising the
+        two adjacent nodes; ``'intersection'`` is mapped to the array of
+        indices of points in the intersection between the two nodes. Created
+        only when :meth:`fit` is called.
 
     """
 
