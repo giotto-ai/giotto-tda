@@ -20,7 +20,8 @@ def plot_static_mapper_graph(
         color_variable=None, node_color_statistic=np.mean,
         color_by_columns_dropdown=False, plotly_kwargs=None,
         clone_pipeline=True):
-    """
+    """Plotting function for static Mapper graphs.
+
     Parameters
     ----------
     pipeline : :class:`MapperPipeline` object
@@ -75,8 +76,9 @@ def plot_static_mapper_graph(
 
     Returns
     -------
-    fig : ploty.graph_objs.Figure
-        The figure representing the nerve (topological graph).
+    fig : :class:`ploty.graph_objs.Figure` object
+        Figure representing the Mapper graph with appropriate node colouring
+        and size.
 
     References
     ----------
@@ -165,7 +167,8 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   node_color_statistic=np.mean,
                                   color_by_columns_dropdown=False,
                                   plotly_kwargs=None):
-    """
+    """Plotting function for Mapper graphs with interactivity.
+
     Parameters
     ----------
     pipeline : :class:`MapperPipeline` object
@@ -212,6 +215,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
+
+    Returns
+    -------
+    disp : :class:`DisplayHandle` object
+        Displays the interactive Mapper graph widget.
 
     References
     ----------
@@ -394,4 +402,5 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     box = widgets.VBox(
         [container_cover, container_cluster, fig, valid, logs_box])
-    display(box, out)
+    disp = display(box, out)
+    return disp
