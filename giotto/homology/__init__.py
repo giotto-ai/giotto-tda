@@ -4,11 +4,12 @@ to modify metric spaces or generate persistence diagrams.
 # License: Apache 2.0
 
 from .consistent import ConsistentRescaling
-from .point_clouds import VietorisRipsPersistence
+from .point_clouds import VietorisRipsPersistence, WitnessPersistence
 from .grids import CubicalPersistence
 
 __all__ = [
     'VietorisRipsPersistence',
+    'WitnessPersistence',
     'CubicalPersistence',
     'ConsistentRescaling',
 ]

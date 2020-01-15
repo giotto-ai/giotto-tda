@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ._utils import _pad_diagram
 from ..utils.validation import validate_params
 
-from ..externals.python import ripser, WitnessComplex
+from ..externals.python import ripser, WitnessComplex, SimplexTree
 
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
@@ -284,11 +284,11 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        witness_complex = WitnessComplex(
-            dimensions=X.shape,
-            top_dimensional_cells=X.flatten(order="F"))
-        Xdgms = witness_complex.persistence(homology_coeff_field=self.coeff,
-                                            min_persistence=0)
+        #Xlandmrk = self._sparsify(X)
+        witness_complex = WitnessComplex(X, Xlandmrk)
+        simplex_tree = witness_complex.create_simplex_tree()
+        Xdgms = simplex_tree.persistence(homology_coeff_field=self.coeff,
+                                         min_persistence=0)
 
         # Separate diagrams by homology dimensions
         Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
