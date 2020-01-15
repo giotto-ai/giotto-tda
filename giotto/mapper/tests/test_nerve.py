@@ -13,8 +13,8 @@ from giotto.mapper.pipeline import make_mapper_pipeline
                                 ),
                 shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
 def test_node_intersection(X):
-    # TODO: replace pipe and graph by Nerve transformer
-    # TODO: improve the Hypothesis strategy to avoid needing to hardcode the
+    # TODO: Replace pipe and graph by Nerve transformer
+    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
     # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X)

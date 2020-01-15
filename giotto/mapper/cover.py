@@ -125,7 +125,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        # TODO: extend validation to n_intervals and overlap_frac,
+        # TODO: Extend validation to n_intervals and overlap_frac,
         #  using validate_params
         _validate_kind(self.kind)
         X = check_array(X, ensure_2d=False)

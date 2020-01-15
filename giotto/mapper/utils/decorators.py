@@ -2,7 +2,7 @@ from sklearn.base import TransformerMixin
 
 
 def method_to_transform(wrapped, method_name):
-    """TODO: add documentation to this decorator
+    """TODO: Add documentation for this decorator
     """
     def wrapper(wrapped):
         class ExtendedEstimator(wrapped, TransformerMixin):

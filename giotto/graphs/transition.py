@@ -127,7 +127,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         Xm = sp.csr_matrix((np.full(n_indices, True),
                            (np.concatenate([first, second]),
                             np.concatenate([second, first]))))
-        # Silence sparse warnings TODO BENCHMARK
+        # Silence sparse warnings TODO: Benchmark
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', SparseEfficiencyWarning)
             sp.csr_matrix.setdiag(Xm, 0)

@@ -424,7 +424,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         self.n_clusters_ = _num_clusters_simple(self.distances_, min_gap_size)
 
         # Cut the tree to find labels
-        # TODO verify whether Daniel Mullner's implementation of this step
+        # TODO: Verify whether Daniel Mullner's implementation of this step
         #  offers any advantage
         self.labels_ = _hc_cut(self.n_clusters_, self.children_,
                                self.n_leaves_)
@@ -547,7 +547,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
             self.distances_, self.freq_threshold, self.n_bins_start)
 
         # Cut the tree to find labels
-        # TODO verify whether Daniel Mullner's implementation of this step
+        # TODO: Verify whether Daniel Mullner's implementation of this step
         #  offers any advantage
         self.labels_ = _hc_cut(self.n_clusters_, self.children_,
                                self.n_leaves_)

@@ -57,7 +57,7 @@ class MapperPipeline(Pipeline):
 
     """
 
-    # TODO abstract away common logic into a more generalisable implementation
+    # TODO: Abstract away common logic into a more generalisable implementation
     def get_mapper_params(self, deep=True):
         """Get all Mapper parameters for this estimator.
 

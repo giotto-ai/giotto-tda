@@ -82,7 +82,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
 
-    # TODO: consider using an immutable default value for metric_params.
+    # TODO: Consider using an immutable default value for metric_params.
     def __init__(self, metric='euclidean', metric_params={}, neighbor_rank=1,
                  n_jobs=None):
         self.metric = metric

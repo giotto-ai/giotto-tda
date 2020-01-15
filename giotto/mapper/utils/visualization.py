@@ -1,3 +1,6 @@
+"""Graph layout functions."""
+# License: GNU AGPLv3
+
 import numpy as np
 from matplotlib.cm import get_cmap
 from matplotlib.colors import rgb2hex
@@ -5,11 +8,9 @@ import plotly.graph_objs as go
 from functools import reduce
 import operator
 
-"""Graph layout functions"""
-
 
 def _get_node_size(node_elements):
-    # TODO: add doc strings to all functions
+    # TODO: Add doc strings to all functions
     return list(map(len, node_elements))
 
 

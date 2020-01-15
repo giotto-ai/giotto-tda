@@ -158,7 +158,7 @@ class Entropy(BaseEstimator, TransformerMixin):
             Array of Shannon entropies.
 
         """
-        # TODO: the following is a crude method to ensure each row vector
+        # TODO: The following is a crude method to ensure each row vector
         #  consists of "probabilities" that sum to one. Consider normalisation
         #  in terms of bin counts?
         check_is_fitted(self, '_is_fitted')

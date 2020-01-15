@@ -90,7 +90,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    # TODO: consider using an immutable default value for metric_params.
+    # TODO: Consider using an immutable default value for metric_params.
     def __init__(self, n_neighbors=4, metric='euclidean',
                  p=2, metric_params={}, n_jobs=None):
         self.n_neighbors = n_neighbors
