@@ -11,7 +11,7 @@ from ..utils.validation import validate_params
 
 
 class Binarizer(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of binary image from an input
+    """Transformer returning a collection of binary images from an input
     collection of 2D or 3D boolean images.
 
     Parameters
