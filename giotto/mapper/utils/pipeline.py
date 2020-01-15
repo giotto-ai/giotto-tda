@@ -14,7 +14,7 @@ def func_from_callable_on_rows(func):
         return None
     func_params = signature(func).parameters
     if 'axis' in func_params:
-        return partial(func, axis=1)
+        return partial(func, axis=1, keepdims=True)
     return make_func_apply_along_axis_1(func)
 
 

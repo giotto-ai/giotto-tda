@@ -416,6 +416,10 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         """
         _validate_kind(self.kind)
+        # reshape filter function values derived from FunctionTransformer
+        if X.ndim == 1:
+            X = X[:, None]
+
         X = check_array(X)
 
         return self._fit(X)
@@ -452,6 +456,10 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
+        # reshape filter function values derived from FunctionTransformer
+        if X.ndim == 1:
+            X = X[:, None]
+
         X = check_array(X)
         n_features_fit = self._n_features_fit
         n_features = X.shape[1]
@@ -489,6 +497,11 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         """
         _validate_kind(self.kind)
+
+        # reshape filter function values derived from FunctionTransformer
+        if X.ndim == 1:
+            X = X[:, None]
+
         X = check_array(X)
 
         if self.kind == 'uniform':
