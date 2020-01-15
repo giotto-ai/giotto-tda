@@ -273,11 +273,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         try:
             for param, value in cover_params.items():
                 if isinstance(value, (int, float, str)):
-                    pipe.set_mapper_params(
+                    pipe.set_params(
                         **{param: cover_params_widgets[param].value})
             for param, value in cluster_params.items():
                 if isinstance(value, (int, float, str)):
-                    pipe.set_mapper_params(
+                    pipe.set_params(
                         **{param: cluster_params_widgets[param].value})
 
             logger.info("Updating figure ...")
