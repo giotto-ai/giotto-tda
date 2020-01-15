@@ -1,7 +1,6 @@
 """Construct and handle Mapper pipelines."""
 # License: GNU AGPLv3
 
-from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
 
