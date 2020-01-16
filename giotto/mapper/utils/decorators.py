@@ -5,7 +5,7 @@ from sklearn.base import TransformerMixin
 
 
 def method_to_transform(cls, method_name):
-    """Wrap a class to add a :meth:`transform`method as an alias to an
+    """Wrap a class to add a :meth:`transform` method as an alias to an
     existing method.
 
     An example of use is for classes possessing a :meth:`score` method such
