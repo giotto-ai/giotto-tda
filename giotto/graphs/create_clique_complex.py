@@ -111,7 +111,7 @@ class CreateCliqueComplex:
         sim_complex[0] = dict(zip(self.graph.nodes, self.graph.nodes))
 
         # Dictionary containing simplexes orders as indexes,
-        # list of tuplas with node id forming the simplexes
+        # list of tuples with node id forming the simplexes
         cliques = list(nx.enumerate_all_cliques(self.graph))
 
         for x in range(nx.number_of_nodes(self.graph) +

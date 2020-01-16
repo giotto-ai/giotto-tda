@@ -1,12 +1,13 @@
-"""Graph layout functions."""
+"""Graph layout functions and plotly layout functions."""
 # License: GNU AGPLv3
 
+import operator
+from functools import reduce
+
 import numpy as np
+import plotly.graph_objs as go
 from matplotlib.cm import get_cmap
 from matplotlib.colors import rgb2hex
-import plotly.graph_objs as go
-from functools import reduce
-import operator
 
 
 def _get_node_size(node_elements):
@@ -16,14 +17,15 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        'Node size:{}<br>Pullback cover set Id:{}<br>Partial cluster label:{}'
+        ('Node size:{}<br>Pullback cover set label:{}<br>Partial cluster '
+         'label:{}')
         .format(
-            len(node_elements), interval_id, cluster_id,
+            len(node_elements), pullback_set_label, partial_cluster_label,
         )
-        for node_elements, interval_id, cluster_id in
+        for node_elements, pullback_set_label, partial_cluster_label in
         zip(graph['node_metadata']['node_elements'],
-            graph['node_metadata']['interval_id'],
-            graph['node_metadata']['cluster_id'])]
+            graph['node_metadata']['pullback_set_label'],
+            graph['node_metadata']['partial_cluster_label'])]
 
 
 def set_node_sizeref(node_elements, node_scale=12):
@@ -35,9 +37,6 @@ def get_node_summary(node_elements, data, summary_stat=np.mean):
     return np.asarray(
         list(map(summary_stat, [data[itr] for itr in node_elements]))
     )
-
-
-"""Plotly layout functions"""
 
 
 def _get_column_color_buttons(data, is_data_dataframe, node_elements,

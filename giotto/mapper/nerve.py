@@ -30,7 +30,7 @@ class Nerve(BaseEstimator, TransformerMixin):
     X_ : list of tuple
         Nodes of the Mapper graph obtained from the input data for
         :meth:`fit`. It is a flattened version of the input Mapper cover,
-        with the addition of a globally unique node ID as the first entry in
+        with the addition of a globally unique node Id as the first entry in
         each tuple. Created only when :meth:`fit` is called.
 
     edges_ : list of dict
@@ -57,11 +57,11 @@ class Nerve(BaseEstimator, TransformerMixin):
             sublist corresponds to a (non-empty) pullback cover set --
             equivalently, to a cover set in the filter range which has
             non-empty preimage -- and contains triples of the form ``( \
-            pullback_cover_id, partial_cluster_label, indices)`` where
+            pullback_set_label, partial_cluster_label, indices)`` where
             ``partial_cluster_label`` is a cluster label within the pullback
-            cover set identified by ``pullback_cover_id``, and ``indices``
+            cover set identified by ``pullback_set_label``, and ``indices``
             is the array of indices of points belonging to cluster ``( \
-            pullback_cover_id, partial_cluster_label)``. In the context of a
+            pullback_set_label, partial_cluster_label)``. In the context of a
             :class:`giotto.mapper.MapperPipeline`, this is the output of the
             clustering step.
 
@@ -92,11 +92,11 @@ class Nerve(BaseEstimator, TransformerMixin):
             sublist corresponds to a (non-empty) pullback cover set --
             equivalently, to a cover set in the filter range which has
             non-empty preimage -- and contains triples of the form ``( \
-            pullback_cover_id, partial_cluster_label, indices)`` where
+            pullback_set_label, partial_cluster_label, indices)`` where
             ``partial_cluster_label`` is a cluster label within the pullback
-            cover set identified by ``pullback_cover_id``, and ``indices``
+            cover set identified by ``pullback_set_label``, and ``indices``
             is the array of indices of points belonging to cluster ``( \
-            pullback_cover_id, partial_cluster_label)``. In the context of a
+            pullback_set_label, partial_cluster_label)``. In the context of a
             :class:`giotto.mapper.MapperPipeline`, this is the output of the
             clustering step.
 
@@ -127,7 +127,8 @@ class Nerve(BaseEstimator, TransformerMixin):
             for edge in _edges
         ])
         graph['node_metadata'] = dict(
-            zip(['node_id', 'interval_id', 'cluster_id', 'node_elements'],
+            zip(['node_id', 'pullback_set_label', 'partial_cluster_label',
+                 'node_elements'],
                 zip(*_X)))
         return graph
 
