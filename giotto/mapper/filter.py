@@ -115,6 +115,9 @@ class Entropy(BaseEstimator, TransformerMixin):
 
     """
 
+    def __init__(self):
+        pass
+
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
