@@ -1,17 +1,26 @@
+"""The module :mod:`giotto.mapper` implements the Mapper algorithm for
+topological clustering and visualisation."""
+
 from .cluster import FirstHistogramGap, FirstSimpleGap
 from .cover import CubicalCover, OneDimensionalCover
 from .filter import Eccentricity, Entropy, Projection
-from .nerve import Nerve
 from .pipeline import make_mapper_pipeline
+from .visualization import (
+    plot_static_mapper_graph, plot_interactive_mapper_graph)
+from .utils.decorators import method_to_transform
+from .utils.pipeline import transformer_from_callable_on_rows
 
 __all__ = [
+    'Projection',
     'Eccentricity',
     'Entropy',
-    'Projection',
     'OneDimensionalCover',
     'CubicalCover',
     'FirstSimpleGap',
     'FirstHistogramGap',
-    'Nerve',
-    'make_mapper_pipeline'
+    'make_mapper_pipeline',
+    'plot_static_mapper_graph',
+    'plot_interactive_mapper_graph',
+    'method_to_transform',
+    'transformer_from_callable_on_rows'
 ]

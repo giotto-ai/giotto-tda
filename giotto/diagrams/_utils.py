@@ -1,5 +1,5 @@
 """Utility functions for diagrams."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 

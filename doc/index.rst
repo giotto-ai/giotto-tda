@@ -1,10 +1,91 @@
-.. giotto documentation master file, created by
+.. giotto-learn documentation master file, created by
    sphinx-quickstart on Mon Jun  3 11:56:46 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 Welcome to giotto's API reference!
 ==================================
+
+
+:mod:`giotto.mapper`: Mapper
+============================
+
+.. automodule:: giotto.mapper
+   :no-members:
+   :no-inherited-members:
+
+Filters
+-------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   mapper.Projection
+   mapper.Eccentricity
+   mapper.Entropy
+
+Covers
+-------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   mapper.OneDimensionalCover
+   mapper.CubicalCover
+
+Clustering
+----------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   mapper.FirstSimpleGap
+   mapper.FirstHistogramGap
+
+Pipeline
+--------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   mapper.pipeline.make_mapper_pipeline
+
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   mapper.pipeline.MapperPipeline
+
+Visualization
+-------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   mapper.visualization.plot_static_mapper_graph
+   mapper.visualization.plot_interactive_mapper_graph
+
+Utilities
+---------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   mapper.utils.decorators.method_to_transform
+   mapper.utils.pipeline.transformer_from_callable_on_rows
 
 
 :mod:`giotto.homology`: Persistent homology

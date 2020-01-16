@@ -16,7 +16,7 @@ from giotto.mapper.cover import OneDimensionalCover
     n_intervals=integers(min_value=1, max_value=100)
 )
 def test_one_dimensional_cover_shape(filter_values, n_intervals):
-    # TODO extend to inputs with shape (n_samples, 1)
+    # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     n_samples, n_intervals = len(filter_values), cover.n_intervals
     try:
@@ -38,10 +38,10 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
                          )
 )
 def test_filter_values_covered_by_single_interval(filter_values):
-    # TODO extend to inputs with shape (n_samples, 1)
+    # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=1)
     interval_masks = cover.fit_transform(filter_values)
-    # TODO: generate filter_values with desired shape
+    # TODO: Generate filter_values with desired shape
     assert_almost_equal(
         filter_values[:, None][interval_masks], filter_values)
 
@@ -57,7 +57,7 @@ def test_filter_values_covered_by_single_interval(filter_values):
 #     n_intervals=integers(min_value=1, max_value=10)
 # )
 # def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
-#     # TODO extend to inputs with shape (n_samples, 1)
+#     # TODO: Extend to inputs with shape (n_samples, 1)
 #     cover = OneDimensionalCover(n_intervals=n_intervals)
 #     interval_masks = cover.fit_transform(filter_values)
 #     intervals = [filter_values[interval_masks[:, i]]

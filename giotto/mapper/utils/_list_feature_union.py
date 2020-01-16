@@ -10,7 +10,7 @@ class ListFeatureUnion(FeatureUnion):
         ----------
         X : iterable or array-like, depending on transformers
             Input data to be transformed.
-        y : array-like, shape (n_samples, ...), optional
+        y : array-like of shape (n_samples, ...), optional
             Targets for supervised learning.
         Returns
         -------

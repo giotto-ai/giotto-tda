@@ -1,4 +1,4 @@
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 import networkx as nx
@@ -6,8 +6,8 @@ import networkx as nx
 from scipy.spatial import distance_matrix
 from scipy.sparse import csr_matrix, lil_matrix
 from itertools import combinations
-from sklearn.utils.validation import check_symmetric, check_is_fitted,\
-    check_array
+from sklearn.utils.validation import (check_symmetric, check_is_fitted,
+                                      check_array)
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -23,7 +23,7 @@ class CreateCliqueComplex:
     graph : nx.graph, optional, default: ``None``
         Graph from which to compute the clique complex
 
-    data : ndarray, shape (n_points, n_dimensions) or \
+    data : ndarray of shape (n_points, n_dimensions) or \
         (n_points, n_points)
         If ``data_type == 'cloud'``, the input should be an
         ndarray, where each entry along axis 0 is a vector with
@@ -111,7 +111,7 @@ class CreateCliqueComplex:
         sim_complex[0] = dict(zip(self.graph.nodes, self.graph.nodes))
 
         # Dictionary containing simplexes orders as indexes,
-        # list of tuplas with node id forming the simplexes
+        # list of tuples with node id forming the simplexes
         cliques = list(nx.enumerate_all_cliques(self.graph))
 
         for x in range(nx.number_of_nodes(self.graph) +

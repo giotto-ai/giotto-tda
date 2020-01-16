@@ -1,18 +1,33 @@
+"""Clustering methods."""
+# License: GNU AGPLv3
+
 from inspect import signature
 
 import numpy as np
 from joblib import Parallel, delayed
-from sklearn.base import BaseEstimator, ClusterMixin, TransformerMixin, clone
+from sklearn.base import BaseEstimator, ClusterMixin, clone
 from sklearn.cluster import DBSCAN
-from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
+
+try:  # scikit-learn >= 0.22.1
+    from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
+except ImportError:
+    from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
-from sklearn.utils.validation import check_is_fitted, check_memory
+from sklearn.utils.validation import check_memory
 
 from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 
 
-class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
+class ParallelClustering(BaseEstimator):
     """Employ joblib parallelism to cluster different portions of a dataset.
+
+    An arbitrary clustering class which stores a ``labels_`` attribute in
+    ``fit`` can be passed to the constructor. Examples are most classes in
+    ``sklearn.cluster``. The input of :meth:`fit` is of the form ``[X_tot,
+    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a
+    two-dimensional boolean array, each column of which indicates the
+    location of a portion of ``X_tot`` to cluster separately. Parallelism is
+    achieved over the columns of ``masks``.
 
     Parameters
     ----------
@@ -21,44 +36,54 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
         :class:`sklearn.base.ClusterMixin`. ``None`` means that the default
         :class:`sklearn.cluster.DBSCAN` is used.
 
-    n_jobs_outer : int or None, optional, default: ``None``
+    parallel_clustering_n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
 
-    prefer : ``'processes'`` | ``'threads'``, optional, default: ``'threads'``
+    parallel_clustering_prefer : ``'processes'`` | ``'threads'``, optional, \
+        default: ``'threads'``
         Selects the default joblib backend. The default process-based backend
         is 'loky' and the default thread-based backend is 'threading'.
 
     Attributes
     ----------
-    clusterer_ : object
-        Unless `clusterer` is ``None``, same as `clusterer`. Cloned prior
-        to fitting each part of the data.
-
     clusterers_ : tuple of object
-        Clones of :attr:`clusterer_`, fitted to the portions of the full
-        data array specified in :meth:`fit`.
+        If `clusterer` is not ``None``, clones of `clusterer` fitted
+        to the portions of the full data array specified in :meth:`fit`.
+        Otherwise, clones of a default instance of
+        :class:`sklearn.cluster.DBSCAN`, fitted in the same way.
+
+    clusters_ : list of list of tuple
+       Labels and indices of each cluster found in :meth:`fit`. The i-th
+       entry corresponds to the i-th portion of the data; it is a list
+       of triples of the form ``(i, label, indices)``, where ``label`` is a
+       cluster label and ``indices`` is the array of indices of points
+       belonging to cluster ``(i, label)``.
 
     """
-    def __init__(self, clusterer=None, n_jobs_outer=None, prefer='threads'):
+
+    def __init__(self, clusterer=None,
+                 parallel_clustering_n_jobs=None,
+                 parallel_clustering_prefer='threads'):
         self.clusterer = clusterer
-        self.n_jobs_outer = n_jobs_outer
-        self.prefer = prefer
+        self.parallel_clustering_n_jobs = parallel_clustering_n_jobs
+        self.parallel_clustering_prefer = parallel_clustering_prefer
 
     def _validate_clusterer(self, default=DBSCAN()):
-        """Depending on the value of parameter `clusterer`, set
-        :attr:`clusterer_`. Also verify whether calculations are to be based
-        on precomputed metric/affinity information or not.
+        """Set :attr:`clusterer_` depending on the value of  `clusterer`.
+
+        Also verify whether calculations are to be based on precomputed
+        metric/affinity information or not.
 
         """
         if self.clusterer is not None:
-            self.clusterer_ = self.clusterer
+            self._clusterer = self.clusterer
         else:
-            self.clusterer_ = default
+            self._clusterer = default
         params = [param for param in ['metric', 'affinity']
-                  if param in signature(self.clusterer_.__init__).parameters]
-        precomputed = [(getattr(self.clusterer_, param) == 'precomputed')
+                  if param in signature(self._clusterer.__init__).parameters]
+        precomputed = [(getattr(self._clusterer, param) == 'precomputed')
                        for param in params]
         if not precomputed:
             self._precomputed = False
@@ -71,6 +96,8 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
 
     def fit(self, X, y=None, sample_weight=None):
         """Fit the clusterer on each portion of the data.
+
+        :attr:`clusterers_` and :attr:`clusters_` are computed and stored.
 
         Parameters
         ----------
@@ -109,12 +136,14 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
         else:
             single_fitter = self._fit_single_abs_labels
 
-        self.clusterers_ = Parallel(
-            n_jobs=self.n_jobs_outer, prefer=self.prefer)(
+        self.clusterers_ = Parallel(n_jobs=self.parallel_clustering_n_jobs,
+                                    prefer=self.parallel_clustering_prefer)(
             delayed(single_fitter)(
                 X_tot, np.flatnonzero(mask),
                 mask_num, sample_weight=sample_weights[mask_num])
             for mask_num, mask in enumerate(masks.T))
+        self.clusters_ = [clusterer.abs_labels_ for clusterer in
+                          self.clusterers_]
         return self
 
     def _fit_single_abs_labels(self, X, relative_indices, mask_num,
@@ -135,7 +164,7 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
         return cloned_clusterer
 
     def _fit_single(self, X, relative_indices, sample_weight):
-        cloned_clusterer = clone(self.clusterer_)
+        cloned_clusterer = clone(self._clusterer)
         X_sub = X[relative_indices]
 
         fit_params = signature(cloned_clusterer.fit).parameters
@@ -155,25 +184,96 @@ class ParallelClustering(BaseEstimator, ClusterMixin, TransformerMixin):
             (mask_num, label, relative_indices[inv == i])
             for i, label in enumerate(unique_labels)]
 
-    def transform(self, X, y=None, sample_weight=None):
-        # TODO consider whether this is better implemented using decorators
-        check_is_fitted(self)
-        Xt = [clusterer.abs_labels_ for clusterer in self.clusterers_]
-        return Xt
-
     def fit_predict(self, X, y=None, sample_weight=None):
+        """Fit to the data, and return the found clusters.
+
+        Parameters
+        ----------
+        X : list-like of form ``[X_tot, masks]``
+            Input data as a list of length 2. ``X_tot`` is an ndarray of shape
+            (n_samples, n_features) or (n_samples, n_samples) specifying the
+            full data. ``masks`` is a boolean ndarray of shape
+            (n_samples, n_portions) whose columns are boolean masks
+            on ``X_tot``, specifying the portions of ``X_tot`` to be
+            independently clustered.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        sample_weight : array-like or None, optional, default: ``None``
+            The weights for each observation in the full data. If ``None``,
+            all observations are assigned equal weight. Otherwise, it has
+            shape (n_samples,).
+
+        Returns
+        -------
+        clusters : list of list of tuple
+            See :attr:`clusters_`.
+
+        """
         self.fit(X, sample_weight=sample_weight)
-        Xt = [clusterer.abs_labels_ for clusterer in self.clusterers_]
+        return self.clusters_
+
+    def transform(self, X, y=None):
+        """Not implemented.
+
+        Only present so that the class is a valid step in a scikit-learn
+        pipeline.
+
+        Parameters
+        ----------
+        X : Ignored
+            Ignored.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        """
+        raise NotImplementedError(
+            "Transforming new data with a fitted ParallelClustering object "
+            "not yet implemented, use fit_transform instead.")
+
+    def fit_transform(self, X, y=None, **fit_params):
+        """Alias for :meth:`fit_predict`.
+
+        Allows for this class to be used as a step in a scikit-learn pipeline.
+
+        Parameters
+        ----------
+        X : list-like of form ``[X_tot, masks]``
+            Input data as a list of length 2. ``X_tot`` is an ndarray of shape
+            (n_samples, n_features) or (n_samples, n_samples) specifying the
+            full data. ``masks`` is a boolean ndarray of shape
+            (n_samples, n_portions) whose columns are boolean masks
+            on ``X_tot``, specifying the portions of ``X_tot`` to be
+            independently clustered.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : list of list of tuple
+            See :attr:`clusters_`.
+
+        """
+        Xt = self.fit_predict(X, y, **fit_params)
         return Xt
 
 
 class Agglomerative:
-    """Base class for agglomerative clustering algorithms employing a
-    stopping rule for determining the number of clusters.
+    """Base class for agglomerative clustering.
+
+    Implements scikit-learn's tree building algorithms for linkage-based
+    clustering. Inheriting classes may implement stopping rules for determining
+    the number of clusters.
 
     Attributes
     ----------
-    children_ : ndarray, shape (n_nodes - 1, 2)
+    children_ : ndarray of shape (n_nodes - 1, 2)
         The children of each non-leaf node. Values less than ``n_samples``
         correspond to leaves of the tree which are the original samples.
         A node ``i`` greater than or equal to ``n_samples`` is a non-leaf
@@ -184,11 +284,12 @@ class Agglomerative:
     n_leaves_ : int
         Number of leaves in the hierarchical tree.
 
-    distances_ : ndarray, shape (n_nodes - 1,)
+    distances_ : ndarray of shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
 
     """
+
     def _build_tree(self, X):
         memory = check_memory(self.memory)
 
@@ -215,8 +316,8 @@ class Agglomerative:
 
 
 class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
-    """Agglomerative clustering with stopping rule given by a threshold-based
-    version of the first gap method.
+    """Agglomerative clustering cutting the dendrogram at the first instance
+    of a sufficiently large gap.
 
     A simple threshold is determined as a fraction of the largest linkage
     value in the full dendrogram. If possible, the dendrogram is cut at the
@@ -236,17 +337,18 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         If ``'precomputed'``, a distance matrix (instead of a similarity
         matrix) is needed as input for :meth:`fit`.
 
-    memory : None, str or object with the joblib.Memory interface,
+    memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
         Used to cache the output of the computation of the tree.
         By default, no caching is done. If a string is given, it is the
         path to the caching directory.
 
     linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``, \
-        optional, default: ``'single'``)
+        optional, default: ``'single'``
         Which linkage criterion to use. The linkage criterion determines which
         distance to use between sets of observation. The algorithm will merge
         the pairs of cluster that minimize this criterion.
+
         - ``'ward'`` minimizes the variance of the clusters being merged.
         - ``'average'`` uses the average of the distances of each observation
           of the two sets.
@@ -260,10 +362,10 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_clusters_ : int
         The number of clusters found by the algorithm.
 
-    labels_ : ndarray, shape (n_samples,)
+    labels_ : ndarray of shape (n_samples,)
         Cluster labels for each sample.
 
-    children_ : ndarray, shape (n_nodes - 1, 2)
+    children_ : ndarray of shape (n_nodes - 1, 2)
         The children of each non-leaf node. Values less than ``n_samples``
         correspond to leaves of the tree which are the original samples.
         A node ``i`` greater than or equal to ``n_samples`` is a non-leaf
@@ -274,7 +376,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_leaves_ : int
         Number of leaves in the hierarchical tree.
 
-    distances_ : ndarray, shape (n_nodes - 1,)
+    distances_ : ndarray of shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
 
@@ -283,6 +385,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     FirstHistogramGap
 
     """
+
     def __init__(self, relative_gap_size=0.3, affinity='euclidean',
                  memory=None, linkage='single'):
         self.relative_gap_size = relative_gap_size
@@ -298,7 +401,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
+        X : ndarray of shape (n_samples, n_features) or (n_samples, n_samples)
             Training instances to cluster, or distances between instances if
             ``affinity='precomputed'``.
 
@@ -321,7 +424,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         self.n_clusters_ = _num_clusters_simple(self.distances_, min_gap_size)
 
         # Cut the tree to find labels
-        # TODO verify whether Daniel Mullner's implementation of this step
+        # TODO: Verify whether Daniel Mullner's implementation of this step
         #  offers any advantage
         self.labels_ = _hc_cut(self.n_clusters_, self.children_,
                                self.n_leaves_)
@@ -356,17 +459,18 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         If ``'precomputed'``, a distance matrix (instead of a similarity
         matrix) is needed as input for :meth:`fit`.
 
-    memory : None, str or object with the joblib.Memory interface,
+    memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
         Used to cache the output of the computation of the tree.
         By default, no caching is done. If a string is given, it is the
         path to the caching directory.
 
     linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``, \
-        optional, default: ``'single'``)
+        optional, default: ``'single'``
         Which linkage criterion to use. The linkage criterion determines which
         distance to use between sets of observation. The algorithm will merge
         the pairs of cluster that minimize this criterion.
+
         - ``'ward'`` minimizes the variance of the clusters being merged.
         - ``'average'`` uses the average of the distances of each observation
           of the two sets.
@@ -380,10 +484,10 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_clusters_ : int
         The number of clusters found by the algorithm.
 
-    labels_ : ndarray, shape (n_samples,)
+    labels_ : ndarray of shape (n_samples,)
         Cluster labels for each sample.
 
-    children_ : ndarray, shape (n_nodes - 1, 2)
+    children_ : ndarray of shape (n_nodes - 1, 2)
         The children of each non-leaf node. Values less than ``n_samples``
         correspond to leaves of the tree which are the original samples.
         A node ``i`` greater than or equal to ``n_samples`` is a non-leaf
@@ -394,7 +498,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     n_leaves_ : int
         Number of leaves in the hierarchical tree.
 
-    distances_ : ndarray, shape (n_nodes - 1,)
+    distances_ : ndarray of shape (n_nodes - 1,)
         Distances between nodes in the corresponding place in
         :attr:`children_`.
 
@@ -403,6 +507,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     FirstSimpleGap
 
     """
+
     def __init__(self, freq_threshold=0, n_bins_start=5, affinity='euclidean',
                  memory=None, linkage='single'):
         self.freq_threshold = freq_threshold
@@ -419,7 +524,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features) or (n_samples, n_samples)
+        X : ndarray of shape (n_samples, n_features) or (n_samples, n_samples)
             Training instances to cluster, or distances between instances if
             ``affinity='precomputed'``.
 
@@ -429,8 +534,8 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         Returns
         -------
         self
-        """
 
+        """
         X = check_array(X)
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
@@ -442,7 +547,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
             self.distances_, self.freq_threshold, self.n_bins_start)
 
         # Cut the tree to find labels
-        # TODO verify whether Daniel Mullner's implementation of this step
+        # TODO: Verify whether Daniel Mullner's implementation of this step
         #  offers any advantage
         self.labels_ = _hc_cut(self.n_clusters_, self.children_,
                                self.n_leaves_)

@@ -1,15 +1,19 @@
 """Rescaling method for persistent homology."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import itertools
+
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
-from joblib import Parallel, delayed
 from sklearn.utils.validation import check_array, check_is_fitted
+
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
+@adapt_fit_transform_docs
 class ConsistentRescaling(BaseEstimator, TransformerMixin):
     """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
@@ -33,7 +37,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         which to calculate distances between pairs of instances (i.e. rows)
         in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
         including "euclidean", "manhattan" or "cosine".
         If `metric` is a callable function, it is called on each pair of
@@ -75,8 +79,10 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
+
     _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
 
+    # TODO: Consider using an immutable default value for metric_params.
     def __init__(self, metric='euclidean', metric_params={}, neighbor_rank=1,
                  n_jobs=None):
         self.metric = metric
@@ -103,12 +109,12 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, \
+        X : ndarray of shape (n_samples, n_points, n_points) or (n_samples, \
             n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -138,7 +144,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_points, n_points) or (n_samples, \
+        X : ndarray of shape (n_samples, n_points, n_points) or (n_samples, \
             n_points, n_dimensions)
             Input data. If ``metric == 'precomputed'``, the input should be an
             ndarray whose each entry along axis 0 is a distance matrix of shape
@@ -152,13 +158,13 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_points, n_points)
+        Xt : ndarray of shape (n_samples, n_points, n_points)
             Array containing (as entries along axis 0) the distance matrices
             after consistent rescaling.
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(

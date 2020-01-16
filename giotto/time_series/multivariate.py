@@ -1,12 +1,15 @@
 """Processing of multivariate time series."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from ..utils import validate_params
 from sklearn.utils.validation import check_is_fitted, check_array
 
+from ..utils import validate_params
+from ..utils._docs import adapt_fit_transform_docs
 
+
+@adapt_fit_transform_docs
 class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     """Pearson dissimilarities from collections of multivariate time series.
 
@@ -41,6 +44,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     SlidingWindow, giotto.homology.VietorisRipsPersistence
 
     """
+
     _hyperparameters = {'absolute_value': [bool, (0, 1)]}
 
     def __init__(self, absolute_value=False, n_jobs=None):
@@ -50,12 +54,12 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_observations, n_features)
+        X : ndarray of shape (n_samples, n_observations, n_features)
             Input data. Each entry along axis 0 is a sample of ``n_features``
             different variables, of size ``n_observations``.
 
@@ -79,7 +83,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_observations, n_features)
+        X : ndarray of shape (n_samples, n_observations, n_features)
             Input data. Each entry along axis 0 is a sample of ``n_features``
             different variables, of size ``n_observations``.
 
@@ -89,12 +93,12 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, n_features)
+        Xt : ndarray of shape (n_samples, n_features, n_features)
             Array of Pearson dissimilarities.
 
         """
         # Check if fit had been called
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         check_array(X, allow_nd=True)
 
         Xt = np.empty((X.shape[0], X.shape[2], X.shape[2]))

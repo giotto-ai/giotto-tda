@@ -1,24 +1,27 @@
 """Persistence diagram preprocessing."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
-import types
 import numbers
+import types
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_amplitude
 from ._utils import _sort, _filter, _discretize
-from ..utils.validation import check_diagram, validate_params, \
-    validate_metric_params
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import (check_diagram, validate_params,
+                                validate_metric_params)
 
 
+@adapt_fit_transform_docs
 class ForgetDimension(BaseEstimator, TransformerMixin):
     """Replaces all homology dimensions in persistence diagrams with
     ``numpy.inf``.
 
-    Useful when downstream tasks require using topological features
-    all at once -- and not separated between different homology dimensions.
+    Useful when downstream tasks require the use of topological features all at
+    once -- and not separated between different homology dimensions.
 
     See also
     --------
@@ -32,12 +35,12 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -61,7 +64,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -72,12 +75,12 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Output persistence diagram.
 
         """
-        # Check is fit had been called
-        check_is_fitted(self)
+        # Check if fit had been called
+        check_is_fitted(self, '_is_fitted')
         X = check_diagram(X)
 
         Xt = X.copy()
@@ -85,6 +88,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class Scaler(BaseEstimator, TransformerMixin):
     """Linear scaling of persistence diagrams.
 
@@ -165,6 +169,7 @@ class Scaler(BaseEstimator, TransformerMixin):
     instance of :class:`ForgetDimension`.
 
     """
+
     _hyperparameters = {'function': [types.FunctionType]}
 
     def __init__(self, metric='bottleneck', metric_params=None,
@@ -181,7 +186,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -224,7 +229,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -235,7 +240,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xs : ndarray, shape (n_samples, n_features, 3)
+        Xs : ndarray of shape (n_samples, n_features, 3)
             Rescaled diagrams.
 
         """
@@ -245,18 +250,18 @@ class Scaler(BaseEstimator, TransformerMixin):
         Xs[:, :, :2] /= self.scale_
         return Xs
 
-    def inverse_transform(self, X, copy=None):
+    def inverse_transform(self, X):
         """Scale back the data to the original representation. Multiplies
         by the scale found in :meth:`fit`.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Data to apply the inverse transform to.
 
         Returns
         -------
-        Xs : ndarray, shape (n_samples, n_features, 3)
+        Xs : ndarray of shape (n_samples, n_features, 3)
             Rescaled diagrams.
 
         """
@@ -267,6 +272,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         return Xs
 
 
+@adapt_fit_transform_docs
 class Filtering(BaseEstimator, TransformerMixin):
     """Filtering of persistence diagrams.
 
@@ -280,8 +286,8 @@ class Filtering(BaseEstimator, TransformerMixin):
     homology_dimensions : iterable or None, optional, default: ``None``
         When set to ``None``, subdiagrams corresponding to all homology
         dimensions seen in :meth:`fit` will be filtered.
-        Otherwise, it contains the homology dimensions at which
-        filtering should occur.
+        Otherwise, it contains the homology dimensions at which filtering
+        should occur.
 
     epsilon : float, optional, default: ``0.01``
         The cutoff value controlling the amount of filtering.
@@ -289,8 +295,8 @@ class Filtering(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     homology_dimensions_ : list
-        If `homology_dimensions` is set to ``None``, then this is the
-        list of homology dimensions seen in :meth:`fit`, sorted in ascending
+        If `homology_dimensions` is set to ``None``, then this is the list
+        of homology dimensions seen in :meth:`fit`, sorted in ascending
         order. Otherwise, it is a similarly sorted version of
         `homology_dimensions`.
 
@@ -300,6 +306,7 @@ class Filtering(BaseEstimator, TransformerMixin):
     giotto.homology.VietorisRipsPersistence
 
     """
+
     _hyperparameters = {'homology_dimensions_': [list, [int, (0, np.inf)]],
                         'epsilon': [numbers.Number, (0., np.inf)]}
 
@@ -311,12 +318,12 @@ class Filtering(BaseEstimator, TransformerMixin):
         """Store relevant homology dimensions in
         :attr:`homology_dimensions_`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -352,7 +359,7 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -363,13 +370,12 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Filtered persistence diagrams. Only the subdiagrams corresponding
             to dimensions in :attr:`homology_dimensions_` are filtered.
             Discarded points are replaced by points on the diagonal.
 
         """
-
         # Check if fit had been called
         check_is_fitted(self)
         X = check_diagram(X)

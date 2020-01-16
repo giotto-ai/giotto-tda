@@ -1,5 +1,5 @@
 """Persistent homology on grids."""
-# License: Apache 2.0
+# License: GNU AGPLv3
 
 import numpy as np
 import numbers

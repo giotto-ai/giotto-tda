@@ -1,16 +1,21 @@
-# License: Apache 2.0
+"""Feature extraction from persistence diagrams."""
+# License: GNU AGPLv3
 
 import numbers
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
-from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from ..utils.validation import validate_params, check_diagram
+from sklearn.utils.validation import check_is_fitted
+
+from ._metrics import betti_curves, landscapes, heats
 from ._utils import _subdiagrams, _discretize
-from giotto.diagrams._metrics import betti_curves, landscapes, heats
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import validate_params, check_diagram
 
 
+@adapt_fit_transform_docs
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """`Persistence entropies <https://giotto.ai/theory>`_ of persistence
     diagrams.
@@ -53,12 +58,12 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         """Store all observed homology dimensions in
         :attr:`homology_dimensions_`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -77,7 +82,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -85,7 +89,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -96,7 +100,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions)
             Persistence entropies: one value per sample and per homology
             dimension seen in :meth:`fit`. Index i along axis 1 corresponds
             to the i-th homology dimension in :attr:`homology_dimensions_`.
@@ -117,6 +121,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class BettiCurve(BaseEstimator, TransformerMixin):
     """`Betti curves <https://giotto.ai/theory>`_ of persistence diagrams.
 
@@ -159,6 +164,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     values to the j-th entry of a curve in dimension q'.
 
     """
+
     _hyperparameters = {'n_values': [int, (1, np.inf)]}
 
     def __init__(self, n_values=100, n_jobs=None):
@@ -171,12 +177,12 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -206,7 +212,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -217,7 +223,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
             Betti curves: one curve (represented as a one-dimensional array
             of integer values) per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
@@ -240,6 +246,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """`Persistence landscapes <https://giotto.ai/theory>`_ of persistence
     diagrams.
@@ -288,6 +295,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     dimension q'.
 
     """
+
     _hyperparameters = {'n_layers': [int, (1, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
@@ -302,12 +310,12 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -331,7 +339,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -339,7 +346,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -350,7 +357,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
             n_layers, n_values)
             Persistence lanscapes: one landscape (represented as a
             two-dimensional array) per sample and per homology dimension seen
@@ -375,6 +382,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class HeatKernel(BaseEstimator, TransformerMixin):
     """Convolution of persistence diagrams with a Gaussian kernel.
 
@@ -434,6 +442,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
+
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
@@ -448,12 +457,12 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -485,7 +494,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -496,7 +505,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions, n_values, \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values, \
             n_values)
             Raster images: one image per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th

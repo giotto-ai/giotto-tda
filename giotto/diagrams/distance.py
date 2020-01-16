@@ -1,4 +1,5 @@
-# License: Apache 2.0
+"""Distance and amplitude calculations for persistence diagrams."""
+# License: GNU AGPLv3
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -6,10 +7,12 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
 from ._utils import _discretize
-from ..utils.validation import check_diagram, validate_params, \
-    validate_metric_params
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import (check_diagram, validate_params,
+                                validate_metric_params)
 
 
+@adapt_fit_transform_docs
 class PairwiseDistance(BaseEstimator, TransformerMixin):
     """`Distances <https://giotto.ai/theory>`_ between pairs of persistence
     diagrams, constructed from the distances between their respective
@@ -100,6 +103,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     `Dyonisus 2 <https://mrzv.org/software/dionysus2/>`_ package.
 
     """
+
     _hyperparameters = {'order': [float, (1, np.inf)]}
 
     def __init__(self, metric='landscape', metric_params=None, order=2.,
@@ -114,12 +118,12 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         :attr:`homology_dimensions_` and compute
         :attr:`effective_metric_params`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples_fit, n_features, 3)
+        X : ndarray of shape (n_samples_fit, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -165,7 +169,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -176,8 +180,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples_fit, n_samples, n_homology_dimensions) \
-             if `order` is ``None``, else (n_samples_fit, n_samples)
+        Xt : ndarray of shape (n_samples_fit, n_samples, \
+             n_homology_dimensions) if `order` is ``None``, else \
+             (n_samples_fit, n_samples)
             Distance matrix or collection of distance matrices between
             diagrams in `X` and diagrams seen in :meth:`fit`. In the
             second case, index i along axis 2 corresponds to the i-th
@@ -202,6 +207,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class Amplitude(BaseEstimator, TransformerMixin):
     """`Amplitudes <https://giotto.ai/theory>`_ of persistence diagrams,
     constructed from the amplitudes of their subdiagrams with constant
@@ -282,6 +288,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
     instance of :class:`ForgetDimension`.
 
     """
+
     _hyperparameters = {'order': [float, (1, np.inf)]}
 
     def __init__(self, metric='landscape', metric_params=None, order=2.,
@@ -296,12 +303,12 @@ class Amplitude(BaseEstimator, TransformerMixin):
         :attr:`homology_dimensions_` and compute
         :attr:`effective_metric_params`. Then, return the estimator.
 
-        This method is there to implement the usual scikit-learn API and hence
+        This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -344,7 +351,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features, 3)
+        X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
@@ -355,7 +362,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_homology_dimensions) if `order` \
+        Xt : ndarray of shape (n_samples, n_homology_dimensions) if `order` \
              is ``None``, else (n_samples, 1)
             Amplitudes or amplitude vectors of the diagrams in `X`. In the
             second case, index i along axis 1 corresponds to the i-th

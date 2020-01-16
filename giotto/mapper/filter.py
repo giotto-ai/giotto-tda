@@ -1,3 +1,6 @@
+"""Filter functions commonly used with Mapper."""
+# License: GNU AGPLv3
+
 import warnings
 
 import numpy as np
@@ -6,23 +9,35 @@ from scipy.special import entr
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..utils._docs import adapt_fit_transform_docs
 
+
+@adapt_fit_transform_docs
 class Eccentricity(BaseEstimator, TransformerMixin):
-    """Maps dataset to reals using the eccentricity filter function.
+    """Eccentricities of points in a point cloud or abstract metric space.
+
+    Let `D` be a square matrix representing distances between points in a
+    point cloud, or directly defining an abstract metric (or metric-like)
+    space. The eccentricity of point `i` in the point cloud or abstract
+    metric space is the `p`-norm (for some `p`) of row `i` in `D`.
 
     Parameters
     ----------
-    exponent : int or np.inf, default: `np.inf`
-        The exponent used to calculate the eccentricity.
+    exponent : int or float, optional, default: ``numpy.inf``
+        `p`-norm exponent used to calculate eccentricities from the distance
+        matrix.
 
-    metric : str or function, default: `'euclidean'`
-        The distance metric to use. If a string, this may be one of the metrics
-        supported by scipy.spatial.distance.pdist
+    metric : str or function, optional, default: ``'euclidean'``
+        Metric to use to compute the distance matrix if point cloud data is
+        passed as input, or ``'precomputed'`` to specify that the input is
+        already a distance matrix. If not ``'precomputed'``, it may be
+        anything allowed by :func:`scipy.spatial.distance.pdist`.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     """
+
     def __init__(self, exponent=2, metric='euclidean', metric_params=None):
         self.exponent = exponent
         self.metric = metric
@@ -36,32 +51,8 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples,)
-            Input data.
-
-        y : None
-            There is no need for a target in fit, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        self : object
-
-        """
-        check_array(X)
-        if self.metric_params is None:
-            self.effective_metric_params_ = dict()
-        else:
-            self.effective_metric_params_ = self.metric_params.copy()
-        return self
-
-    def transform(self, X, y=None):
-        """Apply the eccentricity filter function to each row in the distance
-        matrix derived from `X`.
-
-        Parameters
-        ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features) or (n_samples, \
+            n_samples)
             Input data.
 
         y : None
@@ -70,7 +61,37 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1)
+        self : object
+
+        """
+        # TODO: Consider making this transformer stateful so that the
+        #  eccentricities of new points relative to the data seen in fit
+        #  may be computed. May be useful for supervised tasks with Mapper?
+        #  Evaluate performance impact of doing this.
+        check_array(X)
+        if self.metric_params is None:
+            self.effective_metric_params_ = dict()
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
+        return self
+
+    def transform(self, X, y=None):
+        """Compute the eccentricities of points (i.e. rows) in  `X`.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features) or (n_samples, \
+            n_samples)
+            Input data.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, 1)
+            Column vector of eccentricities of points in `X`.
 
         """
         check_is_fitted(self)
@@ -84,10 +105,19 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class Entropy(BaseEstimator, TransformerMixin):
-    """Maps dataset to reals using the entropy filter function.
+    """Entropy of rows in a two-dimensional array.
+
+    The rows of the array are interpreted as probability vectors,
+    after taking absolute values if necessary and normalizing. Then,
+    their Shannon entropies are computed and returned.
 
     """
+
+    def __init__(self):
+        pass
+
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
@@ -96,11 +126,11 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples,)
+        X : array-like of shape (n_samples, n_features)
             Input data.
 
         y : None
-            There is no need for a target in fit, yet the pipeline
+            There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
 
         Returns
@@ -113,12 +143,12 @@ class Entropy(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Normalise each row in array to have unit norm and calculate the
-        Shannon entropy.
+        """For each row in the array, take absolute values of any negative
+        entry, normalise, and compute the Shannon entropy.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -127,13 +157,14 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1)
+        Xt : ndarray of shape (n_samples, 1)
+            Array of Shannon entropies.
 
         """
-        # TODO: the following is a crude method to ensure each row vector
+        # TODO: The following is a crude method to ensure each row vector
         #  consists of "probabilities" that sum to one. Consider normalisation
         #  in terms of bin counts?
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         X = check_array(X)
 
         if np.any(X < 0):
@@ -146,17 +177,22 @@ class Entropy(BaseEstimator, TransformerMixin):
         return Xt
 
 
+@adapt_fit_transform_docs
 class Projection(BaseEstimator, TransformerMixin):
-    """Maps dataset to reals by projecting onto specified column.
+    """Projection onto specified columns.
+
+    In practice, this simply means returning a selection of columns of the
+    data.
 
     Parameters
     ----------
-    column_indices : int or list of ints, default: `0`
-                     The column indices of the array to project onto.
+    columns : int or list of int, optional, default: ``0``
+        The column indices of the array to project onto.
 
     """
-    def __init__(self, column_indices=0):
-        self.column_indices = column_indices
+
+    def __init__(self, columns=0):
+        self.columns = columns
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -166,11 +202,11 @@ class Projection(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of sparse or dense arrays, shape (n_samples,)
+        X : array-like of shape (n_samples, n_features)
             Input data.
 
         y : None
-            There is no need for a target in fit, yet the pipeline
+            There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
 
         Returns
@@ -183,11 +219,11 @@ class Projection(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Fit and project the data.
+        """Return selected columns of the data.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -196,10 +232,17 @@ class Projection(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, 1)
+        Xt : ndarray of shape (n_samples, n_columns)
+            Output array, where ``n_columns = len(columns)``.
 
         """
-        check_is_fitted(self)
-        X = check_array(X)
-        Xt = X[:, self.column_indices].reshape(X.shape[0], -1)
+        check_is_fitted(self, '_is_fitted')
+        # Simple duck typing to handle case of pandas dataframe input
+        if hasattr(X, 'columns'):
+            # NB in this case we do not check the health of other columns
+            Xt = check_array(X[self.columns], ensure_2d=False)
+        else:
+            X = check_array(X)
+            Xt = X[:, self.columns]
+        Xt = Xt.reshape(len(X), -1)
         return Xt
