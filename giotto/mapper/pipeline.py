@@ -2,13 +2,11 @@
 # License: GNU AGPLv3
 
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
 
 from .cluster import ParallelClustering
 from .nerve import Nerve
 from .utils._list_feature_union import ListFeatureUnion
 from .utils.pipeline import transformer_from_callable_on_rows, identity
-
 
 global_pipeline_params = ('memory', 'verbose')
 nodes_params = ('scaler', 'filter_func', 'cover')
