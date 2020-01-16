@@ -70,8 +70,8 @@ def plot_static_mapper_graph(
         Keyword arguments to configure the Plotly Figure.
 
     clone_pipeline : bool, optional, default: ``True``
-        If ``True``, the input :class:`pipeline` is cloned before computing the
-        Mapper graph to prevent unexepected side effects from in-place
+        If ``True``, the input `pipeline` is cloned before computing the
+        Mapper graph to prevent unexpected side effects from in-place
         parameter updates.
 
     Returns
@@ -83,7 +83,8 @@ def plot_static_mapper_graph(
     References
     ----------
     .. [1] `igraph.Graph.layout
-            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_.
+            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_
+            documentation.
 
     """
 
@@ -224,7 +225,8 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     References
     ----------
     .. [1] `igraph.Graph.layout
-            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_.
+            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_
+            documentation.
 
     """
 
