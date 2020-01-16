@@ -7,7 +7,7 @@ from sklearn.preprocessing import FunctionTransformer
 from .cluster import ParallelClustering
 from .nerve import Nerve
 from .utils._list_feature_union import ListFeatureUnion
-from .utils.pipeline import func_from_callable_on_rows, identity
+from .utils.pipeline import transformer_from_callable_on_rows, identity
 
 
 global_pipeline_params = ('memory', 'verbose')
@@ -335,8 +335,7 @@ def make_mapper_pipeline(scaler=None,
         from sklearn.decomposition import PCA
         _filter_func = PCA(n_components=2)
     elif not hasattr(filter_func, 'fit_transform'):
-        _filter_func = func_from_callable_on_rows(filter_func)
-        _filter_func = FunctionTransformer(func=_filter_func, validate=True)
+        _filter_func = transformer_from_callable_on_rows(filter_func)
     else:
         _filter_func = filter_func
 

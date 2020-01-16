@@ -85,6 +85,7 @@ Utilities
    :template: function.rst
 
    mapper.utils.decorators.method_to_transform
+   mapper.utils.pipeline.transformer_from_callable_on_rows
 
 
 :mod:`giotto.homology`: Persistent homology
