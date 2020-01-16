@@ -219,7 +219,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Returns
     -------
-    disp : :class:`DisplayHandle` object
+    display : :class:`DisplayHandle` object
         Displays the interactive Mapper graph widget.
 
     References
@@ -404,5 +404,4 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     box = widgets.VBox(
         [container_cover, container_cluster, fig, valid, logs_box])
-    disp = display(box, out)
-    return disp
+    display(box, out)
