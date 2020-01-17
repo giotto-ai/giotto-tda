@@ -3,20 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to giotto's API reference!
-==================================
+Welcome to giotto-learn's API reference!
+========================================
 
 
-:mod:`giotto.mapper`: Mapper
-============================
+:mod:`giottolearn.mapper`: Mapper
+=================================
 
-.. automodule:: giotto.mapper
+.. automodule:: giottolearn.mapper
    :no-members:
    :no-inherited-members:
 
 Filters
 -------
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -28,7 +28,7 @@ Filters
 
 Covers
 -------
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -39,7 +39,7 @@ Covers
 
 Clustering
 ----------
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -50,7 +50,7 @@ Clustering
 
 Pipeline
 --------
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -67,7 +67,7 @@ Pipeline
 
 Visualization
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -78,7 +78,7 @@ Visualization
 
 Utilities
 ---------
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -88,14 +88,14 @@ Utilities
    mapper.utils.pipeline.transformer_from_callable_on_rows
 
 
-:mod:`giotto.homology`: Persistent homology
-===========================================
+:mod:`giottolearn.homology`: Persistent homology
+================================================
 
-.. automodule:: giotto.homology
+.. automodule:: giottolearn.homology
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -105,14 +105,14 @@ Utilities
    homology.ConsistentRescaling
 
 
-:mod:`giotto.diagrams`: Persistence diagrams
-============================================
+:mod:`giottolearn.diagrams`: Persistence diagrams
+=================================================
 
-.. automodule:: giotto.diagrams
+.. automodule:: giottolearn.diagrams
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -131,14 +131,14 @@ Utilities
    diagrams.HeatKernel
 
 
-:mod:`giotto.time_series`: Time series
-======================================
+:mod:`giottolearn.time_series`: Time series
+===========================================
 
-.. automodule:: giotto.time_series
+.. automodule:: giottolearn.time_series
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -153,14 +153,14 @@ Utilities
    time_series.Labeller
 
 
-:mod:`giotto.graphs`: Graphs
-============================
+:mod:`giottolearn.graphs`: Graphs
+=================================
 
-.. automodule:: giotto.graphs
+.. automodule:: giottolearn.graphs
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -171,14 +171,14 @@ Utilities
    graphs.GraphGeodesicDistance
    
 
-:mod:`giotto.base`: Base
-========================
+:mod:`giottolearn.base`: Base
+=============================
 
-.. automodule:: giotto.base
+.. automodule:: giottolearn.base
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -187,14 +187,14 @@ Utilities
    base.TransformerResamplerMixin
 
 
-:mod:`giotto.pipeline`: Pipeline
-================================
+:mod:`giottolearn.pipeline`: Pipeline
+=====================================
 
-.. automodule:: giotto.pipeline
+.. automodule:: giottolearn.pipeline
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -209,14 +209,14 @@ Utilities
    pipeline.make_pipeline
 
 
-:mod:`giotto.meta_transformers`: Convenience pipelines
-======================================================
+:mod:`giottolearn.meta_transformers`: Convenience pipelines
+===========================================================
 
-.. automodule:: giotto.meta_transformers
+.. automodule:: giottolearn.meta_transformers
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -227,14 +227,14 @@ Utilities
    meta_transformers.LandscapeGenerator
 
 
-:mod:`giotto.utils`: Validation
-===============================
+:mod:`giottolearn.utils`: Validation
+====================================
 
-.. automodule:: giotto.utils
+.. automodule:: giottolearn.utils
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottolearn
 
 .. autosummary::
    :toctree: generated/
@@ -245,16 +245,16 @@ Utilities
    utils.validate_metric_params
 
 ..
-   :mod:`giotto.images`: Images
-   ============================
+   :mod:`giottolearn.images`: Images
+   =================================
 
 ..
-   automodule:: giotto.images
+   automodule:: giottolearn.images
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: giotto
+   currentmodule:: giottolearn
 
 ..
    autosummary::
@@ -271,16 +271,16 @@ Utilities
 
 
 ..
-   :mod:`giotto.manifold`: Manifold learning
-   =========================================
+   :mod:`giottolearn.manifold`: Manifold learning
+   ==============================================
 
 ..
-   automodule:: giotto.manifold
+   automodule:: giottolearn.manifold
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: giotto
+   currentmodule:: giottolearn
 
 ..
    autosummary::
