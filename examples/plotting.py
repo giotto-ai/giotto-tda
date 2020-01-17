@@ -6,7 +6,6 @@ import plotly.graph_objs as gobj
 from giotto.diagrams._utils import _subdiagrams
 
 import matplotlib.pyplot as plt
-import networkx as nx
 
 
 def plot_point_cloud(point_cloud, dimension=None):
