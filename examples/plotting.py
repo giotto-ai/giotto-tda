@@ -3,7 +3,7 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from giotto.diagrams._utils import _subdiagrams
+from giottolearn.diagrams._utils import _subdiagrams
 
 import matplotlib.pyplot as plt
 

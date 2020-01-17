@@ -24,7 +24,7 @@ doc/build
 doc/generated
 
 # Pybind11
-giotto/externals/pybind11
+giottolearn/externals/pybind11
 
 # Output files
 *.out
@@ -40,4 +40,4 @@ giotto/externals/pybind11
 .hypothesis/
 
 # development
-giotto/mapper/scratch/*
+giottolearn/mapper/scratch/*
