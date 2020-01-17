@@ -1,7 +1,7 @@
-[submodule "giotto/externals/ripser"]
-	path = giotto/externals/ripser
+[submodule "giottolearn/externals/ripser"]
+	path = giottolearn/externals/ripser
 	url = https://github.com/scikit-tda/ripser.py.git
-[submodule "giotto/externals/gudhi-devel"]
-	path = giotto/externals/gudhi-devel
+[submodule "giottolearn/externals/gudhi-devel"]
+	path = giottolearn/externals/gudhi-devel
 	url = https://github.com/giotto-learn/gudhi-devel
-	branch = giotto
+	branch = giottolearn
