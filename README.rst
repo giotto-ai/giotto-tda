@@ -104,8 +104,8 @@ Please refer to your system's instructions and to the `CMake <https://cmake.org/
 `Boost <https://www.boost.org/>`_ websites for definitive guidance on how to install these dependencies. The
 instructions below are unofficial, please follow them at your own risk.
 
-- Most Linux systems should come with a suitable compiler pre-installed. For the other two dependencies,
-you may consider running
+- Most Linux systems should come with a suitable compiler pre-installed. For the other two dependencies, you may
+  consider running
 
 .. code-block:: bash
 
@@ -121,11 +121,11 @@ you may consider running
     brew install boost
 
 - On Windows, you will likely need to have `Visual Studio <https://visualstudio.microsoft.com/>`_ installed. At present,
-it appears to be important to have a recent version of the VS C++ compiler. One way to check whether this is the case
-is as follows: 1) open the VS Installer GUI; 2) under the "Installed" tab, click on "Modify" in the relevant VS
-version; 3) in the newly opened window, select "Individual components" and ensure that v14.24 or above of the MSVC
-"C++ x64/x86 build tools" is selected. The CMake and Boost dependencies are best installed using the latest binary
-executables from the websites of the respective projects.
+  it appears to be important to have a recent version of the VS C++ compiler. One way to check whether this is the case
+  is as follows: 1) open the VS Installer GUI; 2) under the "Installed" tab, click on "Modify" in the relevant VS
+  version; 3) in the newly opened window, select "Individual components" and ensure that v14.24 or above of the MSVC
+  "C++ x64/x86 build tools" is selected. The CMake and Boost dependencies are best installed using the latest binary
+  executables from the websites of the respective projects.
 
 
 Source code
