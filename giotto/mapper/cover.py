@@ -38,7 +38,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    kind : str, optional, default: ``'uniform'``
+    kind : ``'uniform'`` | ``'balanced'``, optional, default: ``'uniform'``
         The kind of cover to use.
 
     n_intervals : int, optional, default: ``10``
@@ -343,7 +343,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    kind : str, optional, default: ``'uniform'``
+    kind : ``'uniform'`` | ``'balanced'``, optional, default: ``'uniform'``
         The kind of cover to use.
 
     n_intervals : int, optional, default: ``10``
