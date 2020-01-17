@@ -24,7 +24,7 @@ import sys; print("Python", sys.version)
 import numpy; print("NumPy", numpy.__version__)
 import scipy; print("SciPy", scipy.__version__)
 import joblib; print("Joblib", joblib.__version__)
-import sklearn; print("scikit-Learn", sklearn.__version__)
+import sklearn; print("Scikit-learn", sklearn.__version__)
 import giottolearn; print("giotto-learn", giottolearn.__version__)
 -->
 
