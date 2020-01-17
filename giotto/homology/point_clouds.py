@@ -71,6 +71,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     See also
     --------
     ConsistentRescaling
+    CubicalPersistence
 
     Notes
     -----

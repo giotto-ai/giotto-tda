@@ -53,6 +53,7 @@ Additionally, developer or pre-release versions require:
 - scikit-learn (>= 0.22.0)
 - python-igraph (>= 0.7.1.post6)
 - matplotlib (>= 3.1.2)
+- networkx (>= 2.4)
 - plotly (>= 4.4.1)
 - ipywidgets
 

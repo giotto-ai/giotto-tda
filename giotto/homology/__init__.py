@@ -5,9 +5,10 @@ to modify metric spaces or generate persistence diagrams.
 
 from .consistent import ConsistentRescaling
 from .point_clouds import VietorisRipsPersistence
-
+from .grids import CubicalPersistence
 
 __all__ = [
     'VietorisRipsPersistence',
-    'ConsistentRescaling'
+    'CubicalPersistence',
+    'ConsistentRescaling',
 ]
