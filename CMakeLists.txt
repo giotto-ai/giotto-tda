@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 project(giotto_bindings LANGUAGES CXX)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/giottolearn/externals/pybind11)
-set(BINDINGS_DIR "giotto/externals/bindings")
+set(BINDINGS_DIR "giottolearn/externals/bindings")
 
 find_package(Boost 1.56 REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
@@ -46,7 +46,7 @@ target_compile_options(giotto_bottleneck PUBLIC -Wall -O3)
 target_compile_options(giotto_bottleneck PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 target_compile_definitions(giotto_bottleneck PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
-set(GUDHI_SRC_DIR "giotto/externals/gudhi-devel/src")
+set(GUDHI_SRC_DIR "giottolearn/externals/gudhi-devel/src")
 
 #######################################################################
 #                           Cubical Complex                           #
