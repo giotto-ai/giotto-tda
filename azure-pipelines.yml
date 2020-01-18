@@ -157,7 +157,7 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" giottolearn/_version.py
       cat giottolearn/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-learn-nightly'
+    displayName: 'Change name to giotto-learn-nightly'
 
   - task: Bash@3
     inputs:
@@ -179,13 +179,13 @@ jobs:
     displayName: 'Install and test the wheels'
 
   - task: CopyFiles@2
-    displayName: 'copy files'
+    displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
+    displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
@@ -225,13 +225,13 @@ jobs:
       cat giottolearn/_version.py
       rm giottolearn/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-learn-nightly'
+    displayName: 'Change name to giotto-learn-nightly'
 
   - script: |
       brew update
       brew install boost
       brew install gcc
-    displayName: 'install boost and gcc'
+    displayName: 'Install boost and gcc'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -260,13 +260,13 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
-    displayName: 'build the wheels'
+    displayName: 'Build the wheels'
 
   - script: |
       pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs giottolearn --cov-report xml --ignore-glob='*externals*'
-    displayName: 'install and test the wheels'
+    displayName: 'Install and test the wheels'
 
   - script: |
       cd doc/
@@ -282,16 +282,16 @@ jobs:
       tarCompression: 'gz'
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       replaceExistingArchive: true
-    displayName: 'archive doc'
+    displayName: 'Archive doc'
 
   - task: CopyFiles@2
-    displayName: 'copy files'
+    displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
+    displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
@@ -330,7 +330,7 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" giottolearn/_version.py
       cat giottolearn/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-learn-nightly'
+    displayName: 'Change name to giotto-learn-nightly'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -361,22 +361,22 @@ jobs:
   - bash: |
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
-    displayName: 'build the wheels'
+    displayName: 'Build the wheels'
 
   - bash: |
       pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs giottolearn --cov-report xml --ignore-glob='*externals*'
-    displayName: 'install and test the wheels'
+    displayName: 'Install and test the wheels'
 
   - task: CopyFiles@2
-    displayName: 'copy files'
+    displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
+    displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
