@@ -148,7 +148,7 @@ To install:
    pip install -e ".[tests, doc]"
 
 This way, you can pull the library's latest changes and make them immediately available on your machine.
-Note: we recommend upgrading ``pip`` and ``setuptools`` to a recent version before installing in this way.
+Note: we recommend upgrading ``pip`` and ``setuptools`` to recent versions before installing in this way.
 
 Testing
 ~~~~~~~
