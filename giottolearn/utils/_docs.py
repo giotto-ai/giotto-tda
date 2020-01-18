@@ -112,23 +112,3 @@ def adapt_fit_transform_docs(transformermixin_cls):
         getattr(transformermixin_cls, 'fit_transform'))
     setattr(transformermixin_cls, 'fit_transform', new_fit_transform)
     return transformermixin_cls
-
-
-# # Alternative to the class decorator above, to be used as a decorator to the
-# fit_transform method instead of the class. Example of usage inside a class
-# definition:
-#     # @adapt_fit_transform_docs(locals())
-#     # def fit_transform(self, X, y=None):
-#     #     return super().fit_transform(X, y)
-#
-# def adapt_fit_transform_docs(local_symbol_table):
-#     fit_docs = getdoc(local_symbol_table['fit'])
-#     transform_docs = getdoc(local_symbol_table['transform'])
-#
-#     def decorator(original_fit_transform):
-#         @wraps(original_fit_transform)
-#         def wrapper(*args, **kwargs):
-#             return original_fit_transform(*args, **kwargs)
-#         wrapper.__doc__ = make_fit_transform_docs(fit_docs, transform_docs)
-#         return wrapper
-#     return decorator
