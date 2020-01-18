@@ -65,6 +65,9 @@ The simplest way to install giotto-learn is using ``pip``   ::
 
     pip install -U giotto-learn
 
+Note: the above may fail on old versions of ``pip``. We recommend upgrading ``pip``
+to a recent version.
+
 Pre-release, experimental builds containing recently added features and/or
 bug fixes can be installed by running   ::
 
@@ -144,7 +147,8 @@ To install:
    cd giotto-learn
    pip install -e ".[tests, doc]"
 
-From there any change in the library files will be immediately available on your machine.
+This way, you can pull the library's latest changes and make them immediately available on your machine.
+Note: we recommend upgrading ``pip`` and ``setuptools`` to a recent version before installing in this way.
 
 Testing
 ~~~~~~~
