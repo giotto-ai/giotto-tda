@@ -3,5 +3,5 @@
 	url = https://github.com/scikit-tda/ripser.py.git
 [submodule "giottolearn/externals/gudhi-devel"]
 	path = giottolearn/externals/gudhi-devel
-	url = https://github.com/giotto-learn/gudhi-devel
+	url = https://github.com/giotto-ai/gudhi-devel
 	branch = giottolearn
