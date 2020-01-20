@@ -22,6 +22,15 @@ def test_vrp_list_of_arrays():
     vrp.fit(X_list)
 
 
+@pytest.mark.skip(reason="Fails, because check_array(, allow_nd=True) is too flexible")
+def test_vrp_list_invalid_arrays():
+    X_invalid = np.array([0,1])
+    X_invalid_2 = np.zeros((2,3,4,1))
+    vrp = VietorisRipsPersistence()
+    with pytest.raises(ValueError):
+        vrp.fit([X_invalid, X_invalid_2])
+
+
 def test_vrp_params():
     metric = 'not_defined'
     vrp = VietorisRipsPersistence(metric=metric)
