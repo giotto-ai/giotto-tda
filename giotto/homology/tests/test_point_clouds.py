@@ -15,6 +15,13 @@ X = np.array([[[2., 2.47942554],
                [2.41211849, 1.92484888]]])
 
 
+def test_vrp_list_of_arrays():
+    X_2 = np.array([[0,1,2], [1,2,4]])
+    X_list = [X[0].copy(), X_2]
+    vrp = VietorisRipsPersistence()
+    vrp.fit(X_list)
+
+
 def test_vrp_params():
     metric = 'not_defined'
     vrp = VietorisRipsPersistence(metric=metric)
