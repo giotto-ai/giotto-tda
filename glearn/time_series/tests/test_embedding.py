@@ -6,8 +6,8 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from giotto.time_series import TakensEmbedding
-from giotto.time_series import SlidingWindow
+from glearn.time_series import TakensEmbedding
+from glearn.time_series import SlidingWindow
 
 signal = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
 

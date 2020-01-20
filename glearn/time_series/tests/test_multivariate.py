@@ -4,7 +4,7 @@
 import numpy as np
 from numpy.testing import assert_almost_equal
 
-from giotto.time_series import PearsonDissimilarity
+from glearn.time_series import PearsonDissimilarity
 
 
 def test_multivariate_transform():

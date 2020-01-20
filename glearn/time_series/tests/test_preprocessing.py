@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from giotto.time_series import Resampler, Stationarizer
+from glearn.time_series import Resampler, Stationarizer
 
 signal_array = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
 

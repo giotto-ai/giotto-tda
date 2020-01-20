@@ -3,8 +3,8 @@
 import numpy as np
 from numpy.testing import assert_almost_equal
 
-from giotto.meta_transformers import EntropyGenerator, BettiCurveGenerator
-from giotto.meta_transformers import LandscapeGenerator
+from glearn.meta_transformers import EntropyGenerator, BettiCurveGenerator
+from glearn.meta_transformers import LandscapeGenerator
 
 
 def test_EntropyGenerator_transform():

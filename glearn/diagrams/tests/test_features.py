@@ -5,7 +5,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from giotto.diagrams import PersistenceEntropy
+from glearn.diagrams import PersistenceEntropy
 
 X_pe = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 
