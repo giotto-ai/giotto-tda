@@ -148,7 +148,7 @@ def check_list_of_arrays(X, **kwargs):
     X : list of input arrays, as modified by check_array
     """
     if isinstance(X, np.ndarray):
-        return check_array(X)
+        return check_array(X, **kwargs)
     else:
         results = []
         messages = []
