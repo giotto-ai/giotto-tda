@@ -22,7 +22,7 @@ available_metric_params = list(set(
      for (param, param_type, param_range) in param_list]))
 
 
-def check_diagram(X):
+def check_diagram(X, at_least_two_values=False):
     """Input validation on a diagram
     """
     if len(X.shape) != 3:
@@ -58,7 +58,18 @@ def check_diagram(X):
                          " {} points in "
                          "all n_samples diagrams are under the diagonal."
                          "".format(n_points_global - n_points_above_diag))
+    if at_least_two_values:
+        _validate_distinct(X)
     return X
+
+
+def _validate_distinct(X):
+    unique_values = [np.unique(x[0:2,:]) for x in X]
+    if np.any([len(u) < 2 for u in unique_values]):
+        raise ValueError("There should be at least two distinct points"
+                         "in the persistent diagrams: now, only {} is present".format(*unique_values))
+    return 0
+
 
 
 def check_graph(X):
