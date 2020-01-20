@@ -4,4 +4,4 @@
 [submodule "glearn/externals/gudhi-devel"]
 	path = glearn/externals/gudhi-devel
 	url = https://github.com/giotto-learn/gudhi-devel
-	branch = glearn
+	branch = giotto
