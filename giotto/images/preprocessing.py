@@ -7,6 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
+from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
