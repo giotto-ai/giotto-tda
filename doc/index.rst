@@ -3,20 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to giotto's API reference!
-==================================
+Welcome to giotto-learn's API reference!
+========================================
 
 
-:mod:`giotto.mapper`: Mapper
+:mod:`glearn.mapper`: Mapper
 ============================
 
-.. automodule:: giotto.mapper
+.. automodule:: glearn.mapper
    :no-members:
    :no-inherited-members:
 
 Filters
 -------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -28,7 +28,7 @@ Filters
 
 Covers
 -------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -39,7 +39,7 @@ Covers
 
 Clustering
 ----------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -50,7 +50,7 @@ Clustering
 
 Pipeline
 --------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -67,7 +67,7 @@ Pipeline
 
 Visualization
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -78,7 +78,7 @@ Visualization
 
 Utilities
 ---------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -88,14 +88,14 @@ Utilities
    mapper.utils.pipeline.transformer_from_callable_on_rows
 
 
-:mod:`giotto.homology`: Persistent homology
+:mod:`glearn.homology`: Persistent homology
 ===========================================
 
-.. automodule:: giotto.homology
+.. automodule:: glearn.homology
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -105,16 +105,16 @@ Utilities
    homology.ConsistentRescaling
 
 
-:mod:`giotto.diagrams`: Persistence diagrams
+:mod:`glearn.diagrams`: Persistence diagrams
 ============================================
 
-.. automodule:: giotto.diagrams
+.. automodule:: glearn.diagrams
    :no-members:
    :no-inherited-members:
 
 Preprocessing
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -126,7 +126,7 @@ Preprocessing
 
 Distances
 ---------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -136,7 +136,7 @@ Distances
 
 Diagram features
 ----------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -149,16 +149,16 @@ Diagram features
    diagrams.HeatKernel
 
 
-:mod:`giotto.time_series`: Time series
+:mod:`glearn.time_series`: Time series
 ======================================
 
-.. automodule:: giotto.time_series
+.. automodule:: glearn.time_series
    :no-members:
    :no-inherited-members:
 
 Preprocessing
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -170,7 +170,7 @@ Preprocessing
 
 Time-delay embedding
 --------------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -180,7 +180,7 @@ Time-delay embedding
 
 Target preparation
 ------------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -190,7 +190,7 @@ Target preparation
 
 Dynamical systems
 -----------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -200,7 +200,7 @@ Dynamical systems
 
 Multivariate
 ------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -209,16 +209,16 @@ Multivariate
    time_series.PearsonDissimilarity
 
 
-:mod:`giotto.graphs`: Graphs
+:mod:`glearn.graphs`: Graphs
 ============================
 
-.. automodule:: giotto.graphs
+.. automodule:: glearn.graphs
    :no-members:
    :no-inherited-members:
 
 Graph creation
 --------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -229,7 +229,7 @@ Graph creation
 
 Graph processing
 ----------------
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -238,14 +238,14 @@ Graph processing
    graphs.GraphGeodesicDistance
    
 
-:mod:`giotto.base`: Base
+:mod:`glearn.base`: Base
 ========================
 
-.. automodule:: giotto.base
+.. automodule:: glearn.base
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -254,14 +254,14 @@ Graph processing
    base.TransformerResamplerMixin
 
 
-:mod:`giotto.pipeline`: Pipeline
+:mod:`glearn.pipeline`: Pipeline
 ================================
 
-.. automodule:: giotto.pipeline
+.. automodule:: glearn.pipeline
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -276,14 +276,14 @@ Graph processing
    pipeline.make_pipeline
 
 
-:mod:`giotto.meta_transformers`: Convenience pipelines
+:mod:`glearn.meta_transformers`: Convenience pipelines
 ======================================================
 
-.. automodule:: giotto.meta_transformers
+.. automodule:: glearn.meta_transformers
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -294,14 +294,14 @@ Graph processing
    meta_transformers.LandscapeGenerator
 
 
-:mod:`giotto.utils`: Validation
+:mod:`glearn.utils`: Validation
 ===============================
 
-.. automodule:: giotto.utils
+.. automodule:: glearn.utils
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: glearn
 
 .. autosummary::
    :toctree: generated/
@@ -312,16 +312,16 @@ Graph processing
    utils.validate_metric_params
 
 ..
-   :mod:`giotto.images`: Images
+   :mod:`glearn.images`: Images
    ============================
 
 ..
-   automodule:: giotto.images
+   automodule:: glearn.images
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: giotto
+   currentmodule:: glearn
 
 ..
    autosummary::
@@ -338,16 +338,16 @@ Graph processing
 
 
 ..
-   :mod:`giotto.manifold`: Manifold learning
+   :mod:`glearn.manifold`: Manifold learning
    =========================================
 
 ..
-   automodule:: giotto.manifold
+   automodule:: glearn.manifold
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: giotto
+   currentmodule:: glearn
 
 ..
    autosummary::

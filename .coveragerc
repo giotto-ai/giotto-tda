@@ -1,13 +1,13 @@
 [run]
 omit =
-    */giotto/externals/*
+    */glearn/externals/*
     **/setup.py
 
-    */giotto/compose/*
-    */giotto/datasets/*
-    */giotto/images/*
-    */giotto/neural_network/*
-    */giotto/model_selection/*
+    */glearn/compose/*
+    */glearn/datasets/*
+    */glearn/images/*
+    */glearn/neural_network/*
+    */glearn/model_selection/*
 
     **/base.py
     **/pipeline.py
