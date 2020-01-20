@@ -476,7 +476,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagram(X, at_least_two_values=True)
         validate_params(self.get_params(), self._hyperparameters)
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
@@ -513,7 +513,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagram(X, at_least_two_values=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
