@@ -75,11 +75,7 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         """
         # TODO: Include a validation step for X
-        self.X_ = reduce(iconcat, X, [])
-        # Preprocess X by 1) flattening and 2) extending each tuple
-        self.X_ = [(node_info[0], *node_info[1])
-                   for node_info in zip(range(len(self.X_)), self.X_)]
-        self.edges_ = list(self._generate_edges(self.X_))
+        self.X_, self.edges_ = self._graph_data_creation(X)
         return self
 
     def fit_transform(self, X, y=None, **fit_params):
@@ -113,11 +109,7 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         """
         # TODO: Include a validation step for X
-        _X = reduce(iconcat, X, [])
-        # Preprocess X by 1) flattening and 2) extending each tuple
-        _X = [(node_info[0], *node_info[1])
-              for node_info in zip(range(len(_X)), _X)]
-        _edges = self._generate_edges(_X)
+        _X, _edges = self._graph_data_creation(X)
 
         # Graph construction
         graph = ig.Graph()
@@ -131,6 +123,14 @@ class Nerve(BaseEstimator, TransformerMixin):
                  'node_elements'],
                 zip(*_X)))
         return graph
+
+    def _graph_data_creation(self, X):
+        X_ = reduce(iconcat, X, [])
+        # Preprocess X by 1) flattening and 2) extending each tuple
+        X_ = [(node_info[0], *node_info[1])
+              for node_info in zip(range(len(X_)), X_)]
+        edges_ = self._generate_edges(X_)
+        return X_, edges_
 
     @staticmethod
     def _pairwise_intersections(min_intersection, node_pair):

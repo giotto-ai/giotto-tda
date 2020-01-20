@@ -11,8 +11,8 @@ from .utils.pipeline import transformer_from_callable_on_rows, identity
 global_pipeline_params = ('memory', 'verbose')
 nodes_params = ('scaler', 'filter_func', 'cover')
 clust_prepr_params = ('clustering_preprocessing',)
-clust_params = ('clusterer', 'parallel_clustering_n_jobs',
-                'parallel_clustering_prefer')
+clust_params = ('clusterer', 'n_jobs',
+                'parallel_backend_prefer')
 nerve_params = ('min_intersection',)
 clust_prepr_params_prefix = 'pullback_cover__'
 nodes_params_prefix = 'pullback_cover__map_and_cover__'
@@ -145,8 +145,8 @@ def make_mapper_pipeline(scaler=None,
                          cover=None,
                          clustering_preprocessing=None,
                          clusterer=None,
-                         parallel_clustering_n_jobs=None,
-                         parallel_clustering_prefer='threads',
+                         n_jobs=None,
+                         parallel_backend_prefer='threads',
                          graph_step=True,
                          min_intersection=1,
                          memory=None,
@@ -186,18 +186,19 @@ def make_mapper_pipeline(scaler=None,
         Clustering object. ``None`` means using DBSCAN
         (:meth:`sklearn.cluster.DBSCAN`) with its default parameters.
 
-    parallel_clustering_n_jobs : int or None, optional, default: ``None``
+    n_jobs : int or None, optional, default: ``None``
         The number of jobs to use in a joblib-parallel application of the
-        clustering step across pullback cover sets. ``None`` means 1 unless
+        clustering step across pullback cover sets. To be used in
+        conjunction with `parallel_backend_prefer`. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    parallel_clustering_prefer : ``'processes'`` | ``'threads'``, optional, \
+    parallel_backend_prefer : ``'processes'`` | ``'threads'``, optional, \
         default: ``'threads'``
-        Selects the default joblib backend to use in a joblib-parallel
-        application of the clustering step across pullback cover sets.
-        The default process-based backend is 'loky' and the default
-        thread-based backend is 'threading'. See [2]_.
+        Soft hint for the default joblib backend to use in a joblib-parallel
+        application of the clustering step across pullback cover sets. To be
+        used in conjunction with `n_jobs`. The default process-based backend is
+        'loky' and the default thread-based backend is 'threading'. See [2]_.
 
     graph_step : bool, optional, default: ``True``
         Whether the resulting pipeline should stop at the calculation of the
@@ -287,7 +288,7 @@ def make_mapper_pipeline(scaler=None,
     >>> # clustering across the pullback cover sets can be beneficial
     >>> from sklearn.cluster import DBSCAN
     >>> mapper = make_mapper_pipeline(clusterer=DBSCAN(),
-    ...                               parallel_clustering_n_jobs=6,
+    ...                               n_jobs=6,
     ...                               memory=mkdtemp(),
     ...                               verbose=True)
     >>> X = np.random.random((100000, 4))
@@ -298,7 +299,7 @@ def make_mapper_pipeline(scaler=None,
     [Pipeline] .... (step 1 of 3) Processing pullback_cover, total=   0.7s
     [Pipeline] ........ (step 2 of 3) Processing clustering, total=   1.9s
     [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.3s
-    >>> mapper.set_params(parallel_clustering_n_jobs=1)
+    >>> mapper.set_params(n_jobs=1)
     >>> mapper.fit_transform(X)
     [Pipeline] ........ (step 2 of 3) Processing clustering, total=   5.3s
     [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.3s
@@ -366,8 +367,8 @@ def make_mapper_pipeline(scaler=None,
              ('map_and_cover', map_and_cover)])),
         ('clustering', ParallelClustering(
             clusterer=_clusterer,
-            parallel_clustering_n_jobs=parallel_clustering_n_jobs,
-            parallel_clustering_prefer=parallel_clustering_prefer))
+            n_jobs=n_jobs,
+            parallel_backend_prefer=parallel_backend_prefer))
     ]
 
     if graph_step:
