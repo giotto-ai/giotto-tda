@@ -4,7 +4,7 @@ method."""
 
 
 class TransformerResamplerMixin:
-    """Mixin class for all transformers-resamplers in giotto-learn."""
+    """Mixin class for all transformers-resamplers in giotto-tda."""
 
     _estimator_type = 'transformer_resampler'
 

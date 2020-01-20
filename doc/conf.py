@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'giotto-learn'
+project = 'giotto-tda'
 copyright = '2019, L2F'
 author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina, ' \
          'Lewis Tunstall'

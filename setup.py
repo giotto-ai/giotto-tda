@@ -20,16 +20,16 @@ with open(version_file) as f:
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-DISTNAME = 'giotto-learn'
+DISTNAME = 'giotto-tda'
 DESCRIPTION = 'Toolbox for Machine Learning using Topological Data Analysis.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = 'text/x-rst'
 MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
-URL = 'https://github.com/giotto-ai/giotto-learn'
+URL = 'https://github.com/giotto-ai/giotto-tda'
 LICENSE = 'GNU AGPLv3'
-DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-learn/tarball/v0.1.3'
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.1.3'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',

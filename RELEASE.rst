@@ -1,6 +1,23 @@
 Release 0.1.4
 =============
 
+Library name change
+-------------------
+The library and GitHub repository have been renamed to `giotto-tda`! While the
+new name is meant to better convey the library's focus on Topology-powered
+machine learning and Data Analysis, the commitment to seamless integration with
+`scikit-learn` will remain just as strong and a defining feature of the project.
+Concurrently, the main module has been renamed from `giotto` to `gtda` in this
+version. `giotto-learn` will remain on PyPI as a legacy package (stuck at v0.1.3)
+until we have ensured that users and developers have fully migrated. The new PyPI
+package `giotto-tda` will start at v0.1.4 for project continuity.
+
+TL;DR ::
+
+    pip install -U giotto-tda
+
+and `import gtda` in your scripts or Jupyter notebooks!
+
 Change of license
 -----------------
 
@@ -11,7 +28,6 @@ Major Features and Improvements
 -  Added `mapper` submodule implementing the Mapper algorithm with all its steps, some clustering algorithms, joblib
    parallelism at the level of clustering, static/interactive visualization tools.
 -  Added support for Python 3.8.
--  Renaming of the main `giotto` module as `gtda` (see below).
 
 Bug Fixes
 ---------
@@ -20,9 +36,8 @@ Bug Fixes
 
 Backwards-Incompatible Changes
 ------------------------------
--  The main module `giotto` has been renamed to `gtda` for 1) similarity with scikit-learn -> `sklearn`, making it
-   easy to memorize, 2) brevity re e.g. `giottolearn`, and 3) consistency with the existence of other libraries in the
-   Giotto ecosystem.
+-  The library name change and the change in the name of the main module `giotto`
+   are important major changes.
 -  There are now additional dependencies in the `python-igraph`, `matplotlib`, `plotly`, and `ipywidgets` libraries.
 
 Thanks to our Contributors
@@ -160,4 +175,4 @@ answered questions, and were part of inspiring discussions.
 Release 0.1a.0
 ==============
 
-Initial release of giotto-learn.
+Initial release of the library, original named `giotto-learn`.

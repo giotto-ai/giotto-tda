@@ -153,11 +153,11 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-learn-nightly'
+    displayName: 'change name to giotto-tda-nightly'
 
   - task: Bash@3
     inputs:
@@ -193,7 +193,7 @@ jobs:
   - bash: |
       pip install twine
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
+      twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'
 
@@ -219,13 +219,13 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed -i.bak "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
       rm gtda/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-learn-nightly'
+    displayName: 'change name to giotto-tda-nightly'
 
   - script: |
       brew update
@@ -244,7 +244,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn
+      pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'false')
@@ -253,7 +253,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn-nightly
+      pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'true')
@@ -296,7 +296,7 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-  - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
+  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'
 
@@ -326,11 +326,11 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
+      sed -i "s/'giotto-tda'/'giotto-tda'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-learn-nightly'
+    displayName: 'change name to giotto-tda-nightly'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -343,7 +343,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn
+      pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'false')
@@ -352,7 +352,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn-nightly
+      pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'true')
@@ -381,6 +381,6 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-  - bash: twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
+  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload wheels to PyPI'

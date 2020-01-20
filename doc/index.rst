@@ -1,9 +1,9 @@
-.. giotto-learn documentation master file, created by
+.. giotto-tda documentation master file, created by
    sphinx-quickstart on Mon Jun  3 11:56:46 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to giotto-learn's API reference!
+Welcome to giotto-tda's API reference!
 ========================================
 
 
@@ -236,7 +236,7 @@ Graph processing
    :template: class.rst
 
    graphs.GraphGeodesicDistance
-   
+
 
 :mod:`gtda.base`: Base
 ========================

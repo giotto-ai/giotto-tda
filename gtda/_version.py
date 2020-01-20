@@ -1,4 +1,4 @@
-"""``giotto-learn`` is a Python library implementing algorithms from
+"""``giotto-tda`` is a Python library implementing algorithms from
 Topological Data Analysis in a machine learning framework."""
 # License: GNU AGPLv3
 
