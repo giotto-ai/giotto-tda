@@ -112,6 +112,8 @@ Utilities
    :no-members:
    :no-inherited-members:
 
+Preprocessing
+-------------
 .. currentmodule:: giotto
 
 .. autosummary::
@@ -122,9 +124,25 @@ Utilities
    diagrams.Scaler
    diagrams.Filtering
 
-   diagrams.PairwiseDistance
-   diagrams.Amplitude
+Distances
+---------
+.. currentmodule:: giotto
 
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   diagrams.PairwiseDistance
+
+Diagram features
+----------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   diagrams.Amplitude
    diagrams.PersistenceEntropy
    diagrams.PersistenceLandscape
    diagrams.BettiCurve
@@ -138,19 +156,57 @@ Utilities
    :no-members:
    :no-inherited-members:
 
+Preprocessing
+-------------
 .. currentmodule:: giotto
 
 .. autosummary::
    :toctree: generated/
    :template: class.rst
 
+   time_series.SlidingWindow
    time_series.Resampler
    time_series.Stationarizer
+
+Time-delay embedding
+--------------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
    time_series.TakensEmbedding
-   time_series.SlidingWindow
-   time_series.PermutationEntropy
-   time_series.PearsonDissimilarity
+
+Target preparation
+------------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
    time_series.Labeller
+
+Dynamical systems
+-----------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   time_series.PermutationEntropy
+
+Multivariate
+------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   time_series.PearsonDissimilarity
 
 
 :mod:`giotto.graphs`: Graphs
@@ -160,6 +216,8 @@ Utilities
    :no-members:
    :no-inherited-members:
 
+Graph creation
+--------------
 .. currentmodule:: giotto
 
 .. autosummary::
@@ -168,6 +226,15 @@ Utilities
 
    graphs.TransitionGraph
    graphs.KNeighborsGraph
+
+Graph processing
+----------------
+.. currentmodule:: giotto
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
    graphs.GraphGeodesicDistance
    
 
