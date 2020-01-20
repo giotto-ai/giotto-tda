@@ -7,16 +7,16 @@ Welcome to giotto-learn's API reference!
 ========================================
 
 
-:mod:`glearn.mapper`: Mapper
+:mod:`gtda.mapper`: Mapper
 ============================
 
-.. automodule:: glearn.mapper
+.. automodule:: gtda.mapper
    :no-members:
    :no-inherited-members:
 
 Filters
 -------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -28,7 +28,7 @@ Filters
 
 Covers
 -------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -39,7 +39,7 @@ Covers
 
 Clustering
 ----------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -50,7 +50,7 @@ Clustering
 
 Pipeline
 --------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -67,7 +67,7 @@ Pipeline
 
 Visualization
 -------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -78,7 +78,7 @@ Visualization
 
 Utilities
 ---------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -88,14 +88,14 @@ Utilities
    mapper.utils.pipeline.transformer_from_callable_on_rows
 
 
-:mod:`glearn.homology`: Persistent homology
+:mod:`gtda.homology`: Persistent homology
 ===========================================
 
-.. automodule:: glearn.homology
+.. automodule:: gtda.homology
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -105,16 +105,16 @@ Utilities
    homology.ConsistentRescaling
 
 
-:mod:`glearn.diagrams`: Persistence diagrams
+:mod:`gtda.diagrams`: Persistence diagrams
 ============================================
 
-.. automodule:: glearn.diagrams
+.. automodule:: gtda.diagrams
    :no-members:
    :no-inherited-members:
 
 Preprocessing
 -------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -126,7 +126,7 @@ Preprocessing
 
 Distances
 ---------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -136,7 +136,7 @@ Distances
 
 Diagram features
 ----------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -149,16 +149,16 @@ Diagram features
    diagrams.HeatKernel
 
 
-:mod:`glearn.time_series`: Time series
+:mod:`gtda.time_series`: Time series
 ======================================
 
-.. automodule:: glearn.time_series
+.. automodule:: gtda.time_series
    :no-members:
    :no-inherited-members:
 
 Preprocessing
 -------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -170,7 +170,7 @@ Preprocessing
 
 Time-delay embedding
 --------------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -180,7 +180,7 @@ Time-delay embedding
 
 Target preparation
 ------------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -190,7 +190,7 @@ Target preparation
 
 Dynamical systems
 -----------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -200,7 +200,7 @@ Dynamical systems
 
 Multivariate
 ------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -209,16 +209,16 @@ Multivariate
    time_series.PearsonDissimilarity
 
 
-:mod:`glearn.graphs`: Graphs
+:mod:`gtda.graphs`: Graphs
 ============================
 
-.. automodule:: glearn.graphs
+.. automodule:: gtda.graphs
    :no-members:
    :no-inherited-members:
 
 Graph creation
 --------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -229,7 +229,7 @@ Graph creation
 
 Graph processing
 ----------------
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -238,14 +238,14 @@ Graph processing
    graphs.GraphGeodesicDistance
    
 
-:mod:`glearn.base`: Base
+:mod:`gtda.base`: Base
 ========================
 
-.. automodule:: glearn.base
+.. automodule:: gtda.base
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -254,14 +254,14 @@ Graph processing
    base.TransformerResamplerMixin
 
 
-:mod:`glearn.pipeline`: Pipeline
+:mod:`gtda.pipeline`: Pipeline
 ================================
 
-.. automodule:: glearn.pipeline
+.. automodule:: gtda.pipeline
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -276,14 +276,14 @@ Graph processing
    pipeline.make_pipeline
 
 
-:mod:`glearn.meta_transformers`: Convenience pipelines
+:mod:`gtda.meta_transformers`: Convenience pipelines
 ======================================================
 
-.. automodule:: glearn.meta_transformers
+.. automodule:: gtda.meta_transformers
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -294,14 +294,14 @@ Graph processing
    meta_transformers.LandscapeGenerator
 
 
-:mod:`glearn.utils`: Validation
+:mod:`gtda.utils`: Validation
 ===============================
 
-.. automodule:: glearn.utils
+.. automodule:: gtda.utils
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: glearn
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -312,16 +312,16 @@ Graph processing
    utils.validate_metric_params
 
 ..
-   :mod:`glearn.images`: Images
+   :mod:`gtda.images`: Images
    ============================
 
 ..
-   automodule:: glearn.images
+   automodule:: gtda.images
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: glearn
+   currentmodule:: gtda
 
 ..
    autosummary::
@@ -338,16 +338,16 @@ Graph processing
 
 
 ..
-   :mod:`glearn.manifold`: Manifold learning
+   :mod:`gtda.manifold`: Manifold learning
    =========================================
 
 ..
-   automodule:: glearn.manifold
+   automodule:: gtda.manifold
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: glearn
+   currentmodule:: gtda
 
 ..
    autosummary::

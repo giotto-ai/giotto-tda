@@ -1,13 +1,13 @@
 [run]
 omit =
-    */glearn/externals/*
+    */gtda/externals/*
     **/setup.py
 
-    */glearn/compose/*
-    */glearn/datasets/*
-    */glearn/images/*
-    */glearn/neural_network/*
-    */glearn/model_selection/*
+    */gtda/compose/*
+    */gtda/datasets/*
+    */gtda/images/*
+    */gtda/neural_network/*
+    */gtda/model_selection/*
 
     **/base.py
     **/pipeline.py

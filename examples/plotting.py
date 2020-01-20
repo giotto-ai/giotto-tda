@@ -3,7 +3,7 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from glearn.diagrams._utils import _subdiagrams
+from gtda.diagrams._utils import _subdiagrams
 
 import matplotlib.pyplot as plt
 

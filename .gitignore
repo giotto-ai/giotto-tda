@@ -24,7 +24,7 @@ doc/build
 doc/generated
 
 # Pybind11
-glearn/externals/pybind11
+gtda/externals/pybind11
 
 # Output files
 *.out
@@ -40,4 +40,4 @@ glearn/externals/pybind11
 .hypothesis/
 
 # development
-glearn/mapper/scratch/*
+gtda/mapper/scratch/*

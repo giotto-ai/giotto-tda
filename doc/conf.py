@@ -13,7 +13,7 @@
 import os
 import sys
 
-from glearn import __version__
+from gtda import __version__
 
 sys.path.insert(0, os.path.abspath('../'))
 

@@ -11,16 +11,16 @@ Major Features and Improvements
 -  Added `mapper` submodule implementing the Mapper algorithm with all its steps, some clustering algorithms, joblib
    parallelism at the level of clustering, static/interactive visualization tools.
 -  Added support for Python 3.8.
--  Renaming of the main `giotto` module as `glearn` (see below).
+-  Renaming of the main `giotto` module as `gtda` (see below).
 
 Bug Fixes
 ---------
 -  Fixed consistently incorrect documentation for the `fit_transform` methods. This has been achieved by introducing a
-   class decorator `adapt_fit_transform_docs` which is defined in the newly introduced `glearn.utils._docs.py`.
+   class decorator `adapt_fit_transform_docs` which is defined in the newly introduced `gtda.utils._docs.py`.
 
 Backwards-Incompatible Changes
 ------------------------------
--  The main module `giotto` has been renamed to `glearn` for 1) similarity with scikit-learn -> `sklearn`, making it
+-  The main module `giotto` has been renamed to `gtda` for 1) similarity with scikit-learn -> `sklearn`, making it
    easy to memorize, 2) brevity re e.g. `giottolearn`, and 3) consistency with the existence of other libraries in the
    Giotto ecosystem.
 -  There are now additional dependencies in the `python-igraph`, `matplotlib`, `plotly`, and `ipywidgets` libraries.

@@ -13,7 +13,7 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 
-version_file = os.path.join('glearn', '_version.py')
+version_file = os.path.join('gtda', '_version.py')
 with open(version_file) as f:
     exec(f.read())
 
@@ -120,7 +120,7 @@ class CMakeBuild(build_ext):
     def install_dependencies(self):
         dir_start = os.getcwd()
         dir_pybind11 = os.path.join(dir_start,
-                                    'glearn', 'externals', 'pybind11')
+                                    'gtda', 'externals', 'pybind11')
         if os.path.exists(dir_pybind11):
             return 0
         os.mkdir(dir_pybind11)
@@ -196,5 +196,5 @@ setup(name=DISTNAME,
       keywords=KEYWORDS,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
-      ext_modules=[CMakeExtension('glearn')],
+      ext_modules=[CMakeExtension('gtda')],
       cmdclass=dict(build_ext=CMakeBuild))

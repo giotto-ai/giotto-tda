@@ -32,7 +32,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
@@ -74,7 +74,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
@@ -114,7 +114,7 @@ jobs:
   - script: |
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
@@ -154,8 +154,8 @@ jobs:
 
   - bash: |
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" glearn/_version.py
-      cat glearn/_version.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -175,7 +175,7 @@ jobs:
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs glearn --cov-report xml --ignore-glob='*externals*'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     displayName: 'Install and test the wheels'
 
   - task: CopyFiles@2
@@ -221,9 +221,9 @@ jobs:
   - bash: |
       sed -i.bak "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
       rm setup.py.bak
-      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" glearn/_version.py
-      cat glearn/_version.py
-      rm glearn/_version.py.bak
+      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
+      rm gtda/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -245,7 +245,7 @@ jobs:
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'false')
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -254,7 +254,7 @@ jobs:
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn-nightly
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -265,7 +265,7 @@ jobs:
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs glearn --cov-report xml --ignore-glob='*externals*'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - script: |
@@ -327,8 +327,8 @@ jobs:
 
   - bash: |
       sed -i "s/'giotto-learn'/'giotto-learn-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" glearn/_version.py
-      cat glearn/_version.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'change name to giotto-learn-nightly'
 
@@ -344,7 +344,7 @@ jobs:
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'false')
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -353,7 +353,7 @@ jobs:
       pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-learn-nightly
-      pytest --cov glearn --cov-report xml
+      pytest --cov gtda --cov-report xml
       flake8
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -366,7 +366,7 @@ jobs:
   - bash: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs glearn --cov-report xml --ignore-glob='*externals*'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
