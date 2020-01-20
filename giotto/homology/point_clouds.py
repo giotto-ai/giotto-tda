@@ -7,6 +7,7 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
+from ..utils.validation import check_list_of_arrays
 
 from ._utils import _pad_diagram
 from ..externals.python import ripser
@@ -158,7 +159,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_array(X, allow_nd=True)
+        #check_array(X, allow_nd=True)
+        check_list_of_arrays(X, allow_nd=True)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
@@ -201,7 +203,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         """
         # Check if fit had been called
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        #X = check_array(X, allow_nd=True)
+        X = check_list_of_arrays(X, allow_nd=True)
 
         n_samples = len(X)
 
