@@ -134,7 +134,7 @@ instructions below are unofficial, please follow them at your own risk.
 Source code
 '''''''''''
 
-You can check the latest sources with the command::
+You can check out the latest state of the source code with the command::
 
     git clone https://github.com/giotto-ai/giotto-tda.git
 
