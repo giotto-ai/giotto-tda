@@ -95,7 +95,7 @@ def plot_static_mapper_graph(
     else:
         pipe = pipeline
 
-    if node_color_statistic is None:
+    if node_color_statistic is not None:
         _node_color_statistic = node_color_statistic
     else:
         _node_color_statistic = np.mean
