@@ -4,7 +4,7 @@
 |Azure|_ |Azure-cov|_ |Azure-test|_ |binder|_
 
 .. |Azure| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-tda?branchName=master
-.. _Azure: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=2&branchName=master
+.. _Azure: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=6&branchName=master
 
 .. |Azure-cov| image:: https://img.shields.io/badge/Coverage-93%25-passed
 .. _Azure-cov: https://dev.azure.com/maintainers/Giotto/_build/results?buildId=6&view=codecoverage-tab
