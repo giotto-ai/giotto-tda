@@ -168,7 +168,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   node_color_statistic=np.mean,
                                   color_by_columns_dropdown=False,
                                   plotly_kwargs=None):
-    """Plotting function for Mapper graphs with interactivity.
+    """Plotting function for interactive Mapper graphs.
 
     Parameters
     ----------
