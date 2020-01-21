@@ -433,7 +433,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
 class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     """Agglomerative clustering with stopping rule given by a histogram-based
-    version of the first gap method.
+    version of the first gap method, introduced in [1]_.
 
     Given a frequency threshold f and an initial integer k: 1) create a
     histogram of k equally spaced bins of the number of merges in the
@@ -505,6 +505,12 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     See also
     --------
     FirstSimpleGap
+
+    References
+    ----------
+    .. [1] G. Singh, F. Mémoli, and G. Carlsson, "Topological methods for the
+           analysis of high dimensional data sets and 3D object recognition";
+           in *SPBG*, pp. 91--100, 2007.
 
     """
 
