@@ -36,7 +36,7 @@ Major Features and Improvements
    The clustering step can be parallelised over the pullback cover sets via ``joblib`` -- though this can actually
    *lower* performance in small- and medium-size datasets. A range of pre-defined filter functions are also included,
    as well as covers in one and several dimensions, agglomerative clustering algorithms based on stopping rules to
-   create flat cuts, and utilities for making transformers out of callables or out of other transformers which have no
+   create flat cuts, and utilities for making transformers out of callables or out of other classes which have no
    ``transform`` method. ``plot_static_mapper_graph`` allows the user to visualise (in 2D or 3D) the Mapper graph
    arising from fit-transforming a ``MapperPipeline`` to data, and offers a range of colouring options to correlate the
    graph's structure with exogenous or endogenous information. It relies on ``plotly`` for plotting and displaying
