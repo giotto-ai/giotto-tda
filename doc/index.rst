@@ -4,11 +4,11 @@
    contain the root `toctree` directive.
 
 Welcome to giotto-tda's API reference!
-========================================
+======================================
 
 
 :mod:`gtda.mapper`: Mapper
-============================
+==========================
 
 .. automodule:: gtda.mapper
    :no-members:
@@ -89,7 +89,7 @@ Utilities
 
 
 :mod:`gtda.homology`: Persistent homology
-===========================================
+=========================================
 
 .. automodule:: gtda.homology
    :no-members:
@@ -106,7 +106,7 @@ Utilities
 
 
 :mod:`gtda.diagrams`: Persistence diagrams
-============================================
+==========================================
 
 .. automodule:: gtda.diagrams
    :no-members:
@@ -150,7 +150,7 @@ Diagram features
 
 
 :mod:`gtda.time_series`: Time series
-======================================
+====================================
 
 .. automodule:: gtda.time_series
    :no-members:
@@ -210,7 +210,7 @@ Multivariate
 
 
 :mod:`gtda.graphs`: Graphs
-============================
+==========================
 
 .. automodule:: gtda.graphs
    :no-members:
@@ -239,7 +239,7 @@ Graph processing
 
 
 :mod:`gtda.base`: Base
-========================
+======================
 
 .. automodule:: gtda.base
    :no-members:
@@ -255,7 +255,7 @@ Graph processing
 
 
 :mod:`gtda.pipeline`: Pipeline
-================================
+==============================
 
 .. automodule:: gtda.pipeline
    :no-members:
@@ -277,7 +277,7 @@ Graph processing
 
 
 :mod:`gtda.meta_transformers`: Convenience pipelines
-======================================================
+====================================================
 
 .. automodule:: gtda.meta_transformers
    :no-members:
@@ -295,7 +295,7 @@ Graph processing
 
 
 :mod:`gtda.utils`: Validation
-===============================
+=============================
 
 .. automodule:: gtda.utils
    :no-members:
@@ -313,7 +313,7 @@ Graph processing
 
 ..
    :mod:`gtda.images`: Images
-   ============================
+   ==========================
 
 ..
    automodule:: gtda.images
@@ -339,7 +339,7 @@ Graph processing
 
 ..
    :mod:`gtda.manifold`: Manifold learning
-   =========================================
+   =======================================
 
 ..
    automodule:: gtda.manifold
