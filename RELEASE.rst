@@ -43,7 +43,7 @@ Major Features and Improvements
    metadata. ``plot_interactive_mapper_graph`` adds interactivity to this, via ``ipywidgets``: specifically, the user
    can fine-tune some parameters involved in the definition of the Mapper pipeline, and observe in real time how the
    structure of the graph changes as a result. In this release, all hyperparameters involved in the covering and
-   clustering step are supported. The ability to fine-tune other hyperparameters will be considered for future versions.
+   clustering steps are supported. The ability to fine-tune other hyperparameters will be considered for future versions.
 -  Added support for Python 3.8.
 
 Bug Fixes
