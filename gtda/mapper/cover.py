@@ -235,7 +235,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         Xt = _remove_empty_and_duplicate_intervals(Xt)
         return Xt
 
-    def fitted_intervals(self):
+    def get_fitted_intervals(self):
         """Returns the open intervals computed in :meth:`fit`, as a list of
         tuples (a, b) where a < b.
 

@@ -91,7 +91,7 @@ def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
 
     lower_limits,\
         upper_limits = np.array(list(map(tuple,
-                                         zip(*cover.fitted_intervals()[1:-1]))
+                                         zip(*cover.get_fitted_intervals()[1:-1]))
                                      ))
 
     # rounding precision
