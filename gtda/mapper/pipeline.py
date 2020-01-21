@@ -173,7 +173,7 @@ def make_mapper_pipeline(scaler=None,
         (:meth:`sklearn.decomposition.PCA`) with 2 components.
 
     cover : object or None, optional, default: ``None``
-        Covering transformer.``None`` means using a cubical cover
+        Covering transformer. ``None`` means using a cubical cover
         (:meth:`gtda.mapper.CubicalCover`) with its default parameters.
 
     clustering_preprocessing : object or None, optional, default: ``None``
@@ -232,6 +232,7 @@ def make_mapper_pipeline(scaler=None,
     Examples
     --------
     >>> # Example of basic usage with default parameters
+    >>> import numpy as np
     >>> from gtda.mapper import make_mapper_pipeline
     >>> mapper = make_mapper_pipeline()
     >>> print(mapper.__class__)
