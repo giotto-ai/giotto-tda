@@ -23,7 +23,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    exponent : int or float, optional, default: ``numpy.inf``
+    exponent : int or float, optional, default: ``2``
         `p`-norm exponent used to calculate eccentricities from the distance
         matrix.
 
