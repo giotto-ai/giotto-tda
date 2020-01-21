@@ -21,12 +21,29 @@ and ``import gtda`` in your scripts or notebooks!
 Change of license
 -----------------
 
-The license changes from Apache 2.0 to AGPLv3 from this release on.
+The license changes from Apache 2.0 to GNU AGPLv3 from this release on.
 
 Major Features and Improvements
 -------------------------------
--  Added ``mapper`` submodule implementing the Mapper algorithm with all its steps, some clustering algorithms, joblib
-   parallelism at the level of clustering, static/interactive visualization tools.
+-  Added a ``mapper`` submodule implementing the Mapper algorithm of Singh, Mémoli and Carlsson. The main tools are the
+   functions ``make_mapper_pipeline``, ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph``. The first
+   creates an object of class ``MapperPipeline`` which can be fit-transformed to data to create a Mapper graph in the
+   form of an ``igraph.Graph`` object (see below). The ``MapperPipeline`` class itself is a simple subclass
+   of scikit-learn's ``Pipeline`` which is adapted to the precise structure of the Mapper algorithm, so that a
+   ``MapperPipeline`` object can be used as part of even larger scikit-learn pipelines, inside a meta-estimator, in a
+   grid search, etc. One also has access to other important features of scikit-learn's ``Pipeline``, such as memory
+   caching to avoid unnecessary recomputation of early steps when parameters involved in later steps are changed.
+   The clustering step can be parallelised over the pullback cover sets via ``joblib`` -- though this can actually
+   *lower* performance in small- and medium-size datasets. A range of pre-defined filter functions are also included,
+   as well as covers in one and several dimensions, agglomerative clustering algorithms based on stopping rules to
+   create flat cuts, and utilities for making transformers out of callables or out of other transformers which have no
+   ``transform`` method. ``plot_static_mapper_graph`` allows the user to visualise (in 2D or 3D) the Mapper graph
+   arising from fit-transforming a ``MapperPipeline`` to data, and offers a range of colouring options to correlate the
+   graph's structure with exogenous or endogenous information. It relies on ``plotly`` for plotting and displaying
+   metadata. ``plot_interactive_mapper_graph`` adds interactivity to this, via ``ipywidgets``: specifically, the user
+   can fine-tune some parameters involved in the definition of the Mapper pipeline, and observe in real time how the
+   structure of the graph changes as a result. In this release, all hyperparameters involved in the covering and
+   clustering step are supported. The ability to fine-tune other hyperparameters will be considered for future versions.
 -  Added support for Python 3.8.
 
 Bug Fixes
