@@ -45,6 +45,12 @@ extensions = [
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
 
+# Add mappings
+intersphinx_mapping = {
+    'sklearn': ('http://scikit-learn.org/stable', None),
+    'plotly': ('https://plot.ly/python-api-reference/', None)
+}
+
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_class_members_toctree = False

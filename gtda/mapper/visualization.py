@@ -76,7 +76,7 @@ def plot_static_mapper_graph(
 
     Returns
     -------
-    fig : :class:`ploty.graph_objs.Figure` object
+    fig : :class:`plotly.graph_objects.Figure` object
         Figure representing the Mapper graph with appropriate node colouring
         and size.
 
