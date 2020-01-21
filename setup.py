@@ -13,23 +13,23 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 
-version_file = os.path.join('giotto', '_version.py')
+version_file = os.path.join('gtda', '_version.py')
 with open(version_file) as f:
     exec(f.read())
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-DISTNAME = 'giotto-learn'
+DISTNAME = 'giotto-tda'
 DESCRIPTION = 'Toolbox for Machine Learning using Topological Data Analysis.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = 'text/x-rst'
 MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
-URL = 'https://github.com/giotto-ai/giotto-learn'
+URL = 'https://github.com/giotto-ai/giotto-tda'
 LICENSE = 'GNU AGPLv3'
-DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-learn/tarball/v0.1.3'
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.1.3'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
@@ -120,7 +120,7 @@ class CMakeBuild(build_ext):
     def install_dependencies(self):
         dir_start = os.getcwd()
         dir_pybind11 = os.path.join(dir_start,
-                                    'giotto', 'externals', 'pybind11')
+                                    'gtda', 'externals', 'pybind11')
         if os.path.exists(dir_pybind11):
             return 0
         os.mkdir(dir_pybind11)
@@ -196,5 +196,5 @@ setup(name=DISTNAME,
       keywords=KEYWORDS,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
-      ext_modules=[CMakeExtension('giotto')],
+      ext_modules=[CMakeExtension('gtda')],
       cmdclass=dict(build_ext=CMakeBuild))

@@ -1,6 +1,6 @@
 <!--
 Thanks for contributing a pull request! Please ensure you have taken a look at
-the contribution guidelines: https://github.com/giotto-learn/giotto-learn/blob/master/CONTRIBUTING.md#pull-request-checklist
+the contribution guidelines: https://github.com/giotto-ai/giotto-tda/blob/master/CONTRIBUTING.md#pull-request-checklist
 -->
 
 #### Reference Issues/PRs

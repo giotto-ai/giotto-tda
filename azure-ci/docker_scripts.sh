@@ -28,10 +28,10 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# installing and uninstalling giotto-learn
+# installing and uninstalling giotto-tda
 cd /io
 pip install -e ".[doc, tests]"
-pip uninstall -y giotto-learn
+pip uninstall -y giotto-tda
 
 # testing, linting
 pytest --cov . --cov-report xml

@@ -1,4 +1,4 @@
-This file describe the governance of the Giotto project.
+This file describe the governance of the giotto-tda project.
 
 Project owner:
 --------------
@@ -8,10 +8,10 @@ Project owner:
 Authors:
 --------
 
-- Please refer to the `authors <https://github.com/giotto-learn/giotto-learn/blob/master/CODE_AUTHORS>`_ file
+- Please refer to the `authors <https://github.com/giotto-ai/giotto-tda/blob/master/CODE_AUTHORS>`_ file
 
-Giotto Project Team:
---------------------
+Giotto-tda Project Team:
+------------------------
 
 - Umberto Lupo u.lupo@l2f.ch (Maintainer)
 - Lewis Tunstall l.tunstall@l2f.ch (Maintainer)

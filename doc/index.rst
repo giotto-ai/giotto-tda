@@ -1,22 +1,22 @@
-.. giotto-learn documentation master file, created by
+.. giotto-tda documentation master file, created by
    sphinx-quickstart on Mon Jun  3 11:56:46 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to giotto's API reference!
-==================================
+Welcome to giotto-tda's API reference!
+======================================
 
 
-:mod:`giotto.mapper`: Mapper
-============================
+:mod:`gtda.mapper`: Mapper
+==========================
 
-.. automodule:: giotto.mapper
+.. automodule:: gtda.mapper
    :no-members:
    :no-inherited-members:
 
 Filters
 -------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -28,7 +28,7 @@ Filters
 
 Covers
 -------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -39,7 +39,7 @@ Covers
 
 Clustering
 ----------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -50,7 +50,7 @@ Clustering
 
 Pipeline
 --------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -67,7 +67,7 @@ Pipeline
 
 Visualization
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -78,7 +78,7 @@ Visualization
 
 Utilities
 ---------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -88,14 +88,14 @@ Utilities
    mapper.utils.pipeline.transformer_from_callable_on_rows
 
 
-:mod:`giotto.homology`: Persistent homology
-===========================================
+:mod:`gtda.homology`: Persistent homology
+=========================================
 
-.. automodule:: giotto.homology
+.. automodule:: gtda.homology
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -105,16 +105,16 @@ Utilities
    homology.ConsistentRescaling
 
 
-:mod:`giotto.diagrams`: Persistence diagrams
-============================================
+:mod:`gtda.diagrams`: Persistence diagrams
+==========================================
 
-.. automodule:: giotto.diagrams
+.. automodule:: gtda.diagrams
    :no-members:
    :no-inherited-members:
 
 Preprocessing
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -126,7 +126,7 @@ Preprocessing
 
 Distances
 ---------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -136,7 +136,7 @@ Distances
 
 Diagram features
 ----------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -149,16 +149,16 @@ Diagram features
    diagrams.HeatKernel
 
 
-:mod:`giotto.time_series`: Time series
-======================================
+:mod:`gtda.time_series`: Time series
+====================================
 
-.. automodule:: giotto.time_series
+.. automodule:: gtda.time_series
    :no-members:
    :no-inherited-members:
 
 Preprocessing
 -------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -170,7 +170,7 @@ Preprocessing
 
 Time-delay embedding
 --------------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -180,7 +180,7 @@ Time-delay embedding
 
 Target preparation
 ------------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -190,7 +190,7 @@ Target preparation
 
 Dynamical systems
 -----------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -200,7 +200,7 @@ Dynamical systems
 
 Multivariate
 ------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -209,16 +209,16 @@ Multivariate
    time_series.PearsonDissimilarity
 
 
-:mod:`giotto.graphs`: Graphs
-============================
+:mod:`gtda.graphs`: Graphs
+==========================
 
-.. automodule:: giotto.graphs
+.. automodule:: gtda.graphs
    :no-members:
    :no-inherited-members:
 
 Graph creation
 --------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -229,23 +229,23 @@ Graph creation
 
 Graph processing
 ----------------
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
    :template: class.rst
 
    graphs.GraphGeodesicDistance
-   
 
-:mod:`giotto.base`: Base
-========================
 
-.. automodule:: giotto.base
+:mod:`gtda.base`: Base
+======================
+
+.. automodule:: gtda.base
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -254,14 +254,14 @@ Graph processing
    base.TransformerResamplerMixin
 
 
-:mod:`giotto.pipeline`: Pipeline
-================================
+:mod:`gtda.pipeline`: Pipeline
+==============================
 
-.. automodule:: giotto.pipeline
+.. automodule:: gtda.pipeline
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -276,14 +276,14 @@ Graph processing
    pipeline.make_pipeline
 
 
-:mod:`giotto.meta_transformers`: Convenience pipelines
-======================================================
+:mod:`gtda.meta_transformers`: Convenience pipelines
+====================================================
 
-.. automodule:: giotto.meta_transformers
+.. automodule:: gtda.meta_transformers
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -294,14 +294,14 @@ Graph processing
    meta_transformers.LandscapeGenerator
 
 
-:mod:`giotto.utils`: Validation
-===============================
+:mod:`gtda.utils`: Validation
+=============================
 
-.. automodule:: giotto.utils
+.. automodule:: gtda.utils
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: gtda
 
 .. autosummary::
    :toctree: generated/
@@ -312,16 +312,16 @@ Graph processing
    utils.validate_metric_params
 
 ..
-   :mod:`giotto.images`: Images
-   ============================
+   :mod:`gtda.images`: Images
+   ==========================
 
 ..
-   automodule:: giotto.images
+   automodule:: gtda.images
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: giotto
+   currentmodule:: gtda
 
 ..
    autosummary::
@@ -338,16 +338,16 @@ Graph processing
 
 
 ..
-   :mod:`giotto.manifold`: Manifold learning
-   =========================================
+   :mod:`gtda.manifold`: Manifold learning
+   =======================================
 
 ..
-   automodule:: giotto.manifold
+   automodule:: gtda.manifold
    :no-members:
    :no-inherited-members:
 
 ..
-   currentmodule:: giotto
+   currentmodule:: gtda
 
 ..
    autosummary::

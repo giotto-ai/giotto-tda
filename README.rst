@@ -3,7 +3,7 @@
 
 |Azure|_ |Azure-cov|_ |Azure-test|_ |binder|_
 
-.. |Azure| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-learn?branchName=master
+.. |Azure| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-tda?branchName=master
 .. _Azure: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=2&branchName=master
 
 .. |Azure-cov| image:: https://img.shields.io/badge/Coverage-93%25-passed
@@ -13,14 +13,14 @@
 .. _Azure-test: https://dev.azure.com/maintainers/Giotto/_build/results?buildId=6&view=ms.vss-test-web.build-test-results-tab
 
 .. |binder| image:: https://mybinder.org/badge_logo.svg
-.. _binder: https://mybinder.org/v2/gh/giotto-ai/giotto-learn/master?filepath=examples
+.. _binder: https://mybinder.org/v2/gh/giotto-ai/giotto-tda/master?filepath=examples
 
 
-giotto-learn
-============
+giotto-tda
+==========
 
 
-giotto-learn is a high performance topological machine learning toolbox in Python built on top of
+giotto-tda is a high performance topological machine learning toolbox in Python built on top of
 scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
 
 Website: https://giotto.ai
@@ -29,7 +29,7 @@ Website: https://giotto.ai
 Project genesis
 ---------------
 
-giotto-learn is the result of a collaborative effort between `L2F SA
+giotto-tda is the result of a collaborative effort between `L2F SA
 <https://www.l2f.ch/>`_, the `Laboratory for Topology and Neuroscience
 <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
 <https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
@@ -40,7 +40,7 @@ Installation
 Dependencies
 ~~~~~~~~~~~~
 
-The latest stable version of giotto-learn requires:
+The latest stable version of giotto-tda requires:
 
 - Python (>= 3.5)
 - NumPy (>= 1.17.0)
@@ -61,9 +61,9 @@ To run the examples, jupyter is required.
 User installation
 ~~~~~~~~~~~~~~~~~
 
-The simplest way to install giotto-learn is using ``pip``   ::
+The simplest way to install giotto-tda is using ``pip``   ::
 
-    pip install -U giotto-learn
+    pip install -U giotto-tda
 
 Note: the above may fail on old versions of ``pip``. We recommend upgrading ``pip``
 to a recent version.
@@ -71,9 +71,9 @@ to a recent version.
 Pre-release, experimental builds containing recently added features and/or
 bug fixes can be installed by running   ::
 
-    pip install -U giotto-learn-nightly
+    pip install -U giotto-tda-nightly
 
-The main difference between ``giotto-learn-nightly`` and the developer
+The main difference between ``giotto-tda-nightly`` and the developer
 installation (see below) is that the former is shipped with pre-compiled wheels
 (similarly to the stable release) and hence does not require any C++ dependencies.
 
@@ -87,13 +87,13 @@ Contributing
 
 We welcome new contributors of all experience levels. The Giotto
 community goals are to be helpful, welcoming, and effective. To learn more about
-making a contribution to giotto-learn, please see the `CONTRIBUTING.rst
-<https://github.com/giotto-ai/giotto-learn/blob/master/CONTRIBUTING.rst>`_ file.
+making a contribution to giotto-tda, please see the `CONTRIBUTING.rst
+<https://github.com/giotto-ai/giotto-tda/blob/master/CONTRIBUTING.rst>`_ file.
 
 Developer installation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Installing both the PyPI release and source of giotto-learn in the same environment is not recommended since it is
+Installing both the PyPI release and source of giotto-tda in the same environment is not recommended since it is
 known to cause conflicts with the C++ bindings.
 
 C++ dependencies:
@@ -136,7 +136,7 @@ Source code
 
 You can check the latest sources with the command::
 
-    git clone https://github.com/giotto-ai/giotto-learn.git
+    git clone https://github.com/giotto-ai/giotto-tda.git
 
 
 To install:
@@ -144,7 +144,7 @@ To install:
 
 .. code-block:: bash
 
-   cd giotto-learn
+   cd giotto-tda
    pip install -e ".[tests, doc]"
 
 This way, you can pull the library's latest changes and make them immediately available on your machine.
@@ -162,15 +162,15 @@ source directory::
 Changelog
 ---------
 
-See the `RELEASE.rst <https://github.com/giotto-ai/giotto-learn/blob/master/RELEASE.rst>`__ file
-for a history of notable changes to giotto-learn.
+See the `RELEASE.rst <https://github.com/giotto-ai/giotto-tda/blob/master/RELEASE.rst>`__ file
+for a history of notable changes to giotto-tda.
 
 Important links
 ~~~~~~~~~~~~~~~
 
-- Official source code repo: https://github.com/giotto-ai/giotto-learn
-- Download releases: https://pypi.org/project/giotto-learn/
-- Issue tracker: https://github.com/giotto-ai/giotto-learn/issues
+- Official source code repo: https://github.com/giotto-ai/giotto-tda
+- Download releases: https://pypi.org/project/giotto-tda/
+- Issue tracker: https://github.com/giotto-ai/giotto-tda/issues
 
 Community
 ---------
