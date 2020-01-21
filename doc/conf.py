@@ -36,7 +36,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'numpydoc',
-    # 'sphinx.ext.linkcode', # need to be setup, not sure what it does
+    'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
