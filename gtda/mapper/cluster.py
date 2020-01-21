@@ -396,7 +396,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     def fit(self, X, y=None):
         """Fit the agglomerative clustering from features or distance matrix.
 
-        The stopping rule is used to determine :attr:`n_clusters_``, and the
+        The stopping rule is used to determine :attr:`n_clusters_`, and the
         full dendrogram is cut there to compute :attr:`labels_`.
 
         Parameters
@@ -519,7 +519,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     def fit(self, X, y=None):
         """Fit the agglomerative clustering from features or distance matrix.
 
-        The stopping rule is used to determine :attr:`n_clusters_``, and the
+        The stopping rule is used to determine :attr:`n_clusters_`, and the
         full dendrogram is cut there to compute :attr:`labels_`.
 
         Parameters
