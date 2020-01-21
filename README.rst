@@ -156,7 +156,7 @@ Testing
 After installation, you can launch the test suite from outside the
 source directory::
 
-    pytest giotto
+    pytest gtda
 
 
 Changelog
