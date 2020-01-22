@@ -82,8 +82,8 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'kind': ['uniform', 'balanced'],
-                        'n_intervals': [int],
+    _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
+                        'n_intervals': [int, (1, np.inf)],
                         'overlap_frac': [float, (0, 1)]}
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
@@ -362,8 +362,8 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'kind': ['uniform', 'balanced'],
-                        'n_intervals': [int],
+    _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
+                        'n_intervals': [int, (1, np.inf)],
                         'overlap_frac': [float, (0, 1)]}
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
