@@ -1,11 +1,6 @@
 import numpy as np
 
 
-def _validate_kind(kind):
-    if kind not in ['uniform', 'balanced']:
-        raise ValueError("'kind' must be one of 'uniform' or 'balanced'")
-
-
 def _check_has_one_column(X):
     if X.shape[1] > 1:
         raise ValueError("X cannot have more than one column.")

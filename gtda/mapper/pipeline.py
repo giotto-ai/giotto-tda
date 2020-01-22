@@ -154,14 +154,15 @@ def make_mapper_pipeline(scaler=None,
     """Construct a MapperPipeline object according to the specified Mapper
     steps. [1]_
 
-    All steps may be arbitrary scikit-learn Pipeline objects. The scaling
-    and cover steps must be transformers implementing a ``fit_transform``
-    method. The filter function step may be a transformer implementing a
-    ``fit_transform``, or a callable acting on one-dimensional arrays -- in
-    the latter case, a transformer is internally created whose
-    ``fit_transform`` applies this callable independently on each row of the
-    data. The clustering step need only implement a ``fit`` method storing
-    clustering labels.
+    The role of this function's key parameters is illustrated in `this diagram
+    <https://docs.giotto.ai/mapper_pipeline.svg>`_. All computational steps
+    may be arbitrary scikit-learn Pipeline objects. The scaling and cover
+    steps must be transformers implementing a ``fit_transform`` method. The
+    filter function step may be a transformer implementing a ``fit_transform``,
+    or a callable acting on one-dimensional arrays -- in the latter case,
+    a transformer is internally created whose ``fit_transform`` applies this
+    callable independently on each row of the data. The clustering step need
+    only implement a ``fit`` method storing clustering labels.
 
     Parameters
     ----------
