@@ -68,7 +68,7 @@ The simplest way to install giotto-tda is using ``pip``   ::
 Note: the above may fail on old versions of ``pip``. We recommend upgrading ``pip``
 to a recent version.
 
-Pre-release, experimental builds containing recently added features and/or
+Pre-release, experimental builds containing recently added features, and/or
 bug fixes can be installed by running   ::
 
     pip install -U giotto-tda-nightly
