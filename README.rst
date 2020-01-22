@@ -3,7 +3,7 @@
 
 |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow| |Slack-join|
 
-.. |Azure-build| image:: https://img.shields.io/azure-devops/build/maintainers/f3825528-0a61-43d7-87c2-e296dd6abb14/6/master
+.. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-tda?branchName=master
 .. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build?definitionId=6&_a=summary&repositoryFilter=6&branchFilter=141&requestedForFilter=ae4334d8-48e3-4663-af95-cb6c654474ea
 
 .. |Azure-cov| image:: https://img.shields.io/azure-devops/coverage/maintainers/Giotto/6/master
@@ -13,10 +13,10 @@
 .. _Azure-test:
 
 .. |Twitter-follow| image:: https://img.shields.io/twitter/follow/giotto_ai?label=Follow%20%40giotto_ai&style=social
-.. _Twitter-follow:
+.. _Twitter-follow: https://twitter.com/intent/follow?screen_name=giotto_ai
 
 .. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-yellow?url=<https://slack.giotto.ai/>?style=social&logo=appveyor
-.. _Slack-join:
+.. _Slack-join: https://slack.giotto.ai/
 
 giotto-tda
 ==========
