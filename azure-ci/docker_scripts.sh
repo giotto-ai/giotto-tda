@@ -5,14 +5,13 @@ set -x
 # upgrading pip and setuptools
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH=${PYTHON_PATH}/bin:${PATH}
-pip install --upgrade pip setuptools
+pip install --upgrade pip==19.3.1 setuptools
 
 # installing cmake
 pip install cmake
 
 # install dependencies for python-igraph
 yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
-pip install python-igraph
 
 # installing boost
 yum install -y wget tar
