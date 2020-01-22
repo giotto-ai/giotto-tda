@@ -13,9 +13,9 @@
 .. _Azure-test:
 
 .. |Twitter-follow| image:: https://img.shields.io/twitter/follow/giotto_ai?label=Follow%20%40giotto_ai&style=social
-.. _Twitter-follow: https://twitter.com/intent/follow?screen_name=giotto_ai
+.. _Twitter-follow: https://img.shields.io/twitter/follow/giotto_ai?label=Follow%20%40giotto_ai&style=social
 
-.. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-yellow?url=<https://slack.giotto.ai/>?style=social&logo=appveyor
+.. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-yellow
 .. _Slack-join: https://slack.giotto.ai/
 
 giotto-tda
