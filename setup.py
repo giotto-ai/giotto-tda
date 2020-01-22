@@ -125,7 +125,6 @@ class CMakeBuild(build_ext):
             return 0
         os.mkdir(dir_pybind11)
         subprocess.check_call(['git', 'clone',
-                               '--single-branch', '--branch', 'v2.4',
                                'https://github.com/pybind/pybind11.git',
                                dir_pybind11])
         os.chdir(dir_pybind11)
