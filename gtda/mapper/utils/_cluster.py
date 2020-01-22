@@ -28,7 +28,7 @@ def _num_clusters_histogram(distances, freq_threshold, n_bins_start, max_frac):
         max_num_clust = np.ceil(max_frac * distances.size)
         over_max_num = True
         while over_max_num:
-            while (not zero_bins) and (not under_max_num):
+            while (not zero_bins) and over_max_num:
                 hist, edges = np.histogram(distances, bins=n_bins_start + i)
                 zero_bins_indices = threshold_func(hist)
                 zero_bins = zero_bins_indices.size
