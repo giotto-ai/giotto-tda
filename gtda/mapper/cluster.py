@@ -1,7 +1,6 @@
 """Clustering methods and classes for parallelised clustering."""
 # License: GNU AGPLv3
 
-import numbers
 from inspect import signature
 
 import numpy as np
@@ -543,7 +542,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     """
 
-    _hyperparameters = {'freq_threshold': [numbers.Number, (0, np.inf)],
+    _hyperparameters = {'freq_threshold': [int, (0, np.inf)],
                         'max_fraction': [float, (0, 1)],
                         'n_bins_start': [int, (1, np.inf)]}
 
