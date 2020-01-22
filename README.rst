@@ -6,13 +6,13 @@
 .. |Azure-build| image:: https://img.shields.io/azure-devops/build/maintainers/f3825528-0a61-43d7-87c2-e296dd6abb14/6/master
 .. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build?definitionId=6&_a=summary&repositoryFilter=6&branchFilter=141&requestedForFilter=ae4334d8-48e3-4663-af95-cb6c654474ea
 
-.. |Azure-cov| image:: https://img.shields.io/azure-devops/coverage/maintainers/Giotto/6/master   :alt: Azure DevOps coverage (master)
+.. |Azure-cov| image:: https://img.shields.io/azure-devops/coverage/maintainers/Giotto/6/master
 .. _Azure-cov: 
 
-.. |Azure-test| image:: https://img.shields.io/azure-devops/tests/maintainers/Giotto/6/master   :alt: Azure DevOps tests (master)
+.. |Azure-test| image:: https://img.shields.io/azure-devops/tests/maintainers/Giotto/6/master
 .. _Azure-test:
 
-.. |Twitter-follow| image:: https://img.shields.io/twitter/follow/giotto_ai?label=Follow%20%40giotto_ai&style=social   :alt: Twitter Follow
+.. |Twitter-follow| image:: https://img.shields.io/twitter/follow/giotto_ai?label=Follow%20%40giotto_ai&style=social
 .. _Twitter-follow:
 
 .. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-yellow?url=<https://slack.giotto.ai/>?style=social&logo=appveyor
