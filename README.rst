@@ -1,10 +1,10 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width: 850
 
-|Azure|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow| |Slack-join|
+|Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow| |Slack-join|
 
-.. |Azure| image:: https://img.shields.io/azure-devops/build/maintainers/Giotto/6/master   :alt: Azure DevOps builds (master)
-.. _Azure:
+.. |Azure-build| image:: https://img.shields.io/azure-devops/build/maintainers/f3825528-0a61-43d7-87c2-e296dd6abb14/6/master   :alt: Azure DevOps builds (master)
+.. _Azure-build:
 
 .. |Azure-cov| image:: https://img.shields.io/azure-devops/coverage/maintainers/Giotto/6/master   :alt: Azure DevOps coverage (master)
 .. _Azure-cov: 
