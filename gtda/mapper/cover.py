@@ -12,9 +12,9 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from .utils._cover import (_check_has_one_column,
-                           _remove_empty_and_duplicate_intervals,
-                           _validate_kind)
+                           _remove_empty_and_duplicate_intervals)
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
@@ -82,6 +82,10 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     """
 
+    _hyperparameters = {'kind': ['uniform', 'balanced'],
+                        'n_intervals': [int],
+                        'overlap_frac': [float, (0, 1)]}
+
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
@@ -125,9 +129,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        # TODO: Extend validation to n_intervals and overlap_frac,
-        #  using validate_params
-        _validate_kind(self.kind)
+        validate_params(self.get_params(), self._hyperparameters)
         X = check_array(X, ensure_2d=False)
         if X.ndim == 2:
             _check_has_one_column(X)
@@ -224,7 +226,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             or duplicated cover sets are removed.
 
         """
-        _validate_kind(self.kind)
+        validate_params(self.get_params(), self._hyperparameters)
         X = check_array(X, ensure_2d=False)
         if X.ndim == 2:
             _check_has_one_column(X)
@@ -360,6 +362,10 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
     """
 
+    _hyperparameters = {'kind': ['uniform', 'balanced'],
+                        'n_intervals': [int],
+                        'overlap_frac': [float, (0, 1)]}
+
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
@@ -415,7 +421,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        _validate_kind(self.kind)
+        validate_params(self.get_params(), self._hyperparameters)
         # reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
@@ -496,8 +502,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             n_features` as empty or duplicated cover sets are removed.
 
         """
-        _validate_kind(self.kind)
-
+        validate_params(self.get_params(), self._hyperparameters)
         # reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
