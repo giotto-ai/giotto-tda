@@ -325,7 +325,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     value in the full dendrogram. If possible, the dendrogram is cut at the
     first occurrence of a gap, between the linkage values of successive merges,
     which exceeds this threshold. Otherwise, a single cluster is returned. The
-    algorithm can partially overridden to ensure that the final number of
+    algorithm can be partially overridden to ensure that the final number of
     clusters does not exceed a certain threshold, by passing a parameter
     `max_fraction`.
 
@@ -335,7 +335,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         The fraction of the largest linkage in the dendrogram to be used as
         a threshold for determining a large enough gap.
 
-    max_fraction : int or None, optional, default: ``None``
+    max_fraction : float or None, optional, default: ``None``
         When not ``None``, the algorithm is constrained to produce no more
         than ``max_fraction * (n_samples - 1)`` clusters, even if a
         candidate gap is observed in the iterative process which would produce
@@ -462,8 +462,8 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     linkage at which the tree is to be cut is the first one after which a
     bin of height no greater than f (i.e. a "gap") is observed; 3) if no gap is
     observed, increase k and repeat 1) and 2) until termination. The algorithm
-    can partially overridden to ensure that the final number of clusters does
-    not exceed a certain threshold, by passing a parameter `max_fraction`.
+    can be partially overridden to ensure that the final number of clusters
+    does not exceed a certain threshold, by passing a parameter `max_fraction`.
 
     Parameters
     ----------
@@ -471,7 +471,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         The frequency threshold for declaring that a gap in the histogram of
         merges is present.
 
-    max_fraction : int or None, optional, default: ``None``
+    max_fraction : float or None, optional, default: ``None``
         When not ``None``, the algorithm is constrained to produce no more
         than ``max_fraction * (n_samples - 1)`` clusters, even if a
         candidate gap is observed in the iterative process which would produce
