@@ -1,7 +1,7 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width: 850
 
-|Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow| |Slack-join|
+|Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
 
 .. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-tda?branchName=master
 .. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build?definitionId=6&_a=summary&repositoryFilter=6&branchFilter=141&requestedForFilter=ae4334d8-48e3-4663-af95-cb6c654474ea
