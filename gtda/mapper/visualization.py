@@ -24,7 +24,7 @@ def plot_static_mapper_graph(
 
     Parameters
     ----------
-    pipeline : :class:`MapperPipeline` object
+    pipeline : :class:`~giotto.mapper.pipeline.MapperPipeline` object
         Mapper pipeline to act on to data.
 
     data : array-like of shape (n_samples, n_features)
@@ -76,7 +76,7 @@ def plot_static_mapper_graph(
 
     Returns
     -------
-    fig : :class:`ploty.graph_objs.Figure` object
+    fig : :class:`plotly.graph_objects.Figure` object
         Figure representing the Mapper graph with appropriate node colouring
         and size.
 
@@ -168,11 +168,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   node_color_statistic=np.mean,
                                   color_by_columns_dropdown=False,
                                   plotly_kwargs=None):
-    """Plotting function for Mapper graphs with interactivity.
+    """Plotting function for interactive Mapper graphs.
 
     Parameters
     ----------
-    pipeline : :class:`MapperPipeline` object
+    pipeline : :class:`~giotto.mapper.pipeline.MapperPipeline` object
         Mapper pipeline to act on to data.
 
     data : array-like of shape (n_samples, n_features)
