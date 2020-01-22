@@ -1,4 +1,5 @@
 from functools import partial
+from math import ceil
 
 import numpy as np
 
@@ -25,7 +26,7 @@ def _num_clusters_histogram(distances, freq_threshold, n_bins_start, max_frac):
         gap_idx = (distances <= left_bin_edge_first_gap).sum()
         num_clust = distances.size + 1 - gap_idx
     else:
-        max_num_clust = np.ceil(max_frac * distances.size)
+        max_num_clust = ceil(max_frac * distances.size)
         over_max_num = True
         while over_max_num:
             while (not zero_bins) and over_max_num:
@@ -62,7 +63,7 @@ def _num_clusters_simple(distances, min_gap_size, max_frac):
         num_clust = distances.size + 1 - gap_indices[0]
         if max_frac is None:
             return num_clust
-        max_num_clust = np.ceil(max_frac * distances.size)
+        max_num_clust = ceil(max_frac * distances.size)
         num_clust = num_clust if num_clust <= max_num_clust else max_num_clust
         return num_clust
     # No big enough gaps -> one cluster
