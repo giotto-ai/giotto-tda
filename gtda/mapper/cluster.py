@@ -428,7 +428,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         self
 
         """
-        _max_fraction = 1 if self.max_fraction is None else self.max_fraction
+        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
         validate_params({'relative_gap_size': self.relative_gap_size,
                          'max_fraction': _max_fraction},
                         self._hyperparameters)
@@ -545,7 +545,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     _hyperparameters = {'freq_threshold': [numbers.Number, (0, np.inf)],
                         'max_fraction': [float, (0, 1)],
-                        'n_bins_start': [int]}
+                        'n_bins_start': [int, (1, np.inf)]}
 
     def __init__(self, freq_threshold=0, max_fraction=None, n_bins_start=5,
                  affinity='euclidean', memory=None, linkage='single'):
@@ -576,7 +576,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         self
 
         """
-        _max_fraction = 1 if self.max_fraction is None else self.max_fraction
+        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
         validate_params({'freq_threshold': self.freq_threshold,
                          'max_fraction': _max_fraction,
                          'n_bins_start': self.n_bins_start},
