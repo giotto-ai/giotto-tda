@@ -5,14 +5,13 @@ set -x
 # upgrading pip and setuptools
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH=${PYTHON_PATH}/bin:${PATH}
-pip install --upgrade pip setuptools
+pip install --upgrade pip==19.3.1 setuptools
 
 # installing cmake
 pip install cmake
 
 # install dependencies for python-igraph
 yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
-pip install python-igraph
 
 # installing boost
 yum install -y wget tar
@@ -28,10 +27,10 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# installing and uninstalling giotto-learn
+# installing and uninstalling giotto-tda
 cd /io
 pip install -e ".[doc, tests]"
-pip uninstall -y giotto-learn
+pip uninstall -y giotto-tda
 
 # testing, linting
 pytest --cov . --cov-report xml
