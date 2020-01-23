@@ -31,6 +31,8 @@ signal_embedded_search = np.array([[2., 2.47942554],
                                    [2.79848711, 2.41211849],
                                    [2.41211849, 1.92484888]])
 
+y = np.arange(signal.shape[0])
+
 signal_embedded_fixed = \
     np.array([[2., 2.47942554, 2.84147098, 2.99749499, 2.90929743],
               [2.47942554, 2.84147098, 2.99749499, 2.90929743, 2.59847214],
@@ -72,7 +74,27 @@ def test_embedder_transform(parameters_type, expected):
     assert_almost_equal(embedder.fit_transform(signal), expected)
 
 
+def test_embedder_resample():
+    embedder = TakensEmbedding(time_delay=4, dimension=5, stride=3)
+    embedder = embedder.fit(signal)
+    y_resampled = embedder.resample(y)
+    assert_almost_equal(y_resampled, y[np.arange(4,20,3)])
+
+
 def test_window_params():
-    window = SlidingWindow(width=0)
+    embedder = SlidingWindow(width=0)
     with pytest.raises(ValueError):
-        window.fit(signal)
+        embedder.fit(signal)
+
+
+def test_window_transform():
+    embedder = SlidingWindow(width=3, stride=2)
+    x_windows = embedder.fit_transform(signal_embedded_search)
+    assert (x_windows.shape == (8,4,2))
+
+
+def test_window_resample():
+    embedder = SlidingWindow(width=3, stride=2)
+    embedder = embedder.fit(signal_embedded_search)
+    y_resampled = embedder.resample(y)
+    assert_almost_equal(y_resampled, y[np.arange(3,20,2)])
