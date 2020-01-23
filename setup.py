@@ -11,6 +11,8 @@ import subprocess
 from distutils.version import LooseVersion
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install
+from subprocess import getoutput
 
 
 version_file = os.path.join('gtda', '_version.py')
@@ -66,8 +68,6 @@ if is_system_win:
         '-learn/windows-binaries/python-igraph/python_igraph-' \
         '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
         format(python_ver_1, python_ver_2)
-    INSTALL_REQUIRES.append('pycairo @ {}'.format(pycairo_whl_url))
-    INSTALL_REQUIRES.append('python-igraph @ {}'.format(igraph_whl_url))
 else:
     INSTALL_REQUIRES.append('python-igraph')
 EXTRAS_REQUIRE = {
@@ -90,6 +90,14 @@ EXTRAS_REQUIRE = {
         'matplotlib',
         'plotly']
 }
+
+
+class IGraphInstall(install):
+    def run(self):
+        if is_system_win:
+            install.run(self)
+            print(getoutput('pip install {0} {1}'.format(
+                pycairo_whl_url, igraph_whl_url)))
 
 
 class CMakeExtension(Extension):
@@ -197,4 +205,4 @@ setup(name=DISTNAME,
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
       ext_modules=[CMakeExtension('gtda')],
-      cmdclass=dict(build_ext=CMakeBuild))
+      cmdclass=dict(install=IGraphInstall, build_ext=CMakeBuild))
