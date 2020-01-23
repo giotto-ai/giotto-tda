@@ -19,17 +19,12 @@ examples/.ipynb_checkpoints
 *.pqt
 data/*
 
-# Examples
-examples/*
-!examples/README.rst
-!examples/Lorenz_Attractor.ipynb
-
 # Built docs
 doc/build
 doc/generated
 
 # Pybind11
-giotto/externals/pybind11
+gtda/externals/pybind11
 
 # Output files
 *.out
@@ -37,4 +32,12 @@ giotto/externals/pybind11
 # External
 *.DS_Store
 .idea/*
+.vscode/*
 *~
+
+# Unit test
+.pytest_cache/
+.hypothesis/
+
+# development
+gtda/mapper/scratch/*

@@ -1,4 +1,4 @@
-# these jobs are triggered automatically and they test the code and the examples.
+# These jobs are triggered automatically and they test the code and the examples.
 
 jobs:
 - job: 'test_ubuntu1604'
@@ -13,6 +13,8 @@ jobs:
         python.version: '3.6'
       Python37:
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   steps:
   - task: UsePythonVersion@0
@@ -28,10 +30,10 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      pytest --cov gtda --cov-report xml
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
@@ -47,6 +49,8 @@ jobs:
         python.version: '3.6'
       Python37:
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   steps:
   - task: UsePythonVersion@0
@@ -57,7 +61,7 @@ jobs:
       brew update
       brew install boost
       brew install gcc
-    displayName: 'install boost and gcc'
+    displayName: 'Install boost and gcc'
 
   - script: |
       python -m pip install --upgrade pip setuptools
@@ -68,10 +72,10 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      pytest --cov gtda --cov-report xml
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
 
@@ -82,11 +86,17 @@ jobs:
   strategy:
     matrix:
       Python35:
+        python_ver: '35'
         python.version: '3.5'
       Python36:
+        python_ver: '36'
         python.version: '3.6'
       Python37:
+        python_ver: '37'
         python.version: '3.7'
+      Python38:
+        python_ver: '38'
+        python.version: '3.8'
 
   steps:
   - task: UsePythonVersion@0
@@ -102,12 +112,12 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      pytest --cov gtda --cov-report xml
+      flake8
     displayName: 'Test with pytest, nbconvert and flake8'
-    
+
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
@@ -131,30 +141,42 @@ jobs:
         plat: manylinux2010_x86_64
         python_ver: '37'
         python.version: '3.7'
+      Python38:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '38'
+        python.version: '3.8'
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
 
+  - bash: |
+      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'change name to giotto-tda-nightly'
+
   - task: Bash@3
     inputs:
-      filePath: azure-ci/build_manylinux2010.sh
+      filePath: .azure-ci/build_manylinux2010.sh
       failOnStderr: false
     env:
       python_ver: $(python_ver)
-    displayName: 'Run the docker and open bash' 
- 
+    displayName: 'Run the docker and open bash'
+
   - script: |
       python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8
-    displayName: 'install pytest suite'
-    
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
+    displayName: 'Install pytest suite'
+
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
-    displayName: 'install and test the wheels'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    displayName: 'Install and test the wheels'
 
   - task: CopyFiles@2
     displayName: 'copy files'
@@ -167,6 +189,13 @@ jobs:
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
+
+  - bash: |
+      pip install twine
+      for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
+      twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Upload wheels to PyPI'
 
 
 - job: 'macOS1014'
@@ -181,11 +210,22 @@ jobs:
         python.version: '3.6'
       Python37:
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+
+  - bash: |
+      sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      rm setup.py.bak
+      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
+      rm gtda/_version.py.bak
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'change name to giotto-tda-nightly'
 
   - script: |
       brew update
@@ -202,20 +242,30 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn
-      pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      pip uninstall -y giotto-tda
+      pytest --cov gtda --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'false')
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+  - script: |
+      pip install openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-tda-nightly
+      pytest --cov gtda --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'true')
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
-    
+
   - script: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - script: |
@@ -223,7 +273,7 @@ jobs:
       make html
       cd ..
     displayName: 'Build sphinx doc'
-    
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: doc/build
@@ -246,6 +296,10 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
+  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Upload wheels to PyPI'
+
 
 - job: 'win2016'
   condition: eq(variables['build_check'], 'true')
@@ -254,16 +308,29 @@ jobs:
   strategy:
     matrix:
       Python35:
+        python_ver: '35'
         python.version: '3.5'
       Python36:
+        python_ver: '36'
         python.version: '3.6'
       Python37:
+        python_ver: '37'
         python.version: '3.7'
+      Python38:
+        python_ver: '38'
+        python.version: '3.8'
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+
+  - bash: |
+      sed -i "s/'giotto-tda'/'giotto-tda'/1" setup.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'change name to giotto-tda-nightly'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -274,22 +341,32 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install plotly matplotlib openml
+      pip install openml
       jupyter nbconvert --to notebook --execute examples/*.ipynb
-      pip uninstall -y giotto-learn
-      pytest --cov giotto --cov-report xml
-      flake8 --exit-zero
+      pip uninstall -y giotto-tda
+      pytest --cov gtda --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'false')
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+  - script: |
+      pip install openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-tda-nightly
+      pytest --cov gtda --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'true')
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
-    
+
   - bash: |
       pip install dist/*.whl
       cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml --ignore-glob='*externals*'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     displayName: 'install and test the wheels'
 
   - task: CopyFiles@2
@@ -303,3 +380,7 @@ jobs:
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
+
+  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Upload wheels to PyPI'
