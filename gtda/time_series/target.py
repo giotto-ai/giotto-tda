@@ -75,7 +75,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     _hyperparameters = {
         'func': [types.FunctionType],
-        '_percentiles': [list, [numbers.Number, (0., 1.)]],
+        '_percentiles': [list, [numbers.Number, (0., 100.)]],
         'n_steps_future': [int, [1, np.inf]]}
 
     def __init__(self, width=10, func=np.std,
