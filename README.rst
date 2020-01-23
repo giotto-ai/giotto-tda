@@ -3,7 +3,7 @@
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
 
-.. |Version| .. image:: https://img.shields.io/pypi/v/giotto-tda
+.. |Version| image:: https://img.shields.io/pypi/v/giotto-tda
 .. _Version:
 
 .. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-tda?branchName=master
