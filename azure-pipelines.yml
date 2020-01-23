@@ -108,7 +108,13 @@ jobs:
       pip install wheel twine
     displayName: 'Install tools'
 
-  - script: pip install -e ".[tests, doc]"
+  - bash: |
+      igraphDependencies=`python .azure-ci\python-igraph_dependencies_win.py python_ver`
+      pip install $igraphDepencencies
+    displayName: 'Install pycairo and python-igraph'
+
+  - script: |
+      pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
@@ -118,7 +124,8 @@ jobs:
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
 
-# these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
+
+# These jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
   condition: eq(variables['build_check'], 'true')
@@ -157,7 +164,7 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-tda-nightly'
+    displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
     inputs:
@@ -179,13 +186,13 @@ jobs:
     displayName: 'Install and test the wheels'
 
   - task: CopyFiles@2
-    displayName: 'copy files'
+    displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
+    displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
@@ -225,13 +232,13 @@ jobs:
       cat gtda/_version.py
       rm gtda/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-tda-nightly'
+    displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
       brew update
       brew install boost
       brew install gcc
-    displayName: 'install boost and gcc'
+    displayName: 'Install boost and gcc'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
@@ -260,13 +267,13 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: python setup.py sdist bdist_wheel
-    displayName: 'build the wheels'
+    displayName: 'Build the wheels'
 
   - script: |
       pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    displayName: 'install and test the wheels'
+    displayName: 'Install and test the wheels'
 
   - script: |
       cd doc/
@@ -282,16 +289,16 @@ jobs:
       tarCompression: 'gz'
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       replaceExistingArchive: true
-    displayName: 'archive doc'
+    displayName: 'Archive doc'
 
   - task: CopyFiles@2
-    displayName: 'copy files'
+    displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
+    displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
@@ -330,10 +337,15 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'change name to giotto-tda-nightly'
+    displayName: 'Change name to giotto-tda-nightly'
 
   - script: python -m pip install --upgrade pip setuptools
     displayName: 'Install tools'
+
+  - bash: |
+      igraphDependencies=`python .azure-ci\python-igraph_dependencies_win.py python_ver`
+      pip install $igraphDepencencies
+    displayName: 'Install pycairo and python-igraph'
 
   - script: |
       pip install -e ".[tests, doc]"
@@ -361,22 +373,22 @@ jobs:
   - bash: |
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
-    displayName: 'build the wheels'
+    displayName: 'Build the wheels'
 
   - bash: |
       pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    displayName: 'install and test the wheels'
+    displayName: 'Install and test the wheels'
 
   - task: CopyFiles@2
-    displayName: 'copy files'
+    displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
+    displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
