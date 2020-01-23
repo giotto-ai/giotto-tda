@@ -29,7 +29,7 @@ MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-tda'
 LICENSE = 'GNU AGPLv3'
-DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.1.3'
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.1.4'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
@@ -44,7 +44,8 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Operating System :: MacOS',
                'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
-               'Programming Language :: Python :: 3.7']
+               'Programming Language :: Python :: 3.7',
+               'Programming Language :: Python :: 3.8']
 KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
     'homology, persistence diagrams, Mapper'
 INSTALL_REQUIRES = requirements

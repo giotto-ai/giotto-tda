@@ -1,4 +1,4 @@
-# these jobs are triggered automatically and they test the code and the examples.
+# These jobs are triggered automatically and they test the code and the examples.
 
 jobs:
 - job: 'test_ubuntu1604'

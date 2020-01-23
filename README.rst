@@ -10,7 +10,7 @@
 .. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build?definitionId=6&_a=summary&repositoryFilter=6&branchFilter=141&requestedForFilter=ae4334d8-48e3-4663-af95-cb6c654474ea
 
 .. |Azure-cov| image:: https://img.shields.io/azure-devops/coverage/maintainers/Giotto/6/master
-.. _Azure-cov: 
+.. _Azure-cov:
 
 .. |Azure-test| image:: https://img.shields.io/azure-devops/tests/maintainers/Giotto/6/master
 .. _Azure-test:
@@ -23,7 +23,6 @@
 
 giotto-tda
 ==========
-
 
 giotto-tda is a high performance topological machine learning toolbox in Python built on top of
 scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
