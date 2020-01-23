@@ -1,7 +1,10 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width: 850
 
-|Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
+|Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
+
+.. |Version| image:: https://img.shields.io/pypi/v/giotto-tda
+.. _Version:
 
 .. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-tda?branchName=master
 .. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build?definitionId=6&_a=summary&repositoryFilter=6&branchFilter=141&requestedForFilter=ae4334d8-48e3-4663-af95-cb6c654474ea
@@ -25,9 +28,6 @@ giotto-tda
 giotto-tda is a high performance topological machine learning toolbox in Python built on top of
 scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
 
-Website: https://giotto.ai
-
-
 Project genesis
 ---------------
 
@@ -35,6 +35,22 @@ giotto-tda is the result of a collaborative effort between `L2F SA
 <https://www.l2f.ch/>`_, the `Laboratory for Topology and Neuroscience
 <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
 <https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
+
+Documentation
+-------------
+
+- API reference (stable release): https://docs-tda.giotto.ai
+- Theory glossary: https://giotto.ai/theory
+
+Getting started
+---------------
+
+To get started with giotto-tda, first follow the installations steps below. `This blog post <https://towardsdatascience.com/getting-started-with-giotto-learn-a-python-library-for-topological-machine-learning-451d88d2c4bc>`_, and references therein, offer a friendly introduction to the topic of topological machine learning and to the philosophy behind giotto-tda.
+
+Tutorials and use cases
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Simple tutorials can be found in the `examples <https://github.com/giotto-ai/giotto-tda/tree/master/examples>`_ folder. For a wide selection of use cases and application domains, you can visit `this page <https://giotto.ai/learn/course-content>`_.
 
 Installation
 ------------
@@ -74,11 +90,6 @@ bug fixes can be installed by running   ::
 The main difference between ``giotto-tda-nightly`` and the developer
 installation (see below) is that the former is shipped with pre-compiled wheels
 (similarly to the stable release) and hence does not require any C++ dependencies.
-
-Documentation
--------------
-
-- HTML documentation (stable release): https://docs.giotto.ai
 
 Contributing
 ------------
