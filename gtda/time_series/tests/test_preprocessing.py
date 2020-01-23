@@ -44,6 +44,15 @@ def test_resampler_transform(period, expected):
     assert_almost_equal(resampler.fit_transform(signal_array), expected)
 
 
+@pytest.mark.parametrize("period, expected",
+                         [(2, signal_resampled_2),
+                          (4, signal_resampled_4)])
+def test_resampler_resample(period, expected):
+    resampler = Resampler(period=period)
+    _ = resampler.fit_transform(signal_array)
+    assert_almost_equal(resampler.resample(signal_array), expected)
+
+
 signal = signal_array.reshape(-1, 1)
 
 signal_stationarized_return = np.array(
@@ -109,3 +118,12 @@ def test_stationarizer_transform(operation, expected):
     stationarizer = Stationarizer(operation=operation)
 
     assert_almost_equal(stationarizer.fit_transform(signal), expected)
+
+
+@pytest.mark.parametrize("operation, expected",
+                         [('return', signal_stationarized_return)])
+def test_stationarizer_resample(operation, expected):
+    stationarizer = Stationarizer(operation=operation)
+    signal_1d = signal.reshape(-1)
+    _ = stationarizer.fit_transform(signal_1d)
+    assert_almost_equal(stationarizer.resample(signal_1d), signal_1d[1:])
