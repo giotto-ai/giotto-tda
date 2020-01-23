@@ -334,7 +334,7 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
-      sed -i "s/'giotto-tda'/'giotto-tda'/1" setup.py
+      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
