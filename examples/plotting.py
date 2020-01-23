@@ -1,11 +1,11 @@
 """Plot functions """
+# License: GNU AGPLv3
 
 import numpy as np
 import plotly.graph_objs as gobj
-from giotto.diagrams._utils import _subdiagrams
+from gtda.diagrams._utils import _subdiagrams
 
 import matplotlib.pyplot as plt
-import networkx as nx
 
 
 def plot_point_cloud(point_cloud, dimension=None):
@@ -15,7 +15,7 @@ def plot_point_cloud(point_cloud, dimension=None):
 
     Parameters
     ----------
-    point_cloud : ndarray, shape (n_samples, n_dimensions)
+    point_cloud : ndarray of shape (n_samples, n_dimensions)
         Data points to be represented in a 2D or 3D scatter plot. Only the
         first 2 or 3 dimensions will be considered for plotting.
 
@@ -124,7 +124,7 @@ def plot_diagram(diagram, homology_dimensions=None):
 
     Parameters
     ----------
-    diagram : ndarray, shape (n_points, 3)
+    diagram : ndarray of shape (n_points, 3)
         The persistence diagram to plot, where the third dimension along axis 1
         contains homology dimensions, and the other two contain (birth, death)
         pairs to be used as coordinates in the two-dimensional plot.
@@ -201,7 +201,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
 
     Parameters
     ----------
-    landscapes : ndarray, shape (n_homology_dimension, n_layers, n_values)
+    landscapes : ndarray of shape (n_homology_dimension, n_layers, n_values)
         Collection of ``n_homology_dimension`` discretised persistence
         landscapes. Each landscape contains ``n_layers`` layers. Entry i along
         axis 0 should be the persistence landscape in homology dimension i.
@@ -210,7 +210,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray, shape (n_homology_dimension, n_layers, n_values), \
+    samplings : ndarray of shape (n_homology_dimension, n_layers, n_values), \
                 default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `landscapes` on
@@ -272,7 +272,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
         
     Parameters
     ----------
-    betti_curves : ndarray, shape (n_homology_dimension, n_values)
+    betti_curves : ndarray of shape (n_homology_dimension, n_values)
         Collection of ``n_homology_dimension`` discretised Betti curves.
         Entry i along axis 0 should be the Betti curve in homology dimension i.
 
@@ -280,7 +280,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray, shape (n_homology_dimension, n_values), \
+    samplings : ndarray of shape (n_homology_dimension, n_values), \
                 default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on
@@ -339,7 +339,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
 
     Parameters
     ----------
-    betti_curves : ndarray, shape (n_samples, n_homology_dimensions, \
+    betti_curves : ndarray of shape (n_samples, n_homology_dimensions, \
                    n_values)
         ``n_samples`` collections of discretised Betti curves. There are
         ``n_homology_dimension`` curves in each collection. Index i along axis
@@ -349,7 +349,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         Homology dimensions for which the Betti surfaces should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray, shape (n_homology_dimension, n_values), \
+    samplings : ndarray of shape (n_homology_dimension, n_values), \
                 default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on the
@@ -394,57 +394,3 @@ def plot_betti_surfaces(betti_curves, samplings=None,
                                        connectgaps=True, hoverinfo='none'))
             
             fig.show()
-
-def plot_entropies(entropies, s_list):
-
-    """
-    Utility function to plot entropies as a function of time steps
-    """
-
-    fig1 = plt.figure(figsize=(7,4))
-    a1 = fig1.add_subplot(111)
-    colors = ['blue', 'red', 'black', 'yellow', 'orange', 'green', 'grey',
-              'brown']
-
-    for i in s_list:
-        # plot entropies Vs temporal indexes
-        hs1 = entropies[:, i]
-        a1.plot(hs1, label="simplex " + str(i), color=colors[i % len(colors)])
-
-    plt.xticks()
-    a1.set_title('Entropy profiles of different simplices')
-    a1.legend()
-
-    return
-
-
-def plot_network_diffusion(G, pos, node_vector=None, edge_vector=None,
-                           node_labels=False, edge_labels=False):
-
-    # Find edge labels
-    l_e = list(G.edges)
-    e = dict((tuple(sorted(l_e[x])), x) for x in range(0, len(l_e)))
-    e_labels = {tuple(x): 'e' + str(y) for x, y in e.items()}
-
-    if edge_vector is not None:
-        colors_edge = np.squeeze(np.asarray(edge_vector))
-        _ = nx.draw_networkx_edges(G, pos, edge_color=colors_edge,
-                                   width=3, with_labels=False)
-    else:
-        _ = nx.draw_networkx_edges(G, pos, edge_color="gray",
-                                   width=2, with_labels=False)
-
-    if node_vector is not None:
-        colors_node = np.squeeze(np.asarray(node_vector))
-        _ = nx.draw_networkx_nodes(G, pos, node_color=colors_node,
-                                   with_labels=False, node_size=500)
-    else:
-        _ = nx.draw_networkx_nodes(G, pos, node_color="blue",
-                                   with_labels=False)
-
-    if edge_labels:
-        _ = nx.draw_networkx_edge_labels(G, pos, e_labels, alpha=1)
-    if node_labels:
-        _ = nx.draw_networkx_labels(G, pos)
-
-    return 
