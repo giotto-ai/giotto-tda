@@ -1,7 +1,7 @@
 import sys
 
 
-def pycairo_igraph_whl_urls(python_ver):
+def whl_urls(python_ver, pkg):
     if python_ver == '38':
         python_ver_1 = python_ver
     else:
@@ -15,8 +15,14 @@ def pycairo_igraph_whl_urls(python_ver):
         '-learn/windows-binaries/python-igraph/python_igraph-' \
         '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
         format(python_ver, python_ver_1)
-    return pycairo_whl_url + ' ' + igraph_whl_url
+    if pkg == 'pycairo':
+        return pycairo_whl_url
+    elif pkg == 'python-igraph':
+        return igraph_whl_url
+    else:
+        raise ValueError("Second argument must be either 'pycairo' or "
+                         "python-igraph")
 
 
 if __name__ == '__main__':
-    pycairo_igraph_whl_urls(sys.argv[1])
+    whl_urls(sys.argv[1], sys.argv[2])
