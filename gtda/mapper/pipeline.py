@@ -155,7 +155,7 @@ def make_mapper_pipeline(scaler=None,
     steps. [1]_
 
     The role of this function's key parameters is illustrated in `this diagram
-    <https://docs.giotto.ai/mapper_pipeline.svg>`_. All computational steps
+    <https://docs-tda.giotto.ai/mapper_pipeline.svg>`_. All computational steps
     may be arbitrary scikit-learn Pipeline objects. The scaling and cover
     steps must be transformers implementing a ``fit_transform`` method. The
     filter function step may be a transformer implementing a ``fit_transform``,
