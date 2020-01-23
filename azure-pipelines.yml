@@ -343,7 +343,7 @@ jobs:
     displayName: 'Install tools'
 
   - bash: |
-      igraphDependencies=`python .azure-ci\python-igraph_dependencies_win.py python_ver`
+      igraphDependencies=`python .azure-ci/python-igraph_dependencies_win.py python_ver`
       pip install $igraphDepencencies
     displayName: 'Install pycairo and python-igraph'
 
