@@ -109,8 +109,8 @@ jobs:
     displayName: 'Install tools'
 
   - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py $python_ver 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py $python_ver 'python-igraph')
+      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
+      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
       pip install "$pycairo_url" "$igraph_url"
     displayName: 'Install pycairo and python-igraph'
 
@@ -128,185 +128,185 @@ jobs:
 
 # These jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
-#- job: 'manylinux2010'
-#  condition: eq(variables['build_check'], 'true')
-#  pool:
-#    vmImage: 'ubuntu-16.04'
-#  strategy:
-#    matrix:
-#      Python35:
-#        arch: x86_64
-#        plat: manylinux2010_x86_64
-#        python_ver: '35'
-#        python.version: '3.5'
-#      Python36:
-#        arch: x86_64
-#        plat: manylinux2010_x86_64
-#        python_ver: '36'
-#        python.version: '3.6'
-#      Python37:
-#        arch: x86_64
-#        plat: manylinux2010_x86_64
-#        python_ver: '37'
-#        python.version: '3.7'
-#      Python38:
-#        arch: x86_64
-#        plat: manylinux2010_x86_64
-#        python_ver: '38'
-#        python.version: '3.8'
-#
-#  steps:
-#  - task: UsePythonVersion@0
-#    inputs:
-#      versionSpec: '$(python.version)'
-#
-#  - bash: |
-#      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
-#      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-#      cat gtda/_version.py
-#    condition: eq(variables['nightly_check'], 'true')
-#    displayName: 'Change name to giotto-tda-nightly'
-#
-#  - task: Bash@3
-#    inputs:
-#      filePath: .azure-ci/build_manylinux2010.sh
-#      failOnStderr: false
-#    env:
-#      python_ver: $(python_ver)
-#    displayName: 'Run the docker and open bash'
-#
-#  - script: |
-#      python -m pip install --upgrade pip
-#      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
-#    displayName: 'Install pytest suite'
-#
-#  - script: |
-#      pip install dist/*.whl
-#      cd /tmp/
-#      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-#    displayName: 'Install and test the wheels'
-#
-#  - task: CopyFiles@2
-#    displayName: 'Copy files'
-#    inputs:
-#      contents: 'dist/*'
-#      targetFolder: '$(Build.ArtifactStagingDirectory)'
-#
-#  - task: PublishBuildArtifacts@1
-#    displayName: 'Create download link'
-#    inputs:
-#      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-#      artifactName: 'wheel_and_doc'
-#
-#  - bash: |
-#      pip install twine
-#      for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
-#      twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
-#    condition: eq(variables['nightly_check'], 'true')
-#    displayName: 'Upload wheels to PyPI'
-#
-#
-#- job: 'macOS1014'
-#  condition: eq(variables['build_check'], 'true')
-#  pool:
-#    vmImage: 'macOS-10.14'
-#  strategy:
-#    matrix:
-#      Python35:
-#        python.version: '3.5'
-#      Python36:
-#        python.version: '3.6'
-#      Python37:
-#        python.version: '3.7'
-#      Python38:
-#        python.version: '3.8'
-#
-#  steps:
-#  - task: UsePythonVersion@0
-#    inputs:
-#      versionSpec: '$(python.version)'
-#
-#  - bash: |
-#      sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
-#      rm setup.py.bak
-#      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-#      cat gtda/_version.py
-#      rm gtda/_version.py.bak
-#    condition: eq(variables['nightly_check'], 'true')
-#    displayName: 'Change name to giotto-tda-nightly'
-#
-#  - script: |
-#      brew update
-#      brew install boost
-#      brew install gcc
-#    displayName: 'Install boost and gcc'
-#
-#  - script: python -m pip install --upgrade pip setuptools
-#    displayName: 'Install tools'
-#
-#  - script: |
-#      pip install -e ".[tests, doc]"
-#      pip install wheel twine
-#    displayName: 'Install dev environment'
-#
-#  - script: |
-#      pip install openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
-#      pip uninstall -y giotto-tda
-#      pytest --cov gtda --cov-report xml
-#      flake8
-#    condition: eq(variables['nightly_check'], 'false')
-#    displayName: 'Test with pytest, nbconvert and flake8'
-#
-#  - script: |
-#      pip install openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
-#      pip uninstall -y giotto-tda-nightly
-#      pytest --cov gtda --cov-report xml
-#      flake8
-#    condition: eq(variables['nightly_check'], 'true')
-#    displayName: 'Test with pytest, nbconvert and flake8'
-#
-#  - script: python setup.py sdist bdist_wheel
-#    displayName: 'Build the wheels'
-#
-#  - script: |
-#      pip install dist/*.whl
-#      cd /tmp/
-#      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-#    displayName: 'Install and test the wheels'
-#
-#  - script: |
-#      cd doc/
-#      make html
-#      cd ..
-#    displayName: 'Build sphinx doc'
-#
-#  - task: ArchiveFiles@2
-#    inputs:
-#      rootFolderOrFile: doc/build
-#      includeRootFolder: true
-#      archiveType: 'zip'
-#      tarCompression: 'gz'
-#      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-#      replaceExistingArchive: true
-#    displayName: 'Archive doc'
-#
-#  - task: CopyFiles@2
-#    displayName: 'Copy files'
-#    inputs:
-#      contents: 'dist/*'
-#      targetFolder: '$(Build.ArtifactStagingDirectory)'
-#
-#  - task: PublishBuildArtifacts@1
-#    displayName: 'Create download link'
-#    inputs:
-#      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-#      artifactName: 'wheel_and_doc'
-#
-#  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
-#    condition: eq(variables['nightly_check'], 'true')
-#    displayName: 'Upload wheels to PyPI'
+- job: 'manylinux2010'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python35:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '35'
+        python.version: '3.5'
+      Python36:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '36'
+        python.version: '3.6'
+      Python37:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '37'
+        python.version: '3.7'
+      Python38:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '38'
+        python.version: '3.8'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - bash: |
+      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Change name to giotto-tda-nightly'
+
+  - task: Bash@3
+    inputs:
+      filePath: .azure-ci/build_manylinux2010.sh
+      failOnStderr: false
+    env:
+      python_ver: $(python_ver)
+    displayName: 'Run the docker and open bash'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
+    displayName: 'Install pytest suite'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    displayName: 'Install and test the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'Copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+  - bash: |
+      pip install twine
+      for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
+      twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Upload wheels to PyPI'
+
+
+- job: 'macOS1014'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - bash: |
+      sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      rm setup.py.bak
+      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+      cat gtda/_version.py
+      rm gtda/_version.py.bak
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Change name to giotto-tda-nightly'
+
+  - script: |
+      brew update
+      brew install boost
+      brew install gcc
+    displayName: 'Install boost and gcc'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests, doc]"
+      pip install wheel twine
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-tda
+      pytest --cov gtda --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'false')
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+  - script: |
+      pip install openml
+      jupyter nbconvert --to notebook --execute examples/*.ipynb
+      pip uninstall -y giotto-tda-nightly
+      pytest --cov gtda --cov-report xml
+      flake8
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'Build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    displayName: 'Install and test the wheels'
+
+  - script: |
+      cd doc/
+      make html
+      cd ..
+    displayName: 'Build sphinx doc'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: doc/build
+      includeRootFolder: true
+      archiveType: 'zip'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+    displayName: 'Archive doc'
+
+  - task: CopyFiles@2
+    displayName: 'Copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+    condition: eq(variables['nightly_check'], 'true')
+    displayName: 'Upload wheels to PyPI'
 
 
 - job: 'win2016'
