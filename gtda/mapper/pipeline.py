@@ -155,10 +155,10 @@ def make_mapper_pipeline(scaler=None,
     steps. [1]_
 
     The role of this function's key parameters is illustrated in `this diagram
-    <https://docs-tda.giotto.ai/mapper_pipeline.svg>`_. All computational steps
-    may be arbitrary scikit-learn Pipeline objects. The scaling and cover
-    steps must be transformers implementing a ``fit_transform`` method. The
-    filter function step may be a transformer implementing a ``fit_transform``,
+    </mapper_pipeline.svg>`_. All computational steps may be arbitrary
+    scikit-learn Pipeline objects. The scaling and cover steps must be
+    transformers implementing a ``fit_transform`` method. The filter
+    function step may be a transformer implementing a ``fit_transform``,
     or a callable acting on one-dimensional arrays -- in the latter case,
     a transformer is internally created whose ``fit_transform`` applies this
     callable independently on each row of the data. The clustering step need
@@ -179,9 +179,10 @@ def make_mapper_pipeline(scaler=None,
 
     clustering_preprocessing : object or None, optional, default: ``None``
         If not ``None``, it is a transformer which is applied to the
-        data independently to the `scaler` -> `filter_func` -> cover` pipeline.
-        Clustering is then performed on portions (determined by the `scaler`
-        -> `filter_func` -> cover` pipeline) of the transformed data.
+        data independently to the `scaler` -> `filter_func` -> `cover`
+        pipeline. Clustering is then performed on portions (determined by
+        the `scaler` -> `filter_func` -> `cover` pipeline) of the
+        transformed data.
 
     clusterer : object or None, optional, default: ``None``
         Clustering object. ``None`` means using DBSCAN
