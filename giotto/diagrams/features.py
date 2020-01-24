@@ -9,6 +9,15 @@ from ..utils.validation import validate_params, check_diagram
 from ._utils import _subdiagrams, _discretize
 from giotto.diagrams._metrics import betti_curves, landscapes, heats
 
+import warnings
+
+warnings.warn(
+    "Starting at v0.1.4, this package was renamed as 'giotto-tda'. The "
+    "giotto-learn PyPI package will no longer be developed or maintained, and "
+    "will remain at the state of v0.1.3. Please visit "
+    "https://github.com/giotto-ai/giotto-tda to find installation information "
+    "for giotto-tda.")
+
 
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """`Persistence entropies <https://giotto.ai/theory>`_ of persistence

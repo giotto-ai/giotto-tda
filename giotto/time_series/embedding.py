@@ -10,6 +10,15 @@ from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 from ..utils.validation import validate_params
 
+import warnings
+
+warnings.warn(
+    "Starting at v0.1.4, this package was renamed as 'giotto-tda'. The "
+    "giotto-learn PyPI package will no longer be developed or maintained, and "
+    "will remain at the state of v0.1.3. Please visit "
+    "https://github.com/giotto-ai/giotto-tda to find installation information "
+    "for giotto-tda.")
+
 
 class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """Sliding windows onto the data.

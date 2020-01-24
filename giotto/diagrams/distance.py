@@ -9,6 +9,15 @@ from ._utils import _discretize
 from ..utils.validation import check_diagram, validate_params, \
     validate_metric_params
 
+import warnings
+
+warnings.warn(
+    "Starting at v0.1.4, this package was renamed as 'giotto-tda'. The "
+    "giotto-learn PyPI package will no longer be developed or maintained, and "
+    "will remain at the state of v0.1.3. Please visit "
+    "https://github.com/giotto-ai/giotto-tda to find installation information "
+    "for giotto-tda.")
+
 
 class PairwiseDistance(BaseEstimator, TransformerMixin):
     """`Distances <https://giotto.ai/theory>`_ between pairs of persistence

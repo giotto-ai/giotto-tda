@@ -1,9 +1,19 @@
 """Utilities for input validation"""
 # License : Apache 2.0
 
+import warnings
+
 import numbers
 
 import numpy as np
+
+warnings.warn(
+    "Starting at v0.1.4, this package was renamed as 'giotto-tda'. The "
+    "giotto-learn PyPI package will no longer be developed or maintained, and "
+    "will remain at the state of v0.1.3. Please visit "
+    "https://github.com/giotto-ai/giotto-tda to find installation information "
+    "for giotto-tda.")
+
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                      'wasserstein': [('p', int, (1, np.inf)),

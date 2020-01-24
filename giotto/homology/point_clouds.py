@@ -11,6 +11,15 @@ from ..utils.validation import validate_params
 
 from ..externals.python import ripser
 
+import warnings
+
+warnings.warn(
+    "Starting at v0.1.4, this package was renamed as 'giotto-tda'. The "
+    "giotto-learn PyPI package will no longer be developed or maintained, and "
+    "will remain at the state of v0.1.3. Please visit "
+    "https://github.com/giotto-ai/giotto-tda to find installation information "
+    "for giotto-tda.")
+
 
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from

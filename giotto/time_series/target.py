@@ -10,6 +10,15 @@ from ..base import TransformerResamplerMixin
 from .embedding import SlidingWindow
 from ..utils.validation import validate_params
 
+import warnings
+
+warnings.warn(
+    "Starting at v0.1.4, this package was renamed as 'giotto-tda'. The "
+    "giotto-learn PyPI package will no longer be developed or maintained, and "
+    "will remain at the state of v0.1.3. Please visit "
+    "https://github.com/giotto-ai/giotto-tda to find installation information "
+    "for giotto-tda.")
+
 
 class Labeller(BaseEstimator, TransformerResamplerMixin):
     """Target creation from sliding windows over a time series.
