@@ -107,8 +107,8 @@ host these wheels so they can be fetched with convenient URLs. For Python 3.5 to
 
 where ``<PYTHON VERSION>`` is e.g. ``37`` for Python 3.7. For Python 3.8, you may run   ::
 
-    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp<PYTHON VERSION>-cp<PYTHON VERSION>-win_amd64.whl
-    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/python-igraph/python_igraph-0.7.1.post6-cp<PYTHON VERSION>-cp<PYTHON VERSION>-win_amd64.whl
+    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp38-cp38-win_amd64.whl
+    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/python-igraph/python_igraph-0.7.1.post6-cp38-cp38-win_amd64.whl
 
 Contributing
 ------------
