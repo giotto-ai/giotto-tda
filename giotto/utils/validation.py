@@ -137,11 +137,13 @@ def validate_metric_params(metric, metric_params):
                              " are {}".format(param,
                                               available_metric_params))
 
+
 def check_list_of_arrays(X, **kwargs):
     """"Check a list of arrays, by itegrating through the input one by one.
     Parameters
     ----------
-    X : list(np.array), such that `X[i].ndim==2` (n_points, n_dimensions), or an array `X.dim==3`
+    X : list(np.array), such that `X[i].ndim==2` (n_points, n_dimensions),
+        or an array `X.dim==3`
 
     Returns
     -------
@@ -154,7 +156,8 @@ def check_list_of_arrays(X, **kwargs):
         messages = []
         for id_x, x in enumerate(X):
             try:
-                X[id_x] = np.squeeze(check_array(np.expand_dims(x, axis=0), **kwargs), axis = 0)
+                X[id_x] = np.squeeze(check_array(np.expand_dims(x, axis=0),
+                                                 **kwargs), axis=0)
                 results.append(True)
                 messages = ['']
             except ValueError as e:
@@ -163,7 +166,5 @@ def check_list_of_arrays(X, **kwargs):
             if all(results):
                 return X
             else:
-                raise ValueError("The following errors were raised by the inputs: \n" + "\n".join(messages))
-
-
-
+                raise ValueError("The following errors were raised" +
+                                 "by the inputs: \n" + "\n".join(messages))

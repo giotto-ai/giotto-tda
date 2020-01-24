@@ -16,16 +16,17 @@ X = np.array([[[2., 2.47942554],
 
 
 def test_vrp_list_of_arrays():
-    X_2 = np.array([[0,1,2], [1,2,4]])
+    X_2 = np.array([[0, 1, 2], [1, 2, 4]])
     X_list = [X[0].copy(), X_2]
     vrp = VietorisRipsPersistence()
     vrp.fit(X_list)
 
 
-@pytest.mark.skip(reason="Fails, because check_array(, allow_nd=True) is too flexible")
+@pytest.mark.skip(reason="Fails, because check_array(, allow_nd=True)" +
+                  "is too flexible")
 def test_vrp_list_invalid_arrays():
-    X_invalid = np.array([0,1])
-    X_invalid_2 = np.zeros((2,3,4,1))
+    X_invalid = np.array([0, 1])
+    X_invalid_2 = np.zeros((2, 3, 4, 1))
     vrp = VietorisRipsPersistence()
     with pytest.raises(ValueError):
         vrp.fit([X_invalid, X_invalid_2])
