@@ -138,8 +138,8 @@ def test_filter_values_covered_by_interval_union(filter_values,
     n_intervals=integers(min_value=1, max_value=10),
     overlap_frac=floats(allow_nan=False,
                         allow_infinity=False,
-                        min_value=0.,
-                        max_value=1.),
+                        min_value=0., exclude_min=True,
+                        max_value=1., exclude_max=True),
     is_uniform=booleans()
 )
 def test_fit_transform_against_fit_and_transform(pts, n_intervals,
