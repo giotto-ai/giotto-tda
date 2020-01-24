@@ -36,7 +36,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
+        ``'betti'`` | ``'heat'`` | ``'persistent_image'``, optional,
+        default: ``'landscape'``
         Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -46,6 +47,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
+        - ``'persistent_image'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
@@ -63,6 +66,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
           (float, default: ``2.``), `n_values` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p`
+          (float, default: ``2.``), `sigma` (float, default: ``1.``) and
+          `n_values` (int, default: ``100``).
+        - If ``metric == 'persistent_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``) and
           `n_values` (int, default: ``100``).
 
@@ -155,7 +161,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
@@ -228,7 +234,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
+        ``'betti'`` | ``'heat'`` | ``'persistent_image'``, optional,
+        default: ``'landscape'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 
@@ -239,6 +246,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
+        - ``'persistent_image'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
@@ -252,6 +261,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
           (float, default: ``2.``), `n_values` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          (int, default: ``100``).
+        - If ``metric == 'persistent_image'`` the available arguments are `p` (float,
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
 
@@ -339,7 +351,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)

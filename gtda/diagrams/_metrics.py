@@ -58,6 +58,22 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
+def persistent_images(diagrams, sampling, step_size, sigma):
+    persistent_images_ = np.zeros((diagrams.shape[0], sampling.shape[0],
+                       sampling.shape[0]))
+    sampled_diags = np.copy(diagrams)
+    sampling_ = sampling.reshape((-1,))
+    sampled_diags[diagrams < sampling_[0]] = sampling_[0]
+    sampled_diags[diagrams > sampling_[-1]] = sampling_[-1]
+    sampled_diags[:, :, 0] = np.array((sampled_diags[:, :, 0] - sampling_[0]) \
+                                      / step_size, dtype=int)
+    sampled_diags[:, :, 1] = np.array((sampled_diags[:, :, 1] - sampled_diags[:, :, 0]) \
+                                      / step_size, dtype=int)
+    [_heat(persistent_images_[i], sampled_diag, sigma)
+     for i, sampled_diag in enumerate(sampled_diags)]
+    persistent_images_ = np.rot90(persistent_images_, k=1, axes=(1, 2))
+    return persistent_images_
+
 def betti_distances(diagrams_1, diagrams_2, sampling, step_size,
                     p=2., **kwargs):
     betti_curves_1 = betti_curves(diagrams_1, sampling)
@@ -119,11 +135,28 @@ def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
     return (step_size ** (1 / p)) * unnorm_dist
 
 
+def persistent_image_distances(diagrams_1, diagrams_2, sampling, step_size,
+                               sigma=1., p=2., **kwargs):
+    persistent_image_1 = persistent_images(diagrams_1, sampling,
+                                           step_size, sigma).\
+        reshape(diagrams_1.shape[0], -1)
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(persistent_image_1, 'minkowski', p=p))
+        return (step_size ** (1 / p)) * unnorm_dist
+    persistent_image_2 = persistent_images(diagrams_2, sampling,
+                                           step_size, sigma).\
+        reshape(diagrams_2.shape[0], -1)
+    unnorm_dist = cdist(persistent_image_1, persistent_image_2,
+                        'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
+
+
 implemented_metric_recipes = {'bottleneck': bottleneck_distances,
                               'wasserstein': wasserstein_distances,
                               'landscape': landscape_distances,
                               'betti': betti_distances,
-                              'heat': heat_distances}
+                              'heat': heat_distances,
+                              'persistent_image': persistent_image_distances}
 
 
 def _matrix_wrapper(distance_func, distance_matrices, slice_, dim,
@@ -183,11 +216,18 @@ def heat_amplitudes(diagrams, sampling, step_size, sigma=1., p=2.,
     return np.linalg.norm(heat, axis=(1, 2), ord=p)
 
 
+def persistent_image_amplitudes(diagrams, sampling, step_size, sigma=1., p=2.,
+                    **kwargs):
+    persistent_image = persistent_images(diagrams, sampling, step_size, sigma)
+    return np.linalg.norm(persistent_image, axis=(1, 2), ord=p)
+
+
 implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,
                                  'landscape': landscape_amplitudes,
                                  'betti': betti_amplitudes,
-                                 'heat': heat_amplitudes}
+                                 'heat': heat_amplitudes,
+                                 'persistent_image': persistent_image}
 
 
 def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,
