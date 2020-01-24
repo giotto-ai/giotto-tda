@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy
+from gtda.diagrams import PersistenceEntropy, PersistentImage
 
 diagram = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 

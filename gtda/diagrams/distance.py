@@ -263,9 +263,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'heat'`` the available arguments are `p` (float,
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
-        - If ``metric == 'persistent_image'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
-          (int, default: ``100``).
+        - If ``metric == 'persistent_image'`` the available arguments are `p`
+          (float, default: ``2.``), `sigma` (float, default: ``1.``) and
+          `n_values` (int, default: ``100``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each diagram a vector of

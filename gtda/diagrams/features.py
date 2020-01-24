@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats
+from ._metrics import betti_curves, landscapes, heats, persistent_images
 from ._utils import _subdiagrams, _discretize
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
@@ -263,8 +263,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         How many layers to consider in the persistence landscape.
 
     n_values : int, optional, default: ``100``
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
+        The number of filtration parameter values, per available
+        homology dimension, to sample during :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -533,12 +533,13 @@ class PersistentImage(BaseEstimator, TransformerMixin):
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], the equivalent diagrams of
-    birth-persistence-dimension [b, d-b, q] triples are computed and subdiagrams
-    corresponding to distinct homology dimensions are considered separately and
-    regarded as sums of Dirac deltas. Then, the convolution with a Gaussian
-    kernel is computed over a rectangular grid of locations evenly sampled from
-    appropriate ranges of the `filtration parameter
-    <https://giotto.ai/theory>`_. The result can be thought of as a raster image.
+    birth-persistence-dimension [b, d-b, q] triples are computed and
+    subdiagrams corresponding to distinct homology dimensions are considered
+    separately and regarded as sums of Dirac deltas.
+    Then, the convolution with a Gaussian kernel is computed over
+    a rectangular grid of locations evenly sampled from appropriate ranges
+    of the `filtration parameter <https://giotto.ai/theory>`_.
+    The result can be thought of as a raster image.
 
     Parameters
     ----------
@@ -660,12 +661,16 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_diagram(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            persistent_images)(_subdiagrams(X, [dim], remove_dim=True)[s],
-                   self._samplings[dim], self._step_size[dim], self.sigma)
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(persistent_images)(_subdiagrams(X, [dim],
+                                                    remove_dim=True)[s],
+                                       self._samplings[dim],
+                                       self._step_size[dim],
+                                       self.sigma)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+                                     effective_n_jobs(self.n_jobs))
+        )
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
                                         self.n_values, self.n_values).\
             transpose((1, 0, 2, 3))
