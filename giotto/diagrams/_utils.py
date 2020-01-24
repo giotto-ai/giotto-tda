@@ -72,9 +72,10 @@ def _discretize(X, n_values=100, **kw_args):
         dim: max_vals[dim] if
         (max_vals[dim] != min_vals[dim]) else
         global_max_val for dim in homology_dimensions}
-    min_vals_2 = {dim: min_vals[dim] if
-        (max_vals_2[dim] != min_vals[dim]) else
-        global_min_val for dim in homology_dimensions}
+    min_vals_2 = {dim: min_vals[dim]
+                  if (max_vals_2[dim] != min_vals[dim])
+                  else global_min_val
+                  for dim in homology_dimensions}
 
     samplings = {}
     step_sizes = {}
