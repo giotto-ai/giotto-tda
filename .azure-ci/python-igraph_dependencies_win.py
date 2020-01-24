@@ -16,9 +16,9 @@ def whl_urls(python_ver, pkg):
         '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
         format(python_ver, python_ver_1)
     if pkg == 'pycairo':
-        return pycairo_whl_url
+        print(pycairo_whl_url)
     elif pkg == 'python-igraph':
-        return igraph_whl_url
+        print(igraph_whl_url)
     else:
         raise ValueError("Second argument must be either 'pycairo' or "
                          "python-igraph")
