@@ -78,7 +78,7 @@ def test_embedder_resample():
     embedder = TakensEmbedding(time_delay=4, dimension=5, stride=3)
     embedder = embedder.fit(signal)
     y_resampled = embedder.resample(y)
-    assert_almost_equal(y_resampled, y[np.arange(4,20,3)])
+    assert_almost_equal(y_resampled, y[np.arange(4, 20, 3)])
 
 
 def test_window_params():
@@ -90,11 +90,11 @@ def test_window_params():
 def test_window_transform():
     embedder = SlidingWindow(width=3, stride=2)
     x_windows = embedder.fit_transform(signal_embedded_search)
-    assert (x_windows.shape == (8,4,2))
+    assert (x_windows.shape == (8, 4, 2))
 
 
 def test_window_resample():
     embedder = SlidingWindow(width=3, stride=2)
     embedder = embedder.fit(signal_embedded_search)
     y_resampled = embedder.resample(y)
-    assert_almost_equal(y_resampled, y[np.arange(3,20,2)])
+    assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])

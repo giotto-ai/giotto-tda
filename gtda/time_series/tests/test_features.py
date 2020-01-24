@@ -6,12 +6,13 @@ from numpy.testing import assert_almost_equal
 from gtda.time_series.features import PermutationEntropy
 from itertools import product
 
-X = np.ones((10, 200, 3)) # 10 samples, of 200 points embedded in a 3d space
+X = np.ones((10, 200, 3))  # 10 samples, of 200 points embedded in a 3d space
 X_unif = np.tile(np.random.randn(200,3), (10,1,1))
 X_3 = np.array([[[1, 2, 3],
                  [1, 2, 3],
                  [7, 6, 5]]])
 pe_3 = 0.91829583
+
 
 def test_entropy_shape():
     pe = PermutationEntropy()
