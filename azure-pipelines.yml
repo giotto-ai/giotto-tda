@@ -344,8 +344,8 @@ jobs:
     displayName: 'Install tools'
 
   - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py $python_ver 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py $python_ver 'python-igraph')
+      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
+      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
       pip install "$pycairo_url" "$igraph_url"
     displayName: 'Install pycairo and python-igraph'
 
