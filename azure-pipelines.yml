@@ -30,7 +30,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
@@ -74,7 +74,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
@@ -122,7 +122,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
@@ -256,7 +256,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda
@@ -267,7 +267,7 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda-nightly
@@ -366,7 +366,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda
@@ -377,7 +377,7 @@ jobs:
     displayName: 'Test with pytest, nbconvert and flake8'
 
   - script: |
-      pip install openml
+      pip install openml pandas
       pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda-nightly
