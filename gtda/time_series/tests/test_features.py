@@ -21,7 +21,7 @@ def test_entropy_shape():
 
 
 def test_entropy_unif():
-    """Check that the process gives the same on the same samples"""
+    """Check that the process gives the same results on the same samples"""
     pe = PermutationEntropy()
     x_transformed = pe.fit_transform(X_unif)
     are_equal = [a == b for a, b in product(x_transformed, x_transformed)]

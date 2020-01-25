@@ -76,7 +76,6 @@ def test_embedder_transform(parameters_type, expected):
 
 def test_embedder_resample():
     embedder = TakensEmbedding(time_delay=4, dimension=5, stride=3)
-    embedder = embedder.fit(signal)
     y_resampled = embedder.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(4, 20, 3)])
 
@@ -95,6 +94,5 @@ def test_window_transform():
 
 def test_window_resample():
     windows = SlidingWindow(width=3, stride=2)
-    windows = windows.fit(signal_embedded_search)
     y_resampled = windows.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])

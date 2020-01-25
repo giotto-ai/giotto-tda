@@ -43,7 +43,7 @@ def test_labeller_with_percentage():
     n_steps_future = 1
     labeller = Labeller(width=width, func=np.max, func_params={},
                         percentiles=[100], n_steps_future=n_steps_future)
-    _ = labeller.fit_transform_resample(X, X)
+    labeller.fit(X)
     assert np.max(X) == labeller.thresholds_[0]
 
 
