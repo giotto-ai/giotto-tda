@@ -76,12 +76,14 @@ def test_embedder_transform(parameters_type, expected):
 
 def test_embedder_resample():
     embedder = TakensEmbedding(time_delay=4, dimension=5, stride=3)
+    embedder.fit(signal)
     y_resampled = embedder.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(4, 20, 3)])
 
 
 def test_window_params():
     windows = SlidingWindow(width=0)
+    windows.fit(signal)
     with pytest.raises(ValueError):
         windows.fit(signal)
 
