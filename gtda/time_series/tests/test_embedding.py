@@ -82,19 +82,19 @@ def test_embedder_resample():
 
 
 def test_window_params():
-    embedder = SlidingWindow(width=0)
+    windows = SlidingWindow(width=0)
     with pytest.raises(ValueError):
-        embedder.fit(signal)
+        windows.fit(signal)
 
 
 def test_window_transform():
-    embedder = SlidingWindow(width=3, stride=2)
-    x_windows = embedder.fit_transform(signal_embedded_search)
+    windows = SlidingWindow(width=3, stride=2)
+    x_windows = windows.fit_transform(signal_embedded_search)
     assert (x_windows.shape == (8, 4, 2))
 
 
 def test_window_resample():
-    embedder = SlidingWindow(width=3, stride=2)
-    embedder = embedder.fit(signal_embedded_search)
-    y_resampled = embedder.resample(y)
+    windows = SlidingWindow(width=3, stride=2)
+    windows = windows.fit(signal_embedded_search)
+    y_resampled = windows.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])
