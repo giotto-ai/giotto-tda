@@ -31,6 +31,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
       flake8
@@ -74,6 +75,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
       flake8
@@ -121,6 +123,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
       flake8
@@ -254,6 +257,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
@@ -264,6 +268,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
@@ -362,6 +367,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
@@ -372,6 +378,7 @@ jobs:
 
   - script: |
       pip install openml
+      pip install --upgrade nbconvert
       jupyter nbconvert --ExecutePreprocessor.timeout=120 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
