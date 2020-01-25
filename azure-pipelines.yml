@@ -31,7 +31,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
       flake8
@@ -75,7 +75,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
       flake8
@@ -123,7 +123,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pytest --cov gtda --cov-report xml
       flake8
@@ -257,7 +257,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
@@ -268,7 +268,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
@@ -367,7 +367,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
@@ -378,7 +378,7 @@ jobs:
 
   - script: |
       pip install openml
-      pip install --upgrade nbconvert
+      pip install --upgrade jupyter nbconvert
       jupyter nbconvert --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=180 --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
