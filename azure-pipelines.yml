@@ -32,7 +32,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
@@ -76,7 +76,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pytest --cov gtda --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -124,7 +124,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
@@ -258,7 +258,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
@@ -269,7 +269,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
@@ -368,7 +368,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
@@ -379,7 +379,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install --upgrade jupyter nbconvert
-      jupyter nbconvert --config .nbconvert_conf.py
+      jupyter nbconvert --config=".nbconvert_conf.py"
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
