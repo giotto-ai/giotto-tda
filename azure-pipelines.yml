@@ -124,7 +124,9 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
+      cd examples
+      papermill --start_timeout 600 *.ipynb -
+      cd ..
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
@@ -368,7 +370,9 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
+      cd examples
+      papermill --start_timeout 600 *.ipynb -
+      cd ..
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
@@ -379,7 +383,9 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
+      cd examples
+      papermill --start_timeout 600 *.ipynb -
+      cd ..
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
