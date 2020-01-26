@@ -32,7 +32,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
@@ -76,7 +76,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
     displayName: 'Test with pytest, papermill and flake8'
@@ -124,7 +124,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
@@ -258,7 +258,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
@@ -269,7 +269,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
@@ -368,7 +368,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
@@ -379,7 +379,7 @@ jobs:
   - script: |
       pip install openml pandas
       pip install papermill
-      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
+      papermill --start_timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
