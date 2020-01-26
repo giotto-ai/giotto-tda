@@ -31,12 +31,12 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
 
 - job: 'test_macOS1014'
@@ -75,11 +75,11 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
 
 - job: 'test_win2016'
@@ -123,12 +123,12 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
 
 # These jobs are triggered manually and they test the code and the examples and build the wheels and docs.
@@ -257,25 +257,25 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'Build the wheels'
@@ -367,25 +367,25 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
   - script: |
       pip install openml pandas
-      pip install --upgrade jupyter nbconvert
-      jupyter nbconvert  --execute --to notebook --ExecutePreprocessor.startup_timeout=3600 --ExecutePreprocessor.timeout=3600 examples/*.ipynb
+      pip install papermill
+      papermill --start-timeout 600 --execution-timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda-nightly
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest, papermill and flake8'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
