@@ -121,16 +121,20 @@ jobs:
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
-  - script: |
+  - bash: |
       pip install openml pandas
       pip install papermill[azure]
       cd examples
       papermill --start_timeout 600 *.ipynb -
       cd ..
+    failOnStderr: true
+    displayName: 'Test jupyter notebooks with papermill'
+
+    - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest, papermill and flake8'
+    displayName: 'Test with pytest and flake8'
 
 
 # These jobs are triggered manually and they test the code and the examples and build the wheels and docs.
