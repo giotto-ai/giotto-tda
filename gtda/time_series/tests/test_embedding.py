@@ -83,7 +83,6 @@ def test_embedder_resample():
 
 def test_window_params():
     windows = SlidingWindow(width=0)
-    windows.fit(signal)
     with pytest.raises(ValueError):
         windows.fit(signal)
 
@@ -96,5 +95,6 @@ def test_window_transform():
 
 def test_window_resample():
     windows = SlidingWindow(width=3, stride=2)
+    windows.fit(y)
     y_resampled = windows.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])
