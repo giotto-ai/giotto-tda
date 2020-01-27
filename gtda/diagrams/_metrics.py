@@ -76,7 +76,7 @@ def persistent_images(diagrams, sampling, step_size, sigma):
     )
     # Persistence into pixels
     sampled_diags[:, :, 1] = np.array(
-        (sampled_diags[:, :, 1] - diagrams[:, :, 0]) / step_size,
+        (sampled_diags[:, :, 1] - sampling_[0]) / step_size,
         dtype=int
     )
     [

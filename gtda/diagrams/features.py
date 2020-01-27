@@ -10,7 +10,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, persistent_images
-from ._utils import _subdiagrams, _discretize
+from ._utils import _subdiagrams, _discretize, _differentiate
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
 
@@ -625,11 +625,13 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         validate_params(self.get_params(), self._hyperparameters)
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        X_pers = _differentiate(X) # transform the diagram to birth-persis.
+
+        self.homology_dimensions_ = sorted(list(set(X_pers[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, self._step_size = _discretize(
-            X, n_values=self.n_values)
+            X_pers, n_values=self.n_values)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
         return self
@@ -661,17 +663,19 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_diagram(X)
 
+        X_pers = _differentiate(X)
+
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(persistent_images)(_subdiagrams(X, [dim],
+            delayed(persistent_images)(_subdiagrams(X_pers, [dim],
                                                     remove_dim=True)[s],
                                        self._samplings[dim],
                                        self._step_size[dim],
                                        self.sigma)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
+            for s in gen_even_slices(X_pers.shape[0],
                                      effective_n_jobs(self.n_jobs))
         )
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X_pers.shape[0],
                                         self.n_values, self.n_values).\
             transpose((1, 0, 2, 3))
         return Xt
