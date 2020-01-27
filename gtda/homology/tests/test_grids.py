@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from giotto.homology import CubicalPersistence
+from gtda.homology import CubicalPersistence
 
 X = np.array([[[2., 2.47942554],
                [2.47942554, 2.84147098],
