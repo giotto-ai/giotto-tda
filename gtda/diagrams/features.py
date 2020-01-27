@@ -550,6 +550,11 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
+    weight_function : fct R^3 -> R, default: (b,p,q) -> p
+        map a point (b, p, q), to a weight, where b, p and q are the birth,
+        persistence and dimension respectively. It should satisfy
+        weight_fct([b,0,q]) = 0 and be continuous with respect to b and p.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -592,10 +597,13 @@ class PersistentImage(BaseEstimator, TransformerMixin):
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
-    def __init__(self, sigma, n_values=100, n_jobs=None):
+    def __init__(self, sigma, n_values=100,
+                 weight_function=lambda x: x[1],
+                 n_jobs=None):
         self.sigma = sigma
         self.n_values = n_values
         self.n_jobs = n_jobs
+        self.weight_function = weight_function
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
@@ -670,7 +678,8 @@ class PersistentImage(BaseEstimator, TransformerMixin):
                                                     remove_dim=True)[s],
                                        self._samplings[dim],
                                        self._step_size[dim],
-                                       self.sigma)
+                                       self.sigma,
+                                       self.weight_function)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X_pers.shape[0],
                                      effective_n_jobs(self.n_jobs))

@@ -36,10 +36,24 @@ def landscapes(diagrams, sampling, n_layers):
 
 
 def _heat(heat, sampled_diag, sigma):
+    _sample(heat, sampled_diag)  # modifies `heat` inplace
+    _smoothen(heat, sigma)
+
+
+def _smoothen(heat, sigma):
+    heat[:, :] = gaussian_filter(heat, sigma, mode="reflect")
+
+
+def _sample(grid, sampled_diag):
     unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
     unique = tuple(tuple(row) for row in unique.T)
-    heat[unique] = counts
-    heat[:, :] = gaussian_filter(heat, sigma, mode="reflect")
+    grid[unique] = counts
+
+
+def _sample_with_weights(grid, sampled_diag, weights):
+    # TODO: optimize this loop (precompute tuples?)
+    for pt, w in zip(sampled_diag, weights):
+        grid[tuple(pt)] += w
 
 
 def heats(diagrams, sampling, step_size, sigma):
@@ -60,11 +74,12 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
-def persistent_images(diagrams, sampling, step_size, sigma):
+def persistent_images(diagrams, sampling, step_size, sigma, weight_function):
     persistent_images_ = np.zeros(
         (diagrams.shape[0], sampling.shape[0], sampling.shape[0])
     )
-    # import pdb;pdb.set_trace()
+    weights = np.apply_along_axis(weight_function,
+                                  -1, diagrams).reshape(*(diagrams.shape[:-1]))
     sampled_diags = np.copy(diagrams)
     sampling_ = sampling.reshape((-1,))
     # Set the values outside of the sampling range to the sampling range.
@@ -79,10 +94,12 @@ def persistent_images(diagrams, sampling, step_size, sigma):
         (sampled_diags[:, :, 1] - sampling_[0]) / step_size,
         dtype=int
     )
-    [
-        _heat(persistent_images_[i], sampled_diag, sigma)
-        for i, sampled_diag in enumerate(sampled_diags)
-    ]
+
+    for i, sampled_diag in enumerate(sampled_diags):
+        _sample_with_weights(persistent_images_[i], sampled_diag, weights[i])
+        # persistent_images_[i] *= weights[i]  # multiply counts by weights
+        _smoothen(persistent_images_[i], sigma)
+
     persistent_images_ = np.rot90(persistent_images_, k=1, axes=(1, 2))
     return persistent_images_
 
@@ -171,17 +188,18 @@ def heat_distances(
 
 
 def persistent_image_distances(
-    diagrams_1, diagrams_2, sampling, step_size, sigma=1.0, p=2.0, **kwargs
+    diagrams_1, diagrams_2, sampling, step_size, sigma=1.0, p=2.0,
+    weight_function=lambda x: x[1], **kwargs
 ):
     persistent_image_1 = persistent_images(
-        diagrams_1, sampling, step_size, sigma
+        diagrams_1, sampling, step_size, sigma, weight_function
     ).reshape(diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(persistent_image_1,
                                        "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
     persistent_image_2 = persistent_images(
-        diagrams_2, sampling, step_size, sigma
+        diagrams_2, sampling, step_size, sigma, weight_function
     ).reshape(diagrams_2.shape[0], -1)
     unnorm_dist = cdist(persistent_image_1, persistent_image_2,
                         "minkowski", p=p)
@@ -268,9 +286,11 @@ def heat_amplitudes(diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs):
 
 
 def persistent_image_amplitudes(
-    diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs
+    diagrams, sampling, step_size, sigma=1.0, p=2.0,
+        weight_function=lambda x: x[1], **kwargs
 ):
-    persistent_image = persistent_images(diagrams, sampling, step_size, sigma)
+    persistent_image = persistent_images(diagrams, sampling, step_size,
+                                         sigma, weight_function)
     return np.linalg.norm(persistent_image, axis=(1, 2), ord=p)
 
 
