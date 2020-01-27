@@ -64,15 +64,19 @@ def persistent_images(diagrams, sampling, step_size, sigma):
     persistent_images_ = np.zeros(
         (diagrams.shape[0], sampling.shape[0], sampling.shape[0])
     )
+    # import pdb;pdb.set_trace()
     sampled_diags = np.copy(diagrams)
     sampling_ = sampling.reshape((-1,))
+    # Set the values outside of the sampling range to the sampling range.
     sampled_diags[diagrams < sampling_[0]] = sampling_[0]
     sampled_diags[diagrams > sampling_[-1]] = sampling_[-1]
+    # Birth into pixels
     sampled_diags[:, :, 0] = np.array(
         (sampled_diags[:, :, 0] - sampling_[0]) / step_size, dtype=int
     )
+    # Persistence into pixels
     sampled_diags[:, :, 1] = np.array(
-        (sampled_diags[:, :, 1] - sampled_diags[:, :, 0]) / step_size,
+        (sampled_diags[:, :, 1] - diagrams[:, :, 0]) / step_size,
         dtype=int
     )
     [
