@@ -163,6 +163,19 @@ def test_fit_transform_limits_not_computed():
         _ = cover.get_fitted_intervals()
 
 
+@given(pts=get_filter(shape=())
+       )
+def test_two_dimensional_tensor(pts):
+    """Verify that the oneDimensionalCover fails for an input
+    with more than one dimension, and that the CubicalCover
+    does not."""
+    one_d = OneDimensionalCover()
+    with pytest.raises(ValueError):
+        one_d.fit(pts)
+    cubical = CubicalCover()
+    _ = cubical.fit(pts)
+
+
 @given(filter=get_filter(),
        kind=get_kind(),
        n_intervals=get_nb_intervals(),
