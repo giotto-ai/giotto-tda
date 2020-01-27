@@ -58,6 +58,7 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
         Xf = np.concatenate([Xf, Xdim], axis=1)
     return Xf
 
+
 def _differentiate(Xs):
     """Change coordinates from
     (birth, death, dimension) -> (birth, persistence, dimension)

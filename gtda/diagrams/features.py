@@ -624,8 +624,8 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
         validate_params(self.get_params(), self._hyperparameters)
-
-        X_pers = _differentiate(X) # transform the diagram to birth-persis.
+        # Transform the diagram to birth-persistence
+        X_pers = _differentiate(X)
 
         self.homology_dimensions_ = sorted(list(set(X_pers[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)

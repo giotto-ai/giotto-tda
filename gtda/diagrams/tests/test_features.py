@@ -32,7 +32,6 @@ def test_pi_no_sigma():
 
 def test_pi_not_fitted():
     pi = PersistentImage(sigma=1)
-
     with pytest.raises(NotFittedError):
         pi.transform(diagram)
 
