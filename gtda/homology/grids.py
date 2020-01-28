@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ._utils import _pad_diagram
 from ..utils.validation import validate_params
 
-from ..externals.python import CubicalComplex
+from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
@@ -32,6 +32,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
+
+    periodic_dimensions:  iterable, optional, default: ``()``
+        Dimensions (non-negative integers) along which boundaries are periodic.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
@@ -63,19 +66,22 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     <http://gudhi.gforge.inria.fr/doc/latest/group__cubical__complex.html>`_.
 
     """
-    _hyperparameters = {'infinity_values_': [numbers.Number],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
+    _hyperparameters = {'_homology_dimensions': [list, [int, (0, np.inf)]],
+                        'coeff': [int, (2, np.inf)],
+                        '_periodic_dimensions': [list, [int, (0, np.inf)]],
+                        'infinity_values_': [numbers.Number]}
 
-    def __init__(self, homology_dimensions=(0, 1), coeff=2,
+
+    def __init__(self, homology_dimensions=(0, 1), coeff=2, periodic=False,
                  infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
+        self.periodic_dimensions = periodic_dimensions
         self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        cubical_complex = CubicalComplex(
+        cubical_complex = self.filtration(
             dimensions=X.shape,
             top_dimensional_cells=X.flatten(order="F"))
         Xdgms = cubical_complex.persistence(homology_coeff_field=self.coeff,
@@ -113,6 +119,11 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        if self.periodic:
+            self.filtration = PeriodicCubicalComplex
+        else:
+            self.filtration = CubicalComplex
+
         if self.infinity_values is None:
             self.infinity_values_ = np.max(X)
         else:
