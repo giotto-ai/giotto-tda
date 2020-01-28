@@ -13,13 +13,13 @@
 import os
 import sys
 
-from giotto import __version__
+from gtda import __version__
 
 sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'giotto-learn'
+project = 'giotto-tda'
 copyright = '2019, L2F'
 author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina, ' \
          'Lewis Tunstall'
@@ -36,7 +36,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'numpydoc',
-    # 'sphinx.ext.linkcode', # need to be setup, not sure what it does
+    'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
@@ -44,6 +44,12 @@ extensions = [
     'sphinx_issues',
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
+
+# Add mappings
+intersphinx_mapping = {
+    'sklearn': ('http://scikit-learn.org/stable', None),
+    'plotly': ('https://plot.ly/python-api-reference/', None)
+}
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
