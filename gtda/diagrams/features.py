@@ -40,9 +40,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
-
+    BettiCurve, PersistenceLandscape, HeatKernel, PersistentImage, \
+    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
     """
 
     def __init__(self, n_jobs=None):
@@ -153,8 +152,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, PersistentImage, \
+    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -283,8 +282,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceEntropy, HeatKernel, PersistentImage, \
+    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -422,8 +421,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, PersistenceEntropy, PersistentImage, \
+    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -573,7 +572,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, PersistenceEntropy, HeatKernel, \
-    Amplitude, PairwiseDistance, giotto.homology.VietorisRipsPersistence
+    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
