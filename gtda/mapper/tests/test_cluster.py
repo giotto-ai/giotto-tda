@@ -5,9 +5,10 @@ from hypothesis.strategies import floats, integers, booleans, composite
 from numpy.testing import assert_almost_equal
 from functools import reduce
 import pytest
+from scipy.spatial import distance_matrix
 
 from sklearn.exceptions import NotFittedError
-from gtda.mapper.cluster import FirstHistogramGap, FirstSimpleGap
+from gtda.mapper import FirstHistogramGap, FirstSimpleGap
 
 
 @composite
@@ -88,3 +89,35 @@ def test_firsthistogramgap(inp):
     assert unique.shape[0] == n_clusters
     # check that the nb of pts in a cluster corresponds to what we expect
     assert_almost_equal(counts, n_points_per_cluster)
+
+
+@given(inp=get_input(), max_frac=floats(min_value=0., exclude_min=True,
+                            max_value=1., exclude_max=True))
+def test_max_fraction_clusters(inp, max_frac):
+    n_points_per_cluster, n_clusters, _, pts = inp
+    max_num_clusters = max_frac * (n_points_per_cluster * n_clusters
+                                   - 1)
+
+    fs = FirstSimpleGap(max_fraction=max_frac)
+    _ = fs.fit_predict(pts)
+    assert fs.n_clusters_ <= np.ceil(max_num_clusters*n_clusters)
+
+    fh = FirstHistogramGap(max_fraction=max_frac)
+    _ = fh.fit_predict(pts)
+    assert fh.n_clusters_ <= np.ceil(max_num_clusters*n_clusters)
+
+
+@given(inp=get_input())
+def test_precomputed_distances(inp):
+    n_points_per_cluster, n_clusters, _, pts = inp
+    dist_matrix = distance_matrix(pts, pts, p=2)
+
+    fh_matrix = FirstHistogramGap(freq_threshold=0, max_fraction=None, n_bins_start=5,
+                           affinity='euclidean', memory=None, linkage='single')
+    preds_mat = fh_matrix.fit_predict(pts)
+
+    fh = FirstHistogramGap(freq_threshold=0, max_fraction=None, n_bins_start=5,
+                                  affinity='euclidean', memory=None, linkage='single')
+    preds = fh.fit_predict(pts)
+
+    assert_almost_equal(preds, preds_mat)
