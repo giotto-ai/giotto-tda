@@ -6,6 +6,7 @@ from numpy.testing import assert_almost_equal
 from scipy.spatial.distance import pdist, squareform
 
 from gtda.mapper import Eccentricity, Entropy, Projection
+from gtda.mapper.utils._list_feature_union import ListFeatureUnion
 from gtda.mapper.utils.decorators import method_to_transform
 
 from sklearn.neighbors import KernelDensity
@@ -96,3 +97,24 @@ def test_gaussian_density_values(X):
     Xt_desired = kde_desired.fit(X).score_samples(X)
     Xt_actual = kde_actual.fit_transform(X)
     assert_almost_equal(Xt_actual, Xt_desired)
+
+
+@given(X=arrays(
+    dtype=np.float,
+    elements=floats(allow_nan=False,
+                    allow_infinity=False,
+                    min_value=1,
+                    max_value=1e3),
+    shape=array_shapes(min_dims=2, max_dims=2, min_side=2),
+    unique=True
+))
+def test_list_feature_union(X):
+    list_dim = [0, 1]
+    p_1_2 = ListFeatureUnion([("proj" + str(k), Projection(columns=k))
+                               for k in list_dim])
+    p12 = Projection(columns=list_dim)
+
+    x_12 = p12.fit_transform(X)
+    x_1_2 = np.concatenate(p_1_2.fit_transform(X), axis=1)
+
+    assert_almost_equal(x_12, x_1_2)
