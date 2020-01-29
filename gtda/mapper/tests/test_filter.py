@@ -108,13 +108,14 @@ def test_gaussian_density_values(X):
     shape=array_shapes(min_dims=2, max_dims=2, min_side=2),
     unique=True
 ))
-def test_list_feature_union(X):
+def test_list_feature_union_transform(X):
     list_dim = [0, 1]
     p_1_2 = ListFeatureUnion([("proj" + str(k), Projection(columns=k))
                                for k in list_dim])
     p12 = Projection(columns=list_dim)
-
-    x_12 = p12.fit_transform(X)
-    x_1_2 = np.concatenate(p_1_2.fit_transform(X), axis=1)
+    for p in [p12, p_1_2]:
+        p.fit(X)
+    x_12 = p12.transform(X)
+    x_1_2 = np.concatenate(p_1_2.transform(X), axis=1)
 
     assert_almost_equal(x_12, x_1_2)

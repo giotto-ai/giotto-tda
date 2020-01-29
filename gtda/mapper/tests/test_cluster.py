@@ -56,11 +56,11 @@ def test_on_trivial_input(inp):
     n_points_per_cluster, n_clusters, dim, pts = inp
     fs = FirstSimpleGap()
     fs = fs.fit(pts)
-    try:
-        assert fs.n_clusters_ == n_clusters
-    except AssertionError as e:
-        print(fs.fit_predict(pts))
-        raise AssertionError(e)
+    assert fs.n_clusters_ == n_clusters
+
+    fh = FirstHistogramGap()
+    fh = fh.fit(pts)
+    assert fh.n_clusters_ == n_clusters
 
 
 @given(inp=get_input(std=0.02))
