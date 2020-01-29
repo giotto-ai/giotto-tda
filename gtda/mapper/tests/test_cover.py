@@ -32,11 +32,11 @@ def get_nb_intervals(draw):
 
 @composite
 def get_overlap_fraction(draw):
-    overlap =draw(floats(allow_nan=False,
-                        allow_infinity=False,
-                        min_value=0., exclude_min=True,
-                        max_value=1., exclude_max=True),
-                  )
+    overlap = draw(floats(allow_nan=False,
+                          allow_infinity=False,
+                          min_value=0., exclude_min=True,
+                          max_value=1., exclude_max=True),
+                   )
     return overlap
 
 
@@ -163,8 +163,7 @@ def test_fit_transform_limits_not_computed():
         _ = cover.get_fitted_intervals()
 
 
-@given(pts=get_filter(shape=())
-       )
+@given(pts=get_filter(shape=array_shapes(min_dims=2, max_dims=2, min_side=2)))
 def test_two_dimensional_tensor(pts):
     """Verify that the oneDimensionalCover fails for an input
     with more than one dimension, and that the CubicalCover
