@@ -119,3 +119,22 @@ def test_list_feature_union_transform(X):
     x_1_2 = np.concatenate(p_1_2.transform(X), axis=1)
 
     assert_almost_equal(x_12, x_1_2)
+
+
+@given(X=arrays(
+    dtype=np.float,
+    elements=floats(allow_nan=False,
+                    allow_infinity=False,
+                    min_value=1,
+                    max_value=1e3),
+    shape=array_shapes(min_dims=2, max_dims=2, min_side=2),
+    unique=True
+))
+def test_list_feature_union_nones(X):
+    none_1_2 = ListFeatureUnion([("None" + str(k), None)
+                              for k in range(2)])
+    x_12_a = none_1_2.fit_transform(X)
+    x_12_b = none_1_2.transform(X)
+    assert x_12_a.shape == (X.shape[0], 0)
+    assert x_12_b.shape == (X.shape[0], 0)
+

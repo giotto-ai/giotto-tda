@@ -7,7 +7,7 @@ from functools import reduce
 import pytest
 
 from sklearn.exceptions import NotFittedError
-from gtda.mapper.cover import OneDimensionalCover, CubicalCover
+from gtda.mapper import OneDimensionalCover, CubicalCover
 
 
 @composite
