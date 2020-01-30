@@ -677,8 +677,8 @@ class PersistentImage(BaseEstimator, TransformerMixin):
                                                     remove_dim=True)[s],
                                        self._samplings[dim],
                                        self._step_size[dim],
-                                       self.sigma,
-                                       self.weight_function)
+                                       self.weight_function,
+                                       self.sigma)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X_pers.shape[0],
                                      effective_n_jobs(self.n_jobs))
