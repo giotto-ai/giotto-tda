@@ -243,7 +243,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     if node_color_statistic is not None:
         _node_color_statistic = node_color_statistic
     else:
-        _node_color_statistic = node_color_statistic
+        _node_color_statistic = np.mean
 
     def get_widgets_per_param(param, value):
         if isinstance(value, float):
@@ -415,5 +415,6 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         layout=container_cluster_layout)
 
     box = widgets.VBox(
-        [container_cover, container_cluster, fig, valid, logs_box])
-    display(box, out)
+        [container_cover, container_cluster, fig, valid, logs_box, out])
+    #display(box, out)
+    return box
