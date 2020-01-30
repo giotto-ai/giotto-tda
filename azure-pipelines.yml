@@ -130,7 +130,8 @@ jobs:
   - bash: |
       pip install openml pandas
       pip install papermill[azure]
-      for notebook in examples/*.ipynb
+      cd examples
+      for notebook in *.ipynb
       do
         papermill --start_timeout 2000 $notebook -
       done
