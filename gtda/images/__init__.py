@@ -1,4 +1,4 @@
-"""The module :mod:`giotto.images` implements techniques
+"""The module :mod:`gtda.images` implements techniques
     that can be used to apply Topological Data Analysis to images.
 """
 
