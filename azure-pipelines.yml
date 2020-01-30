@@ -127,13 +127,13 @@ jobs:
     failOnStderr: true
     displayName: 'Test with pytest and flake8'
 
-  - bash: |
+  - script: |
       pip install openml pandas
       pip install papermill[azure]
       cd examples
       for notebook in *.ipynb
       do
-        papermill --start_timeout 2000 --log-level ERROR $notebook -
+        papermill --start_timeout 2000 $notebook -
       done
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
