@@ -59,6 +59,15 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
     return Xf
 
 
+def _differentiate(Xs):
+    """Change coordinates from
+    (birth, death, dimension) -> (birth, persistence, dimension)
+    """
+    X_persistence = np.copy(Xs)
+    X_persistence[:, :, 1] = Xs[:, :, 1] - Xs[:, :, 0]
+    return X_persistence
+
+
 def _discretize(X, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
 
