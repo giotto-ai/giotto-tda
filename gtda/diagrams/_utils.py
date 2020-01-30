@@ -38,6 +38,12 @@ def _sort(Xs):
     return Xs
 
 
+def _sample_image(image, sampled_diag):
+    unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
+    unique = tuple(tuple(row) for row in unique.T)
+    image[unique] = counts
+
+
 def _filter(Xs, filtered_homology_dimensions, cutoff):
     homology_dimensions = sorted(list(set(Xs[0, :, 2])))
     unfiltered_homology_dimensions = sorted(list(
@@ -57,15 +63,6 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
         Xdim = Xdim[:, :max_points, :]
         Xf = np.concatenate([Xf, Xdim], axis=1)
     return Xf
-
-
-def _differentiate(Xs):
-    """Change coordinates from
-    (birth, death, dimension) -> (birth, persistence, dimension)
-    """
-    X_persistence = np.copy(Xs)
-    X_persistence[:, :, 1] = Xs[:, :, 1] - Xs[:, :, 0]
-    return X_persistence
 
 
 def _discretize(X, n_values=100, **kw_args):
@@ -90,3 +87,10 @@ def _discretize(X, n_values=100, **kw_args):
                                                       num=n_values)
         samplings[dim] = samplings[dim][:, None, None]
     return samplings, step_sizes
+
+
+def _calculate_weights(X, weight_function, samplings, **kw_args):
+    weights = {dim: weight_function(samplings[dim].reshape((-1,))
+                                    - samplings[dim].reshape((-1,))[0])
+               for dim in samplings.keys()}
+    return weights
