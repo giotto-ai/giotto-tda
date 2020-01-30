@@ -52,7 +52,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     infinity_values_ : float or None, default : ``None``
-       Infinity value calculated ub meth:`fit`.
+       Infinity value calculated in meth:`fit`.
 
     See also
     --------
