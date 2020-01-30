@@ -33,8 +33,11 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    periodic_dimensions:  iterable, optional, default: ``()``
-        Dimensions (non-negative integers) along which boundaries are periodic.
+    periodic_dimensions : tuple of bool, optional, default: ``None``
+        Tuple of `D` booleans, where `D` is the dimension of the images. The
+        boolean in the `d`th position expresses whether the boundaries along
+        the `d`th axis are periodic. ``None`` implies that none of the
+        boundaries are periodic.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
@@ -45,6 +48,11 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    Attributes
+    ----------
+    infinity_values_ : float or None, default : ``None``
+       Infinity value calculated ub meth:`fit`.
 
     See also
     --------
@@ -71,9 +79,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
                         '_periodic_dimensions': [list, [int, (0, np.inf)]],
                         'infinity_values_': [numbers.Number]}
 
-
-    def __init__(self, homology_dimensions=(0, 1), coeff=2, periodic=False,
-                 infinity_values=None, n_jobs=None):
+    def __init__(self, homology_dimensions=(0, 1), coeff=2,
+                 periodic_dimensions=(), infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.periodic_dimensions = periodic_dimensions
@@ -83,7 +90,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     def _gudhi_diagram(self, X):
         cubical_complex = self.filtration(
             dimensions=X.shape,
-            top_dimensional_cells=X.flatten(order="F"))
+            top_dimensional_cells=X.flatten(order="F"),
+            **self._filtration_kwargs)
         Xdgms = cubical_complex.persistence(homology_coeff_field=self.coeff,
                                             min_persistence=0)
 
@@ -119,10 +127,14 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        if self.periodic:
-            self.filtration = PeriodicCubicalComplex
-        else:
+        self._filtration_kwargs = {}
+        if self.periodic_dimensions is None or \
+           np.sum(self.periodic_dimensions) == 0:
             self.filtration = CubicalComplex
+        else:
+            self.filtration = PeriodicCubicalComplex
+            self._filtration_kwargs['periodic_dimensions'] = \
+                self.periodic_dimensions
 
         if self.infinity_values is None:
             self.infinity_values_ = np.max(X)
@@ -170,8 +182,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             topological features in dimension :math:`q` across all samples in
             `X`.
         """
-        check_is_fitted(self, ['_homology_dimensions',
-                               '_max_homology_dimension'])
+        check_is_fitted(self)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
