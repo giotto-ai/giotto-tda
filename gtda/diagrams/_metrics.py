@@ -9,7 +9,7 @@ from scipy.spatial.distance import cdist, pdist, squareform
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import _num_samples
 
-from ._utils import _subdiagrams
+from ._utils import _subdiagrams, _sample_image
 
 
 def betti_curves(diagrams, sampling):
@@ -36,34 +36,17 @@ def landscapes(diagrams, sampling, n_layers):
 
 
 def _heat(heat, sampled_diag, sigma):
-    _sample(heat, sampled_diag)  # modifies `heat` inplace
-    _smoothen(heat, sigma)
-
-
-def _smoothen(heat, sigma):
-    heat[:, :] = gaussian_filter(heat, sigma, mode="reflect")
-
-
-def _sample(grid, sampled_diag):
-    unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
-    unique = tuple(tuple(row) for row in unique.T)
-    grid[unique] = counts
-
-
-def _sample_with_weights(grid, sampled_diag, weights):
-    # TODO: optimize this loop (precompute tuples?)
-    for pt, w in zip(sampled_diag, weights):
-        grid[tuple(pt)] += w
+    _sample_image(heat, sampled_diag)  # modifies `heat` inplace
+    gaussian_filter(heat, sigma, mode="reflect")
 
 
 def heats(diagrams, sampling, step_size, sigma):
-    heats_ = np.zeros((diagrams.shape[0], sampling.shape[0],
-                       sampling.shape[0]))
-    sampled_diags = np.copy(diagrams)
-    sampling_ = sampling.reshape((-1,))
-    sampled_diags[diagrams < sampling_[0]] = sampling_[0]
-    sampled_diags[diagrams > sampling_[-1]] = sampling_[-1]
-    sampled_diags = np.array((sampled_diags - sampling_[0]) / step_size,
+    heats_ = np.zeros((diagrams.shape[0],
+                       sampling.shape[0], sampling.shape[0]))
+    sampled_diags = diagrams
+    sampled_diags[diagrams < sampling[0]] = sampling[0]
+    sampled_diags[diagrams > sampling[-1]] = sampling[-1]
+    sampled_diags = np.array((sampled_diags - sampling[0]) / step_size,
                              dtype=int)
     [_heat(heats_[i], sampled_diag, sigma)
         for i, sampled_diag in enumerate(sampled_diags)]
@@ -72,29 +55,28 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
-def persistent_images(diagrams, sampling, step_size, weight_function, sigma):
-    persistent_images_ = np.zeros(
-        (diagrams.shape[0], sampling.shape[0], sampling.shape[0])
-    )
-    weights = np.apply_along_axis(weight_function,
-                                  -1, diagrams).reshape(*(diagrams.shape[:-1]))
-    sampled_diags = np.copy(diagrams)
-    sampling_ = sampling.reshape((-1,))
+def persistent_images(diagrams, sampling, step_size, weights, sigma):
+    persistent_images_ = np.zeros((diagrams.shape[0],
+                                   sampling.shape[0], sampling.shape[0]))
+    # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
+    diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
+
+    sampled_diags = diagrams
     # Set the values outside of the sampling range to the sampling range.
-    sampled_diags[diagrams < sampling_[0]] = sampling_[0]
-    sampled_diags[diagrams > sampling_[-1]] = sampling_[-1]
+    sampled_diags[diagrams < sampling[0]] = sampling[0]
+    sampled_diags[diagrams > sampling[-1]] = sampling[-1]
     # Birth into pixels
     sampled_diags[:, :, 0] = np.array(
-        (sampled_diags[:, :, 0] - sampling_[0]) / step_size, dtype=int)
+        (sampled_diags[:, :, 0] - sampling[0]) / step_size, dtype=int)
     # Persistence into pixels
     sampled_diags[:, :, 1] = np.array(
-        (sampled_diags[:, :, 1] - sampling_[0]) / step_size, dtype=int)
+        (sampled_diags[:, :, 1] - sampling[0]) / step_size, dtype=int)
 
-    for i, sampled_diag in enumerate(sampled_diags):
-        _sample_with_weights(persistent_images_[i], sampled_diag, weights[i])
-        # persistent_images_[i] *= weights[i]  # multiply counts by weights
-        _smoothen(persistent_images_[i], sigma)
+    [_heat(persistent_images_[i], sampled_diag, sigma)
+        for i, sampled_diag in enumerate(sampled_diags)]
 
+    # TODO: Check if this is broadcasting the right way
+    persistent_images_ *= weights / np.max(weights)
     persistent_images_ = np.rot90(persistent_images_, k=1, axes=(1, 2))
     return persistent_images_
 
@@ -148,28 +130,32 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
 
 def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
                    sigma=1.0, p=2.0, **kwargs):
-    heat_1 = heats(diagrams_1, sampling, step_size, sigma).reshape(
+    sampling_ = np.copy(sampling.reshape((-1,)))
+    heat_1 = heats(diagrams_1, sampling_, step_size, sigma).reshape(
         diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heats(diagrams_2, sampling, step_size, sigma).reshape(
+    heat_2 = heats(diagrams_2, sampling_, step_size, sigma).reshape(
         diagrams_2.shape[0], -1)
     unnorm_dist = cdist(heat_1, heat_2, "minkowski", p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
 
 def persistent_image_distances(diagrams_1, diagrams_2, sampling, step_size,
-                               weight_function, sigma=1.0, p=2.0, **kwargs):
-    persistent_image_1 = persistent_images(diagrams_1, sampling, step_size,
-                                           weight_function, sigma).reshape(
+                               weight_function=lambda x: x, sigma=1.0, p=2.0,
+                               **kwargs):
+    sampling_ = np.copy(sampling.reshape((-1,)))
+    weights = weight_function(sampling_ - sampling_[0])
+    persistent_image_1 = persistent_images(diagrams_1, sampling_, step_size,
+                                           weights, sigma).reshape(
         diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(persistent_image_1,
                                        "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    persistent_image_2 = persistent_images(diagrams_2, sampling, step_size,
-                                           weight_function, sigma,).reshape(
+    persistent_image_2 = persistent_images(diagrams_2, sampling_, step_size,
+                                           weights, sigma,).reshape(
         diagrams_2.shape[0], -1)
     unnorm_dist = cdist(persistent_image_1, persistent_image_2,
                         "minkowski", p=p)
@@ -217,7 +203,8 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
     distance_matrices = np.concatenate(distance_matrices, axis=1)
     distance_matrices = np.stack([distance_matrices[:, i * X2.shape[0]:(i + 1)
                                                          * X2.shape[0]]
-                                  for i in range(len(homology_dimensions))], åaxis=2,)
+                                  for i in range(len(homology_dimensions))],
+                                 axis=2)
     return distance_matrices
 
 
@@ -249,7 +236,8 @@ def heat_amplitudes(diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs):
 
 
 def persistent_image_amplitudes(diagrams, sampling, step_size,
-                                weight_function, sigma=1.0, p=2.0, **kwargs):
+                                weight_function=lambda x: x, sigma=1.0, p=2.0,
+                                **kwargs):
     persistent_image = persistent_images(diagrams, sampling, step_size,
                                          weight_function, sigma)
     return np.linalg.norm(persistent_image, axis=(1, 2), ord=p)
@@ -280,9 +268,10 @@ def _parallel_amplitude(X, metric, metric_params,
     step_sizes = effective_metric_params.pop("step_sizes", none_dict)
 
     amplitude_arrays = Parallel(n_jobs=n_jobs)(
-        delayed(amplitude_func)(_subdiagrams(X, [dim], remove_dim=True)[s],
-                                sampling=samplings[dim], step_size=step_sizes[dim],
-                                **effective_metric_params)
+        delayed(amplitude_func)(
+            _subdiagrams(X, [dim], remove_dim=True)[s],
+            sampling=samplings[dim], step_size=step_sizes[dim],
+            **effective_metric_params)
         for dim in homology_dimensions
         for s in gen_even_slices(_num_samples(X), effective_n_jobs(n_jobs)))
 
