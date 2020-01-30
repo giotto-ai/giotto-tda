@@ -133,7 +133,7 @@ jobs:
       cd examples
       for notebook in *.ipynb
       do
-        papermill --start_timeout 2000 $notebook -
+        papermill --start_timeout 2000 --log-level ERROR $notebook -
       done
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
