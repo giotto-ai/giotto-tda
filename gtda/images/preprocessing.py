@@ -41,7 +41,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    giotto.homology.CubicalPersistence
+    gtda.homology.CubicalPersistence
 
     """
     _hyperparameters = {'threshold': [numbers.Number, (1e-16, 1)],
