@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 import numbers
+import types
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -10,7 +11,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, persistent_images
-from ._utils import _subdiagrams, _discretize, _differentiate
+from ._utils import _subdiagrams, _discretize, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
 
@@ -397,7 +398,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    sigma : float
+    sigma : float, optional default ``1.0``
         Standard deviation for Gaussian kernel.
 
     n_values : int, optional, default: ``100``
@@ -445,7 +446,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_values': [int, (1, np.inf)]}
 
-    def __init__(self, sigma, n_values=100, n_jobs=None):
+    def __init__(self, sigma=1.0, n_values=100, n_jobs=None):
         self.sigma = sigma
         self.n_values = n_values
         self.n_jobs = n_jobs
@@ -512,7 +513,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagram(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
@@ -542,17 +543,16 @@ class PersistentImage(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    sigma : float
+    sigma : float, optional default ``1.0``
         Standard deviation for Gaussian kernel.
 
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    weight_function : fct R^3 -> R, default: (b,p,q) -> p
-        map a point (b, p, q), to a weight, where b, p and q are the birth,
-        persistence and dimension respectively. It should satisfy
-        weight_fct([b,0,q]) = 0 and be continuous with respect to b and p.
+    weight_function : fct 1d array -> ad array, default: p -> p
+        Function mapping a 1d-array of persistence of the points of a diagram
+        to a 1d array of their weight.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -568,6 +568,11 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         For each number in `homology_dimensions_`, a discrete sampling of
         filtration parameters, calculated during :meth:`fit` according to the
         minimum birth and maximum death values observed across all samples.
+
+    weights_ : dict
+        For each number in `homology_dimensions_`, an array of weights
+        corresponding to the persistence values obtained from `samplings_`
+        calculated during :meth:`fit` using the `weight_function`.
 
     See also
     --------
@@ -594,15 +599,16 @@ class PersistentImage(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
-                        'n_values': [int, (1, np.inf)]}
+                        'n_values': [int, (1, np.inf)],
+                        'weight_function': [types.FunctionType]}
 
-    def __init__(self, sigma, n_values=100,
-                 weight_function=lambda x: x[1],
+    def __init__(self, sigma=1.0, n_values=100,
+                 weight_function=lambda x: x,
                  n_jobs=None):
         self.sigma = sigma
         self.n_values = n_values
-        self.n_jobs = n_jobs
         self.weight_function = weight_function
+        self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
@@ -631,16 +637,16 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         """
         X = check_diagram(X)
         validate_params(self.get_params(), self._hyperparameters)
-        # Transform the diagram to birth-persistence
-        X_pers = _differentiate(X)
 
-        self.homology_dimensions_ = sorted(list(set(X_pers[0, :, 2])))
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, self._step_size = _discretize(
-            X_pers, n_values=self.n_values)
+            X, n_values=self.n_values)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
+        self.weights_ = _calculate_weights(X, self.weight_function,
+                                           self._samplings)
         return self
 
     def transform(self, X, y=None):
@@ -668,22 +674,20 @@ class PersistentImage(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
-
-        X_pers = _differentiate(X)
+        X = check_diagram(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(persistent_images)(_subdiagrams(X_pers, [dim],
+            delayed(persistent_images)(_subdiagrams(X, [dim],
                                                     remove_dim=True)[s],
-                                       self._samplings[dim],
+                                       self._samplings[dim].reshape((-1,)),
                                        self._step_size[dim],
-                                       self.weight_function,
+                                       self.weights_[dim],
                                        self.sigma)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X_pers.shape[0],
+            for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs))
         )
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X_pers.shape[0],
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
                                         self.n_values, self.n_values).\
             transpose((1, 0, 2, 3))
         return Xt

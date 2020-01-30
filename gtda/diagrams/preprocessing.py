@@ -135,6 +135,11 @@ class Scaler(BaseEstimator, TransformerMixin):
         - If ``metric == 'heat'`` the available arguments are `p` (float,
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
+        - If ``metric == 'persistent_image'`` the available arguments are `p`
+          (float, default: ``2.``), `sigma` (float, default: ``1.``),
+          `n_values` (int, default: ``100``) and `weight_function`
+          (func, default x -> x).
+
 
     function : callable, optional, default: ``numpy.max``
         Function used to extract a positive scalar from the collection of
@@ -211,10 +216,14 @@ class Scaler(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'heat', 'betti', 'persistent_image']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
+
+        if self.metric == 'persistent_image':
+            self.effective_metric_params_['weights'] = \
+                _calculate_weights(X, **self.effective_metric_params_)
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,

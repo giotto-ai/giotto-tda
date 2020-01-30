@@ -25,11 +25,6 @@ def test_pe_transform():
     assert_almost_equal(pe.fit_transform(diagram), diagram_res)
 
 
-def test_pi_no_sigma():
-    with pytest.raises(TypeError):
-        pi = PersistentImage()
-
-
 def test_pi_not_fitted():
     pi = PersistentImage(sigma=1)
     with pytest.raises(NotFittedError):

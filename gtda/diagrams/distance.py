@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
-from ._utils import _discretize
+from ._utils import _discretize, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import (check_diagram, validate_params,
                                 validate_metric_params)
@@ -69,8 +69,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
           (float, default: ``2.``), `sigma` (float, default: ``1.``) and
           `n_values` (int, default: ``100``).
         - If ``metric == 'persistent_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``) and
-          `n_values` (int, default: ``100``).
+          (float, default: ``2.``), `sigma` (float, default: ``1.``),
+          `n_values` (int, default: ``100``) and `weight_function`
+          (func, default x -> x).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each pair of diagrams a
@@ -166,6 +167,10 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
 
+        if self.metric == 'persistent_image':
+            self.effective_metric_params_['weights'] = \
+                _calculate_weights(X, **self.effective_metric_params_)
+
         self._X = X
         return self
 
@@ -196,7 +201,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagram(X, copy=True)
 
         if np.array_equal(X, self._X):
             X2 = None
@@ -264,8 +269,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
         - If ``metric == 'persistent_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``) and
-          `n_values` (int, default: ``100``).
+          (float, default: ``2.``), `sigma` (float, default: ``1.``),
+          `n_values` (int, default: ``100``) and `weight_function`
+          (func, default x -> x).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each diagram a vector of
@@ -356,6 +362,10 @@ class Amplitude(BaseEstimator, TransformerMixin):
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
 
+        if self.metric == 'persistent_image':
+            self.effective_metric_params_['weights'] = \
+                _calculate_weights(X, **self.effective_metric_params_)
+
         return self
 
     def transform(self, X, y=None):
@@ -382,7 +392,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagram(X, copy=True)
 
         Xt = _parallel_amplitude(X, self.metric,
                                  self.effective_metric_params_,
