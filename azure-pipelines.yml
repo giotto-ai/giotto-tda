@@ -131,7 +131,7 @@ jobs:
       pip install openml pandas
       pip install papermill[azure]
       cd examples
-      FOR %notebook in (*.ipynb) DO papermill --start_timeout 2000 %notebook -
+      FOR %n in (*.ipynb) DO (papermill --start_timeout 2000 %n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
 
