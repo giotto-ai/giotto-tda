@@ -119,7 +119,7 @@ making a contribution to giotto-tda, please see the `CONTRIBUTING.rst
 <https://github.com/giotto-ai/giotto-tda/blob/master/CONTRIBUTING.rst>`_ file.
 
 Developer installation
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 Installing both the PyPI release and source of giotto-tda in the same environment is not recommended since it is
 known to cause conflicts with the C++ bindings. On  Windows, the pycairo and python-igraph dependencies have to be
