@@ -149,7 +149,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill[azure]
+      pip install papermill
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
@@ -203,6 +203,7 @@ jobs:
       failOnStderr: true
     env:
       python_ver: $(python_ver)
+    failOnStderr: true
     displayName: 'Run the docker and open bash'
 
   - script: |
@@ -308,6 +309,7 @@ jobs:
   - script: |
       pip install wheel
       python setup.py sdist bdist_wheel
+    failOnStderr: true
     displayName: 'Build the wheels'
 
   - script: |
@@ -383,49 +385,54 @@ jobs:
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
-  - script: python -m pip install --upgrade pip setuptools
-    displayName: 'Install tools'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+    failOnStderr: true
+    displayName: 'Upgrade pip and setuptools'
 
   - bash: |
       pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
       igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
       pip install "$pycairo_url" "$igraph_url"
+    failOnStderr: true
     displayName: 'Install pycairo and python-igraph'
 
   - script: |
       pip install -e ."[tests, doc]"
-      pip install wheel twine
+    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml pandas
-      pip install papermill[azure]
-      cd examples
-      papermill --start_timeout 600 *.ipynb -
-      cd ..
       pip uninstall -y giotto-tda
+    condition: eq(variables['nightly_check'], 'false')
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda'
+
+  - script: |
+      pip uninstall -y giotto-tda-nightly
+    condition: eq(variables['nightly_check'], 'true')
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda-nightly'
+
+  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Test with pytest, papermill and flake8'
+    displayName: 'Test with pytest and flake8'
 
   - script: |
       pip install openml pandas
-      pip install papermill[azure]
+      pip install papermill
       cd examples
-      papermill --start_timeout 600 *.ipynb -
-      cd ..
-      pip uninstall -y giotto-tda-nightly
-      pytest --cov gtda --cov-report xml
-      flake8
+      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Test with pytest, papermill and flake8'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
+      pip install wheel
       python setup.py sdist bdist_wheel
+    failOnStderr: true
     displayName: 'Build the wheels'
 
   - bash: |
@@ -447,6 +454,9 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-  - bash: twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
+  - bash: |
+      pip install twine
+      twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
+    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
