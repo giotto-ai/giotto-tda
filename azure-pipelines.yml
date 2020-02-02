@@ -229,7 +229,7 @@ jobs:
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
       twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload giotto-tda-nightly wheels to PyPI'
+    displayName: 'Upload nightly wheels to PyPI'
 
 
 - job: 'macOS1014'
@@ -349,7 +349,7 @@ jobs:
       pip install twine
       twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload wheels to PyPI'
+    displayName: 'Upload nightly wheels to PyPI'
 
 
 - job: 'win2016'
@@ -447,6 +447,6 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'wheel_and_doc'
 
-  - bash: twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+  - bash: twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload wheels to PyPI'
+    displayName: 'Upload nightly wheels to PyPI'
