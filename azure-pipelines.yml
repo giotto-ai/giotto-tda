@@ -70,7 +70,8 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc cmake boost
+      brew install gcc boost
+      brew update cmake
     failOnStderr: true
     displayName: 'Install gcc, cmake and boost'
 
@@ -263,7 +264,8 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc cmake boost
+      brew install gcc boost
+      brew update cmake
     failOnStderr: true
     displayName: 'Install gcc, cmake and boost'
 
