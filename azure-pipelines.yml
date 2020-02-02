@@ -23,20 +23,29 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
+    failOnStderr: true
+    displayName: 'Upgrade pip and setuptools'
 
   - script: pip install -e ".[tests, doc]"
+    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml pandas
-      pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest, papermill and flake8'
+    displayName: 'Test with pytest and flake8'
+
+  - script: |
+      pip install openml pandas
+      pip install papermill
+      cd examples
+      for n in (*.ipynb)
+      do
+        papermill --start_timeout 2000 $n -
+      done
+    failOnStderr: true
+    displayName: 'Test jupyter notebooks with papermill'
 
 
 - job: 'test_macOS1014'
@@ -60,26 +69,30 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: |
-      brew update
-      brew install boost
-      brew install gcc
-    displayName: 'Install boost and gcc'
-
-  - script: |
       python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
+    failOnStderr: true
+    displayName: 'Upgrade pip and setuptools'
 
   - script: pip install -e ".[tests, doc]"
+    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml pandas
-      pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
       pytest --cov gtda --cov-report xml
       flake8
-    displayName: 'Test with pytest, papermill and flake8'
+    failOnStderr: true
+    displayName: 'Test with pytest and flake8'
+
+  - script: |
+      pip install openml pandas
+      pip install papermill
+      cd examples
+      for n in (*.ipynb)
+      do
+        papermill --start_timeout 2000 $n -
+      done
+    failOnStderr: true
+    displayName: 'Test jupyter notebooks with papermill'
 
 
 - job: 'test_win2016'
@@ -108,13 +121,14 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
+    failOnStderr: true
+    displayName: 'Upgrade pip and setuptools'
 
   - bash: |
       pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
       igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
       pip install "$pycairo_url" "$igraph_url"
+    failOnStderr: true
     displayName: 'Install pycairo and python-igraph'
 
   - script: |
