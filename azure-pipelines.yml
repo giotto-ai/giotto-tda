@@ -203,7 +203,6 @@ jobs:
       failOnStderr: true
     env:
       python_ver: $(python_ver)
-    failOnStderr: true
     displayName: 'Run the docker and open bash'
 
   - script: |
