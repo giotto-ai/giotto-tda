@@ -22,12 +22,6 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: |
-      brew update
-      brew install gcc boost
-    failOnStderr: true
-    displayName: 'Install gcc and boost'
-
-  - script: |
       python -m pip install --upgrade pip setuptools
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
@@ -73,6 +67,12 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+
+  - script: |
+      brew update
+      brew install gcc boost
+    failOnStderr: true
+    displayName: 'Install gcc and boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
