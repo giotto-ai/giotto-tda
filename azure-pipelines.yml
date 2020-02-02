@@ -70,9 +70,9 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost
+      brew install gcc cmake boost
     failOnStderr: true
-    displayName: 'Install gcc and boost'
+    displayName: 'Install gcc, cmake and boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
@@ -263,9 +263,9 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost
+      brew install gcc cmake boost
     failOnStderr: true
-    displayName: 'Install gcc and boost'
+    displayName: 'Install gcc, cmake and boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
