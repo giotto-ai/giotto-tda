@@ -232,9 +232,9 @@ jobs:
   - bash: |
       pip install twine
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-tda -p $(pypi_psw) --skip-existing dist/*
+      twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload wheels to PyPI'
+    displayName: 'Upload giotto-tda-nightly wheels to PyPI'
 
 
 - job: 'macOS1014'
