@@ -26,7 +26,7 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - script: pip install -e ".[tests, doc]"
+  - script: pip install -e ."[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
@@ -138,7 +138,7 @@ jobs:
     displayName: 'Install pycairo and python-igraph'
 
   - script: |
-      pip install -e ".[tests, doc]"
+      pip install -e ."[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
@@ -263,41 +263,51 @@ jobs:
 
   - script: |
       brew update
-      brew install boost
-      brew install gcc
-    displayName: 'Install boost and gcc'
-
-  - script: python -m pip install --upgrade pip setuptools
-    displayName: 'Install tools'
+      brew install gcc boost
+    failOnStderr: true
+    displayName: 'Install gcc and boost'
 
   - script: |
-      pip install -e ".[tests, doc]"
-      pip install wheel twine
+      python -m pip install --upgrade pip setuptools
+    failOnStderr: true
+    displayName: 'Upgrade pip and setuptools'
+
+  - script: pip install -e ."[tests, doc]"
+    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pip install openml pandas
-      pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
       pip uninstall -y giotto-tda
+    condition: eq(variables['nightly_check'], 'false')
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda'
+
+  - script: |
+      pip uninstall -y giotto-tda-nightly
+    condition: eq(variables['nightly_check'], 'true')
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda-nightly'
+
+  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Test with pytest, papermill and flake8'
+    displayName: 'Test with pytest and flake8'
 
   - script: |
       pip install openml pandas
-      pip install papermill[azure]
-      papermill --start_timeout 600 examples/*.ipynb -
-      pip uninstall -y giotto-tda-nightly
-      pytest --cov gtda --cov-report xml
-      flake8
+      pip install papermill
+      cd examples
+      for n in *.ipynb
+      do
+        papermill --start_timeout 2000 $n -
+      done
     failOnStderr: true
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Test with pytest, papermill and flake8'
+    displayName: 'Test jupyter notebooks with papermill'
 
-  - script: python setup.py sdist bdist_wheel
+  - script: |
+      pip install wheel
+      python setup.py sdist bdist_wheel
     displayName: 'Build the wheels'
 
   - script: |
@@ -383,7 +393,7 @@ jobs:
     displayName: 'Install pycairo and python-igraph'
 
   - script: |
-      pip install -e ".[tests, doc]"
+      pip install -e ."[tests, doc]"
       pip install wheel twine
     displayName: 'Install dev environment'
 
