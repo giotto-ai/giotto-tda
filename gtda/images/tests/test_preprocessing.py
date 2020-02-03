@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from giotto.images import Binarizer
+from gtda.images import Binarizer
 
 images_2D = np.stack([np.ones((7, 8)),
                       np.concatenate([np.ones((7, 4)), np.zeros((7, 4))],
