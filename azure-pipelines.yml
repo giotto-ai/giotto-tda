@@ -204,14 +204,53 @@ jobs:
       failOnStderr: true
     env:
       python_ver: $(python_ver)
-    displayName: 'Run the docker and open bash'
+    displayName: 'Run the docker and open bash to install dev environment'
 
   - script: |
-      pip install dist/*.whl
+      pip uninstall -y giotto-tda
+    condition: eq(variables['nightly_check'], 'false')
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda dev'
+
+  - script: |
+      pip uninstall -y giotto-tda-nightly
+    condition: eq(variables['nightly_check'], 'true')
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda-nightly dev'
+
+  - script: |
+      pytest --cov gtda --cov-report xml
+      flake8
+    failOnStderr: true
+    displayName: 'Test with pytest and flake8'
+
+  - script: |
+      pip install wheel
+      python setup.py sdist bdist_wheel
+    failOnStderr: true
+    displayName: 'Build the wheels'
+
+  - script: pip install dist/*.whl
+    failOnStderr: true
+    displayName: 'Install the wheels'
+
+  - script: |
       cd /tmp/
       pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     failOnStderr: true
-    displayName: 'Install and test the wheels'
+    displayName: 'Test the wheels with pytest'
+
+  - script: |
+      cd ../../giotto-tda/examples
+      pip install openml pandas
+      pip install papermill
+      cd examples
+      for n in *.ipynb
+      do
+        papermill --start_timeout 2000 $n -
+      done
+    failOnStderr: true
+    displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
@@ -282,13 +321,13 @@ jobs:
       pip uninstall -y giotto-tda
     condition: eq(variables['nightly_check'], 'false')
     failOnStderr: true
-    displayName: 'Uninstall giotto-tda'
+    displayName: 'Uninstall giotto-tda dev'
 
   - script: |
       pip uninstall -y giotto-tda-nightly
     condition: eq(variables['nightly_check'], 'true')
     failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly'
+    displayName: 'Uninstall giotto-tda-nightly dev'
 
   - script: |
       pytest --cov gtda --cov-report xml
@@ -297,6 +336,23 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - script: |
+      pip install wheel
+      python setup.py sdist bdist_wheel
+    failOnStderr: true
+    displayName: 'Build the wheels'
+
+  - script: pip install dist/*.whl
+    failOnStderr: true
+    displayName: 'Install the wheels'
+
+  - script: |
+      cd /tmp/
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    failOnStderr: true
+    displayName: 'Test the wheels with pytest'
+
+  - script: |
+      cd ../../giotto-tda/examples
       pip install openml pandas
       pip install papermill
       cd examples
@@ -305,20 +361,7 @@ jobs:
         papermill --start_timeout 2000 $n -
       done
     failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-  - script: |
-      pip install wheel
-      python setup.py sdist bdist_wheel
-    failOnStderr: true
-    displayName: 'Build the wheels'
-
-  - script: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: true
-    displayName: 'Install and test the wheels'
+    displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - script: |
       cd doc/
@@ -407,27 +450,19 @@ jobs:
       pip uninstall -y giotto-tda
     condition: eq(variables['nightly_check'], 'false')
     failOnStderr: true
-    displayName: 'Uninstall giotto-tda'
+    displayName: 'Uninstall giotto-tda dev'
 
   - script: |
       pip uninstall -y giotto-tda-nightly
     condition: eq(variables['nightly_check'], 'true')
     failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly'
+    displayName: 'Uninstall giotto-tda-nightly dev'
 
   - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install openml pandas
-      pip install papermill
-      cd examples
-      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
@@ -436,12 +471,23 @@ jobs:
     failOnStderr: true
     displayName: 'Build the wheels'
 
+  - script: pip install dist/*.whl
+    failOnStderr: true
+    displayName: 'Install the wheels'
+
   - bash: |
-      pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     failOnStderr: true
-    displayName: 'Install and test the wheels'
+    displayName: 'Test the wheels with pytest'
+
+  - script: |
+      pip install openml pandas
+      pip install papermill
+      ../../giotto-tda/examples
+      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
+    failOnStderr: true
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
