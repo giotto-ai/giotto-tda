@@ -67,11 +67,18 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
 
 def _discretize(X, metric, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
-    min_vals = {dim: np.min(_subdiagrams(X, [dim], remove_dim=True), axis=(0, 1))
-                for dim in homology_dimensions}
-    max_vals = {dim: np.max(_subdiagrams(X, [dim], remove_dim=True), axis=(0, 1))
-                for dim in homology_dimensions}
     # For some vectorizations, we force the values to be the same, and span the whole range
+    sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
+                 for dim in homology_dimensions}
+    # For persistent images, move into birth-persistence
+    if metric == 'persistent_image':
+        for dim in homology_dimensions:
+            sub_diags[dim][:, :, 1:2] = sub_diags[dim][:, :, 1:2] - sub_diags[dim][:, :, 0:1]
+    min_vals = {dim: np.min(sub_diags[dim], axis=(0, 1))
+                for dim in homology_dimensions}
+    max_vals = {dim: np.max(sub_diags[dim], axis=(0, 1))
+                for dim in homology_dimensions}
+
     if metric in ['landscape', 'betti', 'heat']:
         min_vals = {d: np.array(2*[np.min(m)]) for d, m in min_vals.items()}
         max_vals = {d: np.array(2*[np.max(m)]) for d, m in max_vals.items()}
@@ -79,7 +86,10 @@ def _discretize(X, metric, n_values=100, **kw_args):
         pass
     # Scales between axes should be kept the same, but not necessarily between dimensions
     # (it is better to use persistence scale from dim 1 in dim 0, than the birth scale from dim 0)
-    global_max_val = np.max(np.stack(max_vals.values(), axis=0))
+    all_max_values = np.stack(max_vals.values())
+    if len(homology_dimensions) == 1:
+        all_max_values == all_max_values.reshape(1, -1)
+    global_max_val = np.max(all_max_values, axis=0)
     max_vals = {dim: np.array([max_vals[dim][k] if
                                (max_vals[dim][k] != min_vals[dim][k])
                                else global_max_val[k] for k in range(2)])
@@ -97,7 +107,6 @@ def _discretize(X, metric, n_values=100, **kw_args):
 
 
 def _calculate_weights(X, weight_function, samplings, **kw_args):
-    weights = {dim: weight_function(samplings[dim].reshape((-1,))
-                                    - samplings[dim].reshape((-1,))[0])
+    weights = {dim: weight_function(samplings[dim][:, 1])
                for dim in samplings.keys()}
     return weights
