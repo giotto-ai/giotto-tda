@@ -63,8 +63,9 @@ def persistent_images(diagrams, sampling, step_size, weights, sigma):
 
     sampled_diags = diagrams
     # Set the values outside of the sampling range to the sampling range.
-    sampled_diags[diagrams < sampling[0]] = sampling[0]
-    sampled_diags[diagrams > sampling[-1]] = sampling[-1]
+    for k in range(2):
+        sampled_diags[diagrams < sampling[0]] = sampling[0]
+        sampled_diags[diagrams > sampling[-1]] = sampling[-1]
     # Birth into pixels
     sampled_diags[:, :, 0] = np.array(
         (sampled_diags[:, :, 0] - sampling[0]) / step_size, dtype=int)

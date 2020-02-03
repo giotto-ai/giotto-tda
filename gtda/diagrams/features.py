@@ -11,7 +11,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, persistent_images
-from ._utils import _subdiagrams, _discretize, _calculate_weights
+from ._utils import _subdiagrams, _discretize, _calculate_weights, _get_bounding_box
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
 
@@ -641,9 +641,9 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, self._step_size = _discretize(
-            X, n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self._samplings, self._step_size = _get_bounding_box(
+            X, n_values=self.n_values, is_square=False)
+        self.samplings_ = {dim: [s_.flatten() for s_ in s]
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.weight_function,
                                            self._samplings)
@@ -679,7 +679,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(persistent_images)(_subdiagrams(X, [dim],
                                                     remove_dim=True)[s],
-                                       self._samplings[dim].reshape((-1,)),
+                                       self._samplings[dim],
                                        self._step_size[dim],
                                        self.weights_[dim],
                                        self.sigma)
