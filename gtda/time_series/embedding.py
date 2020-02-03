@@ -326,7 +326,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
-        """Calculate the mutual information given the delay."""
+        """Calculate the mutual information given the time delay."""
         contingency = np.histogram2d(X.reshape((-1,))[:-time_delay],
                                      X.reshape((-1,))[time_delay:],
                                      bins=n_bins)[0]
@@ -335,35 +335,39 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         return mutual_information
 
     @staticmethod
-    def _false_nearest_neighbors(X, time_delay, dimension,
-                                 stride=1):
-        """Calculate the number of false nearest neighbours of embedding
-        dimension. """
+    def _false_nearest_neighbors(X, time_delay, dimension, stride=1):
+        """Calculate the number of false nearest neighbours in a certain
+        embedding dimension, based on heuristics."""
         X_embedded = TakensEmbedding._embed(X, time_delay, dimension, stride)
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
             X_embedded)
         distances, indices = neighbor.kneighbors(X_embedded)
         distance = distances[:, 1]
-        XNeighbor = X[indices[:, 1]]
+        X_first_nbhrs = X[indices[:, 1]]
 
         epsilon = 2.0 * np.std(X)
         tolerance = 10
 
-        dim_by_delay = -dimension * time_delay
-        non_zero_distance = distance[:dim_by_delay] > 0
+        neg_dim_delay = - dimension * time_delay
+        distance_slice = distance[:neg_dim_delay]
+        X_rolled = np.roll(X, neg_dim_delay)
+        X_rolled_slice = slice(X.shape[0] - X_embedded.shape[0], neg_dim_delay)
+        X_first_nbhrs_rolled = np.roll(X_first_nbhrs, neg_dim_delay)
 
-        false_neighbor_criteria = \
-            np.abs(np.roll(X, dim_by_delay)[
-                   X.shape[0] - X_embedded.shape[0]:dim_by_delay] -
-                   np.roll(XNeighbor, dim_by_delay)[:dim_by_delay]) \
-            / distance[:dim_by_delay] > tolerance
+        neighbor_abs_diff = np.abs(
+            X_rolled[X_rolled_slice] - X_first_nbhrs_rolled[:neg_dim_delay]).\
+            flatten()
 
-        limited_dataset_criteria = distance[:dim_by_delay] < epsilon
+        false_neighbor_ratio = np.divide(
+            neighbor_abs_diff, distance_slice,
+            out=np.zeros_like(neighbor_abs_diff), where=(distance_slice != 0))
+        false_neighbor_criteria = false_neighbor_ratio > tolerance
+
+        limited_dataset_criteria = distance_slice < epsilon
 
         n_false_neighbors = np.sum(
-            non_zero_distance * false_neighbor_criteria *
-            limited_dataset_criteria)
+            false_neighbor_criteria * limited_dataset_criteria)
         return n_false_neighbors
 
     def fit(self, X, y=None):
