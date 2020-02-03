@@ -219,7 +219,8 @@ class Scaler(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'betti', 'persistent_image']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, metric=self.metric, **self.effective_metric_params_)
+                _discretize(X, metric=self.metric,
+                            **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \

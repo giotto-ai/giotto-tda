@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from  hypothesis import given
+from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 
@@ -65,5 +65,3 @@ def test_pi_positive(pts):
         np.sort(pts, axis=1), np.zeros((pts.shape[0], 1))],
         axis=1), axis=0)
     assert np.all(pi.fit_transform(diagrams) >= 0.)
-
-

@@ -165,7 +165,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, metric=self.metric, **self.effective_metric_params_)
+                _discretize(X, metric=self.metric,
+                            **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \
@@ -360,7 +361,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, metric=self.metric, **self.effective_metric_params_)
+                _discretize(X, metric=self.metric,
+                            **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \

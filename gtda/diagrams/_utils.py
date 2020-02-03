@@ -67,13 +67,14 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
 
 def _discretize(X, metric, n_values=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
-    # For some vectorizations, we force the values to be the same, and span the whole range
+    # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
                  for dim in homology_dimensions}
     # For persistent images, move into birth-persistence
     if metric == 'persistent_image':
         for dim in homology_dimensions:
-            sub_diags[dim][:, :, 1:2] = sub_diags[dim][:, :, 1:2] - sub_diags[dim][:, :, 0:1]
+            sub_diags[dim][:, :, 1:2] = sub_diags[dim][:, :, 1:2]\
+                                        - sub_diags[dim][:, :, 0:1]
     min_vals = {dim: np.min(sub_diags[dim], axis=(0, 1))
                 for dim in homology_dimensions}
     max_vals = {dim: np.max(sub_diags[dim], axis=(0, 1))
@@ -84,8 +85,7 @@ def _discretize(X, metric, n_values=100, **kw_args):
         max_vals = {d: np.array(2*[np.max(m)]) for d, m in max_vals.items()}
     elif metric == 'persistent_image':
         pass
-    # Scales between axes should be kept the same, but not necessarily between dimensions
-    # (it is better to use persistence scale from dim 1 in dim 0, than the birth scale from dim 0)
+    # Scales between axes should be kept the same, but not between dimension
     all_max_values = np.stack(max_vals.values())
     if len(homology_dimensions) == 1:
         all_max_values == all_max_values.reshape(1, -1)
@@ -105,7 +105,7 @@ def _discretize(X, metric, n_values=100, **kw_args):
     if metric in ['landscape', 'betti', 'heat']:
         for dim in homology_dimensions:
             samplings[dim] = samplings[dim][:, 0, None, None]
-            step_sizes[dim]= step_sizes[dim][0]
+            step_sizes[dim] = step_sizes[dim][0]
     return samplings, step_sizes
 
 
