@@ -203,7 +203,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, _ = _discretize(X, metric='betti', n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         return self
 
@@ -336,7 +336,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, _ = _discretize(X, metric="landscape", n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
 
         return self
@@ -484,7 +484,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         self._samplings, self._step_size = _discretize(
             X, metric='heat', n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         return self
 
