@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_amplitude
-from ._utils import _sort, _filter, _discretize
+from ._utils import _sort, _filter, _discretize, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import (check_diagram, validate_params,
                                 validate_metric_params)
@@ -219,7 +219,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         if self.metric in ['landscape', 'heat', 'betti', 'persistent_image']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, **self.effective_metric_params_)
+                _discretize(X, metric=self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \
