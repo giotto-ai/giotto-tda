@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_amplitude
-from ._utils import _sort, _filter, _discretize, _calculate_weights
+from ._utils import _sort, _filter, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import (check_diagram, validate_params,
                                 validate_metric_params)
@@ -128,16 +128,16 @@ class Scaler(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
           default: ``2``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
         - If ``metric == 'persistent_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_values` (int, default: ``100``) and `weight_function`
+          `n_bins` (int, default: ``100``) and `weight_function`
           (func, default x -> x).
 
 
@@ -218,8 +218,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \
-            _discretize(X, metric=self.metric,
-                        **self.effective_metric_params_)
+            _bin(X, metric=self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \

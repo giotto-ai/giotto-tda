@@ -65,7 +65,7 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
     return Xf
 
 
-def _discretize(X, metric, n_values=100, **kw_args):
+def _bin(X, metric, n_bins=100, **kw_args):
     homology_dimensions = sorted(list(set(X[0, :, 2])))
     # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
@@ -101,7 +101,7 @@ def _discretize(X, metric, n_values=100, **kw_args):
         samplings[dim], step_sizes[dim] = np.linspace(min_vals[dim],
                                                       max_vals[dim],
                                                       retstep=True,
-                                                      num=n_values)
+                                                      num=n_bins)
     if metric in ['landscape', 'betti', 'heat']:
         for dim in homology_dimensions:
             samplings[dim] = samplings[dim][:, 0, None, None]
