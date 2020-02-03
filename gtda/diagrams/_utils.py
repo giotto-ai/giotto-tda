@@ -102,7 +102,10 @@ def _discretize(X, metric, n_values=100, **kw_args):
                                                       max_vals[dim],
                                                       retstep=True,
                                                       num=n_values)
-        # samplings[dim] = samplings[dim][:, None, None]
+    if metric in ['landscape', 'betti', 'heat']:
+        for dim in homology_dimensions:
+            samplings[dim] = samplings[dim][:, 0, None, None]
+            step_sizes[dim]= step_sizes[dim][0]
     return samplings, step_sizes
 
 
