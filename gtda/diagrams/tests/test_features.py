@@ -40,14 +40,17 @@ def test_pi_not_fitted():
                                   max_value=1e6),
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
 def test_pi_null(X):
+    """Test that, if one trivial diagram (all pts on the diagonal) is provided,
+    (along with a non-trivial one), then its pi is null"""
     pi = PersistentImage(sigma=1, n_values=10)
     X = np.append(X, 1 + X[-1])
     diagrams = np.expand_dims(np.stack([X, X,
                                         np.zeros((X.shape[0],),
                                                  dtype=int)]).transpose(),
                               axis=0)
-
-    assert_almost_equal(pi.fit_transform(diagrams), 0)
+    diagrams = np.repeat(diagrams, 2, axis=0)
+    diagrams[1, :, 1] += 1
+    assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
 
 
 @given(pts=arrays(dtype=np.float, unique=True,
