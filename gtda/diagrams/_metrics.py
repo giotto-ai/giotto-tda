@@ -63,14 +63,14 @@ def persistent_images(diagrams, sampling, step_size, weights, sigma):
 
     sampled_diags = diagrams
     # Set the values outside of the sampling range to the sampling range.
-    for k in range(2):
-        sampled_diags[:, :, k][diagrams[:, :, k]
-                               < sampling[0, k]] = sampling[0, k]
-        sampled_diags[:, :, k][diagrams[:, :, k]
-                               > sampling[-1, k]] = sampling[-1, k]
+    for axis in [0, 1]:
+        sampled_diags[:, :, axis][diagrams[:, :, axis]
+                               < sampling[0, axis]] = sampling[0, axis]
+        sampled_diags[:, :, axis][diagrams[:, :, axis]
+                               > sampling[-1, axis]] = sampling[-1, axis]
         # Convert into pixel
-        sampled_diags[:, :, k] = np.array(
-            (sampled_diags[:, :, k] - sampling[0, k]) / step_size[k],
+        sampled_diags[:, :, axis] = np.array(
+            (sampled_diags[:, :, axis] - sampling[0, axis]) / step_size[axis],
             dtype=int)
 
     [_heat(persistent_images_[i], sampled_diag, sigma)

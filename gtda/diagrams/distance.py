@@ -162,11 +162,10 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
-            self.effective_metric_params_['samplings'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, metric=self.metric,
-                            **self.effective_metric_params_)
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _discretize(X, metric=self.metric,
+                        **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \
@@ -358,11 +357,10 @@ class Amplitude(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
-            self.effective_metric_params_['samplings'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, metric=self.metric,
-                            **self.effective_metric_params_)
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _discretize(X, metric=self.metric,
+                        **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \
