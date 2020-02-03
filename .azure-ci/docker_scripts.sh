@@ -2,7 +2,7 @@
 
 set -x
 
-# Upgrading pip and setuptools
+# Upgrading pip and setuptools, TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH=${PYTHON_PATH}/bin:${PATH}
 pip install --upgrade pip==19.3.1 setuptools
@@ -27,11 +27,6 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# Install and uninstall giotto-tda
+# Install and uninstall giotto-tda dev
 cd /io
 pip install -e ."[doc, tests]"
-pip uninstall -y giotto-tda
-
-# Testing and linting
-pytest --cov . --cov-report xml
-flake8 --exit-zero /io/
