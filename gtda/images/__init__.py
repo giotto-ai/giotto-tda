@@ -3,7 +3,9 @@
 """
 
 from .preprocessing import Binarizer
+from .filtration import HeightFiltration
 
 __all__ = [
     'Binarizer',
+    'HeightFiltration'
 ]

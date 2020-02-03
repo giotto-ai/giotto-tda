@@ -1,0 +1,150 @@
+"""Binary image filtration."""
+# License: GNU AGPLv3
+
+import numbers
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+from joblib import Parallel, delayed, effective_n_jobs
+from sklearn.utils import gen_even_slices
+from sklearn.utils.validation import check_is_fitted, check_array
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import validate_params
+
+
+@adapt_fit_transform_docs
+class HeightFiltration(BaseEstimator, TransformerMixin):
+    """Transformer returning a collection of direction-based height image filtrations
+    from a collection of 2D or 3D boolean images.
+
+    Parameters
+    ----------
+    direction : ndarray, shape (n_dimensions_, [1]), optional, default
+        ``np.ones(n_dimensions_)``
+        Direction of the height filtration.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    direction_ : ndarray, shape (n_dimensions_, [1]), optional, default
+        ``np.ones(n_dimensions_)``
+        Effective direction of the height filtration. Set in meth:`fit`.
+
+    n_dimensions_ : int
+        Dimension of the images. Set in meth:`fit`.
+
+    mesh_ : int
+        Mesh image for which each pixel value is its distance to the hyperplane
+        implied by `direction_`. Set in meth:`fit`.
+
+    max_value_: float
+        Maximum pixel value among all pixels in all images of the collection.
+        Set in meth:`fit`.
+
+    See also
+    --------
+    gtda.homology.CubicalPersistence
+
+
+    """
+    _hyperparameters = {'n_dimensions_': [int, [2, 3]],
+                        'direction_': [np.ndarray, (numbers.Number, None)]}
+
+    def __init__(self, direction=None, n_jobs=None):
+        self.direction = direction
+        self.n_jobs = n_jobs
+
+    def _calculate_height(self, X):
+        Xh = np.full(X.shape, self.max_value_)
+
+        for i in range(Xh.shape[0]):
+            Xh[i][X[i] == True] = np.dot(self.mesh_[X[i] == True],
+                                         self.direction_).reshape((-1,))
+
+        return Xh
+
+    def fit(self, X, y=None):
+        """Calculate `n_dimensions_`, 'mesh_' and `max_value_` from a
+        collection of binary image. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            grayscale image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_array(X,  ensure_2d=False, allow_nd=True)
+
+        self.n_dimensions_ = len(X.shape) - 1
+
+        if self.direction is None:
+            self.direction_ = np.ones((self.n_dimensions_, ))
+        else:
+            self.direction_ = np.copy(self.direction)
+
+        validate_params({**self.get_params(), 'direction_': self.direction_,
+                         'n_dimensions_': self.n_dimensions_},
+                         self._hyperparameters)
+
+        self.direction_ = self.direction_ / np.linalg.norm(self.direction_)
+
+        axis_order = [2, 1, 3]
+        mesh_range_list = \
+            [np.arange(X.shape[order]) if self.direction_[i] >= 0
+             else -np.flip(np.arange(X.shape[order])) for i, order
+             in enumerate(axis_order[: self.n_dimensions_])]
+
+        self.mesh_ = np.stack(np.meshgrid(*mesh_range_list, indexing='xy'),
+                              axis=self.n_dimensions_)
+
+        self.max_value_ = 0.
+        self.max_value_ = np.max(self._calculate_height(
+            np.ones((1, *X.shape[1:]))))
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each collection of binary images, calculate the corresponding
+        collection of grayscale images based on the threshold.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            grayscale image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D binary images.
+        """
+
+        check_is_fitted(self)
+        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._calculate_height)(X[s])
+            for s in gen_even_slices(Xt.shape[0], effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        return Xt
