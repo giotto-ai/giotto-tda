@@ -100,11 +100,14 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         X_rank = rankdata(X, method='dense')
         left_limits, right_limits = self._find_interval_limits(
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
-        X_rank -= 1
-        left_ranks = left_limits.astype(int)
-        right_ranks = right_limits.astype(int) + 1
+        left_limits_int = left_limits.astype(int)
+        left_ranks = np.where(left_limits >= 0, left_limits_int, -1)
+        right_limits_int = right_limits.astype(int)
+        right_ranks = np.where(right_limits_int == right_limits,
+                               right_limits_int,
+                               right_limits_int + 1)
         self.left_limits_, self.right_limits_ = self._limits_from_ranks(
-            X_rank, X.flatten(), left_ranks, right_ranks)
+            X_rank - 1, X.flatten(), left_ranks, right_ranks)
         return self
 
     def fit(self, X, y=None):
