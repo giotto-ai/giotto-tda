@@ -35,7 +35,3 @@ pip uninstall -y giotto-tda
 # Testing and linting
 pytest --cov . --cov-report xml
 flake8 --exit-zero /io/
-
-# Build the wheels
-pip install wheel
-python setup.py sdist bdist_wheel
