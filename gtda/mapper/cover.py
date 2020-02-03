@@ -97,7 +97,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return self
 
     def _fit_balanced(self, X):
-        X_rank = rankdata(X, method='dense')
+        X_rank = rankdata(X, method='dense') - 1
         left_limits, right_limits = self._find_interval_limits(
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
         left_limits_int = left_limits.astype(int)
@@ -107,7 +107,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
                                right_limits_int,
                                right_limits_int + 1)
         self.left_limits_, self.right_limits_ = self._limits_from_ranks(
-            X_rank - 1, X.flatten(), left_ranks, right_ranks)
+            X_rank, X.flatten(), left_ranks, right_ranks)
         return self
 
     def fit(self, X, y=None):
@@ -270,8 +270,9 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             only_one_pt = (min_val == max_val)
         else:
             # Assume X is the result of a call to scipy.stats.rankdata
-            min_val, max_val = -0.5, np.max(X) - 0.5
-            only_one_pt = (min_val == max_val - 0.5)
+            min_val, max_val = -0.5, np.max(X) + 0.5
+            print(min_val, max_val)
+            only_one_pt = (min_val == max_val - 1)
 
         # Allow X to have one unique sample only if one interval is required,
         # in which case the fitted interval will be (-np.inf, np.inf).
