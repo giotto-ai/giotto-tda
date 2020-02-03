@@ -202,7 +202,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, _ = _discretize(X, n_values=self.n_values)
+        self._samplings, _ = _discretize(X, metric='betti', n_values=self.n_values)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
         return self
@@ -335,7 +335,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, _ = _discretize(X, n_values=self.n_values)
+        self._samplings, _ = _discretize(X, metric="landscape", n_values=self.n_values)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -483,7 +483,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, self._step_size = _discretize(
-            X, n_values=self.n_values)
+            X, metric='heat', n_values=self.n_values)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
         return self
@@ -642,8 +642,8 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, self._step_size = _discretize(
-            X, n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+            X, metric='persistent_image', n_values=self.n_values)
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.weight_function,
                                            self._samplings)
@@ -679,7 +679,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(persistent_images)(_subdiagrams(X, [dim],
                                                     remove_dim=True)[s],
-                                       self._samplings[dim].reshape((-1,)),
+                                       self._samplings[dim],
                                        self._step_size[dim],
                                        self.weights_[dim],
                                        self.sigma)
