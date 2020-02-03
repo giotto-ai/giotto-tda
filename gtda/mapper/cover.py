@@ -271,7 +271,6 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         else:
             # Assume X is the result of a call to scipy.stats.rankdata
             min_val, max_val = -0.5, np.max(X) + 0.5
-            print(min_val, max_val)
             only_one_pt = (min_val == max_val - 1)
 
         # Allow X to have one unique sample only if one interval is required,
