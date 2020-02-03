@@ -66,49 +66,26 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
 
 
 def _discretize(X, n_values=100, **kw_args):
-    return _get_bounding_box(X, is_square=True, n_values=n_values, **kw_args)
-
-
-def _get_bounding_box(X, is_square, n_values=100, **kw_args):
-    # implicit assumption  that the PD has all the dimensions
     homology_dimensions = sorted(list(set(X[0, :, 2])))
 
-    sub_diagrams = {dim: _subdiagrams(X, [dim], remove_dim=True)
-                    for dim in homology_dimensions}
-    points_dim = sub_diagrams[homology_dimensions[0]].shape[2]
-    min_vals_by_dir = {dim: [np.min(sub_diagrams[dim][:, :, k])
-                             for k in range(points_dim)]
-                       for dim in homology_dimensions}
-    max_vals_by_dir = {dim: [np.max(sub_diagrams[dim][:, :, k])
-                             for k in range(points_dim)]
-                       for dim in homology_dimensions}
-    if is_square:
-        min_vals_by_dir = {dim: points_dim*[np.min(min_vals_by_dir[dim])]
-                           for dim in homology_dimensions}
-        max_vals_by_dir = {dim: points_dim*[np.max(max_vals_by_dir[dim])]
-                           for dim in homology_dimensions}
+    min_vals = {dim: np.min(_subdiagrams(X, [dim], remove_dim=True)[:, :, 0])
+                for dim in homology_dimensions}
+    max_vals = {dim: np.max(_subdiagrams(X, [dim], remove_dim=True)[:, :, 1])
+                for dim in homology_dimensions}
+    global_max_val = max(list(max_vals.values()))
+    max_vals = {
+        dim: max_vals[dim] if
+        (max_vals[dim] != min_vals[dim]) else
+        global_max_val for dim in homology_dimensions}
 
-    global_max_val = max(list(max_vals_by_dir.values()))
-    max_vals_by_dir = {
-        dim: [max_vals_by_dir[dim][k] if
-              (max_vals_by_dir[dim][k] != min_vals_by_dir[dim][k]) else
-              global_max_val for k in range(points_dim)]
-        for dim in homology_dimensions}
-
-    samplings = {dim: points_dim*[None] for dim in homology_dimensions}
-    step_sizes = {dim: points_dim*[None] for dim in homology_dimensions}
+    samplings = {}
+    step_sizes = {}
     for dim in homology_dimensions:
-        for k in range(points_dim):
-            samplings[dim][k], step_sizes[dim][k] = np.linspace(
-                min_vals_by_dir[dim][k], max_vals_by_dir[dim][k],
-                retstep=True, num=n_values)
-        if is_square:
-            samplings[dim] = samplings[dim][0][:, None, None]
-            step_sizes[dim] = step_sizes[dim][0]
-        else:
-            samplings[dim] = np.concatenate([s[:, None, None] for s in samplings[dim]],
-                                            axis=2)
-            step_sizes[dim] = step_sizes[dim]
+        samplings[dim], step_sizes[dim] = np.linspace(min_vals[dim],
+                                                      max_vals[dim],
+                                                      retstep=True,
+                                                      num=n_values)
+        samplings[dim] = samplings[dim][:, None, None]
     return samplings, step_sizes
 
 
