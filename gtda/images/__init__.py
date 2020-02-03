@@ -2,8 +2,9 @@
     that can be used to apply Topological Data Analysis to images.
 """
 
-from .preprocessing import Binarizer
+from .preprocessing import Binarizer, Inverter
 
 __all__ = [
     'Binarizer',
+    'Inverter'
 ]
