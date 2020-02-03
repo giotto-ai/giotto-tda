@@ -228,7 +228,7 @@ jobs:
   - bash: |
       pip install twine
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
 
@@ -350,7 +350,7 @@ jobs:
 
   - bash: |
       pip install twine
-      twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
 
@@ -457,7 +457,7 @@ jobs:
 
   - bash: |
       pip install twine
-      twine upload -u giotto-tda-nightly -p $(pypi_psw) --skip-existing dist/*
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
