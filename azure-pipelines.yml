@@ -215,6 +215,7 @@ jobs:
       pip install dist/*.whl
       cd /tmp/
       pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    failOnStderr: false
     displayName: 'Install and test the wheels'
 
   - script: |
@@ -324,7 +325,7 @@ jobs:
   - script: |
       cd /tmp/
       pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: true
+    failOnStderr: false
     displayName: 'Test the wheels with pytest'
 
   - script: |
@@ -453,7 +454,7 @@ jobs:
   - bash: |
       cd /tmp/
       pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: true
+    failOnStderr: false
     displayName: 'Test the wheels with pytest'
 
   - script: |
