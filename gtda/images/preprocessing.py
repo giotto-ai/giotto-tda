@@ -62,7 +62,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Calculate `n_dimensions_` and `max_value_` from the collection of
-        grayscale image. Then, return the estimator.
+        grayscale images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -164,9 +164,9 @@ class Inverter(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, ensure_2d=False, allow_nd=True)
 
-        self.is_fitted_ = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -191,7 +191,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         """
 
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(X[s])
