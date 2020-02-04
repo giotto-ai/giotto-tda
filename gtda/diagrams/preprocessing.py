@@ -135,7 +135,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         - If ``metric == 'heat'`` the available arguments are `p` (float,
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
-        - If ``metric == 'persistent_image'`` the available arguments are `p`
+        - If ``metric == 'persistence_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``),
           `n_bins` (int, default: ``100``) and `weight_function`
           (func, default x -> x).
@@ -220,7 +220,7 @@ class Scaler(BaseEstimator, TransformerMixin):
             self.effective_metric_params_['step_sizes'] = \
             _bin(X, metric=self.metric, **self.effective_metric_params_)
 
-        if self.metric == 'persistent_image':
+        if self.metric == 'persistence_image':
             self.effective_metric_params_['weights'] = \
                 _calculate_weights(X, **self.effective_metric_params_)
 

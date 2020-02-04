@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats, persistent_images
+from ._metrics import betti_curves, landscapes, heats, persistence_images
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
@@ -41,7 +41,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, PersistentImage, \
+    BettiCurve, PersistenceLandscape, HeatKernel, PersistenceImage, \
     Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
     """
 
@@ -153,7 +153,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, PersistentImage, \
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, PersistenceImage, \
     Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
@@ -283,7 +283,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, PersistentImage, \
+    BettiCurve, PersistenceEntropy, HeatKernel, PersistenceImage, \
     Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
@@ -422,7 +422,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, PersistentImage, \
+    BettiCurve, PersistenceLandscape, PersistenceEntropy, PersistenceImage, \
     Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
 
     Notes
@@ -528,7 +528,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class PersistentImage(BaseEstimator, TransformerMixin):
+class PersistenceImage(BaseEstimator, TransformerMixin):
     """Convolution of persistence diagrams with a Gaussian kernel.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -642,7 +642,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, self._step_size = _bin(
-            X, metric='persistent_image', n_bins=self.n_bins)
+            X, metric='persistence_image', n_bins=self.n_bins)
         self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.weight_function,
@@ -677,7 +677,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         X = check_diagram(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(persistent_images)(_subdiagrams(X, [dim],
+            delayed(persistence_images)(_subdiagrams(X, [dim],
                                                     remove_dim=True)[s],
                                        self._samplings[dim],
                                        self._step_size[dim],

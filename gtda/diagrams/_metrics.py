@@ -57,8 +57,8 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
-def persistent_images(diagrams, sampling, step_size, weights, sigma):
-    persistent_images_ = np.zeros((diagrams.shape[0],
+def persistence_images(diagrams, sampling, step_size, weights, sigma):
+    persistence_images_ = np.zeros((diagrams.shape[0],
                                    sampling.shape[0], sampling.shape[0]))
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
@@ -74,12 +74,12 @@ def persistent_images(diagrams, sampling, step_size, weights, sigma):
             (diagrams[:, :, axis] - sampling[0, axis]) / step_size[axis],
             dtype=int)
 
-    [_heat(persistent_images_[i], sampled_diag, sigma)
+    [_heat(persistence_images_[i], sampled_diag, sigma)
         for i, sampled_diag in enumerate(diagrams)]
 
-    persistent_images_ *= weights / np.max(weights)
-    persistent_images_ = np.rot90(persistent_images_, k=1, axes=(1, 2))
-    return persistent_images_
+    persistence_images_ *= weights / np.max(weights)
+    persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
+    return persistence_images_
 
 
 def betti_distances(diagrams_1, diagrams_2, sampling,
@@ -143,22 +143,22 @@ def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
     return (step_size ** (1 / p)) * unnorm_dist
 
 
-def persistent_image_distances(diagrams_1, diagrams_2, sampling, step_size,
+def persistence_image_distances(diagrams_1, diagrams_2, sampling, step_size,
                                weight_function=lambda x: x, sigma=1.0, p=2.0,
                                **kwargs):
     sampling_ = np.copy(sampling.reshape((-1,)))
     weights = weight_function(sampling_ - sampling_[0])
-    persistent_image_1 = persistent_images(diagrams_1, sampling_, step_size,
+    persistence_image_1 = persistence_images(diagrams_1, sampling_, step_size,
                                            weights, sigma).reshape(
         diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
-        unnorm_dist = squareform(pdist(persistent_image_1,
+        unnorm_dist = squareform(pdist(persistence_image_1,
                                        "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    persistent_image_2 = persistent_images(diagrams_2, sampling_, step_size,
+    persistence_image_2 = persistence_images(diagrams_2, sampling_, step_size,
                                            weights, sigma,).reshape(
         diagrams_2.shape[0], -1)
-    unnorm_dist = cdist(persistent_image_1, persistent_image_2,
+    unnorm_dist = cdist(persistence_image_1, persistence_image_2,
                         "minkowski", p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
@@ -169,7 +169,7 @@ implemented_metric_recipes = {
     "landscape": landscape_distances,
     "betti": betti_distances,
     "heat": heat_distances,
-    "persistent_image": persistent_image_distances,
+    "persistence_image": persistence_image_distances,
 }
 
 
@@ -236,12 +236,12 @@ def heat_amplitudes(diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs):
     return np.linalg.norm(heat, axis=(1, 2), ord=p)
 
 
-def persistent_image_amplitudes(diagrams, sampling, step_size,
+def persistence_image_amplitudes(diagrams, sampling, step_size,
                                 weight_function=lambda x: x, sigma=1.0, p=2.0,
                                 **kwargs):
-    persistent_image = persistent_images(diagrams, sampling, step_size,
+    persistence_image = persistence_images(diagrams, sampling, step_size,
                                          weight_function, sigma)
-    return np.linalg.norm(persistent_image, axis=(1, 2), ord=p)
+    return np.linalg.norm(persistence_image, axis=(1, 2), ord=p)
 
 
 implemented_amplitude_recipes = {
@@ -250,7 +250,7 @@ implemented_amplitude_recipes = {
     "landscape": landscape_amplitudes,
     "betti": betti_amplitudes,
     "heat": heat_amplitudes,
-    "persistent_image": persistent_images,
+    "persistence_image": persistence_images,
 }
 
 

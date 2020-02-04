@@ -70,8 +70,8 @@ def _bin(X, metric, n_bins=100, **kw_args):
     # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
                  for dim in homology_dimensions}
-    # For persistent images, move into birth-persistence
-    if metric == 'persistent_image':
+    # For persistence images, move into birth-persistence
+    if metric == 'persistence_image':
         for dim in homology_dimensions:
             sub_diags[dim][:, :, 1:2] = sub_diags[dim][:, :, 1:2]\
                                         - sub_diags[dim][:, :, 0:1]
@@ -83,7 +83,7 @@ def _bin(X, metric, n_bins=100, **kw_args):
     if metric in ['landscape', 'betti', 'heat']:
         min_vals = {d: np.array(2*[np.min(m)]) for d, m in min_vals.items()}
         max_vals = {d: np.array(2*[np.max(m)]) for d, m in max_vals.items()}
-    elif metric == 'persistent_image':
+    elif metric == 'persistence_image':
         pass
     # Scales between axes should be kept the same, but not between dimension
     all_max_values = np.stack(max_vals.values())

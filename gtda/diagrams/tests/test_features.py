@@ -1,4 +1,4 @@
-"""Testing for PersistenceEntropy"""
+"""Testing for features"""
 # License: GNU AGPLv3
 
 import numpy as np
@@ -10,7 +10,7 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 
-from gtda.diagrams import PersistenceEntropy, PersistentImage
+from gtda.diagrams import PersistenceEntropy, PersistenceImage
 
 diagram = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 
@@ -30,7 +30,7 @@ def test_pe_transform():
 
 
 def test_pi_not_fitted():
-    pi = PersistentImage(sigma=1)
+    pi = PersistenceImage(sigma=1)
     with pytest.raises(NotFittedError):
         pi.transform(diagram)
 
@@ -42,7 +42,7 @@ def test_pi_not_fitted():
 def test_pi_null(X):
     """Test that, if one trivial diagram (all pts on the diagonal) is provided,
     (along with a non-trivial one), then its pi is null"""
-    pi = PersistentImage(sigma=1, n_bins=10)
+    pi = PersistenceImage(sigma=1, n_bins=10)
     X = np.append(X, 1 + X[-1])
     diagrams = np.expand_dims(np.stack([X, X,
                                         np.zeros((X.shape[0],),
@@ -61,7 +61,7 @@ def test_pi_null(X):
                                   max_value=1e6),
                   shape=(20, 2)))
 def test_pi_positive(pts):
-    pi = PersistentImage(sigma=1)
+    pi = PersistenceImage(sigma=1)
     diagrams = np.expand_dims(np.concatenate([
         np.sort(pts, axis=1), np.zeros((pts.shape[0], 1))],
         axis=1), axis=0)

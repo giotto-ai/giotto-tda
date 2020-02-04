@@ -4,7 +4,7 @@ persistence diagrams or extract features from them."""
 from .preprocessing import ForgetDimension, Scaler, Filtering
 from .distance import PairwiseDistance, Amplitude
 from .features import PersistenceEntropy, BettiCurve, PersistenceLandscape, \
-    HeatKernel, PersistentImage
+    HeatKernel, PersistenceImage
 
 __all__ = [
     'ForgetDimension',
@@ -15,6 +15,6 @@ __all__ = [
     'BettiCurve',
     'PersistenceLandscape',
     'HeatKernel',
-    'PersistentImage',
+    'PersistenceImage',
     'PersistenceEntropy'
 ]
