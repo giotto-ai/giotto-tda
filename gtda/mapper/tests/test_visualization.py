@@ -11,6 +11,7 @@ from gtda.mapper import (plot_interactive_mapper_graph,
                          plot_static_mapper_graph)
 from gtda.mapper import FirstSimpleGap
 
+
 class TestCaseNoTemplate(TestCase):
     def setUp(self):
         pio.templates.default = None
@@ -70,27 +71,6 @@ class TestInteractivePlot(TestCaseNoTemplate):
             except (AttributeError, TypeError):
                 pass
 
-    # def test_kind_changes(self):
-    #     pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
-    #     warnings.simplefilter("ignore")
-    #     fig = plot_interactive_mapper_graph(pipe, X)
-    #
-    #     w_scatter = self._get_widget_by_trait(fig, 'data', val=None)
-    #     old_pts = np.array([w_scatter.data[1][c] for c in ['x', 'y']])
-    #
-    #     w = self._get_widget_by_trait(fig, 'description', 'kind')
-    #     w.set_trait('value', 'balanced')
-    #     w_scatter_new = self._get_widget_by_trait(fig, 'data', val=None)
-    #     new_pts = np.array([w_scatter_new.data[1][c] for c in ['x', 'y']])
-    #
-    #     try:
-    #         assert_raises(AssertionError, assert_almost_equal, old_pts, new_pts)
-    #     except AssertionError as e:
-    #         print(e)
-    #         print(old_pts, new_pts)
-    #         print(w)
-    #         raise AssertionError(e)
-
     def test_cluster_sizes(self):
         pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
         warnings.simplefilter("ignore")
@@ -104,5 +84,4 @@ class TestInteractivePlot(TestCaseNoTemplate):
         node_size_real = [len(l)
                           for l in g['node_metadata']['node_elements']]
 
-        #assert_almost_equal(node_size_real, node_sizes_vis)
         assert sum(node_sizes_vis) == sum(node_size_real)
