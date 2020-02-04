@@ -193,10 +193,9 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         the number of unique points in X.
 
         """
-        X_rank = rankdata(X, method='dense')
+        X_rank = rankdata(X, method='dense') - 1
         self._left_limits, self._right_limits = self._find_interval_limits(
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
-        X_rank -= 1
         X_rank = np.broadcast_to(X_rank[:, None],
                                  (X.shape[0], self.n_intervals))
         Xt = (X_rank > self._left_limits) & (X_rank < self._right_limits)
