@@ -204,19 +204,7 @@ jobs:
       failOnStderr: false
     env:
       python_ver: $(python_ver)
-    displayName: 'Run the docker and open bash to install dev environment'
-
-  - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
+    displayName: 'Run the docker and open bash to install and uninstall dev environment'
 
   - script: |
       pytest --cov gtda --cov-report xml
@@ -236,7 +224,7 @@ jobs:
 
   - script: |
       cd /tmp/
-      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+      pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
@@ -347,7 +335,7 @@ jobs:
 
   - script: |
       cd /tmp/
-      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+      pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
@@ -477,7 +465,7 @@ jobs:
 
   - bash: |
       cd /tmp/
-      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+      pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
     failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
