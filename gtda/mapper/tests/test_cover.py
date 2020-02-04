@@ -45,6 +45,7 @@ def get_kind(draw):
     is_uniform = draw(booleans())
     return 'uniform' if is_uniform else 'balanced'
 
+
 @given(
     filter_values=get_filter(),
     n_intervals=get_nb_intervals()
@@ -154,7 +155,8 @@ def test_fit_transform_against_fit_and_transform(pts, n_intervals,
 
 
 def test_fit_transform_limits_not_computed():
-    """We do not compute intervals when `kind`= `'balanced'`, unless fit is explicitly called."""
+    """We do not compute intervals when `kind`= `'balanced'`,
+    unless fit is explicitly called."""
     cover = OneDimensionalCover(n_intervals=10, kind='balanced',
                                 overlap_frac=0.3)
     x = np.arange(0, 30)
@@ -178,8 +180,7 @@ def test_two_dimensional_tensor(pts):
 @given(filter=get_filter(),
        kind=get_kind(),
        n_intervals=get_nb_intervals(),
-       overlap_fraction=get_overlap_fraction(),
-)
+       overlap_fraction=get_overlap_fraction(),)
 def test_cubical_fit_transform_consistent_with_OneD(filter, kind,
                                                     n_intervals,
                                                     overlap_fraction):

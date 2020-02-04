@@ -111,7 +111,7 @@ def test_gaussian_density_values(X):
 def test_list_feature_union_transform(X):
     list_dim = [0, 1]
     p_1_2 = ListFeatureUnion([("proj" + str(k), Projection(columns=k))
-                               for k in list_dim])
+                              for k in list_dim])
     p12 = Projection(columns=list_dim)
     for p in [p12, p_1_2]:
         p.fit(X)
@@ -132,9 +132,8 @@ def test_list_feature_union_transform(X):
 ))
 def test_list_feature_union_nones(X):
     none_1_2 = ListFeatureUnion([("None" + str(k), None)
-                              for k in range(2)])
+                                 for k in range(2)])
     x_12_a = none_1_2.fit_transform(X)
     x_12_b = none_1_2.transform(X)
     assert x_12_a.shape == (X.shape[0], 0)
     assert x_12_b.shape == (X.shape[0], 0)
-

@@ -1,10 +1,8 @@
 import plotly.io as pio
 import numpy as np
-import pandas as pd
 import warnings
 
 from unittest import TestCase
-from numpy.testing import assert_almost_equal, assert_raises
 
 from gtda.mapper import make_mapper_pipeline
 from gtda.mapper import (plot_interactive_mapper_graph,
@@ -40,8 +38,8 @@ X = np.array([[-19.33965799, -284.58638371],
               [-155.54055842, -214.420498],
               [184.6940872,    2.08810678],
               [-184.42012962,   28.8978038]])
-colors = np.array([8.,  8.,  3.,  8.,  0.,  8.,  8.,  8.,  5.,  8.,  8.,  8.,  8.,
-                   4.,  2., 8., 1.,  8., 2.,  8.])
+colors = np.array([8.,  8.,  3.,  8.,  0.,  8.,  8.,  8.,  5.,
+                   8.,  8.,  8.,  8., 4.,  2., 8., 1.,  8., 2.,  8.])
 
 
 class TestStaticPlot(TestCaseNoTemplate):
@@ -52,7 +50,8 @@ class TestStaticPlot(TestCaseNoTemplate):
         fig = plot_static_mapper_graph(pipe, X,
                                        color_variable=colors,
                                        clone_pipeline=False)
-        xy = np.stack([fig.get_state()['_data'][1][c] for c in ['x', 'y']]).transpose()
+        xy = np.stack([fig.get_state()['_data'][1][c]
+                       for c in ['x', 'y']]).transpose()
         assert X.shape >= xy.shape
 
         real_colors = fig.get_state()['_data'][1]['marker']['color']
@@ -78,7 +77,8 @@ class TestInteractivePlot(TestCaseNoTemplate):
         w_scatter = self._get_widget_by_trait(fig, 'data')
 
         node_sizes_vis = [int(s_[10:].split(sep='<')[0])
-                          for s_ in w_scatter.get_state()['_data'][1]['hovertext']]
+                          for s_ in w_scatter.get_state()
+                          ['_data'][1]['hovertext']]
 
         g = pipe.fit_transform(X)
         node_size_real = [len(l)

@@ -6,7 +6,6 @@ import traceback
 
 import numpy as np
 import plotly.graph_objects as go
-from IPython.display import display
 from ipywidgets import Layout, widgets
 from sklearn.base import clone
 
@@ -416,5 +415,4 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     box = widgets.VBox(
         [container_cover, container_cluster, fig, valid, logs_box, out])
-    #display(box, out)
     return box
