@@ -218,8 +218,6 @@ jobs:
     displayName: 'Install and test the wheels'
 
   - script: |
-      pwd
-      cd examples
       pip install openml pandas
       pip install papermill
       cd examples
@@ -330,8 +328,6 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pwd
-      cd examples
       pip install openml pandas
       pip install papermill
       cd examples
@@ -461,9 +457,9 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
+      cd examples
       pip install openml pandas
       pip install papermill
-      ../../giotto-tda/examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
