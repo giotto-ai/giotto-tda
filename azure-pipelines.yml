@@ -218,7 +218,8 @@ jobs:
     displayName: 'Install and test the wheels'
 
   - script: |
-      cd ../../giotto-tda/examples
+      pwd
+      cd examples
       pip install openml pandas
       pip install papermill
       cd examples
@@ -329,7 +330,8 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      cd ../../giotto-tda/examples
+      pwd
+      cd examples
       pip install openml pandas
       pip install papermill
       cd examples
