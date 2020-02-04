@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 import itertools
-
+import numbers
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -45,7 +45,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict, optional, default: ``{}``
+    metric_params : dict, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     neighbor_rank : int, optional, default: ``1``
@@ -56,6 +56,12 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
+
+    Attributes
+    ----------
+    effective_metric_params_ : dict
+        Dictionary containing all information present in `metric_params`.
+        If `metric_params` is `None`, it is set to the empty dictionary.
 
     Examples
     --------
@@ -82,8 +88,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
 
-    # TODO: Consider using an immutable default value for metric_params.
-    def __init__(self, metric='euclidean', metric_params={}, neighbor_rank=1,
+    def __init__(self, metric='euclidean', metric_params=None, neighbor_rank=1,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -92,7 +97,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     def _consistent_homology_distance(self, X):
         Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
-                                **self.metric_params)
+                                **self.effective_metric_params_)
 
         indices_k_neighbor = np.argsort(Xm)[:, self.neighbor_rank]
         distance_k_neighbor = Xm[np.arange(X.shape[0]),
@@ -131,6 +136,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
+
         validate_params(self.get_params(), self._hyperparameters)
         check_array(X, allow_nd=True)
 
@@ -139,8 +149,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each entry in the input data array X, find the metric structure
-        after consistent rescaling and encodes it as a distance matrix. Then,
-        arrange all results in a single ndarray of appropriate shape.
+        after consistent rescaling and encodes it as a distance matrix.
 
         Parameters
         ----------
@@ -163,12 +172,162 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
             after consistent rescaling.
 
         """
-        # Check if fit had been called
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._consistent_homology_distance)(X[i])
+            for i in range(X.shape[0]))
+        Xt = np.array(Xt)
+        return Xt
+
+
+@adapt_fit_transform_docs
+class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
+    """Rescaling of distances between consecutive pairs of points by a fixed
+    factor.
+
+    The computation during :meth:`transform` depends on the nature of the array
+    `X`. If each entry in `X` along axis 0 represents a distance matrix
+    :math:`D`, then the corresponding entry in the transformed array is the
+    distance matrix :math:`D'_{ii+1} = factor \times D_{ii+1}`. If the entries
+    in `X` represent point clouds, their distance matrices are first computed,
+    and then rescaled according to the same formula.
+
+    Parameters
+    ----------
+    metric : string or callable, optional, default: ``'euclidean'``
+        If set to ``'precomputed'``, each entry in `X` along axis 0 is
+        interpreted to be a distance matrix. Otherwise, entries are
+        interpreted as feature arrays, and `metric` determines a rule with
+        which to calculate distances between pairs of instances (i.e. rows)
+        in these arrays.
+        If `metric` is a string, it must be one of the options allowed by
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
+        including "euclidean", "manhattan" or "cosine".
+        If `metric` is a callable function, it is called on each pair of
+        instances and the resulting value recorded. The callable should take
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    metric_params : dict, optional, default: ``None``
+        Additional keyword arguments for the metric function.
+
+    factor : float, optional, default: ``0.``
+        Factor by which to multiply the distance between consecutive
+        points.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
+
+    Attributes
+    ----------
+    effective_metric_params_ : dict
+        Dictionary containing all information present in `metric_params`.
+        If `metric_params` is `None`, it is set to the empty dictionary.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from gtda.homology import ConsecutivetRescaling
+    >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
+    >>> cr = ConsecutiveRescaling()
+    >>> X_rescaled = cr.fit_transform(X)
+    >>> print(X_rescaled.shape)
+    (1, 3, 3)
+
+    See also
+    --------
+    VietorisRipsPersistence
+
+    """
+
+    _hyperparameters = {'factor': [numbers.Number, (0., np.inf)]}
+
+    def __init__(self, metric='euclidean', metric_params=None, factor=0.,
+                 n_jobs=None):
+        self.metric = metric
+        self.metric_params = metric_params
+        self.factor = factor
+        self.n_jobs = n_jobs
+
+    def _consecutive_homology_distance(self, X):
+        Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
+                                **self.effective_metric_params_)
+
+        Xm.ravel()[1 : max(0, Xm.shape[1] - 1) * Xm.shape[1]
+                   : Xm.shape[1] + 1] = 0
+
+        return Xm
+
+    def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_points, n_points) or (n_samples, \
+            n_points, n_dimensions)
+            Input data. If ``metric == 'precomputed'``, the input should be an
+            ndarray whose each entry along axis 0 is a distance matrix of shape
+            ``(n_points, n_points)``. Otherwise, each such entry will be
+            interpreted as an array of ``n_points`` row vectors in
+            ``n_dimensions``-dimensional space.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
+        else:
+            self.effective_metric_params_ = self.metric_params.copy()
+
+        validate_params(self.get_params(), self._hyperparameters)
+        check_array(X, allow_nd=True)
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each entry in the input data array X, find the metric structure
+        after consecutive rescaling and encodes it as a distance matrix.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_points, n_points) or (n_samples, \
+            n_points, n_dimensions)
+            Input data. If ``metric == 'precomputed'``, the input should be an
+            ndarray whose each entry along axis 0 is a distance matrix of shape
+            ``(n_points, n_points)``. Otherwise, each such entry will be
+            interpreted as an array of ``n_points`` row vectors in
+            ``n_dimensions``-dimensional space.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Array containing (as entries along axis 0) the distance matrices
+            after consecutive rescaling.
+
+        """
+        check_is_fitted(self)
+        X = check_array(X, allow_nd=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._consecutive_homology_distance)(X[i])
             for i in range(X.shape[0]))
         Xt = np.array(Xt)
         return Xt
