@@ -678,11 +678,11 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(persistence_images)(_subdiagrams(X, [dim],
-                                                    remove_dim=True)[s],
-                                       self._samplings[dim],
-                                       self._step_size[dim],
-                                       self.weights_[dim],
-                                       self.sigma)
+                                                     remove_dim=True)[s],
+                                        self._samplings[dim],
+                                        self._step_size[dim],
+                                        self.weights_[dim],
+                                        self.sigma)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs))

@@ -59,7 +59,7 @@ def heats(diagrams, sampling, step_size, sigma):
 
 def persistence_images(diagrams, sampling, step_size, weights, sigma):
     persistence_images_ = np.zeros((diagrams.shape[0],
-                                   sampling.shape[0], sampling.shape[0]))
+                                    sampling.shape[0], sampling.shape[0]))
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
 
@@ -144,20 +144,20 @@ def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
 
 
 def persistence_image_distances(diagrams_1, diagrams_2, sampling, step_size,
-                               weight_function=lambda x: x, sigma=1.0, p=2.0,
-                               **kwargs):
+                                weight_function=lambda x: x, sigma=1.0, p=2.0,
+                                **kwargs):
     sampling_ = np.copy(sampling.reshape((-1,)))
     weights = weight_function(sampling_ - sampling_[0])
     persistence_image_1 = persistence_images(diagrams_1, sampling_, step_size,
-                                           weights, sigma).reshape(
-        diagrams_1.shape[0], -1)
+                                             weights, sigma).reshape(
+                                                 diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(persistence_image_1,
                                        "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
     persistence_image_2 = persistence_images(diagrams_2, sampling_, step_size,
-                                           weights, sigma,).reshape(
-        diagrams_2.shape[0], -1)
+                                             weights, sigma,).reshape(
+                                                 diagrams_2.shape[0], -1)
     unnorm_dist = cdist(persistence_image_1, persistence_image_2,
                         "minkowski", p=p)
     return (step_size ** (1 / p)) * unnorm_dist
@@ -203,7 +203,7 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
 
     distance_matrices = np.concatenate(distance_matrices, axis=1)
     distance_matrices = np.stack([distance_matrices[:, i * X2.shape[0]:(i + 1)
-                                                         * X2.shape[0]]
+                                                    * X2.shape[0]]
                                   for i in range(len(homology_dimensions))],
                                  axis=2)
     return distance_matrices
@@ -237,10 +237,10 @@ def heat_amplitudes(diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs):
 
 
 def persistence_image_amplitudes(diagrams, sampling, step_size,
-                                weight_function=lambda x: x, sigma=1.0, p=2.0,
-                                **kwargs):
+                                 weight_function=lambda x: x, sigma=1.0, p=2.0,
+                                 **kwargs):
     persistence_image = persistence_images(diagrams, sampling, step_size,
-                                         weight_function, sigma)
+                                           weight_function, sigma)
     return np.linalg.norm(persistence_image, axis=(1, 2), ord=p)
 
 
