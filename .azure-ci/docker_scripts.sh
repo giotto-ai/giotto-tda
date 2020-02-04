@@ -32,3 +32,11 @@ cd /io
 pip install -e ."[doc, tests]"
 pip uninstall -y giotto-tda
 pip uninstall -y giotto-tda-nightly
+
+# Testing, linting
+pytest --cov . --cov-report xml
+flake8 --exit-zero /io/
+
+# Building wheels
+pip install wheel
+python setup.py sdist bdist_wheel

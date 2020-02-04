@@ -204,19 +204,7 @@ jobs:
       failOnStderr: false
     env:
       python_ver: $(python_ver)
-    displayName: 'Run the docker and open bash to install and uninstall dev environment'
-
-  - script: |
-      pytest --cov gtda --cov-report xml
-      flake8
-    failOnStderr: true
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install wheel
-      python setup.py sdist bdist_wheel
-    failOnStderr: false
-    displayName: 'Build the wheels'
+    displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: pip install dist/*.whl
     failOnStderr: true
