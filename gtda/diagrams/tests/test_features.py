@@ -50,6 +50,7 @@ def test_pi_null(X):
                               axis=0)
     diagrams = np.repeat(diagrams, 2, axis=0)
     diagrams[1, :, 1] += 1
+
     assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
 
 

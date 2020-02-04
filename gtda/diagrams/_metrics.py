@@ -43,13 +43,15 @@ def _heat(heat, sampled_diag, sigma):
 def heats(diagrams, sampling, step_size, sigma):
     heats_ = np.zeros((diagrams.shape[0],
                        sampling.shape[0], sampling.shape[0]))
-    sampled_diags = diagrams
-    sampled_diags[diagrams < sampling[0]] = sampling[0]
-    sampled_diags[diagrams > sampling[-1]] = sampling[-1]
-    sampled_diags = np.array((sampled_diags - sampling[0]) / step_size,
-                             dtype=int)
+
+    diagrams[diagrams < sampling[0]] = sampling[0]
+    diagrams[diagrams > sampling[-1]] = sampling[-1]
+    diagrams = np.array((diagrams - sampling[0]) / step_size,
+                        dtype=int)
+
     [_heat(heats_[i], sampled_diag, sigma)
-        for i, sampled_diag in enumerate(sampled_diags)]
+        for i, sampled_diag in enumerate(diagrams)]
+
     heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
     heats_ = np.rot90(heats_, k=1, axes=(1, 2))
     return heats_
@@ -61,22 +63,20 @@ def persistent_images(diagrams, sampling, step_size, weights, sigma):
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
 
-    sampled_diags = diagrams
-    # Set the values outside of the sampling range to the sampling range.
     for axis in [0, 1]:
-        sampled_diags[:, :, axis][diagrams[:, :, axis]
-                                  < sampling[0, axis]] = sampling[0, axis]
-        sampled_diags[:, :, axis][diagrams[:, :, axis]
-                                  > sampling[-1, axis]] = sampling[-1, axis]
+        # Set the values outside of the sampling range to the sampling range.
+        diagrams[:, :, axis][diagrams[:, :, axis]
+                             < sampling[0, axis]] = sampling[0, axis]
+        diagrams[:, :, axis][diagrams[:, :, axis]
+                             > sampling[-1, axis]] = sampling[-1, axis]
         # Convert into pixel
-        sampled_diags[:, :, axis] = np.array(
-            (sampled_diags[:, :, axis] - sampling[0, axis]) / step_size[axis],
+        diagrams[:, :, axis] = np.array(
+            (diagrams[:, :, axis] - sampling[0, axis]) / step_size[axis],
             dtype=int)
 
     [_heat(persistent_images_[i], sampled_diag, sigma)
-        for i, sampled_diag in enumerate(sampled_diags)]
+        for i, sampled_diag in enumerate(diagrams)]
 
-    # TODO: Check if this is broadcasting the right way
     persistent_images_ *= weights / np.max(weights)
     persistent_images_ = np.rot90(persistent_images_, k=1, axes=(1, 2))
     return persistent_images_
