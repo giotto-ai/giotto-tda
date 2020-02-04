@@ -24,7 +24,7 @@ def plot_static_mapper_graph(
 
     Parameters
     ----------
-    pipeline : :class:`~giotto.mapper.pipeline.MapperPipeline` object
+    pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
         Mapper pipeline to act on to data.
 
     data : array-like of shape (n_samples, n_features)
@@ -178,7 +178,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Parameters
     ----------
-    pipeline : :class:`~giotto.mapper.pipeline.MapperPipeline` object
+    pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
         Mapper pipeline to act on to data.
 
     data : array-like of shape (n_samples, n_features)
