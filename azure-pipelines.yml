@@ -206,10 +206,6 @@ jobs:
       python_ver: $(python_ver)
     displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
-  - script: pip install dist/*.whl
-    failOnStderr: true
-    displayName: 'Install the wheels'
-
   - script: |
       cd /tmp/
       pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
