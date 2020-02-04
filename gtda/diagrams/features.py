@@ -11,7 +11,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, persistent_images
-from ._utils import _subdiagrams, _discretize, _calculate_weights
+from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
 
@@ -132,7 +132,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_values : int, optional, default: ``100``
+    n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
@@ -165,10 +165,10 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'n_values': [int, (1, np.inf)]}
+    _hyperparameters = {'n_bins': [int, (1, np.inf)]}
 
-    def __init__(self, n_values=100, n_jobs=None):
-        self.n_values = n_values
+    def __init__(self, n_bins=100, n_jobs=None):
+        self.n_bins = n_bins
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -202,8 +202,8 @@ class BettiCurve(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, _ = _discretize(X, n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self._samplings, _ = _bin(X, metric='betti', n_bins=self.n_bins)
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         return self
 
@@ -223,7 +223,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
             Betti curves: one curve (represented as a one-dimensional array
             of integer values) per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
@@ -262,7 +262,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     n_layers : int, optional, default: ``1``
         How many layers to consider in the persistence landscape.
 
-    n_values : int, optional, default: ``100``
+    n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available
         homology dimension, to sample during :meth:`fit`.
 
@@ -297,11 +297,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'n_layers': [int, (1, np.inf)],
-                        'n_values': [int, (1, np.inf)]}
+                        'n_bins': [int, (1, np.inf)]}
 
-    def __init__(self, n_layers=1, n_values=100, n_jobs=None):
+    def __init__(self, n_layers=1, n_bins=100, n_jobs=None):
         self.n_layers = n_layers
-        self.n_values = n_values
+        self.n_bins = n_bins
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -335,8 +335,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, _ = _discretize(X, n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self._samplings, _ = _bin(X, metric="landscape", n_bins=self.n_bins)
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
 
         return self
@@ -358,7 +358,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-            n_layers, n_values)
+            n_layers, n_bins)
             Persistence lanscapes: one landscape (represented as a
             two-dimensional array) per sample and per homology dimension seen
             in :meth:`fit`. Each landscape contains a number `n_layers` of
@@ -377,7 +377,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_layers, self.n_values).\
+                                        self.n_layers, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -401,7 +401,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     sigma : float, optional default ``1.0``
         Standard deviation for Gaussian kernel.
 
-    n_values : int, optional, default: ``100``
+    n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
@@ -444,11 +444,11 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
-                        'n_values': [int, (1, np.inf)]}
+                        'n_bins': [int, (1, np.inf)]}
 
-    def __init__(self, sigma=1.0, n_values=100, n_jobs=None):
+    def __init__(self, sigma=1.0, n_bins=100, n_jobs=None):
         self.sigma = sigma
-        self.n_values = n_values
+        self.n_bins = n_bins
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -482,9 +482,9 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, self._step_size = _discretize(
-            X, n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self._samplings, self._step_size = _bin(
+            X, metric='heat', n_bins=self.n_bins)
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         return self
 
@@ -505,8 +505,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values, \
-            n_values)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
+            n_bins)
             Raster images: one image per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -522,7 +522,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_values, self.n_values).\
+                                        self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -546,7 +546,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
     sigma : float, optional default ``1.0``
         Standard deviation for Gaussian kernel.
 
-    n_values : int, optional, default: ``100``
+    n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
@@ -599,14 +599,14 @@ class PersistentImage(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
-                        'n_values': [int, (1, np.inf)],
+                        'n_bins': [int, (1, np.inf)],
                         'weight_function': [types.FunctionType]}
 
-    def __init__(self, sigma=1.0, n_values=100,
+    def __init__(self, sigma=1.0, n_bins=100,
                  weight_function=lambda x: x,
                  n_jobs=None):
         self.sigma = sigma
-        self.n_values = n_values
+        self.n_bins = n_bins
         self.weight_function = weight_function
         self.n_jobs = n_jobs
 
@@ -641,9 +641,9 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, self._step_size = _discretize(
-            X, n_values=self.n_values)
-        self.samplings_ = {dim: s.flatten()
+        self._samplings, self._step_size = _bin(
+            X, metric='persistent_image', n_bins=self.n_bins)
+        self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.weight_function,
                                            self._samplings)
@@ -666,8 +666,8 @@ class PersistentImage(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values, \
-            n_values)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
+            n_bins)
             Raster images: one image per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -679,7 +679,7 @@ class PersistentImage(BaseEstimator, TransformerMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(persistent_images)(_subdiagrams(X, [dim],
                                                     remove_dim=True)[s],
-                                       self._samplings[dim].reshape((-1,)),
+                                       self._samplings[dim],
                                        self._step_size[dim],
                                        self.weights_[dim],
                                        self.sigma)
@@ -688,6 +688,6 @@ class PersistentImage(BaseEstimator, TransformerMixin):
                                      effective_n_jobs(self.n_jobs))
         )
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_values, self.n_values).\
+                                        self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt

@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
-from ._utils import _discretize, _calculate_weights
+from ._utils import _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import (check_diagram, validate_params,
                                 validate_metric_params)
@@ -61,16 +61,16 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
           Unlike the case of ``'bottleneck'``, `delta` cannot be set to
           ``0.`` and an exact algorithm is not available.
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``) and
-          `n_values` (int, default: ``100``).
+          `n_bins` (int, default: ``100``).
         - If ``metric == 'persistent_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_values` (int, default: ``100``) and `weight_function`
+          `n_bins` (int, default: ``100``) and `weight_function`
           (func, default x -> x).
 
     order : float or None, optional, default: ``2.``
@@ -162,10 +162,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
-            self.effective_metric_params_['samplings'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, **self.effective_metric_params_)
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _bin(X, metric=self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \
@@ -261,16 +260,16 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
           default: ``2``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
         - If ``metric == 'persistent_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_values` (int, default: ``100``) and `weight_function`
+          `n_bins` (int, default: ``100``) and `weight_function`
           (func, default x -> x).
 
     order : float or None, optional, default: ``2.``
@@ -357,10 +356,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'persistent_image', 'betti']:
-            self.effective_metric_params_['samplings'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, **self.effective_metric_params_)
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _bin(X, metric=self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistent_image':
             self.effective_metric_params_['weights'] = \
