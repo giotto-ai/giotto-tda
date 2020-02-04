@@ -13,14 +13,22 @@ from ..utils.validation import validate_params
 
 @adapt_fit_transform_docs
 class HeightFiltration(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of direction-based height image filtrations
-    from a collection of 2D or 3D boolean images.
+    """Transformer returning a collection of grayscale images
+    from a collection of 2D or 3D binary images.
+
+    The height filtration assigns to each activated pixel of an image a pixel
+    value corresponding to the distance between the pixel and the hyperplane
+    defined by a direction vector and the first seen edge of the image
+    following that direction. Deactivated pixels are assigned the value of the
+    maximum distance between any pixel of the image and the hyperplance plus
+    one.
 
     Parameters
     ----------
-    direction : ndarray, shape (n_dimensions_, [1]), optional, default
+    direction : ndarray, shape (n_dimensions, [1]), optional, default
         ``np.ones(n_dimensions_)``
-        Direction of the height filtration.
+        Direction of the height filtration, where ``n_dimensions`` is the
+        dimension of the images of the collection.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -114,13 +122,15 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         self.max_value_ = 0.
         self.max_value_ = np.max(self._calculate_height(
-            np.ones((1, *X.shape[1:]))))
+            np.ones((1, *X.shape[1:])))) + 1
 
         return self
 
     def transform(self, X, y=None):
         """For each collection of binary images, calculate the corresponding
-        collection of grayscale images based on the threshold.
+        collection of grayscale images based on the distance the pixel of each
+        image to the hyperplane defined by the ``direction`` vector and the
+        first seen edge of the images following that ``direction``.
 
         Parameters
         ----------
