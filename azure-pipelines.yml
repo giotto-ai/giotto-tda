@@ -207,10 +207,15 @@ jobs:
     displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
+      python -m pip install --upgrade pip
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
+    displayName: 'Install pytest suite'
+
+  - script: |
+      pip install dist/*.whl
       cd /tmp/
-      pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: true
-    displayName: 'Test the wheels with pytest'
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    displayName: 'Install and test the wheels'
 
   - script: |
       cd ../../giotto-tda/examples
