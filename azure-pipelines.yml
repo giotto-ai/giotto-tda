@@ -322,7 +322,7 @@ jobs:
   - script: |
       pip install wheel
       python setup.py sdist bdist_wheel
-    failOnStderr: true
+    failOnStderr: false
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
