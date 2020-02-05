@@ -106,7 +106,6 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             to the i-th homology dimension in :attr:`homology_dimensions_`.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         X = check_diagram(X)
 
@@ -230,7 +229,6 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             homology dimension in :attr:`homology_dimensions_`.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         X = check_diagram(X)
 

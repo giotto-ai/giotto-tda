@@ -132,7 +132,6 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
             ``n_samples_window = width + 1``.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_is_fitted')
         X = check_array(X, ensure_2d=False, allow_nd=True)
 
@@ -162,7 +161,6 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
             (dimension - 1) - 1) // stride + 1``.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_is_fitted')
         yr = column_or_1d(y)
 
@@ -439,7 +437,6 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
             (dimension - 1) - 1) // stride + 1``.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         Xt = check_array(X, ensure_2d=False)
         if Xt.ndim == 1:
@@ -469,7 +466,6 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
             (dimension - 1) - 1) // stride + 1``.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         yr = column_or_1d(y)
 
