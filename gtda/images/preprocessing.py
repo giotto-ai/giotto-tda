@@ -154,7 +154,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -178,7 +178,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
