@@ -15,7 +15,10 @@ available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
                                    ('n_layers', int, (1, np.inf))],
                      'heat': [('order', numbers.Number, (1, np.inf)),
                               ('n_values', int, (1, np.inf)),
-                              ('sigma', numbers.Number, (0., np.inf))]}
+                              ('sigma', numbers.Number, (0., np.inf))],
+                     'silhouette': [('order', numbers.Number, (1, np.inf)),
+                                    ('n_values', int, (1, np.inf))]
+                     }
 
 available_metric_params = list(set(
     [param for param_list in available_metrics.values()
