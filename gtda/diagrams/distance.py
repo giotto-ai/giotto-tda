@@ -36,7 +36,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
+        ``'betti'`` | ``'heat'`` | ``'silhouette'``,
+        optional, default: ``'landscape'``
         Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -46,6 +47,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
+        - ``'silhouette'`` refers to the :math:`L^p` distance between
+          silhouettes.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
@@ -64,6 +67,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``) and
+          `n_values` (int, default: ``100``).
+        - If ``metric == 'silhouette'`` the available arguments are `p`
+          (float, default: ``2.``), `order` (float, default: ``1.``) and
           `n_values` (int, default: ``100``).
 
     order : float or None, optional, default: ``2.``
@@ -88,7 +94,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Amplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
+    Amplitude, Scaler, Filtering, \
+    BettiCurve, PersistenceLandscape, \
+    HeatKernel, Silhouette, \
     gtda.homology.VietorisRipsPersistence
 
     Notes
@@ -228,7 +236,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
+        ``'betti'`` | ``'heat'`` | ``'silhouette'``,
+        optional, default: ``'landscape'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 
@@ -239,6 +248,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
+        - ``'silhouette'`` refers to the :math:`L^p` distance between
+          silhouettes.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
@@ -254,6 +265,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'heat'`` the available arguments are `p` (float,
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
+        - If ``metric == 'silhouette'`` the available arguments are `p`
+          (float, default: ``2.``), `order` (float, default: ``1.``) and
+          `n_values` (int, default: ``100``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each diagram a vector of
@@ -279,7 +293,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     --------
     PairwiseDistance, Scaler, Filtering, \
     BettiCurve, PersistenceLandscape, \
-    HeatKernel, gtda.homology.VietorisRipsPersistence
+    HeatKernel, Silhouette, \
+    gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
