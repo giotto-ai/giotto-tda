@@ -110,8 +110,8 @@ class Binarizer(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
-        """
 
+        """
         check_is_fitted(self)
         Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
 
