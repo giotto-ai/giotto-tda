@@ -41,7 +41,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, Silhouette, gtda.homology.VietorisRipsPersistence
 
     """
 
@@ -154,7 +154,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     See also
     --------
     PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, Silhouette, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -284,7 +284,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, Silhouette, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -423,7 +423,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     See also
     --------
     BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
-    PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, Silhouette, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -526,6 +526,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
+
 @adapt_fit_transform_docs
 class Silhouette(BaseEstimator, TransformerMixin):
     """Silhouettes of persistence diagrams.
@@ -580,7 +581,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute Silhouettes of diagrams in X
+        """Compute Silhouettes of diagrams in X.
+
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features, 3)
@@ -605,12 +607,11 @@ class Silhouette(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_diagram(X)
 
-
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(silhouettes)(
-            _subdiagrams(X, [dim], remove_dim=True)[s],
-            self._samplings[dim], order=self.order)
-                                          for dim in self.homology_dimensions_
-                                          for s in gen_even_slices(X.shape[0],
-                                                                   effective_n_jobs(self.n_jobs)))
+        Xt = (Parallel(n_jobs=self.n_jobs)
+              (delayed(silhouettes)(_subdiagrams(X, [dim], remove_dim=True)[s],
+                                    self._samplings[dim], order=self.order)
+              for dim in self.homology_dimensions_
+              for s in gen_even_slices(X.shape[0],
+                                       effective_n_jobs(self.n_jobs))))
         Xt = np.stack(Xt, axis=1)
         return Xt
