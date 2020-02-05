@@ -140,6 +140,7 @@ jobs:
 
   - script: |
       pip install -e ".[tests, doc]"
+    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
