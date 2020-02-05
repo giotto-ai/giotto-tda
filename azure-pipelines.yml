@@ -213,12 +213,16 @@ jobs:
       pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
     displayName: 'Install pytest suite'
 
+  - script: pip install dist/*.whl
+    failOnStderr: true
+    displayName: 'Install the wheels'
+
   - script: |
-      pip install dist/*.whl
-      cd /tmp/
+      mkdir tmp_test_cov
+      cd tmp_test_cov
       pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: false
-    displayName: 'Install and test the wheels'
+    failOnStderr: true
+    displayName: 'Test the wheels and generate coverage report'
 
   - script: |
       pip install openml pandas
@@ -318,7 +322,7 @@ jobs:
   - script: |
       pip install wheel
       python setup.py sdist bdist_wheel
-    failOnStderr: false
+    failOnStderr: true
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
@@ -326,10 +330,11 @@ jobs:
     displayName: 'Install the wheels'
 
   - script: |
-      cd /tmp/
-      pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: false
-    displayName: 'Test the wheels with pytest'
+      mkdir tmp_test_cov
+      cd tmp_test_cov
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    failOnStderr: true
+    displayName: 'Test the wheels and generate coverage report'
 
   - script: |
       pip install openml pandas
@@ -456,10 +461,11 @@ jobs:
     displayName: 'Install the wheels'
 
   - bash: |
-      cd /tmp/
-      pytest --cov . --pyargs gtda --cov-report xml --ignore-glob='*externals*'
-    failOnStderr: false
-    displayName: 'Test the wheels with pytest'
+      mkdir tmp_test_cov
+      cd tmp_test_cov
+      pytest --cov --pyargs gtda --cov-report xml --ignore-glob='*externals*'
+    failOnStderr: true
+    displayName: 'Test the wheels and generate coverage report'
 
   - script: |
       cd examples
