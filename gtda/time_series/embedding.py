@@ -405,7 +405,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
             n_false_nbhrs_list = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._false_nearest_neighbors)(
-                    X, self.time_delay_, dim, stride=1)
+                    X, self.time_delay_, dim, stride=self.stride)
                 for dim in range(1, self.dimension + 3))
             variation_list = [np.abs(n_false_nbhrs_list[dim - 1]
                                      - 2 * n_false_nbhrs_list[dim] +
