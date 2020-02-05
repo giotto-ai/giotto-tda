@@ -13,7 +13,7 @@ from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
+    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from a
     `filtered Cubical complex <https://giotto.ai/theory>`_.
 
     Given a `grayscale image <https://giotto.ai/theory>`_, information
@@ -52,7 +52,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     infinity_values_ : float
-       Infinity value calculated in :meth:`fit`.
+       Effective death value to assign to features which have infinite
+       persistence. Set in :meth:`fit`.
 
     See also
     --------
@@ -76,7 +77,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)],
-                        '_periodic_dimensions': [list, [int, (0, np.inf)]],
+                        '_periodic_dimensions': [list, [bool, [True, False]]],
                         'infinity_values_': [numbers.Number]}
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
