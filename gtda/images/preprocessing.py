@@ -191,7 +191,7 @@ class Inverter(BaseEstimator, TransformerMixin):
             2D or 3D binary image.
         """
 
-        check_is_fitted(self)
+        check_is_fitted(self, ['_is_fitted'])
         Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
