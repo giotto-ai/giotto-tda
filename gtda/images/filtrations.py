@@ -56,6 +56,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
     gtda.homology.CubicalPersistence, Binarizer
 
     """
+
     _hyperparameters = {'n_dimensions_': [int, [2, 3]],
                         'direction_': [np.ndarray, (numbers.Number, None)]}
 
