@@ -29,7 +29,7 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # Install and uninstall giotto-tda dev
 cd /io
-pip install -e ."[doc, tests]"
+pip install -e ".[tests, doc]"
 pip uninstall -y giotto-tda
 pip uninstall -y giotto-tda-nightly
 
