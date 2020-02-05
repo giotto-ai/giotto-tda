@@ -13,7 +13,7 @@ from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from a
+    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `filtered cubical complexes <https://giotto.ai/theory>`_.
 
     Given a `grayscale image <https://giotto.ai/theory>`_, information
