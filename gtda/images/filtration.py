@@ -40,12 +40,12 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
     direction_ : ndarray of shape (n_dimensions_, )
         Effective direction of the height filtration. Set in :meth:`fit`.
 
-    n_dimensions_ : int
+    n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
-        Mesh image for which each pixel value is its distance to the hyperplane
-        implied by `direction_`. Set in :meth:`fit`.
+        Grayscale image corresponding to the height filtration of a binary
+        image where each pixel is activated. Set in :meth:`fit`.
 
     max_value_: float
         Maximum pixel value among all pixels in all images of the collection.
