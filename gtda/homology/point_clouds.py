@@ -61,7 +61,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this death 
+        filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
@@ -267,10 +267,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    epsilon : float between 0. and 1., optional, default `0.1`
-        Parameter controlling the approximation to Vietoris-Rips filtration.
-        If set to `0.0`, class:`SparseRipsPersistence` leads to the same
-        results as class:`VietorisRipsPersistence` but is slower.
+    epsilon : float between 0. and 1., optional, default: ``0.1``
+        Parameter controlling the approximation to the exact Vietoris-Rips
+        filtration. If set to `0.`, :class:`SparseRipsPersistence` leads to
+        the same results as :class:`VietorisRipsPersistence` but is slower.
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration
@@ -280,8 +280,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
-        as `max_edge_length`.
+    filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -292,7 +292,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value `max_edge_length`.
+        filtration value `max_edge_length`. Set in :meth:`fit`.
 
     See also
     --------
@@ -300,9 +300,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     Notes
     -----
-    `Gudhi <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cubical persistent homology. Python bindings were modified
-    for performance.
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for computing sparse Vietoris-Rips persistent homology. Python bindings
+    were modified for performance.
 
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
@@ -310,11 +310,11 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    [1] P. Dlotko, "Cubical complex", 2015; `GUDHI User and Reference Manual \
-    <http://gudhi.gforge.inria.fr/doc/latest/group__cubical__complex.html>`_.
+    [1] C.Maria, P. Dlotko, V. Rouvreau and M. Glisse "Rips complex", 2020;
+    `GUDHI User and Reference Manual \
+    <http://gudhi.gforge.inria.fr/doc/3.1.0/group__rips__complex.html>`_.
 
     """
-
     _hyperparameters = {'epsilon': [numbers.Number, (0., 1.)],
                         'max_edge_length': [numbers.Number],
                         'infinity_values_': [numbers.Number],
