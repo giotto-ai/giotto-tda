@@ -14,7 +14,7 @@ from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `filtrations of Cubical complex <https://giotto.ai/theory>`_.
+    `filtered Cubical complex <https://giotto.ai/theory>`_.
 
     Given a `grayscale image <https://giotto.ai/theory>`_, information
     about the appearance and disappearance of topological features
@@ -42,7 +42,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
         filtration value `np.inf`. ``None`` assigns the maximum pixel
-        values within all images passed to meth:`fit`.
+        values within all images passed to :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -51,8 +51,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    infinity_values_ : float or None, default : ``None``
-       Infinity value calculated ub meth:`fit`.
+    infinity_values_ : float
+       Infinity value calculated in :meth:`fit`.
 
     See also
     --------
@@ -60,8 +60,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Notes
     -----
-    `Gudhi <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cubical persistent homology. Python bindings were modified
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for computing cubical persistent homology. Python bindings were modified
     for performance.
 
     Persistence diagrams produced by this class must be interpreted with
