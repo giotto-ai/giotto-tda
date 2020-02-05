@@ -83,7 +83,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -149,7 +149,6 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
             2D or 3D grayscale image.
 
         """
-
         check_is_fitted(self)
         Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
 
