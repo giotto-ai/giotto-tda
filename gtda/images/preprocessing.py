@@ -91,8 +91,9 @@ class Binarizer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each collection of grayscale images, calculate the corresponding
-        collection of binary images by applying the threshold.
+        """For each grayscale image in the collection `X`, calculate a
+        corresponding binary image by applying the `threshold`. Return the
+        collection of binary images.
 
         Parameters
         ----------
@@ -128,8 +129,8 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Inverter(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of binary images from an input
-    collection of 2D or 3D grayscale images.
+    """Transformer returning a collection of binary images that are the logical
+    negation of the 2D or 3D binary images of an input collection.
 
     Parameters
     ----------
@@ -170,8 +171,8 @@ class Inverter(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each collection of binary images, calculate the corresponding
-        collection of binary images based on their logical negation.
+        """For each binary image in the collection `X`, calculate its negation.
+        Return the collection of negated binary images.
 
         Parameters
         ----------
