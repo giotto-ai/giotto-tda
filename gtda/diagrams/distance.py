@@ -155,7 +155,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'heat', 'betti', 'silhouette']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
@@ -339,7 +339,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
+        if self.metric in ['landscape', 'heat', 'betti', 'silhouette']:
             self.effective_metric_params_['samplings'], \
                 self.effective_metric_params_['step_sizes'] = \
                 _discretize(X, **self.effective_metric_params_)
