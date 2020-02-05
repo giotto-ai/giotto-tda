@@ -12,6 +12,18 @@ from sklearn.utils.validation import _num_samples
 from ._utils import _subdiagrams
 
 
+def silhouettes(diagrams, sampling, order, **kwargs):
+    """Input = a batch of persistence diagram (*, with a oneD sampling"""
+    sampling = np.transpose(sampling, axes=(1, 2, 0))
+    weights = np.diff(diagrams, axis=2)[:, :, 0:1]**order
+    total_weights = np.sum(weights, axis=1)
+    midpoints = (diagrams[:, :, 1:2] + diagrams[:, :, 0:1]) / 2.
+    heights = (diagrams[:, :, 1:2] - diagrams[:, :, 0:1]) / 2.
+    fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
+    fibers_weighted_sum = np.sum(weights*fibers, axis=1)/total_weights
+    return fibers_weighted_sum
+
+
 def betti_curves(diagrams, sampling):
     born = sampling >= diagrams[:, :, 0]
     not_dead = sampling < diagrams[:, :, 1]
@@ -56,6 +68,17 @@ def heats(diagrams, sampling, step_size, sigma):
     heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
     heats_ = np.rot90(heats_, k=1, axes=(1, 2))
     return heats_
+
+
+def silhouette_distances(diagrams_1, diagrams_2, sampling, step_size,
+                         p=2., **kwargs):
+    silhouette_1 = silhouettes(diagrams_1, sampling, p)
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(silhouette_1, 'minkowski', p=p))
+    else:
+        silhouette_2 = silhouettes(diagrams_2, sampling, p)
+        unnorm_dist = cdist(silhouette_1, silhouette_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
 
 
 def betti_distances(diagrams_1, diagrams_2, sampling, step_size,
@@ -123,7 +146,8 @@ implemented_metric_recipes = {'bottleneck': bottleneck_distances,
                               'wasserstein': wasserstein_distances,
                               'landscape': landscape_distances,
                               'betti': betti_distances,
-                              'heat': heat_distances}
+                              'heat': heat_distances,
+                              'silhouette': silhouette_distances}
 
 
 def _matrix_wrapper(distance_func, distance_matrices, slice_, dim,
@@ -154,6 +178,11 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
         [distance_matrices[:, i*X2.shape[0]: (i+1)*X2.shape[0]]
          for i in range(len(homology_dimensions))], axis=2)
     return distance_matrices
+
+
+def silhouette_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
+    sht = silhouettes(diagrams, sampling, p)
+    return (step_size ** (1 / p)) * np.linalg.norm(sht, axis=1, ord=p)
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
@@ -187,7 +216,8 @@ implemented_amplitude_recipes = {'bottleneck': bottleneck_amplitudes,
                                  'wasserstein': wasserstein_amplitudes,
                                  'landscape': landscape_amplitudes,
                                  'betti': betti_amplitudes,
-                                 'heat': heat_amplitudes}
+                                 'heat': heat_amplitudes,
+                                 'silhouette': silhouette_amplitudes}
 
 
 def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,

@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats
+from ._metrics import betti_curves, landscapes, heats, silhouettes
 from ._utils import _subdiagrams, _discretize
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
@@ -524,4 +524,93 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
                                         self.n_values, self.n_values).\
             transpose((1, 0, 2, 3))
+        return Xt
+
+@adapt_fit_transform_docs
+class Silhouette(BaseEstimator, TransformerMixin):
+    """Silhouettes of persistence diagrams.
+
+    Given a persistence diagram consisting of birth-death-dimension triples
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately. The silhouettes of each subdiagram is the weighted
+    average of the piecewise-linear functions that constitute the landscape.
+    A silhouette is represented as a vector, with entries representing
+    evaluations of the silhouette-function at uniformly sampled points.
+
+    """
+
+    _hyperparameters = {'order': [float, (1, np.inf)],
+                        'n_values': [int, (1, np.inf)]}
+
+    def __init__(self, order=1, n_values=100, n_jobs=None):
+        self.order = order
+        self.n_values = n_values
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and, for each dimension separately,
+        store evenly sample filtration parameter values in :attr:`samplings_`.
+        Then, return the estimator.
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+        Returns
+        -------
+        self : object
+        """
+        X = check_diagram(X)
+        validate_params(self.get_params(), self._hyperparameters)
+
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
+
+        self._samplings, _ = _discretize(X, n_values=self.n_values)
+        self.samplings_ = {dim: s.flatten()
+                           for dim, s in self._samplings.items()}
+
+        return self
+
+    def transform(self, X, y=None):
+        """Compute Silhouettes of diagrams in X
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
+            Silhouette: one curve (represented as a one-dimensional array
+            of integer values) per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+
+        """
+        # Check if fit had been called
+        check_is_fitted(self)
+        X = check_diagram(X)
+
+
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(silhouettes)(
+            _subdiagrams(X, [dim], remove_dim=True)[s],
+            self._samplings[dim], order=self.order)
+                                          for dim in self.homology_dimensions_
+                                          for s in gen_even_slices(X.shape[0],
+                                                                   effective_n_jobs(self.n_jobs)))
+        Xt = np.stack(Xt, axis=1)
         return Xt
