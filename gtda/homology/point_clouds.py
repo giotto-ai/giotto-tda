@@ -280,7 +280,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-    filtration value `max_edge_length`. ``None`` means that this death
+        filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
