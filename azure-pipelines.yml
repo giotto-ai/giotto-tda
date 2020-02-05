@@ -345,7 +345,7 @@ jobs:
   - script: |
       cd doc/
       make html
-      cd ..
+    failOnStderr: true
     displayName: 'Build sphinx doc'
 
   - task: ArchiveFiles@2
