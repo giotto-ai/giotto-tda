@@ -20,13 +20,13 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
     value corresponding to the distance between the pixel and the hyperplane
     defined by a direction vector and the first seen edge of the image
     following that direction. Deactivated pixels are assigned the value of the
-    maximum distance between any pixel of the image and the hyperplance plus
+    maximum distance between any pixel of the image and the hyperplane plus
     one.
 
     Parameters
     ----------
-    direction : ndarray, shape (n_dimensions, [1]), optional, default
-        ``np.ones(n_dimensions_)``
+    direction : ndarray of shape (n_dimensions, ), optional, default:
+        ``np.ones(n_dimensions, )``
         Direction of the height filtration, where ``n_dimensions`` is the
         dimension of the images of the collection.
 
@@ -37,25 +37,23 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    direction_ : ndarray, shape (n_dimensions_, [1]), optional, default
-        ``np.ones(n_dimensions_)``
-        Effective direction of the height filtration. Set in meth:`fit`.
+    direction_ : ndarray of shape (n_dimensions_, )
+        Effective direction of the height filtration. Set in :meth:`fit`.
 
     n_dimensions_ : int
-        Dimension of the images. Set in meth:`fit`.
+        Dimension of the images. Set in :meth:`fit`.
 
-    mesh_ : int
+    mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
         Mesh image for which each pixel value is its distance to the hyperplane
-        implied by `direction_`. Set in meth:`fit`.
+        implied by `direction_`. Set in :meth:`fit`.
 
     max_value_: float
         Maximum pixel value among all pixels in all images of the collection.
-        Set in meth:`fit`.
+        Set in :meth:`fit`.
 
     See also
     --------
-    gtda.homology.CubicalPersistence
-
+    gtda.homology.CubicalPersistence, Binarizer
 
     """
     _hyperparameters = {'n_dimensions_': [int, [2, 3]],
@@ -69,8 +67,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         Xh = np.full(X.shape, self.max_value_)
 
         for i in range(Xh.shape[0]):
-            Xh[i][X[i] == True] = np.dot(self.mesh_[X[i] == True],
-                                         self.direction_).reshape((-1,))
+            Xh[i][np.where(X[i])] = np.dot(self.mesh_[np.where(X[i])],
+                                           self.direction_).reshape((-1,))
 
         return Xh
 
@@ -83,7 +81,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             grayscale image.
 
@@ -107,7 +105,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         validate_params({**self.get_params(), 'direction_': self.direction_,
                          'n_dimensions_': self.n_dimensions_},
-                         self._hyperparameters)
+                        self._hyperparameters)
 
         self.direction_ = self.direction_ / np.linalg.norm(self.direction_)
 
@@ -127,16 +125,17 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each collection of binary images, calculate the corresponding
-        collection of grayscale images based on the distance the pixel of each
-        image to the hyperplane defined by the ``direction`` vector and the
-        first seen edge of the images following that ``direction``.
+        """For each binary image in the collection `X`, calculate a
+        corresponding grayscale image based on the distance of its pixels to
+        the hyperplane defined by the ``direction`` vector and the first seen
+        edge of the images following that ``direction``. Return the collection
+        of grayscale images.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -144,9 +143,11 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        Xt : ndarray of shape (n_samples, n_pixels_x,
+            n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
-            2D or 3D binary images.
+            2D or 3D grayscale image.
+
         """
 
         check_is_fitted(self)
@@ -154,7 +155,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_height)(X[s])
-            for s in gen_even_slices(Xt.shape[0], effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(Xt.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
