@@ -100,9 +100,9 @@ def test_gaussian_density_values(X):
     """Check that ``fit_transform`` and ``fit + score_samples``
     of ``KernelDensity`` are the same."""
     kde_desired = KernelDensity(bandwidth=np.std(X))
-    kde_actual = method_to_transform(KernelDensity,
-                                     'score_samples')(bandwidth=np.std(X))
-    Xt_desired = kde_desired.fit(X).score_samples(X)
+    kde_actual = method_to_transform(
+        KernelDensity, 'score_samples')(bandwidth=np.std(X))
+    Xt_desired = kde_desired.fit(X).score_samples(X).reshape(-1, 1)
     Xt_actual = kde_actual.fit_transform(X)
     assert_almost_equal(Xt_actual, Xt_desired)
 
