@@ -220,7 +220,7 @@ jobs:
       pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
-      pytest --pyargs gtda --no-cov=True --ignore-glob='*externals*'
+      pytest --pyargs gtda --no-cov --ignore-glob='*externals*'
     failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
@@ -332,7 +332,7 @@ jobs:
   - script: |
       mkdir tmp_test_cov
       cd tmp_test_cov
-      pytest --pyargs gtda --no-cov=True --ignore-glob='*externals*'
+      pytest --pyargs gtda --no-cov --ignore-glob='*externals*'
     failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
@@ -463,7 +463,7 @@ jobs:
   - bash: |
       mkdir tmp_test_cov
       cd tmp_test_cov
-      pytest --pyargs gtda --no-cov=True --ignore-glob='*externals*'
+      pytest --pyargs gtda --no-cov --ignore-glob='*externals*'
     failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
