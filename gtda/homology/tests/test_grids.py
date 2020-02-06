@@ -33,8 +33,8 @@ def test_cp_not_fitted():
 
 @pytest.mark.parametrize("periodic_dimensions, expected",
                          [(None, X_cp_res),
-                          ((False, False), X_cp_res),
-                          ((True, True), X_cp_res_periodic)])
+                          (np.array([False, False]), X_cp_res),
+                          (np.array([True, True]), X_cp_res_periodic)])
 def test_cp_transform(periodic_dimensions, expected):
     cp = CubicalPersistence(periodic_dimensions=periodic_dimensions)
     assert_almost_equal(cp.fit_transform(X), expected)
