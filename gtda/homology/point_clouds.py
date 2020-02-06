@@ -1,4 +1,4 @@
- """Persistent homology on point clouds or finite metric spaces."""
+"""Persistent homology on point clouds or finite metric spaces."""
 # License: GNU AGPLv3
 
 import numbers
