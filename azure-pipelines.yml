@@ -71,7 +71,7 @@ jobs:
   - script: |
       brew update
       brew install gcc boost
-      brew upgrade cmake
+      brew outdated | grep -q cmake && brew upgrade cmake
     failOnStderr: true
     displayName: 'Install gcc, cmake and boost'
 
@@ -288,7 +288,7 @@ jobs:
   - script: |
       brew update
       brew install gcc boost
-      brew upgrade cmake
+      brew outdated | grep -q cmake && brew upgrade cmake
     failOnStderr: true
     displayName: 'Install gcc, cmake and boost'
 
