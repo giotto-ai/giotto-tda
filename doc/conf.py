@@ -65,7 +65,7 @@ else:
     mathjax_path = ('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/'
                     'MathJax.js?config=TeX-AMS_SVG')
 
-autodoc_default_flags = ['members', 'inherited-members']
+autodoc_default_options = {'members': True, 'inherited-members': True}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['templates']

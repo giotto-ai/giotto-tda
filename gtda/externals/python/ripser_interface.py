@@ -1,4 +1,3 @@
-import warnings
 from scipy import sparse
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances

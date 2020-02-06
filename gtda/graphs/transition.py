@@ -191,7 +191,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
             graph is encoded by a sparse matrix of boolean type.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         Xt = check_array(X, copy=True, allow_nd=True)
 
