@@ -74,7 +74,7 @@ def validate_params(parameters, references):
                                       references[key][0]))
         if len(references[key]) == 1:
             continue
-        if references[key][0] == list or references[key][0] == np.ndarray:
+        if references[key][0] == list:
             for parameter in parameters[key]:
                 if not isinstance(parameter, references[key][1][0]):
                     raise TypeError("Parameter {} is a list of {}"
@@ -87,6 +87,23 @@ def validate_params(parameters, references):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):
                         raise ValueError("Parameter {} is a list containing {}"
+                                         "which should be in the range [{},{}]"
+                                         "".format(key, parameter,
+                                                   references[key][1][1][0],
+                                                   references[key][1][1][1]))
+            break
+        if references[key][0] == np.ndarray:
+            print(parameters[key].dtype, references[key][1])
+            print(np.issubdtype(parameters[key].dtype, references[key][1]))
+            if not np.issubdtype(parameters[key].dtype, references[key][1]):
+                raise TypeError("Parameter {} is an array of {}"
+                                " but contains element(s) of another type."
+                                "".format(key, references[key][1]))
+            for parameter in parameters[key]:
+                if isinstance(references[key][1], tuple):
+                    if (parameter < references[key][1][1][0] or
+                            parameter > references[key][1][1][1]):
+                        raise ValueError("Parameter {} is an array containing {}"
                                          "which should be in the range [{},{}]"
                                          "".format(key, parameter,
                                                    references[key][1][1][0],
