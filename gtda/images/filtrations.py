@@ -75,7 +75,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Calculate `n_dimensions_`, 'mesh_' and `max_value_` from a
-        collection of binary image. Then, return the estimator.
+        collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
