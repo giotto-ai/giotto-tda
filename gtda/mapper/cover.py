@@ -397,7 +397,6 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             partial(self._clone_and_apply_to_column, X, coverer, fitter)(i)
             for i in range(X.shape[1])
         ]
-        # Only store attributes if above succeeds
         self._n_features_fit = X.shape[1]
         return self
 
@@ -463,8 +462,8 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             n_features` as empty or duplicated cover sets are removed.
 
         """
-        check_is_fitted(self)
-        # reshape filter function values derived from FunctionTransformer
+        check_is_fitted(self, '_coverers')
+        # Reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
 
