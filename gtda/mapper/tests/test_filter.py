@@ -93,6 +93,6 @@ def test_gaussian_density_values(X):
     kde_desired = KernelDensity(bandwidth=np.std(X))
     kde_actual = method_to_transform(
         KernelDensity, 'score_samples')(bandwidth=np.std(X))
-    Xt_desired = kde_desired.fit(X).score_samples(X)
+    Xt_desired = kde_desired.fit(X).score_samples(X).reshape(-1, 1)
     Xt_actual = kde_actual.fit_transform(X)
     assert_almost_equal(Xt_actual, Xt_desired)
