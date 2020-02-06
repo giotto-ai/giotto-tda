@@ -3,8 +3,10 @@
 """
 
 from .preprocessing import Binarizer, Inverter
+from .filtrations import HeightFiltration
 
 __all__ = [
     'Binarizer',
-    'Inverter'
+    'Inverter',
+    'HeightFiltration',
 ]
