@@ -45,6 +45,8 @@ colors = np.array([8.,  8.,  3.,  8.,  0.,  8.,  8.,  8.,  5.,
 class TestStaticPlot(TestCaseNoTemplate):
 
     def test_is_data_present(self):
+        """Verify that what we see in the graph corresponds to
+        the number of samples in the graph."""
         pipe = make_mapper_pipeline()
         warnings.simplefilter("ignore")
         fig = plot_static_mapper_graph(pipe, X,
@@ -71,6 +73,8 @@ class TestInteractivePlot(TestCaseNoTemplate):
                 pass
 
     def test_cluster_sizes(self):
+        """Verify that the total number of calculated clusters is equal to
+        the number of displayed clusters."""
         pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
         warnings.simplefilter("ignore")
         fig = plot_interactive_mapper_graph(pipe, X)

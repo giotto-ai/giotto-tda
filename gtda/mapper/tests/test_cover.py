@@ -12,6 +12,8 @@ from gtda.mapper import OneDimensionalCover, CubicalCover
 
 @composite
 def get_filter(draw, shape=None):
+    """Generate a 1d array of floats, of a given shape.
+    If the shape is not given, generate a shape of at least (4,)."""
     if shape is None:
         shape = array_shapes(min_dims=1, max_dims=1,
                              min_side=4)
@@ -51,6 +53,11 @@ def get_kind(draw):
     n_intervals=get_nb_intervals()
 )
 def test_one_dimensional_cover_shape(filter_values, n_intervals):
+    """Assert that the shape of the mask ``unique_interval_masks``
+    corresponds to the pre-specified ``n_samples`` and ```_intervals``
+    parameters, except when the filter has only a unique value, in which
+    case the  fit_transform should throw an error.
+    """
     # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     n_samples, n_intervals = len(filter_values), cover.n_intervals
@@ -68,6 +75,8 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
     filter_values=get_filter()
 )
 def test_filter_values_covered_by_single_interval(filter_values):
+    """Verify that a single intervals covers all the values in
+    ``filter_values``"""
     # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=1)
     interval_masks = cover.fit_transform(filter_values)
@@ -82,6 +91,8 @@ def test_filter_values_covered_by_single_interval(filter_values):
     overlap_frac=get_overlap_fraction()
 )
 def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
+    """Test that all the intervals have the same length, up to an additive
+    constant of 0.1."""
     cover = OneDimensionalCover(kind='uniform',
                                 n_intervals=n_intervals,
                                 overlap_frac=overlap_frac)
@@ -98,6 +109,7 @@ def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
 
 @composite
 def get_input_tests_balanced(draw):
+    """Points, nb_in_each_interval and nb_intervals"""
     nb_intervals = draw(get_nb_intervals())
     nb_in_each_interval = draw(integers(min_value=2, max_value=5))
     points = draw(get_filter(shape=(nb_in_each_interval * nb_intervals,)))
@@ -106,12 +118,14 @@ def get_input_tests_balanced(draw):
 
 @given(input=get_input_tests_balanced())
 def test_balanced_is_balanced(input):
+    """Test that each point is in one interval, and that each interval has
+    ``nb_in_each_interval`` points."""
     points, nb_in_each_interval, nb_intervals = input
     oneD_cover = OneDimensionalCover(kind='balanced',
                                      n_intervals=nb_intervals,
                                      overlap_frac=0.01)
     mask = oneD_cover.fit_transform(points)
-    # each interval contains 2 points
+    # each interval contains nb_in_each_interval points
     assert all([s == nb_in_each_interval for s in np.sum(mask, axis=0)])
     # each point is in exactly one interval
     assert all([s == 1 for s in np.sum(mask, axis=1)])
@@ -123,6 +137,8 @@ def test_balanced_is_balanced(input):
 )
 def test_filter_values_covered_by_interval_union(filter_values,
                                                  n_intervals):
+    """Test that each value is at least in one interval.
+    (that is, the cover is a true cover)."""
     # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     interval_masks = cover.fit_transform(filter_values)
