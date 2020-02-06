@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage{amssymb}
+
+\begin{document}
+	\section{Homology}
+	
+	\paragraph{Simplicial complex:} 
+	
+	A \textit{simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being subsets of $V$ such that: 1) For every $v$ in $V$, the singleton $\{v\}$ is in $X$. 2) If $x$ is in $X$ and $y$ is a subset of $x$, then $y$ is in $X$. We abuse notation and denote the pair $(V,X)$ simply by $X$.
+	
+	The elements of $X$ are called \textit{simplices} and the \textit{dimension} of a simplex $x$ is defined by $|x| = \# x - 1$ where $\# x$ denotes the cardinality of $x$. Simplices of dimension $d$ are called $d$-simplices. We abuse terminology and refer to the elements of $V$ and to their associated $0$-simplices both as \textit{vertices}.
+	
+	The \textit{$k$-skeleton }$X_k$ of a simplicial complex $X$ is the subcomplex containing all simplices of dimension at most $k$. A simplicial complex is said to be \textit{$d$-dimensional} if $d$ is the smallest integer satisfying $X = X_d$.
+	
+	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
+	
+	A simplicial complex $X$ is a \textit{subcomplex} of a simplicial complex $Y$ if every simplex of $X$ is a simplex of $Y$.
+	
+	\paragraph{Ordered simplicial complex:} 
+	
+	An \textit{ordered simplicial complex} is a \underline{simplicial complex} where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $[v_0, \dots, v_n]$.
+	
+	A \textit{simplicial map} between ordered simplicial complexes is a simplicial map $f$ between their underlying simplicial complexes preserving the order, i.e., $v \leq w$ implies $f(v) \leq f(w)$.
+	
+	\paragraph{Directed simplicial complex:} A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that: 1) For every $v$ in $V$, the tuple $v$ is in $X$. 2) If $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$. With appropriate modifications the same terminology and notation introduced for \underline{ordered simplicial complex} applies to directed simplicial complex.
+	
+	\paragraph{Clique and flag complexes:} Let $G$ be a $1$-dimensional simplicial complex. The simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. A straightforward modification of this definition defines $\langle G \rangle$ for $1$-dimensional directed simplicial complexes. 
+	
+	A simplicial complex $X$ (resp. directed simplicial complex) is a \textit{clique complex} (resp. \textit{flag complex}) if $X = \langle X_1 \rangle$. We remark that in the literature the adjetives clique and flag tend to be used interchangibly.
+	
+	\paragraph{Chain complex:} Let $\Bbbk$ be a field (or more generally a commutative and unital ring). A chain complex of $\Bbbk$-vector spaces is a pair $(C_*, \partial)$ where $C_* = \bigoplus_{n \in \mathbb Z} C_n$ and $\partial = \bigoplus_{n \in \mathbb Z} \partial_n$ with  $\partial_n : C_{n+1} \to C_n$ a $\Bbbk$-linear map such that $\partial_{n+1} \partial_n = 0$. We refer to $\partial$ as the \textit{boundary map} of the chain complex.
+	
+	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of \underline{homology}.
+	
+	A \textit{chain map} is a $\Bbbk$-linear map $f : C \to C'$ between chain complexes such that $f(C_n) \leq C'_n$ and $\partial f = f \partial$.
+	
+	Given a chain complex $(C_*, \partial)$, its linear dual $C^*$ is also a chain complex with $C^{-n} = \mathrm{Hom_\Bbbk}(C_n, \Bbbk)$ and boundary map $\delta$ defined by $\delta(\alpha)(c) = \alpha(\partial c)$ for any $\alpha \in C^*$ and $c \in C_*$.
+	
+	\paragraph{Homology and cohomology:} Let $(C_*, \partial)$ be a \underline{chain complex}. Its \textit{$n$-th homology group} is the quotient of the subspace of $n$-cycles by the subspace of $n$-boundaries, that is, $H_n(C_*) = \mathrm{ker}(\partial_n)/ \mathrm{im}(\partial_{n+1})$. The \textit{homology} of $(C, \partial)$ is defined by $H_*(C) = \bigoplus_{n \in \mathbb Z} H_n(C)$.
+	
+	When the chain complex under consideration is the linear dual of a chain complex we sometimes refer to its homology as the \textit{cohomology} of the predual complex and write $H^n$ for $H_{-n}$.
+	
+	\paragraph{Simplicial homology:} Let $X$ be an ordered or directed simplicial complex. Define its simplicial chain complex $C_*(X; \Bbbk)$ by 
+	$$
+	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n([v_0, \dots, v_n]) = \sum_{i=0}^{n} (-1)^i [v_0, \dots, \widehat v_i, \dots, v_n]
+	$$
+	and its \textit{homology and cohomology with $\Bbbk$-coefficients} as the \underline{homology and cohomology} of this chain complex.
+	
+	\paragraph{Filtered simplicial complex:} A \textit{filtered simplicial complex} is a collection of simplicial complexes $\{X(n)\}_{n \geq 0}$ such that $X(n)$ is a subcomplex of $X(n+1)$ for each $n \geq 0$. A filtered simplicial complex such that the difference between $X(n+1)$ and $X(n)$ is exactly one simplex is called a \textit{simplexwise filtration}. The data of a simplexwise filtration is equivalent to a simplicial complex $X$ together with a total order $\leq$ on its simplices such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$.
+	
+	\paragraph{Persistence modules and barcodes:} A \textit{persistence module} is a collection of vector spaces $\{V(n)\}_{n \geq 0}$ together with linear maps $V(n) \to V(n+1)$. We now define an invariant that completely characterizes a persistence module.  A \textit{multiset} is a pair $(S, \phi)$ where $S$ is a set and  $\phi : S \to \mathbb Z$ is a function attaining positive values. For $s \in S$ we refer to $\phi(s)$ as its \textit{multiplicity}. The \textit{barcode} of a persistence module $V$ is the multiset of half-open intervals $[a,b) \subset \mathbb R$ such that the image of the composition $V(i) \to \cdots \to V(j)$ has dimension equal to the number, counted with multiplicity, of half-open intervals containing $i$ and $j$.
+	
+	\section{Geometry}
+	
+	\paragraph{Metric space:} A  pair $(X, d)$ where $X$ is a set and $d$ is a function 
+	$$
+	d : X \times X \to \mathbb R
+	$$
+	attaining non-negative values is called a \textit{metric space} if for any $x, y, z \in X$:
+	
+	1) $d(x,y) = 0$ if and only if $x = y$,
+	
+	2) $d(x,y) = d(y,x)$, 
+	
+	3) $d(x,z) \leq d(x,y) + d(y, z)$.
+	
+	In this case, the function $d$ is refer to as the \textit{metric} and the value $d(x,y)$ is called the \textit{distance} between $x$ and $y$. 
+	
+	\paragraph{Point cloud:} A \textit{point cloud} is a finite metric space. A common type of point cloud is defined by a finite subset of $\mathbb R^n$ with metric induced from the eucliden distance.
+	
+\end{document}
