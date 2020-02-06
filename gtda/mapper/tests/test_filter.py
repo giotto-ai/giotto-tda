@@ -130,10 +130,10 @@ def test_list_feature_union_transform(X):
     shape=array_shapes(min_dims=2, max_dims=2, min_side=2),
     unique=True
 ))
-def test_list_feature_union_nones(X):
-    none_1_2 = ListFeatureUnion([("None" + str(k), None)
+def test_list_feature_union_drops(X):
+    drop_0_1 = ListFeatureUnion([('drop' + str(k), 'drop')
                                  for k in range(2)])
-    x_12_a = none_1_2.fit_transform(X)
-    x_12_b = none_1_2.transform(X)
-    assert x_12_a.shape == (X.shape[0], 0)
-    assert x_12_b.shape == (X.shape[0], 0)
+    x_01_a = drop_0_1.fit_transform(X)
+    x_01_b = drop_0_1.transform(X)
+    assert x_01_a.shape == (X.shape[0], 0)
+    assert x_01_b.shape == (X.shape[0], 0)
