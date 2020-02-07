@@ -229,7 +229,7 @@ def test_dst_transform(X):
     assert X_res.shape == X.shape
 
 
-parameters = [('wasserstein', {'order': 2, 'delta': 0.1}),
+parameters = [('wasserstein', {'p': 2, 'delta': 0.1}),
               ('betti', {'n_values': 10}),
               ('bottleneck', None)]
 
