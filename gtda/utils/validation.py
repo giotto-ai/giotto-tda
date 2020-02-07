@@ -2,7 +2,6 @@
 # License: GNU AGPLv3
 
 import numbers
-
 import numpy as np
 
 available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
@@ -78,13 +77,15 @@ def validate_params(parameters, references):
                                       references[key][0]))
         if len(references[key]) == 1:
             continue
-        if references[key][0] == list:
+        if references[key][0] == list or references[key][0] == np.ndarray:
             for parameter in parameters[key]:
                 if not isinstance(parameter, references[key][1][0]):
                     raise TypeError("Parameter {} is a list of {}"
                                     " but contains an element of type {}"
                                     "".format(key, type(parameters[key]),
                                               references[key][0]))
+                if references[key][1][1] is None:
+                    break
                 if isinstance(references[key][1], tuple):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):

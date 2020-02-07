@@ -51,7 +51,11 @@ def method_to_transform(cls, method_name):
             def transform(self, X, y=None):
                 has_method = hasattr(self, method_name)
                 if has_method:
-                    return getattr(self, method_name)(X)
+                    Xt = getattr(self, method_name)(X)
+                    # reshape 1D estimators to have shape (n_samples, 1)
+                    if Xt.ndim == 1:
+                        Xt = Xt[:, None]
+                    return Xt
         ExtendedEstimator.__name__ = 'Extended' + wrapped.__name__
         return ExtendedEstimator
     wrapped_cls = wrapper(cls)
