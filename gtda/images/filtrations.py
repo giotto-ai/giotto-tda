@@ -59,7 +59,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'n_dimensions_': [int, [2, 3]],
-                        'direction_': [list, numbers.Number]}
+                        'direction_': [np.ndarray, (numbers.Number, None)]}
 
     def __init__(self, direction=None, n_jobs=None):
         self.direction = direction
@@ -101,9 +101,9 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         self.n_dimensions_ = len(X.shape) - 1
 
         if self.direction is None:
-            self.direction_ = np.ones((self.n_dimensions_, 1))
+            self.direction_ = np.ones((self.n_dimensions_, ))
         else:
-            self.direction_ = np.copy(self.direction).reshape((-1, 1))
+            self.direction_ = np.copy(self.direction)
 
         validate_params({**self.get_params(), 'direction_': self.direction_,
                          'n_dimensions_': self.n_dimensions_},
@@ -177,8 +177,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    center : ndarray of shape (n_dimensions, 1), optional, default:
-        ``np.zeros(n_dimensions, 1)``
+    center : ndarray of shape (n_dimensions, ), optional, default:
+        ``np.zeros(n_dimensions, )``
         Coordinates of the center pixel, where ``n_dimensions`` is the
         dimension of the images of the collection.
 
@@ -211,7 +211,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    center_ : ndarray of shape (n_dimensions_, )
+    center_ : ndarray of shape (n_dimensions_, 1)
         Effective center of the radial filtration. Set in :meth:`fit`.
 
     effective_metric_params_ : dict
@@ -236,7 +236,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'n_dimensions_': [int, [2, 3]],
-                        'center_': [np.ndarray, (int)]}
+                        'center_': [np.ndarray, (int, None)]}
 
     def __init__(self, center=None, radius=np.inf, metric='euclidean',
                  metric_params=None, n_jobs=None):
@@ -249,7 +249,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
     def _calculate_radial(self, X):
         Xr = np.nan_to_num(self.mesh_ * X, nan=np.inf, posinf=np.inf)
         Xr = np.nan_to_num(Xr, posinf=-1)
-        Xr[np.logical_or(Xr == -1, X == False)] = self.max_value_
+
+        Xr[X == 0] = self.max_value_
+        Xr[Xr == -1] = self.max_value_
 
         return Xr
 
@@ -281,13 +283,15 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         self.n_dimensions_ = len(X.shape) - 1
 
         if self.center is None:
-            self.center_ = np.ones((self.n_dimensions_, 1))
+            self.center_ = np.zeros((self.n_dimensions_, ))
         else:
-            self.center_ = np.copy(self.center).reshape((-1, 1))
+            self.center_ = np.copy(self.center)
 
         validate_params({**self.get_params(), 'center_': self.center_,
                          'n_dimensions_': self.n_dimensions_},
                         self._hyperparameters)
+
+        self.center_ = self.center_.reshape((1, -1))
 
         if self.metric_params is None:
             self.effective_metric_params_ = {}
@@ -304,7 +308,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         self.mesh_ = pairwise_distances(
             self.center_, self.mesh_, metric=self.metric,
             n_jobs=1, **self.effective_metric_params_).reshape(X.shape[1:])
-        self.mesh_[self.mesh_ > self.radius] = 0.
+        self.mesh_[self.mesh_ > self.radius] = np.inf
 
         self.max_value_ = 0.
         self.max_value_ = np.max(self._calculate_radial(
@@ -339,7 +343,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._calculate_height)(X[s])
+            delayed(self._calculate_radial)(X[s])
             for s in gen_even_slices(Xt.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
