@@ -17,14 +17,14 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        ('Node size:{}<br>Pullback cover set label:{}<br>Partial cluster '
+        ('Node Id:{}<br>Node size:{}<br>Partial cluster '
          'label:{}')
         .format(
-            len(node_elements), pullback_set_label, partial_cluster_label,
+            node_id, len(node_elements), partial_cluster_label,
         )
-        for node_elements, pullback_set_label, partial_cluster_label in
-        zip(graph['node_metadata']['node_elements'],
-            graph['node_metadata']['pullback_set_label'],
+        for node_id, node_elements, partial_cluster_label in
+        zip(graph['node_metadata']['node_id'],
+            graph['node_metadata']['node_elements'],
             graph['node_metadata']['partial_cluster_label'])]
 
 
