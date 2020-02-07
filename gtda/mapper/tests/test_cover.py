@@ -53,10 +53,11 @@ def get_kind(draw):
     n_intervals=get_nb_intervals()
 )
 def test_one_dimensional_cover_shape(filter_values, n_intervals):
-    """Assert that the shape of the mask ``unique_interval_masks``
-    corresponds to the pre-specified ``n_samples`` and ```_intervals``
-    parameters, except when the filter has only a unique value, in which
-    case the  fit_transform should throw an error.
+    """Assert that the length of the mask ``unique_interval_masks``
+    corresponds to the pre-specified ``n_samples`` and that there
+    are no more intervals in the cover than ``_intervals``.
+    The case when the filter has only a unique value, in which
+    case the fit_transform should throw an error, is treated separately.
     """
     # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)

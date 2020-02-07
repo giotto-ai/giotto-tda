@@ -225,8 +225,9 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Returns
     -------
-    display : :class:`DisplayHandle` object
-        Displays the interactive Mapper graph widget.
+    fig : :class:`ipywidgets.VBox` object. A widget, that contains
+        widgets: parameters for cluster, parameters for cover, figure
+        from ```lot_static_mapper_graph``, a validation and log  boxes.
 
     References
     ----------

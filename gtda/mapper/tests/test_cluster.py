@@ -10,7 +10,7 @@ from gtda.mapper import FirstHistogramGap, FirstSimpleGap
 
 @composite
 def get_one_cluster(draw, n_points, dim):
-    """Get an array of n_points in a dim-dimensional space.,
+    """Get an array of n_points in a dim-dimensional space,
      in the [-1,1]-hypercube"""
     f = draw(arrays(dtype=np.float,
                     elements=floats(allow_nan=False,
@@ -107,7 +107,7 @@ def test_firsthistogramgap(inp):
                                         max_value=1., exclude_max=True))
 def test_max_fraction_clusters(inp, max_frac):
     """ Check that the clusterers (``FirstSimpleGap``,
-    ``FirstHistogramGap``) respect the `max_num_clusters```constraint,
+    ``FirstHistogramGap``) respect the ``max_num_clusters`` constraint,
     if it is set."""
     n_points_per_cluster, n_clusters, _, pts = inp
     max_num_clusters = max_frac * (n_points_per_cluster * n_clusters
@@ -124,7 +124,7 @@ def test_max_fraction_clusters(inp, max_frac):
 
 @given(inp=get_input())
 def test_precomputed_distances(inp):
-    """Verify that the clustering based on `distance_matrix`` is the same
+    """Verify that the clustering based on ``distance_matrix`` is the same
     as the clustering on points, that were used to calculate
     that distance matrix."""
     n_points_per_cluster, n_clusters, _, pts = inp
