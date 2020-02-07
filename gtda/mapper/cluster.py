@@ -435,6 +435,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
+            self.n_clusters_ = 1
             return self
 
         self._build_tree(X)
@@ -583,6 +584,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         X = check_array(X)
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
+            self.n_clusters_ = 1
             return self
 
         self._build_tree(X)

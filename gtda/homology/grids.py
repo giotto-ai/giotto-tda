@@ -14,7 +14,7 @@ from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `filtrations of Cubical complex <https://giotto.ai/theory>`_.
+    `filtered cubical complexes <https://giotto.ai/theory>`_.
 
     Given a `grayscale image <https://giotto.ai/theory>`_, information
     about the appearance and disappearance of topological features
@@ -33,16 +33,18 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    periodic_dimensions : tuple of bool, optional, default: ``None``
-        Tuple of `D` booleans, where `D` is the dimension of the images. The
+    periodic_dimensions : boolean ndarray of shape (n_dimensions, ), optional,
+        default: ``np.zeros((n_dimensions, ), dtype=np.bool)``
+        Periodicity of the boundaries along each of the axis, where
+        ``n_dimensions`` is the dimension of the images of the collection. The
         boolean in the `d`th position expresses whether the boundaries along
-        the `d`th axis are periodic. ``None`` implies that none of the
-        boundaries are periodic.
+        the `d`th axis are periodic. By default, none of the boundaries are
+        periodic.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
         filtration value `np.inf`. ``None`` assigns the maximum pixel
-        values within all images passed to meth:`fit`.
+        values within all images passed to :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -51,8 +53,13 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    infinity_values_ : float or None, default : ``None``
-       Infinity value calculated ub meth:`fit`.
+    periodic_dimensions_ : boolean ndarray of shape (n_dimensions, )
+       Effective periodicity of the boundaries along each of the axis.
+       Set in :meth:`fit`.
+
+    infinity_values_ : float
+       Effective death value to assign to features which have infinite
+       persistence. Set in :meth:`fit`.
 
     See also
     --------
@@ -60,8 +67,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Notes
     -----
-    `Gudhi <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cubical persistent homology. Python bindings were modified
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for computing cubical persistent homology. Python bindings were modified
     for performance.
 
     Persistence diagrams produced by this class must be interpreted with
@@ -76,11 +83,11 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)],
-                        '_periodic_dimensions': [list, [int, (0, np.inf)]],
+                        'periodic_dimensions_': [np.ndarray, (np.bool, None)],
                         'infinity_values_': [numbers.Number]}
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
-                 periodic_dimensions=(), infinity_values=None, n_jobs=None):
+                 periodic_dimensions=None, infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.periodic_dimensions = periodic_dimensions
@@ -88,7 +95,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        cubical_complex = self.filtration(
+        cubical_complex = self._filtration(
             dimensions=X.shape,
             top_dimensional_cells=X.flatten(order="F"),
             **self._filtration_kwargs)
@@ -130,11 +137,13 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self._filtration_kwargs = {}
         if self.periodic_dimensions is None or \
            np.sum(self.periodic_dimensions) == 0:
-            self.filtration = CubicalComplex
+            self._filtration = CubicalComplex
+            self.periodic_dimensions_ = np.zeros((len(X) - 1,), dtype=np.bool)
         else:
-            self.filtration = PeriodicCubicalComplex
+            self._filtration = PeriodicCubicalComplex
+            self.periodic_dimensions_ = self.periodic_dimensions
             self._filtration_kwargs['periodic_dimensions'] = \
-                self.periodic_dimensions
+                self.periodic_dimensions_
 
         if self.infinity_values is None:
             self.infinity_values_ = np.max(X)
@@ -144,6 +153,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self._homology_dimensions = sorted(self.homology_dimensions)
 
         validate_params({**self.get_params(),
+                         'periodic_dimensions_': self.periodic_dimensions_,
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)

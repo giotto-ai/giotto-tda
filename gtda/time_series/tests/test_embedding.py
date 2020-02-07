@@ -75,7 +75,8 @@ def test_embedder_transform(parameters_type, expected):
 
 
 def test_embedder_resample():
-    embedder = TakensEmbedding(time_delay=4, dimension=5, stride=3)
+    embedder = TakensEmbedding(parameters_type='fixed', time_delay=3,
+                               dimension=2, stride=3)
     embedder.fit(signal)
     y_resampled = embedder.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(4, 20, 3)])
