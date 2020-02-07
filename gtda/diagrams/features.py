@@ -548,7 +548,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    weight_function : fct 1d array -> ad array, default: lambda p: p
+    weight_function : fct 1d array -> 1d array, default: ``lambda p: p``
         Function mapping a 1d-array of persistence of the points of a diagram
         to a 1d array of their weight.
 
@@ -559,7 +559,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    effective_weight_function_ : fct 1d array -> ad array, default: lambda p: p
+    effective_weight_function_ : fct 1d array -> 1d array
         Effective function mapping a 1d-array of persistence of the points of a
         diagram to a 1d array of their weight.
 

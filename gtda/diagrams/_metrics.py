@@ -37,16 +37,16 @@ def landscapes(diagrams, sampling, n_layers):
 
 def _heat(heat, sampled_diag, sigma):
     _sample_image(heat, sampled_diag)  # modifies `heat` inplace
-    gaussian_filter(heat, sigma, mode="reflect")
+    heat = gaussian_filter(heat, sigma, mode="reflect")
 
 
 def heats(diagrams, sampling, step_size, sigma):
     heats_ = np.zeros((diagrams.shape[0],
                        sampling.shape[0], sampling.shape[0]))
 
-    diagrams[diagrams < sampling[0]] = sampling[0]
-    diagrams[diagrams > sampling[-1]] = sampling[-1]
-    diagrams = np.array((diagrams - sampling[0]) / step_size,
+    diagrams[diagrams < sampling[0, 0]] = sampling[0, 0]
+    diagrams[diagrams > sampling[-1, 0]] = sampling[-1, 0]
+    diagrams = np.array((diagrams - sampling[0, 0]) / step_size,
                         dtype=int)
 
     [_heat(heats_[i], sampled_diag, sigma)

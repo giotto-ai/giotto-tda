@@ -81,10 +81,11 @@ def _bin(X, metric, n_bins=100, **kw_args):
                 for dim in homology_dimensions}
 
     if metric in ['landscape', 'betti', 'heat']:
+        #  Taking the min(resp. max) of a tuple `m` amounts to extracting
+        #  the birth (resp. death) value
         min_vals = {d: np.array(2*[np.min(m)]) for d, m in min_vals.items()}
         max_vals = {d: np.array(2*[np.max(m)]) for d, m in max_vals.items()}
-    elif metric == 'persistence_image':
-        pass
+
     # Scales between axes should be kept the same, but not between dimension
     all_max_values = np.stack(max_vals.values())
     if len(homology_dimensions) == 1:
