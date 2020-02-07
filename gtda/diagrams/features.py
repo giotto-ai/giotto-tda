@@ -548,9 +548,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    weight_function : fct 1d array -> 1d array, default: ``lambda p: p``
+    weight_function : fct 1d array -> 1d array, default: ``None``
         Function mapping a 1d-array of persistence of the points of a diagram
-        to a 1d array of their weight.
+        to a 1d array of their weight. The default value ``None`` is
+        equivalent to passing ``lambda p: p``.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
