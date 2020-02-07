@@ -14,14 +14,13 @@ from ..utils.validation import validate_params
 
 @adapt_fit_transform_docs
 class HeightFiltration(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of grayscale images
-    from a collection of 2D or 3D binary images.
+    """Filtrations of 2D/3D binary images based on distances to lines/planes.
 
-    The height filtration assigns to each activated pixel of an image a pixel
-    value corresponding to the distance between the pixel and the hyperplane
+    The height filtration assigns to each activated pixel of a binary image a
+    grayscale value equal to the distance between the pixel and the hyperplane
     defined by a direction vector and the first seen edge of the image
     following that direction. Deactivated pixels are assigned the value of the
-    maximum distance between any pixel of the image and the hyperplane plus
+    maximum distance between any pixel of the image and the hyperplane, plus
     one.
 
     Parameters
@@ -129,8 +128,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
         corresponding grayscale image based on the distance of its pixels to
-        the hyperplane defined by the ``direction`` vector and the first seen
-        edge of the images following that ``direction``. Return the collection
+        the hyperplane defined by the `direction` vector and the first seen
+        edge of the images following that `direction`. Return the collection
         of grayscale images.
 
         Parameters
@@ -165,15 +164,16 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class RadialFiltration(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of grayscale images
-    from a collection of 2D or 3D binary images.
+    """Filtrations of 2D/3D binary images based on distances to reference
+    pixels.
 
-    The radial filtration assigns to each activated pixel within a ball
-    centered on a center pixel a pixel value corresponding to the distance
-    between the pixel and the center pixel of the image according to a given
-    metric. Pixels outside of this ball are considered deactivated and each
-    deactivated pixels is assigned the value of the maximum distance between
-    any pixel of the image and the center pixel plus one.
+    The radial filtration assigns to each pixel of a binary image a grayscale
+    value computed as follows in terms of a reference pixel, called the
+    "center", and of a "radius": if the binary pixel is active and lies 
+    within a ball defined by this center and this radius, then the assigned 
+    value equals this distance. In all other cases, the assigned value equals
+    the maximum distance between any pixel of the image and the center 
+    pixel, plus one.
 
     Parameters
     ----------
@@ -182,8 +182,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         Coordinates of the center pixel, where ``n_dimensions`` is the
         dimension of the images of the collection.
 
-    radius : float, default: None
-        The radius of the ball centered in ``center`` inside which
+    radius : float or None, default: ``None``
+        The radius of the ball centered in `center` inside which
         activated pixels are included in the filtration.
 
     metric : string or callable, optional, default: ``'euclidean'``
@@ -201,7 +201,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict, optional, default: ``{}``
+    metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
@@ -216,7 +216,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params`.
-        If `metric_params` is `None`, it is set to the empty dictionary.
+        If `metric_params` is ``None``, it is set to the empty dictionary.
 
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
