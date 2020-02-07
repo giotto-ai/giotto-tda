@@ -93,7 +93,7 @@ def validate_params(parameters, references):
                                               references[key][0]))
                 if references[key][1][1] is None:
                     break
-                if isinstance(references[key][1], tuple):
+                if isinstance(references[key][1][1], tuple):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):
                         raise ValueError("Parameter {} is a list containing {}"
