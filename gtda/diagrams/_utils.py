@@ -80,7 +80,7 @@ def _bin(X, metric, n_bins=100, **kw_args):
     max_vals = {dim: np.max(sub_diags[dim], axis=(0, 1))
                 for dim in homology_dimensions}
 
-    if metric in ['landscape', 'betti', 'heat']:
+    if metric in ['landscape', 'betti', 'heat', 'silhouette']:
         #  Taking the min(resp. max) of a tuple `m` amounts to extracting
         #  the birth (resp. death) value
         min_vals = {d: np.array(2*[np.min(m)]) for d, m in min_vals.items()}
@@ -103,7 +103,7 @@ def _bin(X, metric, n_bins=100, **kw_args):
                                                       max_vals[dim],
                                                       retstep=True,
                                                       num=n_bins)
-    if metric in ['landscape', 'betti', 'heat']:
+    if metric in ['landscape', 'betti', 'heat', 'silhouette']:
         for dim in homology_dimensions:
             samplings[dim] = samplings[dim][:, 0, None, None]
             step_sizes[dim] = step_sizes[dim][0]
