@@ -86,7 +86,7 @@ def test_order_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
                                metric_params={'n_bins': 200,
-                                              'order': -1})
+                                              'p': -1})
 
 
 # Test for the wrong order type
@@ -94,7 +94,7 @@ def test_order_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('heat',
                                metric_params={'n_bins': 200,
-                                              'order': 'a'})
+                                              'p': 'a'})
 
 
 # Test for the wrong sigma value
