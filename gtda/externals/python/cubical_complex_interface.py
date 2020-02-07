@@ -32,12 +32,12 @@ class CubicalComplex:
         self.pcohptr = None
         if (dimensions is not None) and \
                 (top_dimensional_cells is not None) and \
-                (perseus_file is ''):
+                (perseus_file == ''):
             self.thisptr = \
                 Bitmap_cubical_complex_base_interface(dimensions,
                                                       top_dimensional_cells)
         elif (dimensions is None) and \
-             (top_dimensional_cells is None) and (perseus_file is not ''):
+             (top_dimensional_cells is None) and (perseus_file != ''):
             if os.path.isfile(perseus_file):
                 self.thisptr = Bitmap_cubical_complex_base_interface(
                     str.encode(perseus_file))

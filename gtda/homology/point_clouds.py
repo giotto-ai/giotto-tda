@@ -199,7 +199,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
             `X`.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
