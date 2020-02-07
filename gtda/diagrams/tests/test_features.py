@@ -1,30 +1,71 @@
-"""Testing for PersistenceEntropy"""
+"""Testing for features"""
+# License: GNU AGPLv3
 
 import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal
-from hypothesis import given
-from hypothesis.extra.numpy import arrays
-from hypothesis.strategies import integers, floats
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, HeatKernel, Silhouette
+from hypothesis import given
+from hypothesis.extra.numpy import arrays, array_shapes
+from hypothesis.strategies import floats, integers
 
-X_pe = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
+from gtda.diagrams import PersistenceEntropy, HeatKernel, PersistenceImage, Silhouette
+
+diagram = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 
 
 def test_pe_not_fitted():
     pe = PersistenceEntropy()
 
     with pytest.raises(NotFittedError):
-        pe.transform(X_pe)
+        pe.transform(diagram)
 
 
 def test_pe_transform():
     pe = PersistenceEntropy()
-    X_pe_res = np.array([[0.69314718, 0.63651417]])
+    diagram_res = np.array([[0.69314718, 0.63651417]])
 
-    assert_almost_equal(pe.fit_transform(X_pe), X_pe_res)
+    assert_almost_equal(pe.fit_transform(diagram), diagram_res)
+
+
+def test_pi_not_fitted():
+    pi = PersistenceImage(sigma=1)
+    with pytest.raises(NotFittedError):
+        pi.transform(diagram)
+
+
+@given(X=arrays(dtype=np.float, unique=True,
+                elements=integers(min_value=-1e10,
+                                  max_value=1e6),
+                shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
+def test_pi_null(X):
+    """Test that, if one trivial diagram (all pts on the diagonal) is provided,
+    (along with a non-trivial one), then its pi is null"""
+    pi = PersistenceImage(sigma=1, n_bins=10)
+    X = np.append(X, 1 + X[-1])
+    diagrams = np.expand_dims(np.stack([X, X,
+                                        np.zeros((X.shape[0],),
+                                                 dtype=int)]).transpose(),
+                              axis=0)
+    diagrams = np.repeat(diagrams, 2, axis=0)
+    diagrams[1, :, 1] += 1
+
+    assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
+
+
+@given(pts=arrays(dtype=np.float, unique=True,
+                  elements=floats(allow_nan=False,
+                                  allow_infinity=False,
+                                  min_value=-1e10,
+                                  max_value=1e6),
+                  shape=(20, 2)))
+def test_pi_positive(pts):
+    pi = PersistenceImage(sigma=1)
+    diagrams = np.expand_dims(np.concatenate([
+        np.sort(pts, axis=1), np.zeros((pts.shape[0], 1))],
+        axis=1), axis=0)
+    assert np.all(pi.fit_transform(diagrams) >= 0.)
 
 
 def test_silhouette_transform():
@@ -81,22 +122,22 @@ def test_all_pts_the_same():
 
 @given(pts_gen, dims_gen)
 def test_hk_shape(pts, dims):
-    n_values = 10
+    n_bins = 10
     x = get_input(pts, dims)
 
-    hk = HeatKernel(sigma=1, n_values=n_values)
+    hk = HeatKernel(sigma=1, n_bins=n_bins)
     num_dimensions = len(np.unique(dims))
     x_t = hk.fit(x).transform(x)
 
-    assert x_t.shape == (x.shape[0], num_dimensions, n_values, n_values)
+    assert x_t.shape == (x.shape[0], num_dimensions, n_bins, n_bins)
 
 
 @given(pts_gen, dims_gen)
 def test_hk_positive(pts, dims):
     """ We expect the points above the PD-diagonal to be non-negative,
     (up to a numerical error)"""
-    n_values = 10
-    hk = HeatKernel(sigma=1, n_values=n_values)
+    n_bins = 10
+    hk = HeatKernel(sigma=1, n_bins=n_bins)
 
     x = get_input(pts, dims)
     x_t = hk.fit(x).transform(x)
@@ -108,8 +149,8 @@ def test_hk_positive(pts, dims):
 def test_hk_with_diag_points(pts):
     """Add points on the diagonal, and verify that we have the same results
     (on the same fitted values)."""
-    n_values = 10
-    hk = HeatKernel(sigma=1, n_values=n_values)
+    n_bins = 10
+    hk = HeatKernel(sigma=1, n_bins=n_bins)
 
     x = get_input(pts, np.zeros((pts.shape[0], pts.shape[1], 1)))
     diag_points = np.array([[[2, 2, 0], [3, 3, 0], [7, 7, 0]]])
