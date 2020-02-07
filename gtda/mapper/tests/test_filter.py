@@ -20,7 +20,7 @@ from sklearn.neighbors import KernelDensity
     exponent=integers(min_value=1, max_value=100)
 )
 def test_eccentricity_shape_equals_number_of_samples(X, exponent):
-    """Verify that eccentricity preserves the number of samples in the input."""
+    """Verify that eccentricity preserves the nb of samples in the input."""
     eccentricity = Eccentricity(exponent=exponent)
     Xt = eccentricity.fit_transform(X)
     assert Xt.shape == (len(X), 1)
