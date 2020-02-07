@@ -168,12 +168,12 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
     pixels.
 
     The radial filtration assigns to each pixel of a binary image a grayscale
-    value computed as follows in terms of a reference pixel, called the 
-    "center pixel", and a positive number R: if the binary pixel is active and
-    lies within a ball of radius R centered at the center pixel, then the 
-    assigned value equals this distance. In all other cases, the assigned 
-    value equal the maximum distance between any pixel of the image and the 
-    center pixel, plus one.
+    value computed as follows in terms of a reference pixel, called the
+    "center", and of a "radius": if the binary pixel is active and lies 
+    within a ball defined by this center and radius, then the assigned value
+    equals this distance. In all other cases, the assigned value equal the 
+    maximum distance between any pixel of the image and the center pixel, plus
+    one.
 
     Parameters
     ----------
