@@ -550,7 +550,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    weight_function : fct 1d array -> ad array, default: p -> p
+    weight_function : fct 1d array -> ad array, default: lambda p: p
         Function mapping a 1d-array of persistence of the points of a diagram
         to a 1d array of their weight.
 
@@ -561,6 +561,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
+    effective_weight_function_ : fct 1d array -> ad array, default: lambda p: p
+        Effective function mapping a 1d-array of persistence of the points of a
+        diagram to a 1d array of their weight.
+
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`.
 
@@ -600,10 +604,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_bins': [int, (1, np.inf)],
-                        'weight_function': [types.FunctionType]}
+                        'effective_weight_function_': [types.FunctionType]}
 
-    def __init__(self, sigma=1.0, n_bins=100,
-                 weight_function=lambda x: x,
+    def __init__(self, sigma=1.0, n_bins=100, weight_function=None,
                  n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins
@@ -636,7 +639,16 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
-        validate_params(self.get_params(), self._hyperparameters)
+
+        if self.weight_function is None:
+            self.effective_weight_function_ = lambda p: p
+        else:
+            self.effective_weight_function_ = self.weight_function
+
+        validate_params({
+            **self.get_params(),
+            'effective_weight_function_': self.effective_weight_function_},
+                        self._hyperparameters)
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -645,7 +657,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
             X, metric='persistence_image', n_bins=self.n_bins)
         self.samplings_ = {dim: s
                            for dim, s in self._samplings.items()}
-        self.weights_ = _calculate_weights(X, self.weight_function,
+        self.weights_ = _calculate_weights(X, self.effective_weight_function_,
                                            self._samplings)
         return self
 
