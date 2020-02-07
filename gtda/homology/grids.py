@@ -83,7 +83,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)],
-                        'periodic_dimensions_': [np.ndarray, (np.bool, None)],
+                        'periodic_dimensions_': [np.ndarray, (bool, None)],
                         'infinity_values_': [numbers.Number]}
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
