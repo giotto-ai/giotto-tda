@@ -74,13 +74,29 @@ def validate_params(parameters, references):
                                       references[key][0]))
         if len(references[key]) == 1:
             continue
-        if references[key][0] == list:
+        if references[key][0] == list or \
+           references[key][0] == np.ndarray:
             for parameter in parameters[key]:
-                if not isinstance(parameter, references[key][1][0]):
-                    raise TypeError("Parameter {} is a list of {}"
-                                    " but contains an element of type {}"
-                                    "".format(key, type(parameters[key]),
-                                              references[key][0]))
+                if references[key][1][0] == int:
+                    if not isinstance(parameter, numbers.Number):
+                        raise TypeError("Parameter {} is a {} of {}"
+                                        " but contains an element of type {}"
+                                        "".format(key, type(parameters[key]),
+                                                  references[key][1][0],
+                                                  type(parameter)))
+                    if not float(parameter).is_integer():
+                        raise TypeError("Parameter {} is a {} of int"
+                                        " but contains an element of type {}"
+                                        " that is not an integer."
+                                        "".format(key, type(parameters[key]),
+                                                  type(parameter)))
+                else:
+                    if not isinstance(parameter, references[key][1][0]):
+                        raise TypeError("Parameter {} is a {} of {}"
+                                        " but contains an element of type {}"
+                                        "".format(key, type(parameters[key]),
+                                                  references[key][1][0],
+                                                  type(parameter)))
                 if references[key][1][1] is None:
                     break
                 if isinstance(references[key][1], tuple):
@@ -92,13 +108,8 @@ def validate_params(parameters, references):
                                                    references[key][1][1][0],
                                                    references[key][1][1][1]))
             break
-        if references[key][0] == np.ndarray:
-            print(parameters[key].dtype, references[key][1])
-            print(np.issubdtype(parameters[key].dtype, references[key][1]))
-            if not np.issubdtype(parameters[key].dtype, references[key][1]):
-                raise TypeError("Parameter {} is an array of {}"
-                                " but contains element(s) of another type."
-                                "".format(key, references[key][1]))
+        if references[key][1][1] is None:
+            break
             for parameter in parameters[key]:
                 if isinstance(references[key][1], tuple):
                     if (parameter < references[key][1][1][0] or
