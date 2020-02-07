@@ -4,9 +4,6 @@
 import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal
-from hypothesis import given
-from hypothesis.extra.numpy import arrays
-from hypothesis.strategies import integers, floats
 from sklearn.exceptions import NotFittedError
 
 from hypothesis import given
@@ -116,22 +113,22 @@ def test_all_pts_the_same():
 
 @given(pts_gen, dims_gen)
 def test_hk_shape(pts, dims):
-    n_values = 10
+    n_bins = 10
     x = get_input(pts, dims)
 
-    hk = HeatKernel(sigma=1, n_values=n_values)
+    hk = HeatKernel(sigma=1, n_bins=n_bins)
     num_dimensions = len(np.unique(dims))
     x_t = hk.fit(x).transform(x)
 
-    assert x_t.shape == (x.shape[0], num_dimensions, n_values, n_values)
+    assert x_t.shape == (x.shape[0], num_dimensions, n_bins, n_bins)
 
 
 @given(pts_gen, dims_gen)
 def test_hk_positive(pts, dims):
     """ We expect the points above the PD-diagonal to be non-negative,
     (up to a numerical error)"""
-    n_values = 10
-    hk = HeatKernel(sigma=1, n_values=n_values)
+    n_bins = 10
+    hk = HeatKernel(sigma=1, n_bins=n_bins)
 
     x = get_input(pts, dims)
     x_t = hk.fit(x).transform(x)
@@ -143,8 +140,8 @@ def test_hk_positive(pts, dims):
 def test_hk_with_diag_points(pts):
     """Add points on the diagonal, and verify that we have the same results
     (on the same fitted values)."""
-    n_values = 10
-    hk = HeatKernel(sigma=1, n_values=n_values)
+    n_bins = 10
+    hk = HeatKernel(sigma=1, n_bins=n_bins)
 
     x = get_input(pts, np.zeros((pts.shape[0], pts.shape[1], 1)))
     diag_points = np.array([[[2, 2, 0], [3, 3, 0], [7, 7, 0]]])
