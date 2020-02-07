@@ -14,14 +14,14 @@ available_metrics = {
     'landscape': [('p', numbers.Number, (1, np.inf)),
                   ('n_bins', int, (1, np.inf)),
                   ('n_layers', int, (1, np.inf))],
-    'heat': [('order', numbers.Number, (1, np.inf)),
+    'heat': [('p', numbers.Number, (1, np.inf)),
              ('n_bins', int, (1, np.inf)),
              ('sigma', numbers.Number, (0., np.inf))],
-    'persistent_image': [('order', numbers.Number, (1, np.inf)),
-                         ('n_bins', int, (1, np.inf)),
-                         ('sigma', numbers.Number, (0., np.inf)),
-                         ('weight_function', types.FunctionType,
-                          None)]}
+    'persistence_image': [('p', numbers.Number, (1, np.inf)),
+                          ('n_bins', int, (1, np.inf)),
+                          ('sigma', numbers.Number, (0., np.inf)),
+                          ('weight_function', types.FunctionType,
+                           None)]}
 
 available_metric_params = {metric: [p[0] for p in param_lst]
                            for metric, param_lst in available_metrics.items()}
