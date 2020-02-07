@@ -53,7 +53,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    periodic_dimensions_ : tuple of bool, optional, default: ``None``
+    periodic_dimensions_ : boolean ndarray of shape (n_dimensions, )
        Effective periodicity of the boundaries along each of the axis.
        Set in :meth:`fit`.
 
