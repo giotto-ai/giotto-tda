@@ -10,7 +10,8 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 
-from gtda.diagrams import PersistenceEntropy, HeatKernel, PersistenceImage, Silhouette
+from gtda.diagrams import PersistenceEntropy, HeatKernel,\
+    PersistenceImage, Silhouette
 
 diagram = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 

@@ -10,7 +10,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats, persistence_images, silhouettes
+from ._metrics import betti_curves, landscapes, heats,\
+    persistence_images, silhouettes
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
@@ -768,7 +769,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
     .. [1] F. Chazal, B. T. Fasy, F. Lecci, A. Rinaldo, and L. Wasserman,
            "Stochastic Convergence of Persistence Landscapes and Silhouettes";
            *In Proceedings of the thirtieth annual symposium on Computational
-           Geometry*, Kyoto, Japan, 2014, pp. 474–483; doi: `10.1145/2582112.2582128
+           Geometry*, Kyoto, Japan, 2014, pp. 474–483;
+           doi: `10.1145/2582112.2582128
            <http://dx.doi.org/10.1145/2582112.2582128>`_.
 
     """
