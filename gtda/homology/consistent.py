@@ -163,7 +163,6 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
             after consistent rescaling.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_is_fitted')
         X = check_array(X, allow_nd=True)
 

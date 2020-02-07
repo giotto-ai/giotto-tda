@@ -2,18 +2,18 @@
 
 set -x
 
-# upgrading pip and setuptools
+# Upgrading pip and setuptools, TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH=${PYTHON_PATH}/bin:${PATH}
 pip install --upgrade pip==19.3.1 setuptools
 
-# installing cmake
+# Install CMake
 pip install cmake
 
-# install dependencies for python-igraph
+# Install dependencies for python-igraph
 yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
 
-# installing boost
+# Install boost
 yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 tar -zxvf /boost_1_69_0.tar.gz
@@ -23,19 +23,20 @@ cd /boost_1_69_0
 ./b2 install
 cd ..
 
-# helping cmake find boost
+# Help CMake find boost
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# installing and uninstalling giotto-tda
+# Install and uninstall giotto-tda dev
 cd /io
-pip install -e ".[doc, tests]"
+pip install -e ".[tests, doc]"
 pip uninstall -y giotto-tda
+pip uninstall -y giotto-tda-nightly
 
-# testing, linting
+# Testing, linting
 pytest --cov . --cov-report xml
 flake8 --exit-zero /io/
 
-# building wheels
-pip install wheel twine
+# Building wheels
+pip install wheel
 python setup.py sdist bdist_wheel
