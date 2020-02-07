@@ -774,7 +774,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {'order': [float, (1., np.inf)],
-                        'n_values': [int, (1., np.inf)]}
+                        'n_bins': [int, (1., np.inf)]}
 
     def __init__(self, order=1., n_bins=100, n_jobs=None):
         self.order = order
@@ -807,7 +807,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
 
-        self._samplings, _ = _bin(X, n_values=self.n_bins)
+        self._samplings, _ = _bin(X, metric='silhouette', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -829,7 +829,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
             silhouette: one curve (represented as a one-dimensional array)
             per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
