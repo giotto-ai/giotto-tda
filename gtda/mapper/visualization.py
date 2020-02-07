@@ -225,7 +225,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Returns
     -------
-    box : :class:`ipywidgets.VBox` object.
+    box : :class:`ipywidgets.VBox` object
     A box containing the following widgets: parameters of the clustering
     algorithm, parameters for the covering scheme, a Mapper graph arising
     from those parameters, a validation box, and logs.
