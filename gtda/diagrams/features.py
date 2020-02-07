@@ -160,7 +160,7 @@ class BettiCurve(BaseEstimator, TransformerMixin):
     The samplings in :attr:`samplings_` are in general different between
     different homology dimensions. This means that the j-th entry of a Betti
     curve in homology dimension q typically arises from a different parameter
-    values to the j-th entry of a curve in dimension q-1'.
+    values to the j-th entry of a curve in dimension q'.
 
     """
 
@@ -429,7 +429,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     different homology dimensions. This means that the (i, j)-th pixel
     of an image in homology dimension q typically arises from a different
     pair of parameter values to the (i, j)-th pixel of an image in
-    dimension q-1'.
+    dimension q'.
 
     References
     ----------
@@ -533,7 +533,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
     birth-death-dimension triples [b, d, q], subdiagrams corresponding to
     distinct homology dimensions are considered separately.
     The silhouette of each subdiagram is the weighted average
-    of the piecewise-linear functions (fibres) used  to derive a landscape.
+    of the piecewise-linear functions (fibres) used to derive a landscape.
     A silhouette is represented as a vector, with entries computed over
     a evenly sampled locations from appropriate ranges
     of the `filtration parameter <https://giotto.ai/theory>`_.
@@ -542,7 +542,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
     ----------
     order: float, optional, default: ``1``
         The order of the persistence for the weighted average of fibres
-        that constitute the silhouette. d
+        that constitute the silhouette.
 
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
@@ -572,16 +572,26 @@ class Silhouette(BaseEstimator, TransformerMixin):
     -----
     The samplings in :attr:`samplings_` are in general different between
     different homology dimensions. This means that the j-th entry of
-    a Silhouette in homology dimension q typically arises from
+    a silhouette in homology dimension q typically arises from
     a different parameter values to the j-th entry of a curve
-    in dimension q-1'.
+    in dimension q'.
+
+    References
+    ----------
+    .. [1] F. Chazal, B. T. Fasy, F. Lecci, A. Rinaldo, and L. Wasserman,
+    "Stochastic Convergence of Persistence Landscapes and Silhouettes",
+    *In Proceedings of the thirtieth annual symposium on Computational
+    Geometry*, Kyoto, Japan, 2014, pp. 474–483, doi: `10.1145/2582112.2582128
+    <http://dx.doi.org/10.1145/2582112.2582128>`_.
+
+
 
     """
 
-    _hyperparameters = {'order': [float, (1, np.inf)],
-                        'n_values': [int, (1, np.inf)]}
+    _hyperparameters = {'order': [float, (1., np.inf)],
+                        'n_values': [int, (1., np.inf)]}
 
-    def __init__(self, order=1, n_values=100, n_jobs=None):
+    def __init__(self, order=1., n_values=100, n_jobs=None):
         self.order = order
         self.n_values = n_values
         self.n_jobs = n_jobs
@@ -619,7 +629,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute Silhouettes of diagrams in X.
+        """Compute silhouettes of diagrams in X.
 
         Parameters
         ----------
@@ -635,13 +645,12 @@ class Silhouette(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
-            Silhouette: one curve (represented as a one-dimensional array
-            of integer values) per sample and per homology dimension seen
+            silhouette: one curve (represented as a one-dimensional array
+            of integers) per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         X = check_diagram(X)
 
