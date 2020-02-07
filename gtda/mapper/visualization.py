@@ -225,9 +225,10 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Returns
     -------
-    fig : :class:`ipywidgets.VBox` object. A widget, that contains
-        widgets: parameters for cluster, parameters for cover, figure
-        from ```lot_static_mapper_graph``, a validation and log  boxes.
+    box : :class:`ipywidgets.VBox` object.
+    A box containing the following widgets: parameters of the clustering
+    algorithm, parameters for the covering scheme, a Mapper graph arising
+    from those parameters, a validation box, and logs.
 
     References
     ----------

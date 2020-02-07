@@ -55,7 +55,7 @@ def get_kind(draw):
 def test_one_dimensional_cover_shape(filter_values, n_intervals):
     """Assert that the length of the mask ``unique_interval_masks``
     corresponds to the pre-specified ``n_samples`` and that there
-    are no more intervals in the cover than ``_intervals``.
+    are no more intervals in the cover than ``n_intervals``.
     The case when the filter has only a unique value, in which
     case the fit_transform should throw an error, is treated separately.
     """
