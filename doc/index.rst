@@ -147,6 +147,7 @@ Diagram features
    diagrams.PersistenceLandscape
    diagrams.BettiCurve
    diagrams.HeatKernel
+   diagrams.Silhouette
 
 
 :mod:`gtda.time_series`: Time series

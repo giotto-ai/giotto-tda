@@ -532,17 +532,21 @@ class Silhouette(BaseEstimator, TransformerMixin):
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], subdiagrams corresponding to
     distinct homology dimensions are considered separately.
-    The silhouette of each subdiagram is the weighted average
-    of the piecewise-linear functions (fibres) used to derive a landscape.
-    A silhouette is represented as a vector, with entries computed over
-    a evenly sampled locations from appropriate ranges
-    of the `filtration parameter <https://giotto.ai/theory>`_.
+    Let :math:`D=\{p_k\}_{k=1}^N` be a subdiagram, where
+    :math:`p_k=(b_k,d_k)` and :math:`\lambda_k(x)=
+    \max(0, -\mathrm{abs}(x)+(d-b)/2)`. We define the silhouette
+    function of :math:`D` as the persistence-weighted average
+    of the piecewise-linear functions above, with weight :math:`(d-b)^p`
+    for :math:`\lambda_k`.
+    We obtain the silhouette by sampling the silhouette function over
+    evenly spaced locations from appropriate ranges
+    of the `filtration parameter <https://giotto.ai/theory>`_
 
      Parameters
     ----------
     order: float, optional, default: ``1``
-        The order of the persistence for the weighted average of fibres
-        that constitute the silhouette.
+        The order of persistence for the weighted average of fibres.
+        Corresponds to :math:`p` above.
 
     n_values : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
@@ -579,12 +583,10 @@ class Silhouette(BaseEstimator, TransformerMixin):
     References
     ----------
     .. [1] F. Chazal, B. T. Fasy, F. Lecci, A. Rinaldo, and L. Wasserman,
-    "Stochastic Convergence of Persistence Landscapes and Silhouettes",
-    *In Proceedings of the thirtieth annual symposium on Computational
-    Geometry*, Kyoto, Japan, 2014, pp. 474–483, doi: `10.1145/2582112.2582128
-    <http://dx.doi.org/10.1145/2582112.2582128>`_.
-
-
+           "Stochastic Convergence of Persistence Landscapes and Silhouettes";
+           *In Proceedings of the thirtieth annual symposium on Computational
+           Geometry*, Kyoto, Japan, 2014, pp. 474–483; doi: `10.1145/2582112.2582128
+           <http://dx.doi.org/10.1145/2582112.2582128>`_.
 
     """
 
@@ -645,8 +647,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_values)
-            silhouette: one curve (represented as a one-dimensional array
-            of integers) per sample and per homology dimension seen
+            silhouette: one curve (represented as a one-dimensional array)
+            per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
 
