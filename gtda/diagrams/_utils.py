@@ -73,8 +73,8 @@ def _bin(X, metric, n_bins=100, **kw_args):
     # For persistence images, move into birth-persistence
     if metric == 'persistence_image':
         for dim in homology_dimensions:
-            sub_diags[dim][:, :, 1:2] = sub_diags[dim][:, :, 1:2]\
-                                        - sub_diags[dim][:, :, 0:1]
+            sub_diags[dim][:, :, [1]] = sub_diags[dim][:, :, [1]] \
+                - sub_diags[dim][:, :, [0]]
     min_vals = {dim: np.min(sub_diags[dim], axis=(0, 1))
                 for dim in homology_dimensions}
     max_vals = {dim: np.max(sub_diags[dim], axis=(0, 1))
