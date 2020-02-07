@@ -97,7 +97,6 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
             Array of Pearson dissimilarities.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_is_fitted')
         check_array(X, allow_nd=True)
 

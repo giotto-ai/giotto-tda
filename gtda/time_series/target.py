@@ -142,7 +142,6 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             The cut input time series.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         X = column_or_1d(X)
 
@@ -170,7 +169,6 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Target for the prediction task.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         y = column_or_1d(y)
 

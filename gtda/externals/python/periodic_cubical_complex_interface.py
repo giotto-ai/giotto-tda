@@ -9,7 +9,7 @@ from giotto_periodic_cubical_complex import \
 class PeriodicCubicalComplex:
 
     """The PeriodicCubicalComplex is an example of a structured complex useful
-    in computational mathematics (specially rigorous numerics) and image
+    in computational mathematics (especially rigorous numerics) and image
     analysis.
     """
     def __init__(self, dimensions=None, top_dimensional_cells=None,
@@ -30,13 +30,13 @@ class PeriodicCubicalComplex:
         self.thisptr = None
         self.pcohptr = None
         if (dimensions is not None) and (top_dimensional_cells is not None) \
-           and (periodic_dimensions is not None) and (perseus_file is ''):
+           and (periodic_dimensions is not None) and (perseus_file == ''):
             self.thisptr = \
                 Periodic_cubical_complex_base_interface(dimensions,
                                                         top_dimensional_cells,
                                                         periodic_dimensions)
         elif (dimensions is None) and (top_dimensional_cells is None) and \
-             (periodic_dimensions is None) and (perseus_file is not ''):
+             (periodic_dimensions is None) and (perseus_file != ''):
             if os.path.isfile(perseus_file):
                 self.thisptr = \
                     Periodic_cubical_complex_base_interface(

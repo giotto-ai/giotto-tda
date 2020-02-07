@@ -79,7 +79,6 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
             Output persistence diagram.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_is_fitted')
         X = check_diagram(X)
 
@@ -384,7 +383,6 @@ class Filtering(BaseEstimator, TransformerMixin):
             Discarded points are replaced by points on the diagonal.
 
         """
-        # Check if fit had been called
         check_is_fitted(self)
         X = check_diagram(X)
 
