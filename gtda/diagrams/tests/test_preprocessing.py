@@ -230,7 +230,7 @@ def test_dst_transform(X):
 
 
 parameters = [('wasserstein', {'p': 2, 'delta': 0.1}),
-              ('betti', {'n_values': 10}),
+              ('betti', {'n_bins': 10}),
               ('bottleneck', None)]
 
 
