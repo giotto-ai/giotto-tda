@@ -124,11 +124,11 @@ def validate_params(parameters, references):
                 if isinstance(references[key][1], tuple):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):
-                        raise ValueError("Parameter {} is an array containing {}"
-                                         "which should be in the range [{},{}]"
-                                         "".format(key, parameter,
-                                                   references[key][1][1][0],
-                                                   references[key][1][1][1]))
+                        raise ValueError(
+                            "Parameter {} is an array containing {} which "
+                            "should be in the range [{},{}]".format(
+                                key, parameter, references[key][1][1][0],
+                                references[key][1][1][1]))
             break
         if isinstance(references[key][1], tuple):
             if (parameters[key] < references[key][1][0] or
