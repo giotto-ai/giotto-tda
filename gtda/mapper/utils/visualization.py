@@ -17,15 +17,12 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        ('Node Id:{}<br>Node size:{}<br>Partial cluster '
-         'label:{}')
-        .format(
-            node_id, len(node_elements), partial_cluster_label,
+        ("Node ID:{}<br>Node size:{}").format(node_id, len(node_elements),)
+        for node_id, node_elements in zip(
+            graph["node_metadata"]["node_id"],
+            graph["node_metadata"]["node_elements"]
         )
-        for node_id, node_elements, partial_cluster_label in
-        zip(graph['node_metadata']['node_id'],
-            graph['node_metadata']['node_elements'],
-            graph['node_metadata']['partial_cluster_label'])]
+    ]
 
 
 def set_node_sizeref(node_elements, node_scale=12):
