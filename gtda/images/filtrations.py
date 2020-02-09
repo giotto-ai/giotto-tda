@@ -108,7 +108,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         validate_params({**self.get_params(), 'direction_': self.direction_,
                          'n_dimensions_': self.n_dimensions_},
                         self._hyperparameters)
-        print(self.direction_)
+
         self.direction_ = self.direction_ / np.linalg.norm(self.direction_)
 
         axis_order = [2, 1, 3]
@@ -344,6 +344,127 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_radial)(X[s])
+            for s in gen_even_slices(Xt.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        return Xt
+
+
+@adapt_fit_transform_docs
+class DilationFiltration(BaseEstimator, TransformerMixin):
+    """Transformer returning a collection of grayscale images
+    from a collection of 2D or 3D binary images.
+
+    The height filtration assigns to each activated pixel of an image a pixel
+    value corresponding to the distance between the pixel and the hyperplane
+    defined by a direction vector and the first seen edge of the image
+    following that direction. Deactivated pixels are assigned the value of the
+    maximum distance between any pixel of the image and the hyperplane plus
+    one.
+
+    Parameters
+    ----------
+    n_iterations : int or None, optional, default: None
+        Number of iterations of dilation. ``None`` means dilation over
+        the full image.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    n_iterations_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
+    See also
+    --------
+    gtda.homology.CubicalPersistence, Binarizer
+
+    """
+
+    _hyperparameters = {'n_iterations_': [int, [1, np.inf]]}
+
+    def __init__(self, n_iterations=None, n_jobs=None):
+        self.n_iterations = n_iterations
+        self.n_jobs = n_jobs
+
+    def _calculate_dilation(self, X):
+        Xd = X * 1.
+
+        for iteration in range(1, self.n_iterations + 1):
+            Xtemp = np.asarray([ndi.binary_dilation(Xd[i]) for i in range(Xd.shape[0])])
+            Xd += (Xd + Xtemp == 1) * Xtemp * (iteration + 1)
+
+        mask_filtered = Xd == 0
+        Xd -= 1
+        Xd[mask_filtered] = np.inf
+        return Xd
+
+    def fit(self, X, y=None):
+        """Calculate `n_iterations_` from a collection of binary images. Then,
+        return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_array(X,  ensure_2d=False, allow_nd=True)
+
+        if self.n_iterations is None:
+            self.n_iterations = max(X.shape[1:])
+
+        validate_params({**self.get_params(), 'n_iterations_': self.n_iterations_},
+                        self._hyperparameters)
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each binary image in the collection `X`, calculate a
+        corresponding grayscale image based on the distance of its pixels to
+        the hyperplane defined by the ``direction`` vector and the first seen
+        edge of the images following that ``direction``. Return the collection
+        of grayscale images.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_pixels_x,
+            n_pixels_y [, n_pixels_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D grayscale image.
+
+        """
+        check_is_fitted(self)
+        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._calculate_dilation)(X[s])
             for s in gen_even_slices(Xt.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
