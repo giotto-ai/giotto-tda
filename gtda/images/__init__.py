@@ -3,11 +3,12 @@ that can be used to apply Topological Data Analysis to images.
 """
 # License: GNU AGPLv3
 
-from .preprocessing import Binarizer, Inverter
+from .preprocessing import Binarizer, Inverter, ImageToPointCloud
 from .filtrations import HeightFiltration
 
 __all__ = [
     'Binarizer',
     'Inverter',
+    'ImageToPointCloud',
     'HeightFiltration',
 ]
