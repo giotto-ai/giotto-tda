@@ -64,11 +64,29 @@ EXTRAS_REQUIRE = {
         'sphinx-issues',
         'sphinx_rtd_theme',
         'numpydoc'],
-    'examples': [
-        'jupyter',
-        'matplotlib'
-        ]
+    'pydata': [
+        'jupyter >= 1.0.0',
+        'pandas >= 1.0.1',
+        ],
+    'mapper': [
+        'plotly >= 4.4.1',
+        'matplotlib >= 3.1.3',
+        'ipywidgets >= 7.5.1',
+        'python-igraph >= 0.7.1.post6'
+    ]
 }
+
+
+def combine_requirements(new_key, base_keys):
+    EXTRAS_REQUIRE[new_key] = list(
+        set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+combine_requirements('examples', ['pydata', 'mapper'])
+combine_requirements(
+    'all', [k for k in EXTRAS_REQUIRE if (k != 'tests' and k != 'doc')])
+combine_requirements(
+    'all_dev', [k for k in EXTRAS_REQUIRE])
 
 
 class CMakeExtension(Extension):
