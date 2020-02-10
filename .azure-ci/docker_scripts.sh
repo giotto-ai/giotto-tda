@@ -19,6 +19,10 @@ ln -s /usr/bin/ccache /ccache/gcc
 ln -s /usr/bin/ccache /ccache/g++
 ln -s /usr/bin/ccache /ccache/cc
 ln -s /usr/bin/ccache /ccache/c++
+export PATH="/ccache/:$PATH"
+# maximum cache size and compression
+ccache -M 1024M
+export CCACHE_COMPRESS=1
 
 ccache -s
 
