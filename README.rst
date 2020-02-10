@@ -35,6 +35,13 @@ giotto-tda is the result of a collaborative effort between `L2F SA
 <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
 <https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
 
+License
+-------
+
+giotto-tda is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_. 
+If you need a different distribution license, please contact the L2F team at 
+business@l2f.ch
+
 Documentation
 -------------
 
