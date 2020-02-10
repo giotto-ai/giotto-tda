@@ -31,9 +31,9 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
+      set -e
       pytest --cov gtda --cov-report xml
       flake8
-    failOnStderr: true
     displayName: 'Test with pytest and flake8'
 
   - script: |
@@ -84,12 +84,13 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
+      set -e      
       pytest --cov gtda --cov-report xml
       flake8
-    failOnStderr: true
     displayName: 'Test with pytest and flake8'
 
   - script: |
+      set -e
       pip install openml pandas
       pip install papermill
       cd examples
@@ -127,7 +128,6 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
   - bash: |
@@ -137,15 +137,12 @@ jobs:
     failOnStderr: true
     displayName: 'Install pycairo and python-igraph'
 
-  - script: |
-      pip install -e ".[tests, doc]"
-    failOnStderr: true
+  - script: pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
-      flake8
-    failOnStderr: true
+      pytest --cov gtda --cov-report xml || exit /b
+      flake8 || exit /b
     displayName: 'Test with pytest and flake8'
 
   - script: |
@@ -192,17 +189,16 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
     inputs:
       filePath: .azure-ci/build_manylinux2010.sh
-      failOnStderr: false
     env:
       python_ver: $(python_ver)
     displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
@@ -212,18 +208,18 @@ jobs:
     displayName: 'Upgrade pip and setuptools'
 
   - script: pip install dist/*.whl
-    failOnStderr: true
     displayName: 'Install the wheels'
 
   - script: |
+      set -e
       pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
   - script: |
+      set -e
       pip install openml pandas
       pip install papermill
       cd examples
@@ -247,6 +243,7 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
+      set -e
       pip install twine
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
@@ -275,66 +272,62 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      set -e
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
       rm gtda/_version.py.bak
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
+      set -e
       brew update
       brew install gcc boost
-    failOnStderr: true
     displayName: 'Install gcc and boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
   - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
       pip uninstall -y giotto-tda
     condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
     displayName: 'Uninstall giotto-tda dev'
 
   - script: |
       pip uninstall -y giotto-tda-nightly
     condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
     displayName: 'Uninstall giotto-tda-nightly dev'
 
   - script: |
+      set -e
       pytest --cov gtda --cov-report xml
       flake8
-    failOnStderr: true
     displayName: 'Test with pytest and flake8'
 
   - script: |
+      set -e
       pip install wheel
       python setup.py sdist bdist_wheel
-    failOnStderr: false
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
-    failOnStderr: true
     displayName: 'Install the wheels'
 
   - script: |
+      set -e
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
   - script: |
+      set -e
       pip install openml pandas
       pip install papermill
       cd examples
@@ -348,7 +341,6 @@ jobs:
   - script: |
       cd doc/
       make html
-    failOnStderr: true
     displayName: 'Build sphinx doc'
 
   - task: ArchiveFiles@2
@@ -374,6 +366,7 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
+      set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
@@ -405,40 +398,36 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       cat gtda/_version.py
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
   - bash: |
+      set -e
       pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
       igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
       pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
     displayName: 'Install pycairo and python-igraph'
 
   - script: |
       pip install -e ".[tests, doc]"
-    failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
       pip uninstall -y giotto-tda
     condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
     displayName: 'Uninstall giotto-tda dev'
 
   - script: |
       pip uninstall -y giotto-tda-nightly
     condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
     displayName: 'Uninstall giotto-tda-nightly dev'
 
   - script: |
@@ -448,10 +437,10 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - bash: |
+      set -e
       sed -i $'s/\r$//' README.rst
       pip install wheel
       python setup.py sdist bdist_wheel
-    failOnStderr: false
     displayName: 'Build the wheels'
 
   - bash: pip install dist/*.whl
@@ -459,10 +448,10 @@ jobs:
     displayName: 'Install the wheels'
 
   - bash: |
+      set -e
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
   - script: |

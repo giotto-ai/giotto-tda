@@ -1,6 +1,6 @@
 #!/bin/bash
-
 set -x
+set -e
 
 # Upgrading pip and setuptools, TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
