@@ -11,7 +11,16 @@ pip install --upgrade pip==19.3.1 setuptools
 pip install cmake
 
 # Install dependencies for python-igraph
-yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
+yum install -y libxml2 libxml2-devel zlib1g-devel bison flex ccache
+
+# Setup ccache
+mkdir /ccache
+ln -s /usr/bin/ccache /ccache/gcc
+ln -s /usr/bin/ccache /ccache/g++
+ln -s /usr/bin/ccache /ccache/cc
+ln -s /usr/bin/ccache /ccache/c++
+
+ccache -s
 
 # Install boost
 yum install -y wget tar
@@ -22,6 +31,8 @@ cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
 ./b2 install
 cd ..
+
+ccache -s
 
 # Help CMake find boost
 export BOOST_ROOT=/boost
