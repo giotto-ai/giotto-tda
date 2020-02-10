@@ -2,27 +2,33 @@
 # License: GNU AGPLv3
 
 import numbers
-
+import types
 import numpy as np
 
-available_metrics = {'bottleneck': [('delta', numbers.Number, (0., 1.))],
-                     'wasserstein': [('p', int, (1, np.inf)),
-                                     ('delta', numbers.Number, (1e-16, 1.))],
-                     'betti': [('p', numbers.Number, (1, np.inf)),
-                               ('n_values', int, (1, np.inf))],
-                     'landscape': [('p', numbers.Number, (1, np.inf)),
-                                   ('n_values', int, (1, np.inf)),
-                                   ('n_layers', int, (1, np.inf))],
-                     'heat': [('order', numbers.Number, (1, np.inf)),
-                              ('n_values', int, (1, np.inf)),
-                              ('sigma', numbers.Number, (0., np.inf))]}
+available_metrics = {
+    'bottleneck': [('delta', numbers.Number, (0., 1.))],
+    'wasserstein': [('p', int, (1, np.inf)),
+                    ('delta', numbers.Number, (1e-16, 1.))],
+    'betti': [('p', numbers.Number, (1, np.inf)),
+              ('n_values', int, (1, np.inf))],
+    'landscape': [('p', numbers.Number, (1, np.inf)),
+                  ('n_values', int, (1, np.inf)),
+                  ('n_layers', int, (1, np.inf))],
+    'heat': [('order', numbers.Number, (1, np.inf)),
+             ('n_values', int, (1, np.inf)),
+             ('sigma', numbers.Number, (0., np.inf))],
+    'persistent_image': [('order', numbers.Number, (1, np.inf)),
+                         ('n_values', int, (1, np.inf)),
+                         ('sigma', numbers.Number, (0., np.inf)),
+                         ('weight_function', types.FunctionType,
+                          None)]}
 
 available_metric_params = list(set(
     [param for param_list in available_metrics.values()
      for (param, param_type, param_range) in param_list]))
 
 
-def check_diagram(X):
+def check_diagram(X, copy=False):
     """Input validation on a diagram
     """
     if len(X.shape) != 3:
@@ -58,7 +64,10 @@ def check_diagram(X):
                          " {} points in "
                          "all n_samples diagrams are under the diagonal."
                          "".format(n_points_global - n_points_above_diag))
-    return X
+    if copy:
+        return np.copy(X)
+    else:
+        return X
 
 
 def check_graph(X):
@@ -75,13 +84,31 @@ def validate_params(parameters, references):
                                       references[key][0]))
         if len(references[key]) == 1:
             continue
-        if references[key][0] == list:
+        if references[key][0] == list or \
+           references[key][0] == np.ndarray:
             for parameter in parameters[key]:
-                if not isinstance(parameter, references[key][1][0]):
-                    raise TypeError("Parameter {} is a list of {}"
-                                    " but contains an element of type {}"
-                                    "".format(key, type(parameters[key]),
-                                              references[key][0]))
+                if references[key][1][0] == int:
+                    if not isinstance(parameter, numbers.Number):
+                        raise TypeError("Parameter {} is a {} of {}"
+                                        " but contains an element of type {}"
+                                        "".format(key, type(parameters[key]),
+                                                  references[key][1][0],
+                                                  type(parameter)))
+                    if not float(parameter).is_integer():
+                        raise TypeError("Parameter {} is a {} of int"
+                                        " but contains an element of type {}"
+                                        " that is not an integer."
+                                        "".format(key, type(parameters[key]),
+                                                  type(parameter)))
+                else:
+                    if not isinstance(parameter, references[key][1][0]):
+                        raise TypeError("Parameter {} is a {} of {}"
+                                        " but contains an element of type {}"
+                                        "".format(key, type(parameters[key]),
+                                                  references[key][1][0],
+                                                  type(parameter)))
+                if references[key][1][1] is None:
+                    break
                 if isinstance(references[key][1], tuple):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):
@@ -90,6 +117,18 @@ def validate_params(parameters, references):
                                          "".format(key, parameter,
                                                    references[key][1][1][0],
                                                    references[key][1][1][1]))
+            break
+        if references[key][1][1] is None:
+            break
+            for parameter in parameters[key]:
+                if isinstance(references[key][1], tuple):
+                    if (parameter < references[key][1][1][0] or
+                            parameter > references[key][1][1][1]):
+                        raise ValueError(
+                            "Parameter {} is an array containing {} which "
+                            "should be in the range [{},{}]".format(
+                                key, parameter, references[key][1][1][0],
+                                references[key][1][1][1]))
             break
         if isinstance(references[key][1], tuple):
             if (parameters[key] < references[key][1][0] or
@@ -122,12 +161,13 @@ def validate_metric_params(metric, metric_params):
                                 " but must be an {}."
                                 "".format(param, type(input_param),
                                           param_type))
-
-            if input_param < param_values[0] or input_param > param_values[1]:
-                raise ValueError("{} in param_metric should be between {} "
-                                 "and {} but has been set to {}."
-                                 "".format(param, param_values[0],
-                                           param_values[1], input_param))
+            if param_values is not None:
+                if input_param < param_values[0] or \
+                   input_param > param_values[1]:
+                    raise ValueError("{} in param_metric should be between {} "
+                                     "and {} but has been set to {}."
+                                     "".format(param, param_values[0],
+                                               param_values[1], input_param))
 
     for param in metric_params.keys():
         if param not in available_metric_params:

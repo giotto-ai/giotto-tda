@@ -6,7 +6,6 @@ import traceback
 
 import numpy as np
 import plotly.graph_objects as go
-from IPython.display import display
 from ipywidgets import Layout, widgets
 from sklearn.base import clone
 
@@ -21,6 +20,10 @@ def plot_static_mapper_graph(
         color_by_columns_dropdown=False, plotly_kwargs=None,
         clone_pipeline=True):
     """Plotting function for static Mapper graphs.
+
+    Nodes are colored according to :attr:`color_variable`. By default, the
+    hovertext displays a globally unique ID and the number of elements
+    associated with a given node.
 
     Parameters
     ----------
@@ -176,6 +179,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   plotly_kwargs=None):
     """Plotting function for interactive Mapper graphs.
 
+    Provides functionality to interactively update parameters from the cover
+    and clustering steps defined in :attr:`pipeline`. Nodes are colored
+    according to :attr:`color_variable`. By default, the hovertext displays a
+    globally unique ID and the number of elements associated with a given node.
+
     Parameters
     ----------
     pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
@@ -226,8 +234,10 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Returns
     -------
-    display : :class:`DisplayHandle` object
-        Displays the interactive Mapper graph widget.
+    box : :class:`ipywidgets.VBox` object
+    A box containing the following widgets: parameters of the clustering
+    algorithm, parameters for the covering scheme, a Mapper graph arising
+    from those parameters, a validation box, and logs.
 
     References
     ----------
@@ -243,7 +253,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     if node_color_statistic is not None:
         _node_color_statistic = node_color_statistic
     else:
-        _node_color_statistic = node_color_statistic
+        _node_color_statistic = np.mean
 
     def get_widgets_per_param(param, value):
         if isinstance(value, float):
@@ -415,5 +425,5 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         layout=container_cluster_layout)
 
     box = widgets.VBox(
-        [container_cover, container_cluster, fig, valid, logs_box])
-    display(box, out)
+        [container_cover, container_cluster, fig, valid, logs_box, out])
+    return box
