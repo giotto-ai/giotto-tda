@@ -19,9 +19,11 @@ def plot_static_mapper_graph(
         color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, plotly_kwargs=None,
         clone_pipeline=True):
-    """Plotting function for static Mapper graphs, with nodes colored according
-    to :attr:`color_variable`. By default, the hovertext displays a globally
-    unique ID and the number of elements associated with a given node.
+    """Plotting function for static Mapper graphs.
+
+    Nodes are colored according to :attr:`color_variable`. By default, the
+    hovertext displays a globally unique ID and the number of elements
+    associated with a given node.
 
     Parameters
     ----------
@@ -176,6 +178,10 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   color_by_columns_dropdown=False,
                                   plotly_kwargs=None):
     """Plotting function for interactive Mapper graphs.
+
+    Nodes are colored according to :attr:`color_variable`. By default, the
+    hovertext displays a globally unique ID and the number of elements
+    associated with a given node.
 
     Parameters
     ----------
