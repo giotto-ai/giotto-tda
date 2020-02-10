@@ -130,13 +130,6 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
-
   - script: |
       pip install -e ".[tests, doc]"
     failOnStderr: true
@@ -416,13 +409,6 @@ jobs:
       python -m pip install --upgrade pip setuptools
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
-
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
 
   - script: |
       pip install -e ".[tests, doc]"
