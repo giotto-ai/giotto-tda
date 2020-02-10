@@ -72,6 +72,10 @@ class TestInteractivePlot(TestCaseNoTemplate):
             except (AttributeError, TypeError):
                 pass
 
+    def _get_size_from_hovertext(self, s):
+        from re import split
+        return int(split(':|<', s)[-1])
+
     def test_cluster_sizes(self):
         """Verify that the total number of calculated clusters is equal to
         the number of displayed clusters."""
@@ -80,7 +84,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
         fig = plot_interactive_mapper_graph(pipe, X)
         w_scatter = self._get_widget_by_trait(fig, 'data')
 
-        node_sizes_vis = [int(s_[10:].split(sep='<')[0])
+        node_sizes_vis = [self._get_size_from_hovertext(s_)
                           for s_ in w_scatter.get_state()
                           ['_data'][1]['hovertext']]
 
