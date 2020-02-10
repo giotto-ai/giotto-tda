@@ -86,7 +86,7 @@ combine_requirements('examples', ['pydata', 'mapper'])
 combine_requirements(
     'all', [k for k in EXTRAS_REQUIRE if (k != 'tests' and k != 'doc')])
 combine_requirements(
-    'all_dev', [k for k in EXTRAS_REQUIRE])
+    'all_dev', [k for k in EXTRAS_REQUIRE if k != 'pydata'])
 
 
 class CMakeExtension(Extension):
