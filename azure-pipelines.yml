@@ -195,7 +195,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: 'ccache | $(Agent.OS) | $(python.version)'
+      key: 'ccache | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
