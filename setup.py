@@ -66,8 +66,8 @@ EXTRAS_REQUIRE = {
         'numpydoc'],
     'examples': [
         'jupyter',
-        'matplotlib',
-        'plotly']
+        'matplotlib'
+        ]
 }
 
 
