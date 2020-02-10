@@ -15,10 +15,6 @@ from sklearn.model_selection import GridSearchCV
 data = np.random.rand(600, 1)
 
 
-def test_assert_failure():
-    raise ValueError('Ensuring tha CI fails for this test')
-
-
 def split_train_test(data):
     n_train = int(0.7 * data.shape[0])
     n_test = data.shape[0] - n_train
