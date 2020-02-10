@@ -65,11 +65,10 @@ The latest stable version of giotto-tda requires:
 - joblib (>= 0.11)
 - scikit-learn (>= 0.22.0)
 - python-igraph (>= 0.7.1.post6)
-- matplotlib (>= 3.0.3)
 - plotly (>= 4.4.1)
 - ipywidgets (>= 7.5.1)
 
-To run the examples, jupyter is required.
+To run the Mapper and the examples, jupyter and matplotlib is required.
 
 User installation
 ~~~~~~~~~~~~~~~~~
