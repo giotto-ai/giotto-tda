@@ -6,8 +6,6 @@ from functools import reduce
 
 import numpy as np
 import plotly.graph_objs as go
-from matplotlib.cm import get_cmap
-from matplotlib.colors import rgb2hex
 
 
 def _get_node_size(node_elements):
@@ -41,6 +39,9 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
     # TODO: Consider opting for just-in-time computation instead of computing
     # all node summary values ahead-of-time. Solution should preserve scroll
     # zoom functionality of 2D static visualisation.
+    from matplotlib.cm import get_cmap
+    from matplotlib.colors import rgb2hex
+
     if is_data_dataframe:
         columns_to_color = data.columns
     else:
@@ -142,6 +143,9 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
 def _calculate_graph_data(
         pipeline, data, layout, layout_dim,
         color_variable, node_color_statistic,  plotly_kwargs):
+    from matplotlib.cm import get_cmap
+    from matplotlib.colors import rgb2hex
+
     graph = pipeline.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 
