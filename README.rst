@@ -64,11 +64,10 @@ The latest stable version of giotto-tda requires:
 - SciPy (>= 0.17.0)
 - joblib (>= 0.11)
 - scikit-learn (>= 0.22.0)
-- python-igraph (>= 0.7.1.post6)
-- plotly (>= 4.4.1)
-- ipywidgets (>= 7.5.1)
 
-To run the Mapper and the examples, jupyter and matplotlib is required.
+The Mapper functionality requires python-igraph (>= 0.7.1.post6),
+plotly (>= 4.4.1), ipywidgets (>=7.5.1), and matplotlib (>= 3.0.3). To run the
+examples, jupyter (>= 1.0.0) and pandas (>= 1.0.1) are also required.
 
 User installation
 ~~~~~~~~~~~~~~~~~
@@ -79,8 +78,17 @@ The simplest way to install giotto-tda is using ``pip``   ::
 
     pip install -U giotto-tda
 
-If necessary, this will also automatically install all the above dependencies. Note: we recommend
-upgrading ``pip`` to a recent version as the above may fail on very old versions.
+Note that this will only install the minimal dependencies listed above. To
+install the Mapper functionality, run ::
+
+    pip install -U 'giotto-tda[mapper]'
+
+Alternatively, you can install giotto-tda with all dependencies as follows ::
+
+    pip install -U 'giotto-tda[all]'
+
+Note: we recommend upgrading ``pip`` to a recent version as the above may fail
+on very old versions.
 
 Pre-release, experimental builds containing recently added features, and/or
 bug fixes can be installed by running   ::
@@ -175,7 +183,7 @@ To install:
 .. code-block:: bash
 
    cd giotto-tda
-   pip install -e ".[tests, doc]"
+   pip install -e ".[tests, doc, mapper]"
 
 This way, you can pull the library's latest changes and make them immediately available on your machine.
 Note: we recommend upgrading ``pip`` and ``setuptools`` to recent versions before installing in this way.
