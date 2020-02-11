@@ -1,5 +1,6 @@
 #!/bin/bash
 set -x
+echo "Start manylinux2010 docker build"
 
 # Upgrading pip and setuptools, TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
