@@ -3,17 +3,6 @@
 \usepackage{enumerate}
 \usepackage{tikz-cd}
 \usepackage{bm}
-%\usepackage[bookmarks=true,
-%bookmarksnumbered=true, breaklinks=true,
-%pdfstartview=FitH, hyperfigures=false,
-%plainpages=false, naturalnames=true,
-%colorlinks=true, pagebackref=true,
-%pdfpagelabels]{hyperref}
-%\hypersetup{
-%	colorlinks,
-%	citecolor=blue,
-%	linkcolor=blue,
-%	urlcolor=blue}
 
 \begin{document}
 	
@@ -128,7 +117,7 @@
 	
 	\subsection*{Cubical chains and cubical homology:} Let $X$ be a cubical complex. Define its \textit{cubical chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
-	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial x = \sum_{i = 1}^{N} (-1)^{s(i)}(d^+_i x - d^-_i x)
+	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
 	where $x = I_1 \times \cdots \times I_N$ and $s(i)$ is the dimension of $I_1 \times \cdots \times I_i$.
 	Its \textit{homology and cohomology with $\Bbbk$-coefficients} is the \underline{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
@@ -330,15 +319,3 @@
 	\bibliographystyle{alpha}
 	
 \end{document}
-
-% \subsection*{$L^p$-norm:}The $L^p$ norm of $\mathbb R^n$ is defined for $x = (x_1, \dots, x_n)$ by
-% $$
-% ||x||_p = \sum_{i=1}^{n} x_i^p
-% $$
-% when $p < \infty$ and
-% $$
-% ||x||_p = \max_{i\in \{1, \dots, n\}} |x_i|
-% $$
-% when $ p =\infty$.
-%
-% \subsection*{Barcode:} The \textit{barcode} of a \underline{persistence module} $V$ is the multiset of half-open intervals $[a,b) \subset \mathbb R \cup \{+\infty\}$ such that the image of the composition $V(i) \to \cdots \to V(j)$ has dimension equal to the number, counted with multiplicities, of half-open intervals containing $i$ and $j$.
