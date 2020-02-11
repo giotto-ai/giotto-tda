@@ -10,10 +10,8 @@ pip install --upgrade pip==19.3.1 setuptools
 # Install CMake
 pip install cmake
 
-# Install dependencies for python-igraph
-yum install -y libxml2 libxml2-devel zlib1g-devel bison flex ccache
-
 # Setup ccache
+yum install -y ccache
 mkdir /ccache
 ln -s /usr/bin/ccache /ccache/gcc
 ln -s /usr/bin/ccache /ccache/g++

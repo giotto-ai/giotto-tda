@@ -7,8 +7,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -54,8 +52,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -107,9 +103,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         python_ver: '36'
         python.version: '3.6'
@@ -129,13 +122,6 @@ jobs:
       python -m pip install --upgrade pip setuptools
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
-
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
 
   - script: |
       pip install -e ".[tests, doc]"
@@ -165,11 +151,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
@@ -269,8 +250,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -395,9 +374,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         python_ver: '36'
         python.version: '3.6'
@@ -425,13 +401,6 @@ jobs:
       python -m pip install --upgrade pip setuptools
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
-
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
 
   - script: |
       pip install -e ".[tests, doc]"
