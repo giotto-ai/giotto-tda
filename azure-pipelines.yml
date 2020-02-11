@@ -279,22 +279,16 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
       pip install wheel
@@ -399,22 +393,16 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
+    failOnStderr: true
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
