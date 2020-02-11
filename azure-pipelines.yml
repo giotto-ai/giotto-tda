@@ -285,9 +285,9 @@ jobs:
     displayName: 'Test dev install with pytest and flake8'
 
   - script: |
+      set -e
       pip uninstall -y giotto-tda
       pip uninstall -y giotto-tda-nightly
-    failOnStderr: true
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
@@ -399,9 +399,8 @@ jobs:
     displayName: 'Test dev install with pytest and flake8'
 
   - script: |
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
-    failOnStderr: true
+      pip uninstall -y giotto-tda || exit /b
+      pip uninstall -y giotto-tda-nightly || exit /b
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
