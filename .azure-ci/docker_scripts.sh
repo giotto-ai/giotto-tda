@@ -4,7 +4,7 @@ echo "Start manylinux2010 docker build"
 
 # Upgrading pip and setuptools, TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
-export PATH=${PYTHON_PATH}/bin:${PATH}
+export PATH="${PYTHON_PATH}/bin:${PATH}"
 pip install --upgrade pip==19.3.1 setuptools
 
 # Install CMake
@@ -17,7 +17,7 @@ ln -s /usr/bin/ccache /ccache/gcc
 ln -s /usr/bin/ccache /ccache/g++
 ln -s /usr/bin/ccache /ccache/cc
 ln -s /usr/bin/ccache /ccache/c++
-export PATH=/ccache/:${PATH}
+export PATH="/ccache/:${PATH}:/usr/bin/"
 # maximum cache size and compression
 ccache -M 1024M
 export CCACHE_COMPRESS=1
