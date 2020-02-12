@@ -127,9 +127,10 @@ jobs:
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
-  - script: |
-      pytest --cov gtda --cov-report xml || exit /b
-      flake8 || exit /b
+  - bash: |
+      set -e
+      pytest --cov gtda --cov-report xml
+      flake8
     displayName: 'Test with pytest and flake8'
 
   - script: |
@@ -386,16 +387,16 @@ jobs:
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
-  - script: |
+  - bash: |
       set -e
       pytest --cov gtda --cov-report xml
       flake8
-    failOnStderr: true
     displayName: 'Test dev install with pytest and flake8'
 
-  - script: |
-      pip uninstall -y giotto-tda || exit /b
-      pip uninstall -y giotto-tda-nightly || exit /b
+  - bash: |
+      set -e
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
@@ -437,6 +438,7 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
+      set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     failOnStderr: true
