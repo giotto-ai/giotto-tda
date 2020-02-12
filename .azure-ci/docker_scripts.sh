@@ -24,15 +24,17 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# Install and uninstall giotto-tda dev
+# Install dev environment
 cd /io
 pip install -e ".[tests, doc]"
-pip uninstall -y giotto-tda
-pip uninstall -y giotto-tda-nightly
 
-# Testing, linting
+# Test dev install with pytest and flake8
 pytest --cov . --cov-report xml
 flake8 --exit-zero /io/
+
+# Uninstall giotto-tda/giotto-tda-nightly dev
+pip uninstall -y giotto-tda
+pip uninstall -y giotto-tda-nightly
 
 # Building wheels
 pip install wheel
