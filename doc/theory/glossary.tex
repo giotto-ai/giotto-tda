@@ -17,17 +17,6 @@
 
 	\section{Homology}
 	
-	\subsection*{Simplicial complex}
-	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textbf{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textbf{simplex}, explicitly
-	\begin{equation*}
-	[v_0,\dots,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
-	\end{equation*}
-	and to $n$ as its \textbf{dimension}. The \textbf{$i$-th face} of $[v_0, \dots, v_n]$ is defined for $i=0, \dots, n$ by
-	\begin{equation*}
-	d_i[v_0, \dots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n].
-	\end{equation*}
-	A \textbf{simplicial complex} $X$ is a finite union of simplices in $\mathbb{R}^N$ satisfying that every face of a simplex in $X$ is in $X$ and that the non-empty intersection of two simplices in $X$ is a face of each. A \textbf{subcomplex} of $X$ is a simplicial complex whose simplices are also simplices of $X$. We denote the set of $n$-dimensional simplices by $X_n$.
-	
 	\subsection*{Cubical complex}
 	
 	An \textbf{elementary interval} $I_a$ is a subset of $\mathbb{R}$ of the form $[a, a+1]$ or $[a,a] = \{a\}$ for some $a \in \mathbb{R}$. These two types are called respectively \textbf{non-degenerate} and \textbf{degenerate}. To a non-degenerate elementary interval we assign two degenerate elementary intervals
@@ -51,6 +40,19 @@
 	
 	\paragraph{Reference:} \cite{mischaikow04computational}
 	
+	\subsection*{Simplicial complex}
+	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textbf{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textbf{simplex}, explicitly
+	\begin{equation*}
+	[v_0,\dots,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
+	\end{equation*}
+	and to $n$ as its \textbf{dimension}. The \textbf{$i$-th face} of $[v_0, \dots, v_n]$ is defined for $i=0, \dots, n$ by
+	\begin{equation*}
+	d_i[v_0, \dots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
+	\end{equation*}
+	where $\widehat{v}_i$ denotes the absence of $v_i$ from the set.
+	
+	A \textbf{simplicial complex} $X$ is a finite union of simplices in $\mathbb{R}^N$ satisfying that every face of a simplex in $X$ is in $X$ and that the non-empty intersection of two simplices in $X$ is a face of each. Every simplicial complex defines an \underline{abstract simplicial complex}.
+	
 	\subsection*{Abstract simplicial complex:} \label{simplicial complex}
 	
 	An \textit{abstract simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being subsets of $V$ such that: 
@@ -68,7 +70,7 @@
 	
 	A simplicial complex $X$ is a \textit{subcomplex} of a simplicial complex $Y$ if every simplex of $X$ is a simplex of $Y$.
 	
-	Given a finite abstract simplicial complex $X = (V, X)$ we can choose a bijection from $V$ to a geometrically independent subset of $\mathbb R^N$ and associate a \underline{simplicial complex} $|X|$ to $X$ called its \textit{geometric realization}.
+	Given a finite abstract simplicial complex $X = (V, X)$ we can choose a bijection from $V$ to a geometrically independent subset of $\mathbb R^N$ and associate a \underline{simplicial complex} to $X$ called its \textit{geometric realization}.
 	
 	\subsection*{Ordered simplicial complex:} 
 	
@@ -83,7 +85,7 @@
 	\end{enumerate}
 	With appropriate modifications the same terminology and notation introduced for \underline{ordered simplicial complex} applies to directed simplicial complex.
 	
-	\subsection*{Clique or flag complexes:} Let $G$ be a $1$-dimensional simplicial complex. The simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. 
+	\subsection*{Clique or flag complexes:} Let $G$ be a $1$-dimensional simplicial complex, abstract or otherwise. The complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. 
 	
 	Let $G$ be a $1$-dimensional directed simplicial complex. The directed simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $(v_0, \dots, v_n)$ is a simplex in $\langle G \rangle$ if an only if $(v_i, v_j) \in G$ for each pair of vertices $v_i, v_j$ with $i < j$. 
 	
@@ -97,7 +99,7 @@
 	
 	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of \underline{homology}.
 	
-	A \textit{chain map} is a $\Bbbk$-linear map $f : C \to C'$ between chain complexes such that $f(C_n) \leq C'_n$ and $\partial f = f \partial$.
+	A \textit{chain map} is a $\Bbbk$-linear map $f : C \to C'$ between chain complexes such that $f(C_n) \subseteq C'_n$ and $\partial f = f \partial$.
 	
 	Given a chain complex $(C_*, \partial)$, its linear dual $C^*$ is also a chain complex with $C^{-n} = \mathrm{Hom_\Bbbk}(C_n, \Bbbk)$ and boundary map $\delta$ defined by $\delta(\alpha)(c) = \alpha(\partial c)$ for any $\alpha \in C^*$ and $c \in C_*$.
 	
@@ -109,9 +111,9 @@
 	
 	\subsection*{Simplicial chains and simplicial homology:} Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
 	$$
-	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n([v_0, \dots, v_n]) = \sum_{i=0}^{n} (-1)^i [v_0, \dots, \widehat v_i, \dots, v_n]
+	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
 	$$
-	and its \textit{homology and cohomology with $\Bbbk$-coefficients} as the \underline{homology and cohomology} of this chain complex. We use the notation$H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	and its \textit{homology and cohomology with $\Bbbk$-coefficients} as the \underline{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
 	
 	A \underline{simplicial map} induces a \underline{chain map} between the associated simplicial chain complexes and, therefore, between the associated simplicial (co)homologies.
 	
@@ -125,16 +127,12 @@
 	\subsection*{Filtered complex:}
 	A \textit{filtered complex} is a collection of simplicial or of cubical complexes $\{X(n)\}_{n \in \mathbb N}$ such that $X(n)$ is a subcomplex of $X(n+1)$ for each $n \geq 0$.
 	
-	\subsection*{Simplexwise filtration:}
+	\subsection*{Cellwise filtration:}
 	A \underline{filtered complex} such that $X(n+1)$ contains exactly one more simplex or elementary cube than $X(n)$. \par
-	The data of a simplexwise filtration is equivalent to a simplicial complex $X$ together with a total order $\leq$ on its simplices such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$.
+	The data of a cellwise filtration is equivalent to a complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$.
 	
 	\subsection*{Persistence module:}
-	A \textit{persistence module} is a collection containing a $\Bbbk$-vector spaces $V(s)$ for each real number $s$ together with $\Bbbk$-linear maps $f_{st} : V(s) \to V(t)$, referred to as \textit{structure maps}, for each pair $s \leq t$, satisfying:
-	\begin{enumerate}
-		\item if $r \leq s \leq t$, then $f_{rt} = f_{st} \circ f_{rs}$ and
-		\item all but finitely many structure maps are isomorphisms.
-	\end{enumerate}
+	A \textit{persistence module} is a collection containing a $\Bbbk$-vector spaces $V(s)$ for each real number $s$ together with $\Bbbk$-linear maps $f_{st} : V(s) \to V(t)$, referred to as \textit{structure maps}, for each pair $s \leq t$, satisfying	naturality, i.e., if $r \leq s \leq t$, then $f_{rt} = f_{st} \circ f_{rs}$ and tameness, i.e., all but finitely many structure maps are isomorphisms.
 	
 	A \textit{morphism of persistence modules} $F : V \to W$ is a collection of linear maps $F(s) : V(s) \to W(s)$ such that $F(t) \circ f_{st} = f_{st} \circ F(s)$ for each par of reals $s \leq t$.	We say that $F$ is an \textit{isomorphisms} if each $F(s)$ is.
 	
@@ -143,12 +141,16 @@
 	\begin{equation*}
 	H_*(X(s); \Bbbk)
 	\end{equation*}
-	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not me persistence module, but we restrict attention to the cases where it does.
+	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not satisfy the tameness condition of a \underline{persistence module}, but we restrict attention to the cases where it does.
 	
 	\textit{Persistence simplicial cohomology with $\Bbbk$-coefficients} is defined analogously.
 	
 	\subsection*{Vietoris-Rips complex and Vietoris-Rips homology:}
-	The \textit{Vietoris-Rips complex} of a \underline{finite metric space} $(X, d)$ is given by the following construction: let $s \geq 0$, define the {\underline{simplicial complex}} $VR_X(s)$ to have vertices the set $X$ and declare a subset $\{x_0, \dots, x_n\}$ of distinct points in $X$ to be a simplex if $d(x_i, x_j) \leq s$ for all $x_i, x_j$. 
+	The \textit{Vietoris-Rips complex} of a \underline{finite metric space} $(X, d)$ is given by the following construction: let $s \geq 0$, define the {\underline{simplicial complex}} $VR_X(s)$ to have vertices the set $X$ and declare a subset $\{x_0, \dots, x_n\}$ of distinct points in $X$ to be a simplex if $d(x_i, x_j) \leq s$ for all $x_i, x_j$, explicitly
+	\begin{equation*}
+	VR_X(s) = \big\{ [v_0,\dots,v_n]\ |\ d(v_i,v_j) \leq s \text{ for all } i,j = 0,\dots n \big\}.
+	\end{equation*}
+	
 	We equipped this collection of complexes with the inclusion maps $VR_X(s) \to VR_X(t)$ for each $s \leq t$ and define the Vietoris-Rips homology of $(X, d)$ to be the \underline{persistent simplicial homology} of this collection.
 	
 	\subsection*{Multiset:}
