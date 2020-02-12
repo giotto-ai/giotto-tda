@@ -35,6 +35,13 @@ giotto-tda is the result of a collaborative effort between `L2F SA
 <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
 <https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
 
+License
+-------
+
+giotto-tda is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_. 
+If you need a different distribution license, please contact the L2F team at 
+business@l2f.ch.
+
 Documentation
 -------------
 
@@ -59,7 +66,7 @@ Dependencies
 
 The latest stable version of giotto-tda requires:
 
-- Python (>= 3.5)
+- Python (>= 3.6)
 - NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
 - joblib (>= 0.11)
@@ -74,8 +81,6 @@ To run the examples, jupyter is required.
 User installation
 ~~~~~~~~~~~~~~~~~
 
-Linux and macOS
-'''''''''''''''
 The simplest way to install giotto-tda is using ``pip``   ::
 
     pip install -U giotto-tda
@@ -88,27 +93,9 @@ bug fixes can be installed by running   ::
 
     pip install -U giotto-tda-nightly
 
-The main difference between giotto-tda-nightly and the developer installation (see below)
-is that the former is shipped with pre-compiled wheels (similarly to the stable release)
-and hence does not require any C++ dependencies.
-
-Windows
-'''''''
-In this case, python-igraph and its dependency pycairo must be manually installed before
-proceeding as above. This is because the python-igraph project does not yet provide official
-installers for Windows via PyPI, so that ``pip install python-igraph`` would fail there.
-The preferred way to install python-igraph on Windows is to download and install the relevant
-wheels built by Christoph Gohlke for both `pycairo <https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycairo>`_
-and `python-igraph <https://www.lfd.uci.edu/~gohlke/pythonlibs/#python-igraph>`_. We
-host these wheels so they can be fetched with convenient URLs. For Python 3.5 to 3.7, you may run   ::
-
-    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp<PYTHON VERSION>-cp<PYTHON VERSION>m-win_amd64.whl
-    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/python-igraph/python_igraph-0.7.1.post6-cp<PYTHON VERSION>-cp<PYTHON VERSION>m-win_amd64.whl
-
-where ``<PYTHON VERSION>`` is e.g. ``37`` for Python 3.7. For Python 3.8, you may run   ::
-
-    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/pycairo/pycairo-1.18.2-cp38-cp38-win_amd64.whl
-    pip install https://storage.googleapis.com/l2f-open-models/giotto-learn/windows-binaries/python-igraph/python_igraph-0.7.1.post6-cp38-cp38-win_amd64.whl
+The main difference between giotto-tda-nightly and the developer installation (see the section
+on contributing, below) is that the former is shipped with pre-compiled wheels (similarly to the stable
+release) and hence does not require any C++ dependencies.
 
 Contributing
 ------------
@@ -122,8 +109,7 @@ Developer installation
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Installing both the PyPI release and source of giotto-tda in the same environment is not recommended since it is
-known to cause conflicts with the C++ bindings. On  Windows, the pycairo and python-igraph dependencies have to be
-installed manually just as in the case of a simple user installation.
+known to cause conflicts with the C++ bindings.
 
 The developer installation requires three important C++ dependencies:
 

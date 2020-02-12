@@ -10,9 +10,6 @@ pip install --upgrade pip==19.3.1 setuptools
 # Install CMake
 pip install cmake
 
-# Install dependencies for python-igraph
-yum install -y libxml2 libxml2-devel zlib1g-devel bison flex
-
 # Install boost
 yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
@@ -27,15 +24,17 @@ cd ..
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
-# Install and uninstall giotto-tda dev
+# Install dev environment
 cd /io
 pip install -e ".[tests, doc]"
-pip uninstall -y giotto-tda
-pip uninstall -y giotto-tda-nightly
 
-# Testing, linting
+# Test dev install with pytest and flake8
 pytest --cov . --cov-report xml
 flake8 --exit-zero /io/
+
+# Uninstall giotto-tda/giotto-tda-nightly dev
+pip uninstall -y giotto-tda
+pip uninstall -y giotto-tda-nightly
 
 # Building wheels
 pip install wheel

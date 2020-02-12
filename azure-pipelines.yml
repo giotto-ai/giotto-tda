@@ -7,8 +7,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -38,7 +36,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -54,8 +52,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -92,7 +88,7 @@ jobs:
   - script: |
       set -e
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -108,9 +104,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         python_ver: '36'
         python.version: '3.6'
@@ -130,14 +123,8 @@ jobs:
       python -m pip install --upgrade pip setuptools
     displayName: 'Upgrade pip and setuptools'
 
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
-
-  - script: pip install -e ".[tests, doc]"
+  - script: |
+      pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
@@ -147,7 +134,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
@@ -162,11 +149,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
@@ -221,7 +203,7 @@ jobs:
   - script: |
       set -e
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -257,8 +239,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -295,20 +275,16 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Uninstall giotto-tda-nightly dev'
+      pytest --cov gtda --cov-report xml
+      flake8
+    failOnStderr: true
+    displayName: 'Test dev install with pytest and flake8'
 
   - script: |
       set -e
-      pytest --cov gtda --cov-report xml
-      flake8
-    displayName: 'Test with pytest and flake8'
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
       set -e
@@ -329,7 +305,7 @@ jobs:
   - script: |
       set -e
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -379,9 +355,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         python_ver: '36'
         python.version: '3.6'
@@ -409,32 +382,21 @@ jobs:
       python -m pip install --upgrade pip setuptools
     displayName: 'Upgrade pip and setuptools'
 
-  - bash: |
-      set -e
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    displayName: 'Install pycairo and python-igraph'
-
   - script: |
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
+      set -e
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      pip uninstall -y giotto-tda || exit /b
+      pip uninstall -y giotto-tda-nightly || exit /b
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       set -e
@@ -457,7 +419,7 @@ jobs:
   - script: |
       cd examples
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
