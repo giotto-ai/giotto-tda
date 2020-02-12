@@ -12,15 +12,7 @@ pip install cmake
 
 # Setup ccache
 yum install -y ccache
-mkdir /ccache
-ln -s /usr/bin/ccache /ccache/gcc
-ln -s /usr/bin/ccache /ccache/g++
-ln -s /usr/bin/ccache /ccache/cc
-ln -s /usr/bin/ccache /ccache/c++
-export PATH="/ccache/:${PATH}:/usr/bin/"
-# maximum cache size and compression
-ccache -M 1024M
-export CCACHE_COMPRESS=1
+source /io/.azure-ci/setup_ccache.sh
 
 ccache -s
 

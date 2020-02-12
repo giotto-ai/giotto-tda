@@ -13,20 +13,28 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+  variables:
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: |
-      python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
+  - task: Cache@2
+    inputs:
+      key: 'ccache | $(Agent.OS) | "$(python.version)"'
+      path: $(CCACHE_DIR)
+    displayName: ccache
 
-  - script: pip install -e ".[tests, doc]"
+  - script: |
+      sudo apt-get update
+      sudo apt-get install -y ccache
+      source .azure-ci/setup_ccache.sh
+      python -m pip install --upgrade pip setuptools
+      pip install -e ".[tests, doc]"
     failOnStderr: true
-    displayName: 'Install dev environment'
+    displayName: 'Install dependencies and dev environment'
 
   - script: |
       pytest --cov gtda --cov-report xml
@@ -58,26 +66,33 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+  variables:
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
 
+  - task: Cache@2
+    inputs:
+      key: 'ccache | $(Agent.OS) | "$(python.version)"'
+      path: $(CCACHE_DIR)
+    displayName: ccache
+
   - script: |
       brew update
-      brew install gcc boost
+      brew install gcc boost ccache
     failOnStderr: true
-    displayName: 'Install gcc and boost'
+    displayName: 'Install gcc, boost and ccache'
 
   - script: |
+      source .azure-ci/setup_ccache.sh
       python -m pip install --upgrade pip setuptools
+      pip install -e ".[tests, doc]"
+      ccache -s
     failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
-    displayName: 'Install dev environment'
+    displayName: 'Install dependencies and dev environment'
 
   - script: |
       pytest --cov gtda --cov-report xml
@@ -176,7 +191,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: 'ccache | $(Agent.OS) | "$(python.version)"'
+      key: 'ccache-wheels | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -256,6 +271,8 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+  variables:
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
   - task: UsePythonVersion@0
@@ -272,20 +289,20 @@ jobs:
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
+  - task: Cache@2
+    inputs:
+      key: 'ccache | $(Agent.OS) | "$(python.version)"'
+      path: $(CCACHE_DIR)
+    displayName: ccache
+
   - script: |
       brew update
-      brew install gcc boost
-    failOnStderr: true
-    displayName: 'Install gcc and boost'
-
-  - script: |
+      brew install gcc boost ccache
       python -m pip install --upgrade pip setuptools
+      source .azure-ci/setup_ccache.sh
+      pip install -e ".[tests, doc]"
     failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
-    displayName: 'Install dev environment'
+    displayName: 'Install dependencies and dev environement'
 
   - script: |
       pip uninstall -y giotto-tda
