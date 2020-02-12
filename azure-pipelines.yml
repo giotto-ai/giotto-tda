@@ -309,7 +309,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install 'papermill<=1.2.1'
       cd examples
       for n in *.ipynb
       do
