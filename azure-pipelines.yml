@@ -36,7 +36,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -87,7 +87,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -136,7 +136,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
@@ -206,7 +206,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -309,7 +309,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -424,7 +424,7 @@ jobs:
   - script: |
       cd examples
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
