@@ -133,8 +133,13 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
                 color_data = data[color_variable].to_numpy()
             else:
                 color_data = data[:, color_variable]
-        node_colors = get_node_summary(node_elements, color_data,
-                                       summary_stat=node_color_statistic)
+
+        node_colors = get_node_summary(
+            node_elements, color_data, summary_stat=node_color_statistic)
+
+    # Normalise node colours in range [0,1] for colorscale mapping
+    node_colors = (node_colors - np.min(node_colors)) / \
+        (np.max(node_colors) - np.min(node_colors))
 
     return node_colors
 
