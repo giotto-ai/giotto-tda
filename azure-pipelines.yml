@@ -30,11 +30,16 @@ jobs:
   - script: |
       sudo apt-get update
       sudo apt-get install -y ccache
+    failOnStderr: true
+    displayName: 'Install ccache'
+
+  - script: |
       source .azure-ci/setup_ccache.sh
       python -m pip install --upgrade pip setuptools
       pip install -e ".[tests, doc]"
+      ccache -s
     failOnStderr: true
-    displayName: 'Install dependencies and dev environment'
+    displayName: 'Install dev environment'
 
   - script: |
       pytest --cov gtda --cov-report xml
@@ -92,7 +97,7 @@ jobs:
       pip install -e ".[tests, doc]"
       ccache -s
     failOnStderr: true
-    displayName: 'Install dependencies and dev environment'
+    displayName: 'Install dev environment'
 
   - script: |
       pytest --cov gtda --cov-report xml
@@ -298,9 +303,14 @@ jobs:
   - script: |
       brew update
       brew install gcc boost ccache
+    failOnStderr: true
+    displayName: 'Install system dependencies'
+
+  - script: |
       python -m pip install --upgrade pip setuptools
       source .azure-ci/setup_ccache.sh
       pip install -e ".[tests, doc]"
+      ccache -s
     failOnStderr: true
     displayName: 'Install dependencies and dev environement'
 
