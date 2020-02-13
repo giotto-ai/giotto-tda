@@ -95,7 +95,9 @@ bug fixes can be installed by running   ::
 
 The main difference between giotto-tda-nightly and the developer installation (see the section
 on contributing, below) is that the former is shipped with pre-compiled wheels (similarly to the stable
-release) and hence does not require any C++ dependencies.
+release) and hence does not require any C++ dependencies. As the main library module is called ``gtda`` in
+both the stable and nightly versions, giotto-tda and giotto-tda-nightly should not be installed in
+the same environment.
 
 Contributing
 ------------
@@ -126,7 +128,7 @@ Most Linux systems should come with a suitable compiler pre-installed. For the o
 
 .. code-block:: bash
 
-    sudo apt-get install cmake boost
+    sudo apt-get install cmake libboost-dev
 
 if ``apt-get`` is available in your system.
 
