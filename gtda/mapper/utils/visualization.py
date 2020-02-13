@@ -138,8 +138,8 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
             node_elements, color_data, summary_stat=node_color_statistic)
 
     # Normalise node colours in range [0,1] for colorscale mapping
-    node_colors = (node_colors - np.min(node_colors)) / \
-        (np.max(node_colors) - np.min(node_colors))
+    node_colors = (node_colors - np.nanmin(node_colors)) / \
+        (np.nanmax(node_colors) - np.nanmin(node_colors))
 
     return node_colors
 
