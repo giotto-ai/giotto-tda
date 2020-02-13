@@ -1,4 +1,4 @@
-.. image:: https://www.giotto.ai/static/vector/logo.svg
+.. image:: https://www.giotto.ai/static/vector/logo-tda.svg
    :width: 850
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
@@ -34,6 +34,13 @@ giotto-tda is the result of a collaborative effort between `L2F SA
 <https://www.l2f.ch/>`_, the `Laboratory for Topology and Neuroscience
 <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
 <https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
+
+License
+-------
+
+giotto-tda is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_. 
+If you need a different distribution license, please contact the L2F team at 
+business@l2f.ch.
 
 Documentation
 -------------
@@ -88,7 +95,9 @@ bug fixes can be installed by running   ::
 
 The main difference between giotto-tda-nightly and the developer installation (see the section
 on contributing, below) is that the former is shipped with pre-compiled wheels (similarly to the stable
-release) and hence does not require any C++ dependencies.
+release) and hence does not require any C++ dependencies. As the main library module is called ``gtda`` in
+both the stable and nightly versions, giotto-tda and giotto-tda-nightly should not be installed in
+the same environment.
 
 Contributing
 ------------
@@ -119,7 +128,7 @@ Most Linux systems should come with a suitable compiler pre-installed. For the o
 
 .. code-block:: bash
 
-    sudo apt-get install cmake boost
+    sudo apt-get install cmake libboost-dev
 
 if ``apt-get`` is available in your system.
 

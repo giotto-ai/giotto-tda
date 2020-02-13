@@ -49,7 +49,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -87,7 +87,7 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost ccache
+      brew install boost ccache
     failOnStderr: true
     displayName: 'Install gcc, boost and ccache'
 
@@ -100,14 +100,14 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test with pytest and flake8'
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -156,7 +156,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
@@ -235,7 +235,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -302,7 +302,7 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost ccache
+      brew install boost ccache
     failOnStderr: true
     displayName: 'Install system dependencies'
 
@@ -315,22 +315,16 @@ jobs:
     displayName: 'Install dependencies and dev environement'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      set -e
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
       pip install wheel
@@ -351,7 +345,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -435,22 +429,15 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      pip uninstall -y giotto-tda || exit /b
+      pip uninstall -y giotto-tda-nightly || exit /b
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
@@ -473,7 +460,7 @@ jobs:
   - script: |
       cd examples
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
