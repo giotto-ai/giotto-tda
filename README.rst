@@ -1,4 +1,4 @@
-.. image:: https://www.giotto.ai/static/vector/logo.svg
+.. image:: https://www.giotto.ai/static/vector/logo-tda.svg
    :width: 850
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
