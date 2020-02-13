@@ -138,6 +138,9 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
             node_elements, color_data, summary_stat=node_color_statistic)
 
     # Normalise node colours in range [0,1] for colorscale mapping
+    if any(np.logical_not(np.isfinite(node_colors))):
+        from warnings import warn
+        warn('The variable defining colors contains NaN values.', RuntimeWarning)
     node_colors = (node_colors - np.nanmin(node_colors)) / \
         (np.nanmax(node_colors) - np.nanmin(node_colors))
 
