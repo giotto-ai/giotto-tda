@@ -66,7 +66,7 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost
+      brew install boost
     failOnStderr: true
     displayName: 'Install gcc and boost'
 
@@ -81,7 +81,7 @@ jobs:
 
   - script: |
       set -e      
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     displayName: 'Test with pytest and flake8'
 
@@ -265,7 +265,7 @@ jobs:
   - script: |
       set -e
       brew update
-      brew install gcc boost
+      brew install boost
     displayName: 'Install gcc and boost'
 
   - script: |

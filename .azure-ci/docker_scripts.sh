@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-# Upgrading pip and setuptools, TODO: Monitor status of pip versions
+# Upgrade pip and setuptools. TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH=${PYTHON_PATH}/bin:${PATH}
 pip install --upgrade pip==19.3.1 setuptools
@@ -28,13 +28,13 @@ cd /io
 pip install -e ".[tests, doc]"
 
 # Test dev install with pytest and flake8
-pytest --cov . --cov-report xml
+pytest --cov gtda --cov-report xml
 flake8 --exit-zero /io/
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
 pip uninstall -y giotto-tda
 pip uninstall -y giotto-tda-nightly
 
-# Building wheels
+# Build wheels
 pip install wheel
 python setup.py sdist bdist_wheel
