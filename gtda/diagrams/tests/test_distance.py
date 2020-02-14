@@ -246,7 +246,7 @@ parameters = [('bottleneck', None),
               ('wasserstein', {'p': 2, 'delta': 0.1}),
               ('betti', {'p': 2.1, 'n_bins': 10}),
               ('landscape', {'n_bins': 10}),
-              # ('heat', {'n_bins': 10}) See issue #63
+              ('heat', {'n_bins': 10})  # See issue #63
               ]
 
 
