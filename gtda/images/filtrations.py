@@ -367,7 +367,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_iterations : int or None, optional, default: None
+    n_iterations : int or None, optional, default: ``None``
         Number of iterations in the dilation process. ``None`` means dilation
         over the full image.
 
