@@ -63,11 +63,16 @@ EXTRAS_REQUIRE = {
         'sphinx-issues',
         'sphinx_rtd_theme',
         'numpydoc'],
-    'examples': [
-        'jupyter',
-        'matplotlib',
-        'plotly']
+    'examples': ['jupyter']
 }
+
+def combine_requirements(new_key, base_keys):
+    EXTRAS_REQUIRE[new_key] = list(
+        set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+combine_requirements(
+    "dev", [k for k in EXTRAS_REQUIRE if k != "examples"]
+)
 
 
 class CMakeExtension(Extension):

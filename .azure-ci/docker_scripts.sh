@@ -26,7 +26,7 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # Install dev environment
 cd /io
-pip install -e ".[tests, doc]"
+pip install -e ".[dev]"
 
 # Test dev install with pytest and flake8
 pytest --cov gtda --cov-report xml

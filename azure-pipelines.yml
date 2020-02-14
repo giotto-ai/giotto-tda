@@ -24,7 +24,7 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - script: pip install -e ".[tests, doc]"
+  - script: pip install -e ".[dev]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
@@ -75,7 +75,7 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - script: pip install -e ".[tests, doc]"
+  - script: pip install -e ".[dev]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
@@ -124,7 +124,7 @@ jobs:
     displayName: 'Upgrade pip and setuptools'
 
   - script: |
-      pip install -e ".[tests, doc]"
+      pip install -e ".[dev]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
@@ -274,7 +274,7 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - script: pip install -e ".[tests, doc]"
+  - script: pip install -e ".[dev]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
@@ -388,7 +388,7 @@ jobs:
     displayName: 'Upgrade pip and setuptools'
 
   - script: |
-      pip install -e ".[tests, doc]"
+      pip install -e ".[dev]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
