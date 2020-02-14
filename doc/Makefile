@@ -7,6 +7,21 @@ SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = build
+GITDIR    = ../docs
+
+togit:
+	@cp -a build/html/ "$(GITDIR)"
+cleangit:
+	@rm "$(GITDIR)"
+
+github:
+	@make html
+	@make togit
+
+github-clean:
+	@make clean
+	@rm cleangit
+
 
 # Put it first so that "make" without argument is like "make help".
 help:
