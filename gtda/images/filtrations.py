@@ -354,8 +354,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class DilationFiltration(BaseEstimator, TransformerMixin):
-    """Filtrations of 2D/3D binary images based on distances to a reference
-    pixel.
+    """Filtrations of 2D/3D binary images based on distances to activated
+    pixels.
 
     The dilation filtration assigns to each deactivated pixel of an image a
     pixel value corresponding to the Manhattan distance between the pixel and
