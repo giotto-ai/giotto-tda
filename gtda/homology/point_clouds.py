@@ -10,7 +10,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics.pairwise import pairwise_distances
 
 from ._utils import _pad_diagram
-from ..externals.python import ripser, SparseRipsComplex
+from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
@@ -518,20 +518,18 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference Manual \
-    <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_cohomology.html>`_.
+    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
+    Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+    cohomology.html>`_.
 
     """
-
     _hyperparameters = {'max_edge_length': [numbers.Number],
                         'infinity_values_': [numbers.Number],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), coeff=2,
-                 infinity_values=None, n_jobs=None):
-        self.metric = metric
+    def __init__(self, max_edge_length=np.inf, homology_dimensions=(0, 1),
+                 coeff=2, infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.max_edge_length = max_edge_length
@@ -539,9 +537,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        cech_complex = CechComplex(
-            distance_points=Xdgms, max_radius=self.max_edge_length)
-        simplex_tree = sparse_rips_complex.create_simplex_tree(
+        cech_complex = CechComplex(points=X, max_radius=self.max_edge_length)
+        simplex_tree = cech_complex.create_simplex_tree(
             max_dimension=max(self._homology_dimensions) + 1)
         Xdgms = simplex_tree.persistence(
             homology_coeff_field=self.coeff, min_persistence=0)
