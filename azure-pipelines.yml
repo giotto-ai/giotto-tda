@@ -32,7 +32,7 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - script: |
-      pip install -e ".[examples]"
+      sudo pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -193,7 +193,7 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install -e ".[examples]"
+      sudo pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -201,7 +201,7 @@ jobs:
         papermill --start_timeout 2000 $n -
       done
     failOnStderr: true
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
@@ -301,7 +301,7 @@ jobs:
         papermill --start_timeout 2000 $n -
       done
     failOnStderr: true
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - script: |
       cd doc/
