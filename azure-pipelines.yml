@@ -125,12 +125,12 @@ jobs:
       flake8
     displayName: 'Test with pytest and flake8'
 
-  - bash: |
-      set -e
+  - script: |
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
+      failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
 
 
@@ -405,12 +405,12 @@ jobs:
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
     displayName: 'Test the wheels with pytest'
 
-  - bash: |
-      set -e
+  - script: |
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
+    failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
