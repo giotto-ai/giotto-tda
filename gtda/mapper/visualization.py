@@ -21,6 +21,10 @@ def plot_static_mapper_graph(
         clone_pipeline=True):
     """Plotting function for static Mapper graphs.
 
+    Nodes are colored according to :attr:`color_variable`. By default, the
+    hovertext displays a globally unique ID and the number of elements
+    associated with a given node.
+
     Parameters
     ----------
     pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
@@ -174,6 +178,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   color_by_columns_dropdown=False,
                                   plotly_kwargs=None):
     """Plotting function for interactive Mapper graphs.
+
+    Provides functionality to interactively update parameters from the cover
+    and clustering steps defined in :attr:`pipeline`. Nodes are colored
+    according to :attr:`color_variable`. By default, the hovertext displays a
+    globally unique ID and the number of elements associated with a given node.
 
     Parameters
     ----------

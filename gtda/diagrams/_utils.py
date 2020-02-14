@@ -87,7 +87,7 @@ def _bin(X, metric, n_bins=100, **kw_args):
         max_vals = {d: np.array(2*[np.max(m)]) for d, m in max_vals.items()}
 
     # Scales between axes should be kept the same, but not between dimension
-    all_max_values = np.stack(max_vals.values())
+    all_max_values = np.stack(list(max_vals.values()))
     if len(homology_dimensions) == 1:
         all_max_values == all_max_values.reshape(1, -1)
     global_max_val = np.max(all_max_values, axis=0)

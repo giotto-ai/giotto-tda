@@ -7,8 +7,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -38,7 +36,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -54,8 +52,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -70,7 +66,7 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost
+      brew install boost
     failOnStderr: true
     displayName: 'Install gcc and boost'
 
@@ -84,14 +80,14 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test with pytest and flake8'
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -107,9 +103,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         python_ver: '36'
         python.version: '3.6'
@@ -130,13 +123,6 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
-
   - script: |
       pip install -e ".[tests, doc]"
     failOnStderr: true
@@ -150,7 +136,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
@@ -165,11 +151,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
-      Python35:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         arch: x86_64
         plat: manylinux2010_x86_64
@@ -225,7 +206,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -260,8 +241,6 @@ jobs:
     vmImage: 'macOS-10.14'
   strategy:
     matrix:
-      Python35:
-        python.version: '3.5'
       Python36:
         python.version: '3.6'
       Python37:
@@ -286,7 +265,7 @@ jobs:
 
   - script: |
       brew update
-      brew install gcc boost
+      brew install boost
     failOnStderr: true
     displayName: 'Install gcc and boost'
 
@@ -300,22 +279,16 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      set -e
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
       pip install wheel
@@ -336,7 +309,7 @@ jobs:
 
   - script: |
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -386,9 +359,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python35:
-        python_ver: '35'
-        python.version: '3.5'
       Python36:
         python_ver: '36'
         python.version: '3.6'
@@ -417,35 +387,21 @@ jobs:
     failOnStderr: true
     displayName: 'Upgrade pip and setuptools'
 
-  - bash: |
-      pycairo_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'pycairo')
-      igraph_url=$(python .azure-ci/python-igraph_dependencies_win.py '$(python_ver)' 'python-igraph')
-      pip install "$pycairo_url" "$igraph_url"
-    failOnStderr: true
-    displayName: 'Install pycairo and python-igraph'
-
   - script: |
       pip install -e ".[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pip uninstall -y giotto-tda
-    condition: eq(variables['nightly_check'], 'false')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda dev'
-
-  - script: |
-      pip uninstall -y giotto-tda-nightly
-    condition: eq(variables['nightly_check'], 'true')
-    failOnStderr: true
-    displayName: 'Uninstall giotto-tda-nightly dev'
-
-  - script: |
       pytest --cov gtda --cov-report xml
       flake8
     failOnStderr: true
-    displayName: 'Test with pytest and flake8'
+    displayName: 'Test dev install with pytest and flake8'
+
+  - script: |
+      pip uninstall -y giotto-tda || exit /b
+      pip uninstall -y giotto-tda-nightly || exit /b
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
@@ -468,7 +424,7 @@ jobs:
   - script: |
       cd examples
       pip install openml pandas
-      pip install papermill
+      pip install "papermill==1.2.1"
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
