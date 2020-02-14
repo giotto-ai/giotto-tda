@@ -3,6 +3,7 @@
 
 import numbers
 import numpy as np
+from scipy import ndimage as ndi
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.metrics import pairwise_distances
@@ -164,19 +165,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class RadialFiltration(BaseEstimator, TransformerMixin):
-<<<<<<< HEAD
-    """Transformer returning a collection of grayscale images
-    from a collection of 2D or 3D binary images.
-
-    The radial filtration assigns to each activated pixel within a ball
-    centered on a center pixel a pixel value corresponding to the distance
-    between the pixel and the center pixel of the image according to a given
-    metric. Pixels outside of this ball are considered deactivated and each
-    deactivated pixels is assigned the value of the maximum distance between
-    any pixel of the image and the center pixel plus one.
-=======
-    """Filtrations of 2D/3D binary images based on distances to reference
-    pixels.
+    """Filtrations of 2D/3D binary images based on distances to a reference
+    pixel.
 
     The radial filtration assigns to each pixel of a binary image a grayscale
     value computed as follows in terms of a reference pixel, called the
@@ -185,7 +175,6 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
     value equals this distance. In all other cases, the assigned value equals
     the maximum distance between any pixel of the image and the center
     pixel, plus one.
->>>>>>> 701bcce3ce18b3f1c826006d334472f95790b2b8
 
     Parameters
     ----------
@@ -194,13 +183,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         Coordinates of the center pixel, where ``n_dimensions`` is the
         dimension of the images of the collection.
 
-<<<<<<< HEAD
-    radius : float, default: None
-        The radius of the ball centered in ``center`` inside which
-=======
     radius : float or None, default: ``None``
         The radius of the ball centered in `center` inside which
->>>>>>> 701bcce3ce18b3f1c826006d334472f95790b2b8
         activated pixels are included in the filtration.
 
     metric : string or callable, optional, default: ``'euclidean'``
@@ -218,11 +202,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-<<<<<<< HEAD
-    metric_params : dict, optional, default: ``{}``
-=======
     metric_params : dict or None, optional, default: ``None``
->>>>>>> 701bcce3ce18b3f1c826006d334472f95790b2b8
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
@@ -237,11 +217,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params`.
-<<<<<<< HEAD
-        If `metric_params` is `None`, it is set to the empty dictionary.
-=======
         If `metric_params` is ``None``, it is set to the empty dictionary.
->>>>>>> 701bcce3ce18b3f1c826006d334472f95790b2b8
 
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
@@ -378,21 +354,22 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class DilationFiltration(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of grayscale images
-    from a collection of 2D or 3D binary images.
+    """Filtrations of 2D/3D binary images based on distances to a reference
+    pixel.
 
-    The height filtration assigns to each activated pixel of an image a pixel
-    value corresponding to the distance between the pixel and the hyperplane
-    defined by a direction vector and the first seen edge of the image
-    following that direction. Deactivated pixels are assigned the value of the
-    maximum distance between any pixel of the image and the hyperplane plus
-    one.
+    The dilation filtration assigns to each deactivated pixel of an image a
+    pixel value corresponding to the Manhattan distance between the pixel and
+    its closest activated pixel. The dilation process is iterative and the
+    number of iterations `n_iterations` sets the maximum distance considered.
+    Deactivated pixels further away from activated pixels are assigned the
+    maximum Manhattan distance between two pixels on the image and activated
+    pixels are assigned a value of 0.
 
     Parameters
     ----------
     n_iterations : int or None, optional, default: None
-        Number of iterations of dilation. ``None`` means dilation over
-        the full image.
+        Number of iterations in the dilation process. ``None`` means dilation
+        over the full image.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -401,16 +378,20 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    n_iterations_ : ``2`` or ``3``
-        Dimension of the images. Set in :meth:`fit`.
+    n_iterations_ : int
+        Effective number of iterations in the dilation process. Set in
+        :meth:`fit`.
+
+    max_value_: float
+        Maximum pixel value among all pixels in all images of the collection.
+        Set in :meth:`fit`.
 
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
     """
-
-    _hyperparameters = {'n_iterations_': [int, [1, np.inf]]}
+    _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -419,18 +400,20 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     def _calculate_dilation(self, X):
         Xd = X * 1.
 
-        for iteration in range(1, self.n_iterations + 1):
-            Xtemp = np.asarray([ndi.binary_dilation(Xd[i]) for i in range(Xd.shape[0])])
+        for iteration in range(1, min(self.n_iterations_,
+                                      self.max_value_) + 1):
+            Xtemp = np.asarray([ndi.binary_dilation(Xd[i])
+                                for i in range(Xd.shape[0])])
             Xd += (Xd + Xtemp == 1) * Xtemp * (iteration + 1)
 
         mask_filtered = Xd == 0
         Xd -= 1
-        Xd[mask_filtered] = np.inf
+        Xd[mask_filtered] = self.max_value_
         return Xd
 
     def fit(self, X, y=None):
-        """Calculate `n_iterations_` from a collection of binary images. Then,
-        return the estimator.
+        """Calculate `n_iterations_` and 'max_value_'from a collection of
+        binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -453,18 +436,22 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         X = check_array(X,  ensure_2d=False, allow_nd=True)
 
         if self.n_iterations is None:
-            self.n_iterations = max(X.shape[1:])
+            self.n_iterations_ = int(np.max(X.shape[1:]))
+        else:
+            self.n_iterations_ = self.n_iterations
 
-        validate_params({**self.get_params(), 'n_iterations_': self.n_iterations_},
+        validate_params({**self.get_params(),
+                         'n_iterations_': self.n_iterations_},
                         self._hyperparameters)
+
+        self.max_value_ = np.max(X.shape[1:])
 
         return self
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
         corresponding grayscale image based on the distance of its pixels to
-        the hyperplane defined by the ``direction`` vector and the first seen
-        edge of the images following that ``direction``. Return the collection
+        their closest activated neighboring pixel. Return the collection
         of grayscale images.
 
         Parameters
