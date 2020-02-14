@@ -35,7 +35,7 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - script: |
-      pip install openml pandas
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -86,7 +86,7 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - script: |
-      pip install openml pandas
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -135,7 +135,7 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - script: |
-      pip install openml pandas
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
@@ -205,7 +205,7 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install openml pandas
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -308,7 +308,7 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install openml pandas
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -423,7 +423,7 @@ jobs:
 
   - script: |
       cd examples
-      pip install openml pandas
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
