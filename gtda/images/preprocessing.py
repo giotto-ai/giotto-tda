@@ -208,6 +208,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     """Transformer returning a collection of point clouds that are the
     coordinates in a 2- or 3-dimensional space of the activated pixel of the
     input collection of 2-, respectively 3-dimensional binary images.
+    Deactivated pixels are given infinite coordinates in that space.
 
     Parameters
     ----------
@@ -235,7 +236,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        Xpts = np.stack([self._mesh for _ in range(X.shape[0])]) * 1.0
+        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.0
         Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
         return Xpts
 
@@ -266,7 +267,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         n_dimensions = len(X.shape) - 1
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
-                           for i in axis_order[:.n_dimensions]]
+                           for i in axis_order[:n_dimensions]]
 
         self.mesh_ = np.flip(np.stack(np.meshgrid(*mesh_range_list),
                                       axis=n_dimensions),
@@ -276,7 +277,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each collection of binary images, calculate the corresponding
-        collection of point clouds based on the coordinates of activated pixels.
+        collection of point clouds based on the coordinates of activated
+        pixels.
 
         Parameters
         ----------
