@@ -5,3 +5,6 @@
 	path = gtda/externals/gudhi-devel
 	url = https://github.com/giotto-ai/gudhi-devel
 	branch = giotto
+[submodule "docs"]
+	path = docs
+	url = git@github.com:wreise/gtda-docs.git
