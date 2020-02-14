@@ -21,15 +21,12 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
+      pip install -e ".[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test with pytest and flake8'
@@ -68,14 +65,11 @@ jobs:
       brew update
       brew install boost
     failOnStderr: true
-    displayName: 'Install gcc and boost'
+    displayName: 'Install boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
+      pip install -e ".[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
@@ -120,16 +114,12 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: |
       pip install -e ".[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test with pytest and flake8'
@@ -190,9 +180,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install dist/*.whl
+      pip install dist/*.whl
     failOnStderr: true
     displayName: 'Install the wheels'
 
@@ -267,19 +255,16 @@ jobs:
       brew update
       brew install boost
     failOnStderr: true
-    displayName: 'Install gcc and boost'
+    displayName: 'Install boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
+      pip install -e ".[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test dev install with pytest and flake8'
@@ -384,16 +369,12 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: |
       pip install -e ".[tests, doc]"
     failOnStderr: true
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test dev install with pytest and flake8'
@@ -422,9 +403,9 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      cd examples
       pip install openml pandas
       pip install "papermill==1.2.1"
+      cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
