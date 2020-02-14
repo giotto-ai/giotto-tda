@@ -63,7 +63,10 @@ EXTRAS_REQUIRE = {
         'sphinx-issues',
         'sphinx_rtd_theme',
         'numpydoc'],
-    'examples': ['jupyter']
+    'examples': [
+        'jupyter',
+        'pandas',
+        'openml']
 }
 
 
