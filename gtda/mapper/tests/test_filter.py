@@ -46,8 +46,8 @@ def test_eccentricity_values_with_infinity_norm_equals_max_row_values(X):
     shape=array_shapes(min_dims=2, max_dims=2, min_side=2)
 ))
 def test_entropy_values_for_negative_inputs(X):
-    """Verify the numerical results of entropy (does it have the correct logic),
-    on a collection of **negative** inputs."""
+    """Verify the numerical results of entropy (does it have the correct
+    logic), on a collection of **negative** inputs."""
     entropy = Entropy()
     Xt = entropy.fit_transform(X)
     probs = X / X.sum(axis=1, keepdims=True)
@@ -117,8 +117,8 @@ def test_gaussian_density_values(X):
     unique=True
 ))
 def test_list_feature_union_transform(X):
-    """Check that a ``ListFeatureUnion`` of two projections gives the same result
-    as stacking the projections."""
+    """Check that a ``ListFeatureUnion`` of two projections gives the same
+    result as stacking the projections."""
     list_dim = [0, 1]
     p_1_2 = ListFeatureUnion([("proj" + str(k), Projection(columns=k))
                               for k in list_dim])
@@ -141,8 +141,8 @@ def test_list_feature_union_transform(X):
     unique=True
 ))
 def test_list_feature_union_drops(X):
-    """Check the the drop of ``ListFeatureUnion`` keeps the correct
-    number of samples"""
+    """Check the the drop of ``ListFeatureUnion`` keeps the correct number
+    of samples"""
     drop_0_1 = ListFeatureUnion([('drop' + str(k), 'drop')
                                  for k in range(2)])
     x_01_a = drop_0_1.fit_transform(X)
