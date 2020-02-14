@@ -29,7 +29,7 @@ cd /io
 pip install -e ".[dev]"
 
 # Test dev install with pytest and flake8
-pytest --cov gtda --cov-report xml
+pytest gtda --cov --cov-report xml
 flake8 --exit-zero /io/
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
