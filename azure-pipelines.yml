@@ -20,21 +20,19 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
+      pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
       set -e
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     displayName: 'Test with pytest and flake8'
 
   - script: |
+      set -e
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
@@ -42,7 +40,6 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
-    failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
 
 
@@ -65,18 +62,15 @@ jobs:
       versionSpec: '$(python.version)'
 
   - script: |
+      set -e
       brew update
       brew install boost
-    failOnStderr: true
-    displayName: 'Install gcc and boost'
+    displayName: 'Install boost'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
+      pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
@@ -119,26 +113,24 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - script: |
+  - bash: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: |
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - bash: |
       set -e
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     displayName: 'Test with pytest and flake8'
 
-  - script: |
+  - bash: |
+      set -e
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
 
 
@@ -187,10 +179,9 @@ jobs:
     displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install dist/*.whl
+      pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -266,19 +257,18 @@ jobs:
       set -e
       brew update
       brew install boost
-    displayName: 'Install gcc and boost'
+    displayName: 'Install boost'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
+      pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      set -e
+      pytest gtda --cov --cov-report xml
       flake8
-    failOnStderr: true
     displayName: 'Test dev install with pytest and flake8'
 
   - script: |
@@ -379,17 +369,15 @@ jobs:
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
-  - script: |
+  - bash: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: |
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
   - bash: |
       set -e
-      pytest --cov gtda --cov-report xml
+      pytest gtda --cov --cov-report xml
       flake8
     displayName: 'Test dev install with pytest and flake8'
 
@@ -417,12 +405,12 @@ jobs:
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
     displayName: 'Test the wheels with pytest'
 
-  - script: |
-      cd examples
+  - bash: |
+      set -e
       pip install openml pandas
       pip install "papermill==1.2.1"
+      cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -441,6 +429,5 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
