@@ -210,6 +210,12 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     input collection of 2-, respectively 3-dimensional binary images.
     Deactivated pixels are given infinite coordinates in that space.
 
+    Notes
+    -----
+    This transformer is meant to transform a collection of imagea to a point
+    cloud so that collection of point clouds-based persistent homology module
+    can be applied.
+
     Parameters
     ----------
     n_jobs : int or None, optional, default: ``None``
