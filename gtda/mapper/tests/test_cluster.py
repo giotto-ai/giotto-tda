@@ -141,7 +141,11 @@ def test_precomputed_distances(inp):
     preds = fh.fit_predict(pts)
 
     indices_cluster = set(preds)
-    def get_set_of_clusters(preds):
-        return set([frozenset(np.where(preds==c)[0]) for c in indices_cluster])
+    def get_partition_from_preds(preds):
+        """From a vector of predictions (labels), get a set of frozensets,
+        where each frozenset represents a cluster, and has the indices of rows
+        of its elements."""
+        return set([frozenset(np.where(preds == c)[0]) for c in indices_cluster])
 
-    assert(get_set_of_clusters(preds) == get_set_of_clusters(preds_mat))
+    assert(get_partition_from_preds(preds)
+           == get_partition_from_preds(preds_mat))
