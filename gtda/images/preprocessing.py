@@ -201,3 +201,117 @@ class Inverter(BaseEstimator, TransformerMixin):
         Xt = np.concatenate(Xt)
 
         return Xt
+
+
+@adapt_fit_transform_docs
+class Padder(BaseEstimator, TransformerMixin):
+    """Transformer returning a collection of binary images that are the padded
+    version od the 2D or 3D binary images of an input collection.
+
+    Parameters
+    ----------
+    paddings : int ndarray of shape (padding_x, padding_y [, padding_z]) or
+        None, optional, default: ``None``
+        Number of pixels to pad the images along each axis and on both side of
+        the images. By default, the a frame of a single pixel width is added
+        around the image.
+
+    activated : bool, optional, default: ``False``
+        If ``True``, the padded pixels are activated. If ``False``, they are
+        deactivated.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    paddings_ : int ndarray of shape (padding_x, padding_y [, padding_z])
+       Effective padding along each of the axis. Set in :meth:`fit`.
+
+    """
+    _hyperparameters = {'paddings_': [np.ndarray, (int, None)],
+                        'activated': [bool, [True, False]]}
+
+    def __init__(self, paddings=None, activated=False, n_jobs=None):
+        self.paddings = paddings
+        self.activated = activated
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Calculate `paddings_` from a collection of binary images. Then,
+        return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        if self.paddings is None:
+            self.paddings_ = np.ones(len(X.shape[1:]), dtype=np.int)
+        else:
+            self.paddings_ = self.paddings
+
+        n_dimensions = len(X.shape) - 1
+
+        validate_params({**self.get_params(),
+                         'paddings_': self.paddings_,
+                         'paddings_dim': len(self.paddings_)},
+                        {**self._hyperparameters,
+                         'paddings_dim': [int, [n_dimensions]]})
+
+        check_array(X, ensure_2d=False, allow_nd=True)
+
+        self._pad_width = ((0, 0),
+                           *[(self.paddings_[axis], self.paddings_[axis])
+                             for axis in range(n_dimensions)])
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each binary image in the collection `X`, adds a padding.
+        Return the collection of negated binary images.
+
+        Parameters
+        ----------
+        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray, shape (n_samples, n_pixels_x + padding_x,
+            n_pixels_y + padding_y [, n_pixels_z + padding_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D binary image.
+
+        """
+        check_is_fitted(self)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
+            np.pad)(X[s], pad_width=self._pad_width,
+                    constant_values=self.activated)
+            for s in gen_even_slices(X.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        return Xt

@@ -3,12 +3,13 @@ that can be used to apply Topological Data Analysis to images.
 """
 # License: GNU AGPLv3
 
-from .preprocessing import Binarizer, Inverter
+from .preprocessing import Binarizer, Inverter, Padder
 from .filtrations import HeightFiltration, RadialFiltration, DilationFiltration
 
 __all__ = [
     'Binarizer',
     'Inverter',
+    'Padder',
     'HeightFiltration',
     'RadialFiltration',
     'DilationFiltration',
