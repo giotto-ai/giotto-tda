@@ -11,8 +11,9 @@ GITDIR    = ../docs
 
 togit:
 	@cp -a build/html/ "$(GITDIR)"
+# prevent the gitdirectory from being cleaned
 cleangit:
-	@rm "$(GITDIR)"
+	@ls "$(GITDIR)"BLA
 
 github:
 	@make html

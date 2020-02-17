@@ -36,7 +36,7 @@ release = __version__
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'numpydoc',
+    # 'numpydoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -44,6 +44,7 @@ extensions = [
     # 'sphinx_gallery.gen_gallery',
     'sphinx_issues',
     'sphinx_rtd_theme',
+    'sphinx.ext.napoleon'
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
 
