@@ -3,10 +3,10 @@
 
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.images import Binarizer, Inverter
+from gtda.images import Binarizer, Inverter, Padder
 
 images_2D = np.stack([
     np.ones((7, 8)),
@@ -67,3 +67,25 @@ def test_inverter_transform(images, expected):
 
     assert_almost_equal(inverter.fit_transform(images),
                         expected)
+
+
+def test_padder_not_fitted():
+    padder = Padder()
+    with pytest.raises(NotFittedError):
+        padder.transform(images_2D)
+
+
+@pytest.mark.parametrize("images, paddings, ",
+                         [(images_2D, np.array([1, 1], dtype=np.int)),
+                          (images_2D, None),
+                          (images_3D, np.array([2, 2, 2], dtype=np.int))])
+def test_padder_transform(images, paddings):
+    padder = Padder(paddings=paddings)
+
+    if paddings is None:
+        expected_shape = np.asarray(images.shape[1:]) + 2
+    else:
+        expected_shape = images.shape[1:] + 2 * paddings
+
+    assert_equal(padder.fit_transform(images).shape[1:],
+                 expected_shape)
