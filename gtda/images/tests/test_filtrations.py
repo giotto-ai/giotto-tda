@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.images import HeightFiltration
+from gtda.images import HeightFiltration, RadialFiltration, DilationFiltration
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],
@@ -73,4 +73,97 @@ def test_height_transform(direction, images, expected):
     height = HeightFiltration(direction=direction)
 
     assert_almost_equal(height.fit_transform(images),
+                        expected)
+
+
+def test_radial_not_fitted():
+    radial = RadialFiltration()
+    with pytest.raises(NotFittedError):
+        radial.transform(images_2D)
+
+
+def test_radial_errors():
+    center = 'a'
+    radial = RadialFiltration(center=center)
+    with pytest.raises(TypeError):
+        radial.fit(images_2D)
+
+
+images_2D_radial = np.array(
+    [[[0., 1., 2., 3.],
+      [1., 1.41421356, 2.23606798, 3.16227766],
+      [2., 2.23606798, 2.82842712, 3.60555128]],
+     [[0., 1., 4.60555128, 4.60555128],
+      [1., 1.41421356, 4.60555128, 4.60555128],
+      [2., 2.23606798, 4.60555128, 4.60555128]],
+     [[4.60555128, 4.60555128, 4.60555128, 4.60555128],
+      [4.60555128, 4.60555128, 4.60555128, 4.60555128],
+      [4.60555128, 4.60555128, 4.60555128, 4.60555128]]])
+
+
+images_3D_radial = np.array(
+    [[[[1.41421356, 1.], [1., 0.],
+       [1.41421356, 1.], [2.23606798, 2.]],
+      [[1.73205081, 1.41421356], [1.41421356, 1.],
+       [1.73205081, 1.41421356], [2.44948974, 2.23606798]],
+      [[2.44948974, 2.23606798], [2.23606798, 2.],
+       [2.44948974, 2.23606798], [3., 2.82842712]]],
+     [[[1.41421356, 1.], [1., 0.], [4., 4.], [4., 4.]],
+      [[1.73205081, 1.41421356], [1.41421356, 1.], [4., 4.], [4., 4.]],
+      [[2.44948974, 2.23606798], [2.23606798, 2.], [4., 4.], [4., 4.]]],
+     [[[4., 4.], [4., 4.],  [4., 4.], [4., 4.]],
+      [[4., 4.], [4., 4.], [4., 4.], [4., 4.]],
+      [[4., 4.], [4., 4.], [4., 4.], [4., 4.]]]])
+
+
+@pytest.mark.parametrize("center, images, expected",
+                         [(None, images_2D, images_2D_radial),
+                          ([0, 0], images_2D, images_2D_radial),
+                          ([1, 0, 1], images_3D, images_3D_radial)])
+def test_radial_transform(center, images, expected):
+    radial = RadialFiltration(center=center)
+
+    assert_almost_equal(radial.fit_transform(images),
+                        expected)
+
+
+def test_dilation_not_fitted():
+    dilation = DilationFiltration()
+    with pytest.raises(NotFittedError):
+        dilation.transform(images_2D)
+
+
+def test_dilation_errors():
+    n_iterations = 'a'
+    dilation = DilationFiltration(n_iterations=n_iterations)
+    with pytest.raises(TypeError):
+        dilation.fit(images_2D)
+
+
+images_2D_dilation = np.array(
+    [[[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]],
+     [[0., 0., 1., 2.], [0., 0., 1., 2.], [0., 0., 1., 2.]],
+     [[7., 7., 7., 7.], [7., 7., 7., 7.], [7., 7., 7., 7.]]])
+
+
+images_3D_dilation = np.array(
+    [[[[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]]],
+     [[[0., 0.], [0., 0.], [1., 1.], [9., 9.]],
+      [[0., 0.], [0., 0.], [1., 1.], [9., 9.]],
+      [[0., 0.], [0., 0.], [1., 1.], [9., 9.]]],
+     [[[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]]]])
+
+
+@pytest.mark.parametrize("n_iterations, images, expected",
+                         [(None, images_2D, images_2D_dilation),
+                          (100, images_2D, images_2D_dilation),
+                          (1, images_3D, images_3D_dilation)])
+def test_dilation_transform(n_iterations, images, expected):
+    dilation = DilationFiltration(n_iterations=n_iterations)
+    print(dilation.fit_transform(images))
+    assert_almost_equal(dilation.fit_transform(images),
                         expected)
