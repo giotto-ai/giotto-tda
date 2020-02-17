@@ -683,7 +683,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
-            n_bins)
+             n_bins)
             Raster images: one image per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -788,20 +788,25 @@ class Silhouette(BaseEstimator, TransformerMixin):
         :attr:`homology_dimensions_` and, for each dimension separately,
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
+        
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
+
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features, 3)
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+
         y : None
             There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
+
         Returns
         -------
         self : object
+
         """
         X = check_diagram(X)
         validate_params(self.get_params(), self._hyperparameters)
