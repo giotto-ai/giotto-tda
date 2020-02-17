@@ -170,7 +170,7 @@ def validate_metric_params(metric, metric_params):
 
     for param in metric_params.keys():
         if param not in available_metric_params[metric]:
-            raise ValueError("{} in param_metric is not an available"
-                             " parameter. Available metric_params."
+            raise ValueError("{} in metric_param is not an available"
+                             " parameter. Available metric_params"
                              " are {}".format(param,
                                               available_metric_params[metric]))
