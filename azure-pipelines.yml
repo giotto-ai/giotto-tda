@@ -68,8 +68,7 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      python -m pip install --upgrade pip setuptools
-      sudo -H pip install -e ".[examples]"
+      pip install pandas openml
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
