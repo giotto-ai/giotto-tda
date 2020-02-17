@@ -13,7 +13,7 @@ from ._utils import _subdiagrams, _sample_image
 
 
 def silhouettes(diagrams, sampling, order, **kwargs):
-    """Input: a batch of persistence diagrams with a oneD sampling"""
+    """Input: a batch of persistence diagrams with a 1D sampling"""
     sampling = np.transpose(sampling, axes=(1, 2, 0))
     weights = np.diff(diagrams, axis=2)[:, :, 0:1]**order
     total_weights = np.sum(weights, axis=1)
