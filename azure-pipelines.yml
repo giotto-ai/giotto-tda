@@ -32,7 +32,7 @@ jobs:
     displayName: 'Test with pytest and flake8'
 
   - script: |
-      sudo pip install -e ".[examples]"
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -176,7 +176,7 @@ jobs:
       failOnStderr: false
     env:
       python_ver: $(python_ver)
-    displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
+    displayName: 'Run docker container, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
       python -m pip install --upgrade pip
@@ -193,7 +193,8 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      sudo pip install -e ".[examples]"
+      cd /io
+      pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
