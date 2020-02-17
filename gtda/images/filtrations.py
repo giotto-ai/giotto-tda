@@ -354,16 +354,20 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class DilationFiltration(BaseEstimator, TransformerMixin):
-    """Filtrations of 2D/3D binary images based on distances to activated
-    pixels.
+    """Filtrations of 2D/3D binary images based on the dilation of activated
+    regions.
 
-    The dilation filtration assigns to each deactivated pixel of an image a
-    pixel value corresponding to the Manhattan distance between the pixel and
-    its closest activated pixel. The dilation process is iterative and the
-    number of iterations `n_iterations` sets the maximum distance considered.
-    Deactivated pixels further away from activated pixels are assigned the
-    maximum Manhattan distance between two pixels on the image and activated
-    pixels are assigned a value of 0.
+    This filtration assigns to each pixel in an image a grayscale value
+    calculated as follows. If the minimum Manhattan distance between the
+    pixel and any activated pixel in the image is less than or equal to
+    the parameter `n_iterations`, the assigned value is this distance –
+    in particular, activated pixels are assigned a value of 0.
+    Otherwise, the assigned grayscale value is the sum of the lengths
+    along all axes of the image – equivalently, it is the maximum
+    Manhattan distance between any two pixels in the image. The name of
+    this filtration comes from the fact that these values can be computed
+    by iteratively dilating activated regions, thickening them by a total
+    amount `n_iterations`.
 
     Parameters
     ----------
@@ -404,7 +408,11 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
                                       self.max_value_) + 1):
             Xtemp = np.asarray([ndi.binary_dilation(Xd[i])
                                 for i in range(Xd.shape[0])])
-            Xd += (Xd + Xtemp == 1) * Xtemp * (iteration + 1)
+            Xnew = (Xd + Xtemp) == 1
+            if np.any(Xnew):
+                Xd[Xnew] = iteration + 1
+            else:
+                break
 
         mask_filtered = Xd == 0
         Xd -= 1
@@ -435,16 +443,16 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         """
         X = check_array(X,  ensure_2d=False, allow_nd=True)
 
+        self.max_value_ = np.sum(X.shape[1:])
+
         if self.n_iterations is None:
-            self.n_iterations_ = int(np.max(X.shape[1:]))
+            self.n_iterations_ = int(self.max_value_)
         else:
             self.n_iterations_ = self.n_iterations
 
         validate_params({**self.get_params(),
                          'n_iterations_': self.n_iterations_},
                         self._hyperparameters)
-
-        self.max_value_ = np.max(X.shape[1:])
 
         return self
 
