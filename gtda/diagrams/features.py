@@ -788,7 +788,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
         :attr:`homology_dimensions_` and, for each dimension separately,
         store evenly sample filtration parameter values in :attr:`samplings_`.
         Then, return the estimator.
-        
+
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
