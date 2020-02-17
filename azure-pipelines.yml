@@ -1,168 +1,8 @@
-# These jobs are triggered automatically and they test the code and the examples.
-
+# These jobs are triggered automatically and they test code, examples, and wheels.
+# Additional checks can be manually triggered
 jobs:
-- job: 'test_ubuntu1604'
-  condition: eq(variables['build_check'], 'false')
-  pool:
-    vmImage: 'ubuntu-16.04'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-  variables:
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - task: Cache@2
-    inputs:
-      key: '"ccache-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
-      path: $(CCACHE_DIR)
-    displayName: ccache
-
-  - script: |
-      sudo apt-get update
-      sudo apt-get install -y ccache
-    failOnStderr: true
-    displayName: 'Install ccache'
-
-  - script: |
-      source .azure-ci/setup_ccache.sh
-      python -m pip install --upgrade pip setuptools
-      pip install -e ".[dev]"
-      ccache -s
-    failOnStderr: true
-    displayName: 'Install dev environment'
-
-  - script: |
-      pytest gtda --cov --cov-report xml
-      flake8
-    failOnStderr: true
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
-      cd examples
-      for n in *.ipynb
-      do
-        papermill --start_timeout 2000 $n -
-      done
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-
-- job: 'test_macOS1014'
-  condition: eq(variables['build_check'], 'false')
-  pool:
-    vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-  variables:
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - task: Cache@2
-    inputs:
-      key: '"ccache-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
-      path: $(CCACHE_DIR)
-    displayName: ccache
-
-  - script: |
-      brew update
-      brew install boost ccache
-    failOnStderr: true
-    displayName: 'Install boost and ccache'
-
-  - script: |
-      source .azure-ci/setup_ccache.sh
-      python -m pip install --upgrade pip setuptools
-      pip install -e ".[dev]"
-      ccache -s
-    failOnStderr: true
-    displayName: 'Install dev environment'
-
-  - script: |
-      pytest gtda --cov --cov-report xml
-      flake8
-    failOnStderr: true
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
-      cd examples
-      for n in *.ipynb
-      do
-        papermill --start_timeout 2000 $n -
-      done
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-
-- job: 'test_win2016'
-  condition: eq(variables['build_check'], 'false')
-  pool:
-    vmImage: 'vs2017-win2016'
-  strategy:
-    matrix:
-      Python36:
-        python_ver: '36'
-        python.version: '3.6'
-      Python37:
-        python_ver: '37'
-        python.version: '3.7'
-      Python38:
-        python_ver: '38'
-        python.version: '3.8'
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install -e ".[dev]"
-    failOnStderr: true
-    displayName: 'Install dev environment'
-
-  - script: |
-      pytest gtda --cov --cov-report xml
-      flake8
-    failOnStderr: true
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
-      cd examples
-      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-
-# These jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -260,7 +100,6 @@ jobs:
 
 
 - job: 'macOS1014'
-  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'macOS-10.14'
   strategy:
@@ -385,7 +224,6 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
