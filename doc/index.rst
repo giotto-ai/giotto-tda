@@ -3,9 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
 Welcome to giotto-tda's API reference!
 ======================================
 
+Checkout the :ref:`readme` and :ref:`contrib`.
 
 :mod:`gtda.mapper`: Mapper
 ==========================
