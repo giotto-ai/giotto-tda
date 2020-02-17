@@ -728,7 +728,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
      Parameters
     ----------
-    order: float, optional, default: ``1``
+    order: float, optional, default: ``1.``
         The order of persistence for the weighted average of fibres.
         Corresponds to :math:`p` above.
 
