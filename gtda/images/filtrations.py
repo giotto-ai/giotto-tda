@@ -490,3 +490,143 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         Xt = np.concatenate(Xt)
 
         return Xt
+
+
+@adapt_fit_transform_docs
+class ErosionFiltration(BaseEstimator, TransformerMixin):
+    """Filtrations of 2D/3D binary images based on the erosion of activated
+    regions.
+
+    This filtration assigns to each pixel in an image a grayscale value
+    calculated as follows. If the minimum Manhattan distance between the
+    pixel and any activated pixel in the image is less than or equal to
+    the parameter `n_iterations`, the assigned value is this distance –
+    in particular, activated pixels are assigned a value of 0.
+    Otherwise, the assigned grayscale value is the sum of the lengths
+    along all axes of the image – equivalently, it is the maximum
+    Manhattan distance between any two pixels in the image. The name of
+    this filtration comes from the fact that these values can be computed
+    by iteratively dilating activated regions, thickening them by a total
+    amount `n_iterations`.
+
+    Parameters
+    ----------
+    n_iterations : int or None, optional, default: ``None``
+        Number of iterations in the erosion process. ``None`` means erosion
+        over the full image.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    n_iterations_ : int
+        Effective number of iterations in the erosion process. Set in
+        :meth:`fit`.
+
+    max_value_: float
+        Maximum pixel value among all pixels in all images of the collection.
+        Set in :meth:`fit`.
+
+    See also
+    --------
+    gtda.homology.CubicalPersistence, Binarizer
+
+    """
+    _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
+
+    def __init__(self, n_iterations=None, n_jobs=None):
+        self.n_iterations = n_iterations
+        self.n_jobs = n_jobs
+
+    def _calculate_erosion(self, X):
+        Xd = np.logical_not(X) * 1.
+
+        for iteration in range(1, min(self.n_iterations_,
+                                      self.max_value_) + 1):
+            Xtemp = np.asarray([ndi.binary_dilation(Xd[i])
+                                for i in range(Xd.shape[0])])
+            Xnew = (Xd + Xtemp) == 1
+            if np.any(Xnew):
+                Xd[Xnew] = iteration + 1
+            else:
+                break
+
+        mask_filtered = Xd == 0
+        Xd -= 1
+        Xd[mask_filtered] = self.max_value_
+        return Xd
+
+    def fit(self, X, y=None):
+        """Calculate `n_iterations_` and 'max_value_'from a collection of
+        binary images. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_array(X,  ensure_2d=False, allow_nd=True)
+
+        self.max_value_ = np.sum(X.shape[1:])
+
+        if self.n_iterations is None:
+            self.n_iterations_ = int(self.max_value_)
+        else:
+            self.n_iterations_ = self.n_iterations
+
+        validate_params({**self.get_params(),
+                         'n_iterations_': self.n_iterations_},
+                        self._hyperparameters)
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each binary image in the collection `X`, calculate a
+        corresponding grayscale image based on the distance of its pixels to
+        their closest activated neighboring pixel. Return the collection
+        of grayscale images.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_pixels_x,
+            n_pixels_y [, n_pixels_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D grayscale image.
+
+        """
+        check_is_fitted(self)
+        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._calculate_erosion)(X[s])
+            for s in gen_even_slices(Xt.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        return Xt
