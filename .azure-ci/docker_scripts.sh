@@ -1,14 +1,20 @@
 #!/bin/bash
-
 set -x
+echo "Start manylinux2010 docker build"
 
 # Upgrade pip and setuptools. TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
-export PATH=${PYTHON_PATH}/bin:${PATH}
+export PATH="${PYTHON_PATH}/bin:${PATH}"
 pip install --upgrade pip==19.3.1 setuptools
 
 # Install CMake
 pip install cmake
+
+# Setup ccache
+yum install -y ccache
+source /io/.azure-ci/setup_ccache.sh
+
+ccache -s
 
 # Install boost
 yum install -y wget tar
@@ -17,8 +23,10 @@ tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install
+./b2 install -j3
 cd ..
+
+ccache -s
 
 # Help CMake find boost
 export BOOST_ROOT=/boost
@@ -29,7 +37,7 @@ cd /io
 pip install -e ".[tests, doc]"
 
 # Test dev install with pytest and flake8
-pytest --cov gtda --cov-report xml
+pytest gtda --cov --cov-report xml
 flake8 --exit-zero /io/
 
 # Uninstall giotto-tda/giotto-tda-nightly dev

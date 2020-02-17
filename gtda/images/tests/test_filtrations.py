@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.images import HeightFiltration, RadialFiltration
+from gtda.images import HeightFiltration, RadialFiltration, DilationFiltration
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],
@@ -123,7 +123,47 @@ images_3D_radial = np.array(
 def test_radial_transform(center, images, expected):
     radial = RadialFiltration(center=center)
 
-    print(radial.fit_transform(images))
-
     assert_almost_equal(radial.fit_transform(images),
+                        expected)
+
+
+def test_dilation_not_fitted():
+    dilation = DilationFiltration()
+    with pytest.raises(NotFittedError):
+        dilation.transform(images_2D)
+
+
+def test_dilation_errors():
+    n_iterations = 'a'
+    dilation = DilationFiltration(n_iterations=n_iterations)
+    with pytest.raises(TypeError):
+        dilation.fit(images_2D)
+
+
+images_2D_dilation = np.array(
+    [[[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]],
+     [[0., 0., 1., 2.], [0., 0., 1., 2.], [0., 0., 1., 2.]],
+     [[7., 7., 7., 7.], [7., 7., 7., 7.], [7., 7., 7., 7.]]])
+
+
+images_3D_dilation = np.array(
+    [[[[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]]],
+     [[[0., 0.], [0., 0.], [1., 1.], [9., 9.]],
+      [[0., 0.], [0., 0.], [1., 1.], [9., 9.]],
+      [[0., 0.], [0., 0.], [1., 1.], [9., 9.]]],
+     [[[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]]]])
+
+
+@pytest.mark.parametrize("n_iterations, images, expected",
+                         [(None, images_2D, images_2D_dilation),
+                          (100, images_2D, images_2D_dilation),
+                          (1, images_3D, images_3D_dilation)])
+def test_dilation_transform(n_iterations, images, expected):
+    dilation = DilationFiltration(n_iterations=n_iterations)
+    print(dilation.fit_transform(images))
+    assert_almost_equal(dilation.fit_transform(images),
                         expected)
