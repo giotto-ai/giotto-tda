@@ -1,5 +1,6 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+jobs:
 
 - job: 'manylinux2010'
   pool:
