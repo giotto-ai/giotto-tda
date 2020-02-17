@@ -120,3 +120,9 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['source/_static/style.css'] # []  # ['_static']
 
+
+#scv_whitelist_branches = ('master', 'w_persistent_image', 'w_cubical', 'w-p-igraph-dep',
+#                          'time_series_tests', 'test_features', 'silhouette')
+#scv_whitelist_tags = ('v0.1a.0', 'v0.1.0', 'v0.1.1', 'v0.1.2')
+scv_whitelist_tags = ('v0.1.4', 'v0.1.3')
+scv_whitelist_branches = ('ghpages', )
