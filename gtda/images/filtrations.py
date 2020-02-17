@@ -499,14 +499,14 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
     This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
-    pixel and any activated pixel in the image is less than or equal to
+    pixel and any deactivated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
-    in particular, activated pixels are assigned a value of 0.
+    in particular, deactivated pixels are assigned a value of 0.
     Otherwise, the assigned grayscale value is the sum of the lengths
     along all axes of the image – equivalently, it is the maximum
     Manhattan distance between any two pixels in the image. The name of
     this filtration comes from the fact that these values can be computed
-    by iteratively dilating activated regions, thickening them by a total
+    by iteratively eroding activated regions, shrinking them by a total
     amount `n_iterations`.
 
     Parameters
