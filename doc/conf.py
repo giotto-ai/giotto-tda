@@ -41,7 +41,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
-    # 'sphinx_gallery.gen_gallery',
+    'sphinx_gallery.gen_gallery',
     'sphinx_issues',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
@@ -52,6 +52,11 @@ extensions = [
 intersphinx_mapping = {
     'sklearn': ('http://scikit-learn.org/stable', None),
     'plotly': ('https://plot.ly/python-api-reference/', None)
+}
+
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples/',   # path to your example scripts
+    'gallery_dirs': 'gallery',  # path to where to save gallery generated output
 }
 
 # this is needed for some reason...
@@ -115,6 +120,11 @@ pygments_style = 'sphinx'
 #
 #html_theme = 'nature'
 html_theme = "sphinx_rtd_theme"
+
+html_theme_options = {
+    'collapse_navigation': True,
+    'sticky_navigation': True
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

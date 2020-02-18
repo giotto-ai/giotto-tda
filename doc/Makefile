@@ -8,6 +8,7 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = build
 GITDIR    = ../docs
+EXAMPLESDIR  = ../examples
 
 togit:
 	@cp -a build/html/ "$(GITDIR)"
@@ -24,12 +25,16 @@ theory:
 all-gh:
 	@make clean
 	@make theory
+	@make sphinx-gal
 	@make github
 
 gh-commit:
 	@cd "$(GITDIR)"; git add *.html generated/*.html;\
 	git add objects.inv; git add searchindex.js; \ git add _sources/*.txt; git add _sources/theory/*.txt; git add theory/*.html; \
 	git commit -m "Update docs"; git push origin
+
+sphinx-gal:
+	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done
 
 # Put it first so that "make" without argument is like "make help".
 help:

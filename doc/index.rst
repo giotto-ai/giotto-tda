@@ -7,7 +7,11 @@
 Welcome to giotto-tda's API reference!
 ======================================
 
-Checkout the :ref:`readme`, :ref:`contrib` and the :ref:`theory`.
+Checkout the following resources:
+ * :ref:`readme`,
+ * :ref:`contrib`,
+ * :ref:`theory`,
+ * :doc:`gallery/index`
 
 :mod:`gtda.mapper`: Mapper
 ==========================
