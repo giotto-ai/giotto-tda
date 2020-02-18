@@ -27,9 +27,9 @@ all-gh:
 	@make github
 
 gh-commit:
-	@cd "$(GITDIR)"; git add *.html generated/*.html; \
-git add objects.inv; git add searchindex.js; \ git add _sources/*.txt; git add theory/*.html;
-git commit -m "Update docs"; git push origin
+	@cd "$(GITDIR)"; git add *.html generated/*.html;\
+	git add objects.inv; git add searchindex.js; \ git add _sources/*.txt; git add _sources/theory/*.txt; git add theory/*.html; \
+	git commit -m "Update docs"; git push origin
 
 # Put it first so that "make" without argument is like "make help".
 help:
