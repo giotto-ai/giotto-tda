@@ -70,14 +70,13 @@ EXTRAS_REQUIRE = {
 }
 
 
-def combine_requirements(new_key, base_keys):
-    EXTRAS_REQUIRE[new_key] = list(
+def combine_requirements(base_keys):
+    return list(
         set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
 
 
-combine_requirements(
-    "dev", [k for k in EXTRAS_REQUIRE if k != "examples"]
-)
+EXTRAS_REQUIRE["dev"] = combine_requirements(
+    [k for k in EXTRAS_REQUIRE if k != "examples"])
 
 
 class CMakeExtension(Extension):
