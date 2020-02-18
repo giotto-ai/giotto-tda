@@ -29,7 +29,7 @@ all-gh:
 gh-commit:
 	@cd "$(GITDIR)"; git add *.html generated/*.html;\
 	git add objects.inv; git add searchindex.js; \ git add _sources/*.txt; git add _sources/theory/*.txt; git add theory/*.html; \
-	git commit -m "Update docs"; git push origin
+	git add gallery/*.html; git add _images/*.png; git add _sources/gallery/*.txt; git commit -m "Update docs"; git push origin
 
 sphinx-gal:
 	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done
