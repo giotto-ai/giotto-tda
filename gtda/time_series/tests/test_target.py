@@ -51,4 +51,4 @@ def test_labeller_invalid_percentage():
     labeller = Labeller(width=5, func=np.max, func_params={},
                         percentiles=[101], n_steps_future=2)
     with pytest.raises(ValueError):
-        labeller.fit_transform_resample([], [])
+        labeller.fit_transform_resample(X, signal)

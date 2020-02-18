@@ -45,15 +45,15 @@ def test_inputs_arrayStruc_V():
 # Test for the wrong metric value
 def test_metric_V():
     with pytest.raises(ValueError, match="No metric called"):
-        validate_metric_params('bottleeck', metric_params={
-            'n_values': 200, 'delta': 0.01})
+        validate_metric_params('blah', metric_params={
+            'n_bins': 200, 'delta': 0.01})
 
 
 # Test for the wrong n_values type
 def test_n_values_T():
     with pytest.raises(TypeError, match=" in params_metric is of type "):
         validate_metric_params('landscape',
-                               metric_params={'n_values': 'a',
+                               metric_params={'n_bins': 'a',
                                               'delta': 0.01})
 
 
@@ -61,7 +61,7 @@ def test_n_values_T():
 def test_n_values_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('landscape',
-                               metric_params={'n_values': -2,
+                               metric_params={'n_bins': -2,
                                               'delta': 0.01})
 
 
@@ -69,7 +69,7 @@ def test_n_values_V():
 def test_delta_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('bottleneck',
-                               metric_params={'n_values': 200,
+                               metric_params={'n_bins': 200,
                                               'delta': -1})
 
 
@@ -77,7 +77,7 @@ def test_delta_V():
 def test_delta_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('bottleneck',
-                               metric_params={'n_values': 200,
+                               metric_params={'n_bins': 200,
                                               'delta': 'a'})
 
 
@@ -85,30 +85,30 @@ def test_delta_T():
 def test_order_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
-                               metric_params={'n_values': 200,
-                                              'order': -1})
+                               metric_params={'n_bins': 200,
+                                              'p': -1})
 
 
 # Test for the wrong order type
 def test_order_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
         validate_metric_params('heat',
-                               metric_params={'n_values': 200,
-                                              'order': 'a'})
+                               metric_params={'n_bins': 200,
+                                              'p': 'a'})
 
 
 # Test for the wrong sigma value
 def test_sigma_V():
     with pytest.raises(ValueError, match=" in param_metric should be between"):
         validate_metric_params('heat',
-                               metric_params={'n_values': 200,
+                               metric_params={'n_bins': 200,
                                               'sigma': -1})
 
 
 # Test for the wrong sigma type
 def test_sigma_T():
     with pytest.raises(TypeError, match=" in params_metric is of type"):
-        validate_metric_params('heat', metric_params={'n_values': 200,
+        validate_metric_params('heat', metric_params={'n_bins': 200,
                                                       'sigma': 'a'})
 
 
