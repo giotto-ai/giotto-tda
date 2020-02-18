@@ -267,7 +267,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         -------
         self : object
 
-
         """
         X = check_array(X,  ensure_2d=False, allow_nd=True)
 
@@ -303,8 +302,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
             n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
             point cloud in a `n_dimensions` dimensional space.
-        """
 
+        """
         check_is_fitted(self)
         Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
 
