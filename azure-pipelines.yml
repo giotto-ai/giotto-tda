@@ -52,6 +52,7 @@ jobs:
     displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip
       pip install dist/*.whl
     displayName: 'Install the wheels'
@@ -150,7 +151,6 @@ jobs:
       set -e
       pytest gtda --cov --cov-report xml
       flake8
-    failOnStderr: true
     displayName: 'Test dev install with pytest and flake8'
 
   - script: |
@@ -250,7 +250,6 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
-      set -e
       python -m pip install --upgrade pip setuptools
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
@@ -284,12 +283,12 @@ jobs:
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
     displayName: 'Test the wheels with pytest'
 
-  - script: |
+  - bash: |
+      set -e
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
     condition: eq(variables['notebooks_check'], 'true')
     displayName: 'Test the wheels on jupyter notebooks with papermill'
 
@@ -309,6 +308,5 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
