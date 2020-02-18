@@ -205,9 +205,10 @@ class Inverter(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ImageToPointCloud(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of point clouds that are the
-    coordinates in a 2- or 3-dimensional space of the activated pixel of the
-    input collection of 2-, respectively 3-dimensional binary images.
+    """Transformer returning a collection of point clouds corresponding to the
+    coordinates of the activated pixels of the 2D or 3D binary images of an
+    input collection.
+
     Deactivated pixels are given infinite coordinates in that space.
 
     Notes
