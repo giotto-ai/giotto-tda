@@ -15,10 +15,10 @@ from ._utils import _subdiagrams, _sample_image
 def silhouettes(diagrams, sampling, order, **kwargs):
     """Input: a batch of persistence diagrams with a 1D sampling"""
     sampling = np.transpose(sampling, axes=(1, 2, 0))
-    weights = np.diff(diagrams, axis=2)[:, :, 0:1]**order
+    weights = np.diff(diagrams, axis=2)[:, :, [0]]**order
     total_weights = np.sum(weights, axis=1)
-    midpoints = (diagrams[:, :, 1:2] + diagrams[:, :, 0:1]) / 2.
-    heights = (diagrams[:, :, 1:2] - diagrams[:, :, 0:1]) / 2.
+    midpoints = (diagrams[:, :, [1]] + diagrams[:, :, [0]]) / 2.
+    heights = (diagrams[:, :, [1]] - diagrams[:, :, [0]]) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
     fibers_weighted_sum = np.sum(weights*fibers, axis=1)/total_weights
     return fibers_weighted_sum
