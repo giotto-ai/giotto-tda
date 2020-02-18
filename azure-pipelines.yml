@@ -74,7 +74,6 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
-    failOnStderr: true
     condition: eq(variables['notebooks_check'], 'true')
     displayName: 'Test the wheels on jupyter notebooks with papermill'
 
@@ -259,8 +258,7 @@ jobs:
       flake8
     displayName: 'Test dev install with pytest and flake8'
 
-  - bash: |
-      set -e
+  - script: |
       pip uninstall -y giotto-tda
       pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
@@ -276,15 +274,13 @@ jobs:
     failOnStderr: true
     displayName: 'Install the wheels'
 
-  - bash: |
-      set -e
+  - script: |
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
     displayName: 'Test the wheels with pytest'
 
-  - bash: |
-      set -e
+  - script: |
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
