@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics.pairwise import pairwise_distances
 
-from ._utils import _pad_diagram
+from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
@@ -209,23 +209,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_array(X, allow_nd=True)
 
-        n_samples = len(X)
-
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
-                                          for i in range(n_samples))
+                                          for i in range(len(X)))
 
-        max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
-                                            for i in range(n_samples)]))
-                        for dim in self.homology_dimensions}
-        min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                else 0 for i in range(n_samples)])
-                      for dim in self.homology_dimensions}
-
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
-                Xt[i], self._homology_dimensions, max_n_points, min_values)
-            for i in range(n_samples))
-        Xt = np.stack(Xt)
-        Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
+        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+                                   self.infinity_values_, self.n_jobs)
         return Xt
 
 
@@ -441,21 +429,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
                 X.shape[0]))
 
-        max_n_points = {
-            dim: max(1, np.max([Xt[i][dim].shape[0] for i in range(len(
-                Xt))])) for dim in self.homology_dimensions}
-        min_values = {
-            dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size else
-                      np.inf for i in range(len(Xt))]) for dim in
-            self.homology_dimensions}
-        min_values = {
-            dim: min_values[dim] if min_values[dim] != np.inf else 0 for dim
-            in self.homology_dimensions}
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
-            Xt[i], self._homology_dimensions, max_n_points, min_values)
-            for i in range(len(Xt)))
-        Xt = np.stack(Xt)
-        Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
+        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+                                   self.infinity_values_, self.n_jobs)
         return Xt
 
 
@@ -486,10 +461,10 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
-        as `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -504,12 +479,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, SparseRipsPersistence, ConsistentRescaling
 
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cubical persistent homology. Python bindings were modified
+    for computing Cech persistent homology. Python bindings were modified
     for performance.
 
     Persistence diagrams produced by this class must be interpreted with
@@ -632,19 +607,6 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
                 X.shape[0]))
 
-        max_n_points = {
-            dim: max(1, np.max([Xt[i][dim].shape[0] for i in range(len(
-                Xt))])) for dim in self.homology_dimensions}
-        min_values = {
-            dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size else
-                      np.inf for i in range(len(Xt))]) for dim in
-            self.homology_dimensions}
-        min_values = {
-            dim: min_values[dim] if min_values[dim] != np.inf else 0 for dim
-            in self.homology_dimensions}
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
-            Xt[i], self._homology_dimensions, max_n_points, min_values)
-            for i in range(len(Xt)))
-        Xt = np.stack(Xt)
-        Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
+        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+                                   self.infinity_values_, self.n_jobs)
         return Xt
