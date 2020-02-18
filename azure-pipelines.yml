@@ -39,7 +39,6 @@ jobs:
   - bash: |
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      cat gtda/_version.py
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
@@ -76,6 +75,7 @@ jobs:
         papermill --start_timeout 2000 $n -
       done
     failOnStderr: true
+    condition: eq(variables['notebooks_check'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -121,7 +121,6 @@ jobs:
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      cat gtda/_version.py
       rm gtda/_version.py.bak
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
@@ -245,7 +244,6 @@ jobs:
   - bash: |
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      cat gtda/_version.py
     failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
@@ -291,7 +289,8 @@ jobs:
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
+    condition: eq(variables['notebooks_check'], 'true')
+    displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
