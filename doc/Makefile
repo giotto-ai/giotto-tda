@@ -13,8 +13,6 @@ EXAMPLESDIR  = ../examples
 togit:
 	@cp -a build/html/ "$(GITDIR)"
 
-# prevent the git directory from being cleaned
-
 github:
 	@make html
 	@make togit
