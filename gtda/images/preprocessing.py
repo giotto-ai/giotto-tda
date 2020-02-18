@@ -213,8 +213,8 @@ class Padder(BaseEstimator, TransformerMixin):
     paddings : int ndarray of shape (padding_x, padding_y [, padding_z]) or
         None, optional, default: ``None``
         Number of pixels to pad the images along each axis and on both side of
-        the images. By default, the a frame of a single pixel width is added
-        around the image.
+        the images. By default, a frame of a single pixel width is added
+        around the image (`1 = padding_x = padding_y [= padding_z]`).
 
     activated : bool, optional, default: ``False``
         If ``True``, the padded pixels are activated. If ``False``, they are
@@ -298,8 +298,8 @@ class Padder(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x + padding_x,
-            n_pixels_y + padding_y [, n_pixels_z + padding_z])
+        Xt : ndarray, shape (n_samples, n_pixels_x + 2 * padding_x,
+            n_pixels_y + 2 * padding_y [, n_pixels_z + 2 * padding_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
 
