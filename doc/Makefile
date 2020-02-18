@@ -13,19 +13,13 @@ togit:
 	@cp -a build/html/ "$(GITDIR)"
 
 # prevent the git directory from being cleaned
-cleangit:
-	@ls "$(GITDIR)"BLA
 
 github:
 	@make html
 	@make togit
 
-github-clean:
-	@make clean
-	@rm cleangit
-
 theory:
-	@pandoc pandoc theory/glossary.tex -f latex -t rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
+	@pandoc theory/glossary.tex -f latex -t rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
 
 all-gh:
 	@make clean
@@ -33,8 +27,8 @@ all-gh:
 	@make github
 
 gh-commit:
-	@cd ../docs/; git add *.html generated/*.html; \
-git add objects.inv; git add searchindex.js; \
+	@cd "$(GITDIR)"; git add *.html generated/*.html; \
+git add objects.inv; git add searchindex.js; \ git add _sources/*.txt; git add theory/*.html;
 git commit -m "Update docs"; git push origin
 
 # Put it first so that "make" without argument is like "make help".
