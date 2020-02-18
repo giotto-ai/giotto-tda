@@ -1,4 +1,4 @@
-"""Helper function for image processing."""
+"""Helper functions for image processing."""
 # License: GNU AGPLv3
 
 import numpy as np

@@ -355,10 +355,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class DilationFiltration(BaseEstimator, TransformerMixin):
     """Filtrations of 2D/3D binary images based on the dilation of activated
-    regions. Binary dilation is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_.
+    regions.
 
-    This filtration assigns to each pixel in an image a grayscale value
+    Binary dilation is a morphological operator commonly used in
+    image processing and relies on the scipy.ndimage module [1]_. This
+    filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any activated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
@@ -488,10 +489,11 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class ErosionFiltration(BaseEstimator, TransformerMixin):
     """Filtrations of 2D/3D binary images based on the erosion of activated
-    regions. Binary erosion is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_.
+    regions.
 
-    This filtration assigns to each pixel in an image a grayscale value
+    Binary erosion is a morphological operator commonly used in
+    image processing and relies on the scipy.ndimage module [1]_.This
+    filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any deactivated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
