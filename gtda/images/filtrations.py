@@ -3,7 +3,6 @@
 
 import numbers
 import numpy as np
-from scipy import ndimage as ndi
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.metrics import pairwise_distances
@@ -11,6 +10,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
+from ._utils import _dilate
 
 
 @adapt_fit_transform_docs
@@ -355,7 +355,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class DilationFiltration(BaseEstimator, TransformerMixin):
     """Filtrations of 2D/3D binary images based on the dilation of activated
-    regions.
+    regions. Binary dilation is a morphological operator commonly used in
+    image processing and relies on the scipy.ndimage module [1]_.
 
     This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
@@ -373,7 +374,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     ----------
     n_iterations : int or None, optional, default: ``None``
         Number of iterations in the dilation process. ``None`` means dilation
-        over the full image.
+        reaches all deactivated pixels.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -394,6 +395,11 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
+    References
+    ----------
+    [1] "Multi-dimensional image processing (scipy.ndimage)" \
+        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
+
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -404,23 +410,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     def _calculate_dilation(self, X):
         Xd = X * 1.
 
-        for iteration in range(1, min(self.n_iterations_,
-                                      self.max_value_) + 1):
-            Xtemp = np.asarray([ndi.binary_dilation(Xd[i])
-                                for i in range(Xd.shape[0])])
-            Xnew = (Xd + Xtemp) == 1
-            if np.any(Xnew):
-                Xd[Xnew] = iteration + 1
-            else:
-                break
-
-        mask_filtered = Xd == 0
-        Xd -= 1
-        Xd[mask_filtered] = self.max_value_
-        return Xd
+        return _dilate(Xd, self.n_iterations_, self.max_value_)
 
     def fit(self, X, y=None):
-        """Calculate `n_iterations_` and 'max_value_'from a collection of
+        """Calculate `n_iterations_` and 'max_value_' from a collection of
         binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
@@ -495,7 +488,8 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class ErosionFiltration(BaseEstimator, TransformerMixin):
     """Filtrations of 2D/3D binary images based on the erosion of activated
-    regions.
+    regions. Binary erosion is a morphological operator commonly used in
+    image processing and relies on the scipy.ndimage module [1]_.
 
     This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
@@ -513,7 +507,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     ----------
     n_iterations : int or None, optional, default: ``None``
         Number of iterations in the erosion process. ``None`` means erosion
-        over the full image.
+       reaches all activated pixels.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -534,6 +528,11 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
+    References
+    ----------
+    [1] "Multi-dimensional image processing (scipy.ndimage)" \
+        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
+
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -544,20 +543,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     def _calculate_erosion(self, X):
         Xd = np.logical_not(X) * 1.
 
-        for iteration in range(1, min(self.n_iterations_,
-                                      self.max_value_) + 1):
-            Xtemp = np.asarray([ndi.binary_dilation(Xd[i])
-                                for i in range(Xd.shape[0])])
-            Xnew = (Xd + Xtemp) == 1
-            if np.any(Xnew):
-                Xd[Xnew] = iteration + 1
-            else:
-                break
-
-        mask_filtered = Xd == 0
-        Xd -= 1
-        Xd[mask_filtered] = self.max_value_
-        return Xd
+        return _dilate(Xd, self.n_iterations_, self.max_value_)
 
     def fit(self, X, y=None):
         """Calculate `n_iterations_` and 'max_value_'from a collection of
