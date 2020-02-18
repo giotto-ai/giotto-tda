@@ -1,151 +1,8 @@
-# These jobs are triggered automatically and they test the code and the examples.
-
+# These jobs are triggered automatically and they test code, examples, and wheels.
+# Additional checks can be manually triggered
 jobs:
-- job: 'test_ubuntu1604'
-  condition: eq(variables['build_check'], 'false')
-  pool:
-    vmImage: 'ubuntu-16.04'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
-    displayName: 'Install dev environment'
-
-  - script: |
-      set -e
-      pytest --cov gtda --cov-report xml
-      flake8
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install openml pandas
-      pip install "papermill==1.2.1"
-      cd examples
-      for n in *.ipynb
-      do
-        papermill --start_timeout 2000 $n -
-      done
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-
-- job: 'test_macOS1014'
-  condition: eq(variables['build_check'], 'false')
-  pool:
-    vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      brew update
-      brew install gcc boost
-    failOnStderr: true
-    displayName: 'Install gcc and boost'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-    failOnStderr: true
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    failOnStderr: true
-    displayName: 'Install dev environment'
-
-  - script: |
-      set -e      
-      pytest --cov gtda --cov-report xml
-      flake8
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      set -e
-      pip install openml pandas
-      pip install "papermill==1.2.1"
-      cd examples
-      for n in *.ipynb
-      do
-        papermill --start_timeout 2000 $n -
-      done
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-
-- job: 'test_win2016'
-  condition: eq(variables['build_check'], 'false')
-  pool:
-    vmImage: 'vs2017-win2016'
-  strategy:
-    matrix:
-      Python36:
-        python_ver: '36'
-        python.version: '3.6'
-      Python37:
-        python_ver: '37'
-        python.version: '3.7'
-      Python38:
-        python_ver: '38'
-        python.version: '3.8'
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: |
-      pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - bash: |
-      set -e
-      pytest --cov gtda --cov-report xml
-      flake8
-    displayName: 'Test with pytest and flake8'
-
-  - script: |
-      pip install openml pandas
-      pip install "papermill==1.2.1"
-      cd examples
-      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
-
-
-# These jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -165,17 +22,24 @@ jobs:
         plat: manylinux2010_x86_64
         python_ver: '38'
         python.version: '3.8'
+  variables:
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
+
+  - task: Cache@2
+    inputs:
+      key: '"ccache-wheels-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
+      path: $(CCACHE_DIR)
+    displayName: ccache
 
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
@@ -184,13 +48,12 @@ jobs:
       filePath: .azure-ci/build_manylinux2010.sh
     env:
       python_ver: $(python_ver)
+      CCACHE_DIR: $(CCACHE_DIR)
     displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
       python -m pip install --upgrade pip
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install dist/*.whl
+      pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -211,6 +74,7 @@ jobs:
         papermill --start_timeout 2000 $n -
       done
     failOnStderr: true
+    condition: eq(variables['notebooks_check'], 'true')
     displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -235,7 +99,6 @@ jobs:
 
 
 - job: 'macOS1014'
-  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'macOS-10.14'
   strategy:
@@ -246,6 +109,8 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+  variables:
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
   - task: UsePythonVersion@0
@@ -257,26 +122,33 @@ jobs:
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      cat gtda/_version.py
       rm gtda/_version.py.bak
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
+  - task: Cache@2
+    inputs:
+      key: '"ccache-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
+      path: $(CCACHE_DIR)
+    displayName: ccache
+
   - script: |
       set -e
       brew update
-      brew install gcc boost
-    displayName: 'Install gcc and boost'
+      brew install boost ccache
+    displayName: 'Install system dependencies'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
+      source .azure-ci/setup_ccache.sh
+      pip install -e ".[tests, doc]"
+      ccache -s
+    displayName: 'Install dependencies and dev environement'
 
   - script: |
-      pytest --cov gtda --cov-report xml
+      set -e
+      pytest gtda --cov --cov-report xml
       flake8
     failOnStderr: true
     displayName: 'Test dev install with pytest and flake8'
@@ -351,7 +223,6 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
@@ -375,21 +246,17 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      cat gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip setuptools
-    displayName: 'Upgrade pip and setuptools'
-
-  - script: |
       pip install -e ".[tests, doc]"
     displayName: 'Install dev environment'
 
-  - bash: |
-      set -e
-      pytest --cov gtda --cov-report xml
+  - script: |
+      pytest gtda --cov --cov-report xml || exit /b
       flake8
     displayName: 'Test dev install with pytest and flake8'
 
@@ -418,12 +285,13 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      cd examples
       pip install openml pandas
       pip install "papermill==1.2.1"
+      cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
-    displayName: 'Test jupyter notebooks with papermill'
+    condition: eq(variables['notebooks_check'], 'true')
+    displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'

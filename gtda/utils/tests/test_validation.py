@@ -4,8 +4,8 @@
 import numpy as np
 import pytest
 
-from ..validation import check_diagram
-from ..validation import validate_metric_params, validate_params
+from gtda.utils.validation import (check_diagram, validate_metric_params,
+                                   validate_params)
 
 
 # Testing for validate_params
