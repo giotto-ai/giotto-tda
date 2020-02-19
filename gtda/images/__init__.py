@@ -4,7 +4,8 @@ that can be used to apply Topological Data Analysis to images.
 # License: GNU AGPLv3
 
 from .preprocessing import Binarizer, Inverter, ImageToPointCloud
-from .filtrations import HeightFiltration, RadialFiltration, DilationFiltration
+from .filtrations import HeightFiltration, RadialFiltration, \
+    DilationFiltration, ErosionFiltration
 
 __all__ = [
     'Binarizer',
@@ -13,4 +14,5 @@ __all__ = [
     'HeightFiltration',
     'RadialFiltration',
     'DilationFiltration',
+    'ErosionFiltration',
 ]
