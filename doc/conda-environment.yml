@@ -1,7 +1,7 @@
 name: gtda-env
 dependencies:
   - cmake
-  - python=3.7
+  - python=3.8
   - pip
   - pip:
     - numpy >= 1.17.0
