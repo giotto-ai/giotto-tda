@@ -22,8 +22,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     the nature of the array `X`. If each entry in `X` along axis 0 represents a
     distance matrix :math:`D`, then the corresponding entry in the transformed
     array is the distance matrix
-    :math:`D'_{ij} = D_{ij}/\\sqrt{D_{ik_i}D_{jk_j}}`, where :math:`k_i` is the
-    index of the :math:`k`-th largest value in row :math:`i` (and similarly
+    :math:`D'_{i,j} = D_{i,j}/\\sqrt{D_{i,k_i}D_{j,k_j}}`, where :math:`k_i` is
+    the index of the :math:`k`-th largest value in row :math:`i` (and similarly
     for :math:`j`). If the entries in `X` represent point clouds, their
     distance matrices are first computed, and then rescaled according to the
     same formula.
@@ -45,7 +45,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict, optional, default: ``None``
+    metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     neighbor_rank : int, optional, default: ``1``
@@ -61,7 +61,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params`.
-        If `metric_params` is `None`, it is set to the empty dictionary.
+        If `metric_params` is ``None``, it is set to the empty dictionary.
 
     Examples
     --------
@@ -149,7 +149,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each entry in the input data array X, find the metric structure
-        after consistent rescaling and encodes it as a distance matrix.
+        after consistent rescaling and encode it as a distance matrix.
 
         Parameters
         ----------
@@ -190,7 +190,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     The computation during :meth:`transform` depends on the nature of the array
     `X`. If each entry in `X` along axis 0 represents a distance matrix
     :math:`D`, then the corresponding entry in the transformed array is the
-    distance matrix :math:`D'_{ii+1} = factor \times D_{ii+1}`. If the entries
+    distance matrix :math:`D'_{i,i+1} = factor \times D_{i,i+1}`. If the entries
     in `X` represent point clouds, their distance matrices are first computed,
     and then rescaled according to the same formula.
 
@@ -211,7 +211,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict, optional, default: ``None``
+    metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     factor : float, optional, default: ``0.``
@@ -227,12 +227,12 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params`.
-        If `metric_params` is `None`, it is set to the empty dictionary.
+        If `metric_params` is ``None``, it is set to the empty dictionary.
 
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.homology import ConsecutivetRescaling
+    >>> from gtda.homology import ConsecutiveRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsecutiveRescaling()
     >>> X_rescaled = cr.fit_transform(X)
@@ -301,7 +301,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each entry in the input data array X, find the metric structure
-        after consecutive rescaling and encodes it as a distance matrix.
+        after consecutive rescaling and encode it as a distance matrix.
 
         Parameters
         ----------
