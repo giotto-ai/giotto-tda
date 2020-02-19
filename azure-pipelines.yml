@@ -290,7 +290,7 @@ jobs:
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
     failOnStderr: true
     condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
