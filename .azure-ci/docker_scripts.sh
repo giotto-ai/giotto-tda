@@ -37,9 +37,8 @@ export Boost_INCLUDE_DIR=/boost/include
 cd /io
 pip install -e ".[dev]"
 
-# Test dev install with pytest and flake8
+# Test dev install with pytest
 pytest gtda --cov --cov-report xml
-flake8 --exit-zero /io/
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
 pip uninstall -y giotto-tda

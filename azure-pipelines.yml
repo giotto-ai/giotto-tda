@@ -49,7 +49,7 @@ jobs:
     env:
       python_ver: $(python_ver)
       CCACHE_DIR: $(CCACHE_DIR)
-    displayName: 'Run docker container, install and uninstall dev environment, test with pytest and flake8, build the wheels'
+    displayName: 'Run the docker, install and uninstall dev environment, test with pytest, build the wheels'
 
   - script: |
       set -e
@@ -59,7 +59,7 @@ jobs:
 
   - script: |
       set -e
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
@@ -149,8 +149,12 @@ jobs:
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
+    displayName: 'Test dev install with pytest'
+
+  - script: |
+      set -e
       flake8
-    displayName: 'Test dev install with pytest and flake8'
+    displayName: 'Test dev install with flake8'
 
   - script: |
       set -e
@@ -255,8 +259,7 @@ jobs:
 
   - script: |
       pytest gtda --cov --cov-report xml || exit /b
-      flake8
-    displayName: 'Test dev install with pytest and flake8'
+    displayName: 'Test dev install with pytest'
 
   - script: |
       pip uninstall -y giotto-tda
