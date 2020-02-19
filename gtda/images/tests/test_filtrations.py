@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import HeightFiltration, RadialFiltration, \
-    DilationFiltration, SignedDistanceFiltration
+   DilationFiltration, ErosionFiltration, SignedDistanceFiltration
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],
@@ -170,6 +170,48 @@ def test_dilation_transform(n_iterations, images, expected):
                         expected)
 
 
+def test_erosion_not_fitted():
+    erosion = ErosionFiltration()
+    with pytest.raises(NotFittedError):
+        erosion.transform(images_2D)
+
+
+def test_erosion_errors():
+    n_iterations = 'a'
+    erosion = ErosionFiltration(n_iterations=n_iterations)
+    with pytest.raises(TypeError):
+        erosion.fit(images_2D)
+
+
+images_2D_erosion = np.array(
+    [[[7., 7., 7., 7.], [7., 7., 7., 7.], [7., 7., 7., 7.]],
+     [[2., 1., 0., 0.], [2., 1., 0., 0.], [2., 1., 0., 0.]],
+     [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]]])
+
+
+images_3D_erosion = np.array(
+    [[[[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]]],
+     [[[9., 9.], [1., 1.], [0., 0.], [0., 0.]],
+      [[9., 9.], [1., 1.], [0., 0.], [0., 0.]],
+      [[9., 9.], [1., 1.], [0., 0.], [0., 0.]]],
+     [[[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]]]])
+
+
+@pytest.mark.parametrize("n_iterations, images, expected",
+                         [(None, images_2D, images_2D_erosion),
+                          (100, images_2D, images_2D_erosion),
+                          (1, images_3D, images_3D_erosion)])
+def test_erosion_transform(n_iterations, images, expected):
+    erosion = ErosionFiltration(n_iterations=n_iterations)
+
+    assert_almost_equal(erosion.fit_transform(images),
+                        expected)
+
+
 def test_signed_not_fitted():
     signed = SignedDistanceFiltration()
     with pytest.raises(NotFittedError):
@@ -189,12 +231,12 @@ images_2D_signed = np.array(
      [[-7., -7., -7., -7.], [-7., -7., -7., -7.], [-7., -7., -7., -7.]]])
 
 images_3D_signed = np.array(
-    [[[[ 9., 9.], [ 9., 9.], [ 9., 9.], [ 9., 9.]],
-      [[ 9., 9.], [ 9., 9.], [ 9., 9.], [ 9., 9.]],
-      [[ 9., 9.], [ 9., 9.], [ 9., 9.], [ 9., 9.]]],
-     [[[ 1., 1.], [ 0., 0.], [-1., -1.], [-2., -2.]],
-      [[ 1., 1.], [ 0., 0.], [-1., -1.], [-2., -2.]],
-      [[ 1., 1.], [ 0., 0.], [-1., -1.], [-2., -2.]]],
+    [[[[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]]],
+     [[[1., 1.], [0., 0.], [-1., -1.], [-2., -2.]],
+      [[1., 1.], [0., 0.], [-1., -1.], [-2., -2.]],
+      [[1., 1.], [0., 0.], [-1., -1.], [-2., -2.]]],
      [[[-9., -9.], [-9., -9.], [-9., -9.], [-9., -9.]],
       [[-9., -9.], [-9., -9.], [-9., -9.], [-9., -9.]],
       [[-9., -9.], [-9., -9.], [-9., -9.], [-9., -9.]]]])
