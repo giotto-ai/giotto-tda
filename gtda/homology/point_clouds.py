@@ -61,8 +61,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this death
-        value is declared to be equal to `max_edge_length`.
+        filtration value :param:`max_edge_length`. ``None`` means that this
+        death value is declared to be equal to :param:`max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -73,7 +73,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value `max_edge_length`.
+        filtration value :param:`max_edge_length`.
 
     See also
     --------
@@ -130,7 +130,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         return Xdgms
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`infinity_values_`. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -268,8 +268,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this death
-        value is declared to be equal to `max_edge_length`.
+        filtration value :param:`max_edge_length`. ``None`` means that this
+        death value is declared to be equal to :param:`max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -280,7 +280,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value `max_edge_length`. Set in :meth:`fit`.
+        filtration value :param:`max_edge_length`. Set in :meth:`fit`.
 
     See also
     --------
@@ -346,7 +346,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         return Xdgms
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`infinity_values_`. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -444,7 +444,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
     various dimensions and at different scales is summarised in the
     corresponding persistence diagram.
 
-    Parameters
+xs    Parameters
     ----------
     homology_dimensions : iterable, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
@@ -464,7 +464,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
-        value is declared to be equal to `max_edge_length`.
+        value is declared to be equal to :param:`max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -534,7 +534,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         return Xdgms
 
     def fit(self, X, y=None):
-        """Calculate `infinity_values_`. Then, return the estimator.
+        """Calculate :attr:`infinity_values_`. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
