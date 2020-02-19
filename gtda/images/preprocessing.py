@@ -61,15 +61,16 @@ class Binarizer(BaseEstimator, TransformerMixin):
         return Xbin
 
     def fit(self, X, y=None):
-        """Calculate `n_dimensions_` and `max_value_` from the collection of
-        grayscale images. Then, return the estimator.
+        """Calculate :attr:`n_dimensions_` and :attr:`max_value_` from the
+        collection of grayscale images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y \
+            [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             grayscale image.
 
@@ -97,7 +98,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             grayscale image.
 
@@ -107,7 +108,8 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y \
+            [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
 
@@ -152,7 +154,7 @@ class Inverter(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -176,7 +178,7 @@ class Inverter(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -186,7 +188,8 @@ class Inverter(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y \
+            [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
 
@@ -205,16 +208,15 @@ class Inverter(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Padder(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of binary images that are the padded
-    version od the 2D or 3D binary images of an input collection.
+    """Transformer returning a collection of padded binary 2D/3D images.
 
     Parameters
     ----------
-    paddings : int ndarray of shape (padding_x, padding_y [, padding_z]) or
+    paddings : int ndarray of shape (padding_x, padding_y [, padding_z]) or \
         None, optional, default: ``None``
         Number of pixels to pad the images along each axis and on both side of
         the images. By default, a frame of a single pixel width is added
-        around the image (`1 = padding_x = padding_y [= padding_z]`).
+        around the image (``1 = padding_x = padding_y [= padding_z]``).
 
     activated : bool, optional, default: ``False``
         If ``True``, the padded pixels are activated. If ``False``, they are
@@ -240,15 +242,15 @@ class Padder(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Calculate `paddings_` from a collection of binary images. Then,
-        return the estimator.
+        """Calculate :attr:`paddings_` from a collection of binary images.
+        Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -288,7 +290,7 @@ class Padder(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -298,7 +300,7 @@ class Padder(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x + 2 * padding_x,
+        Xt : ndarray of shape (n_samples, n_pixels_x + 2 * padding_x, \
             n_pixels_y + 2 * padding_y [, n_pixels_z + 2 * padding_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
