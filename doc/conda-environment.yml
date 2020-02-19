@@ -1,6 +1,7 @@
 name: gtda-env
 dependencies:
   - cmake
+  - boost==1.71.*
   - python=3.8
   - pip
   - pip:
