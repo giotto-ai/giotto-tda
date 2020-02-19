@@ -9,7 +9,12 @@ sphinx:
   configuration: doc/conf.py
 
 # Optionally build your docs in additional formats such as PDF and ePub
-formats: all
+formats: []
 
 conda:
   environment: doc/conda-environment.yml
+
+python:
+   install:
+      - method: pip
+        path: .

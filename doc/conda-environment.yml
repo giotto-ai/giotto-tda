@@ -12,5 +12,3 @@ dependencies:
     - matplotlib >= 3.0.3
     - plotly >= 4.4.1
     - ipywidgets >= 7.5.1
-    - .
-
