@@ -186,6 +186,7 @@ jobs:
     displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - script: |
+      set -e
       cd doc/
       make html
     displayName: 'Build sphinx doc'
@@ -282,7 +283,7 @@ jobs:
       pip install openml pandas
       pip install "papermill==1.2.1"
       cd examples
-      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
+      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
     displayName: 'Test the wheels on jupyter notebooks with papermill'
 
