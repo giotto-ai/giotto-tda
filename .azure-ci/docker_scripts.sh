@@ -6,8 +6,8 @@ echo "Start manylinux2010 docker build"
 # Upgrade pip and setuptools. TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH="${PYTHON_PATH}/bin:${PATH}"
-pip install --upgrade pip==19.3.1 setuptools
 pip config set global.progress_bar off
+pip install --upgrade pip==19.3.1 setuptools
 
 # Install CMake
 pip install cmake
