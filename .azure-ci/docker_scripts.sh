@@ -24,7 +24,7 @@ tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install -j3 || echo "Parts of boost failed to build. Continuning.."
+./b2 install -j3 || echo "Parts of boost failed to build. Continuing.."
 cd ..
 
 ccache -s
