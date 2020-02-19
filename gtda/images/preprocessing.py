@@ -205,15 +205,13 @@ class Inverter(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ImageToPointCloud(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of point clouds corresponding to the
-    coordinates of the activated pixels of the 2D or 3D binary images of an
-    input collection.
+    """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
-    Deactivated pixels are given infinite coordinates in that space.
+    The coordinates of each point is calculated as follow. For each activated
+    pixel, assign coordinates that are the pixel position on this image. All
+    deactivated pixels are given infinite coordinates in that space.
 
-    Notes
-    -----
-    This transformer is meant to transform a collection of imagea to a point
+    This transformer is meant to transform a collection of images to a point
     cloud so that collection of point clouds-based persistent homology module
     can be applied.
 
@@ -226,7 +224,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z],
+    mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
         n_dimensions)
         Mesh image for which each pixel value is its coordinates in a
         `n_dimensions` space, where `n_dimensions` is the dimension of the
