@@ -1,9 +1,9 @@
 import os
 import numpy as np
-from giotto_cubical_complex \
+from gtda.externals.modules.giotto_cubical_complex \
     import Cubical_complex_interface \
     as Bitmap_cubical_complex_base_interface
-from giotto_persistent_cohomology \
+from gtda.externals.modules.giotto_persistent_cohomology \
     import Persistent_cohomology_interface \
     as Cubical_complex_persistence_interface
 
