@@ -1,0 +1,14 @@
+name: gtda-env
+dependencies:
+  - cmake
+  - python=3.7
+  - pip:
+    - numpy >= 1.17.0
+    - scipy >= 0.17.0
+    - joblib >= 0.11
+    - scikit-learn >= 0.22.0
+    - python-igraph >= 0.7.1.post6
+    - matplotlib >= 3.0.3
+    - plotly >= 4.4.1
+    - ipywidgets >= 7.5.1
+
