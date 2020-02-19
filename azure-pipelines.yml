@@ -183,7 +183,6 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
-    failOnStderr: true
     displayName: 'Test the wheels on jupyter notebooks with papermill'
 
   - script: |
@@ -271,7 +270,6 @@ jobs:
     displayName: 'Build the wheels'
 
   - bash: pip install dist/*.whl
-    failOnStderr: true
     displayName: 'Install the wheels'
 
   - script: |
