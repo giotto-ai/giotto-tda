@@ -36,7 +36,7 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # Install dev environment
 cd /io
-python -m pip install -e ".[dev]"
+pip install -e ".[dev]"
 
 # Test dev install with pytest
 pytest gtda --cov --cov-report xml
