@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 set -x
 echo "Start manylinux2010 docker build"
 
@@ -23,7 +24,7 @@ tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install -j3
+./b2 install -j3 || echo "Parts of boost failed to build. Continuing.."
 cd ..
 
 ccache -s
@@ -36,9 +37,8 @@ export Boost_INCLUDE_DIR=/boost/include
 cd /io
 pip install -e ".[tests, doc]"
 
-# Test dev install with pytest and flake8
+# Test dev install with pytest
 pytest gtda --cov --cov-report xml
-flake8 --exit-zero /io/
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
 pip uninstall -y giotto-tda
