@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _parallel_pairwise, _parallel_amplitude
-from ._utils import _discretize
+from ._utils import _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import (check_diagram, validate_params,
                                 validate_metric_params)
@@ -36,7 +36,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
+        ``'betti'`` | ``'heat'`` | ``'persistence_image'``, optional,
+        default: ``'landscape'``
         Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
@@ -46,6 +47,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
+        - ``'persistence_image'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
@@ -58,13 +61,17 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
           Unlike the case of ``'bottleneck'``, `delta` cannot be set to
           ``0.`` and an exact algorithm is not available.
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``) and
-          `n_values` (int, default: ``100``).
+          `n_bins` (int, default: ``100``).
+        - If ``metric == 'persistence_image'`` the available arguments are `p`
+          (float, default: ``2.``), `sigma` (float, default: ``1.``),
+          `n_bins` (int, default: ``100``) and `weight_function`
+          (func, default x -> x).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each pair of diagrams a
@@ -155,10 +162,13 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['samplings'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, **self.effective_metric_params_)
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _bin(X, metric=self.metric, **self.effective_metric_params_)
+
+        if self.metric == 'persistence_image':
+            self.effective_metric_params_['weights'] = \
+                _calculate_weights(X, **self.effective_metric_params_)
 
         self._X = X
         return self
@@ -190,7 +200,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagram(X, copy=True)
 
         if np.array_equal(X, self._X):
             X2 = None
@@ -228,7 +238,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'landscape'``
+        ``'betti'`` | ``'heat'`` | ``'persistence_image'``, optional,
+        default: ``'landscape'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 
@@ -239,6 +250,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'heat'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams.
+        - ``'persistence_image'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function:
@@ -247,13 +260,17 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
           default: ``2``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
+        - If ``metric == 'persistence_image'`` the available arguments are `p`
+          (float, default: ``2.``), `sigma` (float, default: ``1.``),
+          `n_bins` (int, default: ``100``) and `weight_function`
+          (func, default x -> x).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each diagram a vector of
@@ -339,10 +356,13 @@ class Amplitude(BaseEstimator, TransformerMixin):
         X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        if self.metric in ['landscape', 'heat', 'betti']:
-            self.effective_metric_params_['samplings'], \
-                self.effective_metric_params_['step_sizes'] = \
-                _discretize(X, **self.effective_metric_params_)
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _bin(X, metric=self.metric, **self.effective_metric_params_)
+
+        if self.metric == 'persistence_image':
+            self.effective_metric_params_['weights'] = \
+                _calculate_weights(X, **self.effective_metric_params_)
 
         return self
 
@@ -370,7 +390,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagram(X, copy=True)
 
         Xt = _parallel_amplitude(X, self.metric,
                                  self.effective_metric_params_,

@@ -62,7 +62,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Calculate `n_dimensions_` and `max_value_` from the collection of
-        grayscale image. Then, return the estimator.
+        grayscale images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -91,8 +91,9 @@ class Binarizer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each collection of grayscale images, calculate the corresponding
-        collection of binary images by applying the threshold.
+        """For each grayscale image in the collection `X`, calculate a
+        corresponding binary image by applying the `threshold`. Return the
+        collection of binary images.
 
         Parameters
         ----------
@@ -109,8 +110,8 @@ class Binarizer(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
-        """
 
+        """
         check_is_fitted(self)
         Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
 
@@ -128,8 +129,8 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Inverter(BaseEstimator, TransformerMixin):
-    """Transformer returning a collection of binary images from an input
-    collection of 2D or 3D grayscale images.
+    """Transformer returning a collection of binary images that are the logical
+    negation of the 2D or 3D binary images of an input collection.
 
     Parameters
     ----------
@@ -153,7 +154,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -164,20 +165,20 @@ class Inverter(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, ensure_2d=False, allow_nd=True)
 
-        self.is_fitted_ = True
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
-        """For each collection of binary images, calculate the corresponding
-        collection of binary images based on their logical negation.
+        """For each binary image in the collection `X`, calculate its negation.
+        Return the collection of negated binary images.
 
         Parameters
         ----------
         X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -188,10 +189,10 @@ class Inverter(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D binary image.
-        """
 
-        check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        """
+        check_is_fitted(self, ['_is_fitted'])
+        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(X[s])

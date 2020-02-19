@@ -42,7 +42,6 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Operating System :: POSIX',
                'Operating System :: Unix',
                'Operating System :: MacOS',
-               'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
                'Programming Language :: Python :: 3.7',
                'Programming Language :: Python :: 3.8']
@@ -107,24 +106,6 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['git', 'clone',
                                'https://github.com/pybind/pybind11.git',
                                dir_pybind11])
-        os.chdir(dir_pybind11)
-        dir_build = os.path.join(dir_pybind11, 'build')
-        os.mkdir(dir_build)
-        os.chdir(dir_build)
-        cmake_cmd1 = ['cmake', '-DPYBIND11_TEST=OFF', '..']
-        if platform.system() == "Windows":
-            cmake_cmd2 = ['cmake', '--install', '.']
-            if sys.maxsize > 2**32:
-                cmake_cmd1 += ['-A', 'x64']
-        else:
-            cmake_cmd2 = ['make', 'install']
-            cmake_cmd2_sudo = ['sudo', 'make', 'install']
-        subprocess.check_call(cmake_cmd1, cwd=dir_build)
-        try:
-            subprocess.check_call(cmake_cmd2, cwd=dir_build)
-        except:  # noqa
-            subprocess.check_call(cmake_cmd2_sudo, cwd=dir_build)
-        os.chdir(dir_start)
 
         subprocess.check_call(['git', 'submodule', 'update',
                                '--init', '--recursive'])

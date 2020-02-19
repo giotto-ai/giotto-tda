@@ -96,7 +96,6 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
             One permutation entropy per entry in `X` along axis 0.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_is_fitted')
         X = check_array(X, allow_nd=True)
 

@@ -157,7 +157,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             Adjacency matrices of kNN graphs.
 
         """
-        # Check if fit had been called
         check_is_fitted(self, '_nearest_neighbors')
         X = check_array(X, allow_nd=True)
 

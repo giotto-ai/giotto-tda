@@ -66,12 +66,12 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
           default: ``2``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
 
     scaler_function : callable, optional, default: ``numpy.max``
@@ -234,12 +234,12 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
           default: ``2``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
 
     scaler_function : callable, optional, default: ``numpy.max``
@@ -249,7 +249,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
     filter_epsilon : float, optional, default: ``0.``
         The cutoff value controlling the amount of filtering.
 
-    n_values : int, optional, default: ``100``
+    n_bins : int, optional, default: ``100``
         Length of array used to sample the continuous Betti curves.
 
     n_jobs : int or None, optional, default: ``None``
@@ -262,7 +262,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
                  homology_dimensions=(0, 1), scaler_metric='bottleneck',
                  scaler_metric_params=None, scaler_function=np.max,
-                 filter_epsilon=0., n_values=100, n_jobs=None):
+                 filter_epsilon=0., n_bins=100, n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -270,7 +270,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         self.scaler_metric = scaler_metric
         self.scaler_function = scaler_function
         self.filter_epsilon = filter_epsilon
-        self.n_values = n_values
+        self.n_bins = n_bins
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -309,7 +309,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
                 n_jobs=self.n_jobs)),
             ('filter', diag.Filtering(
                 epsilon=self.filter_epsilon)),
-            ('betticurve', diag.BettiCurve(n_values=self.n_values))]
+            ('betticurve', diag.BettiCurve(n_bins=self.n_bins))]
 
         self._pipeline = Pipeline(steps).fit(X)
         return self
@@ -332,7 +332,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-             n_values)
+             n_bins)
             For each point cloud in `X`, one discretised Betti curve
             per homology dimension in `homology_dimensions`.
 
@@ -398,12 +398,12 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
           default: ``2``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
 
     scaler_function : callable, optional, default: ``numpy.max``
@@ -416,7 +416,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
     n_layers : int, optional, default: ``1``
         How many layers to consider in the persistence landscape.
 
-    n_values : int, optional, default: ``100``
+    n_bins : int, optional, default: ``100``
         Length of array used to sample the continuous persistence landscapes.
 
     n_jobs : int or None, optional, default: ``None``
@@ -429,7 +429,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
     def __init__(self, metric='euclidean', max_edge_length=np.inf,
                  homology_dimensions=(0, 1), scaler_metric='bottleneck',
                  scaler_metric_params=None, scaler_function=np.max,
-                 filter_epsilon=0., n_layers=1, n_values=100, n_jobs=None):
+                 filter_epsilon=0., n_layers=1, n_bins=100, n_jobs=None):
         self.metric = metric
         self.max_edge_length = max_edge_length
         self.homology_dimensions = homology_dimensions
@@ -438,7 +438,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         self.scaler_function = scaler_function
         self.filter_epsilon = filter_epsilon
         self.n_layers = n_layers
-        self.n_values = n_values
+        self.n_bins = n_bins
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -478,7 +478,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
             ('filter', diag.Filtering(
                 epsilon=self.filter_epsilon)),
             ('landscape', diag.PersistenceLandscape(
-                n_values=self.n_values, n_layers=self.n_layers))]
+                n_bins=self.n_bins, n_layers=self.n_layers))]
 
         self._pipeline = Pipeline(steps).fit(X)
         return self
@@ -501,7 +501,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-             n_layers, n_values)
+             n_layers, n_bins)
             For each point cloud in `X`, one discretised persistence landscape
             per homology dimension in `homology_dimensions`, consisting of
             `n_layers` layers.

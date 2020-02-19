@@ -112,7 +112,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         return Xc + Xc.T
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`effective_metric_params_`. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -144,7 +145,6 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         validate_params(self.get_params(), self._hyperparameters)
         check_array(X, allow_nd=True)
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -173,7 +173,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._consistent_homology_distance)(X[i])
@@ -264,7 +264,8 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
         return Xm
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`effective_metric_params_`. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -324,7 +325,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._consecutive_homology_distance)(X[i])
