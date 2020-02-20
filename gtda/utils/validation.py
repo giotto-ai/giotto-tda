@@ -179,31 +179,28 @@ def validate_metric_params(metric, metric_params):
 
 
 def check_list_of_arrays(X, **kwargs):
-    """"Check a list of arrays, by itegrating through the input one by one.
+    """"Check a list of arrays, by integrating through the input one by one.
     Parameters
     ----------
-    X : list(np.array), such that `X[i].ndim==2` (n_points, n_dimensions),
+    X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
         or an array `X.dim==3`
     Returns
     -------
     X : list of input arrays, as modified by check_array
     """
-    if isinstance(X, np.ndarray):
-        return check_array(X, **kwargs)
-    else:
-        results = []
-        messages = []
-        for id_x, x in enumerate(X):
-            try:
-                X[id_x] = np.squeeze(check_array(np.expand_dims(x, axis=0),
-                                                 **kwargs), axis=0)
-                results.append(True)
-                messages = ['']
-            except ValueError as e:
-                results.append(False)
-                messages.append(str(e))
-            if all(results):
-                return X
-            else:
-                raise ValueError("The following errors were raised" +
-                                 "by the inputs: \n" + "\n".join(messages))
+
+    results = []
+    messages = []
+    for id_x, x in enumerate(X):
+        try:
+            X[id_x] = check_array(x, **kwargs)
+            results.append(True)
+            messages = ['']
+        except ValueError as e:
+            results.append(False)
+            messages.append(str(e))
+        if all(results):
+            return X
+        else:
+            raise ValueError("The following errors were raised" +
+                             "by the inputs: \n" + "\n".join(messages))
