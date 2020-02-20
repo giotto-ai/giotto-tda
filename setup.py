@@ -65,9 +65,18 @@ EXTRAS_REQUIRE = {
         'numpydoc'],
     'examples': [
         'jupyter',
-        'matplotlib',
-        'plotly']
+        'pandas',
+        'openml']
 }
+
+
+def combine_requirements(base_keys):
+    return list(
+        set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+EXTRAS_REQUIRE["dev"] = combine_requirements(
+    [k for k in EXTRAS_REQUIRE if k != "examples"])
 
 
 class CMakeExtension(Extension):
