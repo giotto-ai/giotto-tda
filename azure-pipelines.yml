@@ -37,46 +37,45 @@ jobs:
     displayName: ccache
 
   - bash: |
+      set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
     inputs:
       filePath: .azure-ci/build_manylinux2010.sh
-      failOnStderr: false
     env:
       python_ver: $(python_ver)
       CCACHE_DIR: $(CCACHE_DIR)
-    displayName: 'Run the docker, install and uninstall dev environment, test with pytest and flake8, build the wheels'
+    displayName: 'Run docker container, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip
       pip install dist/*.whl
-    failOnStderr: true
     displayName: 'Install the wheels'
 
   - script: |
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8 hypothesis
+      set -e
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install openml pandas
+      set -e
+      pip install pandas openml
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
         papermill --start_timeout 2000 $n -
       done
-    failOnStderr: true
     condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
@@ -91,6 +90,7 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
+      set -e
       pip install twine
       for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
@@ -118,11 +118,11 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      set -e
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
@@ -133,24 +133,28 @@ jobs:
     displayName: ccache
 
   - script: |
+      set -e
       brew update
       brew install boost ccache
-    failOnStderr: true
     displayName: 'Install system dependencies'
 
   - script: |
+      set -e
       python -m pip install --upgrade pip setuptools
       source .azure-ci/setup_ccache.sh
-      pip install -e ".[tests, doc]"
+      python -m pip install -e ".[dev]"
       ccache -s
-    failOnStderr: true
     displayName: 'Install dependencies and dev environement'
 
   - script: |
+      set -e
       pytest gtda --cov --cov-report xml
+    displayName: 'Test dev install with pytest'
+
+  - script: |
+      set -e
       flake8
-    failOnStderr: true
-    displayName: 'Test dev install with pytest and flake8'
+    displayName: 'Test dev install with flake8'
 
   - script: |
       set -e
@@ -159,37 +163,36 @@ jobs:
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
+      set -e
       pip install wheel
       python setup.py sdist bdist_wheel
-    failOnStderr: false
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
-    failOnStderr: true
     displayName: 'Install the wheels'
 
   - script: |
+      set -e
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install openml pandas
+      set -e
+      python -m pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
         papermill --start_timeout 2000 $n -
       done
-    failOnStderr: true
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - script: |
+      set -e
       cd doc/
       make html
-    failOnStderr: true
     displayName: 'Build sphinx doc'
 
   - task: ArchiveFiles@2
@@ -215,6 +218,7 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
+      set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
@@ -242,55 +246,49 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install -e ".[tests, doc]"
-    failOnStderr: true
+      python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml
-      flake8
-    failOnStderr: true
-    displayName: 'Test dev install with pytest and flake8'
+      pytest gtda --cov --cov-report xml || exit /b
+    displayName: 'Test dev install with pytest'
 
   - script: |
-      pip uninstall -y giotto-tda || exit /b
-      pip uninstall -y giotto-tda-nightly || exit /b
+      pip uninstall -y giotto-tda
+      pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
+      set -e
       sed -i $'s/\r$//' README.rst
       pip install wheel
       python setup.py sdist bdist_wheel
-    failOnStderr: false
     displayName: 'Build the wheels'
 
   - bash: pip install dist/*.whl
-    failOnStderr: true
     displayName: 'Install the wheels'
 
-  - bash: |
+  - script: |
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    failOnStderr: true
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install openml pandas
+      python -m pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
-      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n -)
-    failOnStderr: true
+      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
@@ -305,8 +303,8 @@ jobs:
       artifactName: 'wheel_and_doc'
 
   - bash: |
+      set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    failOnStderr: true
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 docker run -t --rm -e python_ver=$PYTHON_VER \
 	-v `pwd`:/io \
 	-v "${CCACHE_DIR}":/root/.ccache/  \
