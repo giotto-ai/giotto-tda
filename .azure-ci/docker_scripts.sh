@@ -48,3 +48,6 @@ pip uninstall -y giotto-tda-nightly
 # Build wheels
 pip install wheel
 python setup.py sdist bdist_wheel
+
+# Repair wheels with auditwheel
+auditwheel repair dist/*whl -w dist/
