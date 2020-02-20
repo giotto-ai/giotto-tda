@@ -410,7 +410,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _calculate_dilation(self, X):
-        Xd = _dilate(X * 1, 1, self.n_iterations_, 1, self.max_value_)
+        Xd = _dilate(X, 1, self.n_iterations_, 1, self.max_value_)
 
         mask_undilated = Xd == 0
         Xd -= 1
