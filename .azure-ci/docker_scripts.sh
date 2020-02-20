@@ -6,6 +6,7 @@ echo "Start manylinux2010 docker build"
 # Upgrade pip and setuptools. TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH="${PYTHON_PATH}/bin:${PATH}"
+pip config set global.progress_bar off
 pip install --upgrade pip==19.3.1 setuptools
 
 # Install CMake
@@ -35,7 +36,7 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # Install dev environment
 cd /io
-pip install -e ".[tests, doc]"
+pip install -e ".[dev]"
 
 # Test dev install with pytest
 pytest gtda --cov --cov-report xml
