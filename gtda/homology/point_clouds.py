@@ -61,8 +61,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value :param:`max_edge_length`. ``None`` means that this
-        death value is declared to be equal to :param:`max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this
+        death value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -73,7 +73,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value :param:`max_edge_length`.
+        filtration value `max_edge_length`.
 
     See also
     --------
@@ -268,8 +268,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value :param:`max_edge_length`. ``None`` means that this
-        death value is declared to be equal to :param:`max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this
+        death value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -280,7 +280,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value :param:`max_edge_length`. Set in :meth:`fit`.
+        filtration value `max_edge_length`. Set in :meth:`fit`.
 
     See also
     --------
@@ -464,7 +464,7 @@ xs    Parameters
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
-        value is declared to be equal to :param:`max_edge_length`.
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
