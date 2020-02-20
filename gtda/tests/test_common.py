@@ -28,6 +28,7 @@ XFAIL_TESTS = {
                 "check_fit1d"],
 }
 
+
 # adapted from sklearn.utils.estimator_check v0.22
 def _get_callable_name(obj):
     """Get string representation of a function or a partial function name
@@ -53,7 +54,7 @@ def _get_callable_name(obj):
 
 def _get_estimator_name(estimator):
     """Get string representation for classes and class instances
-    
+
     Examples
     --------
     >>> from sklearn.preprocessing import StandardScaler
@@ -63,12 +64,11 @@ def _get_estimator_name(estimator):
     'StandardScaler'
     """
     if isinstance(estimator, type):
-       # this is class
-       return estimator.__name__
+        # this is class
+        return estimator.__name__
     else:
-       # this an instance
-       return estimator.__class__.__name__
-
+        # this an instance
+        return estimator.__class__.__name__
 
 
 @parametrize_with_checks(
@@ -84,6 +84,7 @@ def test_sklearn_api(check, estimator, request):
 
     if check_name in XFAIL_TESTS[estimator_name]:
         # mark tests as a known failure
-        request.applymarker(pytest.mark.xfail(run=True, reason='known failure'))
-    
+        request.applymarker(pytest.mark.xfail(
+            run=True, reason='known failure'))
+
     check(estimator)
