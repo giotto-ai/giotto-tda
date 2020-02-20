@@ -54,7 +54,7 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip
-      pip install dist/*.whl
+      pip install dist/*manylinux2010*.whl
     displayName: 'Install the wheels'
 
   - script: |
