@@ -599,6 +599,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
             `X`. ``n_features`` equals :math:`\\sum_q n_q`, where :math:`n_q`
             is the maximum number of topological features in dimension
             :math:`q` across all samples in `X`.
+
         """
         check_is_fitted(self)
         X = check_array(X, allow_nd=True)
