@@ -190,7 +190,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     The computation during :meth:`transform` depends on the nature of the array
     `X`. If each entry in `X` along axis 0 represents a distance matrix
     :math:`D`, then the corresponding entry in the transformed array is the
-    distance matrix :math:`D'_{i,i+1} = factor \times D_{i,i+1}`. If the entries
+    distance matrix :math:`D'_{i,i+1} = factor\times D_{i,i+1}`. If the entries
     in `X` represent point clouds, their distance matrices are first computed,
     and then rescaled according to the same formula.
 
