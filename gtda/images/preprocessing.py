@@ -207,7 +207,7 @@ class Inverter(BaseEstimator, TransformerMixin):
 class ImageToPointCloud(BaseEstimator, TransformerMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
-    The coordinates of each point is calculated as follow. For each activated
+    The coordinates of each point is calculated as follows. For each activated
     pixel, assign coordinates that are the pixel position on this image. All
     deactivated pixels are given infinite coordinates in that space.
 
