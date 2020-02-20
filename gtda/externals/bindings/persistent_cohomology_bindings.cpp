@@ -11,7 +11,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_persistent_cohomology, m) {
+PYBIND11_MODULE(gtda_persistent_cohomology, m) {
   using Persistent_cohomology_interface_inst =
       Gudhi::Persistent_cohomology_interface<
           Gudhi::cubical_complex::Cubical_complex_interface<>>;
