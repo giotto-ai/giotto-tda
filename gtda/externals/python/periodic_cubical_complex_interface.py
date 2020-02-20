@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from gtda.externals.modules.giotto_periodic_cubical_complex import \
+from ..modules.giotto_periodic_cubical_complex import \
     Periodic_cubical_complex_base_interface, \
     Periodic_cubical_complex_persistence_interface
 

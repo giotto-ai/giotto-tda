@@ -1,4 +1,4 @@
-from gtda.externals.modules.giotto_cech_complex import Cech_complex_interface
+from ..modules.giotto_cech_complex import Cech_complex_interface
 from . import SimplexTree
 
 
