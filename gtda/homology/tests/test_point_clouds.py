@@ -6,7 +6,8 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence
+from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
+    EuclideanCechPersistence
 
 pc = np.array([[[2., 2.47942554], [2.47942554, 2.84147098],
                [2.98935825, 2.79848711], [2.79848711, 2.41211849],
@@ -67,3 +68,32 @@ def test_srp_transform(epsilon, point_clouds, expected):
 
     assert_almost_equal(np.sort(srp.fit_transform(point_clouds), axis=1),
                         np.sort(expected, axis=1))
+
+
+def test_cp_params():
+    coeff = 'not_defined'
+    cp = EuclideanCechPersistence(coeff=coeff)
+
+    with pytest.raises(TypeError):
+        cp.fit_transform(pc)
+
+
+def test_cp_not_fitted():
+    cp = EuclideanCechPersistence()
+
+    with pytest.raises(NotFittedError):
+        cp.transform(pc)
+
+
+pc_cp_res = np.array(
+    [[[0., 0.31093103, 0.], [0., 0.30038548, 0.],
+      [0., 0.25587055, 0.], [0., 0.21547186, 0.],
+      [0.34546959, 0.41473758, 1.], [0.51976681, 0.55287585, 1.],
+      [0.26746207, 0.28740871, 1.], [0.52355742, 0.52358794, 1.],
+      [0.40065941, 0.40067135, 1.], [0.45954496, 0.45954497, 1.]]])
+
+
+def test_cp_transform():
+    cp = EuclideanCechPersistence()
+
+    assert_almost_equal(cp.fit_transform(pc), pc_cp_res)
