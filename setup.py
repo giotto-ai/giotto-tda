@@ -65,9 +65,18 @@ EXTRAS_REQUIRE = {
         'numpydoc'],
     'examples': [
         'jupyter',
-        'matplotlib',
-        'plotly']
+        'pandas',
+        'openml']
 }
+
+
+def combine_requirements(base_keys):
+    return list(
+        set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+EXTRAS_REQUIRE["dev"] = combine_requirements(
+    [k for k in EXTRAS_REQUIRE if k != "examples"])
 
 
 class CMakeExtension(Extension):
@@ -111,8 +120,8 @@ class CMakeBuild(build_ext):
                                '--init', '--recursive'])
 
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(
-            self.get_ext_fullpath(ext.name)))
+        extdir = os.path.abspath(os.path.join(os.path.dirname(
+            self.get_ext_fullpath(ext.name)), 'gtda', 'externals', 'modules'))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
