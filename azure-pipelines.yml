@@ -67,7 +67,7 @@ jobs:
 
   - script: |
       set -e
-      python -m pip install -e ".[examples]"
+      pip install pandas openml
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
