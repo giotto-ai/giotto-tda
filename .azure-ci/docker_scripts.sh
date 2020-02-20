@@ -51,3 +51,5 @@ python setup.py sdist bdist_wheel
 
 # Repair wheels with auditwheel
 auditwheel repair dist/*whl -w dist/
+# remove wheels that are not manylinux2010
+rm -rf dist/*-linux*.whl

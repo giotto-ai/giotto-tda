@@ -55,7 +55,6 @@ jobs:
       set -e
       python -m pip install --upgrade pip
       # remove wheels that are not manylinux2010
-      rm -rf dist/*-linux*.whl
       pip install dist/*manylinux2010*.whl
     displayName: 'Install the wheels'
 
