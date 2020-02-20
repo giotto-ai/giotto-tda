@@ -47,4 +47,4 @@ pip uninstall -y giotto-tda-nightly
 
 # Build wheels
 pip install wheel
-python setup.py sdist bdist_wheel
+python setup.py bdist_wheel
