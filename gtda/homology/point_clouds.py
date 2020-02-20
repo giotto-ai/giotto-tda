@@ -298,9 +298,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    [1] C.Maria, P. Dlotko, V. Rouvreau and M. Glisse "Rips complex", 2020;
-    `GUDHI User and Reference Manual \
-    <http://gudhi.gforge.inria.fr/doc/3.1.0/group__rips__complex.html>`_.
+    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
+        Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+        cohomology.html>`_.
 
     """
     _hyperparameters = {'epsilon': [numbers.Number, (0., 1.)],
@@ -444,7 +444,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
     various dimensions and at different scales is summarised in the
     corresponding persistence diagram.
 
-xs    Parameters
+    Parameters
     ----------
     homology_dimensions : iterable, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
@@ -494,8 +494,8 @@ xs    Parameters
     References
     ----------
     [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
-    Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
-    cohomology.html>`_.
+        Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+        cohomology.html>`_.
 
     """
     _hyperparameters = {'max_edge_length': [numbers.Number],
