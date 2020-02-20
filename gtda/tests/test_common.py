@@ -1,10 +1,7 @@
 # License: GNU AGPLv3
-from itertools import chain
 from functools import partial
-import re
 
 import pytest
-import sklearn
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from gtda.images.preprocessing import Binarizer, Inverter
