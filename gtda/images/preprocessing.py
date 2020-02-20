@@ -13,7 +13,7 @@ from ..utils.validation import validate_params
 
 @adapt_fit_transform_docs
 class Binarizer(BaseEstimator, TransformerMixin):
-    """Binarize all 2D/3D grayscale images in a collection
+    """Binarize all 2D/3D grayscale images in a collection.
 
     Parameters
     ----------
@@ -130,7 +130,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Inverter(BaseEstimator, TransformerMixin):
-    """Invert all 2D/3D binary images in a collection
+    """Invert all 2D/3D binary images in a collection.
 
 
     Parameters
@@ -207,7 +207,7 @@ class Inverter(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Padder(BaseEstimator, TransformerMixin):
-    """Pad all 2D/3D binary images in a collection
+    """Pad all 2D/3D binary images in a collection.
 
     Parameters
     ----------
@@ -285,7 +285,7 @@ class Padder(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, adds a padding.
-        Return the collection of negated binary images.
+        Return the collection of padded binary images.
 
         Parameters
         ----------
