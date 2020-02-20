@@ -166,7 +166,7 @@ jobs:
   - script: |
       set -e
       pip install wheel
-      python setup.py sdist bdist_wheel
+      python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
@@ -271,7 +271,7 @@ jobs:
       set -e
       sed -i $'s/\r$//' README.rst
       pip install wheel
-      python setup.py sdist bdist_wheel
+      python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
   - bash: pip install dist/*.whl
