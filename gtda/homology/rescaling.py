@@ -85,7 +85,6 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
-
     _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
 
     def __init__(self, metric='euclidean', metric_params=None, neighbor_rank=1,
@@ -244,7 +243,6 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     VietorisRipsPersistence
 
     """
-
     _hyperparameters = {'factor': [numbers.Number, (0., np.inf)]}
 
     def __init__(self, metric='euclidean', metric_params=None, factor=0.,
@@ -259,7 +257,8 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
                                 **self.effective_metric_params_)
 
         Xm.ravel()[
-            1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] = 0
+            1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] *= \
+                self.factor
 
         return Xm
 
