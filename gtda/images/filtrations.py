@@ -722,7 +722,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, ensure_2d=False, allow_nd=True)
 
         self.max_value_ = np.sum(X.shape[1:])
 
