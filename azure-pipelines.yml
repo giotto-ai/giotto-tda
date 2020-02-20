@@ -49,7 +49,7 @@ jobs:
     env:
       python_ver: $(python_ver)
       CCACHE_DIR: $(CCACHE_DIR)
-    displayName: 'Run the docker, install and uninstall dev environment, test with pytest, build the wheels'
+    displayName: 'Run docker container, install and uninstall dev environment, test with pytest and flake8, build the wheels'
 
   - script: |
       set -e
@@ -67,7 +67,7 @@ jobs:
 
   - script: |
       set -e
-      pip install openml pandas
+      pip install pandas openml
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
@@ -75,7 +75,7 @@ jobs:
         papermill --start_timeout 2000 $n -
       done
     condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'
@@ -142,7 +142,7 @@ jobs:
       set -e
       python -m pip install --upgrade pip setuptools
       source .azure-ci/setup_ccache.sh
-      pip install -e ".[tests, doc]"
+      python -m pip install -e ".[dev]"
       ccache -s
     displayName: 'Install dependencies and dev environement'
 
@@ -165,7 +165,7 @@ jobs:
   - script: |
       set -e
       pip install wheel
-      python setup.py sdist bdist_wheel
+      python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
@@ -180,14 +180,14 @@ jobs:
 
   - script: |
       set -e
-      pip install openml pandas
+      python -m pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
         papermill --start_timeout 2000 $n -
       done
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - script: |
       set -e
@@ -254,7 +254,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install -e ".[tests, doc]"
+      python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
   - script: |
@@ -270,7 +270,7 @@ jobs:
       set -e
       sed -i $'s/\r$//' README.rst
       pip install wheel
-      python setup.py sdist bdist_wheel
+      python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
   - bash: pip install dist/*.whl
@@ -283,12 +283,12 @@ jobs:
     displayName: 'Test the wheels with pytest'
 
   - script: |
-      pip install openml pandas
+      python -m pip install -e ".[examples]"
       pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test the wheels on jupyter notebooks with papermill'
+    displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
     displayName: 'Copy files'

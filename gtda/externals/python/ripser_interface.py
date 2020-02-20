@@ -1,7 +1,7 @@
 from scipy import sparse
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
-from giotto_ripser import rips_dm, rips_dm_sparse
+from ..modules.gtda_ripser import rips_dm, rips_dm_sparse
 
 
 def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):

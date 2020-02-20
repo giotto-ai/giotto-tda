@@ -1,4 +1,5 @@
-from giotto_witness_complex import Witness_complex_interface
+from ..modules.gtda_witness_complex \
+    import Witness_complex_interface
 from . import SimplexTree
 
 
