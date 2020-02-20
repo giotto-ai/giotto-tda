@@ -65,9 +65,18 @@ EXTRAS_REQUIRE = {
         'numpydoc'],
     'examples': [
         'jupyter',
-        'matplotlib',
-        'plotly']
+        'pandas',
+        'openml']
 }
+
+
+def combine_requirements(base_keys):
+    return list(
+        set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+EXTRAS_REQUIRE["dev"] = combine_requirements(
+    [k for k in EXTRAS_REQUIRE if k != "examples"])
 
 
 class CMakeExtension(Extension):
@@ -106,31 +115,13 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['git', 'clone',
                                'https://github.com/pybind/pybind11.git',
                                dir_pybind11])
-        os.chdir(dir_pybind11)
-        dir_build = os.path.join(dir_pybind11, 'build')
-        os.mkdir(dir_build)
-        os.chdir(dir_build)
-        cmake_cmd1 = ['cmake', '-DPYBIND11_TEST=OFF', '..']
-        if platform.system() == "Windows":
-            cmake_cmd2 = ['cmake', '--install', '.']
-            if sys.maxsize > 2**32:
-                cmake_cmd1 += ['-A', 'x64']
-        else:
-            cmake_cmd2 = ['make', 'install']
-            cmake_cmd2_sudo = ['sudo', 'make', 'install']
-        subprocess.check_call(cmake_cmd1, cwd=dir_build)
-        try:
-            subprocess.check_call(cmake_cmd2, cwd=dir_build)
-        except:  # noqa
-            subprocess.check_call(cmake_cmd2_sudo, cwd=dir_build)
-        os.chdir(dir_start)
 
         subprocess.check_call(['git', 'submodule', 'update',
                                '--init', '--recursive'])
 
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(
-            self.get_ext_fullpath(ext.name)))
+        extdir = os.path.abspath(os.path.join(os.path.dirname(
+            self.get_ext_fullpath(ext.name)), 'gtda', 'externals', 'modules'))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 

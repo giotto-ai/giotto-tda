@@ -165,7 +165,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_array(X, allow_nd=True)
+        check_array(X, allow_nd=True, force_all_finite=False)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
@@ -207,7 +207,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True, force_all_finite=False)
 
         n_samples = len(X)
 
@@ -393,7 +393,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_array(X, allow_nd=True)
+        check_array(X, allow_nd=True, force_all_finite=False)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
@@ -435,7 +435,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True, force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(

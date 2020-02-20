@@ -10,7 +10,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_sparse_rips_complex, m) {
+PYBIND11_MODULE(gtda_sparse_rips_complex, m) {
   py::class_<Gudhi::rips_complex::Rips_complex_interface>(
       m, "Rips_complex_interface")
       .def(py::init<>())

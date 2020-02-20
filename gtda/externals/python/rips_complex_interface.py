@@ -1,4 +1,5 @@
-from giotto_sparse_rips_complex import Rips_complex_interface
+from ..modules.gtda_sparse_rips_complex \
+    import Rips_complex_interface
 from . import SimplexTree
 
 

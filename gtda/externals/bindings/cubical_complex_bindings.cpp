@@ -17,7 +17,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_cubical_complex, m) {
+PYBIND11_MODULE(gtda_cubical_complex, m) {
   using namespace pybind11::literals;
   using Cubical_complex_interface_inst =
       Gudhi::cubical_complex::Cubical_complex_interface<>;
