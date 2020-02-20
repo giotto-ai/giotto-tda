@@ -258,7 +258,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
         Xm.ravel()[
             1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] *= \
-                self.factor
+            self.factor
 
         return Xm
 
