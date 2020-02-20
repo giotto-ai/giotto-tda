@@ -93,12 +93,12 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         self.overlap_frac = overlap_frac
 
         if overlap_frac == 0.:
-            raise ValueError("The `overlap_frac` must be positive,"
-                             "as otherwise, the intervals will not cover"
+            raise ValueError("`overlap_frac` must be positive,"
+                             "as otherwise the intervals will not cover"
                              "the range")
         if overlap_frac <= 1e-8:
-            warnings.warn("The `overlap_frac` is close to zero,"
-                          "what might cause numerical issues and errors",
+            warnings.warn("`overlap_frac` is close to zero,"
+                          "which might cause numerical issues and errors",
                           RuntimeWarning)
 
     def _fit_uniform(self, X):
