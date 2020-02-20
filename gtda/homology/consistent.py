@@ -7,10 +7,10 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import validate_params
+from ..utils.validation import validate_params, check_list_of_arrays
 
 
 @adapt_fit_transform_docs
@@ -132,7 +132,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        check_array(X, allow_nd=True)
+        check_list_of_arrays(X, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -164,7 +164,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        X = check_array(X, allow_nd=True)
+        X = check_list_of_arrays(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._consistent_homology_distance)(X[i])
