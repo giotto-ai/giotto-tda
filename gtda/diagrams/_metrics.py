@@ -1,8 +1,8 @@
 # License: GNU AGPLv3
 
 import numpy as np
-from ..externals.modules.giotto_bottleneck import bottleneck_distance
-from ..externals.modules.giotto_wasserstein import wasserstein_distance
+from ..externals.modules.gtda_bottleneck import bottleneck_distance
+from ..externals.modules.gtda_wasserstein import wasserstein_distance
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.ndimage import gaussian_filter
 from scipy.spatial.distance import cdist, pdist, squareform
