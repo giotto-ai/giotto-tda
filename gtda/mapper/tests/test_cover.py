@@ -36,7 +36,7 @@ def get_nb_intervals(draw):
 def get_overlap_fraction(draw):
     overlap = draw(floats(allow_nan=False,
                           allow_infinity=False,
-                          min_value=0., exclude_min=True,
+                          min_value=1e-6, exclude_min=True,
                           max_value=1., exclude_max=True),
                    )
     return overlap
