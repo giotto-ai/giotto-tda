@@ -199,8 +199,8 @@ def check_list_of_arrays(X, **kwargs):
         except ValueError as e:
             results.append(False)
             messages.append(str(e))
-        if all(results):
-            return X
-        else:
-            raise ValueError("The following errors were raised" +
-                             "by the inputs: \n" + "\n".join(messages))
+    if all(results):
+        return X
+    else:
+        raise ValueError("The following errors were raised" +
+                         "by the inputs: \n" + "\n".join(messages))
