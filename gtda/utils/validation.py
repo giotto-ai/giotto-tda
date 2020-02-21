@@ -86,7 +86,7 @@ def validate_params(parameters, references):
         if len(references[key]) == 1:
             continue
         if references[key][0] == list or \
-           references[key][0] == np.ndarray:
+                references[key][0] == np.ndarray:
             for parameter in parameters[key]:
                 if references[key][1][0] == int:
                     if not isinstance(parameter, numbers.Number):
@@ -164,7 +164,7 @@ def validate_metric_params(metric, metric_params):
                                           param_type))
             if param_values is not None:
                 if input_param < param_values[0] or \
-                   input_param > param_values[1]:
+                        input_param > param_values[1]:
                     raise ValueError("{} in param_metric should be between {} "
                                      "and {} but has been set to {}."
                                      "".format(param, param_values[0],
@@ -200,7 +200,7 @@ def check_list_of_images(X, **kwargs):
         as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
-    kwargs_default = {'force_same_n_axis':  False,
+    kwargs_default = {'force_same_n_axis': False,
                       'force_same_shape': False, 'force_all_finite': True,
                       'ensure_2d': False, 'allow_nd': True}
     kwargs_default.update(kwargs)
@@ -268,28 +268,28 @@ def check_list_of_arrays(X, force_same_shape=True, force_same_n_axis=True,
     # if restrictions on the dimensions of the input are imposed
     if force_same_shape:
         shapes = [x.shape for x in X]
-        if not(all([shapes[0] == s for s in shapes])):
+        if not (all([shapes[0] == s for s in shapes])):
             raise ValueError(f"The arrays in X do not have the same dimensions"
                              "({shapes}), while they should.")
     # if the number of dimensions can vary
-    if force_same_n_axis:
-        n_axis = [len(x.shape) for x in X]
-        if not(all([n_axis[0] == n for n in n_axis])):
+    elif force_same_n_axis:
+        n_axis = [x.ndim for x in X]
+        if not (all([n_axis[0] == n for n in n_axis])):
             raise ValueError(f"The arrays in X do not have the same number"
                              "of axes ({n_axis}), while they should.")
 
-    results = []
+    is_check_failed = False
     messages = []
-    for id_x, x in enumerate(X):
+    for i, x in enumerate(X):
         try:
-            X[id_x] = check_array(x, **kwargs)
-            results.append(True)
+            # TODO: verifythe behavior depending on copy.
+            X[i] = check_array(x, **kwargs)
             messages = ['']
         except ValueError as e:
-            results.append(False)
+            is_check_failed = True
             messages.append(str(e))
-    if all(results):
-        return X
-    else:
+    if is_check_failed:
         raise ValueError("The following errors were raised" +
                          "by the inputs: \n" + "\n".join(messages))
+    else:
+        return X
