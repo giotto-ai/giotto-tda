@@ -12,7 +12,7 @@ from sklearn.metrics.pairwise import pairwise_distances
 from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import validate_params, check_list_of_arrays
+from ..utils.validation import validate_params, check_list_of_point_clouds
 
 
 @adapt_fit_transform_docs
@@ -165,7 +165,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_list_of_arrays(X, ensure_2d=True, force_all_finite=False)
+        check_list_of_point_clouds(X, ensure_2d=True, force_all_finite=False)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
@@ -207,7 +207,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_arrays(X, ensure_2d=True, force_all_finite=False)
+        X = check_list_of_point_clouds(X, ensure_2d=True, force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
                                           for i in range(len(X)))
@@ -381,7 +381,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_list_of_arrays(X, ensure_2d=True, force_all_finite=False)
+        check_list_of_point_clouds(X, ensure_2d=True, force_all_finite=False)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
@@ -423,7 +423,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_arrays(X, ensure_2d=True, force_all_finite=False)
+        X = check_list_of_point_clouds(X, ensure_2d=True, force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
@@ -565,7 +565,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_list_of_arrays(X, ensure_2d=True)
+        check_list_of_point_clouds(X, ensure_2d=True)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
@@ -602,7 +602,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_arrays(X, ensure_2d=True)
+        X = check_list_of_point_clouds(X, ensure_2d=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(

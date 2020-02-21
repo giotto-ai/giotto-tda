@@ -183,15 +183,14 @@ def check_list_of_images(X, **kwargs):
     through the input one by one.
     Parameters
     ----------
-    X : list(ndarray), ???
+    X : list of ndarray, 
     Returns
     -------
-    X : list of input arrays, as modified by check_array
+    X : list of ndarray, as modified by check_array
     """
-    kwargs_default = {'allow_n_axis_incons':  False,
-                      'allow_dims_incons': False,
-                      'force_all_finite': True,
-                      'ensure_2d': False}
+    kwargs_default = {'force_same_n_axis':  False,
+                      'force_same_dim': True, 'force_all_finite': True,
+                      'ensure_2d': False, 'allow_nd': True}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
 
@@ -207,7 +206,8 @@ def check_list_of_point_clouds(X, **kwargs):
     -------
     X : list of input arrays, as modified by check_array
     """
-    kwargs_default = {'ensure_2d': True, 'force_all_finite': False}
+    kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
+                      'force_same_dim': False, 'force_same_n_axis': True}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
 
@@ -222,18 +222,18 @@ def check_list_of_arrays(X, **kwargs):
     -------
     X : list of input arrays, as modified by check_array
     """
-    allow_n_axis_incons = kwargs.pop('allow_n_axis_incons', True)
-    allow_dim_incons = kwargs.pop('allow_dims_incons', True)
+    force_same_dim = kwargs.pop('force_same_dim', True)
+    force_same_n_axis = kwargs.pop('force_same_n_axis', True)
 
     # if restrictions on the dimensions of the input are imposed
-    if not allow_dim_incons:
-        shapes = [X.shape for x in X]
+    if force_same_dim:
+        shapes = [x.shape for x in X]
         if not(all([shapes[0] == s for s in shapes])):
             raise ValueError("The arrays in X do not have the same dimensions"
                              "({}), while they should.".format(shapes))
-        # if the number of dimensions can very
-    if not allow_n_axis_incons:
-        n_axis = [len(X.shape) for x in X]
+    # if the number of dimensions can vary
+    if force_same_n_axis:
+        n_axis = [len(x.shape) for x in X]
         if not(all([n_axis[0] == n for n in n_axis])):
             raise ValueError("The arrays in X do not have the same number"
                              "of axes ({}), while they should.".format(n_axis))
