@@ -51,7 +51,8 @@ extensions = [
 # Add mappings
 intersphinx_mapping = {
     'sklearn': ('http://scikit-learn.org/stable', None),
-    'plotly': ('https://plot.ly/python-api-reference/', None)
+    'plotly': ('https://plot.ly/python-api-reference/', None),
+    'scipy': ('http://docs.scipy.org/doc/scipy/reference', None)
 }
 
 sphinx_gallery_conf = {
