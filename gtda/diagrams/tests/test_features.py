@@ -85,11 +85,11 @@ dims_gen = arrays(
 
 
 def _validate_distinct(X):
-    unique_values = [np.unique(x[0:2, :]) for x in X]
+    """Check if, in X, there is any persistence diagram for which all births
+    and deaths are equal."""
+    unique_values = [np.unique(x[:, 0:2]) for x in X]
     if np.any([len(u) < 2 for u in unique_values]):
-        raise ValueError("There should be at least two distinct points"
-                         "in the persistent diagrams:" +
-                         "now, only {} is present".format(*unique_values))
+        raise ValueError
     return 0
 
 
