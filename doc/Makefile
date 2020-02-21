@@ -9,9 +9,13 @@ SOURCEDIR     = .
 BUILDDIR      = build
 GITDIR    = ../../../projects/gtda-docs
 EXAMPLESDIR  = ../examples
+VERSION = stable
+
+CURRENTDOCFOLDER = $(GITDIR)/$(VERSION)
 
 togit:
-	@cp -a build/html/ "$(GITDIR)"
+	@mkdir -p "$(CURRENTDOCFOLDER)"
+	@cp -a build/html/ "$(CURRENTDOCFOLDER)"
 
 github:
 	@make html
