@@ -9,7 +9,7 @@ from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import validate_params,check_list_of_images
+from ..utils.validation import validate_params, check_list_of_images
 
 
 @adapt_fit_transform_docs
@@ -324,8 +324,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
-    pixel, assign coordinates that are the pixel position on this image. All
-    deactivated pixels are given infinite coordinates in that space.
+    pixel, assign coordinates that are the pixel position on this image.
     This transformer is meant to transform a collection of images to a point
     cloud so that collection of point clouds-based persistent homology module
     can be applied.
@@ -354,11 +353,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _embed_(self, X):
-        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.0
-        Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
-        return Xpts
-
     def _embed(self, X):
         Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
         return Xpts
@@ -383,16 +377,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_list_of_images(X)
-
-        n_dimensions = len(X[0].shape)
-        axis_order = [2, 1, 3]
-        mesh_range_list = [np.arange(0, X.shape[i])
-                           for i in axis_order[:n_dimensions]]
-
-        self.mesh_ = np.flip(np.stack(np.meshgrid(*mesh_range_list),
-                                      axis=n_dimensions),
-                             axis=0).reshape((-1, n_dimensions))
+        _ = check_list_of_images(X)
 
         return self
 
@@ -426,6 +411,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
             self._embed)(X[s])
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
-        #Xt = np.concatenate(Xt)
+
         Xt = reduce(sum, Xt, [])
         return Xt
