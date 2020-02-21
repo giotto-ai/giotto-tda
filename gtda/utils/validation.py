@@ -201,7 +201,7 @@ def check_list_of_images(X, **kwargs):
 
     """
     kwargs_default = {'force_same_n_axis':  False,
-                      'force_same_dim': False, 'force_all_finite': True,
+                      'force_same_shape': False, 'force_all_finite': True,
                       'ensure_2d': False, 'allow_nd': True}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
@@ -230,12 +230,12 @@ def check_list_of_point_clouds(X, **kwargs):
 
     """
     kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
-                      'force_same_dim': False, 'force_same_n_axis': True}
+                      'force_same_shape': False, 'force_same_n_axis': True}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
 
 
-def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
+def check_list_of_arrays(X, force_same_shape=True, force_same_n_axis=True,
                          **kwargs):
     """Check a list of arrays, by integrating through the input one by one.
     The constraints are to be specified in :param:`kwargs`. On top of
@@ -247,7 +247,7 @@ def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
     X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
         or an array `X.dim==3`
 
-    force_same_dim : bool, optional, default: ``True``
+    force_same_shape : bool, optional, default: ``True``
         Indicates whether the shapes of the elements of X should all
         be the same.
 
@@ -266,7 +266,7 @@ def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
     """
 
     # if restrictions on the dimensions of the input are imposed
-    if force_same_dim:
+    if force_same_shape:
         shapes = [x.shape for x in X]
         if not(all([shapes[0] == s for s in shapes])):
             raise ValueError(f"The arrays in X do not have the same dimensions"
