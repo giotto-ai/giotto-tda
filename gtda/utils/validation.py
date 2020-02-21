@@ -216,7 +216,7 @@ def check_list_of_point_clouds(X, **kwargs):
 
     Parameters
     ----------
-    X : list of ndarray, such that `X[i].ndim==2` (n_points, n_dimensions),
+    X : list of ndarray, such that ``X[i].ndim==2`` (n_points, n_dimensions),
         or an array `X.dim==3`
 
     kwargs : dict or None, optional, default: ``None``
@@ -237,31 +237,33 @@ def check_list_of_point_clouds(X, **kwargs):
 
 def check_list_of_arrays(X, force_same_shape=True, force_same_ndim=True,
                          **kwargs):
-    """Check a list of arrays, by integrating through the input one by one.
-    The constraints are to be specified in :param:`kwargs`. On top of
+    """Input validation on a list of lists, arrays, sparse matrices, or similar.
+
+    The constraints are to be specified in `kwargs`. On top of
     parameters from :func:`~sklearn.utils.validation.check_array`,
     the optional parameters are listed below.
 
     Parameters
     ----------
-    X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
-        or an array `X.dim==3`
+    X : list
+        Input list of objects to check / convert.
 
     force_same_shape : bool, optional, default: ``True``
-        Indicates whether the shapes of the elements of X should all
+        Indicates whether the shapes of the elements of `X` should all
         be the same.
 
     force_same_ndim : bool, optional, default: ``True``
-        Indicates whether the number of axes in the elements of X should all
+        Indicates whether the number of axes in the elements of `X` should all
         be the same.
 
-    kwargs: dict or None, optional, default: ``None``
+    kwargs : dict or None, optional, default: ``None``
         Parameters accepted by :func:`~sklearn.utils.validation.check_array`.
 
     Returns
     -------
-    X : list of input arrays
-        as modified by :func:`~sklearn.utils.validation.check_array`
+    X : list
+        Output list of objects, each checked / converted by
+        :func:`~sklearn.utils.validation.check_array`
 
     """
 
