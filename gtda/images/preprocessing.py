@@ -6,9 +6,9 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_is_fitted
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import validate_params
+from ..utils.validation import validate_params,check_list_of_images
 
 
 @adapt_fit_transform_docs
@@ -83,7 +83,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_list_of_images(X)
 
         self.n_dimensions_ = len(X.shape) - 1
         self.max_value_ = np.max(X)
@@ -114,7 +114,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_list_of_images(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._binarize)(X[s])
@@ -166,7 +166,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        X = check_list_of_images(X)
 
         self._is_fitted = True
         return self
@@ -194,7 +194,7 @@ class Inverter(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_list_of_images(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(X[s])
@@ -275,7 +275,7 @@ class Padder(BaseEstimator, TransformerMixin):
                         {**self._hyperparameters,
                          'paddings_dim': [int, [n_dimensions]]})
 
-        check_array(X, ensure_2d=False, allow_nd=True)
+        check_list_of_images(X)
 
         self._pad_width = ((0, 0),
                            *[(self.paddings_[axis], self.paddings_[axis])
@@ -306,7 +306,7 @@ class Padder(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_list_of_images(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(X[s], pad_width=self._pad_width,
@@ -378,7 +378,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_list_of_images(X)
 
         n_dimensions = len(X.shape) - 1
         axis_order = [2, 1, 3]
@@ -415,7 +415,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_list_of_images(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._embed)(X[s])
