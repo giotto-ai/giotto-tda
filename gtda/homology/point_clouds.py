@@ -207,7 +207,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_point_clouds(X, ensure_2d=True, force_all_finite=False)
+        X = check_list_of_point_clouds(X, ensure_2d=True,
+                                       force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
                                           for i in range(len(X)))
@@ -423,7 +424,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_point_clouds(X, ensure_2d=True, force_all_finite=False)
+        X = check_list_of_point_clouds(X, ensure_2d=True,
+                                       force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(

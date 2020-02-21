@@ -183,7 +183,7 @@ def check_list_of_images(X, **kwargs):
     through the input one by one.
     Parameters
     ----------
-    X : list of ndarray, 
+    X : list of ndarray,
     Returns
     -------
     X : list of ndarray, as modified by check_array
