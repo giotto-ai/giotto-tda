@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 import numbers
+from functools import reduce
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
@@ -353,9 +354,13 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _embed(self, X):
+    def _embed_(self, X):
         Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.0
         Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
+        return Xpts
+
+    def _embed(self, X):
+        Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
         return Xpts
 
     def fit(self, X, y=None):
@@ -380,7 +385,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         """
         X = check_list_of_images(X)
 
-        n_dimensions = len(X.shape) - 1
+        n_dimensions = len(X[0].shape)
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
                            for i in axis_order[:n_dimensions]]
@@ -421,5 +426,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
             self._embed)(X[s])
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt)
+        #Xt = np.concatenate(Xt)
+        Xt = reduce(sum, Xt, [])
         return Xt

@@ -136,6 +136,24 @@ images_3D_img2pc = np.array(
       [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
       [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf]]])
 
+images_2D_img2pc = list(
+    [np.array([[0., 2.], [1., 2.], [0., 1.], [1., 1.], [0., 0.], [1., 0.]]),
+     np.array([[0., 2.], [0., 1.], [0., 0.]]),
+     np.array([[]])
+     ])
+
+images_3D_img2pc = list(
+    [np.array([[0., 2., 0.], [0., 2., 1.],
+              [1., 2., 0.], [1., 2., 1.],
+              [0., 1., 0.], [0., 1., 1.],
+              [1., 1., 0.], [1., 1., 1.],
+              [0., 0., 0.], [0., 0., 1.],
+              [1., 0., 0.], [1., 0., 1.]]),
+     np.array([[0., 2., 0.], [0., 2., 1.],
+               [0., 1., 0.], [0., 1., 1.],
+               [0., 0., 0.], [0., 0., 1.]]),
+     np.array([[]])])
+
 
 @pytest.mark.parametrize("images, expected",
                          [(images_2D_small, images_2D_img2pc),
@@ -143,5 +161,15 @@ images_3D_img2pc = np.array(
 def test_img2pc_transform(images, expected):
     img2pc = ImageToPointCloud()
 
-    assert_almost_equal(img2pc.fit_transform(images),
-                        expected)
+    all(compare_arrays_as_sets(res, expected)
+        for res, expected in zip(img2pc.fit_transform(images),
+                                 expected))
+
+
+def compare_arrays_as_sets(a1, a2):
+    """ A helper function to compare two point_clouds. They should have the same points,
+    but not necessarily in the same order"""
+    def to_set_of_elements(a):
+        return set([tuple(p) for p in a])
+    as1, as2 = [to_set_of_elements(a) for a in [a1, a2]]
+    return (as1 <= as2) and (as1 >= as2)
