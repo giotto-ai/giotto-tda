@@ -179,24 +179,25 @@ def validate_metric_params(metric, metric_params):
 
 
 def check_list_of_images(X, **kwargs):
-    """"Check a list of arrays representing images, by integrating
-    through the input one by one. To pass a test with
-    :param:`kwargs`=``None``, all images x in X must satisfy:
-        - x.ndim >= 2,
-        - all(np.isfinite(x))
+    """Check a list of arrays representing images, by integrating
+    through the input one by one. To pass a test when `kwargs` is ``None``,
+    all images ``x`` in `X` must satisfy:
+        - ``x.ndim`` >= 2,
+        - ``all(np.isfinite(x))``
 
     Parameters
     ----------
-    X : list of ndarray,
-        Each entry of X corresponds to an image.
+    X : list of ndarray
+        Each entry of `X` corresponds to an image.
 
-    kwargs: dict or None, optional, default: ``None``
+    kwargs : dict or None, optional, default: ``None``
         Parameters accepted by
         :func:`~gtda.utils.validation.check_list_of_arrays`.
 
     Returns
     -------
-    X : list of ndarray, as modified by check_array
+    X : list of ndarray
+        as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
     kwargs_default = {'force_same_n_axis':  False,
@@ -207,24 +208,25 @@ def check_list_of_images(X, **kwargs):
 
 
 def check_list_of_point_clouds(X, **kwargs):
-    """"Check a list of arrays representing point clouds, by integrating
-    through the input one by one. To pass a test with
-    :param:`kwargs`=``None``, all point clouds x, y in X must satisfy:
-        - x.ndim == 2,
-        - len(y.shape) == len(y.shape).
+    """Check a list of arrays representing point clouds, by integrating
+    through the input one by one. To pass a test when `kwargs` is ``None``,
+    all point clouds ``x``, ``y`` in X must satisfy:
+        - ``x.ndim == 2``,
+        - ``len(y.shape) == len(y.shape)``.
 
     Parameters
     ----------
-    X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
+    X : list of ndarray, such that `X[i].ndim==2` (n_points, n_dimensions),
         or an array `X.dim==3`
 
-    kwargs: dict or None, optional, default: ``None``
+    kwargs : dict or None, optional, default: ``None``
         Parameters accepted by
         :func:`~gtda.utils.validation.check_list_of_arrays`.
 
     Returns
     -------
-    X : list of input arrays, as modified by check_array
+    X : list of input arrays
+        as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
     kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
@@ -235,7 +237,7 @@ def check_list_of_point_clouds(X, **kwargs):
 
 def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
                          **kwargs):
-    """"Check a list of arrays, by integrating through the input one by one.
+    """Check a list of arrays, by integrating through the input one by one.
     The constraints are to be specified in :param:`kwargs`. On top of
     parameters from :func:`~sklearn.utils.validation.check_array`,
     the optional parameters are listed below.
@@ -258,7 +260,8 @@ def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
 
     Returns
     -------
-    X : list of input arrays, as modified by check_array
+    X : list of input arrays
+        as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
 
@@ -266,14 +269,14 @@ def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
     if force_same_dim:
         shapes = [x.shape for x in X]
         if not(all([shapes[0] == s for s in shapes])):
-            raise ValueError("The arrays in X do not have the same dimensions"
-                             "({}), while they should.".format(shapes))
+            raise ValueError(f"The arrays in X do not have the same dimensions"
+                             "({shapes}), while they should.")
     # if the number of dimensions can vary
     if force_same_n_axis:
         n_axis = [len(x.shape) for x in X]
         if not(all([n_axis[0] == n for n in n_axis])):
-            raise ValueError("The arrays in X do not have the same number"
-                             "of axes ({}), while they should.".format(n_axis))
+            raise ValueError(f"The arrays in X do not have the same number"
+                             "of axes ({n_axis}), while they should.")
 
     results = []
     messages = []
