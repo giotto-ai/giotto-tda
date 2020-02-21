@@ -1,7 +1,7 @@
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: ../generated/homology/
+   :toctree: generated/homology/
    :template: class.rst
 
    homology.VietorisRipsPersistence

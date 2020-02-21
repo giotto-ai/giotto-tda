@@ -3,7 +3,7 @@ Preprocessing
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: ../generated/diagrams/preprocessing/
+   :toctree: generated/diagrams/preprocessing/
    :template: class.rst
 
    diagrams.ForgetDimension
@@ -15,7 +15,7 @@ Distances
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: ../generated/diagrams/distances/
+   :toctree: generated/diagrams/distances/
    :template: class.rst
 
    diagrams.PairwiseDistance
@@ -25,7 +25,7 @@ Diagram features
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: ../generated/diagrams/features/
+   :toctree: generated/diagrams/features/
    :template: class.rst
 
    diagrams.Amplitude

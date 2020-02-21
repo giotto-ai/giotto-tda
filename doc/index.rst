@@ -16,6 +16,10 @@ Checkout the following resources:
 :mod:`gtda.mapper`: Mapper
 ==========================
 
+.. automodule:: gtda.mapper
+   :no-members:
+   :no-inherited-members:
+
 .. include:: modules/mapper.rst
 
 :mod:`gtda.homology`: Persistent homology
@@ -43,58 +47,7 @@ Checkout the following resources:
    :no-members:
    :no-inherited-members:
 
-Preprocessing
--------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/time_series/preprocessing/
-   :template: class.rst
-
-   time_series.SlidingWindow
-   time_series.Resampler
-   time_series.Stationarizer
-
-Time-delay embedding
---------------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/time_series/embedding/
-   :template: class.rst
-
-   time_series.TakensEmbedding
-
-Target preparation
-------------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/time_series/target_preparation/
-   :template: class.rst
-
-   time_series.Labeller
-
-Dynamical systems
------------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/time_series/dynamical_system/
-   :template: class.rst
-
-   time_series.PermutationEntropy
-
-Multivariate
-------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/time_series/multivariate/
-   :template: class.rst
-
-   time_series.PearsonDissimilarity
-
+.. include:: modules/time_series.rst
 
 :mod:`gtda.graphs`: Graphs
 ==========================
@@ -103,27 +56,7 @@ Multivariate
    :no-members:
    :no-inherited-members:
 
-Graph creation
---------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/graphs/creation/
-   :template: class.rst
-
-   graphs.TransitionGraph
-   graphs.KNeighborsGraph
-
-Graph processing
-----------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/graphs/processing/
-   :template: class.rst
-
-   graphs.GraphGeodesicDistance
-
+.. include:: modules/graphs.rst
 
 :mod:`gtda.base`: Base
 ======================
@@ -132,14 +65,7 @@ Graph processing
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   base.TransformerResamplerMixin
-
+.. include:: modules/base.rst
 
 :mod:`gtda.pipeline`: Pipeline
 ==============================
@@ -148,20 +74,7 @@ Graph processing
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   pipeline.Pipeline
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-   pipeline.make_pipeline
-
+.. include:: modules/pipeline.rst
 
 :mod:`gtda.meta_transformers`: Convenience pipelines
 ====================================================
@@ -170,16 +83,7 @@ Graph processing
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   meta_transformers.EntropyGenerator
-   meta_transformers.BettiCurveGenerator
-   meta_transformers.LandscapeGenerator
-
+.. include:: modules/meta_transformers.rst
 
 :mod:`gtda.utils`: Validation
 =============================
@@ -190,39 +94,16 @@ Graph processing
 
 .. currentmodule:: gtda
 
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
+.. include:: modules/validation.rst
 
-   utils.check_diagram
-   utils.validate_params
-   utils.validate_metric_params
+:mod:`gtda.images`: Images
+==========================
 
-..
-   :mod:`gtda.images`: Images
-   ==========================
-
-..
-   automodule:: gtda.images
+.. automodule:: gtda.images
    :no-members:
    :no-inherited-members:
 
-..
-   currentmodule:: gtda/images/
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   images.ImageInverter
-   images.HeightFiltration
-   images.RadialFiltration
-   images.DilationFiltration
-   images.ErosionFiltration
-   images.SignedDistanceFiltration
-   images.DensityFiltration
-
+.. include:: modules/imagesr.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning
