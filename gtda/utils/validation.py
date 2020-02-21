@@ -181,19 +181,26 @@ def validate_metric_params(metric, metric_params):
 def check_list_of_images(X, **kwargs):
     """"Check a list of arrays representing images, by integrating
     through the input one by one. To pass a test with
-    :param:`kwargs`=None
+    :param:`kwargs`=``None``, all images x in X must satisfy:
+        - x.ndim >= 2,
+        - all(np.isfinite(x))
 
     Parameters
     ----------
     X : list of ndarray,
         Each entry of X corresponds to an image.
+
+    kwargs: dict or None, optional, default: ``None``
+        Parameters accepted by
+        :func:`~gtda.utils.validation.check_list_of_arrays`.
+
     Returns
     -------
     X : list of ndarray, as modified by check_array
 
     """
     kwargs_default = {'force_same_n_axis':  False,
-                      'force_same_dim': True, 'force_all_finite': True,
+                      'force_same_dim': False, 'force_all_finite': True,
                       'ensure_2d': False, 'allow_nd': True}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
@@ -201,11 +208,19 @@ def check_list_of_images(X, **kwargs):
 
 def check_list_of_point_clouds(X, **kwargs):
     """"Check a list of arrays representing point clouds, by integrating
-    through the input one by one.
+    through the input one by one. To pass a test with
+    :param:`kwargs`=``None``, all point clouds x, y in X must satisfy:
+        - x.ndim == 2,
+        - len(y.shape) == len(y.shape).
+
     Parameters
     ----------
     X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
         or an array `X.dim==3`
+
+    kwargs: dict or None, optional, default: ``None``
+        Parameters accepted by
+        :func:`~gtda.utils.validation.check_list_of_arrays`.
 
     Returns
     -------
