@@ -20,6 +20,7 @@ togit:
 github:
 	@make html
 	@make togit
+	@python create_index.py
 
 theory:
 	@pandoc theory/glossary.tex -f latex -t rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
