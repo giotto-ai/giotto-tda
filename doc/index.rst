@@ -16,83 +16,7 @@ Checkout the following resources:
 :mod:`gtda.mapper`: Mapper
 ==========================
 
-.. automodule:: gtda.mapper
-   :no-members:
-   :no-inherited-members:
-
-Filters
--------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   mapper.Projection
-   mapper.Eccentricity
-   mapper.Entropy
-
-Covers
--------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   mapper.OneDimensionalCover
-   mapper.CubicalCover
-
-Clustering
-----------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   mapper.FirstSimpleGap
-   mapper.FirstHistogramGap
-
-Pipeline
---------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-   mapper.pipeline.make_mapper_pipeline
-
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   mapper.pipeline.MapperPipeline
-
-Visualization
--------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-   mapper.visualization.plot_static_mapper_graph
-   mapper.visualization.plot_interactive_mapper_graph
-
-Utilities
----------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-   mapper.utils.decorators.method_to_transform
-   mapper.utils.pipeline.transformer_from_callable_on_rows
-
+.. include:: modules/mapper.rst
 
 :mod:`gtda.homology`: Persistent homology
 =========================================
@@ -101,15 +25,7 @@ Utilities
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   homology.VietorisRipsPersistence
-   homology.ConsistentRescaling
-
+.. include:: modules/homology.rst
 
 :mod:`gtda.diagrams`: Persistence diagrams
 ==========================================
@@ -118,42 +34,7 @@ Utilities
    :no-members:
    :no-inherited-members:
 
-Preprocessing
--------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   diagrams.ForgetDimension
-   diagrams.Scaler
-   diagrams.Filtering
-
-Distances
----------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   diagrams.PairwiseDistance
-
-Diagram features
-----------------
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   diagrams.Amplitude
-   diagrams.PersistenceEntropy
-   diagrams.PersistenceLandscape
-   diagrams.BettiCurve
-   diagrams.HeatKernel
-
+.. include:: modules/diagrams.rst
 
 :mod:`gtda.time_series`: Time series
 ====================================
@@ -167,7 +48,7 @@ Preprocessing
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/time_series/preprocessing/
    :template: class.rst
 
    time_series.SlidingWindow
@@ -179,7 +60,7 @@ Time-delay embedding
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/time_series/embedding/
    :template: class.rst
 
    time_series.TakensEmbedding
@@ -189,7 +70,7 @@ Target preparation
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/time_series/target_preparation/
    :template: class.rst
 
    time_series.Labeller
@@ -199,7 +80,7 @@ Dynamical systems
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/time_series/dynamical_system/
    :template: class.rst
 
    time_series.PermutationEntropy
@@ -209,7 +90,7 @@ Multivariate
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/time_series/multivariate/
    :template: class.rst
 
    time_series.PearsonDissimilarity
@@ -227,7 +108,7 @@ Graph creation
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/graphs/creation/
    :template: class.rst
 
    graphs.TransitionGraph
@@ -238,7 +119,7 @@ Graph processing
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/graphs/processing/
    :template: class.rst
 
    graphs.GraphGeodesicDistance
@@ -327,7 +208,7 @@ Graph processing
    :no-inherited-members:
 
 ..
-   currentmodule:: gtda
+   currentmodule:: gtda/images/
 
 ..
    autosummary::
