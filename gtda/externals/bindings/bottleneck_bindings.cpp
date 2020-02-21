@@ -21,7 +21,7 @@ double bottleneck_distance(const std::vector<std::pair<double, double>>& dgm1,
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_bottleneck, m) {
+PYBIND11_MODULE(gtda_bottleneck, m) {
   m.doc() = "bottleneck dionysus implementation";
   using namespace pybind11::literals;
   m.def("bottleneck_distance", &bottleneck_distance, "dgm1"_a, "dgm2"_a,

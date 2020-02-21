@@ -51,7 +51,7 @@ class Cech_complex_interface {
 }  // namespace cech_complex
 }  // namespace Gudhi
 
-PYBIND11_MODULE(giotto_cech_complex, m) {
+PYBIND11_MODULE(gtda_cech_complex, m) {
   using namespace pybind11::literals;
   using Simplex_tree =
       Gudhi::Simplex_tree<Gudhi::Simplex_tree_options_fast_persistence>;

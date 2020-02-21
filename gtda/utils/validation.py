@@ -10,22 +10,21 @@ available_metrics = {
     'wasserstein': [('p', int, (1, np.inf)),
                     ('delta', numbers.Number, (1e-16, 1.))],
     'betti': [('p', numbers.Number, (1, np.inf)),
-              ('n_values', int, (1, np.inf))],
+              ('n_bins', int, (1, np.inf))],
     'landscape': [('p', numbers.Number, (1, np.inf)),
-                  ('n_values', int, (1, np.inf)),
+                  ('n_bins', int, (1, np.inf)),
                   ('n_layers', int, (1, np.inf))],
-    'heat': [('order', numbers.Number, (1, np.inf)),
-             ('n_values', int, (1, np.inf)),
+    'heat': [('p', numbers.Number, (1, np.inf)),
+             ('n_bins', int, (1, np.inf)),
              ('sigma', numbers.Number, (0., np.inf))],
-    'persistent_image': [('order', numbers.Number, (1, np.inf)),
-                         ('n_values', int, (1, np.inf)),
-                         ('sigma', numbers.Number, (0., np.inf)),
-                         ('weight_function', types.FunctionType,
-                          None)]}
+    'persistence_image': [('p', numbers.Number, (1, np.inf)),
+                          ('n_bins', int, (1, np.inf)),
+                          ('sigma', numbers.Number, (0., np.inf)),
+                          ('weight_function', types.FunctionType,
+                           None)]}
 
-available_metric_params = list(set(
-    [param for param_list in available_metrics.values()
-     for (param, param_type, param_range) in param_list]))
+available_metric_params = {metric: [p[0] for p in param_lst]
+                           for metric, param_lst in available_metrics.items()}
 
 
 def check_diagram(X, copy=False):
@@ -109,7 +108,7 @@ def validate_params(parameters, references):
                                                   type(parameter)))
                 if references[key][1][1] is None:
                     break
-                if isinstance(references[key][1], tuple):
+                if isinstance(references[key][1][1], tuple):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):
                         raise ValueError("Parameter {} is a list containing {}"
@@ -170,8 +169,8 @@ def validate_metric_params(metric, metric_params):
                                                param_values[1], input_param))
 
     for param in metric_params.keys():
-        if param not in available_metric_params:
-            raise ValueError("{} in param_metric is not an available"
-                             " parameter. Available metric_params."
+        if param not in available_metric_params[metric]:
+            raise ValueError("{} in metric_param is not an available"
+                             " parameter. Available metric_params"
                              " are {}".format(param,
-                                              available_metric_params))
+                                              available_metric_params[metric]))
