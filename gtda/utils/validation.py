@@ -180,13 +180,17 @@ def validate_metric_params(metric, metric_params):
 
 def check_list_of_images(X, **kwargs):
     """"Check a list of arrays representing images, by integrating
-    through the input one by one.
+    through the input one by one. To pass a test with
+    :param:`kwargs`=None
+
     Parameters
     ----------
     X : list of ndarray,
+        Each entry of X corresponds to an image.
     Returns
     -------
     X : list of ndarray, as modified by check_array
+
     """
     kwargs_default = {'force_same_n_axis':  False,
                       'force_same_dim': True, 'force_all_finite': True,
@@ -202,9 +206,11 @@ def check_list_of_point_clouds(X, **kwargs):
     ----------
     X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
         or an array `X.dim==3`
+
     Returns
     -------
     X : list of input arrays, as modified by check_array
+
     """
     kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
                       'force_same_dim': False, 'force_same_n_axis': True}
@@ -212,18 +218,34 @@ def check_list_of_point_clouds(X, **kwargs):
     return check_list_of_arrays(X, **kwargs_default)
 
 
-def check_list_of_arrays(X, **kwargs):
+def check_list_of_arrays(X, force_same_dim=True, force_same_n_axis=True,
+                         **kwargs):
     """"Check a list of arrays, by integrating through the input one by one.
+    The constraints are to be specified in :param:`kwargs`. On top of
+    parameters from :func:`~sklearn.utils.validation.check_array`,
+    the optional parameters are listed below.
+
     Parameters
     ----------
     X : list(ndarray), such that `X[i].ndim==2` (n_points, n_dimensions),
         or an array `X.dim==3`
+
+    force_same_dim : bool, optional, default: ``True``
+        Indicates whether the shapes of the elements of X should all
+        be the same.
+
+    force_same_n_axis : bool, optional, default: ``True``
+        Indicates whether the number of axes in the elements of X should all
+        be the same.
+
+    kwargs: dict or None, optional, default: ``None``
+        Parameters accepted by :func:`~sklearn.utils.validation.check_array`.
+
     Returns
     -------
     X : list of input arrays, as modified by check_array
+
     """
-    force_same_dim = kwargs.pop('force_same_dim', True)
-    force_same_n_axis = kwargs.pop('force_same_n_axis', True)
 
     # if restrictions on the dimensions of the input are imposed
     if force_same_dim:

@@ -160,9 +160,10 @@ images_3D_img2pc = list(
                           (images_3D_small, images_3D_img2pc)])
 def test_img2pc_transform(images, expected):
     img2pc = ImageToPointCloud()
+    results = img2pc.fit_transform(images)
 
     all(compare_arrays_as_sets(res, expected)
-        for res, expected in zip(img2pc.fit_transform(images),
+        for res, expected in zip(results,
                                  expected))
 
 

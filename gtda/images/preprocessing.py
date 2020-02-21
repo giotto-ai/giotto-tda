@@ -124,7 +124,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
         Xt = np.concatenate(Xt)
 
         if self.n_dimensions_ == 2:
-            Xt = Xt.reshape((*X.shape))
+            Xt = Xt.reshape(X.shape)
 
         return Xt
 
@@ -378,6 +378,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
         """
         _ = check_list_of_images(X)
+        self.is_fitted_ = True
 
         return self
 
