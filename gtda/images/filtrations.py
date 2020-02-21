@@ -493,7 +493,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class ErosionFiltration(BaseEstimator, TransformerMixin):
     """Filtrations of 2D/3D binary images based on the erosion of activated
-    regions. Binary erosion is a morphological operator commonly used in
+    regions.
+
+    Binary erosion is a morphological operator commonly used in
     image processing and relies on the scipy.ndimage module [1]_.
 
     This filtration assigns to each pixel in an image a grayscale value
@@ -632,12 +634,12 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
     of activated regions.
 
     This filtration assigns to each pixel in an image a grayscale value
-    calculated as follows. For activated pixels, if the minimum Manhattan
+    calculated as follows. For deactivated pixels, if the minimum Manhattan
     distance between the pixel and any activated pixel in the image is less
     than or equal to the parameter :param:`n_iterations`, the assigned value is
     this distance. Otherwise, the assigned grayscale value is the sum of the
     lengths along all axes of the image – equivalently, it is the maximum
-    Manhattan distance between any two pixels in the image. For deactivated
+    Manhattan distance between any two pixels in the image. For activated
     pixels, if the minimum Manhattan distance between the pixel and any
     deactivated pixel in the image is less than or equal to the parameter
     :param:`n_iterations`, the assigned value is the opposite of this distance.
