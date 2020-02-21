@@ -182,7 +182,7 @@ def check_list_of_images(X, **kwargs):
     """Check a list of arrays representing images, by integrating
     through the input one by one. To pass a test when `kwargs` is ``None``,
     all images ``x`` in `X` must satisfy:
-        - ``x.ndim`` >= 2,
+        - ``x.ndim >= 2``,
         - ``all(np.isfinite(x))``
 
     Parameters
@@ -200,7 +200,7 @@ def check_list_of_images(X, **kwargs):
         as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
-    kwargs_default = {'force_same_n_axis': False,
+    kwargs_default = {'force_same_ndim': False,
                       'force_same_shape': False, 'force_all_finite': True,
                       'ensure_2d': False, 'allow_nd': True}
     kwargs_default.update(kwargs)
@@ -230,12 +230,12 @@ def check_list_of_point_clouds(X, **kwargs):
 
     """
     kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
-                      'force_same_shape': False, 'force_same_n_axis': True}
+                      'force_same_shape': False, 'force_same_ndim': True}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
 
 
-def check_list_of_arrays(X, force_same_shape=True, force_same_n_axis=True,
+def check_list_of_arrays(X, force_same_shape=True, force_same_ndim=True,
                          **kwargs):
     """Check a list of arrays, by integrating through the input one by one.
     The constraints are to be specified in :param:`kwargs`. On top of
@@ -251,7 +251,7 @@ def check_list_of_arrays(X, force_same_shape=True, force_same_n_axis=True,
         Indicates whether the shapes of the elements of X should all
         be the same.
 
-    force_same_n_axis : bool, optional, default: ``True``
+    force_same_ndim : bool, optional, default: ``True``
         Indicates whether the number of axes in the elements of X should all
         be the same.
 
@@ -272,7 +272,7 @@ def check_list_of_arrays(X, force_same_shape=True, force_same_n_axis=True,
             raise ValueError(f"The arrays in X do not have the same dimensions"
                              "({shapes}), while they should.")
     # if the number of dimensions can vary
-    elif force_same_n_axis:
+    elif force_same_ndim:
         n_axis = [x.ndim for x in X]
         if not (all([n_axis[0] == n for n in n_axis])):
             raise ValueError(f"The arrays in X do not have the same number"
