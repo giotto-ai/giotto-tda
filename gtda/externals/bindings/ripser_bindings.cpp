@@ -12,7 +12,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_ripser, m) {
+PYBIND11_MODULE(gtda_ripser, m) {
   m.doc() = "Ripser python interface";
   py::class_<ripserResults>(m, "ripserResults")
       .def_readwrite("births_and_deaths_by_dim",

@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_simplex_tree, m) {
+PYBIND11_MODULE(gtda_simplex_tree, m) {
   // Simplex_tree_interface_full_featured
   using simplex_tree_interface_inst = Gudhi::Simplex_tree_interface<>;
   py::class_<simplex_tree_interface_inst>(

@@ -128,8 +128,8 @@ def test_precomputed_distances(inp):
     as the clustering on points, that were used to calculate
     that distance matrix."""
     n_points_per_cluster, n_clusters, _, pts = inp
-    dist_matrix = distance_matrix(pts, pts, p=2)
 
+    dist_matrix = distance_matrix(pts, pts, p=2)
     fh_matrix = FirstHistogramGap(freq_threshold=0, max_fraction=None,
                                   n_bins_start=5, affinity='precomputed',
                                   memory=None, linkage='single')
@@ -140,4 +140,14 @@ def test_precomputed_distances(inp):
                            memory=None, linkage='single')
     preds = fh.fit_predict(pts)
 
-    assert_almost_equal(preds, preds_mat)
+    indices_cluster = set(preds)
+
+    def get_partition_from_preds(preds):
+        """From a vector of predictions (labels), get a set of frozensets,
+        where each frozenset represents a cluster, and has the indices of rows
+        of its elements."""
+        return set([frozenset(np.where(preds == c)[0])
+                    for c in indices_cluster])
+
+    assert(get_partition_from_preds(preds)
+           == get_partition_from_preds(preds_mat))

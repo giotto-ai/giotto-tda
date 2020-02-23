@@ -53,7 +53,7 @@ pdfpagelabels]{hyperref}
 	\paragraph{\\ Reference:} \cite{mischaikow04computational}
 	
 	\subsection*{Simplicial complex} \label{simplicial complex}
-	
+
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textbf{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textbf{simplex}, explicitly
 	\begin{equation*}
 	[v_0,\dots,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
@@ -82,7 +82,7 @@ pdfpagelabels]{hyperref}
 	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
 	
 	A simplicial complex $X$ is a \textit{subcomplex} of a simplicial complex $Y$ if every simplex of $X$ is a simplex of $Y$.
-	
+
 	Given a finite abstract simplicial complex $X = (V, X)$ we can choose a bijection from $V$ to a geometrically independent subset of $\mathbb R^N$ and associate a \hyperref[simplicial complex]{simplicial complex} to $X$ called its \textit{geometric realization}.
 	
 	\subsection*{Ordered simplicial complex:} \label{ordered simplical complex}
@@ -98,6 +98,7 @@ pdfpagelabels]{hyperref}
 		\item for every $v$ in $V$, the tuple $v$ is in $X$ and
 		\item if $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$. 
 	\end{enumerate}
+
 	With appropriate modifications the same terminology and notation introduced for \hyperref[ordered simplicial complex]{ordered simplicial complex} applies to directed simplicial complex.
 	
 	\subsection*{Clique or flag complexes:} \label{clique or flag complexes}
@@ -115,7 +116,7 @@ pdfpagelabels]{hyperref}
 	C_* = \bigoplus_{n \in \mathbb Z} C_n \quad \mathrm{and} \quad \partial = \bigoplus_{n \in \mathbb Z} \partial_n
 	\end{equation*}
 	with  $C_n$ a $\Bbbk$-vector space and $\partial_n : C_{n+1} \to C_n$ is a $\Bbbk$-linear map such that $\partial_{n+1} \partial_n = 0$. We refer to $\partial$ as the \textit{boundary map} of the chain complex.
-	
+
 	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of \hyperref[homology]{homology}.
 	
 	A \textit{chain map} is a $\Bbbk$-linear map $f : C \to C'$ between chain complexes such that $f(C_n) \subseteq C'_n$ and $\partial f = f \partial$.
@@ -186,14 +187,14 @@ pdfpagelabels]{hyperref}
 	\subsection*{Multiset:} \label{multiset}
 	
 	A \textit{multiset} is a pair $(S, \phi)$ where $S$ is a set and  $\phi : S \to \mathbb N  \cup \{+\infty\}$ is a function attaining positive values. For $s \in S$ we refer to $\phi(s)$ as its \textit{multiplicity}. The \textit{union} of two multisets $(S_1, \phi_1), (S_2, \phi_2)$ is the multiset $(S_1 \cup S_2, \phi_1 \cup \phi_2)$ with
-	$$
+	\begin{equation*}
 	(\phi_1 \cup \phi_2)(s) = 
 	\begin{cases}
 	\phi_1(s) & s \in S_1, s \not\in S_2 \\
 	\phi_2(s) & s \in S_2, s \not\in S_1 \\
 	\phi_1(s) + \phi_2(s) & s \in S_1, s \in S_2. \\
 	\end{cases}
-	$$
+	\end{equation*}
 	
 	\subsection*{Persistence diagram:} \label{persistence diagram}
 	
@@ -207,15 +208,15 @@ pdfpagelabels]{hyperref}
 	\subsection*{Wasserstein and bottleneck distance:}	\label{wasserstein and bottleneck distance}
 	
 	The \textit{$p$-Wasserstein distance} between two persistence diagrams $D_1$ and $D_2$ is the infimum over all bijections $\gamma: D_1 \cup \Delta \to D_2 \cup \Delta$ of
-	$$
+	\begin{equation*}
 	\sum_{x \in D_1 \cup \Delta} \Big(||x - \gamma(x)||_\infty^p \Big)^{1/p}
-	$$
+	\end{equation*}
 	where $||-||_\infty$ is defined for $(x,y) \in \mathbb R^2$ by $\max\{|x|, |y|\}$. 
 	
 	The limit $p \to \infty$ defines the \textit{bottleneck distance}. More explicitly, it is the infimum over the same set of bijections of the value
-	$$
+	\begin{equation*}
 	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
-	$$
+	\end{equation*}
 	\paragraph{\\ Reference:} \cite{kerber2017geometry}
 	
 	\subsection*{Persistence  landscape:} \label{persitence landscape}
@@ -282,9 +283,15 @@ pdfpagelabels]{hyperref}
 	d : X \times X \to \mathbb R
 	\end{equation*}
 	attaining non-negative values is called a \textit{metric space} if
-	$$d(x,y) = 0\ \Leftrightarrow\  x = y$$
-	$$d(x,y) = d(y,x)$$
-	$$d(x,z) \leq d(x,y) + d(y, z)$$
+  \begin{equation*}
+	d(x,y) = 0\ \Leftrightarrow\  x = y
+  \end{equation*}
+	\begin{equation*}
+  d(x,y) = d(y,x)
+  \end{equation*}
+	\begin{equation*}
+  d(x,z) \leq d(x,y) + d(y, z)
+  \end{equation*}
 	
 	In this case, the function $d$ is refer to as the \textit{metric} and the value $d(x,y)$ is called the \textit{distance} between $x$ and $y$. 
 	
@@ -352,12 +359,12 @@ pdfpagelabels]{hyperref}
 	x_i = \varphi(i \cdot \tau, x)
 	\end{equation*}
 	is an injective map with full rank. 
-	\paragraph{\\ Reference:} \cite{takens1981detecting}
+  
+  \paragraph{\\ Reference:} \cite{takens1981detecting}
 	
 	\subsection*{Manifold:} \label{manifold}
 	
-	Intuitively, a manifold of dimension $n$ is a space locally equivalent to $\mathbb R^n$. Formally, a subset $M$ of $\mathbb R^d$ is an $n$-dimensional manifold if for each $x \in M$ there exists an 
-	open ball $B(x) = \{ y \in M\,;\ d(x,y) < \epsilon\}$ and a smooth function with smooth inverse 
+	Intuitively, a manifold of dimension $n$ is a space locally equivalent to $\mathbb R^n$. Formally, a subset $M$ of $\mathbb R^d$ is an $n$-dimensional manifold if for each $x \in M$ there exists an open ball $B(x) = \{ y \in M\,;\ d(x,y) < \epsilon\}$ and a smooth function with smooth inverse 
 	\begin{equation*}
 	\phi_x : B(x) \to \{v \in \mathbb R^n\,;\ ||v||<1\}.
 	\end{equation*}

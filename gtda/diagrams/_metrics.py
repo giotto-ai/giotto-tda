@@ -1,8 +1,8 @@
 # License: GNU AGPLv3
 
 import numpy as np
-from giotto_bottleneck import bottleneck_distance
-from giotto_wasserstein import wasserstein_distance
+from ..externals.modules.gtda_bottleneck import bottleneck_distance
+from ..externals.modules.gtda_wasserstein import wasserstein_distance
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.ndimage import gaussian_filter
 from scipy.spatial.distance import cdist, pdist, squareform
@@ -131,13 +131,12 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
 
 def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
                    sigma=1.0, p=2.0, **kwargs):
-    sampling_ = np.copy(sampling.reshape((-1,)))
-    heat_1 = heats(diagrams_1, sampling_, step_size, sigma).reshape(
+    heat_1 = heats(diagrams_1, sampling, step_size, sigma).reshape(
         diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heats(diagrams_2, sampling_, step_size, sigma).reshape(
+    heat_2 = heats(diagrams_2, sampling, step_size, sigma).reshape(
         diagrams_2.shape[0], -1)
     unnorm_dist = cdist(heat_1, heat_2, "minkowski", p=p)
     return (step_size ** (1 / p)) * unnorm_dist
