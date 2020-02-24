@@ -17,7 +17,7 @@ available_metrics = {
     'heat': [('p', numbers.Number, (1, np.inf)),
              ('n_bins', int, (1, np.inf)),
              ('sigma', numbers.Number, (0., np.inf))],
-    'persistent_image': [('p', numbers.Number, (1, np.inf)),
+    'persistence_image': [('p', numbers.Number, (1, np.inf)),
                          ('n_bins', int, (1, np.inf)),
                          ('sigma', numbers.Number, (0., np.inf)),
                          ('weight_function', types.FunctionType,
