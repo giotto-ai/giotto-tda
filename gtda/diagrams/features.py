@@ -715,15 +715,9 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], subdiagrams corresponding to
-    distinct homology dimensions are considered separately.
-    Let :math:`D=\\{p_k/\\}_{k=1}^N` be a subdiagram, where
-    :math:`p_k=(b_k,d_k)` and :math:`\\lambda_k(x)=
-    \\max(0, -\\mathrm{abs}(x)+(d-b)/2)`. We define the silhouette
-    function of :math:`D` as the persistence-weighted average
-    of the piecewise-linear functions above, with weight :math:`(d-b)^p`
-    for :math:`/\\lambda_k`.
-    We obtain the silhouette by sampling the silhouette function over
-    evenly spaced locations from appropriate ranges
+    distinct homology dimensions are considered separately, and their
+    respective silhouette by sampling the silhouette function over evenly
+    spaced locations from appropriate ranges
     of the `filtration parameter <https://giotto.ai/theory>`_
 
      Parameters
