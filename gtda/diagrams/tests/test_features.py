@@ -136,6 +136,19 @@ def test_hk_positive(pts, dims):
     assert np.all((np.tril(x_t[:, :, ::-1, :]) + 1e-13) >= 0.)
 
 
+@given(pts_gen, dims_gen)
+def test_hk_big_sigma(pts, dims):
+    """ We expect that with a huge sigma, the diagrams are so diluted that
+    they are almost 0. Effectively, verifies that the smoothing is really applied."""
+    n_bins = 10
+    x = get_input(pts, dims)
+
+    hk = HeatKernel(sigma=100*np.max(np.abs(x)), n_bins=n_bins)
+    x_t = hk.fit(x).transform(x)
+
+    assert np.all(np.abs(x_t) <= 1e-4)
+
+
 @given(pts_gen)
 def test_hk_with_diag_points(pts):
     """Add points on the diagonal, and verify that we have the same results
