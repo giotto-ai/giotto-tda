@@ -35,9 +35,9 @@ def landscapes(diagrams, sampling, n_layers):
     return fibers
 
 
-def _heat(heat, sampled_diag, sigma):
-    _sample_image(heat, sampled_diag)  # modifies `heat` inplace
-    heat = gaussian_filter(heat, sigma, mode="reflect")
+def _heat(image, sampled_diag, sigma):
+    _sample_image(image, sampled_diag)  # modifies `heat` inplace
+    image[:] = gaussian_filter(image, sigma, mode="reflect")
 
 
 def heats(diagrams, sampling, step_size, sigma):
