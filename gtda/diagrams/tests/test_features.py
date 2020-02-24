@@ -112,11 +112,11 @@ dims_gen = arrays(
 
 
 def _validate_distinct(X):
-    unique_values = [np.unique(x[0:2, :]) for x in X]
+    """Check if, in X, there is any persistence diagram for which all births
+    and deaths are equal."""
+    unique_values = [np.unique(x[:, 0:2]) for x in X]
     if np.any([len(u) < 2 for u in unique_values]):
-        raise ValueError("There should be at least two distinct points"
-                         "in the persistent diagrams:" +
-                         "now, only {} is present".format(*unique_values))
+        raise ValueError
     return 0
 
 
@@ -161,6 +161,19 @@ def test_hk_positive(pts, dims):
     x_t = hk.fit(x).transform(x)
 
     assert np.all((np.tril(x_t[:, :, ::-1, :]) + 1e-13) >= 0.)
+
+
+@given(pts_gen, dims_gen)
+def test_hk_big_sigma(pts, dims):
+    """ We expect that with a huge sigma, the diagrams are so diluted that
+    they are almost 0. Effectively, verifies that the smoothing is applied."""
+    n_bins = 10
+    x = get_input(pts, dims)
+
+    hk = HeatKernel(sigma=100*np.max(np.abs(x)), n_bins=n_bins)
+    x_t = hk.fit(x).transform(x)
+
+    assert np.all(np.abs(x_t) <= 1e-4)
 
 
 @given(pts_gen)
