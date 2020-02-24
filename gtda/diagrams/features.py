@@ -771,7 +771,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'order': [float, (1., np.inf)],
+    _hyperparameters = {'order': [float, (0., np.inf)],
                         'n_bins': [int, (1., np.inf)]}
 
     def __init__(self, order=1., n_bins=100, n_jobs=None):
