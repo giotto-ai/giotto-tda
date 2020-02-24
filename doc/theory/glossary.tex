@@ -216,6 +216,20 @@
 	whenever the right hand side exists and is finite. 
 	\paragraph{References:} \cite{stein2011functional, bubenik2015statistical}
 	
+	\subsection*{Weighted silhouette:}
+	A \textit{weighted silhouette} is a continuous function
+	\begin{equation*}
+	\phi :  \mathbb R \to \mathbb R.
+	\end{equation*}
+	Let $D = \{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \underline{persistence module} and $0<p \leq \infty $ an integer. The \textit{weighted silhouette} associated to $D$ is given by
+	\begin{equation*}
+	\phi^{p}(t) = \frac{\sum_{i\in I}w_i^p \Lambda_i(t)}{\sum_{i\in I}w_i^p},
+	\end{equation*}
+	where $w_i = \vert d_i-b_i \vert$ and $\Lambda_i(t) = \max(0, -\vert x \vert+(d_i-b_i)/2)$.
+	
+	Intuitively, we can describe the \textit{weighted silhouette} as the weighted sum of the piecewise-linear functions, whose value at some point $t$ is given by the minimum between how long the component (associated to $(b_i,d_i)$ has persisted and how long it will persist.
+	\paragraph{References:}  \cite{chazal2014stochastic}
+	
 	\subsection*{Amplitude} Given a function assigning a real number to a pair of persistence diagrams. We define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \underline{Wasserstein and bottleneck distances} and \underline{landscape distance}.
 	
 	\subsection*{Persistence entropy:}
