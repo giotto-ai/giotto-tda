@@ -111,20 +111,10 @@ class Pipeline(pipeline.Pipeline):
             step, param = pname.split('__', 1)
             fit_params_steps[step][param] = pval
         for step_idx, name, transformer in self._iter(with_final=False):
-            if hasattr(memory, 'location'):
-                # joblib >= 0.12
-                if memory.location is None:
-                    # we do not clone when caching is disabled to
-                    # preserve backward compatibility
-                    cloned_transformer = transformer
-                else:
-                    cloned_transformer = clone(transformer)
-            elif hasattr(memory, 'cachedir'):
-                # joblib < 0.11
-                if memory.cachedir is None:
-                    # we do not clone when caching is disabled to
-                    # preserve backward compatibility
-                    cloned_transformer = transformer
+            if hasattr(memory, 'location') and (memory.location is None):
+                # joblib >= 0.12. We do not clone when caching is disabled to
+                # preserve backward compatibility
+                cloned_transformer = transformer
             else:
                 cloned_transformer = clone(transformer)
             # Fit or load from cache the current transfomer
