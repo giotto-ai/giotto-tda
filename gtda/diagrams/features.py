@@ -533,7 +533,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class PersistenceImage(BaseEstimator, TransformerMixin):
-    """Convolution of persistence diagrams with a Gaussian kernel.
+    """`Persistence images <https://giotto.ai/theory>`_ of persistence
+    diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], the equivalent diagrams of
@@ -711,7 +712,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Silhouette(BaseEstimator, TransformerMixin):
-    """Silhouettes of persistence diagrams.
+    """`Power-weighted silhouettes <https://giotto.ai/theory>`_ of persistence
+    diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], subdiagrams corresponding to
