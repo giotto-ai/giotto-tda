@@ -139,7 +139,7 @@ def test_hk_positive(pts, dims):
 @given(pts_gen, dims_gen)
 def test_hk_big_sigma(pts, dims):
     """ We expect that with a huge sigma, the diagrams are so diluted that
-    they are almost 0. Effectively, verifies that the smoothing is really applied."""
+    they are almost 0. Effectively, verifies that the smoothing is applied."""
     n_bins = 10
     x = get_input(pts, dims)
 
