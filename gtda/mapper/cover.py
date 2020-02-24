@@ -3,6 +3,7 @@
 
 from functools import partial
 from itertools import product
+import warnings
 
 import numpy as np
 from scipy.stats import rankdata
@@ -84,12 +85,21 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
                         'n_intervals': [int, (1, np.inf)],
-                        'overlap_frac': [float, (0, 1)]}
+                        'overlap_frac': [float, (0., 1.)]}
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
         self.overlap_frac = overlap_frac
+
+        if overlap_frac == 0.:
+            raise ValueError("`overlap_frac` must be positive,"
+                             "as otherwise the intervals will not cover"
+                             "the range")
+        if overlap_frac <= 1e-8:
+            warnings.warn("`overlap_frac` is close to zero,"
+                          "which might cause numerical issues and errors",
+                          RuntimeWarning)
 
     def _fit_uniform(self, X):
         self.left_limits_, self.right_limits_ = self._find_interval_limits(

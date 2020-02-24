@@ -54,7 +54,7 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip
-      pip install dist/*.whl
+      pip install dist/*manylinux2010*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -92,8 +92,7 @@ jobs:
   - bash: |
       set -e
       pip install twine
-      for f in dist/*linux* ; do sudo mv "$f" "${f/linux/manylinux2010}"; done
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
 
@@ -165,7 +164,7 @@ jobs:
   - script: |
       set -e
       pip install wheel
-      python setup.py sdist bdist_wheel
+      python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
   - script: pip install dist/*.whl
@@ -270,7 +269,7 @@ jobs:
       set -e
       sed -i $'s/\r$//' README.rst
       pip install wheel
-      python setup.py sdist bdist_wheel
+      python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
   - bash: pip install dist/*.whl
