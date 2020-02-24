@@ -725,8 +725,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
      Parameters
     ----------
     order: float, optional, default: ``1.``
-        The order of persistence for the weighted average of fibres.
-        Corresponds to :math:`p` above.
+        The power to which persistence values are raised to define the
+        `power-weighted silhouettes <https://giotto.ai/theory>`_.
 
     n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
