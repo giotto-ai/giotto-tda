@@ -185,7 +185,7 @@ def plot_diagram(diagram, homology_dimensions=None):
                                showlegend=False, hoverinfo='none'))
     
     for i, dimension in enumerate(homology_dimensions):
-        name = "H{}".format(int(dimension))
+        name = f"H{int(dimension)}"
         subdiagram = _subdiagrams(np.asarray([diagram]), [dimension],
                                   remove_dim=True)[0]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
@@ -247,8 +247,8 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
     
     for i, dimension in enumerate(homology_dimensions):
         layout_dim = layout.copy()
-        layout_dim['title'] = "Persistence landscape for homology dimension" + \
-                              "{}".format(int(dimension))
+        layout_dim['title'] = f"Persistence landscape for homology "\
+                              f"dimension {int(dimension)}"
         fig = gobj.Figure(layout=layout_dim)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
                          mirror=False)
@@ -261,7 +261,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
                                        y=landscapes[i, layer, :],
                                        mode='lines', showlegend=False,
                                        hoverinfo='none',
-                                       name="layer {}".format(layer + 1)))
+                                       name=f"layer {layer + 1}"))
 
         fig.show()
 
@@ -386,8 +386,9 @@ def plot_betti_surfaces(betti_curves, samplings=None,
     else:
         for i, dimension in enumerate(homology_dimensions):
             fig = gobj.Figure()
-            fig.update_layout(scene=scene, title="Betti surface for homology "
-                                                 "dimension {}".format(int(dimension)))
+            fig.update_layout(scene=scene,
+                              title=f"Betti surface for homology "
+                                    f"dimension {int(dimension)}")
             fig.add_trace(gobj.Surface(x=samplings,
                                        y=np.arange(betti_curves.shape[0]),
                                        z=betti_curves[:, i, :],

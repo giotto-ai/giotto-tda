@@ -67,8 +67,8 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
         assert n_samples == unique_interval_masks.shape[0]
         assert n_intervals >= unique_interval_masks.shape[1]
     except ValueError as ve:
-        assert ve.args[0] == "Only one unique filter value found, cannot " \
-                             "fit {} > 1 intervals.".format(n_intervals)
+        assert ve.args[0] == f"Only one unique filter value found, cannot " \
+                             f"fit {n_intervals} > 1 intervals."
         assert (n_intervals > 1) and (len(np.unique(filter_values)) == 1)
 
 

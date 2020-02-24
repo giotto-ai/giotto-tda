@@ -257,8 +257,8 @@ def make_mapper_pipeline(scaler=None,
     >>> # Find which points belong to first node of graph
     >>> node_id, node_elements = mapper_graph['node_metadata']['node_id'],
     ... mapper_graph['node_metadata']['node_elements']
-    >>> print('Node Id: {}, Node elements: {}, Data points: {}'
-              .format(node_id[0], node_elements[0], X[node_elements[0]]))
+    >>> print(f'Node Id: {node_id[0]}, Node elements: {node_elements[0]}, '
+              f'Data points: {X[node_elements[0]]}')
     Node Id: 0,
     Node elements: [8768],
     Data points: [[0.01838998 0.76928754 0.98199244 0.0074299 ]]
