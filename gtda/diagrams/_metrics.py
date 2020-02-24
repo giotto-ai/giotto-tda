@@ -17,7 +17,10 @@ def silhouettes(diagrams, sampling, order, **kwargs):
     returned by _bin) of a one-dimensional range.
     """
     sampling = np.transpose(sampling, axes=(1, 2, 0))
-    weights = np.diff(diagrams, axis=2)[:, :, [0]]**order
+    weights = np.diff(diagrams, axis=2)[:, :, [0]]
+    if order > 8.:
+        weights = weights/np.max(weights, axis=1, keepdims=True)
+    weights = weights**order
     total_weights = np.sum(weights, axis=1)
     midpoints = (diagrams[:, :, [1]] + diagrams[:, :, [0]]) / 2.
     heights = (diagrams[:, :, [1]] - diagrams[:, :, [0]]) / 2.
