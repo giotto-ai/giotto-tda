@@ -73,11 +73,18 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
         diagrams[:, :, axis] = np.array(
             (diagrams[:, :, axis] - sampling[0, axis]) / step_size[axis],
             dtype=int)
+    # Sample the image
+    [_sample_image(persistence_images_[i], sampled_diag)
+     for i, sampled_diag in enumerate(diagrams)]
 
-    [_heat(persistence_images_[i], sampled_diag, sigma)
-        for i, sampled_diag in enumerate(diagrams)]
-
+    # Apply the weights
     persistence_images_ *= weights / np.max(weights)
+
+    # Smoothen the weighted-image
+    for i, image in enumerate(persistence_images_):
+        persistence_images_[i] = gaussian_filter(image, sigma,
+                                                 mode="reflect")
+
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
     return persistence_images_
 
