@@ -9,9 +9,9 @@
 	\section{Symbols}
 	
 	\begin{tabular}{ l l l}
-		$\Bbbk$ & :  & An arbitrary field. \\
+		$\Bbbk$ & : & An arbitrary field. \\
 		$\mathbb R^d$ & : & The vector space of $d$-tuples of real numbers. \\
-		$\mathbb N$ & : & The counting numbers $0,1,2, \dots$ as a subset of $\mathbb R$. \\
+		$\mathbb N_{(>0)}$ & : & The counting numbers $(0, )1, 2, \ldots$ as a subset of $\mathbb R$. \\
 		$\Delta$ & : & The \underline{multiset} $\{(s,s)\,;\ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
 	\end{tabular}
 
@@ -185,19 +185,18 @@
 	$$
 	\paragraph{Reference:} \cite{kerber2017geometry}
 	
-	\subsection*{Persistence  landscape:}
-	A \textit{persistence  landscape} is a continuous function
+	\subsection*{Persistence landscape:}
+	A \textit{persistence landscape} is a continuous function
 	\begin{equation*}
 	\lambda : \mathbb N \times  \mathbb R \to \mathbb R \cup \{+\infty\}
 	\end{equation*}
 	and the function $\lambda_k(s) = \lambda(k,s)$ is refered to as the \textit{$k$-layer of the persistence diagram}.
 	
-	Let $\{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \underline{persistence module}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting
-	$\lambda_k(t)$ be  $k$-th largest value of 
-	$$
-	\min_{i \in I}\{t-b_i, d_i-t\}_+
-	$$
-	where $c_+$ denotes $max(c,0)$.
+	Let $\{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \underline{persistence module}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k(t)$ be $k$-th largest value of the collection $\{ \Lambda_i(t) \}_{i \in I}$, where
+	\begin{equation*}
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
+	\end{equation*}
+	and $c_+ := \max(c,0)$.
 	
 	Intuitively, we can describe the graph of this persistence landscape by first joining each of the points in the multiset to the diagonal via a horizontal as well as a vertical line, then rotating the figure 45 degrees clockwise, and rescaling by $1/\sqrt{2}$.
 	\paragraph{References:}  \cite{bubenik2015statistical}
@@ -213,24 +212,19 @@
 	\begin{equation*}
 	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
 	\end{equation*}
-	whenever the right hand side exists and is finite. 
+	whenever the right hand side exists and is finite.
 	\paragraph{References:} \cite{stein2011functional, bubenik2015statistical}
-	
-	\subsection*{Weighted silhouette:}
-	A \textit{weighted silhouette} is a continuous function
+
+	\subsection*{Weighted silhouettes:}
+	Let $D = \{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \underline{persistence module}. A \textit{weighted silhouette} associated to $D$ is a continuous function $\phi : \mathbb R \to \mathbb R$ of the form
 	\begin{equation*}
-	\phi :  \mathbb R \to \mathbb R.
+	\phi(t) = \frac{\sum_{i\in I}w_i \Lambda_i(t)}{\sum_{i\in I}w_i},
 	\end{equation*}
-	Let $D = \{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \underline{persistence module} and $0<p \leq \infty $ an integer. The \textit{weighted silhouette} associated to $D$ is given by
-	\begin{equation*}
-	\phi^{p}(t) = \frac{\sum_{i\in I}w_i^p \Lambda_i(t)}{\sum_{i\in I}w_i^p},
-	\end{equation*}
-	where $w_i = \vert d_i-b_i \vert$ and $\Lambda_i(t) = \max(0, -\vert x \vert+(d_i-b_i)/2)$.
-	
-	Intuitively, we can describe the \textit{weighted silhouette} as the weighted sum of the piecewise-linear functions, whose value at some point $t$ is given by the minimum between how long the component (associated to $(b_i,d_i)$ has persisted and how long it will persist.
+	where $\{w_i\}_{i \in I}$ is a collection of positive weights, and $\Lambda_i(t)$ is as defined above for persistence landscapes.  The particular choice $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ leads to the \textit{power-weighted silhouettes}.
 	\paragraph{References:}  \cite{chazal2014stochastic}
 	
-	\subsection*{Amplitude} Given a function assigning a real number to a pair of persistence diagrams. We define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \underline{Wasserstein and bottleneck distances} and \underline{landscape distance}.
+	\subsection*{Amplitude:}
+	Given a function assigning a real number to a pair of persistence diagrams. We define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \underline{Wasserstein and bottleneck distances} and \underline{landscape distance}.
 	
 	\subsection*{Persistence entropy:}
 	Intuitively, this is a measure of the entropy of the points in a \underline{persistence diagram}. Precisely, let $D = \{(b_i, d_i)\}_{i \in I}$ be a persistence diagram with each $d_i < +\infty$. The \textit{persistence entropy} of $D$ is defined by
