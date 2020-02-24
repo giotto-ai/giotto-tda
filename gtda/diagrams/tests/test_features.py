@@ -77,6 +77,7 @@ def test_silhouette_transform():
 
     assert_almost_equal(sht.fit_transform(diagram)[0][0], X_sht_res)
 
+
 def test_silhouette_big_order():
     diagrams = np.array([[[0, 2, 0], [1, 4, 0]]])
     sht_10 = Silhouette(n_bins=41, order=10.)
