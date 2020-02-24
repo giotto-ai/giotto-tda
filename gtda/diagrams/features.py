@@ -837,7 +837,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            silhouette: one curve (represented as a one-dimensional array)
+            One silhouette (represented as a one-dimensional array)
             per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -852,5 +852,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
               for dim in self.homology_dimensions_
               for s in gen_even_slices(X.shape[0],
                                        effective_n_jobs(self.n_jobs))))
-        Xt = np.stack(Xt, axis=1)
+
+        Xt = np.concatenate(Xt). \
+            reshape(self._n_dimensions, X.shape[0], -1). \
+            transpose((1, 0, 2))
         return Xt
