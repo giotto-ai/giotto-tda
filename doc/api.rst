@@ -1,6 +1,7 @@
---------------------------------------
+
+======================================
 Welcome to giotto-tda's API reference!
---------------------------------------
+======================================
 
 :mod:`gtda.mapper`: Mapper
 ==========================
@@ -92,7 +93,7 @@ Welcome to giotto-tda's API reference!
    :no-members:
    :no-inherited-members:
 
-.. include:: modules/imagesr.rst
+.. include:: modules/images.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning

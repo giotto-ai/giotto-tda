@@ -1,13 +1,25 @@
-.. currentmodule:: gtda/images/
+.. currentmodule:: gtda
+
+Preprocessing
+-------------
 
 .. autosummary::
    :toctree: generated/images
    :template: class.rst
 
-   images.ImageInverter
+   images.Inverter
+   images.Padder
+   images.ImageToPointCloud
+
+Filtrations
+-----------
+
+.. autosummary::
+   :toctree: generated/images
+   :template: class.rst
+
    images.HeightFiltration
    images.RadialFiltration
    images.DilationFiltration
    images.ErosionFiltration
    images.SignedDistanceFiltration
-   images.DensityFiltration
