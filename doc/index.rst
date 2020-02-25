@@ -38,7 +38,8 @@ by Lewis Tunstall provides a general overview of the library.
 Mapper example
 --------------
 
-INCLUDE THE EXAMPLE HERE
+.. include::
+   mapper_quickstart
 
 Installation
 ============
@@ -58,7 +59,11 @@ See :doc:`the API reference <api>`.
 
 Examples
 ========
-Please have a look at :doc:`gallery/index`.
+..
+   Please have a look at :doc:`gallery/index`.
+
+.. include:: notebooks/notebooks_readme.rst
+   :start-after: Examples
 
 Theory
 ======

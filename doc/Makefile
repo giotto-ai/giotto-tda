@@ -32,7 +32,8 @@ clean-gh:
 all-gh:
 	@make clean-gh
 	@make theory-gl
-	@make sphinx-gal
+	@cp ../examples/*.ipynb notebooks/
+	@cp ../examples/plotting.py notebooks/
 	@make github
 
 gh-commit:

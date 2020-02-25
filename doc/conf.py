@@ -43,6 +43,8 @@ extensions = [
     'sphinx.ext.imgconverter',
     #'sphinx_gallery.gen_gallery',
     #'sphinx_nbexamples',
+    #'ipypublish.sphinx.notebook',
+    'nbsphinx',
     'sphinx_issues',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
@@ -61,6 +63,18 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'gallery',  # path to where to save gallery generated output
 }
 
+# ipypublish.sphinx.notebook
+source_suffix = {
+    '.ipynb': 'jupyter_notebook',
+}
+numfig = True
+math_numfig = True
+numfig_secnum_depth = 2
+
+math_number_all = True
+
+
+# Sphinx-nbexamples
 process_examples = True
 example_gallery_config = dict(
     examples_dirs='../examples/',
