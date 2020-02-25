@@ -1,4 +1,4 @@
-"""Rescaling method for persistent homology."""
+"""Rescaling methods for persistent homology."""
 # License: GNU AGPLv3
 
 import itertools
@@ -94,7 +94,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         self.neighbor_rank = neighbor_rank
         self.n_jobs = n_jobs
 
-    def _consistent_homology_distance(self, X):
+    def _consistent_rescaling(self, X):
         Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
                                 **self.effective_metric_params_)
 
@@ -175,7 +175,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consistent_homology_distance)(X[i])
+            delayed(self._consistent_rescaling)(X[i])
             for i in range(X.shape[0]))
         Xt = np.array(Xt)
         return Xt
@@ -189,9 +189,10 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     The computation during :meth:`transform` depends on the nature of the array
     `X`. If each entry in `X` along axis 0 represents a distance matrix
     :math:`D`, then the corresponding entry in the transformed array is the
-    distance matrix :math:`D'_{i,i+1} = factor\times D_{i,i+1}`. If the entries
-    in `X` represent point clouds, their distance matrices are first computed,
-    and then rescaled according to the same formula.
+    distance matrix :math:`D'_{i,i+1} = \\alpha D_{i,i+1}` where
+    :math:`\\alpha` is a positive factor. If the entries in `X` represent point
+    clouds, their distance matrices are first computed, and then rescaled
+    according to the same formula.
 
     Parameters
     ----------
@@ -252,13 +253,13 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
         self.factor = factor
         self.n_jobs = n_jobs
 
-    def _consecutive_homology_distance(self, X):
+    def _consecutive_rescaling(self, X):
         Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
                                 **self.effective_metric_params_)
-
-        Xm.ravel()[
-            1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] *= \
-            self.factor
+        Xm[:, range(X.shape[1]-1), range(1, X.shape[1])] *= self.factor
+        # Xm.ravel()[
+        #     1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] *= \
+        #     self.factor
 
         return Xm
 
@@ -327,7 +328,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consecutive_homology_distance)(X[i])
+            delayed(self._consecutive_rescaling)(X[i])
             for i in range(X.shape[0]))
         Xt = np.array(Xt)
         return Xt
