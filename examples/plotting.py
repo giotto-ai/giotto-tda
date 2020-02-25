@@ -140,29 +140,29 @@ def plot_diagram(diagram, homology_dimensions=None):
     maximum_persistence = np.where(np.isinf(diagram), -np.inf, diagram).max()
 
     layout = {
-        "title": "Persistence diagram", 
+        "title": "Persistence diagram",
         "width": 500,
         "height": 500,
         "xaxis1": {
             "title": "Birth",
-            "side": "bottom", 
-            "type": "linear", 
+            "side": "bottom",
+            "type": "linear",
             "range": [0, 1.1 * maximum_persistence],
-            "ticks": "outside", 
-            "anchor": "y1",  
-            "showline": True, 
+            "ticks": "outside",
+            "anchor": "y1",
+            "showline": True,
             "zeroline": True,
             "showexponent": "all",
             "exponentformat": "e"
         }, 
         "yaxis1": {
             "title": "Death",
-            "side": "left", 
-            "type": "linear", 
+            "side": "left",
+            "type": "linear",
             "range": [0, 1.1 * maximum_persistence],
-            "ticks": "outside", 
-            "anchor": "x1",  
-            "showline": True, 
+            "ticks": "outside",
+            "anchor": "x1",
+            "showline": True,
             "zeroline": True,
             "showexponent": "all",
             "exponentformat": "e"
@@ -223,21 +223,21 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         samplings = np.arange(0, landscapes.shape[2])
     layout = {
         "xaxis1": {
-            "side": "bottom", 
-            "type": "linear", 
-            "ticks": "outside", 
-            "anchor": "y1",  
-            "showline": True, 
+            "side": "bottom",
+            "type": "linear",
+            "ticks": "outside",
+            "anchor": "y1",
+            "showline": True,
             "zeroline": True,
             "showexponent": "all",
             "exponentformat": "e"
         }, 
         "yaxis1": {
-            "side": "left", 
-            "type": "linear", 
-            "ticks": "outside", 
-            "anchor": "x1",  
-            "showline": True, 
+            "side": "left",
+            "type": "linear",
+            "ticks": "outside",
+            "anchor": "x1",
+            "showline": True,
             "zeroline": True,
             "showexponent": "all",
             "exponentformat": "e"
@@ -376,7 +376,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         },
         "zaxis": {
             "title": "Betti number",
-            "type": "linear", 
+            "type": "linear",
             "showexponent": "all",
             "exponentformat": "e"
         } 

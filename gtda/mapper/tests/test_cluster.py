@@ -29,7 +29,7 @@ def get_clusters(draw, n_clusters, n_points_per_cluster, dim, std=1):
                                       elements=integers(min_value=-100,
                                                         max_value=100),
                                       shape=(1, dim),
-                                      unique=True)),  repeats=n_clusters,
+                                      unique=True)), repeats=n_clusters,
                           axis=0)
     positions += np.repeat(np.arange(0, n_clusters).reshape(-1, 1),
                            repeats=dim, axis=1)
