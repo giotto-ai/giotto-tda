@@ -256,10 +256,9 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     def _consecutive_rescaling(self, X):
         Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
                                 **self.effective_metric_params_)
-        Xm[:, range(X.shape[1]-1), range(1, X.shape[1])] *= self.factor
-        # Xm.ravel()[
-        #     1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] *= \
-        #     self.factor
+        Xm.ravel()[
+            1: max(0, Xm.shape[1] - 1) * Xm.shape[1]: Xm.shape[1] + 1] *= \
+            self.factor
 
         return Xm
 
