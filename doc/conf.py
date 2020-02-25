@@ -148,3 +148,9 @@ html_static_path = ['source/_static/style.css'] # []  # ['_static']
 #scv_whitelist_tags = ('v0.1a.0', 'v0.1.0', 'v0.1.1', 'v0.1.2')
 scv_whitelist_tags = ('v0.1.4', 'v0.1.3')
 scv_whitelist_branches = ('ghpages', )
+
+rst_epilog = """
+.. |ProjectVersion| replace:: Foo Project, version {versionnum}
+""".format(
+    versionnum=release,
+)

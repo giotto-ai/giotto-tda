@@ -3,6 +3,8 @@
 Welcome to giotto-tda's API reference!
 ======================================
 
+This pages contains a list of available features in the library.
+
 :mod:`gtda.mapper`: Mapper
 ==========================
 

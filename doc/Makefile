@@ -20,14 +20,18 @@ togit:
 github:
 	@make html
 	@make togit
-	@python create_index.py
+	@cd $(GITDIR); python create_index.py
 
-theory:
+theory-gl:
 	@pandoc theory/glossary.tex -f latex -t rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
 
-all-gh:
+clean-gh:
 	@make clean
-	@make theory
+	@rm theory/glossary.rst
+
+all-gh:
+	@make clean-gh
+	@make theory-gl
 	@make sphinx-gal
 	@make github
 
