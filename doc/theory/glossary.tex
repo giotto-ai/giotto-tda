@@ -21,7 +21,7 @@ pdfpagelabels]{hyperref}
 	\section{Symbols}	
 	
 	\begin{tabular}{ l l l}
-		$\Bbbk$ & :  & An arbitrary field. \\
+		$\Bbbk$ & : & An arbitrary field. \\
 		$\mathbb R^d$ & : & The vector space of $d$-tuples of real numbers. \\
 		$\mathbb N$ & : & The counting numbers $0,1,2, \dots$ as a subset of $\mathbb R$. \\
 		$\Delta$ & : & The \hyperref[multiset]{multiset} $\{(s,s)\,;\ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
@@ -217,26 +217,26 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
 	\end{equation*}
+
 	\paragraph{\\ Reference:} \cite{kerber2017geometry}
 	
-	\subsection*{Persistence  landscape:} \label{persitence landscape}
-	
-	A \textit{persistence  landscape} is a continuous function
+	\subsection*{Persistence  landscape:} \label{persistence landscape}
+
+	A \textit{persistence landscape} is a continuous function
 	\begin{equation*}
-	\lambda : \mathbb N \times  \mathbb R \to \mathbb R \cup \{+\infty\}
+	\lambda : \mathbb N \times \mathbb R \to \mathbb R \cup \{+\infty\}
 	\end{equation*}
 	and the function $\lambda_k(s) = \lambda(k,s)$ is refered to as the \textit{$k$-layer of the persistence diagram}.
-	
-	Let $\{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \hyperref[persistence module]{persistence module}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting
-	$\lambda_k(t)$ be  $k$-th largest value of 
+
+  Let ${(b_i, d_i)}{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k(t)$ be the $k$-th largest value of the collection ${ \Lambda_i(t) }{i \in I}$, where
 	\begin{equation*}
-	\min_{i \in I}\{t-b_i, d_i-t\}_+
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
 	\end{equation*}
-	where $c_+$ denotes $max(c,0)$.
+	and $c_+ := \max(c,0)$.
 	
 	Intuitively, we can describe the graph of this persistence landscape by first joining each of the points in the multiset to the diagonal via a horizontal as well as a vertical line, then rotating the figure 45 degrees clockwise, and rescaling by $1/\sqrt{2}$.
-	
-	\paragraph{\\ Reference:}  \cite{bubenik2015statistical}
+
+	\paragraph{\\ Reference:} \cite{bubenik2015statistical}
 	
 	\subsection*{Persistence landscape norm:} \label{persistence landscape norm}
 	
@@ -246,16 +246,27 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	whenever the right hand side exists and is finite.
 	
-	The \textit{persistence landscape $p$-norm} of a \hyperref[persitence landscape]{persistence landscape} $\lambda : \mathbb N \times \mathbb R \to \overline{\mathbb R}$ is defined to be
+	The \textit{persistence landscape $p$-norm} of a \hyperref[persistence landscape]{persistence landscape} $\lambda : \mathbb N \times \mathbb R \to \overline{\mathbb R}$ is defined to be
 	\begin{equation*}
 	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
 	\end{equation*}
-	whenever the right hand side exists and is finite. 
+	whenever the right hand side exists and is finite.
+
 	\paragraph{References:} \cite{stein2011functional, bubenik2015statistical}
+
+	\subsection*{Weighted silhouettes:} \label{weighted silhouettes}
+
+	Let $D = {(b_i, d_i)}_{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. A \textit{weighted silhouette} associated to $D$ is a continuous function $\phi : \mathbb R \to \mathbb R$ of the form
+	\begin{equation*}
+	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},
+	\end{equation*}
+	where $\{w_i\}_{i \in I}$ is a collection of positive weights, and $\Lambda_i(t)$ is as defined for \hyperref[persistence landscapes]{persistence landscapes}.  The particular choice $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ is referred to as \textit{power-weighted silhouettes}.
+
+	\paragraph{References:}  \cite{chazal2014stochastic}
 	
 	\subsection*{Amplitude:} \label{amplitude}
-	
-	Given a function assigning a real number to a pair of persistence diagrams. We define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \hyperref[wasserstein and bottleneck distance]{Wasserstein and bottleneck distances} and \hyperref[persistence landscape norm]{landscape distance}.
+
+	Given a function assigning a real number to a pair of persistence diagrams, we define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \hyperref[wasserstein and bottleneck distance]{Wasserstein and bottleneck distances} and \hyperref[persistence landscape norm]{landscape distance}.
 	
 	\subsection*{Persistence entropy:} \label{persistence entropy}
 	
