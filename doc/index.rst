@@ -1,11 +1,12 @@
-.. giotto-tda documentation master file, created by
-   sphinx-quickstart on Mon Jun  3 11:56:46 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+-----------------------
+Giotto-tda documentation
+------------------------
 
+**A high performance topological machine learning toolbox in Python.**
 
-Welcome to giotto-tda's API reference!
-======================================
+Giotto-tda is a high performance topological machine learning toolbox in Python built on top of
+scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
+
 
 Checkout the following resources:
  * :ref:`readme`,
@@ -13,115 +14,28 @@ Checkout the following resources:
  * :ref:`theory`,
  * :doc:`gallery/index`
 
-:mod:`gtda.mapper`: Mapper
-==========================
+Guiding principles
+------------------
+BLA (take from Umbertos presentation at AMLD).
 
-.. automodule:: gtda.mapper
-   :no-members:
-   :no-inherited-members:
+**Read our paper on arXiv!**
 
-.. include:: modules/mapper.rst
+30s guide to giotto-tda
+-----------------------
+Include the mapper quickstart notebook and Lewi's Medium post.
 
-:mod:`gtda.homology`: Persistent homology
-=========================================
+Installation
+-----------
 
-.. automodule:: gtda.homology
-   :no-members:
-   :no-inherited-members:
+.. include:: ../README.rst
+   :start-after: Installation
+   :end-before: Contributing
 
-.. include:: modules/homology.rst
+Developer installation
+~~~~~~~~~~~~~~~~~~~~~~
 
-:mod:`gtda.diagrams`: Persistence diagrams
-==========================================
+For information about the developer installation, please refer to the :ref:`Contributing section <contributing-section>`.
 
-.. automodule:: gtda.diagrams
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/diagrams.rst
-
-:mod:`gtda.time_series`: Time series
-====================================
-
-.. automodule:: gtda.time_series
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/time_series.rst
-
-:mod:`gtda.graphs`: Graphs
-==========================
-
-.. automodule:: gtda.graphs
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/graphs.rst
-
-:mod:`gtda.base`: Base
-======================
-
-.. automodule:: gtda.base
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/base.rst
-
-:mod:`gtda.pipeline`: Pipeline
-==============================
-
-.. automodule:: gtda.pipeline
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/pipeline.rst
-
-:mod:`gtda.meta_transformers`: Convenience pipelines
-====================================================
-
-.. automodule:: gtda.meta_transformers
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/meta_transformers.rst
-
-:mod:`gtda.utils`: Validation
-=============================
-
-.. automodule:: gtda.utils
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: gtda
-
-.. include:: modules/validation.rst
-
-:mod:`gtda.images`: Images
-==========================
-
-.. automodule:: gtda.images
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/imagesr.rst
-
-..
-   :mod:`gtda.manifold`: Manifold learning
-   =======================================
-
-..
-   automodule:: gtda.manifold
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: gtda
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   manifold.StatefulMDS
-
-   manifold.Kinematics
+API reference
+-------------
+See :doc:`api`.

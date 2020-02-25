@@ -41,7 +41,8 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
-    'sphinx_gallery.gen_gallery',
+    #'sphinx_gallery.gen_gallery',
+    #'sphinx_nbexamples',
     'sphinx_issues',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
@@ -59,6 +60,15 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples/',   # path to your example scripts
     'gallery_dirs': 'gallery',  # path to where to save gallery generated output
 }
+
+process_examples = True
+example_gallery_config = dict(
+    examples_dirs='../examples/',
+    gallery_dirs='gallery_nb',
+    pattern='*.ipynb',
+
+)
+
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69

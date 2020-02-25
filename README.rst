@@ -99,6 +99,8 @@ release) and hence does not require any C++ dependencies. As the main library mo
 both the stable and nightly versions, giotto-tda and giotto-tda-nightly should not be installed in
 the same environment.
 
+.. _contributing-section:
+
 Contributing
 ------------
 
