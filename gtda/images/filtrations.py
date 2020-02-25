@@ -184,8 +184,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         dimension of the images of the collection.
 
     radius : float or None, default: ``None``
-        The radius of the ball centered in :param:`center` inside which
-        activated pixels are included in the filtration.
+        The radius of the ball centered in `center` inside which activated
+        pixels are included in the filtration.
 
     metric : string or callable, optional, default: ``'euclidean'``
         If set to ``'precomputed'``, each entry in `X` along axis 0 is
@@ -217,8 +217,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     effective_metric_params_ : dict
         Dictionary containing all information present in
-        :param:`metric_params`. If :param:`metric_params` is ``None``, it is
-        set to the empty dictionary.
+        `metric_params`. If `metric_params` is ``None``, it is set to
+        the empty dictionary.
 
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
@@ -359,8 +359,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     regions.
 
     Binary dilation is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_. This
-    filtration assigns to each pixel in an image a grayscale value
+    image processing and relies on the scipy.ndimage module [1]_.
+
+    This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any activated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
@@ -548,12 +549,12 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _calculate_erosion(self, X):
-        Xd = _erode(X, 1, self.n_iterations_, 1, self.max_value_)
+        Xe = _erode(X, 1, self.n_iterations_, 1, self.max_value_)
 
-        mask_uneroded = Xd == 0
-        Xd -= 1
-        Xd[mask_uneroded] = self.max_value_
-        return Xd
+        mask_uneroded = Xe == 0
+        Xe -= 1
+        Xe[mask_uneroded] = self.max_value_
+        return Xe
 
     def fit(self, X, y=None):
         """Calculate :attr:`n_iterations_` and :attr:'max_value_'from a
@@ -634,20 +635,22 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
     of activated regions.
 
     This filtration assigns to each pixel in an image a grayscale value
-    calculated as follows. For deactivated pixels, if the minimum Manhattan
-    distance between the pixel and any activated pixel in the image is less
-    than or equal to the parameter :param:`n_iterations`, the assigned value is
-    this distance. Otherwise, the assigned grayscale value is the sum of the
-    lengths along all axes of the image – equivalently, it is the maximum
-    Manhattan distance between any two pixels in the image. For activated
-    pixels, if the minimum Manhattan distance between the pixel and any
-    deactivated pixel in the image is less than or equal to the parameter
-    :param:`n_iterations`, the assigned value is the opposite of this distance.
+    calculated as follows. For activated pixels, if the minimum Manhattan
+    distance between the pixel and any deactivated pixel in the image is less
+    than or equal to the parameter `n_iterations`, the assigned value is
+    this distance minus 1. Otherwise, the assigned grayscale value is the sum
+    of the lengths along all axes of the image – equivalently, it is the
+    maximum Manhattan distance between any two pixels in the image, minus 1.
+    For deactivated pixels, if the minimum Manhattan distance between the pixel
+    and any activated pixel in the image is less than or equal to the parameter
+    `n_iterations`, the assigned value is the opposite of this distance.
     Otherwise, the assigned grayscale value is the opposite of the maximum
     Manhattan distance between any two pixels in the image.
 
-    The name of this filtration comes from the fact that it is a negatively
-    signed dilation combined with a positively signed erosion.
+    The name of this filtration comes from the fact that it is a a negatively
+    signed dilation plus a positively signed erosion, minus 1 on the activated
+    pixels. Therefore, pixels the activated pixels at the boundary of the
+    activated regions always have a pixel value of 0.
 
     Parameters
     ----------
