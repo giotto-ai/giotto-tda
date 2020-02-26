@@ -1,9 +1,9 @@
-"""Plot functions """
+"""Plotting functions."""
 # License: GNU AGPLv3
 
 import numpy as np
 import plotly.graph_objs as gobj
-from gtda.diagrams._utils import _subdiagrams
+from ..diagrams._utils import _subdiagrams
 
 import matplotlib.pyplot as plt
 
