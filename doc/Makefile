@@ -37,7 +37,7 @@ all-gh:
 	@make github
 
 gh-commit:
-	@cd "$(GITDIR)"; git commit -a -m "Update docs"; git push origin
+	@cd "$(CURRENTDOCFOLDER)"; git add *; git commit -a -m "Update docs"; git push origin
 
 sphinx-gal:
 	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done
