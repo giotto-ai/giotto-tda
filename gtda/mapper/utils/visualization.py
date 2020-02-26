@@ -151,7 +151,7 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
 
 def _calculate_graph_data(
         pipeline, data, layout, layout_dim,
-        color_variable, node_color_statistic,  plotly_kwargs):
+        color_variable, node_color_statistic, plotly_kwargs):
     graph = pipeline.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 
