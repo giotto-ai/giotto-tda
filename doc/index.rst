@@ -295,13 +295,15 @@ Graph processing
    meta_transformers.LandscapeGenerator
 
 
-:mod:`gtda.utils`: Validation
-=============================
+:mod:`gtda.utils`: Utilities
+============================
 
 .. automodule:: gtda.utils
    :no-members:
    :no-inherited-members:
 
+Validation
+----------
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -311,6 +313,20 @@ Graph processing
    utils.check_diagram
    utils.validate_params
    utils.validate_metric_params
+
+Plotting
+--------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   utils.plot_point_cloud
+   utils.plot_diagram
+   utils.plot_landscapes
+   utils.plot_betti_curves
+   utils.plot_betti_surfaces
 
 ..
    :mod:`gtda.images`: Images
