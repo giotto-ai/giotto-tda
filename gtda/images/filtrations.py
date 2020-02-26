@@ -75,8 +75,9 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         return Xh
 
     def fit(self, X, y=None):
-        """Calculate `direction_`, `n_dimensions_`, 'mesh_' and `max_value_`
-        from a collection of binary images. Then, return the estimator.
+        """Calculate :attr:`direction_`, :attr:`n_dimensions_`, :attr:`mesh_`
+        and :attr:`max_value_` from a collection of binary images. Then,
+        return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -359,7 +360,8 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     regions.
 
     Binary dilation is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_.
+    image processing and relies on the `scipy.ndimage \
+    <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_ module.
 
     This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
@@ -398,11 +400,6 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
-    References
-    ----------
-    [1] "Multi-dimensional image processing (scipy.ndimage)" \
-        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
-
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -419,7 +416,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         return Xd
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:'max_value_' from a
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
         collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
@@ -497,7 +494,8 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     regions.
 
     Binary erosion is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_.
+    image processing and relies on the `scipy.ndimage \
+    <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_ module.
 
     This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
@@ -536,11 +534,6 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
-    References
-    ----------
-    [1] "Multi-dimensional image processing (scipy.ndimage)" \
-        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
-
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -557,7 +550,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         return Xe
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:'max_value_'from a
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_`from a
         collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
@@ -678,11 +671,6 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
     gtda.homology.CubicalPersistence, Binarizer, ErosionFiltration, \
     DilationFiltration
 
-    References
-    ----------
-    [1] "Multi-dimensional image processing (scipy.ndimage)" \
-        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
-
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -706,7 +694,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         return (Xd + Xe)
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:'max_value_'from a
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
         collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
