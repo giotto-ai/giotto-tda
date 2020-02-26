@@ -288,8 +288,8 @@ Image preprocessing
    images.Padder
    images.ImageToPointCloud
 
-Binary image filtration
------------------------
+Binary image filtrations
+------------------------
 .. currentmodule:: gtda
 
 .. autosummary::
