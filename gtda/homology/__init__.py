@@ -3,9 +3,9 @@ to generate persistence diagrams.
 """
 # License: GNU AGPLv3
 
-from .point_clouds import VietorisRipsPersistence, SparseRipsPersistence, \
+from .simplicial import VietorisRipsPersistence, SparseRipsPersistence, \
     EuclideanCechPersistence
-from .grids import CubicalPersistence
+from .cubical import CubicalPersistence
 
 __all__ = [
     'VietorisRipsPersistence',
