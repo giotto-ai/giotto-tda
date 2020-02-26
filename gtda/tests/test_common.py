@@ -15,6 +15,7 @@ SKIP_TESTS = {
 
 # mark tests as a known failure
 # TODO: these should be addressed later.
+# Note with scikit-learn 0.23 these can be moved to estimator tags
 XFAIL_TESTS = {
   'Binarizer':  ["check_transformer_data_not_an_array",
                  "check_transformer_general",
@@ -45,9 +46,9 @@ def _get_callable_name(obj):
     if not obj.keywords:
         return obj.func.__name__
 
-    kwstring = ",".join(["{}={}".format(k, v)
+    kwstring = ",".join([f"{k}={v}"
                          for k, v in obj.keywords.items()])
-    return "{}({})".format(obj.func.__name__, kwstring)
+    return f"{obj.func.__name__}({kwstring})"
 
 
 def _get_estimator_name(estimator):
