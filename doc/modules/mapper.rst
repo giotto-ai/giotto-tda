@@ -1,5 +1,9 @@
+
+.. figure:: images/mapper_pipeline_object.svg
+
 Filters
 -------
+
 .. currentmodule:: gtda
 
 .. autosummary::
