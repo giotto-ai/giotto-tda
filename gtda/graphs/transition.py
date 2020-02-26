@@ -111,7 +111,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'_func': [types.FunctionType]}
+    _hyperparameters = {'_func': [types.FunctionType, None]}
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):
         self.func = func
