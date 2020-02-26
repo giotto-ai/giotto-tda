@@ -20,11 +20,11 @@ XFAIL_TESTS = {
   'Binarizer':  ["check_transformer_data_not_an_array",
                  "check_transformer_general",
                  "check_transformer_general(readonly_memmap=True)",
-                ],
+                 ],
   'Inverter':  ["check_transformer_data_not_an_array",
                 "check_transformer_general",
                 "check_transformer_general(readonly_memmap=True)",
-               ],
+                ],
 }
 
 
