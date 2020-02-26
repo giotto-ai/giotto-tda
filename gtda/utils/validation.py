@@ -77,17 +77,36 @@ def check_graph(X):
 
 # Check the type and range of numerical parameters
 def validate_params(parameters, references):
+    """Function to automatize hyperparameters validation.
+
+    Parameters
+    ----------
+    parameters : dict, required
+        Dictionnary that associates keys being the hyperparameters' name to
+        values being the hyperparameters' value.
+
+    references : dict, required
+        Dictionnary that associates keys being the hyperparameters' name to
+        values being a list. The first element of that list is a type and the
+        second is either ``None``, a tuple containing two elements representing
+        the bounds of the range of values the hyperparameters can take, or a
+        list containing all possible allowed values for the hyperparameter.
+
+    """
     for key in references.keys():
+        # Check type
         if not isinstance(parameters[key], references[key][0]):
             raise TypeError("Parameter {} is of type {}"
                             " while it should be of type {}"
                             "".format(key, type(parameters[key]),
                                       references[key][0]))
-        if len(references[key]) == 1:
-            continue
-        if references[key][0] == list or \
+
+        # If the key is a list, tuple, or numpy array, check element by element
+        if references[key][0] == list or references[key][0] == tuple or \
            references[key][0] == np.ndarray:
             for parameter in parameters[key]:
+                # If an element has to be an int, it can be passed as a float
+                # that has no decimals, else we check the type of the element
                 if references[key][1][0] == int:
                     if not isinstance(parameter, numbers.Number):
                         raise TypeError("Parameter {} is a {} of {}"
@@ -102,49 +121,57 @@ def validate_params(parameters, references):
                                         "".format(key, type(parameters[key]),
                                                   type(parameter)))
                 else:
+                    # Otherwise just check for the type
                     if not isinstance(parameter, references[key][1][0]):
                         raise TypeError("Parameter {} is a {} of {}"
                                         " but contains an element of type {}"
                                         "".format(key, type(parameters[key]),
                                                   references[key][1][0],
                                                   type(parameter)))
+
+                # If there is no parameter range to check, continue
                 if references[key][1][1] is None:
-                    break
+                    continue
+                # Check element range indicated by a tuple of 2 values
                 if isinstance(references[key][1][1], tuple):
                     if (parameter < references[key][1][1][0] or
                             parameter > references[key][1][1][1]):
-                        raise ValueError("Parameter {} is a list containing {}"
+                        raise ValueError("Parameter {} is a {} containing {}"
                                          "which should be in the range [{},{}]"
-                                         "".format(key, parameter,
+                                         "".format(key, type(parameters[key]),
+                                                   parameter,
                                                    references[key][1][1][0],
                                                    references[key][1][1][1]))
-            break
-        if references[key][1][1] is None:
-            break
-            for parameter in parameters[key]:
-                if isinstance(references[key][1], tuple):
-                    if (parameter < references[key][1][1][0] or
-                            parameter > references[key][1][1][1]):
-                        raise ValueError(
-                            "Parameter {} is an array containing {} which "
-                            "should be in the range [{},{}]".format(
-                                key, parameter, references[key][1][1][0],
-                                references[key][1][1][1]))
-            break
-        if isinstance(references[key][1], tuple):
-            if (parameters[key] < references[key][1][0] or
-                    parameters[key] > references[key][1][1]):
-                raise ValueError("Parameter {} is {}, while it"
-                                 " should be in the range [{}, {}]"
-                                 "".format(key, parameters[key],
-                                           references[key][1][0],
-                                           references[key][1][1]))
-        if isinstance(references[key][1], list):
-            if parameters[key] not in references[key][1]:
-                raise ValueError("Parameter {} is {}, while it"
-                                 " should be one of the following {}"
-                                 "".format(key, parameters[key],
-                                           references[key][1]))
+                # Check if element is in a list
+                elif isinstance(references[key][1][1], list):
+                    if parameter not in references[key][1][1]:
+                        raise ValueError("Parameter {} is a {} containing {},"
+                                         " while it should only contain one of"
+                                         " the following {}"
+                                         "".format(key, type(parameters[key]),
+                                                   parameter,
+                                                   references[key][1][1]))
+        else:
+            # If only the type should be checked, continue
+            if references[key][1] is None:
+                continue
+
+            # Check parameter range indicated by a tuple of 2 values
+            if isinstance(references[key][1], tuple):
+                if (parameters[key] < references[key][1][0] or
+                        parameters[key] > references[key][1][1]):
+                    raise ValueError("Parameter {} is {}, while it"
+                                     " should be in the range [{}, {}]"
+                                     "".format(key, parameters[key],
+                                               references[key][1][0],
+                                               references[key][1][1]))
+            # Check if parameter is in a list
+            elif isinstance(references[key][1], list):
+                if parameters[key] not in references[key][1]:
+                    raise ValueError("Parameter {} is {}, while it"
+                                     " should be one of the following {}"
+                                     "".format(key, parameters[key],
+                                               references[key][1]))
 
 
 def validate_metric_params(metric, metric_params):
