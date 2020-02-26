@@ -40,14 +40,14 @@ gtda/externals/pybind11
 .hypothesis/
 
 # Latex
-doc/theory/glossary.aux
-doc/theory/glossary.bbl
-doc/theory/glossary.blg
-doc/theory/glossary.brf
-doc/theory/glossary.log
-doc/theory/glossary.pdf
-doc/theory/glossary.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.brf
+*.log
+*.pdf
+*.synctex.gz
 doc/theory/glossary_backup
 
 # development
-gtda/mapper/scratch/
+tda/mapper/scratch/
