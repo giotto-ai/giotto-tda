@@ -25,7 +25,7 @@ def test_labeller_transformed():
     labeller = Labeller(width=width, func=np.max, func_params={},
                         percentiles=None, n_steps_future=n_steps_future)
     x, y = labeller.fit_transform_resample(X, X)
-    assert_almost_equal(x,  X[(width-1):-n_steps_future])
+    assert_almost_equal(x, X[(width-1):-n_steps_future])
 
 
 def test_labeller_resampled():
@@ -34,8 +34,8 @@ def test_labeller_resampled():
     labeller = Labeller(width=width, func=np.max, func_params={},
                         percentiles=None, n_steps_future=n_steps_future)
     x, y = labeller.fit_transform_resample(X, X)
-    assert_almost_equal(y,  np.array([5, 6, 7, 8, 9, 9, 9,
-                                      9, 9, 9, 5, 6, 7, 8, 9]))
+    assert_almost_equal(y, np.array([5, 6, 7, 8, 9, 9, 9,
+                                     9, 9, 9, 5, 6, 7, 8, 9]))
 
 
 def test_labeller_with_percentage():

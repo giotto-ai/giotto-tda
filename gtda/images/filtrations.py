@@ -96,7 +96,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.n_dimensions_ = len(X.shape) - 1
 
@@ -152,7 +152,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_height)(X[s])
@@ -280,7 +280,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.n_dimensions_ = len(X.shape) - 1
 
@@ -342,7 +342,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_radial)(X[s])
@@ -440,7 +440,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -480,7 +480,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_dilation)(X[s])
@@ -578,7 +578,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -618,7 +618,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_erosion)(X[s])
@@ -727,7 +727,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -767,7 +767,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_signed_distance)(X[s])
