@@ -86,7 +86,7 @@ example_gallery_config = dict(
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
-numpydoc_class_members_toctree = False
+numpydoc_class_members_toctree = True
 
 # For maths, use mathjax by default and svg if NO_MATHJAX env variable is set
 # (useful for viewing the doc offline)
@@ -147,8 +147,8 @@ pygments_style = 'sphinx'
 html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
-    'collapse_navigation': True,
-    'sticky_navigation': True
+    'collapse_navigation': False,
+    'sticky_navigation': False
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -160,8 +160,8 @@ html_static_path = ['source/_static/style.css'] # []  # ['_static']
 #scv_whitelist_branches = ('master', 'w_persistent_image', 'w_cubical', 'w-p-igraph-dep',
 #                          'time_series_tests', 'test_features', 'silhouette')
 #scv_whitelist_tags = ('v0.1a.0', 'v0.1.0', 'v0.1.1', 'v0.1.2')
-scv_whitelist_tags = ('v0.1.4', 'v0.1.3')
-scv_whitelist_branches = ('ghpages', )
+#scv_whitelist_tags = ('v0.1.4', 'v0.1.3')
+#scv_whitelist_branches = ('ghpages', )
 
 rst_epilog = """
 .. |ProjectVersion| replace:: Foo Project, version {versionnum}

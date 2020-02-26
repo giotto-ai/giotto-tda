@@ -63,7 +63,7 @@ Examples
    Please have a look at :doc:`gallery/index`.
 
 .. include:: notebooks/notebooks_readme.rst
-   :start-after: Examples
+   :start-after: Examples, tutorials and plotting utilities
 
 Theory
 ======
