@@ -5,17 +5,20 @@ import numpy as np
 from scipy import ndimage as ndi
 
 
-def _dilate(Xd, n_iterations, max_value):
-    for iteration in range(1, min(n_iterations, max_value) + 1):
-        Xtemp = np.asarray([ndi.binary_dilation(Xd[i])
-                            for i in range(Xd.shape[0])])
-        Xnew = (Xd + Xtemp) == 1
+def _dilate(X, min_iteration, max_iteration, min_value, max_value):
+    X = X * 1.
+    for iteration in range(min_iteration, min(max_iteration, max_value) + 1):
+        Xtemp = np.asarray([ndi.binary_dilation(X[i])
+                            for i in range(X.shape[0])])
+        Xnew = (X + Xtemp) == 1
         if np.any(Xnew):
-            Xd[Xnew] = iteration + 1
+            X[Xnew] = iteration + min_value
         else:
             break
 
-    mask_filtered = Xd == 0
-    Xd -= 1
-    Xd[mask_filtered] = max_value
-    return Xd
+    return X
+
+
+def _erode(X, min_iteration, max_iteration, min_value, max_value):
+    return _dilate(np.logical_not(X), min_iteration, max_iteration,
+                   min_value, max_value)

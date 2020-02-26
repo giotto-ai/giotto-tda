@@ -10,7 +10,8 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 
-from gtda.diagrams import PersistenceEntropy, HeatKernel, PersistenceImage
+from gtda.diagrams import PersistenceEntropy, HeatKernel,\
+    PersistenceImage, Silhouette
 
 diagram = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
 
@@ -68,6 +69,32 @@ def test_pi_positive(pts):
     assert np.all(pi.fit_transform(diagrams) >= 0.)
 
 
+def test_silhouette_transform():
+    sht = Silhouette(n_bins=31, order=1.)
+    X_sht_res = np.array([0., 0.05, 0.1, 0.15, 0.2, 0.25, 0.2, 0.15, 0.1,
+                          0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0., 0.05,
+                          0.1, 0.15, 0.2, 0.25, 0.2, 0.15, 0.1, 0.05, 0.])
+
+    assert_almost_equal(sht.fit_transform(diagram)[0][0], X_sht_res)
+
+
+def test_silhouette_big_order():
+    diagrams = np.array([[[0, 2, 0], [1, 4, 0]]])
+    sht_10 = Silhouette(n_bins=41, order=10.)
+    X_sht_res = np.array([0., 0.00170459, 0.00340919, 0.00511378, 0.00681837,
+                          0.00852296, 0.01022756, 0.01193215, 0.01363674,
+                          0.01534133, 0.01704593, 0.11363674, 0.21022756,
+                          0.30681837, 0.40340919, 0.5, 0.59659081, 0.69318163,
+                          0.78977244, 0.88636326, 0.98295407, 1.08124948,
+                          1.17954489, 1.27784029, 1.3761357, 1.47443111,
+                          1.3761357, 1.27784029, 1.17954489, 1.08124948,
+                          0.98295407, 0.88465867, 0.78636326, 0.68806785,
+                          0.58977244, 0.49147704, 0.39318163, 0.29488622,
+                          0.19659081, 0.09829541, 0.])
+
+    assert_almost_equal(sht_10.fit_transform(diagrams)[0][0], X_sht_res)
+
+
 pts_gen = arrays(
     dtype=np.float,
     elements=floats(allow_nan=False,
@@ -85,11 +112,11 @@ dims_gen = arrays(
 
 
 def _validate_distinct(X):
-    unique_values = [np.unique(x[0:2, :]) for x in X]
+    """Check if, in X, there is any persistence diagram for which all births
+    and deaths are equal."""
+    unique_values = [np.unique(x[:, 0:2]) for x in X]
     if np.any([len(u) < 2 for u in unique_values]):
-        raise ValueError("There should be at least two distinct points"
-                         "in the persistent diagrams:" +
-                         "now, only {} is present".format(*unique_values))
+        raise ValueError
     return 0
 
 
@@ -134,6 +161,19 @@ def test_hk_positive(pts, dims):
     x_t = hk.fit(x).transform(x)
 
     assert np.all((np.tril(x_t[:, :, ::-1, :]) + 1e-13) >= 0.)
+
+
+@given(pts_gen, dims_gen)
+def test_hk_big_sigma(pts, dims):
+    """ We expect that with a huge sigma, the diagrams are so diluted that
+    they are almost 0. Effectively, verifies that the smoothing is applied."""
+    n_bins = 10
+    x = get_input(pts, dims)
+
+    hk = HeatKernel(sigma=100*np.max(np.abs(x)), n_bins=n_bins)
+    x_t = hk.fit(x).transform(x)
+
+    assert np.all(np.abs(x_t) <= 1e-4)
 
 
 @given(pts_gen)

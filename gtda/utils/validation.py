@@ -21,7 +21,9 @@ available_metrics = {
                           ('n_bins', int, (1, np.inf)),
                           ('sigma', numbers.Number, (0., np.inf)),
                           ('weight_function', types.FunctionType,
-                           None)]}
+                           None)],
+    'silhouette': [('order', numbers.Number, (0, np.inf)),
+                   ('n_bins', int, (1, np.inf))]}
 
 available_metric_params = {metric: [p[0] for p in param_lst]
                            for metric, param_lst in available_metrics.items()}

@@ -295,11 +295,11 @@ class Agglomerative:
         memory = check_memory(self.memory)
 
         if self.linkage == "ward" and self.affinity != "euclidean":
-            raise ValueError("{} was provided as affinity. Ward can only work"
-                             "with Euclidean distances.".format(self.affinity))
+            raise ValueError(f"{self.affinity} was provided as affinity. "
+                             f"Ward can only work with Euclidean distances.")
         if self.linkage not in _TREE_BUILDERS:
-            raise ValueError("Unknown linkage type {}. Valid options are {}"
-                             .format(self.linkage, _TREE_BUILDERS.keys()))
+            raise ValueError(f"Unknown linkage type {self.linkage}. Valid "
+                             f"options are {_TREE_BUILDERS.keys()}")
         tree_builder = _TREE_BUILDERS[self.linkage]
 
         # Construct the tree
