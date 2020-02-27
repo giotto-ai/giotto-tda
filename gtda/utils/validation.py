@@ -101,9 +101,9 @@ def validate_params(parameters, references):
           corresponding hyperparameter.
 
         If that type is an iterable, the second element is a list that provides
-        information to validate each element of that iterable. The first element
-        of that list is the type of the elements of the iterable and the second
-        element of that list can be one of:
+        information to validate each element of that iterable. The first
+        element of that list is the type of the elements of the iterable and
+        the second element of that list can be one of:
 
         - ``None``, when only the type should be checked.
         - A tuple of two numbers, when the type is numerical. In this case,

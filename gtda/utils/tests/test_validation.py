@@ -27,7 +27,7 @@ def test_validate_params():
 
 # Testing for validate_params
 def test_validate_params_list():
-    references = {'par1': [list, [float,[1., 2.]]]}
+    references = {'par1': [list, [float, [1., 2.]]]}
     parameters = {'par1': [1.]}
 
     validate_params(parameters, references)
