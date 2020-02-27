@@ -1,13 +1,12 @@
 """The module :mod:`gtda.homology` implements transformers
-to modify metric spaces or generate persistence diagrams.
+to generate persistence diagrams.
 """
 # License: GNU AGPLv3
 
-from .rescaling import ConsistentRescaling, ConsecutiveRescaling
-from .point_clouds import VietorisRipsPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence
-from .graphs import FlagPersistence
-from .grids import CubicalPersistence
+from .simplicial import VietorisRipsPersistence, SparseRipsPersistence, \
+    EuclideanCechPersistence, FlagPersistence
+from .cubical import CubicalPersistence
+>>>>>>> 2334fe9c519bfe7cea43292517cc42c82c6da825
 
 __all__ = [
     'VietorisRipsPersistence',
@@ -15,6 +14,4 @@ __all__ = [
     'EuclideanCechPersistence',
     'FlagPersistence',
     'CubicalPersistence',
-    'ConsistentRescaling',
-    'ConsecutiveRescaling',
 ]

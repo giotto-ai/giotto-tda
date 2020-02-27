@@ -438,6 +438,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `Cech filtrations <https://giotto.ai/theory>`_.
+
     Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
     information about the appearance and disappearance of topological
     features (technically, `homology classes <https://giotto.ai/theory>`_) of
