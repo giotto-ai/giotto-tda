@@ -101,8 +101,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'max_edge_length': [numbers.Number],
-                        'infinity_values_': [numbers.Number],
+    _hyperparameters = {'max_edge_length': [numbers.Number, None],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
@@ -310,8 +310,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {'epsilon': [numbers.Number, (0., 1.)],
-                        'max_edge_length': [numbers.Number],
-                        'infinity_values_': [numbers.Number],
+                        'max_edge_length': [numbers.Number, None],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
@@ -505,8 +505,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         cohomology.html>`_.
 
     """
-    _hyperparameters = {'max_edge_length': [numbers.Number],
-                        'infinity_values_': [numbers.Number],
+    _hyperparameters = {'max_edge_length': [numbers.Number, None],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
