@@ -77,20 +77,21 @@ def check_graph(X):
 
 # Check the type and range of numerical parameters
 def validate_params(parameters, references):
-    """Function to automate hyperparameters validation.
+    """Function to automate the validation of hyperparameters.
 
     Parameters
     ----------
     parameters : dict, required
-        Dictionnary that associates keys being the hyperparameters' name to
-        values being the hyperparameters' value.
+        Dictionary in which the keys are hyperparameter names and the
+        corresponding values are hyperparameter values.
 
     references : dict, required
-        Dictionnary that associates keys being the hyperparameters' name to
-        values being a list. The first element of that list is a type and the
-        second is either ``None``, a tuple containing two elements representing
-        the bounds of the range of values the hyperparameters can take, or a
-        list containing all possible allowed values for the hyperparameter.
+        Dictionary in which the keys are hyperparameter names and the
+        corresponding values are lists. The first element of that list is a
+        type and the second is either ``None``, a tuple containing two
+        elements representing the bounds of the range of values the
+        hyperparameters can take, or a list containing all possible allowed
+        values for the hyperparameter.
 
     """
     for key in references.keys():
