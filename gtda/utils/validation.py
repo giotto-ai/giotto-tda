@@ -142,9 +142,9 @@ def validate_params(parameters, references):
                     # Otherwise just check for the type
                     if not isinstance(parameter, references[key][1][0]):
                         raise TypeError(
-                            "Parameter {key} is a {type(parameters[key])} of "
-                            "{references[key][1][0]}  but contains an "
-                            "element of type {type(parameter)}.")
+                            f"Parameter {key} is a {type(parameters[key])} of "
+                            f"{references[key][1][0]}  but contains an "
+                            f"element of type {type(parameter)}.")
 
                 # If there is no parameter range to check, continue
                 if references[key][1][1] is None:
