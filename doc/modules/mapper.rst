@@ -63,3 +63,14 @@ Visualization
 
    mapper.visualization.plot_static_mapper_graph
    mapper.visualization.plot_interactive_mapper_graph
+
+Utilities
+---------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   mapper.utils.decorators.method_to_transform
+   mapper.utils.pipeline.transformer_from_callable_on_rows

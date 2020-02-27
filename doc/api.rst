@@ -32,6 +32,15 @@ This pages contains a list of available features in the library.
 
 .. include:: modules/diagrams.rst
 
+:mod:`gtda.point_clouds`: Point clouds
+==========================================
+
+.. automodule:: gtda.point_clouds
+   :no-members:
+   :no-inherited-members:
+
+.. include:: modules/point_clouds.rst
+
 :mod:`gtda.time_series`: Time series
 ====================================
 

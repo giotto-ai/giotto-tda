@@ -10,7 +10,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
-from ._utils import _dilate
+from ._utils import _dilate, _erode
 
 
 @adapt_fit_transform_docs
@@ -75,8 +75,9 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         return Xh
 
     def fit(self, X, y=None):
-        """Calculate `direction_`, `n_dimensions_`, 'mesh_' and `max_value_`
-        from a collection of binary images. Then, return the estimator.
+        """Calculate :attr:`direction_`, :attr:`n_dimensions_`, :attr:`mesh_`
+        and :attr:`max_value_` from a collection of binary images. Then,
+        return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -96,7 +97,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.n_dimensions_ = len(X.shape) - 1
 
@@ -152,7 +153,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_height)(X[s])
@@ -184,8 +185,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         dimension of the images of the collection.
 
     radius : float or None, default: ``None``
-        The radius of the ball centered in `center` inside which
-        activated pixels are included in the filtration.
+        The radius of the ball centered in `center` inside which activated
+        pixels are included in the filtration.
 
     metric : string or callable, optional, default: ``'euclidean'``
         If set to ``'precomputed'``, each entry in `X` along axis 0 is
@@ -216,8 +217,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         Effective center of the radial filtration. Set in :meth:`fit`.
 
     effective_metric_params_ : dict
-        Dictionary containing all information present in `metric_params`.
-        If `metric_params` is ``None``, it is set to the empty dictionary.
+        Dictionary containing all information present in
+        `metric_params`. If `metric_params` is ``None``, it is set to
+        the empty dictionary.
 
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
@@ -257,9 +259,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         return Xr
 
     def fit(self, X, y=None):
-        """Calculate `center_`, 'effective_metric_params_', `n_dimensions_`,
-        'mesh_' and `max_value_` from a collection of binary images. Then,
-        return the estimator.
+        """Calculate :attr:`center_`, :attr:'effective_metric_params_',
+        :attr:`n_dimensions_`, :attr:'mesh_' and :attr:`max_value_` from a
+        collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -279,7 +281,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.n_dimensions_ = len(X.shape) - 1
 
@@ -341,7 +343,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_radial)(X[s])
@@ -358,8 +360,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     regions.
 
     Binary dilation is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_. This
-    filtration assigns to each pixel in an image a grayscale value
+    image processing and relies on the `scipy.ndimage \
+    <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_ module.
+
+    This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any activated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
@@ -396,11 +400,6 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
-    References
-    ----------
-    [1] "Multi-dimensional image processing (scipy.ndimage)" \
-        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
-
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -409,13 +408,16 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _calculate_dilation(self, X):
-        Xd = X * 1.
+        Xd = _dilate(X, 1, self.n_iterations_, 1, self.max_value_)
 
-        return _dilate(Xd, self.n_iterations_, self.max_value_)
+        mask_undilated = Xd == 0
+        Xd -= 1
+        Xd[mask_undilated] = self.max_value_
+        return Xd
 
     def fit(self, X, y=None):
-        """Calculate `n_iterations_` and 'max_value_' from a collection of
-        binary images. Then, return the estimator.
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
+        collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -435,7 +437,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -475,7 +477,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_dilation)(X[s])
@@ -492,8 +494,10 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     regions.
 
     Binary erosion is a morphological operator commonly used in
-    image processing and relies on the scipy.ndimage module [1]_.This
-    filtration assigns to each pixel in an image a grayscale value
+    image processing and relies on the `scipy.ndimage \
+    <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_ module.
+
+    This filtration assigns to each pixel in an image a grayscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any deactivated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
@@ -530,11 +534,6 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
-    References
-    ----------
-    [1] "Multi-dimensional image processing (scipy.ndimage)" \
-        <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_.
-
     """
     _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
 
@@ -543,13 +542,16 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _calculate_erosion(self, X):
-        Xd = np.logical_not(X) * 1.
+        Xe = _erode(X, 1, self.n_iterations_, 1, self.max_value_)
 
-        return _dilate(Xd, self.n_iterations_, self.max_value_)
+        mask_uneroded = Xe == 0
+        Xe -= 1
+        Xe[mask_uneroded] = self.max_value_
+        return Xe
 
     def fit(self, X, y=None):
-        """Calculate `n_iterations_` and 'max_value_'from a collection of
-        binary images. Then, return the estimator.
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_`from a
+        collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -569,7 +571,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X,  ensure_2d=False, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -609,10 +611,154 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X,  ensure_2d=False, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_erosion)(X[s])
+            for s in gen_even_slices(Xt.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        return Xt
+
+
+@adapt_fit_transform_docs
+class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
+    """Filtrations of 2D/3D binary images based on the dilation and the erosion
+    of activated regions.
+
+    This filtration assigns to each pixel in an image a grayscale value
+    calculated as follows. For activated pixels, if the minimum Manhattan
+    distance between the pixel and any deactivated pixel in the image is less
+    than or equal to the parameter `n_iterations`, the assigned value is
+    this distance minus 1. Otherwise, the assigned grayscale value is the sum
+    of the lengths along all axes of the image – equivalently, it is the
+    maximum Manhattan distance between any two pixels in the image, minus 1.
+    For deactivated pixels, if the minimum Manhattan distance between the pixel
+    and any activated pixel in the image is less than or equal to the parameter
+    `n_iterations`, the assigned value is the opposite of this distance.
+    Otherwise, the assigned grayscale value is the opposite of the maximum
+    Manhattan distance between any two pixels in the image.
+
+    The name of this filtration comes from the fact that it is a a negatively
+    signed dilation plus a positively signed erosion, minus 1 on the activated
+    pixels. Therefore, pixels the activated pixels at the boundary of the
+    activated regions always have a pixel value of 0.
+
+    Parameters
+    ----------
+    n_iterations : int or None, optional, default: ``None``
+        Number of iterations in the dilation process. ``None`` means dilation
+        over the full image.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    n_iterations_ : int
+        Effective number of iterations in the dilation process. Set in
+        :meth:`fit`.
+
+    max_value_: float
+        Maximum pixel value among all pixels in all images of the collection.
+        Set in :meth:`fit`.
+
+    See also
+    --------
+    gtda.homology.CubicalPersistence, Binarizer, ErosionFiltration, \
+    DilationFiltration
+
+    """
+    _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
+
+    def __init__(self, n_iterations=None, n_jobs=None):
+        self.n_iterations = n_iterations
+        self.n_jobs = n_jobs
+
+    def _calculate_signed_distance(self, X):
+        mask = X == 1
+
+        Xd = -_dilate(X, 1, self.n_iterations_, 0, self.max_value_)
+        Xe = _erode(X, 0, self.n_iterations_, 0, self.max_value_)
+
+        mask_e = Xe == 0
+        mask_d = Xd == 0
+        Xe[np.logical_not(mask)] = 0
+        Xe[mask] -= 1
+        Xd[mask] = 0
+        Xd[mask_d] = -self.max_value_
+        Xe[mask_e] = self.max_value_
+        return (Xd + Xe)
+
+    def fit(self, X, y=None):
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
+        collection of binary images. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_array(X, allow_nd=True)
+
+        self.max_value_ = np.sum(X.shape[1:])
+
+        if self.n_iterations is None:
+            self.n_iterations_ = int(self.max_value_)
+        else:
+            self.n_iterations_ = self.n_iterations
+
+        validate_params({**self.get_params(),
+                         'n_iterations_': self.n_iterations_},
+                        self._hyperparameters)
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each binary image in the collection `X`, calculate a
+        corresponding grayscale image based on the distance of its pixels to
+        their closest activated neighboring pixel. Return the collection
+        of grayscale images.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_pixels_x,
+            n_pixels_y [, n_pixels_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D grayscale image.
+
+        """
+        check_is_fitted(self)
+        Xt = check_array(X, allow_nd=True, copy=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._calculate_signed_distance)(X[s])
             for s in gen_even_slices(Xt.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)

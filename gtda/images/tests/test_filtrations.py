@@ -7,8 +7,7 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import HeightFiltration, RadialFiltration, \
-    DilationFiltration, ErosionFiltration
-
+   DilationFiltration, ErosionFiltration, SignedDistanceFiltration
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],
@@ -113,7 +112,7 @@ images_3D_radial = np.array(
      [[[1.41421356, 1.], [1., 0.], [4., 4.], [4., 4.]],
       [[1.73205081, 1.41421356], [1.41421356, 1.], [4., 4.], [4., 4.]],
       [[2.44948974, 2.23606798], [2.23606798, 2.], [4., 4.], [4., 4.]]],
-     [[[4., 4.], [4., 4.],  [4., 4.], [4., 4.]],
+     [[[4., 4.], [4., 4.], [4., 4.], [4., 4.]],
       [[4., 4.], [4., 4.], [4., 4.], [4., 4.]],
       [[4., 4.], [4., 4.], [4., 4.], [4., 4.]]]])
 
@@ -166,7 +165,7 @@ images_3D_dilation = np.array(
                           (1, images_3D, images_3D_dilation)])
 def test_dilation_transform(n_iterations, images, expected):
     dilation = DilationFiltration(n_iterations=n_iterations)
-    print(dilation.fit_transform(images))
+
     assert_almost_equal(dilation.fit_transform(images),
                         expected)
 
@@ -210,4 +209,45 @@ def test_erosion_transform(n_iterations, images, expected):
     erosion = ErosionFiltration(n_iterations=n_iterations)
 
     assert_almost_equal(erosion.fit_transform(images),
+                        expected)
+
+
+def test_signed_not_fitted():
+    signed = SignedDistanceFiltration()
+    with pytest.raises(NotFittedError):
+        signed.transform(images_2D)
+
+
+def test_signed_errors():
+    n_iterations = 'a'
+    signed = SignedDistanceFiltration(n_iterations=n_iterations)
+    with pytest.raises(TypeError):
+        signed.fit(images_2D)
+
+
+images_2D_signed = np.array(
+    [[[7., 7., 7., 7.], [7., 7., 7., 7.], [7., 7., 7., 7.]],
+     [[1., 0., -1., -2.], [1., 0., -1., -2.], [1., 0., -1., -2.]],
+     [[-7., -7., -7., -7.], [-7., -7., -7., -7.], [-7., -7., -7., -7.]]])
+
+images_3D_signed = np.array(
+    [[[[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]],
+      [[9., 9.], [9., 9.], [9., 9.], [9., 9.]]],
+     [[[1., 1.], [0., 0.], [-1., -1.], [-2., -2.]],
+      [[1., 1.], [0., 0.], [-1., -1.], [-2., -2.]],
+      [[1., 1.], [0., 0.], [-1., -1.], [-2., -2.]]],
+     [[[-9., -9.], [-9., -9.], [-9., -9.], [-9., -9.]],
+      [[-9., -9.], [-9., -9.], [-9., -9.], [-9., -9.]],
+      [[-9., -9.], [-9., -9.], [-9., -9.], [-9., -9.]]]])
+
+
+@pytest.mark.parametrize("n_iterations, images, expected",
+                         [(None, images_2D, images_2D_signed),
+                          (100, images_2D, images_2D_signed),
+                          (2, images_3D, images_3D_signed)])
+def test_signed_transform(n_iterations, images, expected):
+    signed = SignedDistanceFiltration(n_iterations=n_iterations)
+
+    assert_almost_equal(signed.fit_transform(images),
                         expected)

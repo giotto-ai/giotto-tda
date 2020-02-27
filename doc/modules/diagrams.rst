@@ -20,16 +20,27 @@ Distances
 
    diagrams.PairwiseDistance
 
-Diagram features
-----------------
+Representations
+---------------
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/diagrams/features/
+   :toctree: generated/diagrams/representations/
+   :template: class.rst
+
+   diagrams.PersistenceLandscape
+   diagrams.BettiCurve
+   diagrams.HeatKernel
+   diagrams.PersistenceImage
+   diagrams.Silhouette
+
+Features
+--------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/diagrams/features
    :template: class.rst
 
    diagrams.Amplitude
    diagrams.PersistenceEntropy
-   diagrams.PersistenceLandscape
-   diagrams.BettiCurve
-   diagrams.HeatKernel

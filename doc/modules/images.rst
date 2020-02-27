@@ -7,6 +7,7 @@ Preprocessing
    :toctree: generated/images
    :template: class.rst
 
+   images.Binarizer
    images.Inverter
    images.Padder
    images.ImageToPointCloud

@@ -5,4 +5,6 @@
    :template: class.rst
 
    homology.VietorisRipsPersistence
-   homology.ConsistentRescaling
+   homology.SparseRipsPersistence
+   homology.EuclideanCechPersistence
+   homology.CubicalPersistence
