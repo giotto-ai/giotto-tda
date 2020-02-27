@@ -668,13 +668,13 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    ConsistentRescaling
+    VietorisRipsPersistence, SparseRipsPeristence
 
     Notes
     -----
-    `Flagser <https://github.com/luetge/flagser>`_ is used as a C++ backend
-    for computing Flag complexes persistent homology. Python bindings rely on
-    the `pyflagser <https://github.com/giotto-ai/pyflagser>`_ package.
+    The `pyflagser <https://github.com/giotto-ai/pyflagser>`_ Python package
+    is used for bindings `Flagser <https://github.com/luetge/flagser>`_, a C++
+    backend for computing Flag complexes persistent homology.
 
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
