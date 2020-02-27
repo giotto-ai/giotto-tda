@@ -77,7 +77,7 @@ def check_graph(X):
 
 # Check the type and range of numerical parameters
 def validate_params(parameters, references):
-    """Function to automatize hyperparameters validation.
+    """Function to automate hyperparameters validation.
 
     Parameters
     ----------
