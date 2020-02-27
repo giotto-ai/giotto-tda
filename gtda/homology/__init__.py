@@ -6,7 +6,6 @@ to generate persistence diagrams.
 from .simplicial import VietorisRipsPersistence, SparseRipsPersistence, \
     EuclideanCechPersistence, FlagPersistence
 from .cubical import CubicalPersistence
->>>>>>> 2334fe9c519bfe7cea43292517cc42c82c6da825
 
 __all__ = [
     'VietorisRipsPersistence',
