@@ -14,22 +14,22 @@ outputs_end = '\n\n'
 
 def get_preamble_docs(docs):
     re_search = re.search(
-        '^(.*){}'.format(inputs_start), docs, flags=re.DOTALL)
+        f'^(.*){inputs_start}', docs, flags=re.DOTALL)
     return re_search.group(1)
 
 
 def get_inputs_docs(docs):
     re_search = re.search(
-        '{}(.*){}'.format(inputs_start, inputs_end), docs, flags=re.DOTALL)
+        f'{inputs_start}(.*){inputs_end}', docs, flags=re.DOTALL)
     return re_search.group(1)
 
 
 def get_outputs_docs(docs):
     re_search = re.search(
-        '{}(.*){}'.format(inputs_end, outputs_end), docs, flags=re.DOTALL)
+        f'{inputs_end}(.*){outputs_end}', docs, flags=re.DOTALL)
     if re_search is None:
         re_search = re.search(
-            '{}(.*)$'.format(inputs_end), docs, flags=re.DOTALL)
+            f'{inputs_end}(.*)$', docs, flags=re.DOTALL)
     return re_search.group(1)
 
 

@@ -11,7 +11,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_strong_witness_complex, m) {
+PYBIND11_MODULE(gtda_strong_witness_complex, m) {
   using simplex_tree_interface_inst = Gudhi::Simplex_tree_interface<>;
   using strong_witness_interface_inst =
       Gudhi::witness_complex::Strong_witness_complex_interface;

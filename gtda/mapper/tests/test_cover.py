@@ -36,7 +36,7 @@ def get_nb_intervals(draw):
 def get_overlap_fraction(draw):
     overlap = draw(floats(allow_nan=False,
                           allow_infinity=False,
-                          min_value=0., exclude_min=True,
+                          min_value=1e-8, exclude_min=True,
                           max_value=1., exclude_max=True),
                    )
     return overlap
@@ -67,8 +67,8 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
         assert n_samples == unique_interval_masks.shape[0]
         assert n_intervals >= unique_interval_masks.shape[1]
     except ValueError as ve:
-        assert ve.args[0] == "Only one unique filter value found, cannot " \
-                             "fit {} > 1 intervals.".format(n_intervals)
+        assert ve.args[0] == f"Only one unique filter value found, cannot " \
+                             f"fit {n_intervals} > 1 intervals."
         assert (n_intervals > 1) and (len(np.unique(filter_values)) == 1)
 
 

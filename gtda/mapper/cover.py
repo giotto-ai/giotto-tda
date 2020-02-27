@@ -3,6 +3,7 @@
 
 from functools import partial
 from itertools import product
+import warnings
 
 import numpy as np
 from scipy.stats import rankdata
@@ -84,12 +85,21 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
                         'n_intervals': [int, (1, np.inf)],
-                        'overlap_frac': [float, (0, 1)]}
+                        'overlap_frac': [float, (0., 1.)]}
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
         self.overlap_frac = overlap_frac
+
+        if overlap_frac == 0.:
+            raise ValueError("`overlap_frac` must be positive,"
+                             "as otherwise the intervals will not cover"
+                             "the range")
+        if overlap_frac <= 1e-8:
+            warnings.warn("`overlap_frac` is close to zero,"
+                          "which might cause numerical issues and errors",
+                          RuntimeWarning)
 
     def _fit_uniform(self, X):
         self.left_limits_, self.right_limits_ = self._find_interval_limits(
@@ -276,8 +286,8 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         # in which case the fitted interval will be (-np.inf, np.inf).
         if only_one_pt and n_intervals > 1:
             raise ValueError(
-                "Only one unique filter value found, cannot fit {} > 1 "
-                "intervals.".format(n_intervals))
+                f"Only one unique filter value found, cannot fit "
+                f"{n_intervals} > 1 intervals.")
 
         left_limits, right_limits = \
             self._cover_limits(min_val, max_val, n_intervals, overlap_frac)
@@ -378,12 +388,12 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         try:
             return getattr(clone(coverer), method_name)(X[:, [i]])
         except ValueError as ve:
-            if ve.args[0] == "Only one unique filter value found, cannot " \
-                             "fit {} > 1 intervals.".format(self.n_intervals):
+            if ve.args[0] == f"Only one unique filter value found, cannot " \
+                             f"fit {self.n_intervals} > 1 intervals.":
                 raise ValueError(
-                    "Only one unique filter value found along feature "
-                    "dimension {}, cannot fit {} > 1 intervals there.".format(
-                        i, self.n_intervals))
+                    f"Only one unique filter value found along feature "
+                    f"dimension {i}, cannot fit {self.n_intervals} > 1 "
+                    f"intervals there.")
             else:
                 raise ve
 
@@ -472,8 +482,8 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         n_features = X.shape[1]
         if n_features != n_features_fit:
             raise DataDimensionalityWarning(
-                "Different number of columns between 'fit' ({}) and "
-                "'transform' ({}).".format(n_features_fit, n_features))
+                f"Different number of columns between 'fit' ({n_features_fit})"
+                f" and 'transform' ({n_features}).")
 
         if self.kind == 'balanced':
             # Test on the first coverer whether the left_limits_ and

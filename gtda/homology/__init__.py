@@ -3,15 +3,18 @@ to modify metric spaces or generate persistence diagrams.
 """
 # License: GNU AGPLv3
 
-from .consistent import ConsistentRescaling
-from .point_clouds import VietorisRipsPersistence, SparseRipsPersistence
+from .rescaling import ConsistentRescaling, ConsecutiveRescaling
+from .point_clouds import VietorisRipsPersistence, SparseRipsPersistence, \
+    EuclideanCechPersistence
 from .grids import CubicalPersistence
 from .graphs import FlagPersistence
 
 __all__ = [
     'VietorisRipsPersistence',
     'SparseRipsPersistence',
+    'EuclideanCechPersistence',
     'FlagPersistence',
     'CubicalPersistence',
     'ConsistentRescaling',
+    'ConsecutiveRescaling',
 ]

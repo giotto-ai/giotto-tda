@@ -38,8 +38,8 @@ X = np.array([[-19.33965799, -284.58638371],
               [-155.54055842, -214.420498],
               [184.6940872,    2.08810678],
               [-184.42012962,   28.8978038]])
-colors = np.array([8.,  8.,  3.,  8.,  0.,  8.,  8.,  8.,  5.,
-                   8.,  8.,  8.,  8., 4.,  2., 8., 1.,  8., 2.,  8.])
+colors = np.array([8., 8., 3., 8., 0., 8., 8., 8., 5.,
+                   8., 8., 8., 8., 4., 2., 8., 1., 8., 2., 8.])
 
 
 class TestStaticPlot(TestCaseNoTemplate):
@@ -72,6 +72,10 @@ class TestInteractivePlot(TestCaseNoTemplate):
             except (AttributeError, TypeError):
                 pass
 
+    def _get_size_from_hovertext(self, s):
+        from re import split
+        return int(split(':|<', s)[-1])
+
     def test_cluster_sizes(self):
         """Verify that the total number of calculated clusters is equal to
         the number of displayed clusters."""
@@ -80,7 +84,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
         fig = plot_interactive_mapper_graph(pipe, X)
         w_scatter = self._get_widget_by_trait(fig, 'data')
 
-        node_sizes_vis = [int(s_[10:].split(sep='<')[0])
+        node_sizes_vis = [self._get_size_from_hovertext(s_)
                           for s_ in w_scatter.get_state()
                           ['_data'][1]['hovertext']]
 
