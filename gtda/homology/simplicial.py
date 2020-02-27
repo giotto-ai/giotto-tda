@@ -691,7 +691,7 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
     _hyperparameters = {'directed': [bool, [True, False]],
                         'max_entries': [int, None],
                         'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
