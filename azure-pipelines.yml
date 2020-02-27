@@ -16,171 +16,9 @@ jobs:
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
-    - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '$(python.version)'
-
-    - script: |
-        set -e
-        brew update
-        brew install boost ccache
-      displayName: 'Install system dependencies'
-
-    - script: |
-        set -e
-        python -m pip install --upgrade pip setuptools
-        source .azure-ci/setup_ccache.sh
-        python -m pip install -e ".[dev]"
-        ccache -s
-      displayName: 'Install dependencies and dev environement'
-
-    - script:
-        set -e
-        cd ..
-        git clone git@github.com:giotto-ai/gtda-docs.git
-      displayName: "Clone the docs repo"
-
-    - script: |
-        install weird stuff (pandoc???)
-      displayName: 'Install additional stuff to build docs'
-
-    - script:
-        cd doc
-        git config --local user.name "Azure Pipelines"
-        git config --local user.email "azuredevops@microsoft.com"
-        make all-gh
-      displayName: 'Build and commit the docs'
-      failOnStderr: false
-
-
-- job: 'manylinux2010'
-  pool:
-    vmImage: 'ubuntu-16.04'
-  strategy:
-    matrix:
-      Python36:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '36'
-        python.version: '3.6'
-      Python37:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '37'
-        python.version: '3.7'
-      Python38:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '38'
-        python.version: '3.8'
-  variables:
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
-
-  steps:
   - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - task: Cache@2
-    inputs:
-      key: '"ccache-wheels-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
-      path: $(CCACHE_DIR)
-    displayName: ccache
-
-  - bash: |
-      set -e
-      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Change name to giotto-tda-nightly'
-
-  - task: Bash@3
-    inputs:
-      filePath: .azure-ci/build_manylinux2010.sh
-    env:
-      python_ver: $(python_ver)
-      CCACHE_DIR: $(CCACHE_DIR)
-    displayName: 'Run docker container, install and uninstall dev environment, test with pytest and flake8, build the wheels'
-
-  - script: |
-      set -e
-      python -m pip install --upgrade pip
-      pip install dist/*manylinux2010*.whl
-    displayName: 'Install the wheels'
-
-  - script: |
-      set -e
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
-      mkdir tmp_test_cov
-      cd tmp_test_cov
-      pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    displayName: 'Test the wheels with pytest'
-
-  - script: |
-      set -e
-      pip install pandas openml
-      pip install "papermill==1.2.1"
-      cd examples
-      for n in *.ipynb
-      do
-        papermill --start_timeout 2000 $n -
-      done
-    condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test jupyter notebooks with papermill'
-
-  - task: CopyFiles@2
-    displayName: 'Copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'Create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
-
-  - bash: |
-      set -e
-      pip install twine
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload nightly wheels to PyPI'
-
-
-- job: 'macOS1014'
-  pool:
-    vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-  variables:
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - bash: |
-      set -e
-      sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
-      rm setup.py.bak
-      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-      rm gtda/_version.py.bak
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Change name to giotto-tda-nightly'
-
-  - task: Cache@2
-    inputs:
-      key: '"ccache-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
-      path: $(CCACHE_DIR)
-    displayName: ccache
+      inputs:
+        versionSpec: '$(python.version)'
 
   - script: |
       set -e
@@ -196,165 +34,327 @@ jobs:
       ccache -s
     displayName: 'Install dependencies and dev environement'
 
-  - script: |
+  - script:
       set -e
-      pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+      cd ..
+      git clone git@github.com:giotto-ai/gtda-docs.git
+    displayName: "Clone the docs repo"
 
   - script: |
-      set -e
-      flake8
-    displayName: 'Test dev install with flake8'
+      install weird stuff (pandoc???)
+    displayName: 'Install additional stuff to build docs'
 
-  - script: |
-      set -e
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
-    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
-
-  - script: |
-      set -e
-      pip install wheel
-      python setup.py bdist_wheel
-    displayName: 'Build the wheels'
-
-  - script: pip install dist/*.whl
-    displayName: 'Install the wheels'
-
-  - script: |
-      set -e
-      mkdir tmp_test_cov
-      cd tmp_test_cov
-      pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    displayName: 'Test the wheels with pytest'
-
-  - script: |
-      set -e
-      python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
-      cd examples
-      for n in *.ipynb
-      do
-        papermill --start_timeout 2000 $n -
-      done
-    displayName: 'Test jupyter notebooks with papermill'
-
-  - script: |
-      set -e
-      cd doc/
-      make html
-    displayName: 'Build sphinx doc'
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: doc/build
-      includeRootFolder: true
-      archiveType: 'zip'
-      tarCompression: 'gz'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      replaceExistingArchive: true
-    displayName: 'Archive doc'
-
-  - task: CopyFiles@2
-    displayName: 'Copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'Create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
-
-  - bash: |
-      set -e
-      pip install twine
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload nightly wheels to PyPI'
+  - script:
+      cd doc
+      git config --local user.name "Azure Pipelines"
+      git config --local user.email "azuredevops@microsoft.com"
+      make all-gh
+    displayName: 'Build and commit the docs'
+    failOnStderr: false
 
 
-- job: 'win2016'
-  pool:
-    vmImage: 'vs2017-win2016'
-  strategy:
-    matrix:
-      Python36:
-        python_ver: '36'
-        python.version: '3.6'
-      Python37:
-        python_ver: '37'
-        python.version: '3.7'
-      Python38:
-        python_ver: '38'
-        python.version: '3.8'
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - bash: |
-      set -e
-      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
-      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Change name to giotto-tda-nightly'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-      python -m pip install -e ".[dev]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pytest gtda --cov --cov-report xml || exit /b
-    displayName: 'Test dev install with pytest'
-
-  - script: |
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
-    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
-
-  - bash: |
-      set -e
-      sed -i $'s/\r$//' README.rst
-      pip install wheel
-      python setup.py bdist_wheel
-    displayName: 'Build the wheels'
-
-  - bash: pip install dist/*.whl
-    displayName: 'Install the wheels'
-
-  - script: |
-      mkdir tmp_test_cov
-      cd tmp_test_cov
-      pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
-    displayName: 'Test the wheels with pytest'
-
-  - script: |
-      python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
-      cd examples
-      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
-    condition: eq(variables['notebooks_check'], 'true')
-    displayName: 'Test jupyter notebooks with papermill'
-
-  - task: CopyFiles@2
-    displayName: 'Copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'Create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
-
-  - bash: |
-      set -e
-      pip install twine
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
-    displayName: 'Upload nightly wheels to PyPI'
+#- job: 'manylinux2010'
+#  pool:
+#    vmImage: 'ubuntu-16.04'
+#  strategy:
+#    matrix:
+#      Python36:
+#        arch: x86_64
+#        plat: manylinux2010_x86_64
+#        python_ver: '36'
+#        python.version: '3.6'
+#      Python37:
+#        arch: x86_64
+#        plat: manylinux2010_x86_64
+#        python_ver: '37'
+#        python.version: '3.7'
+#      Python38:
+#        arch: x86_64
+#        plat: manylinux2010_x86_64
+#        python_ver: '38'
+#        python.version: '3.8'
+#  variables:
+#    CCACHE_DIR: $(Pipeline.Workspace)/ccache
+#
+#  steps:
+#  - task: UsePythonVersion@0
+#    inputs:
+#      versionSpec: '$(python.version)'
+#
+#  - task: Cache@2
+#    inputs:
+#      key: '"ccache-wheels-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
+#      path: $(CCACHE_DIR)
+#    displayName: ccache
+#
+#  - bash: |
+#      set -e
+#      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+#      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Change name to giotto-tda-nightly'
+#
+#  - task: Bash@3
+#    inputs:
+#      filePath: .azure-ci/build_manylinux2010.sh
+#    env:
+#      python_ver: $(python_ver)
+#      CCACHE_DIR: $(CCACHE_DIR)
+#    displayName: 'Run docker container, install and uninstall dev environment, test with pytest and flake8, build the wheels'
+#
+#  - script: |
+#      set -e
+#      python -m pip install --upgrade pip
+#      pip install dist/*manylinux2010*.whl
+#    displayName: 'Install the wheels'
+#
+#  - script: |
+#      set -e
+#      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
+#      mkdir tmp_test_cov
+#      cd tmp_test_cov
+#      pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+#    displayName: 'Test the wheels with pytest'
+#
+#  - script: |
+#      set -e
+#      pip install pandas openml
+#      pip install "papermill==1.2.1"
+#      cd examples
+#      for n in *.ipynb
+#      do
+#        papermill --start_timeout 2000 $n -
+#      done
+#    condition: eq(variables['notebooks_check'], 'true')
+#    displayName: 'Test jupyter notebooks with papermill'
+#
+#  - task: CopyFiles@2
+#    displayName: 'Copy files'
+#    inputs:
+#      contents: 'dist/*'
+#      targetFolder: '$(Build.ArtifactStagingDirectory)'
+#
+#  - task: PublishBuildArtifacts@1
+#    displayName: 'Create download link'
+#    inputs:
+#      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+#      artifactName: 'wheel_and_doc'
+#
+#  - bash: |
+#      set -e
+#      pip install twine
+#      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Upload nightly wheels to PyPI'
+#
+#
+#- job: 'macOS1014'
+#  pool:
+#    vmImage: 'macOS-10.14'
+#  strategy:
+#    matrix:
+#      Python36:
+#        python.version: '3.6'
+#      Python37:
+#        python.version: '3.7'
+#      Python38:
+#        python.version: '3.8'
+#  variables:
+#    CCACHE_DIR: $(Pipeline.Workspace)/ccache
+#
+#  steps:
+#  - task: UsePythonVersion@0
+#    inputs:
+#      versionSpec: '$(python.version)'
+#
+#  - bash: |
+#      set -e
+#      sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+#      rm setup.py.bak
+#      sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+#      rm gtda/_version.py.bak
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Change name to giotto-tda-nightly'
+#
+#  - task: Cache@2
+#    inputs:
+#      key: '"ccache-v2020.02.17" | $(Agent.OS) | "$(python.version)"'
+#      path: $(CCACHE_DIR)
+#    displayName: ccache
+#
+#  - script: |
+#      set -e
+#      brew update
+#      brew install boost ccache
+#    displayName: 'Install system dependencies'
+#
+#  - script: |
+#      set -e
+#      python -m pip install --upgrade pip setuptools
+#      source .azure-ci/setup_ccache.sh
+#      python -m pip install -e ".[dev]"
+#      ccache -s
+#    displayName: 'Install dependencies and dev environement'
+#
+#  - script: |
+#      set -e
+#      pytest gtda --cov --cov-report xml
+#    displayName: 'Test dev install with pytest'
+#
+#  - script: |
+#      set -e
+#      flake8
+#    displayName: 'Test dev install with flake8'
+#
+#  - script: |
+#      set -e
+#      pip uninstall -y giotto-tda
+#      pip uninstall -y giotto-tda-nightly
+#    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
+#
+#  - script: |
+#      set -e
+#      pip install wheel
+#      python setup.py bdist_wheel
+#    displayName: 'Build the wheels'
+#
+#  - script: pip install dist/*.whl
+#    displayName: 'Install the wheels'
+#
+#  - script: |
+#      set -e
+#      mkdir tmp_test_cov
+#      cd tmp_test_cov
+#      pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+#    displayName: 'Test the wheels with pytest'
+#
+#  - script: |
+#      set -e
+#      python -m pip install -e ".[examples]"
+#      pip install "papermill==1.2.1"
+#      cd examples
+#      for n in *.ipynb
+#      do
+#        papermill --start_timeout 2000 $n -
+#      done
+#    displayName: 'Test jupyter notebooks with papermill'
+#
+#  - script: |
+#      set -e
+#      cd doc/
+#      make html
+#    displayName: 'Build sphinx doc'
+#
+#  - task: ArchiveFiles@2
+#    inputs:
+#      rootFolderOrFile: doc/build
+#      includeRootFolder: true
+#      archiveType: 'zip'
+#      tarCompression: 'gz'
+#      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+#      replaceExistingArchive: true
+#    displayName: 'Archive doc'
+#
+#  - task: CopyFiles@2
+#    displayName: 'Copy files'
+#    inputs:
+#      contents: 'dist/*'
+#      targetFolder: '$(Build.ArtifactStagingDirectory)'
+#
+#  - task: PublishBuildArtifacts@1
+#    displayName: 'Create download link'
+#    inputs:
+#      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+#      artifactName: 'wheel_and_doc'
+#
+#  - bash: |
+#      set -e
+#      pip install twine
+#      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Upload nightly wheels to PyPI'
+#
+#
+#- job: 'win2016'
+#  pool:
+#    vmImage: 'vs2017-win2016'
+#  strategy:
+#    matrix:
+#      Python36:
+#        python_ver: '36'
+#        python.version: '3.6'
+#      Python37:
+#        python_ver: '37'
+#        python.version: '3.7'
+#      Python38:
+#        python_ver: '38'
+#        python.version: '3.8'
+#
+#  steps:
+#  - task: UsePythonVersion@0
+#    inputs:
+#      versionSpec: '$(python.version)'
+#
+#  - bash: |
+#      set -e
+#      sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+#      sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Change name to giotto-tda-nightly'
+#
+#  - script: |
+#      python -m pip install --upgrade pip setuptools
+#      python -m pip install -e ".[dev]"
+#    displayName: 'Install dev environment'
+#
+#  - script: |
+#      pytest gtda --cov --cov-report xml || exit /b
+#    displayName: 'Test dev install with pytest'
+#
+#  - script: |
+#      pip uninstall -y giotto-tda
+#      pip uninstall -y giotto-tda-nightly
+#    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
+#
+#  - bash: |
+#      set -e
+#      sed -i $'s/\r$//' README.rst
+#      pip install wheel
+#      python setup.py bdist_wheel
+#    displayName: 'Build the wheels'
+#
+#  - bash: pip install dist/*.whl
+#    displayName: 'Install the wheels'
+#
+#  - script: |
+#      mkdir tmp_test_cov
+#      cd tmp_test_cov
+#      pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+#    displayName: 'Test the wheels with pytest'
+#
+#  - script: |
+#      python -m pip install -e ".[examples]"
+#      pip install "papermill==1.2.1"
+#      cd examples
+#      FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
+#    condition: eq(variables['notebooks_check'], 'true')
+#    displayName: 'Test jupyter notebooks with papermill'
+#
+#  - task: CopyFiles@2
+#    displayName: 'Copy files'
+#    inputs:
+#      contents: 'dist/*'
+#      targetFolder: '$(Build.ArtifactStagingDirectory)'
+#
+#  - task: PublishBuildArtifacts@1
+#    displayName: 'Create download link'
+#    inputs:
+#      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+#      artifactName: 'wheel_and_doc'
+#
+#  - bash: |
+#      set -e
+#      pip install twine
+#      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
+#    condition: eq(variables['nightly_check'], 'true')
+#    displayName: 'Upload nightly wheels to PyPI'
