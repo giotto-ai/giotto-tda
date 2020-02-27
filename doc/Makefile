@@ -3,13 +3,17 @@
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
+########## Config
+
+GITDIR    = ../../../projects/gtda-docs
+VERSION = stable
+
+########## Constant config
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = build
-GITDIR    = ../../../projects/gtda-docs
 EXAMPLESDIR  = ../examples
-VERSION = stable
 
 CURRENTDOCFOLDER = $(GITDIR)/$(VERSION)
 
@@ -23,7 +27,7 @@ github:
 	@cd $(GITDIR); python create_index.py
 
 theory-gl:
-	@pandoc theory/glossary.tex -f latex -t rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
+	@pandoc theory/glossary.tex -f latex -t rst --reference-location=block -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
 
 clean-gh:
 	@make clean

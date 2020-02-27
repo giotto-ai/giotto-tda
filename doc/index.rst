@@ -10,20 +10,32 @@ scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the 
 
 **Read our paper on arXiv!**
 
+.. toctree::
+
+   Guiding principles
+   30s guide to giotto-tda
+      Introduction to giotto-tda
+      Mapper-example
+   Installation <installation>
+   Release notes - 0.1.4
+   FAQ
+
+
+
 Guiding principles
 ==================
 
- * | Seamless integration with widely used ML frameworks: Python + scikit-learn.
+ * | **Seamless integration with widely used ML frameworks: Python + scikit-learn.**
    | Inherit their strengths and allow for creation of heterogeneous ML pipelines.
- * | Code modularity: Algorithms as transformers
+ * | **Code modularity: Algorithms as transformers.**
    | “Lego blocks” approach.
- * | User-friendliness and familiarity to the broad data science community.
+ * | **User-friendliness and familiarity to the broad data science community.**
    | Strict adherence to scikit-learn API and developer guidelines, “fit-transform” paradigm
- * | Standardisation.
+ * | **Standardisation.**
    | Allow for integration of most available techniques into a generic framework.  Consistency of API across different modules
- * | Performance within the language constraints.
+ * | **Performance within the language constraints.**
    | Vectorized code, parallelism (likely in future: just-in-time compilation and more)
- * | Data structures.
+ * | **Data structures.**
    | Support for time series, graphs, images.
 
 30s guide to giotto-tda
@@ -39,19 +51,16 @@ Mapper example
 --------------
 
 .. include::
-   mapper_quickstart
+   notebooks/mapper_quickstart
 
-Installation
-============
+..
+   Installation
+   ============
 
-.. include:: ../README.rst
-   :start-after: Installation
-   :end-before: Contributing
+   .. include:: ../README.rst
+      :start-after: Installation
+      :end-before: Contributing
 
-Developer installation
-----------------------
-
-For information about the developer installation, please refer to :ref:`Contributing guidelines <contrib>`.
 
 API reference
 =============
@@ -59,11 +68,8 @@ See :doc:`the API reference <api>`.
 
 Examples
 ========
-..
-   Please have a look at :doc:`gallery/index`.
 
-.. include:: notebooks/notebooks_readme.rst
-   :start-after: Examples, tutorials and plotting utilities
+Please have a look at :doc:`notebooks/notebooks_readme`.
 
 Theory
 ======
@@ -141,6 +147,6 @@ We are also grateful to all who filed issues or helped resolve them, asked and
 answered questions, and were part of inspiring discussions.
 
 FAQ
-===========
+===
 
 For additional information, please refer to :doc:`Frequently asked questions <faq>`.
