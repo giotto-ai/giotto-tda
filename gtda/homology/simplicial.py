@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 import numbers
+import types
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -10,6 +11,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics.pairwise import pairwise_distances
 
 from ._utils import _postprocess_diagrams
+from ._subsamplings import *
 from ..externals.python import ripser, SparseRipsComplex, CechComplex, \
     WitnessComplex
 from ..utils._docs import adapt_fit_transform_docs
@@ -247,6 +249,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
+    metric_params : dict or None, optional, default: ``{}``
+        Additional keyword arguments for the metric function.
+
     homology_dimensions : iterable, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
@@ -322,7 +327,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        Xdgms = pairwise_distances(X, metric=self.metric)
+        Xdgms = pairwise_distances(X, metric=self.metric, **self.metric_params)
         sparse_rips_complex = SparseRipsComplex(
             distance_matrix=Xdgms, max_edge_length=self.max_edge_length,
             sparse=self.epsilon)
@@ -620,20 +625,40 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
     `filtrations of Witness complex <https://giotto.ai/theory>`_.
 
     Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
-    distance matrix, information about the appearance and disappearance of
+    information about the appearance and disappearance of
     topological features (technically, `homology classes
     <https://giotto.ai/theory>`_) of various dimensions and at different
     scales is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
+    n_landmarks : int, optional, default: ``5``
+        Number of landmarks.
+
+    strong : bool, optional, default: ``False``
+        If ``True`` computes the persistence of the strong Witness complex.
+        If ``False`` computes the persistence of the weak Witness complex.
+
+    relaxation : float, optional, default: ``0``
+        Relaxation parameter for the construction of the relaxed Witness
+        complex.
+
+    subsampling: string or callable, optional, default: ``'random'``
+        Rule with wich to subsample the point clouds to obtain the landmark.
+        If `subsampling` is a string, it must be a subsambling function listed
+        in :obj:`gtda.homology.SUBSAMPLING_FUNCTIONS`. Note that only "random"
+        is currently supported.
+        If `subsampling` is a callable function, it is called on each instances
+        of point cloud. The callable should take a point cloud from the entry
+        in `X` and a number of landmarks `n_landmarks` as inputs, and return a
+        point cloud of landmarks.
+
+    subsampling_params : dict or None, optional, default: ``{}``
+        Additional keyword arguments for the subsampling function.
+
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to ``'precomputed'``, each entry in `X` along axis 0 is
-        interpreted to be a distance matrix. Otherwise, entries are
-        interpreted as feature arrays, and `metric` determines a rule with
-        which to calculate distances between pairs of instances (i.e. rows)
-        in these arrays.
+        Rule with which to calculate distances between pairs of instances
+        (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
         :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
@@ -642,8 +667,11 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         instances and the resulting value recorded. The callable should take
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
+        Note that metric cannot be ``'precomputed'`` as each entry in the input
+        collection has to be a point clouds. Distance matrices are not
+        supported.
 
-    metric_params : dict or None, optional, default: ``None``
+    metric_params : dict or None, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
     homology_dimensions : iterable, optional, default: ``(0, 1)``
@@ -665,9 +693,15 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    infinity_values_ : float
+        Effective death value to assign to features which are still alive at
+        filtration value `max_edge_length`.
+
     See also
     --------
-    VietorisRipsPersistence
+    VietorisRipsPersistence, SparseRipsPersistence, EuclideanCechPersistence
 
     Notes
     -----
@@ -682,26 +716,47 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
     References
     ----------
     [1] S. Kachanovich, "Witness complex", 2015; `GUDHI User and Reference Manual \
-    <http://gudhi.gforge.inria.fr/doc/latest/group__witness__complex.html>`_.
+        <http://gudhi.gforge.inria.fr/doc/latest/group__witness__complex.html>`_.
+
+    [2] V. De Silva and G. Carlsson, "Topological estimation using witness \
+        complexes". Proc. Sympos. Point-Based Graphics, pages 157–166, 2004;
+        `doi: 10.5555/2386332.2386359
+        <https://doi.org/10.5555/2386332.2386359>`_.
 
     """
-    _hyperparameters = {'infinity_values_': [numbers.Number],
+    _hyperparameters = {'n_landmarks':  [int, (1, np.inf)],
+                        '_subsample': [types.FunctionType, None]
+                        'strong': [bool, [True, False]],
+                        'relaxation': [numbers.Number, (0, np.inf)],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, homology_dimensions=(0, 1), coeff=2,
-                 infinity_values=None, n_jobs=None):
+    def __init__(self, n_landmarks=5, strong=False, relaxation=0.,
+                 subsampling='random', subsampling_params={},
+                 homology_dimensions=(0, 1), coeff=2, infinity_values=None,
+                 n_jobs=None):
+        self.n_landmarks = n_landmarks
+        self.subsampling = subsampling
+        self.strong = strong
+        self.relaxation = relaxation
+        self.metric = metric
+        self.metric_params = metric_params
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        #Xlandmrk = self._sparsify(X)
-        witness_complex = WitnessComplex(X, Xlandmrk)
-        simplex_tree = witness_complex.create_simplex_tree()
-        Xdgms = simplex_tree.persistence(homology_coeff_field=self.coeff,
-                                         min_persistence=0)
+        Xl = self._subsample(X, self.n_landmarks)
+        X = pairwise_distances(X, Xl, metric=self.metric, **self.metric_params)
+
+        witness_complex = self._filtration(nearest_landmark_table=X)
+        simplex_tree = witness_complex.create_simplex_tree(
+            max_alpha_square=self.relaxation**2)
+        Xdgms = simplex_tree.persistence(
+            homology_coeff_field=self.coeff,
+            min_persistence=self._min_homology_dimension)
 
         # Separate diagrams by homology dimensions
         Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
@@ -716,7 +771,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         return Xdgms
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`infinity_values_`. Then, return the estimator.
 
         This method is there to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -735,6 +790,9 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+
+        self._subsample = SUBSAMPLING_FUNCTIONS[self.subsampling]
+
         if self.infinity_values is None:
             self.infinity_values_ = np.max(X)
         else:
@@ -743,10 +801,16 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         self._homology_dimensions = sorted(self.homology_dimensions)
 
         validate_params({**self.get_params(),
+                         '_subsample': self._subsample,
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
         check_array(X, allow_nd=True)
+
+        if self.strong:
+            self._filtration = StrongWitnessComplex
+        else:
+            self._filtration = WitnessComplex
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
