@@ -104,6 +104,7 @@ Utilities
    homology.VietorisRipsPersistence
    homology.SparseRipsPersistence
    homology.EuclideanCechPersistence
+   homology.WitnessPersistence
    homology.CubicalPersistence
 
 
