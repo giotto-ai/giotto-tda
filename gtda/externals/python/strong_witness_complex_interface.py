@@ -1,4 +1,5 @@
-from giotto_strong_witness_complex import Strong_witness_complex_interface
+from ..modules.gtda_strong_witness_complex \
+    import Strong_witness_complex_interface
 from . import SimplexTree
 
 
@@ -44,7 +45,7 @@ class StrongWitnessComplex:
         """
         stree = SimplexTree()
         stree_int_ptr = stree.thisptr
-        if limit_dimension is not -1:
+        if limit_dimension != -1:
             self.thisptr.create_simplex_tree(stree_int_ptr, max_alpha_square,
                                              limit_dimension)
         else:

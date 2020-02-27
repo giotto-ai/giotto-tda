@@ -1,4 +1,4 @@
-"""Clustering methods."""
+"""Clustering methods and classes for parallelised clustering."""
 # License: GNU AGPLv3
 
 from inspect import signature
@@ -15,6 +15,7 @@ except ImportError:
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
 
+from ..utils.validation import validate_params
 from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 
 
@@ -294,11 +295,11 @@ class Agglomerative:
         memory = check_memory(self.memory)
 
         if self.linkage == "ward" and self.affinity != "euclidean":
-            raise ValueError("{} was provided as affinity. Ward can only work"
-                             "with Euclidean distances.".format(self.affinity))
+            raise ValueError(f"{self.affinity} was provided as affinity. "
+                             f"Ward can only work with Euclidean distances.")
         if self.linkage not in _TREE_BUILDERS:
-            raise ValueError("Unknown linkage type {}. Valid options are {}"
-                             .format(self.linkage, _TREE_BUILDERS.keys()))
+            raise ValueError(f"Unknown linkage type {self.linkage}. Valid "
+                             f"options are {_TREE_BUILDERS.keys()}")
         tree_builder = _TREE_BUILDERS[self.linkage]
 
         # Construct the tree
@@ -322,13 +323,22 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     A simple threshold is determined as a fraction of the largest linkage
     value in the full dendrogram. If possible, the dendrogram is cut at the
     first occurrence of a gap, between the linkage values of successive merges,
-    which exceeds this threshold. Otherwise, a single cluster is returned.
+    which exceeds this threshold. Otherwise, a single cluster is returned. The
+    algorithm can be partially overridden to ensure that the final number of
+    clusters does not exceed a certain threshold, by passing a parameter
+    `max_fraction`.
 
     Parameters
     ----------
     relative_gap_size : float, optional, default: ``0.3``
         The fraction of the largest linkage in the dendrogram to be used as
         a threshold for determining a large enough gap.
+
+    max_fraction : float or None, optional, default: ``None``
+        When not ``None``, the algorithm is constrained to produce no more
+        than ``max_fraction * (n_samples - 1)`` clusters, even if a
+        candidate gap is observed in the iterative process which would produce
+        a greater number of clusters.
 
     affinity : str, optional, default: ``'euclidean'``
         Metric used to compute the linkage. Can be ``'euclidean'``, ``'l1'``,
@@ -386,9 +396,13 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     """
 
-    def __init__(self, relative_gap_size=0.3, affinity='euclidean',
-                 memory=None, linkage='single'):
+    _hyperparameters = {'relative_gap_size': [float, (0, 1)],
+                        'max_fraction': [float, (0, 1)]}
+
+    def __init__(self, relative_gap_size=0.3, max_fraction=None,
+                 affinity='euclidean', memory=None, linkage='single'):
         self.relative_gap_size = relative_gap_size
+        self.max_fraction = max_fraction
         self.affinity = affinity
         self.memory = memory
         self.linkage = linkage
@@ -413,15 +427,22 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         self
 
         """
+        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
+        validate_params({'relative_gap_size': self.relative_gap_size,
+                         'max_fraction': _max_fraction},
+                        self._hyperparameters)
         X = check_array(X)
+
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
+            self.n_clusters_ = 1
             return self
 
         self._build_tree(X)
 
         min_gap_size = self.relative_gap_size * self.distances_[-1]
-        self.n_clusters_ = _num_clusters_simple(self.distances_, min_gap_size)
+        self.n_clusters_ = _num_clusters_simple(
+            self.distances_, min_gap_size, self.max_fraction)
 
         # Cut the tree to find labels
         # TODO: Verify whether Daniel Mullner's implementation of this step
@@ -433,20 +454,28 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
 class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     """Agglomerative clustering with stopping rule given by a histogram-based
-    version of the first gap method.
+    version of the first gap method, introduced in [1]_.
 
     Given a frequency threshold f and an initial integer k: 1) create a
     histogram of k equally spaced bins of the number of merges in the
     dendrogram, as a function of the linkage parameter; 2) the value of
     linkage at which the tree is to be cut is the first one after which a
     bin of height no greater than f (i.e. a "gap") is observed; 3) if no gap is
-    observed, increase k and repeat 1) and 2) until termination.
+    observed, increase k and repeat 1) and 2) until termination. The algorithm
+    can be partially overridden to ensure that the final number of clusters
+    does not exceed a certain threshold, by passing a parameter `max_fraction`.
 
     Parameters
     ----------
     freq_threshold : int, optional, default: ``0``
         The frequency threshold for declaring that a gap in the histogram of
         merges is present.
+
+    max_fraction : float or None, optional, default: ``None``
+        When not ``None``, the algorithm is constrained to produce no more
+        than ``max_fraction * (n_samples - 1)`` clusters, even if a
+        candidate gap is observed in the iterative process which would produce
+        a greater number of clusters.
 
     n_bins_start : int, optional, default: ``5``
         The initial number of bins in the iterative process for finding a
@@ -506,11 +535,22 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     --------
     FirstSimpleGap
 
+    References
+    ----------
+    .. [1] G. Singh, F. Mémoli, and G. Carlsson, "Topological methods for the
+           analysis of high dimensional data sets and 3D object recognition";
+           in *SPBG*, pp. 91--100, 2007.
+
     """
 
-    def __init__(self, freq_threshold=0, n_bins_start=5, affinity='euclidean',
-                 memory=None, linkage='single'):
+    _hyperparameters = {'freq_threshold': [int, (0, np.inf)],
+                        'max_fraction': [float, (0, 1)],
+                        'n_bins_start': [int, (1, np.inf)]}
+
+    def __init__(self, freq_threshold=0, max_fraction=None, n_bins_start=5,
+                 affinity='euclidean', memory=None, linkage='single'):
         self.freq_threshold = freq_threshold
+        self.max_fraction = max_fraction
         self.n_bins_start = n_bins_start
         self.affinity = affinity
         self.memory = memory
@@ -536,15 +576,22 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         self
 
         """
+        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
+        validate_params({'freq_threshold': self.freq_threshold,
+                         'max_fraction': _max_fraction,
+                         'n_bins_start': self.n_bins_start},
+                        self._hyperparameters)
         X = check_array(X)
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
+            self.n_clusters_ = 1
             return self
 
         self._build_tree(X)
 
         self.n_clusters_ = _num_clusters_histogram(
-            self.distances_, self.freq_threshold, self.n_bins_start)
+            self.distances_, self.freq_threshold, self.n_bins_start,
+            self.max_fraction)
 
         # Cut the tree to find labels
         # TODO: Verify whether Daniel Mullner's implementation of this step

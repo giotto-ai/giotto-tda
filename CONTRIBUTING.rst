@@ -101,7 +101,7 @@ We provide a pre-commit git hook to prevent accidental commits to the master bra
 .. code-block:: bash
 
     cd .git/hooks
-    ln -s ../../tools/git-pre-commit pre-commit
+    ln -s ../../.tools/git-pre-commit pre-commit
 
 Running unit tests
 ------------------

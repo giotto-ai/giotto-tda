@@ -1,5 +1,5 @@
 import numpy as np
-from giotto_simplex_tree import *
+from ..modules.gtda_simplex_tree import *
 
 
 class SimplexTree:

@@ -182,11 +182,14 @@ Thanks to our Contributors
 
 This release contains contributions from many people:
 
-Guillaume Tauzin, Umberto Lupo, Philippe Nguyen, Matteo Caorsi, Julian Burella Pérez,
-Alessio Ghiraldello.
+Guillaume Tauzin, Umberto Lupo, Philippe Nguyen, Matteo Caorsi, Julian Burella Pérez, Alessio Ghiraldello.
 
 We are also grateful to all who filed issues or helped resolve them, asked and
-answered questions, and were part of inspiring discussions.
+answered questions, and were part of inspiring discussions. In particular, we would like
+to thank `Martino Milani <https://github.com/MartMilani/reportPACS>`_, who worked on an early
+prototype of a Mapper implementation; although very different from the current one, it
+adopted an early form of caching to avoid recomputation in refitting, which was an inspiration
+for this implementation.
 
 
 Release 0.1a.0

@@ -1,9 +1,9 @@
 import os
 import numpy as np
-from giotto_cubical_complex \
+from ..modules.gtda_cubical_complex \
     import Cubical_complex_interface \
     as Bitmap_cubical_complex_base_interface
-from giotto_persistent_cohomology \
+from ..modules.gtda_persistent_cohomology \
     import Persistent_cohomology_interface \
     as Cubical_complex_persistence_interface
 
@@ -32,12 +32,12 @@ class CubicalComplex:
         self.pcohptr = None
         if (dimensions is not None) and \
                 (top_dimensional_cells is not None) and \
-                (perseus_file is ''):
+                (perseus_file == ''):
             self.thisptr = \
                 Bitmap_cubical_complex_base_interface(dimensions,
                                                       top_dimensional_cells)
         elif (dimensions is None) and \
-             (top_dimensional_cells is None) and (perseus_file is not ''):
+             (top_dimensional_cells is None) and (perseus_file != ''):
             if os.path.isfile(perseus_file):
                 self.thisptr = Bitmap_cubical_complex_base_interface(
                     str.encode(perseus_file))

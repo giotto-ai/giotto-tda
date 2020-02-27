@@ -27,7 +27,7 @@ double wasserstein_distance(const std::vector<std::pair<double, double>>& dgm1,
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_wasserstein, m) {
+PYBIND11_MODULE(gtda_wasserstein, m) {
   m.doc() = "wasserstein dionysus implementation";
   using namespace pybind11::literals;
   m.def("wasserstein_distance", &wasserstein_distance, "dgm1"_a, "dgm2"_a,

@@ -6,7 +6,6 @@ import traceback
 
 import numpy as np
 import plotly.graph_objects as go
-from IPython.display import display
 from ipywidgets import Layout, widgets
 from sklearn.base import clone
 
@@ -17,14 +16,18 @@ from .utils.visualization import (_calculate_graph_data,
 
 def plot_static_mapper_graph(
         pipeline, data, layout='kamada_kawai', layout_dim=2,
-        color_variable=None, node_color_statistic=np.mean,
+        color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, plotly_kwargs=None,
         clone_pipeline=True):
     """Plotting function for static Mapper graphs.
 
+    Nodes are colored according to :attr:`color_variable`. By default, the
+    hovertext displays a globally unique ID and the number of elements
+    associated with a given node.
+
     Parameters
     ----------
-    pipeline : :class:`~giotto.mapper.pipeline.MapperPipeline` object
+    pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
         Mapper pipeline to act on to data.
 
     data : array-like of shape (n_samples, n_features)
@@ -53,14 +56,15 @@ def plot_static_mapper_graph(
             4. If an index or string, or list of indices / strings, equivalent
                to selecting a column or subset of columns from `data`.
 
-    node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
-        (n_nodes, 1), optional, default: ``numpy.mean``
+    node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``None``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
         the Mapper graph, and its values are used directly for node
-        coloring, ignoring `color_variable`. Otherwise, it must be a
-        callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by `color_variable`.
+        coloring, ignoring `color_variable`. Otherwise, it can be a
+        callable object which is used to obtain a summary statistic, within
+        each Mapper node, of the quantity specified by `color_variable`. The
+        default value ``None`` is equivalent to passing ``numpy.mean``.
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
@@ -94,13 +98,18 @@ def plot_static_mapper_graph(
     else:
         pipe = pipeline
 
+    if node_color_statistic is not None:
+        _node_color_statistic = node_color_statistic
+    else:
+        _node_color_statistic = np.mean
+
     # Simple duck typing to determine whether data is a pandas dataframe
     is_data_dataframe = hasattr(data, 'columns')
 
     node_trace, edge_trace, node_elements, _node_colors, plot_options = \
         _calculate_graph_data(
             pipe, data, layout, layout_dim,
-            color_variable, node_color_statistic,  plotly_kwargs)
+            color_variable, _node_color_statistic, plotly_kwargs)
 
     # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
@@ -165,14 +174,19 @@ def plot_static_mapper_graph(
 
 def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   layout_dim=2, color_variable=None,
-                                  node_color_statistic=np.mean,
+                                  node_color_statistic=None,
                                   color_by_columns_dropdown=False,
                                   plotly_kwargs=None):
     """Plotting function for interactive Mapper graphs.
 
+    Provides functionality to interactively update parameters from the cover
+    and clustering steps defined in :attr:`pipeline`. Nodes are colored
+    according to :attr:`color_variable`. By default, the hovertext displays a
+    globally unique ID and the number of elements associated with a given node.
+
     Parameters
     ----------
-    pipeline : :class:`~giotto.mapper.pipeline.MapperPipeline` object
+    pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
         Mapper pipeline to act on to data.
 
     data : array-like of shape (n_samples, n_features)
@@ -201,14 +215,15 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
             4. If an index or string, or list of indices / strings, equivalent
                to selecting a column or subset of columns from `data`.
 
-    node_color_statistic : callable, or ndarray of shape (n_nodes,) or \
-        (n_nodes, 1), optional, default: ``numpy.mean``
+    node_color_statistic :None, callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``None``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
         the Mapper graph, and its values are used directly for node
-        coloring, ignoring `color_variable`. Otherwise, it must be a
-        callable object and is used to obtain a summary statistic within
-        each Mapper node of the quantity specified by `color_variable`.
+        coloring, ignoring `color_variable`. Otherwise, it can be a
+        callable object which is used to obtain a summary statistic, within
+        each Mapper node, of the quantity specified by `color_variable`. The
+        default value ``None`` is equivalent to passing ``numpy.mean``.
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
@@ -219,8 +234,10 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     Returns
     -------
-    display : :class:`DisplayHandle` object
-        Displays the interactive Mapper graph widget.
+    box : :class:`ipywidgets.VBox` object
+    A box containing the following widgets: parameters of the clustering
+    algorithm, parameters for the covering scheme, a Mapper graph arising
+    from those parameters, a validation box, and logs.
 
     References
     ----------
@@ -232,6 +249,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
 
     # clone pipeline to avoid side effects from in-place parameter changes
     pipe = clone(pipeline)
+
+    if node_color_statistic is not None:
+        _node_color_statistic = node_color_statistic
+    else:
+        _node_color_statistic = np.mean
 
     def get_widgets_per_param(param, value):
         if isinstance(value, float):
@@ -295,7 +317,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                 (node_trace, edge_trace, node_elements, node_colors,
                  plot_options) = _calculate_graph_data(
                     pipe, data, layout, layout_dim,
-                    color_variable, node_color_statistic, plotly_kwargs
+                    color_variable, _node_color_statistic, plotly_kwargs
                 )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
 
@@ -349,7 +371,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     logger = logging.getLogger(__name__)
     handler = OutputWidgetHandler()
     handler.setFormatter(logging.Formatter(
-        '%(asctime)s  - [%(levelname)s] %(message)s'))
+        '%(asctime)s - [%(levelname)s] %(message)s'))
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
@@ -384,7 +406,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         plotly_kwargs = dict()
 
     fig = plot_static_mapper_graph(
-        pipe, data, layout, layout_dim, color_variable, node_color_statistic,
+        pipe, data, layout, layout_dim, color_variable, _node_color_statistic,
         color_by_columns_dropdown, plotly_kwargs, clone_pipeline=False)
 
     observe_widgets(cover_params, cover_params_widgets)
@@ -403,5 +425,5 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         layout=container_cluster_layout)
 
     box = widgets.VBox(
-        [container_cover, container_cluster, fig, valid, logs_box])
-    display(box, out)
+        [container_cover, container_cluster, fig, valid, logs_box, out])
+    return box

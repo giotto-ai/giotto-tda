@@ -2,8 +2,6 @@
 Pipelines that include TransformerResamplers."""
 # License: GNU AGPLv3
 
-import numpy as np
-
 from sklearn import pipeline
 from sklearn.base import clone
 from sklearn.utils.metaestimators import if_delegate_has_method
@@ -113,25 +111,15 @@ class Pipeline(pipeline.Pipeline):
             step, param = pname.split('__', 1)
             fit_params_steps[step][param] = pval
         for step_idx, name, transformer in self._iter(with_final=False):
-            if hasattr(memory, 'location'):
-                # joblib >= 0.12
-                if memory.location is None:
-                    # we do not clone when caching is disabled to
-                    # preserve backward compatibility
-                    cloned_transformer = transformer
-                else:
-                    cloned_transformer = clone(transformer)
-            elif hasattr(memory, 'cachedir'):
-                # joblib < 0.11
-                if memory.cachedir is None:
-                    # we do not clone when caching is disabled to
-                    # preserve backward compatibility
-                    cloned_transformer = transformer
+            if hasattr(memory, 'location') and (memory.location is None):
+                # joblib >= 0.12. We do not clone when caching is disabled to
+                # preserve backward compatibility
+                cloned_transformer = transformer
             else:
                 cloned_transformer = clone(transformer)
             # Fit or load from cache the current transfomer
-            if (hasattr(cloned_transformer, "resample") or
-                hasattr(cloned_transformer, "fit_transform_resample")):
+            if hasattr(cloned_transformer, "resample") or \
+               hasattr(cloned_transformer, "fit_transform_resample"):
                 if y is None:
                     X, fitted_transformer = fit_transform_one_cached(
                         cloned_transformer, None, X, y,
@@ -317,11 +305,10 @@ class Pipeline(pipeline.Pipeline):
         return self._resample
 
     def _resample(self, X, y=None):
-        Xt, yr = X, y
+        yr = y
         for _, _, transform in self._iter():
             yr = transform.resample(yr)
         return yr
-
 
     @property
     def transform_resample(self):
@@ -384,7 +371,7 @@ class Pipeline(pipeline.Pipeline):
         return self._transform
 
     def _transform(self, X, y=None):
-        Xt, yr = X, y
+        Xt = X
         for _, _, transform in self._iter():
             Xt = transform.transform(Xt)
         return Xt
@@ -416,7 +403,7 @@ class Pipeline(pipeline.Pipeline):
     def _inverse_transform(self, X, y=None):
         Xt, yr = X, y
         reverse_iter = reversed(list(self._iter()))
-        for _, _, transform in self._iter():
+        for _, _, transform in reverse_iter:
             Xt = transform.inverse_transform(Xt, yr)
         return Xt
 
@@ -470,7 +457,7 @@ def _fit_transform_resample_one(transformer_resampler, weight,
                                 X, y, **fit_params):
     if hasattr(transformer_resampler, 'fit_transform_resample'):
         X_res, y_res = transformer_resampler.fit_transform_resample(
-        X, y, **fit_params)
+            X, y, **fit_params)
     else:
         X_res, y_res = transformer_resampler.fit(
             X, y, **fit_params).transform_resample(
@@ -525,6 +512,6 @@ def make_pipeline(*steps, **kwargs):
     """
     memory = kwargs.pop('memory', None)
     if kwargs:
-        raise TypeError('Unknown keyword arguments: "{}"'
-                        .format(list(kwargs.keys())[0]))
+        raise TypeError(
+            f'Unknown keyword arguments: "{list(kwargs.keys())[0]}"')
     return Pipeline(pipeline._name_estimators(steps), memory=memory)

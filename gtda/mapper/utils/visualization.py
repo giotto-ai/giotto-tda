@@ -17,15 +17,11 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        ('Node size:{}<br>Pullback cover set label:{}<br>Partial cluster '
-         'label:{}')
-        .format(
-            len(node_elements), pullback_set_label, partial_cluster_label,
-        )
-        for node_elements, pullback_set_label, partial_cluster_label in
-        zip(graph['node_metadata']['node_elements'],
-            graph['node_metadata']['pullback_set_label'],
-            graph['node_metadata']['partial_cluster_label'])]
+        f"Node ID:{node_id}<br>Node size:{len(node_elements)}"
+        for node_id, node_elements in zip(
+            graph["node_metadata"]["node_id"],
+            graph["node_metadata"]["node_elements"])
+        ]
 
 
 def set_node_sizeref(node_elements, node_scale=12):
@@ -82,7 +78,7 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
                     'marker.cmax': [None, np.max(node_colors)],
                     'hoverlabel.bgcolor': [None, node_color_map]
                 }],
-                label='Column {}'.format(column),
+                label=f'Column {column}',
                 method='restyle'
             )
         )
@@ -136,15 +132,26 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
                 color_data = data[color_variable].to_numpy()
             else:
                 color_data = data[:, color_variable]
-        node_colors = get_node_summary(node_elements, color_data,
-                                       summary_stat=node_color_statistic)
+
+        node_colors = get_node_summary(
+            node_elements, color_data, summary_stat=node_color_statistic)
+
+    # Check if node_colors contains NaNs
+    if any(np.logical_not(np.isfinite(node_colors))):
+        from warnings import warn
+        warn('NaN values detected in the array of Mapper node colors!'
+             'These values will be ignored in the color scale', RuntimeWarning)
+
+    # Normalise node colours in range [0,1] for colorscale mapping
+    node_colors = (node_colors - np.nanmin(node_colors)) / \
+        (np.nanmax(node_colors) - np.nanmin(node_colors))
 
     return node_colors
 
 
 def _calculate_graph_data(
         pipeline, data, layout, layout_dim,
-        color_variable, node_color_statistic,  plotly_kwargs):
+        color_variable, node_color_statistic, plotly_kwargs):
     graph = pipeline.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 

@@ -30,7 +30,7 @@ class Nerve(BaseEstimator, TransformerMixin):
     X_ : list of tuple
         Nodes of the Mapper graph obtained from the input data for
         :meth:`fit`. It is a flattened version of the input Mapper cover,
-        with the addition of a globally unique node Id as the first entry in
+        with the addition of a globally unique node ID as the first entry in
         each tuple. Created only when :meth:`fit` is called.
 
     edges_ : list of dict

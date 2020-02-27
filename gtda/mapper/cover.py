@@ -3,6 +3,7 @@
 
 from functools import partial
 from itertools import product
+import warnings
 
 import numpy as np
 from scipy.stats import rankdata
@@ -12,9 +13,9 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from .utils._cover import (_check_has_one_column,
-                           _remove_empty_and_duplicate_intervals,
-                           _validate_kind)
+                           _remove_empty_and_duplicate_intervals)
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
@@ -82,10 +83,23 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     """
 
+    _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
+                        'n_intervals': [int, (1, np.inf)],
+                        'overlap_frac': [float, (0., 1.)]}
+
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
         self.overlap_frac = overlap_frac
+
+        if overlap_frac == 0.:
+            raise ValueError("`overlap_frac` must be positive,"
+                             "as otherwise the intervals will not cover"
+                             "the range")
+        if overlap_frac <= 1e-8:
+            warnings.warn("`overlap_frac` is close to zero,"
+                          "which might cause numerical issues and errors",
+                          RuntimeWarning)
 
     def _fit_uniform(self, X):
         self.left_limits_, self.right_limits_ = self._find_interval_limits(
@@ -93,12 +107,15 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return self
 
     def _fit_balanced(self, X):
-        X_rank = rankdata(X, method='dense')
+        X_rank = rankdata(X, method='dense') - 1
         left_limits, right_limits = self._find_interval_limits(
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
-        X_rank -= 1
-        left_ranks = left_limits.astype(int)
-        right_ranks = right_limits.astype(int) + 1
+        left_limits_int = left_limits.astype(int)
+        left_ranks = np.where(left_limits >= 0, left_limits_int, -1)
+        right_limits_int = right_limits.astype(int)
+        right_ranks = np.where(right_limits_int == right_limits,
+                               right_limits_int,
+                               right_limits_int + 1)
         self.left_limits_, self.right_limits_ = self._limits_from_ranks(
             X_rank, X.flatten(), left_ranks, right_ranks)
         return self
@@ -125,9 +142,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        # TODO: Extend validation to n_intervals and overlap_frac,
-        #  using validate_params
-        _validate_kind(self.kind)
+        validate_params(self.get_params(), self._hyperparameters)
         X = check_array(X, ensure_2d=False)
         if X.ndim == 2:
             _check_has_one_column(X)
@@ -188,10 +203,9 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         the number of unique points in X.
 
         """
-        X_rank = rankdata(X, method='dense')
+        X_rank = rankdata(X, method='dense') - 1
         self._left_limits, self._right_limits = self._find_interval_limits(
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
-        X_rank -= 1
         X_rank = np.broadcast_to(X_rank[:, None],
                                  (X.shape[0], self.n_intervals))
         Xt = (X_rank > self._left_limits) & (X_rank < self._right_limits)
@@ -224,7 +238,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             or duplicated cover sets are removed.
 
         """
-        _validate_kind(self.kind)
+        validate_params(self.get_params(), self._hyperparameters)
         X = check_array(X, ensure_2d=False)
         if X.ndim == 2:
             _check_has_one_column(X)
@@ -265,15 +279,15 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             only_one_pt = (min_val == max_val)
         else:
             # Assume X is the result of a call to scipy.stats.rankdata
-            min_val, max_val = -0.5, np.max(X) - 0.5
-            only_one_pt = (min_val == max_val - 0.5)
+            min_val, max_val = -0.5, np.max(X) + 0.5
+            only_one_pt = (min_val == max_val - 1)
 
         # Allow X to have one unique sample only if one interval is required,
         # in which case the fitted interval will be (-np.inf, np.inf).
         if only_one_pt and n_intervals > 1:
             raise ValueError(
-                "Only one unique filter value found, cannot fit {} > 1 "
-                "intervals.".format(n_intervals))
+                f"Only one unique filter value found, cannot fit "
+                f"{n_intervals} > 1 intervals.")
 
         left_limits, right_limits = \
             self._cover_limits(min_val, max_val, n_intervals, overlap_frac)
@@ -360,6 +374,10 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
     """
 
+    _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
+                        'n_intervals': [int, (1, np.inf)],
+                        'overlap_frac': [float, (0, 1)]}
+
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
         self.n_intervals = n_intervals
@@ -370,12 +388,12 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         try:
             return getattr(clone(coverer), method_name)(X[:, [i]])
         except ValueError as ve:
-            if ve.args[0] == "Only one unique filter value found, cannot " \
-                             "fit {} > 1 intervals.".format(self.n_intervals):
+            if ve.args[0] == f"Only one unique filter value found, cannot " \
+                             f"fit {self.n_intervals} > 1 intervals.":
                 raise ValueError(
-                    "Only one unique filter value found along feature "
-                    "dimension {}, cannot fit {} > 1 intervals there.".format(
-                        i, self.n_intervals))
+                    f"Only one unique filter value found along feature "
+                    f"dimension {i}, cannot fit {self.n_intervals} > 1 "
+                    f"intervals there.")
             else:
                 raise ve
 
@@ -389,7 +407,6 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             partial(self._clone_and_apply_to_column, X, coverer, fitter)(i)
             for i in range(X.shape[1])
         ]
-        # Only store attributes if above succeeds
         self._n_features_fit = X.shape[1]
         return self
 
@@ -415,7 +432,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        _validate_kind(self.kind)
+        validate_params(self.get_params(), self._hyperparameters)
         # reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
@@ -455,8 +472,8 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             n_features` as empty or duplicated cover sets are removed.
 
         """
-        check_is_fitted(self)
-        # reshape filter function values derived from FunctionTransformer
+        check_is_fitted(self, '_coverers')
+        # Reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
 
@@ -465,8 +482,8 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         n_features = X.shape[1]
         if n_features != n_features_fit:
             raise DataDimensionalityWarning(
-                "Different number of columns between 'fit' ({}) and "
-                "'transform' ({}).".format(n_features_fit, n_features))
+                f"Different number of columns between 'fit' ({n_features_fit})"
+                f" and 'transform' ({n_features}).")
 
         if self.kind == 'balanced':
             # Test on the first coverer whether the left_limits_ and
@@ -496,8 +513,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             n_features` as empty or duplicated cover sets are removed.
 
         """
-        _validate_kind(self.kind)
-
+        validate_params(self.get_params(), self._hyperparameters)
         # reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]

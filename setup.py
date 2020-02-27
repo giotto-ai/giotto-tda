@@ -29,7 +29,7 @@ MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-tda'
 LICENSE = 'GNU AGPLv3'
-DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.1.3'
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.1.4'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
@@ -42,33 +42,12 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Operating System :: POSIX',
                'Operating System :: Unix',
                'Operating System :: MacOS',
-               'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
-               'Programming Language :: Python :: 3.7']
+               'Programming Language :: Python :: 3.7',
+               'Programming Language :: Python :: 3.8']
 KEYWORDS = 'machine learning, topological data analysis, persistent ' + \
     'homology, persistence diagrams, Mapper'
 INSTALL_REQUIRES = requirements
-is_system_win = platform.system() == 'Windows'
-if is_system_win:
-    python_ver = sys.version_info
-    python_ver_1 = str(python_ver.major) + str(python_ver.minor)
-    if python_ver_1 == '38':
-        python_ver_2 = python_ver_1
-    else:
-        python_ver_2 = python_ver_1 + 'm'
-    pycairo_whl_url = \
-        'https://storage.googleapis.com/l2f-open-models/giotto' \
-        '-learn/windows-binaries/pycairo/pycairo-1.18.2-cp{}' \
-        '-cp{}-win_amd64.whl'.format(python_ver_1, python_ver_2)
-    igraph_whl_url = \
-        'https://storage.googleapis.com/l2f-open-models/giotto' \
-        '-learn/windows-binaries/python-igraph/python_igraph-' \
-        '0.7.1.post6-cp{}-cp{}-win_amd64.whl'.\
-        format(python_ver_1, python_ver_2)
-    INSTALL_REQUIRES.append('pycairo @ {}'.format(pycairo_whl_url))
-    INSTALL_REQUIRES.append('python-igraph @ {}'.format(igraph_whl_url))
-else:
-    INSTALL_REQUIRES.append('python-igraph')
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
@@ -86,9 +65,18 @@ EXTRAS_REQUIRE = {
         'numpydoc'],
     'examples': [
         'jupyter',
-        'matplotlib',
-        'plotly']
+        'pandas',
+        'openml']
 }
+
+
+def combine_requirements(base_keys):
+    return list(
+        set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+EXTRAS_REQUIRE["dev"] = combine_requirements(
+    [k for k in EXTRAS_REQUIRE if k != "examples"])
 
 
 class CMakeExtension(Extension):
@@ -127,40 +115,22 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['git', 'clone',
                                'https://github.com/pybind/pybind11.git',
                                dir_pybind11])
-        os.chdir(dir_pybind11)
-        dir_build = os.path.join(dir_pybind11, 'build')
-        os.mkdir(dir_build)
-        os.chdir(dir_build)
-        cmake_cmd1 = ['cmake', '-DPYBIND11_TEST=OFF', '..']
-        if platform.system() == "Windows":
-            cmake_cmd2 = ['cmake', '--install', '.']
-            if sys.maxsize > 2**32:
-                cmake_cmd1 += ['-A', 'x64']
-        else:
-            cmake_cmd2 = ['make', 'install']
-            cmake_cmd2_sudo = ['sudo', 'make', 'install']
-        subprocess.check_call(cmake_cmd1, cwd=dir_build)
-        try:
-            subprocess.check_call(cmake_cmd2, cwd=dir_build)
-        except:  # noqa
-            subprocess.check_call(cmake_cmd2_sudo, cwd=dir_build)
-        os.chdir(dir_start)
 
         subprocess.check_call(['git', 'submodule', 'update',
                                '--init', '--recursive'])
 
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(
-            self.get_ext_fullpath(ext.name)))
+        extdir = os.path.abspath(os.path.join(os.path.dirname(
+            self.get_ext_fullpath(ext.name)), 'gtda', 'externals', 'modules'))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
-        if platform.system() == "Windows":
-            cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(
-                cfg.upper(), extdir)]
+        if platform.system() == 'Windows':
+            cmake_args += [f'-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}'
+                           f'={extdir}']
             if sys.maxsize > 2**32:
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']

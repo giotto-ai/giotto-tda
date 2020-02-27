@@ -154,14 +154,15 @@ def make_mapper_pipeline(scaler=None,
     """Construct a MapperPipeline object according to the specified Mapper
     steps. [1]_
 
-    All steps may be arbitrary scikit-learn Pipeline objects. The scaling
-    and cover steps must be transformers implementing a ``fit_transform``
-    method. The filter function step may be a transformer implementing a
-    ``fit_transform``, or a callable acting on one-dimensional arrays -- in
-    the latter case, a transformer is internally created whose
-    ``fit_transform`` applies this callable independently on each row of the
-    data. The clustering step need only implement a ``fit`` method storing
-    clustering labels.
+    The role of this function's key parameters is illustrated in `this diagram
+    </mapper_pipeline.svg>`_. All computational steps may be arbitrary
+    scikit-learn Pipeline objects. The scaling and cover steps must be
+    transformers implementing a ``fit_transform`` method. The filter
+    function step may be a transformer implementing a ``fit_transform``,
+    or a callable acting on one-dimensional arrays -- in the latter case,
+    a transformer is internally created whose ``fit_transform`` applies this
+    callable independently on each row of the data. The clustering step need
+    only implement a ``fit`` method storing clustering labels.
 
     Parameters
     ----------
@@ -178,9 +179,10 @@ def make_mapper_pipeline(scaler=None,
 
     clustering_preprocessing : object or None, optional, default: ``None``
         If not ``None``, it is a transformer which is applied to the
-        data independently to the `scaler` -> `filter_func` -> cover` pipeline.
-        Clustering is then performed on portions (determined by the `scaler`
-        -> `filter_func` -> cover` pipeline) of the transformed data.
+        data independently to the `scaler` -> `filter_func` -> `cover`
+        pipeline. Clustering is then performed on portions (determined by
+        the `scaler` -> `filter_func` -> `cover` pipeline) of the
+        transformed data.
 
     clusterer : object or None, optional, default: ``None``
         Clustering object. ``None`` means using DBSCAN
@@ -248,6 +250,18 @@ def make_mapper_pipeline(scaler=None,
     >>> mapper_graph = mapper.fit_transform(X)  # Create the mapper graph
     >>> print(type(mapper_graph))
     igraph.Graph
+    >>> # Node metadata stored as dict in graph object
+    >>> print(mapper_graph['node_metadata'].keys())
+    dict_keys(['node_id', 'pullback_set_label', 'partial_cluster_label',
+               'node_elements'])
+    >>> # Find which points belong to first node of graph
+    >>> node_id, node_elements = mapper_graph['node_metadata']['node_id'],
+    ... mapper_graph['node_metadata']['node_elements']
+    >>> print(f'Node Id: {node_id[0]}, Node elements: {node_elements[0]}, '
+              f'Data points: {X[node_elements[0]]}')
+    Node Id: 0,
+    Node elements: [8768],
+    Data points: [[0.01838998 0.76928754 0.98199244 0.0074299 ]]
     >>> #######################################################################
     >>> # Example using a scaler from scikit-learn, a filter function from
     >>> # gtda.mapper.filter, and a clusterer from gtda.mapper.cluster
