@@ -99,28 +99,30 @@ def test_cp_transform():
     assert_almost_equal(cp.fit_transform(pc), pc_cp_res)
 
 
-# def test_wit_params():
-#     metric = 'not_defined'
-#     wit = WitnessPersistence()
+def test_wit_params():
+    coeff = 'not_defined'
+    wit = WitnessPersistence(coeff=coeff)
 
-#     with pytest.raises(ValueError):
-#         wit.fit_transform(X)
+    with pytest.raises(TypeError):
+        wit.fit_transform(pc)
 
 
 def test_wit_not_fitted():
     wit = WitnessPersistence()
 
     with pytest.raises(NotFittedError):
-        wit.transform(X)
+        wit.transform(pc)
+
+
+pc_wit_res = np.array([[[0., 0.43094373, 0],
+                        [0., 0.5117411, 0],
+                        [0., 0.60077095, 0],
+                        [0., 0.62186205, 0],
+                        [0.69093919, 0.80131882, 1]]])
 
 
 def test_wit_transform():
     wit = WitnessPersistence()
-    X_vrp_wit = np.array([[[0., 0.43094373, 0],
-                           [0., 0.5117411, 0],
-                           [0., 0.60077095, 0],
-                           [0., 0.62186205, 0],
-                           [0.69093919, 0.80131882, 1]]])
-    print(wit.fit_transform(X))
+    print(wit.fit_transform(pc))
     assert false
     #assert_almost_equal(wit.fit_transform(X), X_vrp_wit)

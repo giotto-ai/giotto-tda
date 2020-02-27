@@ -725,7 +725,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {'n_landmarks':  [int, (1, np.inf)],
-                        '_subsample': [types.FunctionType, None]
+                        '_subsample': [types.FunctionType, None],
                         'strong': [bool, [True, False]],
                         'relaxation': [numbers.Number, (0, np.inf)],
                         'infinity_values_': [numbers.Number, None],
@@ -734,6 +734,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
 
     def __init__(self, n_landmarks=5, strong=False, relaxation=0.,
                  subsampling='random', subsampling_params={},
+                 metric='euclidean', metric_params= {},
                  homology_dimensions=(0, 1), coeff=2, infinity_values=None,
                  n_jobs=None):
         self.n_landmarks = n_landmarks
