@@ -618,7 +618,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class FlagPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `filtrations of directed or undirecte flag complexes
+    `filtrations of directed or undirected flag complexes
     <https://giotto.ai/theory>`_.
 
     Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
