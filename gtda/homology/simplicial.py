@@ -315,10 +315,11 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), coeff=2, epsilon=0.1,
-                 infinity_values=None, n_jobs=None):
+    def __init__(self, metric='euclidean', metric_params={},
+                 max_edge_length=np.inf, homology_dimensions=(0, 1),
+                 coeff=2, epsilon=0.1, infinity_values=None, n_jobs=None):
         self.metric = metric
+        self.metric_params = metric_params
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.epsilon = epsilon
@@ -748,10 +749,14 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
-    def _gudhi_diagram(self, X):
+    def _create_nearest_landmark_table(self, X):
         Xl = self._subsample(X, self.n_landmarks)
         X = pairwise_distances(X, Xl, metric=self.metric, **self.metric_params)
 
+        return X
+
+    def _gudhi_diagram(self, X):
+        X = self._create_nearest_landmark_table(X)
         witness_complex = self._filtration(nearest_landmark_table=X)
         simplex_tree = witness_complex.create_simplex_tree(
             max_alpha_square=self.relaxation**2)

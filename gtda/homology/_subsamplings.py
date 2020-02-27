@@ -6,7 +6,7 @@ import random
 
 
 def random_subsampling(X, n_landmarks, **kwargs):
-    return X[random.sample(xrange(len(X)), self.n_landmarks), :]
+    return X[random.sample(range(len(X)), n_landmarks), :]
 
 
 SUBSAMPLING_FUNCTIONS = {
