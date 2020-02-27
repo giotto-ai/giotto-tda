@@ -1,8 +1,8 @@
 {# Import the theme's layout. #}
-{% extends "!layout.html" %}
+{% extends "sphinx_rtd_theme/layout.html" %}
 
 {# Add some extra stuff before and use existing with 'super()' call. #}
 {% block footer %}
-  <a href="{{pathto(master_doc)}}../choose_version.html"><h2>Checkout other versions!</h2></a>
+  <a href="{{pathto(master_doc)}}../choose_version.html">Checkout other versions!</a>
   {{ super() }}
 {% endblock %}

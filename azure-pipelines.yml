@@ -40,8 +40,9 @@ jobs:
 
     - script:
         cd doc
+        git config --local user.name "Azure Pipelines"
+        git config --local user.email "azuredevops@microsoft.com"
         make all-gh
-        make gh-commit
       displayName: 'Build and commit the docs'
       failOnStderr: false
 
