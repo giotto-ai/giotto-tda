@@ -13,12 +13,13 @@ jobs:
     EXECUTE: 'true'
     GITDIR: ../gtda-docs
     VERSION: stable
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
     - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
-    
+
     - script: |
         set -e
         brew update
