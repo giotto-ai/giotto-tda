@@ -57,10 +57,10 @@ jobs:
     displayName:  'Commit the docs'
     failOnStderr: false
 
-  - task: DownloadSecureFile@1
-    inputs:
-      secureFile: deploy_key
-    displayName: 'Get the deploy key'
+  #- task: DownloadSecureFile@1
+  #  inputs:
+  #    secureFile: deploy_key
+  #  displayName: 'Get the deploy key'
 
   - script: |
       cd $GITDIR
