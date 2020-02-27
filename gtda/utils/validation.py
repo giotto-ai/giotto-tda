@@ -36,34 +36,36 @@ def check_diagram(X, copy=False):
     if len(X.shape) != 3:
         raise ValueError(f"X should be a 3d np.array: X.shape = {X.shape}.")
     if X.shape[2] != 3:
-        raise ValueError(f"X should be a 3d np.array with a 3rd dimension of "
-                         f"3 components: X.shape[2] = {X.shape[2]}.")
+        raise ValueError(
+            f"X should be a 3d np.array with a 3rd dimension of 3 components: "
+            f"X.shape[2] = {X.shape[2]}.")
 
     homology_dimensions = sorted(list(set(X[0, :, 2])))
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:
-                raise ValueError(f"np.inf is a valid homology dimension for a "
-                                 f"stacked diagram but it should be the only "
-                                 f"one: homology_dimensions "
-                                 f"= {homology_dimensions}.")
+                raise ValueError(
+                    f"np.inf is a valid homology dimension for a stacked "
+                    f"diagram but it should be the only one: "
+                    f"homology_dimensions = {homology_dimensions}.")
         else:
             if dim != int(dim):
-                raise ValueError(f"All homology dimensions should be "
-                                 f"integer valued: {dim} can't be cast "
-                                 f"to an int of the same value.")
+                raise ValueError(
+                    f"All homology dimensions should be integer valued: "
+                    f"{dim} can't be cast to an int of the same value.")
             if dim != np.abs(dim):
-                raise ValueError(f"All homology dimensions should be "
-                                 f"integer valued: {dim} can't be cast "
-                                 f"to an int of the same value.")
+                raise ValueError(
+                    f"All homology dimensions should be integer valued: "
+                    f"{dim} can't be cast to an int of the same value.")
 
     n_points_above_diag = np.sum(X[:, :, 1] >= X[:, :, 0])
     n_points_global = X.shape[0] * X.shape[1]
     if n_points_above_diag != n_points_global:
-        raise ValueError(f"All points of all persistence diagrams should "
-                         f"be above the diagonal, X[:,:,1] >= X[:,:,0]. "
-                         f"{n_points_global - n_points_above_diag} points "
-                         f"are under the diagonal.")
+        raise ValueError(
+            f"All points of all persistence diagrams should be above the "
+            f"diagonal, X[:,:,1] >= X[:,:,0]. "
+            f"{n_points_global - n_points_above_diag} points are under the "
+            f"diagonal.")
     if copy:
         return np.copy(X)
     else:
@@ -87,10 +89,15 @@ def validate_params(parameters, references):
     references : dict, required
         Dictionary in which the keys are hyperparameter names and the
         corresponding values are lists. The first element of that list is a
-        type and the second is either ``None``, a tuple containing two
-        elements representing the bounds of the range of values the
-        hyperparameters can take, or a list containing all possible allowed
-        values for the hyperparameter.
+        type and the second can be one of:
+
+        - ``None``, when only the type should be checked.
+        - A tuple of two numbers, when the type is numerical. In this case,
+          the first (resp. second) entry in the tuple defines a lower
+          (resp. upper) bound constraining the value of the corresponding
+          hyperparameter.
+        - A list containing all possible allowed values for the
+          corresponding hyperparameter.
 
     """
     for key in references.keys():
