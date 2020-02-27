@@ -89,7 +89,21 @@ def validate_params(parameters, references):
     references : dict, required
         Dictionary in which the keys are hyperparameter names and the
         corresponding values are lists. The first element of that list is a
-        type and the second can be one of:
+        type. If that type is not an iterable, the second element can be one
+        of:
+
+        - ``None``, when only the type should be checked.
+        - A tuple of two numbers, when the type is numerical. In this case,
+          the first (resp. second) entry in the tuple defines a lower
+          (resp. upper) bound constraining the value of the corresponding
+          hyperparameter.
+        - A list containing all possible allowed values for the
+          corresponding hyperparameter.
+
+        If that type is an iterable, the second element is a list that provides
+        information to validate each element of that iterable. The first element
+        of that list is the type of the elements of the iterable and the second
+        element of that list can be one of:
 
         - ``None``, when only the type should be checked.
         - A tuple of two numbers, when the type is numerical. In this case,
