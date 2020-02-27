@@ -6,8 +6,8 @@ to modify metric spaces or generate persistence diagrams.
 from .rescaling import ConsistentRescaling, ConsecutiveRescaling
 from .point_clouds import VietorisRipsPersistence, SparseRipsPersistence, \
     EuclideanCechPersistence
-from .grids import CubicalPersistence
 from .graphs import FlagPersistence
+from .grids import CubicalPersistence
 
 __all__ = [
     'VietorisRipsPersistence',

@@ -10,7 +10,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics.pairwise import pairwise_distances
 
 from ._utils import _pad_diagram
-from ..externals.python import ripser, SparseRipsComplex
+from pyflagser import flagser
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
@@ -30,29 +30,25 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and `metric` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
-        If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
-        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
-        including "euclidean", "manhattan", or "cosine".
-        If `metric` is a callable function, it is called on each pair of
-        instances and the resulting value recorded. The callable should take
-        two arrays from the entry in `X` as input, and return a value
-        indicating the distance between them.
-
     homology_dimensions : iterable, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
+
+    directed : bool, optional, default: ``True``
+        If true, computes the directed flag complex. Otherwise it
+        computes the undirected flag complex.
 
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
+
+    max_entries : int, optional, default: ``-1``
+        Number of entries above which all cells creating columns in the
+        reduction matrix are skipped. Use this for hard problems, a good
+        value is often `100,000`. Increase for higher precision, decrease
+        for faster computation. A negative value computes highest possible
+        precision.
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration
@@ -76,10 +72,9 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
 
     Notes
     -----
-    `Flagser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris-Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
-    <https://github.com/scikit-tda/ripser.py>`_ package.
+    `Flagser <https://github.com/luetge/flagser>`_ is used as a C++ backend
+    for computing Flag complexes persistent homology. Python bindings rely on
+    the `pyflagser <https://github.com/giotto-ai/pyflagser>`_ package.
 
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
@@ -87,32 +82,38 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris-Rips persistence \
-        barcodes", 2019; `arXiv:1908.02518 \
-        <https://arxiv.org/abs/1908.02518>`_.
+    [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing \
+        persistent homology of directed flag complexes", Algorithms,
+        13(1), 2020.
 
     """
 
-    _hyperparameters = {'max_edge_length': [numbers.Number],
+    _hyperparameters = {'directed': [bool, [True, False]],
+                        'max_entries': [int, None],
+                        'max_edge_length': [numbers.Number, None],
                         'infinity_values_': [numbers.Number],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), coeff=2, infinity_values=None,
+    def __init__(self, homology_dimensions=(0, 1), directed=True, coeff=2,
+                 max_entries=-1, max_edge_length=np.inf, infinity_values=None,
                  n_jobs=None):
-        self.metric = metric
         self.homology_dimensions = homology_dimensions
+        self.directed = directed
         self.coeff = coeff
+        self.max_entries = max_entries
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
     def _flagser_diagram(self, X):
-        Xdgms = ripser(X[X[:, 0] != np.inf],
-                       maxdim=self._max_homology_dimension,
-                       thresh=self.max_edge_length, coeff=self.coeff,
-                       metric=self.metric)['dgms']
+        X[X >= self.max_edge_length] = self.max_edge_length
+
+        Xdgms = flagser(X[X[:, 0] != np.inf],
+                        min_dimension=self._min_homology_dimension,
+                        max_dimension=self._max_homology_dimension,
+                        directed=self.directed, coeff=self.coeff,
+                        approximation=self.max_entries)['dgms']
 
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
@@ -162,6 +163,7 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
                         self._hyperparameters)
         check_array(X, allow_nd=True)
 
+        self._min_homology_dimension = self._homology_dimensions[0]
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -202,18 +204,16 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
 
         """
         # Check if fit had been called
-        X = check_array(X, allow_nd=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
-        n_samples = len(X)
-
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
-                                          for i in range(n_samples))
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._flagser_diagram)(Xt[i])
+                                          for i in range(len(X)))
 
         max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
-                                            for i in range(n_samples)]))
+                                            for i in range(len(X))]))
                         for dim in self.homology_dimensions}
         min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size
-                                else 0 for i in range(n_samples)])
+                                else 0 for i in range(len(X))])
                       for dim in self.homology_dimensions}
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
