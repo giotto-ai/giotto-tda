@@ -115,5 +115,4 @@ This pages contains a list of available features in the library.
    :template: class.rst
 
    manifold.StatefulMDS
-
    manifold.Kinematics

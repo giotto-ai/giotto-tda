@@ -1,3 +1,5 @@
+.. currentmodule:: gtda
+
 .. autosummary::
    :toctree: generated/validation
    :template: function.rst

@@ -9,10 +9,10 @@ In this folder you can find basic tutorials and examples to get started quickly 
 
 .. toctree:
 
-   classifying_shapes
-   lorenz_attractor
-   mapper_quickstart
-   voids_on_the_plane
+   classifying_shapes.ipynb
+   lorenz_attractor.ipynb
+   mapper_quickstart.ipynb
+   voids_on_the_plane.ipynb
 
 
 
