@@ -6,7 +6,9 @@ jobs:
   pool:
     vmImage: 'macOS-10.14'
   strategy:
-    python.version: '3.8'
+    matrix:
+      Python38:
+        python.version: '3.8'
   variables:
     EXECUTE: 'true'
     GITDIR: ../gtda-docs

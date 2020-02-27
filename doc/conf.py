@@ -146,9 +146,18 @@ pygments_style = 'sphinx'
 #html_theme = 'nature'
 html_theme = "sphinx_rtd_theme"
 
+path_to_image = 'images/tda_logo.svg'
+if os.path.exists(path_to_image):
+    import requests
+    r = requests.get('https://www.giotto.ai/static/vector/logo-tda.svg')
+    with open(path_to_image, 'w') as f:
+        f.write(r.content)
+html_logo = path_to_image
+
 html_theme_options = {
     'collapse_navigation': False,
-    'sticky_navigation': False
+    'sticky_navigation': False,
+    'logo_only': True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

@@ -36,7 +36,7 @@ theory-gl:
 
 clean-gh:
 	@make clean
-	@rm theory/glossary.rst
+	@rm -f theory/glossary.rst
 
 all-gh:
 	@make clean-gh
