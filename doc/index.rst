@@ -10,18 +10,6 @@ scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the 
 
 **Read our paper on arXiv!**
 
-.. toctree::
-
-   Guiding principles
-   30s guide to giotto-tda
-      Introduction to giotto-tda
-      Mapper-example
-   Installation <installation>
-   Release notes - 0.1.4
-   FAQ
-
-
-
 Guiding principles
 ==================
 
@@ -53,14 +41,11 @@ Mapper example
 .. include::
    notebooks/mapper_quickstart
 
-..
-   Installation
-   ============
+Installation
+============
 
-   .. include:: ../README.rst
-      :start-after: Installation
-      :end-before: Contributing
-
+.. include:: ../installation.rst
+  :start-after: Installation
 
 API reference
 =============

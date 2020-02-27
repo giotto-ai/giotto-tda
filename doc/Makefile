@@ -5,8 +5,13 @@
 # from the environment for the first two.
 ########## Config
 
+ifndef GITDIR
 GITDIR    = ../../../projects/gtda-docs
+endif
+
+ifndef VERSION
 VERSION = stable
+endif
 
 ########## Constant config
 SPHINXOPTS    ?=
@@ -41,7 +46,7 @@ all-gh:
 	@make github
 
 gh-commit:
-	@cd "$(CURRENTDOCFOLDER)"; git add *; git commit -a -m "Update docs"; git push origin
+	@cd "$(CURRENTDOCFOLDER)"; git add $(VERSION)/*; git commit -a -m "Update docs"; git push origin
 
 sphinx-gal:
 	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done

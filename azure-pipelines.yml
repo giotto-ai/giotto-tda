@@ -2,6 +2,50 @@
 # Additional checks can be manually triggered
 jobs:
 
+- job: 'Documentation'
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    Python38:
+      python.version: '3.8'
+  variables:
+    EXECUTE: 'true'
+    GITDIR: ../gtda-docs
+    VERSION: stable
+
+  steps:
+    - script: |
+        set -e
+        brew update
+        brew install boost ccache
+      displayName: 'Install system dependencies'
+
+    - script: |
+        set -e
+        python -m pip install --upgrade pip setuptools
+        source .azure-ci/setup_ccache.sh
+        python -m pip install -e ".[tests, doc]"
+        ccache -s
+      displayName: 'Install dependencies and dev environement'
+
+    - script:
+        set -e
+        cd ..
+        git clone git@github.com:giotto-ai/gtda-docs.git
+      displayName: "Clone the docs repo"
+
+    - script: |
+        install weird stuff (pandoc???)
+      displayName: 'Install additional stuff to build docs'
+
+    - script:
+        cd doc
+        make all-gh
+        make gh-commit
+      displayName: 'Build and commit the docs'
+      failOnStderr: false
+
+
 - job: 'manylinux2010'
   pool:
     vmImage: 'ubuntu-16.04'
