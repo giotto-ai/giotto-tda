@@ -15,6 +15,10 @@ jobs:
     VERSION: stable
 
   steps:
+    - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(python.version)'
+    
     - script: |
         set -e
         brew update
@@ -25,7 +29,7 @@ jobs:
         set -e
         python -m pip install --upgrade pip setuptools
         source .azure-ci/setup_ccache.sh
-        python -m pip install -e ".[tests, doc]"
+        python -m pip install -e ".[dev]"
         ccache -s
       displayName: 'Install dependencies and dev environement'
 
