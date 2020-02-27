@@ -684,7 +684,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `np.inf`. ``None`` assigns the maximum pixel
         values within all images passed to meth:`fit`.
@@ -719,7 +719,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
     [1] S. Kachanovich, "Witness complex", 2015; `GUDHI User and Reference Manual \
         <http://gudhi.gforge.inria.fr/doc/latest/group__witness__complex.html>`_.
 
-    [2] V. De Silva and G. Carlsson, "Topological estimation using witness \
+    [2] V. de Silva and G. Carlsson, "Topological estimation using witness \
         complexes". Proc. Sympos. Point-Based Graphics, pages 157–166, 2004;
         `doi: 10.5555/2386332.2386359
         <https://doi.org/10.5555/2386332.2386359>`_.
@@ -796,7 +796,6 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-
         self._subsample = SUBSAMPLING_FUNCTIONS[self.subsampling]
 
         if self.infinity_values is None:
@@ -850,6 +849,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
             topological features in dimension :math:`q` across all samples in
             `X`.
+
         """
         check_is_fitted(self, ['_homology_dimensions',
                                '_max_homology_dimension'])
