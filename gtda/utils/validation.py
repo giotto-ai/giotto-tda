@@ -62,8 +62,8 @@ def check_diagram(X, copy=False):
     if n_points_above_diag != n_points_global:
         raise ValueError(f"All points of all persistence diagrams should "
                          f"be above the diagonal, X[:,:,1] >= X[:,:,0]. "
-                         f"{n_points_global - n_points_above_} points are "
-                         f"under the diagonal.")
+                         f"{n_points_global - n_points_above_diag} points "
+                         f"are under the diagonal.")
     if copy:
         return np.copy(X)
     else:
