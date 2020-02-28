@@ -1,5 +1,5 @@
 
-.. figure:: images/mapper_pipeline_object.svg
+.. figure:: ../images/mapper_pipeline_object.svg
 
 Filters
 -------
