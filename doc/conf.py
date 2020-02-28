@@ -133,6 +133,7 @@ html_theme_options = {
     'collapse_navigation': False,
     'sticky_navigation': False,
     'logo_only': True,
+    'github_url': 'https://github.com/giotto-ai/giotto-tda',
 }
 
 path_to_image = 'images/tda_logo.svg'
