@@ -29,7 +29,7 @@ or check `the static version <classifying_shapes.html>`_.
    :end-before: Import libraries
 
 Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/voids_on_the_plane.ipynb>`_ for full interactivity,
-or check `the static version <voids_on_the_plan.html>`_.
+or check `the static version <voids_on_the_plane.html>`_.
 
 ..
    toctree:
