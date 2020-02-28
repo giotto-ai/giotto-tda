@@ -4,7 +4,7 @@ Installation
 .. contents::
 
 Dependencies
-------------
+^^^^^^^^^^^^
 
 The latest stable version of giotto-tda requires:
 
@@ -21,7 +21,7 @@ The latest stable version of giotto-tda requires:
 To run the examples, jupyter is required.
 
 User installation
------------------
+^^^^^^^^^^^^^^^^^
 
 The simplest way to install giotto-tda is using ``pip``   ::
 
@@ -42,7 +42,7 @@ both the stable and nightly versions, giotto-tda and giotto-tda-nightly should n
 the same environment.
 
 Developer installation
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 For information about the developer installation, please refer to :ref:`Contributing guidelines <contrib>`.
 
