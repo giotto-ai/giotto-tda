@@ -97,8 +97,8 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     The value of the scale factor depends on two things:
 
-        - A way of computing, for each homology dimension, the `amplitude
-          <https://giotto.ai/theory>`_ in that dimension of a persistence
+        - A way of computing, for each homology dimension, the :ref:`amplitude
+          <amplitude>` in that dimension of a persistence
           diagram consisting of birth-death-dimension triples [b, d, q].
           Together, `metric` and `metric_params` define this in the same way as
           in :class:`Amplitude`.

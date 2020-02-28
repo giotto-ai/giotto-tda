@@ -19,7 +19,7 @@ from ..utils.validation import validate_params, check_diagram
 
 @adapt_fit_transform_docs
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """`Persistence entropies <https://giotto.ai/theory>`_ of persistence
+    """:ref:`Persistence entropies <persistence entropy>` of persistence
     diagrams.
 
     Given a persistence diagrams consisting of birth-death-dimension triples
@@ -125,12 +125,12 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class BettiCurve(BaseEstimator, TransformerMixin):
-    """`Betti curves <https://giotto.ai/theory>`_ of persistence diagrams.
+    """:ref:`Betti curves <betti curve>` of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective Betti curves are obtained by
-    evenly sampling the `filtration parameter <https://giotto.ai/theory>`_.
+    evenly sampling the :ref:`filtration parameter <filtered complex>`.
 
     Parameters
     ----------
@@ -250,14 +250,14 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class PersistenceLandscape(BaseEstimator, TransformerMixin):
-    """`Persistence landscapes <https://giotto.ai/theory>`_ of persistence
+    """:ref:`Persistence landscapes <persistence landscape>` of persistence
     diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and layers of their respective persistence
-    landscapes are obtained by evenly sampling the `filtration parameter
-    <https://giotto.ai/theory>`_.
+    landscapes are obtained by evenly sampling the :ref:`filtration parameter
+    <filtered complex>`.
 
     Parameters
     ----------
@@ -394,7 +394,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
     distinct homology dimensions are considered separately and regarded as sums
     of Dirac deltas. Then, the convolution with a Gaussian kernel is computed
     over a rectangular grid of locations evenly sampled from appropriate
-    ranges of the `filtration parameter <https://giotto.ai/theory>`_. The
+    ranges of the :ref:`filtration parameter <filtered complex>`. The
     same is done with the reflected images of the subdiagrams about the
     diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a raster image.
@@ -533,7 +533,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class PersistenceImage(BaseEstimator, TransformerMixin):
-    """`Persistence images <https://giotto.ai/theory>`_ of persistence
+    """:ref:`Persistence images <persistence image>` of persistence
     diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -543,7 +543,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
     separately and regarded as sums of Dirac deltas.
     Then, the convolution with a Gaussian kernel is computed over
     a rectangular grid of locations evenly sampled from appropriate ranges
-    of the `filtration parameter <https://giotto.ai/theory>`_.
+    of the :ref:`filtration parameter <filtered complex>`.
     The result can be thought of as a raster image.
 
     Parameters
@@ -712,7 +712,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Silhouette(BaseEstimator, TransformerMixin):
-    """`Power-weighted silhouettes <https://giotto.ai/theory>`_ of persistence
+    """:ref:`Power-weighted silhouettes <weighted silhouette>` of persistence
     diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -720,13 +720,13 @@ class Silhouette(BaseEstimator, TransformerMixin):
     distinct homology dimensions are considered separately, and their
     respective silhouette by sampling the silhouette function over evenly
     spaced locations from appropriate ranges
-    of the `filtration parameter <https://giotto.ai/theory>`_
+    of the :ref:`filtration parameter <filtered>`.
 
      Parameters
     ----------
     order: float, optional, default: ``1.``
         The power to which persistence values are raised to define the
-        `power-weighted silhouettes <https://giotto.ai/theory>`_.
+        :ref:`power-weighted silhouettes <weighted silhouette>`.
 
     n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
