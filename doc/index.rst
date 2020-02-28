@@ -44,7 +44,7 @@ Mapper example
 Installation
 ============
 
-.. include:: ../installation.rst
+.. include:: installation.rst
   :start-after: Installation
 
 API reference

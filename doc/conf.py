@@ -41,27 +41,11 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
-    #'sphinx_gallery.gen_gallery',
-    #'sphinx_nbexamples',
-    #'ipypublish.sphinx.notebook',
-    'nbsphinx',
     'sphinx_issues',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
-
-# Add mappings
-intersphinx_mapping = {
-    'sklearn': ('http://scikit-learn.org/stable', None),
-    'plotly': ('https://plot.ly/python-api-reference/', None),
-    'scipy': ('http://docs.scipy.org/doc/scipy/reference', None)
-}
-
-sphinx_gallery_conf = {
-    'examples_dirs': '../examples/',   # path to your example scripts
-    'gallery_dirs': 'gallery',  # path to where to save gallery generated output
-}
 
 # ipypublish.sphinx.notebook
 source_suffix = {
@@ -101,7 +85,7 @@ else:
 autodoc_default_options = {'members': True, 'inherited-members': True}
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['templates']
+templates_path = ['templates/']
 
 # generate autosummary even if no references
 autosummary_generate = True
@@ -143,16 +127,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = 'nature'
 html_theme = "sphinx_rtd_theme"
-
-path_to_image = 'images/tda_logo.svg'
-if os.path.exists(path_to_image):
-    import requests
-    r = requests.get('https://www.giotto.ai/static/vector/logo-tda.svg')
-    with open(path_to_image, 'w') as f:
-        f.write(r.content)
-html_logo = path_to_image
 
 html_theme_options = {
     'collapse_navigation': False,
@@ -160,17 +135,18 @@ html_theme_options = {
     'logo_only': True,
 }
 
+path_to_image = 'images/tda_logo.svg'
+if not(os.path.exists(path_to_image)):
+    import requests
+    r = requests.get('https://www.giotto.ai/static/vector/logo-tda.svg')
+    with open(path_to_image, 'wb') as f:
+        f.write(r.content)
+html_logo = path_to_image
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['source/_static/style.css'] # []  # ['_static']
-
-
-#scv_whitelist_branches = ('master', 'w_persistent_image', 'w_cubical', 'w-p-igraph-dep',
-#                          'time_series_tests', 'test_features', 'silhouette')
-#scv_whitelist_tags = ('v0.1a.0', 'v0.1.0', 'v0.1.1', 'v0.1.2')
-#scv_whitelist_tags = ('v0.1.4', 'v0.1.3')
-#scv_whitelist_branches = ('ghpages', )
+html_static_path = ['source/_static/style.css']  # []  # ['_static']
 
 rst_epilog = """
 .. |ProjectVersion| replace:: Foo Project, version {versionnum}

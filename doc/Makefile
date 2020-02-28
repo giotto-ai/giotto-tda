@@ -13,6 +13,10 @@ ifndef VERSION
 VERSION = stable
 endif
 
+ifndef RUNNOTEBOOKS
+RUNNOTEBOOKS=FALSE
+endif
+
 ########## Constant config
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
@@ -32,7 +36,10 @@ github:
 	@cd $(GITDIR); python create_index.py
 
 theory-gl:
-	@pandoc theory/glossary.tex -f latex -t rst --reference-location=block -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
+	@pandoc theory/glossary.tex -f latex -t rst --toc --include-before-body=theory/before_glossary.rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
+
+convert-notebooks:
+	@jupyter nbconvert notebooks/*.ipynb --execute --to rst
 
 clean-gh:
 	@make clean
@@ -41,8 +48,11 @@ clean-gh:
 all-gh:
 	@make clean-gh
 	@make theory-gl
-	@cp ../examples/*.ipynb notebooks/
-	@cp ../examples/plotting.py notebooks/
+	@if ($(RUNNOTEBOOKS)); then\
+	   cp ../examples/*.ipynb notebooks/;\
+	   cp ../examples/plotting.py notebooks/;\
+	   make convert-notebooks;\
+	fi
 	@make github
 
 gh-commit:
