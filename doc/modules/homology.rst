@@ -1,3 +1,10 @@
+:mod:`gtda.homology`: Persistent homology
+=========================================
+
+.. automodule:: gtda.homology
+   :no-members:
+   :no-inherited-members:
+
 .. currentmodule:: gtda
 
 .. autosummary::

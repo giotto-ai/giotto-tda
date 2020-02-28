@@ -1,3 +1,10 @@
+:mod:`gtda.diagrams`: Persistence diagrams
+==========================================
+
+.. automodule:: gtda.diagrams
+   :no-members:
+   :no-inherited-members:
+
 Preprocessing
 -------------
 .. currentmodule:: gtda

@@ -1,3 +1,10 @@
+:mod:`gtda.meta_transformers`: Convenience pipelines
+====================================================
+
+.. automodule:: gtda.meta_transformers
+   :no-members:
+   :no-inherited-members:
+
 .. currentmodule:: gtda
 
 .. autosummary::

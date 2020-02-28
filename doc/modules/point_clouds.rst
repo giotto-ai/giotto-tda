@@ -1,3 +1,5 @@
+:mod:`gtda.point_clouds`: Point clouds
+==========================================
 
 .. automodule:: gtda.point_clouds
    :no-members:

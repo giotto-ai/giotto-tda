@@ -1,3 +1,10 @@
+:mod:`gtda.graphs`: Graphs
+==========================
+
+.. automodule:: gtda.graphs
+   :no-members:
+   :no-inherited-members:
+
 Graph creation
 --------------
 .. currentmodule:: gtda

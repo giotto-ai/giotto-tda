@@ -1,5 +1,5 @@
 
-========================
+
 Giotto-tda documentation
 ========================
 
@@ -10,8 +10,11 @@ scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the 
 
 **Read our paper on arXiv!**
 
+.. contents::
+   :maxdepth: 2
+
 Guiding principles
-==================
+------------------
 
  * | **Seamless integration with widely used ML frameworks: Python + scikit-learn.**
    | Inherit their strengths and allow for creation of heterogeneous ML pipelines.
@@ -27,46 +30,40 @@ Guiding principles
    | Support for time series, graphs, images.
 
 30s guide to giotto-tda
-=======================
-
-Introduction to giotto-tda
---------------------------
+------------------------
 
 The `post <https://towardsdatascience.com/getting-started-with-giotto-learn-a-python-library-for-topological-machine-learning-451d88d2c4bc>`_
 by Lewis Tunstall provides a general overview of the library.
 
-Mapper example
---------------
-
-.. include::
-   notebooks/mapper_quickstart
+The mapper notebook, :doc:`included in the documentation <notebooks/mapper_quickstart.rst>`,
+provides a comprehensive introduction to mapper.
 
 Installation
-============
+------------
 
 .. include:: installation.rst
-  :start-after: Installation
+   :start-after: Installation
 
 API reference
-=============
+-------------
 See :doc:`the API reference <api>`.
 
 Examples
-========
+--------
 
 Please have a look at :doc:`notebooks/notebooks_readme`.
 
 Theory
-======
+------
 
 The theory behind Topological Data Analysis might be overwhelming.
 For this reason, we provide a :doc:`theory/glossary`.
 
 Release notes - 0.1.4
-=====================
+---------------------
 
 Library name change
--------------------
+^^^^^^^^^^^^^^^^^^^
 The library and GitHub repository have been renamed to ``giotto-tda``! While the
 new name is meant to better convey the library's focus on Topology-powered
 machine learning and Data Analysis, the commitment to seamless integration with
@@ -83,12 +80,12 @@ Short summary: install via ::
 and ``import gtda`` in your scripts or notebooks!
 
 Change of license
------------------
+^^^^^^^^^^^^^^^^^
 
 The license changes from Apache 2.0 to GNU AGPLv3 from this release on.
 
 Major Features and Improvements
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 -  Added a ``mapper`` submodule implementing the Mapper algorithm of Singh, Mémoli and Carlsson. The main tools are the
    functions ``make_mapper_pipeline``, ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph``. The first
    creates an object of class ``MapperPipeline`` which can be fit-transformed to data to create a Mapper graph in the
@@ -111,18 +108,18 @@ Major Features and Improvements
 -  Added support for Python 3.8.
 
 Bug Fixes
----------
+^^^^^^^^^
 -  Fixed consistently incorrect documentation for the ``fit_transform`` methods. This has been achieved by introducing a
    class decorator ``adapt_fit_transform_docs`` which is defined in the newly introduced ``gtda.utils._docs.py``.
 
 Backwards-Incompatible Changes
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 -  The library name change and the change in the name of the main module ``giotto``
    are important major changes.
 -  There are now additional dependencies in the ``python-igraph``, ``matplotlib``, ``plotly``, and ``ipywidgets`` libraries.
 
 Thanks to our Contributors
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This release contains contributions from many people:
 
@@ -132,6 +129,6 @@ We are also grateful to all who filed issues or helped resolve them, asked and
 answered questions, and were part of inspiring discussions.
 
 FAQ
-===
+---
 
 For additional information, please refer to :doc:`Frequently asked questions <faq>`.

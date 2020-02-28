@@ -1,3 +1,10 @@
+:mod:`gtda.utils`: Validation
+=============================
+
+.. automodule:: gtda.validation
+   :no-members:
+   :no-inherited-members:
+
 .. currentmodule:: gtda
 
 .. autosummary::

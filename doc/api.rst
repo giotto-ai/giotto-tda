@@ -5,106 +5,20 @@ Welcome to giotto-tda's API reference!
 
 This pages contains a list of available features in the library.
 
-:mod:`gtda.mapper`: Mapper
-==========================
+.. toctree::
+   :maxdepth: 3
 
-.. automodule:: gtda.mapper
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/mapper.rst
-
-:mod:`gtda.homology`: Persistent homology
-=========================================
-
-.. automodule:: gtda.homology
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/homology.rst
-
-:mod:`gtda.diagrams`: Persistence diagrams
-==========================================
-
-.. automodule:: gtda.diagrams
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/diagrams.rst
-
-:mod:`gtda.point_clouds`: Point clouds
-==========================================
-
-.. automodule:: gtda.point_clouds
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/point_clouds.rst
-
-:mod:`gtda.time_series`: Time series
-====================================
-
-.. automodule:: gtda.time_series
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/time_series.rst
-
-:mod:`gtda.graphs`: Graphs
-==========================
-
-.. automodule:: gtda.graphs
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/graphs.rst
-
-:mod:`gtda.base`: Base
-======================
-
-.. automodule:: gtda.base
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/base.rst
-
-:mod:`gtda.pipeline`: Pipeline
-==============================
-
-.. automodule:: gtda.pipeline
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/pipeline.rst
-
-:mod:`gtda.meta_transformers`: Convenience pipelines
-====================================================
-
-.. automodule:: gtda.meta_transformers
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/meta_transformers.rst
-
-:mod:`gtda.utils`: Validation
-=============================
-
-.. automodule:: gtda.utils
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: gtda
-
-.. include:: modules/validation.rst
-
-:mod:`gtda.images`: Images
-==========================
-
-.. automodule:: gtda.images
-   :no-members:
-   :no-inherited-members:
-
-.. include:: modules/images.rst
+   modules/mapper.rst
+   modules/homology.rst
+   modules/diagrams.rst
+   modules/point_clouds.rst
+   modules/time_series.rst
+   modules/graphs.rst
+   modules/base.rst
+   modules/pipeline.rst
+   modules/meta_transformers.rst
+   modules/validation.rst
+   modules/images.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning

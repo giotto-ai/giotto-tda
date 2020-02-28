@@ -1,3 +1,10 @@
+:mod:`gtda.images`: Images
+==========================
+
+.. automodule:: gtda.images
+   :no-members:
+   :no-inherited-members:
+
 .. currentmodule:: gtda
 
 Preprocessing

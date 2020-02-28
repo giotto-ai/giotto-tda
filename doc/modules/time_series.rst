@@ -1,3 +1,10 @@
+:mod:`gtda.time_series`: Time series
+====================================
+
+.. automodule:: gtda.time_series
+   :no-members:
+   :no-inherited-members:
+
 Preprocessing
 -------------
 .. currentmodule:: gtda

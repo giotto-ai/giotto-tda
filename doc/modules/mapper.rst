@@ -1,3 +1,9 @@
+:mod:`gtda.mapper`: Mapper
+==========================
+
+.. automodule:: gtda.mapper
+   :no-members:
+   :no-inherited-members:
 
 .. figure:: ../images/mapper_pipeline_object.svg
 

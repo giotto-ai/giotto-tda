@@ -1,3 +1,10 @@
+:mod:`gtda.pipeline`: Pipeline
+==============================
+
+.. automodule:: gtda.pipeline
+   :no-members:
+   :no-inherited-members:
+
 .. currentmodule:: gtda
 
 .. autosummary::
