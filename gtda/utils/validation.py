@@ -223,9 +223,10 @@ def validate_metric_params(metric, metric_params):
 def check_list_of_images(X, **kwargs):
     """Check a list of arrays representing images, by integrating
     through the input one by one. To pass a test when `kwargs` is ``None``,
-    all images ``x`` in `X` must satisfy:
+    all images ``x``, ``y`` in `X` must satisfy:
         - ``x.ndim >= 2``,
-        - ``all(np.isfinite(x))``
+        - ``all(np.isfinite(x))``,
+        - ``x.shape == y.shape``.
 
     Parameters
     ----------
@@ -257,7 +258,7 @@ def check_list_of_point_clouds(X, **kwargs):
     through the input one by one. To pass a test when `kwargs` is ``None``,
     all point clouds ``x``, ``y`` in X must satisfy:
         - ``x.ndim == 2``,
-        - ``len(y.shape) == len(y.shape)``.
+        - ``len(y.shape[1:]) == len(y.shape[1:])``.
 
     Parameters
     ----------
@@ -295,7 +296,7 @@ def check_dimensions(X, get_property):
     get_property: function: ndarray -> _,
         Defines a property to be conserved, across all arrays (samples)
         in X.
-    
+
     """
     from functools import reduce
     from operator import and_
