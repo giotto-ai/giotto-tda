@@ -17,12 +17,11 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        ("Node ID:{}<br>Node size:{}").format(node_id, len(node_elements),)
+        f"Node ID:{node_id}<br>Node size:{len(node_elements)}"
         for node_id, node_elements in zip(
             graph["node_metadata"]["node_id"],
-            graph["node_metadata"]["node_elements"]
-        )
-    ]
+            graph["node_metadata"]["node_elements"])
+        ]
 
 
 def set_node_sizeref(node_elements, node_scale=12):
@@ -79,7 +78,7 @@ def _get_column_color_buttons(data, is_data_dataframe, node_elements,
                     'marker.cmax': [None, np.max(node_colors)],
                     'hoverlabel.bgcolor': [None, node_color_map]
                 }],
-                label='Column {}'.format(column),
+                label=f'Column {column}',
                 method='restyle'
             )
         )
@@ -152,7 +151,7 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
 
 def _calculate_graph_data(
         pipeline, data, layout, layout_dim,
-        color_variable, node_color_statistic,  plotly_kwargs):
+        color_variable, node_color_statistic, plotly_kwargs):
     graph = pipeline.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 

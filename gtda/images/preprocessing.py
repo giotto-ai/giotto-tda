@@ -84,7 +84,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         """
         validate_params(self.get_params(), self._hyperparameters)
-        X = check_list_of_images(X)
+        X = check_list_of_images(X, allow_nd=True)
 
         self.n_dimensions_ = len(X.shape) - 1
         self.max_value_ = np.max(X)
@@ -115,10 +115,10 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_list_of_images(X, copy=True)
+        Xt = check_list_of_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._binarize)(X[s])
+            self._binarize)(Xt[s])
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
@@ -167,7 +167,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_list_of_images(X)
+        X = check_list_of_images(X, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -195,10 +195,10 @@ class Inverter(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_list_of_images(X, copy=True)
+        Xt = check_list_of_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            np.logical_not)(X[s])
+            np.logical_not)(Xt[s])
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
@@ -276,7 +276,7 @@ class Padder(BaseEstimator, TransformerMixin):
                         {**self._hyperparameters,
                          'paddings_dim': [int, [n_dimensions]]})
 
-        check_list_of_images(X)
+        check_list_of_images(X, allow_nd=True)
 
         self._pad_width = ((0, 0),
                            *[(self.paddings_[axis], self.paddings_[axis])
@@ -307,10 +307,10 @@ class Padder(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_list_of_images(X, copy=True)
+        Xt = check_list_of_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            np.pad)(X[s], pad_width=self._pad_width,
+            np.pad)(Xt[s], pad_width=self._pad_width,
                     constant_values=self.activated)
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
@@ -377,8 +377,17 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        _ = check_list_of_images(X)
+        _ = check_list_of_images(X, allow_nd=True)
         self.is_fitted_ = True
+
+        n_dimensions = len(X.shape) - 1
+        axis_order = [2, 1, 3]
+        mesh_range_list = [np.arange(0, X.shape[i])
+                           for i in axis_order[:n_dimensions]]
+
+        self.mesh_ = np.flip(np.stack(np.meshgrid(*mesh_range_list),
+                                      axis=n_dimensions),
+                             axis=0).reshape((-1, n_dimensions))
 
         return self
 
@@ -406,10 +415,10 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_list_of_images(X, copy=True)
+        Xt = check_list_of_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._embed)(X[s])
+            self._embed)(Xt[s])
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
 

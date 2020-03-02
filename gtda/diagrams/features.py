@@ -10,7 +10,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats, persistence_images
+from ._metrics import betti_curves, landscapes, heats,\
+    persistence_images, silhouettes
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
@@ -41,8 +42,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, PersistenceImage, \
-    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
+    PersistenceImage, PairwiseDistance, Silhouette, \
+    gtda.homology.VietorisRipsPersistence
+
     """
 
     def __init__(self, n_jobs=None):
@@ -152,8 +155,9 @@ class BettiCurve(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, PersistenceImage, \
-    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
+    PairwiseDistance, Silhouette, PersistenceImage,\
+    gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -281,8 +285,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, PersistenceImage, \
-    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
+    PairwiseDistance, Silhouette, PersistenceImage, \
+    gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
@@ -420,15 +425,16 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, PersistenceImage, \
-    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
+    PairwiseDistance, Silhouette, PersistenceImage, \
+    gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
     The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the (i, j)-th pixel of a
-    persistence image in homology dimension q typically arises from a different
-    pair of parameter values to the (i, j)-th pixel of a persistence image in
+    different homology dimensions. This means that the (i, j)-th pixel
+    of an image in homology dimension q typically arises from a different
+    pair of parameter values to the (i, j)-th pixel of an image in
     dimension q'.
 
     References
@@ -527,7 +533,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class PersistenceImage(BaseEstimator, TransformerMixin):
-    """Convolution of persistence diagrams with a Gaussian kernel.
+    """`Persistence images <https://giotto.ai/theory>`_ of persistence
+    diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], the equivalent diagrams of
@@ -602,7 +609,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_bins': [int, (1, np.inf)],
-                        'effective_weight_function_': [types.FunctionType]}
+                        'effective_weight_function_': [types.FunctionType,
+                                                       None]}
 
     def __init__(self, sigma=1.0, n_bins=100, weight_function=None,
                  n_jobs=None):
@@ -677,7 +685,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
-            n_bins)
+             n_bins)
             Raster images: one image per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
@@ -700,4 +708,149 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
                                         self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
+        return Xt
+
+
+@adapt_fit_transform_docs
+class Silhouette(BaseEstimator, TransformerMixin):
+    """`Power-weighted silhouettes <https://giotto.ai/theory>`_ of persistence
+    diagrams.
+
+    Based on ideas in [1]_. Given a persistence diagram consisting of
+    birth-death-dimension triples [b, d, q], subdiagrams corresponding to
+    distinct homology dimensions are considered separately, and their
+    respective silhouette by sampling the silhouette function over evenly
+    spaced locations from appropriate ranges
+    of the `filtration parameter <https://giotto.ai/theory>`_
+
+     Parameters
+    ----------
+    order: float, optional, default: ``1.``
+        The power to which persistence values are raised to define the
+        `power-weighted silhouettes <https://giotto.ai/theory>`_.
+
+    n_bins : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during :meth:`fit`.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
+
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    samplings_ : dict
+        For each number in `homology_dimensions_`, a discrete sampling of
+        filtration parameters, calculated during :meth:`fit` according to the
+        minimum birth and maximum death values observed across all samples.
+
+    See also
+    --------
+    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
+    PairwiseDistance, BettiCurve, gtda.homology.VietorisRipsPersistence
+
+    Notes
+    -----
+    The samplings in :attr:`samplings_` are in general different between
+    different homology dimensions. This means that the j-th entry of
+    a silhouette in homology dimension q typically arises from
+    a different parameter values to the j-th entry of a curve
+    in dimension q'.
+
+    References
+    ----------
+    .. [1] F. Chazal, B. T. Fasy, F. Lecci, A. Rinaldo, and L. Wasserman,
+           "Stochastic Convergence of Persistence Landscapes and Silhouettes";
+           *In Proceedings of the thirtieth annual symposium on Computational
+           Geometry*, Kyoto, Japan, 2014, pp. 474–483;
+           doi: `10.1145/2582112.2582128
+           <http://dx.doi.org/10.1145/2582112.2582128>`_.
+
+    """
+
+    _hyperparameters = {'order': [float, (0., np.inf)],
+                        'n_bins': [int, (1., np.inf)]}
+
+    def __init__(self, order=1., n_bins=100, n_jobs=None):
+        self.order = order
+        self.n_bins = n_bins
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and, for each dimension separately,
+        store evenly sample filtration parameter values in :attr:`samplings_`.
+        Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_diagram(X)
+        validate_params(self.get_params(), self._hyperparameters)
+
+        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self._n_dimensions = len(self.homology_dimensions_)
+
+        self._samplings, _ = _bin(X, metric='silhouette', n_bins=self.n_bins)
+        self.samplings_ = {dim: s.flatten()
+                           for dim, s in self._samplings.items()}
+
+        return self
+
+    def transform(self, X, y=None):
+        """Compute silhouettes of diagrams in X.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
+            One silhouette (represented as a one-dimensional array)
+            per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+
+        """
+        check_is_fitted(self)
+        X = check_diagram(X)
+
+        Xt = (Parallel(n_jobs=self.n_jobs)
+              (delayed(silhouettes)(_subdiagrams(X, [dim], remove_dim=True)[s],
+                                    self._samplings[dim], order=self.order)
+              for dim in self.homology_dimensions_
+              for s in gen_even_slices(X.shape[0],
+                                       effective_n_jobs(self.n_jobs))))
+
+        Xt = np.concatenate(Xt). \
+            reshape(self._n_dimensions, X.shape[0], -1). \
+            transpose((1, 0, 2))
         return Xt

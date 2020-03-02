@@ -83,8 +83,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {'_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)],
-                        'periodic_dimensions_': [np.ndarray, (np.bool, None)],
-                        'infinity_values_': [numbers.Number]}
+                        'periodic_dimensions_': [np.ndarray, (np.bool_, None)],
+                        'infinity_values_': [numbers.Number, None]}
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
                  periodic_dimensions=None, infinity_values=None, n_jobs=None):
@@ -141,7 +141,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             self.periodic_dimensions_ = np.zeros((len(X) - 1,), dtype=np.bool)
         else:
             self._filtration = PeriodicCubicalComplex
-            self.periodic_dimensions_ = self.periodic_dimensions
+            self.periodic_dimensions_ = np.array(self.periodic_dimensions,
+                                                 dtype=np.bool)
             self._filtration_kwargs['periodic_dimensions'] = \
                 self.periodic_dimensions_
 
