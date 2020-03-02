@@ -609,7 +609,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
                         'n_bins': [int, (1, np.inf)],
-                        'effective_weight_function_': [types.FunctionType]}
+                        'effective_weight_function_': [types.FunctionType,
+                                                       None]}
 
     def __init__(self, sigma=1.0, n_bins=100, weight_function=None,
                  n_jobs=None):

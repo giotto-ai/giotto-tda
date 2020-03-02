@@ -174,7 +174,7 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'function': [types.FunctionType]}
+    _hyperparameters = {'function': [types.FunctionType, None]}
 
     def __init__(self, metric='bottleneck', metric_params=None,
                  function=np.max, n_jobs=None):
