@@ -66,7 +66,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.homology import ConsistentRescaling
+    >>> from gtda.point_clouds import ConsistentRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsistentRescaling()
     >>> X_rescaled = cr.fit_transform(X)
@@ -232,7 +232,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.homology import ConsecutiveRescaling
+    >>> from gtda.point_clouds import ConsecutiveRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsecutiveRescaling()
     >>> X_rescaled = cr.fit_transform(X)
