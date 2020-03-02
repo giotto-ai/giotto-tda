@@ -284,8 +284,8 @@ def check_list_of_point_clouds(X, **kwargs):
         kwargs_default = {'ensure_2d': False, 'force_all_finite': False,
                           'check_shapes': [('embedding_dimension',
                                             lambda x: x.shape[1:],
-                                            'Not all point clouds have the same'
-                                            'embedding dimension')]}
+                                            'Not all point clouds have the '
+                                            'same embedding dimension.')]}
         kwargs_default.update(kwargs)
         return check_list_of_arrays(X, **kwargs_default)
 
