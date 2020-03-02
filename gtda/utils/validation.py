@@ -242,9 +242,12 @@ def check_list_of_images(X, **kwargs):
         as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
-    kwargs_default = {'force_same_ndim': False,
-                      'force_same_shape': False, 'force_all_finite': True,
-                      'ensure_2d': False, 'allow_nd': True}
+    kwargs_default = {'force_all_finite': True,
+                      'ensure_2d': False, 'allow_nd': True,
+                      'check_shapes': [('embedding_dimension',
+                                        lambda x: x.shape,
+                                        'The images should have exactly'
+                                        'the same shape')]}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
 
@@ -272,13 +275,24 @@ def check_list_of_point_clouds(X, **kwargs):
 
     """
     kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
-                      'force_same_shape': False, 'force_same_ndim': True}
+                      'check_shapes': [('embedding_dimension',
+                                        lambda x: x.shape[1:],
+                                        'Not all point clouds have the same'
+                                        'embedding dimension')]}
     kwargs_default.update(kwargs)
     return check_list_of_arrays(X, **kwargs_default)
 
 
-def check_list_of_arrays(X, force_same_shape=True, force_same_ndim=True,
-                         **kwargs):
+def check_dimensions(X, get_property):
+    """ """
+    from functools import reduce
+    from operator import and_
+    reference = get_property(X[0])
+    return reduce(and_, map(lambda x: get_property(x) == reference, X[1:]),
+                  True)
+
+
+def check_list_of_arrays(X, check_shapes=list(), **kwargs):
     """Input validation on a list of lists, arrays, sparse matrices, or similar.
 
     The constraints are to be specified in `kwargs`. On top of
@@ -290,13 +304,10 @@ def check_list_of_arrays(X, force_same_shape=True, force_same_ndim=True,
     X : list
         Input list of objects to check / convert.
 
-    force_same_shape : bool, optional, default: ``True``
-        Indicates whether the shapes of the elements of `X` should all
-        be the same.
-
-    force_same_ndim : bool, optional, default: ``True``
-        Indicates whether the number of axes in the elements of `X` should all
-        be the same.
+    check_shapes: list of tuples t, where t = (str, function to pass to
+        check_dimensions, error message if test fails).
+        The checks are applied in the order they are provided, only until
+        the first failure.
 
     kwargs : dict or None, optional, default: ``None``
         Parameters accepted by :func:`~sklearn.utils.validation.check_array`.
@@ -310,17 +321,11 @@ def check_list_of_arrays(X, force_same_shape=True, force_same_ndim=True,
     """
 
     # if restrictions on the dimensions of the input are imposed
-    if force_same_shape:
-        shapes = [x.shape for x in X]
-        if not (all([shapes[0] == s for s in shapes])):
-            raise ValueError(f"The arrays in X do not have the same dimensions"
-                             "({shapes}), while they should.")
-    # if the number of dimensions can vary
-    elif force_same_ndim:
-        n_axis = [x.ndim for x in X]
-        if not (all([n_axis[0] == n for n in n_axis])):
-            raise ValueError(f"The arrays in X do not have the same number"
-                             "of axes ({n_axis}), while they should.")
+    for (test_name, get_property, err_message) in check_shapes:
+        if check_dimensions(X, get_property):
+            continue
+        else:
+            raise ValueError(err_message)
 
     is_check_failed = False
     messages = []
