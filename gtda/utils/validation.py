@@ -243,14 +243,17 @@ def check_list_of_images(X, **kwargs):
         as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
-    kwargs_default = {'force_all_finite': True,
-                      'ensure_2d': False, 'allow_nd': True,
-                      'check_shapes': [('embedding_dimension',
-                                        lambda x: x.shape,
-                                        'The images should have exactly'
-                                        'the same shape')]}
-    kwargs_default.update(kwargs)
-    return check_list_of_arrays(X, **kwargs_default)
+    if hasattr(X, 'shape'):
+        return check_array(X, **kwargs)
+    else:
+        kwargs_default = {'force_all_finite': True,
+                          'ensure_2d': False, 'allow_nd': True,
+                          'check_shapes': [('embedding_dimension',
+                                            lambda x: x.shape,
+                                            'The images should have exactly'
+                                            'the same shape')]}
+        kwargs_default.update(kwargs)
+        return check_list_of_arrays(X, **kwargs_default)
 
 
 def check_list_of_point_clouds(X, **kwargs):
@@ -275,13 +278,16 @@ def check_list_of_point_clouds(X, **kwargs):
         as modified by :func:`~sklearn.utils.validation.check_array`
 
     """
-    kwargs_default = {'ensure_2d': True, 'force_all_finite': False,
-                      'check_shapes': [('embedding_dimension',
-                                        lambda x: x.shape[1:],
-                                        'Not all point clouds have the same'
-                                        'embedding dimension')]}
-    kwargs_default.update(kwargs)
-    return check_list_of_arrays(X, **kwargs_default)
+    if hasattr(X, 'shape'):
+        return check_array(X, **kwargs)
+    else:
+        kwargs_default = {'ensure_2d': False, 'force_all_finite': False,
+                          'check_shapes': [('embedding_dimension',
+                                            lambda x: x.shape[1:],
+                                            'Not all point clouds have the same'
+                                            'embedding dimension')]}
+        kwargs_default.update(kwargs)
+        return check_list_of_arrays(X, **kwargs_default)
 
 
 def check_dimensions(X, get_property):
@@ -345,7 +351,8 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
     for i, x in enumerate(X):
         try:
             # TODO: verifythe behavior depending on copy.
-            X[i] = check_array(x, **kwargs)
+            X[i] = check_array(x.reshape(1, *x.shape),
+                               **kwargs).reshape(*x.shape)
             messages = ['']
         except ValueError as e:
             is_check_failed = True

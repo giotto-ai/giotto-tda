@@ -7,7 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 from ._utils import _pad_diagram
-from ..utils.validation import validate_params, check_list_of_arrays
+from ..utils.validation import validate_params, check_list_of_images
 
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 
@@ -158,7 +158,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
                          'infinity_values_': self.infinity_values_,
                          '_homology_dimensions': self._homology_dimensions},
                         self._hyperparameters)
-        check_list_of_arrays(X, allow_nd=True)
+        check_list_of_images(X, allow_nd=True)
 
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
