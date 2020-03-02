@@ -266,7 +266,7 @@ def check_list_of_point_clouds(X, **kwargs):
 
     kwargs : dict or None, optional, default: ``None``
         Parameters accepted by
-        :func:`~gtda.utils.validation.check_list_of_arrays`.
+        :func:`~`gtda.utils.validation.check_list_of_arrays``.
 
     Returns
     -------
@@ -284,7 +284,19 @@ def check_list_of_point_clouds(X, **kwargs):
 
 
 def check_dimensions(X, get_property):
-    """ """
+    """Check the dimensions of X are consistent, where the check is defined
+    by get_property 'sample-wise'.
+    Parameters
+    ----------
+    X: list of ndarray,
+        Usually represents point clouds or images- see
+        :func:`~`gtda.utils.validation.check_list_of_arrays``.
+
+    get_property: function: ndarray -> _,
+        Defines a property to be conserved, across all arrays (samples)
+        in X.
+    
+    """
     from functools import reduce
     from operator import and_
     reference = get_property(X[0])
