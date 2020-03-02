@@ -108,34 +108,6 @@ def test_img2pc_not_fitted():
         img2pc.transform(images_2D)
 
 
-images_2D_img2pc = np.array(
-    [[[0., 2.], [1., 2.], [0., 1.],
-      [1., 1.], [0., 0.], [1., 0.]],
-     [[0., 2.], [np.inf, np.inf], [0., 1.],
-      [np.inf, np.inf], [0., 0.], [np.inf, np.inf]],
-     [[np.inf, np.inf], [np.inf, np.inf], [np.inf, np.inf],
-      [np.inf, np.inf], [np.inf, np.inf], [np.inf, np.inf]]])
-
-images_3D_img2pc = np.array(
-    [[[0., 2., 0.], [0., 2., 1.],
-      [1., 2., 0.], [1., 2., 1.],
-      [0., 1., 0.], [0., 1., 1.],
-      [1., 1., 0.], [1., 1., 1.],
-      [0., 0., 0.], [0., 0., 1.],
-      [1., 0., 0.], [1., 0., 1.]],
-     [[0., 2., 0.], [0., 2., 1.],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [0., 1., 0.], [0., 1., 1.],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [0., 0., 0.], [0., 0., 1.],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf]],
-     [[np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf]]])
-
 images_2D_img2pc = list(
     [np.array([[0., 2.], [1., 2.], [0., 1.], [1., 1.], [0., 0.], [1., 0.]]),
      np.array([[0., 2.], [0., 1.], [0., 0.]]),
