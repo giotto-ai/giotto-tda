@@ -244,6 +244,10 @@ def check_list_of_images(X, **kwargs):
 
     """
     if hasattr(X, 'shape'):
+        if X.ndim < 3:
+            raise ValueError(f"An image in the collection X should be at "
+                             f"least of dimension 2, while it has dimension "
+                             f"{X.ndim - 1}.")
         return check_array(X, **kwargs)
     else:
         kwargs_default = {'force_all_finite': True,
