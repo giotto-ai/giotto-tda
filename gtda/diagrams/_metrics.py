@@ -1,8 +1,9 @@
 # License: GNU AGPLv3
 
+from numbers import Real
+from types import FunctionType
+
 import numpy as np
-from ..externals.modules.gtda_bottleneck import bottleneck_distance
-from ..externals.modules.gtda_wasserstein import wasserstein_distance
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.ndimage import gaussian_filter
 from scipy.spatial.distance import cdist, pdist, squareform
@@ -10,23 +11,40 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import _num_samples
 
 from ._utils import _subdiagrams, _sample_image
+from ..externals.modules.gtda_bottleneck import bottleneck_distance
+from ..externals.modules.gtda_wasserstein import wasserstein_distance
+from ..utils.intervals import Interval
 
+_AVAILABLE_METRICS = {
+    'bottleneck': {
+        'delta': {'type': Real, 'in': Interval(0, 1, closed='both')}},
+    'wasserstein': {
+        'p': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'delta': {'type': Real, 'in': Interval(0, 1, closed='right')}},
+    'betti': {
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')}},
+    'landscape': {
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'n_layers': {'type': int, 'in': Interval(1, np.inf, closed='left')}},
+    'heat': {
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')}},
+    'persistence_image': {
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
+        'weight_function': {'type': FunctionType, 'in': None}},
+    'silhouette': {
+        'power': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')}}}
 
-def silhouettes(diagrams, sampling, order, **kwargs):
-    """Input: a batch of persistence diagrams with a sampling (3d array
-    returned by _bin) of a one-dimensional range.
-    """
-    sampling = np.transpose(sampling, axes=(1, 2, 0))
-    weights = np.diff(diagrams, axis=2)[:, :, [0]]
-    if order > 8.:
-        weights = weights/np.max(weights, axis=1, keepdims=True)
-    weights = weights**order
-    total_weights = np.sum(weights, axis=1)
-    midpoints = (diagrams[:, :, [1]] + diagrams[:, :, [0]]) / 2.
-    heights = (diagrams[:, :, [1]] - diagrams[:, :, [0]]) / 2.
-    fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
-    fibers_weighted_sum = np.sum(weights*fibers, axis=1)/total_weights
-    return fibers_weighted_sum
+_AVAILABLE_AMPLITUDE_METRICS = _AVAILABLE_METRICS.copy()
+for metric in ['bottleneck', 'wasserstein']:
+    _AVAILABLE_AMPLITUDE_METRICS[metric].pop('delta')
 
 
 def betti_curves(diagrams, sampling):
@@ -74,17 +92,6 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
-def silhouette_distances(diagrams_1, diagrams_2, sampling, step_size,
-                         p=2., **kwargs):
-    silhouette_1 = silhouettes(diagrams_1, sampling, p)
-    if np.array_equal(diagrams_1, diagrams_2):
-        unnorm_dist = squareform(pdist(silhouette_1, 'minkowski', p=p))
-    else:
-        silhouette_2 = silhouettes(diagrams_2, sampling, p)
-        unnorm_dist = cdist(silhouette_1, silhouette_2, 'minkowski', p=p)
-    return (step_size ** (1 / p)) * unnorm_dist
-
-
 def persistence_images(diagrams, sampling, step_size, weights, sigma):
     persistence_images_ = np.zeros((diagrams.shape[0],
                                     sampling.shape[0], sampling.shape[0]))
@@ -117,6 +124,37 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
     return persistence_images_
 
 
+def silhouettes(diagrams, sampling, power, **kwargs):
+    """Input: a batch of persistence diagrams with a sampling (3d array
+    returned by _bin) of a one-dimensional range.
+    """
+    sampling = np.transpose(sampling, axes=(1, 2, 0))
+    weights = np.diff(diagrams, axis=2)[:, :, [0]]
+    if power > 8.:
+        weights = weights/np.max(weights, axis=1, keepdims=True)
+    weights = weights**power
+    total_weights = np.sum(weights, axis=1)
+    midpoints = (diagrams[:, :, [1]] + diagrams[:, :, [0]]) / 2.
+    heights = (diagrams[:, :, [1]] - diagrams[:, :, [0]]) / 2.
+    fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
+    fibers_weighted_sum = np.sum(weights*fibers, axis=1)/total_weights
+    return fibers_weighted_sum
+
+
+def bottleneck_distances(diagrams_1, diagrams_2, delta=0.01, **kwargs):
+    return np.array([[bottleneck_distance(
+        diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
+        diagram_2[diagram_2[:, 0] != diagram_2[:, 1]],
+        delta) for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
+
+
+def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
+    return np.array([[wasserstein_distance(
+        diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
+        diagram_2[diagram_2[:, 0] != diagram_2[:, 1]],
+        p, delta,) for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
+
+
 def betti_distances(diagrams_1, diagrams_2, sampling,
                     step_size, p=2.0, **kwargs):
     betti_curves_1 = betti_curves(diagrams_1, sampling)
@@ -131,7 +169,7 @@ def betti_distances(diagrams_1, diagrams_2, sampling,
 
 
 def landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
-                        p=2.0, n_layers=1, **kwargs):
+                        p=2., n_layers=1, **kwargs):
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
@@ -150,22 +188,8 @@ def landscape_distances(diagrams_1, diagrams_2, sampling, step_size,
     return (step_size ** (1 / p)) * unnorm_dist
 
 
-def bottleneck_distances(diagrams_1, diagrams_2, delta=0.01, **kwargs):
-    return np.array([[bottleneck_distance(
-        diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
-        diagram_2[diagram_2[:, 0] != diagram_2[:, 1]],
-        delta) for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
-
-
-def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
-    return np.array([[wasserstein_distance(
-        diagram_1[diagram_1[:, 0] != diagram_1[:, 1]],
-        diagram_2[diagram_2[:, 0] != diagram_2[:, 1]],
-        p, delta,) for diagram_2 in diagrams_2] for diagram_1 in diagrams_1])
-
-
 def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
-                   sigma=1.0, p=2.0, **kwargs):
+                   sigma=1., p=2., **kwargs):
     heat_1 = heats(diagrams_1, sampling, step_size, sigma).reshape(
         diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
@@ -178,7 +202,7 @@ def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
 
 
 def persistence_image_distances(diagrams_1, diagrams_2, sampling, step_size,
-                                weight_function=lambda x: x, sigma=1.0, p=2.0,
+                                weight_function=lambda x: x, sigma=1., p=2.,
                                 **kwargs):
     sampling_ = np.copy(sampling.reshape((-1,)))
     weights = weight_function(sampling_ - sampling_[0])
@@ -194,6 +218,17 @@ def persistence_image_distances(diagrams_1, diagrams_2, sampling, step_size,
                                                  diagrams_2.shape[0], -1)
     unnorm_dist = cdist(persistence_image_1, persistence_image_2,
                         "minkowski", p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
+
+
+def silhouette_distances(diagrams_1, diagrams_2, sampling, step_size,
+                         power=2., p=2., **kwargs):
+    silhouette_1 = silhouettes(diagrams_1, sampling, power)
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(silhouette_1, 'minkowski', p=p))
+    else:
+        silhouette_2 = silhouettes(diagrams_2, sampling, power)
+        unnorm_dist = cdist(silhouette_1, silhouette_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
 
@@ -244,9 +279,14 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
     return distance_matrices
 
 
-def silhouette_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
-    sht = silhouettes(diagrams, sampling, p)
-    return (step_size ** (1 / p)) * np.linalg.norm(sht, axis=1, ord=p)
+def bottleneck_amplitudes(diagrams, **kwargs):
+    dists_to_diago = np.sqrt(2) / 2.0 * (diagrams[:, :, 1] - diagrams[:, :, 0])
+    return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
+
+
+def wasserstein_amplitudes(diagrams, p=2.0, **kwargs):
+    dists_to_diago = np.sqrt(2) / 2.0 * (diagrams[:, :, 1] - diagrams[:, :, 0])
+    return np.linalg.norm(dists_to_diago, axis=1, ord=p)
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2.0, **kwargs):
@@ -261,16 +301,6 @@ def landscape_amplitudes(diagrams, sampling, step_size, p=2.0, n_layers=1,
     return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
 
-def bottleneck_amplitudes(diagrams, **kwargs):
-    dists_to_diago = np.sqrt(2) / 2.0 * (diagrams[:, :, 1] - diagrams[:, :, 0])
-    return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
-
-
-def wasserstein_amplitudes(diagrams, p=2.0, **kwargs):
-    dists_to_diago = np.sqrt(2) / 2.0 * (diagrams[:, :, 1] - diagrams[:, :, 0])
-    return np.linalg.norm(dists_to_diago, axis=1, ord=p)
-
-
 def heat_amplitudes(diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs):
     heat = heats(diagrams, sampling, step_size, sigma)
     return np.linalg.norm(heat, axis=(1, 2), ord=p)
@@ -282,6 +312,12 @@ def persistence_image_amplitudes(diagrams, sampling, step_size,
     persistence_image = persistence_images(diagrams, sampling, step_size,
                                            weight_function, sigma)
     return np.linalg.norm(persistence_image, axis=(1, 2), ord=p)
+
+
+def silhouette_amplitudes(diagrams, sampling, step_size, power=2., p=2.,
+                          **kwargs):
+    sht = silhouettes(diagrams, sampling, power)
+    return (step_size ** (1 / p)) * np.linalg.norm(sht, axis=1, ord=p)
 
 
 implemented_amplitude_recipes = {
@@ -301,8 +337,7 @@ def _arrays_wrapper(amplitude_func, amplitude_arrays, slice_, dim,
                                                         **kwargs)
 
 
-def _parallel_amplitude(X, metric, metric_params,
-                        homology_dimensions, n_jobs):
+def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
     amplitude_func = implemented_amplitude_recipes[metric]
     effective_metric_params = metric_params.copy()
     none_dict = {dim: None for dim in homology_dimensions}
