@@ -55,8 +55,12 @@ all-gh:
 	fi
 	@make github
 
+gh-stage:
+	@cd "$(CURRENTDOCFOLDER)"; git add --all;
+
 gh-commit:
-	@cd "$(CURRENTDOCFOLDER)"; git add $(VERSION)/. ; git commit -a -m "Update docs"; git push origin
+	@make gh-stage
+	@cd "$(CURRENTDOCFOLDER)"; git commit -a -m "Update docs"; git push origin
 
 sphinx-gal:
 	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done
