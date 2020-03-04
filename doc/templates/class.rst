@@ -1,12 +1,9 @@
 {{objname}}
 {{ underline }}==============
-..
-    :mod:{{objname}}
-    {{ underline }}==============
 
-.. currentmodule:: {{ module }}
+.. currentmodule:: {{module}}
 
-.. autoclass:: {{ objname }}
+.. autoclass:: {{objname}}
 
    {% block methods %}
    .. automethod:: __init__
@@ -14,7 +11,7 @@
 
 ..
    Exclude sphinx-gallery generated examples since we use binder for now
-   include:: {{module}}.{{objname}}.examples
+   include:: {{module}}.{{objname}}.{{examples}}
 
 .. raw:: html
 

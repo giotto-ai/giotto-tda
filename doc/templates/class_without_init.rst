@@ -5,11 +5,11 @@
     :mod:`{{module}}`.{{objname}}
     {{ underline }}==============
 
-.. currentmodule:: {{ module }}
+.. currentmodule:: {{module}}
 
-.. autoclass:: {{ objname }}
+.. autoclass:: {{objname}}
 
-.. include:: {{module}}.{{objname}}.examples
+.. include:: {{module}}.{{objname}}.{{examples}}
 
 .. raw:: html
 
