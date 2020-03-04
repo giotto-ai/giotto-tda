@@ -1,10 +1,10 @@
-
+############
 Installation
-============
-.. contents::
+############
 
+************
 Dependencies
-^^^^^^^^^^^^
+************
 
 The latest stable version of giotto-tda requires:
 
@@ -20,8 +20,10 @@ The latest stable version of giotto-tda requires:
 
 To run the examples, jupyter is required.
 
+
+*****************
 User installation
-^^^^^^^^^^^^^^^^^
+*****************
 
 The simplest way to install giotto-tda is using ``pip``   ::
 
@@ -41,8 +43,9 @@ release) and hence does not require any C++ dependencies. As the main library mo
 both the stable and nightly versions, giotto-tda and giotto-tda-nightly should not be installed in
 the same environment.
 
+**********************
 Developer installation
-^^^^^^^^^^^^^^^^^^^^^^
+**********************
 
 For information about the developer installation, please refer to :ref:`Contributing guidelines <contrib>`.
 
