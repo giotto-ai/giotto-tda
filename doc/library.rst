@@ -1,6 +1,6 @@
-######################
-The Giotto-TDA library
-######################
+########
+Overview
+########
 
 **A high performance topological machine learning toolbox in Python.**
 
@@ -30,9 +30,19 @@ Guiding principles
 30s guide to Giotto-TDA
 ***********************
 
+For installation instructions, see :ref:`the developer installation instructions <installation>`.
+
 The `post <https://towardsdatascience.com/getting-started-with-giotto-learn-a-python-library-for-topological-machine-learning-451d88d2c4bc>`_
 by Lewis Tunstall provides a general overview of the library.
 
 The mapper notebook, :doc:`included in the documentation <notebooks/mapper_quickstart.rst>`,
 provides a comprehensive introduction to mapper.
 
+**********
+What's new
+**********
+
+.. include::
+   release.rst
+   :start-after: Release 0.1.4
+   :end-before: Release 0.1.3

@@ -8,17 +8,17 @@ This pages contains a list of available features in the library.
 .. toctree::
    :maxdepth: 3
 
-   modules/mapper.rst
-   modules/homology.rst
-   modules/diagrams.rst
-   modules/point_clouds.rst
-   modules/time_series.rst
-   modules/graphs.rst
-   modules/base.rst
-   modules/pipeline.rst
-   modules/meta_transformers.rst
-   modules/validation.rst
-   modules/images.rst
+   mapper.rst
+   homology.rst
+   diagrams.rst
+   point_clouds.rst
+   time_series.rst
+   graphs.rst
+   base.rst
+   pipeline.rst
+   meta_transformers.rst
+   validation.rst
+   images.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning

@@ -11,5 +11,8 @@ Contents
 
    library
    installation
-   api
+   modules/index
+   theory/glossary
+   contributing
+   release
    faq
