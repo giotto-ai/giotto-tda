@@ -98,8 +98,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'max_edge_length': [numbers.Number],
-                        'infinity_values_': [numbers.Number],
+    _hyperparameters = {'max_edge_length': [numbers.Number, None],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
@@ -304,8 +304,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {'epsilon': [numbers.Number, (0., 1.)],
-                        'max_edge_length': [numbers.Number],
-                        'infinity_values_': [numbers.Number],
+                        'max_edge_length': [numbers.Number, None],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
@@ -438,6 +438,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `Cech filtrations <https://giotto.ai/theory>`_.
+
     Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
     information about the appearance and disappearance of topological
     features (technically, `homology classes <https://giotto.ai/theory>`_) of
@@ -498,8 +499,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         cohomology.html>`_.
 
     """
-    _hyperparameters = {'max_edge_length': [numbers.Number],
-                        'infinity_values_': [numbers.Number],
+    _hyperparameters = {'max_edge_length': [numbers.Number, None],
+                        'infinity_values_': [numbers.Number, None],
                         '_homology_dimensions': [list, [int, (0, np.inf)]],
                         'coeff': [int, (2, np.inf)]}
 
