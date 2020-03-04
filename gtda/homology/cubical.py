@@ -37,7 +37,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         default: ``np.zeros((n_dimensions, ), dtype=np.bool)``
         Periodicity of the boundaries along each of the axis, where
         ``n_dimensions`` is the dimension of the images of the collection. The
-        boolean in the `d`th position expresses whether the boundaries along
+        boolean in the `d`-th position expresses whether the boundaries along
         the `d`th axis are periodic. By default, none of the boundaries are
         periodic.
 

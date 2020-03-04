@@ -723,7 +723,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
     spaced locations from appropriate ranges
     of the :ref:`filtration parameter <filtered>`.
 
-     Parameters
+    Parameters
     ----------
     order: float, optional, default: ``1.``
         The power to which persistence values are raised to define the

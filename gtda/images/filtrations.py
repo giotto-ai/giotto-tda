@@ -550,7 +550,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         return Xe
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:`max_value_`from a
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
         collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
