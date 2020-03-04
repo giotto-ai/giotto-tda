@@ -44,7 +44,7 @@ This allows you to jump in the familiar way of generating features from your dat
   from gtda.homology import VietorisRipsPersistence
   vietorisrips_tr = VietorisRipsPersistence()
 
-which calculates :ref:` persistent diagrams <persistence diagram>` from a :ref:`point cloud <finite metric spaces and point clouds>`.
+which calculates :ref:`persistent diagrams <persistence diagram>` from a :ref:`point cloud <finite metric spaces and point clouds>`.
 
 .. code-block:: python
 
@@ -87,7 +87,7 @@ Use cases
 =========
 
 A selection of use cases that we worked on are available as github repositories and some of them are published as posts on Medium.
-Please refer to `github <https://github.com/giotto-ai>` or the `L2F website <https://giotto.ai/learn/course-content>` for a summary.
+Please refer to `github <https://github.com/giotto-ai>`_ or the `L2F website <https://giotto.ai/learn/course-content>`_ for a summary.
 
 Mapper notebook
 ======================

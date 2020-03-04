@@ -1,3 +1,4 @@
+
 #############
 Release Notes
 #############
@@ -178,11 +179,11 @@ The following submodules where added:
 
 Bug Fixes
 =========
-
+None
 
 Backwards-Incompatible Changes
 ==============================
-
+None
 
 Thanks to our Contributors
 ==========================
