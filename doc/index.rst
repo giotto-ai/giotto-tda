@@ -1,5 +1,5 @@
 ########################
-Giotto-tda documentation
+Giotto-TDA documentation
 ########################
 
 ********
@@ -12,6 +12,7 @@ Contents
    library
    installation
    modules/index
+   notebooks/index
    theory/glossary
    contributing
    release
