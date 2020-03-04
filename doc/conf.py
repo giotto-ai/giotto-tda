@@ -104,6 +104,7 @@ master_doc = 'index'
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
     '**neural_network**',
+    'templates/*.rst'
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -131,12 +132,11 @@ html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
     'collapse_navigation': False,
-    'sticky_navigation': False,
+    'sticky_navigation': True,
     'logo_only': True,
-    'github_url': 'https://github.com/giotto-ai/giotto-tda',
 }
 
-path_to_image = 'images/tda_logo.svg'
+path_to_image = "images/tda_logo.svg"
 if not(os.path.exists(path_to_image)):
     import requests
     r = requests.get('https://www.giotto.ai/static/vector/logo-tda.svg')
