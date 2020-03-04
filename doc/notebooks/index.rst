@@ -1,11 +1,12 @@
+##########################################
+Examples, tutorials and plotting utilities
+##########################################
+
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width: 850
 
-==========================================
-Examples, tutorials and plotting utilities
-==========================================
-
-In this folder you can find basic tutorials and examples to get started quickly with giotto-tda. Additionally, ``plotting.py`` contains utilities for plotting the outputs of several computations you can perform with giotto-tda.
+This page contains examples and is composed of two parts. First, a more comprehensive view of how the API can be used in simple, synthetic examples,
+with an intuitive explanation of topological techniques. Second, more advanced examples showcasing basic academic applications.
 
 .. include:: mapper_quickstart.rst
    :end-before: Import libraries

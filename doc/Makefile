@@ -50,13 +50,13 @@ all-gh:
 	@make theory-gl
 	@if ($(RUNNOTEBOOKS)); then\
 	   cp ../examples/*.ipynb notebooks/;\
-	   cp ../examples/plotting.py notebooks/;\
+	   cp ../examples/*.py notebooks/;\
 	   make convert-notebooks;\
 	fi
 	@make github
 
 gh-commit:
-	@cd "$(CURRENTDOCFOLDER)"; git add $(VERSION)/.; git commit -a -m "Update docs"; git push origin
+	@cd "$(CURRENTDOCFOLDER)"; git add $(VERSION)/. ; git commit -a -m "Update docs"; git push origin
 
 sphinx-gal:
 	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done
