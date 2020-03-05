@@ -42,9 +42,14 @@ _AVAILABLE_METRICS = {
         'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
         'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')}}}
 
-_AVAILABLE_AMPLITUDE_METRICS = _AVAILABLE_METRICS.copy()
-for metric in ['bottleneck', 'wasserstein']:
-    _AVAILABLE_AMPLITUDE_METRICS[metric].pop('delta')
+_AVAILABLE_AMPLITUDE_METRICS = dict()
+for metric, metric_params in _AVAILABLE_METRICS.items():
+    if metric not in ['bottleneck', 'wasserstein']:
+        _AVAILABLE_AMPLITUDE_METRICS[metric] = metric_params.copy()
+    else:
+        _AVAILABLE_AMPLITUDE_METRICS[metric] = \
+            {name: descr for name, descr in metric_params.items()
+             if name != 'delta'}
 
 
 def betti_curves(diagrams, sampling):
