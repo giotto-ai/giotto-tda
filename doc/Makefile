@@ -44,6 +44,7 @@ convert-notebooks:
 clean-gh:
 	@make clean
 	@rm -f theory/glossary.rst
+	@make gh-remove
 
 all-gh:
 	@make clean-gh
@@ -54,6 +55,9 @@ all-gh:
 	   make convert-notebooks;\
 	fi
 	@make github
+
+gh-remove:
+	@cd $(GITDIR); rm -rfv $(VERSION) && mkdir $(VERSION)
 
 gh-stage:
 	@cd "$(CURRENTDOCFOLDER)"; git add --all;
