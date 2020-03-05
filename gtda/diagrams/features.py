@@ -412,7 +412,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    sigma : float, optional default ``1.0``
+    sigma : float, optional default ``1.``
         Standard deviation for Gaussian kernel.
 
     n_bins : int, optional, default: ``100``
@@ -462,7 +462,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
         'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')}}
 
-    def __init__(self, sigma=1.0, n_bins=100, n_jobs=None):
+    def __init__(self, sigma=1., n_bins=100, n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins
         self.n_jobs = n_jobs
@@ -561,7 +561,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    sigma : float, optional default ``1.0``
+    sigma : float, optional default ``1.``
         Standard deviation for Gaussian kernel.
 
     n_bins : int, optional, default: ``100``
@@ -625,7 +625,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
         'weight_function': {'type': (types.FunctionType, type(None))}}
 
-    def __init__(self, sigma=1.0, n_bins=100, weight_function=None,
+    def __init__(self, sigma=1., n_bins=100, weight_function=None,
                  n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins

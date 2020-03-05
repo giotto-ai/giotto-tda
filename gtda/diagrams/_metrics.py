@@ -63,8 +63,8 @@ def betti_curves(diagrams, sampling):
 def landscapes(diagrams, sampling, n_layers):
     n_points = diagrams.shape[1]
 
-    midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) / 2.0
-    heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.0
+    midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) / 2.
+    heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
     top_pos = range(-min(n_layers, n_points), 0)
     fibers.partition(top_pos, axis=2)
@@ -161,7 +161,7 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
 
 
 def betti_distances(diagrams_1, diagrams_2, sampling,
-                    step_size, p=2.0, **kwargs):
+                    step_size, p=2., **kwargs):
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(betti_curves_1,
@@ -285,34 +285,34 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
 
 
 def bottleneck_amplitudes(diagrams, **kwargs):
-    dists_to_diago = np.sqrt(2) / 2.0 * (diagrams[:, :, 1] - diagrams[:, :, 0])
+    dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
 
 
-def wasserstein_amplitudes(diagrams, p=2.0, **kwargs):
-    dists_to_diago = np.sqrt(2) / 2.0 * (diagrams[:, :, 1] - diagrams[:, :, 0])
+def wasserstein_amplitudes(diagrams, p=2., **kwargs):
+    dists_to_diago = np.sqrt(2) / 2. * (diagrams[:, :, 1] - diagrams[:, :, 0])
     return np.linalg.norm(dists_to_diago, axis=1, ord=p)
 
 
-def betti_amplitudes(diagrams, sampling, step_size, p=2.0, **kwargs):
+def betti_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
     bcs = betti_curves(diagrams, sampling)
     return (step_size ** (1 / p)) * np.linalg.norm(bcs, axis=1, ord=p)
 
 
-def landscape_amplitudes(diagrams, sampling, step_size, p=2.0, n_layers=1,
+def landscape_amplitudes(diagrams, sampling, step_size, p=2., n_layers=1,
                          **kwargs):
     ls = landscapes(diagrams, sampling, n_layers).reshape(len(diagrams),
                                                           -1)
     return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
 
-def heat_amplitudes(diagrams, sampling, step_size, sigma=1.0, p=2.0, **kwargs):
+def heat_amplitudes(diagrams, sampling, step_size, sigma=1., p=2., **kwargs):
     heat = heats(diagrams, sampling, step_size, sigma)
     return np.linalg.norm(heat, axis=(1, 2), ord=p)
 
 
 def persistence_image_amplitudes(diagrams, sampling, step_size,
-                                 weight_function=lambda x: x, sigma=1.0, p=2.0,
+                                 weight_function=lambda x: x, sigma=1., p=2.,
                                  **kwargs):
     persistence_image = persistence_images(diagrams, sampling, step_size,
                                            weight_function, sigma)

@@ -372,7 +372,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.0
+        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
         Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
         return Xpts
 

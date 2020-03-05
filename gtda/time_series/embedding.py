@@ -349,7 +349,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         distance = distances[:, 1]
         X_first_nbhrs = X[indices[:, 1]]
 
-        epsilon = 2.0 * np.std(X)
+        epsilon = 2. * np.std(X)
         tolerance = 10
 
         neg_dim_delay = - dimension * time_delay
