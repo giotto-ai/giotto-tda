@@ -58,7 +58,7 @@ EXTRAS_REQUIRE = {
         'flake8',
         'hypothesis'],
     'doc': [
-        'openml'
+        'openml',
         'sphinx',
         'nbconvert',
         'sphinx-issues',
