@@ -9,6 +9,9 @@ from gtda.utils.validation import check_diagram, validate_params
 
 # Testing for validate_params
 def test_validate_params():
+    """These tests should fail because either the type of parameters[
+    parameter_name] is incorrect, or because parameter not in references[
+    parameter_name]['in']."""
     references = {'par1': {'type': int, 'in': [0, 1]}}
     parameters = {'par1': 0.5}
 
@@ -26,6 +29,9 @@ def test_validate_params():
 
 # Testing for validate_params when one of the parameters is of list type
 def test_validate_params_list():
+    """Test the behaviour of validate_params on parameters which are of list
+    type. Each entry in the list should satisfy the constraints described by
+    references[parameter_name]['of']."""
     references = {
         'par1': {'type': list, 'of': {'type': float, 'in': [1., 2.]}}
     }
