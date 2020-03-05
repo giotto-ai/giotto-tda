@@ -65,7 +65,8 @@ Similarly, we remove `theory/glossary.rst`, which might have been geenerated by 
 Theory
 ------
 
-**This step requires `pandoc` as an additional dependency.
+**This step requires `pandoc` and `pandoc-citeproc` as additional dependencies.**
+
 The glossary `theory/glossary.tex` contains the mathematical definitions of the functionalities
 and the terms used throughout the documentation.
 

@@ -26,6 +26,18 @@ EXAMPLESDIR  = ../examples
 
 CURRENTDOCFOLDER = $(GITDIR)/$(VERSION)
 
+REQUIRED="pandoc pandoc-citeproc jupyter"
+
+check_installs:
+	@for cmd in ${REQUIRED};\
+	do
+		if ! command -v ${cmd} 2> /dev/null;\
+		then
+			echo Please install ${cmd}!;\
+			exit 1
+		fi;\
+	done;
+
 togit:
 	@mkdir -p "$(CURRENTDOCFOLDER)"
 	@cp -a build/html/ "$(CURRENTDOCFOLDER)"
