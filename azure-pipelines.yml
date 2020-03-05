@@ -12,7 +12,8 @@ jobs:
   variables:
     EXECUTE: 'true'
     GITDIR: ../gtda-docs
-    VERSION: stable
+    RUNNOTEBOOKS: TRUE
+    VERSION: master
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
@@ -41,7 +42,7 @@ jobs:
     displayName: "Clone the docs repo"
 
   - script: |
-      install weird stuff (pandoc???)
+      brew install pandoc pandoc-citeproc
     displayName: 'Install additional stuff to build docs'
 
   - script:
@@ -54,6 +55,8 @@ jobs:
       cd $GITDIR
       git config --local user.name "Azure Pipelines"
       git config --local user.email "azuredevops@microsoft.com"
+      git commit -m "Update docs - AZURE"
+      git push origin master
     displayName:  'Commit the docs'
     failOnStderr: false
 
@@ -62,17 +65,17 @@ jobs:
   #    secureFile: deploy_key
   #  displayName: 'Get the deploy key'
 
-  - script: |
-      cd $GITDIR
-      mkdir ~/.ssh && mv $DOWNLOADSECUREFILE_SECUREFILEPATH ~/.ssh/id_rsa
-      chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa
-      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-      git remote set-url --push origin git@github.com:giotto-ai/giotto-tda.git
-      git push origin HEAD:master
-    displayName: 'Publish GitHub Pages'
-    condition: |
-      and(not(eq(variables['Build.Reason'], 'PullRequest')),
-          eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#  - script: |
+#      cd $GITDIR
+#      mkdir ~/.ssh && mv $DOWNLOADSECUREFILE_SECUREFILEPATH ~/.ssh/id_rsa
+#      chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa
+#      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+#      git remote set-url --push origin git@github.com:giotto-ai/giotto-tda.git
+#      git push origin HEAD:master
+#    displayName: 'Publish GitHub Pages'
+#    condition: |
+#      and(not(eq(variables['Build.Reason'], 'PullRequest')),
+#          eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
 
 #- job: 'manylinux2010'
