@@ -65,10 +65,11 @@ Similarly, we remove `theory/glossary.rst`, which might have been geenerated by 
 Theory
 ------
 
+**This step requires `pandoc` as an additional dependency.
 The glossary `theory/glossary.tex` contains the mathematical definitions of the functionalities
 and the terms used throughout the documentation.
 
-The document, along with the bibliography, is converted to an `.rst`, using pandoc.
+The document, along with the bibliography, is converted to an `.rst`, using `pandoc`.
 It is included in the main `toctree` of the documentation.
 The only purpose and use of `theory/before_glossary.rst` is to have the reference/hyperlink.
 

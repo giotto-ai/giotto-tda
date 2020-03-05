@@ -14,7 +14,7 @@ VERSION = stable
 endif
 
 ifndef RUNNOTEBOOKS
-RUNNOTEBOOKS=FALSE
+RUNNOTEBOOKS=TRUE
 endif
 
 ########## Constant config
