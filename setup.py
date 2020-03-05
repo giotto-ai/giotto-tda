@@ -59,7 +59,7 @@ EXTRAS_REQUIRE = {
         'hypothesis'],
     'doc': [
         'sphinx',
-        'sphinx-gallery',
+        'nbconvert',
         'sphinx-issues',
         'sphinx_rtd_theme',
         'numpydoc'],

@@ -47,27 +47,6 @@ extensions = [
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
 
-# ipypublish.sphinx.notebook
-source_suffix = {
-    '.ipynb': 'jupyter_notebook',
-}
-numfig = True
-math_numfig = True
-numfig_secnum_depth = 2
-
-math_number_all = True
-
-
-# Sphinx-nbexamples
-process_examples = True
-example_gallery_config = dict(
-    examples_dirs='../examples/',
-    gallery_dirs='gallery_nb',
-    pattern='*.ipynb',
-
-)
-
-
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_class_members_toctree = True
