@@ -49,5 +49,5 @@ the same environment.
 Developer installation
 **********************
 
-For information about the developer installation, please refer to :ref:`Contributing guidelines <contrib>`.
+For information about the developer installation, please refer to :ref:`Contributing guidelines <dev_installation>`.
 

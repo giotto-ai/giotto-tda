@@ -14,6 +14,6 @@ Contents
    modules/index
    notebooks/index
    theory/glossary
-   contributing
+   contributing/index
    release
    faq
