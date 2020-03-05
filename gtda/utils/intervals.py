@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real
+from operator import le, lt
 
 
 def _interval_like(other):

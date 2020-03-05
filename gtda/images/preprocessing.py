@@ -297,8 +297,6 @@ class Padder(BaseEstimator, TransformerMixin):
         else:
             self.paddings_ = self.paddings
 
-
-
         self._pad_width = ((0, 0),
                            *[(self.paddings_[axis], self.paddings_[axis])
                              for axis in range(n_dimensions)])
