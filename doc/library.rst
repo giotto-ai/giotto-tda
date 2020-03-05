@@ -10,6 +10,8 @@ scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the 
 
 **Read our paper on arXiv!**
 
+.. _guiding_principles:
+
 ******************
 Guiding principles
 ******************
