@@ -151,7 +151,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         if self.periodic_dimensions is None or \
            np.sum(self.periodic_dimensions) == 0:
             self._filtration = CubicalComplex
-            self.periodic_dimensions_ = np.zeros((len(X) - 1,), dtype=np.bool)
+            self.periodic_dimensions_ = np.zeros(len(X) - 1, dtype=np.bool)
         else:
             self._filtration = PeriodicCubicalComplex
             self.periodic_dimensions_ = np.array(self.periodic_dimensions,

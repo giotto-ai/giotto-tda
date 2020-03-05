@@ -305,7 +305,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.center is None:
-            self.center_ = np.zeros((self.n_dimensions_,))
+            self.center_ = np.zeros(self.n_dimensions_)
         else:
             self.center_ = np.copy(self.center)
         self.center_ = self.center_.reshape((1, -1))
