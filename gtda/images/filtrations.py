@@ -3,6 +3,7 @@
 
 from numbers import Real
 from types import FunctionType
+from warnings import warn
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -109,10 +110,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{self.n_dimensions_} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -300,10 +299,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{self.n_dimensions_} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -462,10 +459,8 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if (n_dimensions < 2) or (n_dimensions > 3):
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{n_dimensions} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -605,10 +600,8 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if (n_dimensions < 2) or (n_dimensions > 3):
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{n_dimensions} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -758,10 +751,8 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if (n_dimensions < 2) or (n_dimensions > 3):
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{n_dimensions} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 

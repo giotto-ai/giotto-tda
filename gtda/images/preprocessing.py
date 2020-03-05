@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real
+from warnings import warn
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -91,10 +92,8 @@ class Binarizer(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{self.n_dimensions_} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -281,10 +280,8 @@ class Padder(BaseEstimator, TransformerMixin):
         check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{n_dimensions} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -293,7 +290,7 @@ class Padder(BaseEstimator, TransformerMixin):
         elif len(self.paddings) != n_dimensions:
             raise ValueError(
                 f"`paddings` has length {self.paddings} while the input "
-                f"data requires it to have length equal to {n_dimensions}")
+                f"data requires it to have length equal to {n_dimensions}.")
         else:
             self.paddings_ = self.paddings
 
@@ -402,10 +399,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
-            raise ValueError(
-                f"Input of `fit` must be a collection of 2D or 3D arrays "
-                f"representing images. Arrays of dimension "
-                f"{n_dimensions} detected.")
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
 
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
