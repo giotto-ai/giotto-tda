@@ -8,7 +8,7 @@ def check_diagram(X, copy=False):
     """Input validation on a persistence diagram.
 
     """
-    if len(X.shape) != 3:
+    if X.ndim != 3:
         raise ValueError(f"X should be a 3d np.array: X.shape = {X.shape}.")
     if X.shape[2] != 3:
         raise ValueError(
@@ -63,8 +63,8 @@ def _validate_params_single(parameter, reference, name):
             f"Parameter `{name}` is of type {type(parameter)} while "
             f"it should be of type {ref_type}.")
 
-    # If the reference type parameter is not list or tuple, the checks are
-    # performed on the parameter object directly. Note: ref_type can be
+    # If the reference type parameter is not list, tuple, np.ndarray or dict,
+    # the checks are performed on the parameter object directly.
     elif ref_type not in [list, tuple, np.ndarray, dict]:
         ref_in = reference.get('in', None)
         ref_other = reference.get('other', None)
@@ -77,16 +77,14 @@ def _validate_params_single(parameter, reference, name):
         if ref_other is not None:
             return ref_other(parameter)
 
-    # Explicitly return a boolean flag to indicate that checks must be
-    # performed recursively at deeper layers
+    # Explicitly return the type of reference if one of list, tuple, np.ndarray
+    # or dict.
     else:
         return ref_type
 
 
 def _validate_params(parameters, references, rec_name=None):
     for name, parameter in parameters.items():
-        if name == 'n_jobs':
-            continue
         if name not in references.keys():
             name_extras = "" if rec_name is None else f" in `{rec_name}`"
             raise KeyError(
@@ -99,49 +97,54 @@ def _validate_params(parameters, references, rec_name=None):
             ref_of = reference.get('of', None)
             if ref_type == dict:
                 _validate_params(parameter, ref_of, rec_name=name)
-            else:  # List or tuple type
+            else:  # List, tuple or ndarray type
                 for i, parameter_elem in enumerate(parameter):
                     _validate_params_single(
                         parameter_elem, ref_of, f"{name}[{i}]")
 
 
 def validate_params(parameters, references, exclude=None):
-    """Function to automate the validation of hyperparameters.
+    """Function to automate the validation of (hyper)parameters.
 
     Parameters
     ----------
     parameters : dict, required
-        Dictionary in which the keys are hyperparameter names and the
-        corresponding values are hyperparameter values.
+        Dictionary in which the keys parameter names (as strings) and the
+        corresponding values are parameter values. Unless `exclude` (see
+        below) contains some of the keys in this dictionary, all parameters
+        are checked against `references`.
 
     references : dict, required
-        Dictionary in which the keys are hyperparameter names and the
-        corresponding values are lists. The first element of that list is a
-        type. If that type is not one of ``list``, ``tuple`` or
-        ``numpy.ndarray``, the second element can be one of:
+        Dictionary in which the keys are parameter names (as strings). The
+        value ``reference`` corresponding to a key ``name`` is a dictionary
+        responsible for checking the value ``parameter`` in `parameters`
+        corresponding to ``name``, and containing any of the following keys:
 
-        - ``None``, when only the type should be checked.
-        - A tuple of two numbers, when the type is numerical. In this case,
-          the first (resp. second) entry in the tuple defines a lower
-          (resp. upper) bound constraining the value of the corresponding
-          hyperparameter.
-        - A list containing all possible allowed values for the
-          corresponding hyperparameter.
+        - ``'type'``, mapping to a class or tuple of classes. ``parameter``
+          is checked to be an instance of this class or tuple of classes.
 
-        If that type is one of ``list``,``tuple`` or ``numpy.ndarray``,
-        the second element is a list that provides information to validate
-        each element of that iterable. The first element of that list is the
-        type of the elements of the iterable and the second element of that
-        list can be one of:
+        - ``'in'``, when the value of ``'type'`` is not one of ``list``,
+          ``tuple``, ``numpy.ndarray`` or ``dict``. If the corresponding value
+          is ``ref_in`` the following check is performed on ``parameter``:
+          ``parameter in ref_in``.
 
-        - ``None``, when only the type of the iterable elements should be
-          checked.
-        - A tuple of two numbers, when the type is numerical. In this case,
-          the first (resp. second) entry in the tuple defines a lower
-          (resp. upper) bound constraining the value of the corresponding
-          iterable element.
-        - A list containing all possible allowed values for the
-          corresponding iterable element.
+        - ``'of'``, mapping to a dictionary ``ref_of``, when the value of
+          ``'type'`` is one of ``list``, ``tuple``, ``numpy.ndarray`` or
+          ``dict``. When the value of ``'type'`` is ``dict`` – meaning that
+          ``parameter`` should be a dictionary – ``ref_of`` should have a
+          similar structure as `references` and :func:`validate_params`
+          is called recursively on ``(parameter, ref_of)``. Otherwise,
+          ``ref_of`` should have a similar structure as ``reference`` and
+          each entry in ``parameter`` is checked to satisfy the constraints
+          in ``ref_of``.
+
+        - ``'other'``, which should map to a callable defining custom checks on
+          ``parameter``.
+
+    exclude : list of str, or None, optional, default: ``None``
+        List of parameter names which are among the keys in `parameters` but
+        should be excluded from validation. ``None`` is equivalent to
+        passing the empty list.
 
     """
     exclude_ = [] if exclude is None else exclude
