@@ -104,7 +104,8 @@ master_doc = 'index'
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
     '**neural_network**',
-    'templates/*.rst'
+    'templates/*.rst',
+    'theory/before_glossary.rst'
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
