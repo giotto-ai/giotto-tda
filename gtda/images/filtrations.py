@@ -274,8 +274,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         return Xr
 
     def fit(self, X, y=None):
-        """Calculate :attr:`center_`, :attr:'effective_metric_params_',
-        :attr:`n_dimensions_`, :attr:'mesh_' and :attr:`max_value_` from a
+        """Calculate :attr:`center_`, :attr:`effective_metric_params_`,
+        :attr:`n_dimensions_`, :attr:`mesh_` and :attr:`max_value_` from a
         collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
@@ -534,7 +534,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     ----------
     n_iterations : int or None, optional, default: ``None``
         Number of iterations in the erosion process. ``None`` means erosion
-       reaches all activated pixels.
+        reaches all activated pixels.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -576,7 +576,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         return Xe
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:`max_value_`from a
+        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
         collection of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence

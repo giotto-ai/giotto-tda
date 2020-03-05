@@ -358,8 +358,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
         n_dimensions)
         Mesh image for which each pixel value is its coordinates in a
-        `n_dimensions` space, where `n_dimensions` is the dimension of the
-        images of the input collection. Set in meth:`fit`.
+        ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
+        dimension of the images of the input collection. Set in meth:`fit`.
 
     See also
     --------
@@ -432,7 +432,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
             n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
-            point cloud in a `n_dimensions` dimensional space.
+            point cloud in ``n_dimensions``-dimensional space.
 
         """
         check_is_fitted(self)
