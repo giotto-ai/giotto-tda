@@ -38,13 +38,13 @@ are cloned in `/path/to/giotto-tda/` and `path/to/gtda-docs/`.
 
 Set the environment variable `GITDIR` to `path/to/gtda-docs/`, either directly in the console or editing the `Makefile`:
 
-.. code_block:: bash
+.. code-block:: bash
 
    GITDIR = path/to/gtda-docs/
 
 Then, generating the documentation, copying it to the `gtda-docs` repository and committing is done with:
 
-.. code_block:: bash
+.. code-block:: bash
 
    make all_gh
    make gh-commit
