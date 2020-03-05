@@ -1,15 +1,18 @@
 """Distance and amplitude calculations for persistence diagrams."""
 # License: GNU AGPLv3
 
+from numbers import Real
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import _parallel_pairwise, _parallel_amplitude
+from ._metrics import _AVAILABLE_METRICS, _AVAILABLE_AMPLITUDE_METRICS, \
+    _parallel_pairwise, _parallel_amplitude
 from ._utils import _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import (check_diagram, validate_params,
-                                validate_metric_params)
+from ..utils.intervals import Interval
+from ..utils.validation import check_diagram, validate_params
 
 
 @adapt_fit_transform_docs
@@ -118,7 +121,11 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'order': [float, (1, np.inf)]}
+    _hyperparameters = {
+        'metric': {'type': str, 'in': _AVAILABLE_METRICS.keys()},
+        'order': {'type': (Real, type(None)),
+                  'in': Interval(0, np.inf, closed='right')},
+        'metric_params': {'type': (dict, type(None))}}
 
     def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
@@ -152,20 +159,15 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
-
-        hyperparameters = self.get_params().copy()
-        if self.order is not None:
-            if isinstance(self.order, int):
-                hyperparameters['order'] = float(self.order)
-        else:
-            hyperparameters['order'] = 1.  # Automatically pass validate_params
-
-        validate_params(hyperparameters, self._hyperparameters)
-        validate_metric_params(self.metric, self.effective_metric_params_)
+        validate_params(
+            self.effective_metric_params_, _AVAILABLE_METRICS[self.metric])
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
@@ -321,7 +323,11 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'order': [float, (1, np.inf)]}
+    _hyperparameters = {
+        'metric': {'type': str, 'in': _AVAILABLE_AMPLITUDE_METRICS.keys()},
+        'order': {'type': (Real, type(None)),
+                  'in': Interval(0, np.inf, closed='right')},
+        'metric_params': {'type': (dict, type(None))}}
 
     def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
@@ -354,21 +360,17 @@ class Amplitude(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        X = check_diagram(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
+        validate_params(self.effective_metric_params_,
+                        _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        hyperparameters = self.get_params().copy()
-        if self.order is not None:
-            if isinstance(self.order, int):
-                hyperparameters['order'] = float(self.order)
-        else:
-            hyperparameters['order'] = 1.  # Automatically pass validate_params
-
-        validate_params(hyperparameters, self._hyperparameters)
-        validate_metric_params(self.metric, self.effective_metric_params_)
-        X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         self.effective_metric_params_['samplings'], \

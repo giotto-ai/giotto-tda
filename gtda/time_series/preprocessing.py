@@ -8,6 +8,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
@@ -37,7 +38,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
     """
 
-    _hyperparameters = {'period': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'period': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
 
     def __init__(self, period=2):
         self.period = period
@@ -61,8 +63,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
         check_array(X, ensure_2d=False, allow_nd=True)
+        validate_params(self.get_params(), self._hyperparameters)
 
         self._is_fitted = True
         return self
@@ -156,7 +158,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
 
     """
 
-    _hyperparameters = {'operation': [str, ['return', 'log-return']]}
+    _hyperparameters = {
+        'operation': {'type': str, 'in': ['return', 'log-return']}}
 
     def __init__(self, operation='return'):
         self.operation = operation
@@ -180,8 +183,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
         check_array(X, ensure_2d=False, allow_nd=True)
+        validate_params(self.get_params(), self._hyperparameters)
 
         self._is_fitted = True
         return self

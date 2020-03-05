@@ -1,16 +1,20 @@
 """Binary image filtration."""
 # License: GNU AGPLv3
 
-import numbers
+from numbers import Real
+from types import FunctionType
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
-from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import validate_params
+
 from ._utils import _dilate, _erode
+from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
+from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
@@ -26,10 +30,13 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    direction : ndarray of shape (n_dimensions, 1), optional, default:
-        ``np.ones(n_dimensions, 1)``
-        Direction of the height filtration, where ``n_dimensions`` is the
-        dimension of the images of the collection.
+    direction : ndarray of shape (n_dimensions,) or None, optional, default: \
+        ``None``
+        Direction vector of the height filtration in
+        ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
+        dimension of the images of the collection (2 or 3). ``None`` is
+        equivalent to passing ``numpy.ones(n_dimensions)``.
+
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -38,11 +45,11 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    direction_ : ndarray of shape (n_dimensions_, 1)
-        Effective direction of the height filtration. Set in :meth:`fit`.
-
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
+
+    direction_ : ndarray of shape (n_dimensions_,)
+        Effective direction of the height filtration. Set in :meth:`fit`.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
         Grayscale image corresponding to the height filtration of a binary
@@ -58,8 +65,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'n_dimensions_': [int, [2, 3]],
-                        'direction_': [np.ndarray, (numbers.Number, None)]}
+    _hyperparameters = {
+        'direction': {
+            'type': (np.ndarray, type(None)), 'of': {'type': Real}}
+    }
 
     def __init__(self, direction=None, n_jobs=None):
         self.direction = direction
@@ -98,18 +107,19 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         """
         X = check_array(X, allow_nd=True)
-
-        self.n_dimensions_ = len(X.shape) - 1
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+            raise ValueError(
+                f"Input of `fit` must be a collection of 2D or 3D arrays "
+                f"representing images. Arrays of dimension "
+                f"{self.n_dimensions_} detected.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.direction is None:
-            self.direction_ = np.ones((self.n_dimensions_, ))
+            self.direction_ = np.ones(self.n_dimensions_,)
         else:
             self.direction_ = np.copy(self.direction)
-
-        validate_params({**self.get_params(), 'direction_': self.direction_,
-                         'n_dimensions_': self.n_dimensions_},
-                        self._hyperparameters)
-        print(self.direction_)
         self.direction_ = self.direction_ / np.linalg.norm(self.direction_)
 
         axis_order = [2, 1, 3]
@@ -179,10 +189,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    center : ndarray of shape (n_dimensions, ), optional, default:
-        ``np.zeros(n_dimensions, )``
+    center : ndarray of shape (n_dimensions,) or None, optional, default: \
+        ``None``
         Coordinates of the center pixel, where ``n_dimensions`` is the
-        dimension of the images of the collection.
+        dimension of the images of the collection (2 or 3). ``None`` is
+        equivalent to passing ``np.zeros(n_dimensions,)``.
 
     radius : float or None, default: ``None``
         The radius of the ball centered in `center` inside which activated
@@ -213,16 +224,16 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    center_ : ndarray of shape (n_dimensions_, 1)
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
+    center_ : ndarray of shape (n_dimensions_,)
         Effective center of the radial filtration. Set in :meth:`fit`.
 
     effective_metric_params_ : dict
         Dictionary containing all information present in
         `metric_params`. If `metric_params` is ``None``, it is set to
         the empty dictionary.
-
-    n_dimensions_ : ``2`` or ``3``
-        Dimension of the images. Set in :meth:`fit`.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
         Grayscale image corresponding to the radial filtration of a binary
@@ -238,8 +249,13 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'n_dimensions_': [int, [2, 3]],
-                        'center_': [np.ndarray, (int, None)]}
+    _hyperparameters = {
+        'center': {
+            'type': (np.ndarray, type(None)), 'of': {'type': int}},
+        'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': (dict, type(None))}
+    }
 
     def __init__(self, center=None, radius=np.inf, metric='euclidean',
                  metric_params=None, n_jobs=None):
@@ -282,18 +298,19 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
         """
         X = check_array(X, allow_nd=True)
-
-        self.n_dimensions_ = len(X.shape) - 1
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+            raise ValueError(
+                f"Input of `fit` must be a collection of 2D or 3D arrays "
+                f"representing images. Arrays of dimension "
+                f"{self.n_dimensions_} detected.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.center is None:
-            self.center_ = np.zeros((self.n_dimensions_, ))
+            self.center_ = np.zeros((self.n_dimensions_,))
         else:
             self.center_ = np.copy(self.center)
-
-        validate_params({**self.get_params(), 'center_': self.center_,
-                         'n_dimensions_': self.n_dimensions_},
-                        self._hyperparameters)
-
         self.center_ = self.center_.reshape((1, -1))
 
         if self.metric_params is None:
@@ -401,7 +418,12 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     gtda.homology.CubicalPersistence, Binarizer
 
     """
-    _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
+
+    _hyperparameters = {
+        'n_iterations': {
+            'type': (int, type(None)),
+            'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -438,6 +460,14 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
         """
         X = check_array(X, allow_nd=True)
+        n_dimensions = X.ndim - 1
+        if (n_dimensions < 2) or (n_dimensions > 3):
+            raise ValueError(
+                f"Input of `fit` must be a collection of 2D or 3D arrays "
+                f"representing images. Arrays of dimension "
+                f"{n_dimensions} detected.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -445,10 +475,6 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
             self.n_iterations_ = int(self.max_value_)
         else:
             self.n_iterations_ = self.n_iterations
-
-        validate_params({**self.get_params(),
-                         'n_iterations_': self.n_iterations_},
-                        self._hyperparameters)
 
         return self
 
@@ -535,7 +561,12 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     gtda.homology.CubicalPersistence, Binarizer
 
     """
-    _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
+
+    _hyperparameters = {
+        'n_iterations': {
+            'type': (int, type(None)),
+            'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -572,6 +603,14 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
         """
         X = check_array(X, allow_nd=True)
+        n_dimensions = X.ndim - 1
+        if (n_dimensions < 2) or (n_dimensions > 3):
+            raise ValueError(
+                f"Input of `fit` must be a collection of 2D or 3D arrays "
+                f"representing images. Arrays of dimension "
+                f"{n_dimensions} detected.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -579,10 +618,6 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
             self.n_iterations_ = int(self.max_value_)
         else:
             self.n_iterations_ = self.n_iterations
-
-        validate_params({**self.get_params(),
-                         'n_iterations_': self.n_iterations_},
-                        self._hyperparameters)
 
         return self
 
@@ -672,7 +707,12 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
     DilationFiltration
 
     """
-    _hyperparameters = {'n_iterations_': [int, (1, np.inf)]}
+
+    _hyperparameters = {
+        'n_iterations': {
+            'type': (int, type(None)),
+            'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -716,6 +756,14 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
 
         """
         X = check_array(X, allow_nd=True)
+        n_dimensions = X.ndim - 1
+        if (n_dimensions < 2) or (n_dimensions > 3):
+            raise ValueError(
+                f"Input of `fit` must be a collection of 2D or 3D arrays "
+                f"representing images. Arrays of dimension "
+                f"{n_dimensions} detected.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.max_value_ = np.sum(X.shape[1:])
 
@@ -723,10 +771,6 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
             self.n_iterations_ = int(self.max_value_)
         else:
             self.n_iterations_ = self.n_iterations
-
-        validate_params({**self.get_params(),
-                         'n_iterations_': self.n_iterations_},
-                        self._hyperparameters)
 
         return self
 
