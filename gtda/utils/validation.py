@@ -115,27 +115,30 @@ def validate_params(parameters, references, exclude=None):
         are checked against `references`.
 
     references : dict, required
-        Dictionary in which the keys are parameter names (as strings). The
-        value ``reference`` corresponding to a key ``name`` is a dictionary
-        responsible for checking the value ``parameter`` in `parameters`
-        corresponding to ``name``, and containing any of the following keys:
+        Dictionary in which the keys are parameter names (as strings). Let
+        ``name`` and ``parameter`` denote a key-value pair in `parameters`.
+        Since ``name`` should also be a key in `references`, let ``reference``
+        be the corresponding value there. Then, ``reference`` must be a
+        dictionary containing any of the following keys:
 
         - ``'type'``, mapping to a class or tuple of classes. ``parameter``
           is checked to be an instance of this class or tuple of classes.
 
-        - ``'in'``, mapping to a dictionary ``ref_in``, when the value of
-          ``'type'`` is not one of ``list``, ``tuple``, ``numpy.ndarray`` or
-          ``dict``. The following check is performed: ``parameter in ref_in``.
+        - ``'in'``, mapping to a dictionary, when the value of ``'type'`` is
+          not one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
+          Letting ``ref_in`` denote this dictionary, the following check is
+          performed: ``parameter in ref_in``.
 
-        - ``'of'``, mapping to a dictionary ``ref_of``, when the value of
-          ``'type'`` is one of ``list``, ``tuple``, ``numpy.ndarray`` or
-          ``dict``. When the value of ``'type'`` is ``dict`` – meaning that
-          ``parameter`` should be a dictionary – ``ref_of`` should have a
-          similar structure as `references` and :func:`validate_params`
-          is called recursively on ``(parameter, ref_of)``. Otherwise,
-          ``ref_of`` should have a similar structure as ``reference`` and
-          each entry in ``parameter`` is checked to satisfy the constraints
-          in ``ref_of``.
+        - ``'of'``, mapping to a dictionary], when the value of ``'type'``
+          is one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
+          Let``ref_of`` denote this dictionary. Then:
+          a) If ``reference['type'] == dict`` – meaning that ``parameter``
+             should be a dictionary – ``ref_of`` should have a similar
+             structure as `references`, and :func:`validate_params` is called
+             recursively on ``(parameter, ref_of)``.
+          b) Otherwise, ``ref_of`` should have a similar structure as
+             ``reference`` and each entry in ``parameter`` is checked to
+             satisfy the constraints in ``ref_of``.
 
         - ``'other'``, which should map to a callable defining custom checks on
           ``parameter``.
