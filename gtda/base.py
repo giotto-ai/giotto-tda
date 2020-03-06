@@ -18,6 +18,7 @@ class TransformerResamplerMixin:
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
+
         y : None
             There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
@@ -47,6 +48,7 @@ class TransformerResamplerMixin:
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
+
         y : ndarray of shape (n_samples, )
             Target data.
 
@@ -54,6 +56,7 @@ class TransformerResamplerMixin:
         -------
         Xt : ndarray of shape (n_samples, ...)
             Transformed input.
+
         yr : ndarray of shape (n_samples, ...)
             Resampled target.
 
@@ -69,6 +72,7 @@ class TransformerResamplerMixin:
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
+
         y : ndarray of shape (n_samples, )
             Target data.
 
@@ -76,6 +80,7 @@ class TransformerResamplerMixin:
         -------
         Xt : ndarray of shape (n_samples, ...)
             Transformed input.
+
         yr : ndarray of shape (n_samples, ...)
             Resampled target.
 
@@ -87,20 +92,23 @@ class PlotterMixin:
     """Mixin class for all plotters in giotto-tda."""
 
     def fit_transform_plot(self, X, y=None, sample=0, **plot_params):
-        """Fit to data, then transform it.
-
-        Fits transformer to `X` and `y` with optional parameters `fit_params`
-        and returns a transformed version of `X`.
+        """Fit to data, then transform and plot a sample in the input collection.
+        Returns the transformed sample input.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
+
         y : None
             There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
+
         sample : int
             Sample to be plotted.
+
+        plot_params : dict
+            Optional plotting parameters.
 
         Returns
         -------
@@ -108,23 +116,28 @@ class PlotterMixin:
             Transformed input sample.
 
         """
-        Xt = self.fit_transform(X, y)
+        Xt = self.fit(X, y).transform(X[sample:sample+1], y[sample:sample+1])
 
-        self.plot(Xt, sample, **plot_params)
+        self.plot(Xt, sample=0, **plot_params)
         return Xt
 
     def transform_plot(self, X, y, sample=0, **plot_params):
-        """Fit to data, then transform it.
-
-        Fits transformer to `X` and `y` with optional parameters `fit_params`
-        and returns a transformed version of `X`.
+        """Transform and plot a sample in the input collection.
+        Returns the transformed sample input.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
+
         y : ndarray of shape (n_samples, )
             Target data.
+
+        sample : int
+            Sample to be plotted.
+
+        plot_params : dict
+            Optional plotting parameters.
 
         Returns
         -------
@@ -132,7 +145,7 @@ class PlotterMixin:
             Transformed input.
 
         """
-        Xt = self.transform(X, y)
+        Xt = self.transform(X[sample:sample+1], y[sample:sample+1])
 
-        self.plot(Xt, sample, **plot_params)
+        self.plot(Xt, sample=0, **plot_params)
         return Xt
