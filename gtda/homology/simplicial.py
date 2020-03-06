@@ -218,7 +218,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
-    def plot(X, sample=0, **layout):
+    def plot(self, X, sample=0, **layout):
         """Plot a single persistence diagram.
 
         Parameters
