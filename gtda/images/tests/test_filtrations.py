@@ -68,8 +68,9 @@ images_3D_height = np.array(
 
 @pytest.mark.parametrize("direction, images, expected",
                          [(None, images_2D, images_2D_height),
-                          ([1, 1], images_2D, images_2D_height),
-                          ([1, 0, 1], images_3D, images_3D_height)])
+                          (np.asarray([1, 1]), images_2D, images_2D_height),
+                          (np.asarray([1, 0, 1]), images_3D,
+                           images_3D_height)])
 def test_height_transform(direction, images, expected):
     height = HeightFiltration(direction=direction)
 
@@ -119,8 +120,9 @@ images_3D_radial = np.array(
 
 @pytest.mark.parametrize("center, images, expected",
                          [(None, images_2D, images_2D_radial),
-                          ([0, 0], images_2D, images_2D_radial),
-                          ([1, 0, 1], images_3D, images_3D_radial)])
+                          (np.asarray([0, 0]), images_2D, images_2D_radial),
+                          (np.asarray([1, 0, 1]), images_3D,
+                           images_3D_radial)])
 def test_radial_transform(center, images, expected):
     radial = RadialFiltration(center=center)
 

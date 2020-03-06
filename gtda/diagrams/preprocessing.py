@@ -1,18 +1,18 @@
 """Persistence diagram preprocessing."""
 # License: GNU AGPLv3
 
-import numbers
-import types
+from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import _parallel_amplitude
+from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import (check_diagram, validate_params,
-                                validate_metric_params)
+from ..utils.intervals import Interval
+from ..utils.validation import check_diagram, validate_params
 
 
 @adapt_fit_transform_docs
@@ -54,7 +54,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        check_diagram(X)
 
         self._is_fitted = True
         return self
@@ -174,7 +174,11 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'function': [types.FunctionType, None]}
+    _hyperparameters = {
+        'metric': {'type': str, 'in': _AVAILABLE_AMPLITUDE_METRICS.keys()},
+        'metric_params': {'type': (dict, type(None))},
+        'function': {'type': (FunctionType, type(None))}
+    }
 
     def __init__(self, metric='bottleneck', metric_params=None,
                  function=np.max, n_jobs=None):
@@ -204,15 +208,17 @@ class Scaler(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
+        X = check_diagram(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
+        validate_params(self.effective_metric_params_,
+                        _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        validate_metric_params(self.metric, self.effective_metric_params_)
-        X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         self.effective_metric_params_['samplings'], \
@@ -290,11 +296,11 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    homology_dimensions : iterable or None, optional, default: ``None``
+    homology_dimensions : list, tuple, or None, optional, default: ``None``
         When set to ``None``, subdiagrams corresponding to all homology
         dimensions seen in :meth:`fit` will be filtered.
-        Otherwise, it contains the homology dimensions at which filtering
-        should occur.
+        Otherwise, it contains the homology dimensions (as non-negative
+        integers) at which filtering should occur.
 
     epsilon : float, optional, default: ``0.01``
         The cutoff value controlling the amount of filtering.
@@ -314,8 +320,12 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'homology_dimensions_': [list, [int, (0, np.inf)]],
-                        'epsilon': [numbers.Number, (0., np.inf)]}
+    _hyperparameters = {
+        'homology_dimensions': {
+            'type': (list, tuple, type(None)),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'epsilon': {'type': Real, 'in': Interval(0, np.inf, closed='left')}
+    }
 
     def __init__(self, homology_dimensions=None, epsilon=0.01):
         self.homology_dimensions = homology_dimensions
@@ -345,19 +355,14 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        validate_params(
+            self.get_params(), self._hyperparameters)
 
         if self.homology_dimensions is None:
             self.homology_dimensions_ = [int(dim) for dim in set(X[0, :, 2])]
         else:
             self.homology_dimensions_ = self.homology_dimensions
         self.homology_dimensions_ = sorted(self.homology_dimensions_)
-
-        validate_params({**self.get_params(),
-                         'homology_dimensions_': self.homology_dimensions_},
-                        self._hyperparameters)
-
-        self.homology_dimensions_ = \
-            [float(dim) for dim in self.homology_dimensions_]
 
         return self
 
