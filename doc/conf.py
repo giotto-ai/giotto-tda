@@ -116,6 +116,14 @@ html_theme_options = {
     'logo_only': True,
 }
 
+# List versions
+with open('versions') as f:
+    _versions = f.read().splitlines()
+html_theme_options.update({'versions': [(c, f'../{c[:-1]}/index.html')
+                                        for c in _versions]})
+html_theme_options.update({'current_version': os.environ['VERSION']})
+
+# Get logo
 path_to_image = "images/tda_logo.svg"
 if not(os.path.exists(path_to_image)):
     import requests

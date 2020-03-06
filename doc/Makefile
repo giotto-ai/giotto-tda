@@ -10,11 +10,11 @@ GITDIR    = ../../../projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = stable
+VERSION = dev
 endif
 
 ifndef RUNNOTEBOOKS
-RUNNOTEBOOKS=TRUE
+RUNNOTEBOOKS = FALSE
 endif
 
 ########## Constant config
@@ -23,6 +23,9 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = build
 EXAMPLESDIR  = ../examples
+
+SHOW_VERSIONS = TRUE
+PRODUCTION_DOMAIN = giotto-ai.github.io/gtda-docs/
 
 CURRENTDOCFOLDER = $(GITDIR)/$(VERSION)
 
@@ -43,9 +46,9 @@ togit:
 	@cp -a build/html/ "$(CURRENTDOCFOLDER)"
 
 github:
-	@make html
+	@make update-versions-list
+	@export VERSION=$(VERSION); make html
 	@make togit
-	@cd $(GITDIR); python create_index.py
 
 theory-gl:
 	@pandoc theory/glossary.tex -f latex -t rst --toc --include-before-body=theory/before_glossary.rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
@@ -57,6 +60,10 @@ clean-gh:
 	@make clean
 	@rm -f theory/glossary.rst
 	@make gh-remove
+
+update-versions-list:
+	@cd $(GITDIR); find . -type d -depth 1 > versions
+	@mv $(GITDIR)/versions versions
 
 all-gh:
 	@make clean-gh
@@ -77,9 +84,6 @@ gh-stage:
 gh-commit:
 	@make gh-stage
 	@cd "$(CURRENTDOCFOLDER)"; git commit -a -m "Update docs"; git push origin
-
-sphinx-gal:
-	@for f in $(EXAMPLESDIR)/*.ipynb; do python3 ipynb_to_py.py $$f ; done
 
 # Put it first so that "make" without argument is like "make help".
 help:
