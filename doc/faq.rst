@@ -38,7 +38,7 @@ I cannot install `giotto-tda` on Windows.
 
 We are trying our best to support a variety of most-used operating systems.
 If you experience any trouble, it is likely that others already have and reported it.
-Please consult the list of `issues <https://github.com/giotto-ai/giotto-tda/issues?q=is%3Aissue>`,
+Please consult the list of `issues <https://github.com/giotto-ai/giotto-tda/issues?q=is%3Aissue>`_,
 including the closed ones, and open a new one in case you did not find help.
 
 There are many TDA-libraries available. How is `giotto-tda` different?

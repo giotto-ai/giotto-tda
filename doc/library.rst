@@ -35,9 +35,6 @@ Guiding principles
 
 For installation instructions, see :ref:`the installation instructions <installation>`.
 
-The core data structure of Keras is a model, a way to organize layers. The simplest type of model is the Sequential model, a linear stack of layers.
-For more complex architectures, you should use the Keras functional API, which allows to build arbitrary graphs of layers.
-
 The functionalities of Giotto-TDA are provided in `scikit-learn`-style transformers.
 This allows you to jump in the familiar way of generating features from your data. Here is an example of `VietorisRipsPersistence`,
 
@@ -74,6 +71,12 @@ like grid-search or cross-validate your model.
   model.fit(X_train, y_train)
   model.score(X_valid, y_valid)
 
+EXPAND WITH A SNIPPET OR TWO FOR MAPPER
+
+*********
+Resources
+*********
+
 Examples
 ========
 
@@ -90,11 +93,6 @@ Use cases
 
 A selection of use cases that we worked on are available as github repositories and some of them are published as posts on Medium.
 Please refer to `github <https://github.com/giotto-ai>`_ or the `L2F website <https://giotto.ai/learn/course-content>`_ for a summary.
-
-Mapper notebook
-======================
-The mapper notebook, :doc:`included in the documentation <notebooks/mapper_quickstart.rst>`,
-provides a comprehensive introduction to mapper.
 
 **********
 What's new
