@@ -2,8 +2,6 @@
 method and TransformerPlotterMixin for transformers that have a plot method."""
 # License: GNU AGPLv3
 
-from sklearn.base import TransformerMixin
-
 
 class TransformerResamplerMixin:
     """Mixin class for all transformers-resamplers in giotto-tda."""

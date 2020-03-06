@@ -709,7 +709,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                             **layout)
 
 
-
 @adapt_fit_transform_docs
 class SparseRipsPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from

@@ -3,7 +3,6 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from gtda.diagrams._utils import _subdiagrams
 
 
 def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
@@ -126,8 +125,9 @@ def plot_betti_surfaces(betti_curves, samplings=None,
     else:
         for i, dimension in enumerate(homology_dimensions):
             fig = gobj.Figure()
-            fig.update_layout(scene=scene, title="Betti surface for homology "
-                                                 "dimension {}".format(int(dimension)))
+            fig.update_layout(scene=scene,
+                              title="Betti surface for homology "
+                              "dimension {}".format(int(dimension)))
             fig.add_trace(gobj.Surface(x=samplings,
                                        y=np.arange(betti_curves.shape[0]),
                                        z=betti_curves[:, i, :],
@@ -187,8 +187,8 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
 
     for i, dimension in enumerate(homology_dimensions):
         layout_dim = layout.copy()
-        layout_dim['title'] = "Persistence landscape for homology dimension" + \
-                              "{}".format(int(dimension))
+        layout_dim['title'] = "Persistence landscape for homology " + \
+                              "dimension {}".format(int(dimension))
         fig = gobj.Figure(layout=layout_dim)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
                          mirror=False)
