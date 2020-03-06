@@ -129,9 +129,10 @@ def validate_params(parameters, references, exclude=None):
           Letting ``ref_in`` denote this dictionary, the following check is
           performed: ``parameter in ref_in``.
 
-        - ``'of'``, mapping to a dictionary], when the value of ``'type'``
+        - ``'of'``, mapping to a dictionary, when the value of ``'type'``
           is one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
-          Let``ref_of`` denote this dictionary. Then:
+          Let ``ref_of`` denote this dictionary. Then:
+
           a) If ``reference['type'] == dict`` – meaning that ``parameter``
              should be a dictionary – ``ref_of`` should have a similar
              structure as `references`, and :func:`validate_params` is called
