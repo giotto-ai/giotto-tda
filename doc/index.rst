@@ -341,24 +341,6 @@ Binary image filtrations
    pipeline.make_pipeline
 
 
-:mod:`gtda.meta_transformers`: Convenience pipelines
-====================================================
-
-.. automodule:: gtda.meta_transformers
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: gtda
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   meta_transformers.EntropyGenerator
-   meta_transformers.BettiCurveGenerator
-   meta_transformers.LandscapeGenerator
-
-
 :mod:`gtda.utils`: Validation
 =============================
 
@@ -375,3 +357,41 @@ Binary image filtrations
    utils.check_diagram
    utils.validate_params
    utils.validate_metric_params
+
+
+:mod:`gtda.plots`: Plotting
+=============================
+
+.. automodule:: gtda.plots
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   plots.plot_point_cloud
+   plots.plot_diagram
+   plots.plot_betti_curves
+   plots.plot_betti_surfaces
+   plots.plot_landscapes
+
+
+:mod:`gtda.meta_transformers`: Convenience pipelines
+====================================================
+
+.. automodule:: gtda.meta_transformers
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   meta_transformers.EntropyGenerator
+   meta_transformers.BettiCurveGenerator
+   meta_transformers.LandscapeGenerator
