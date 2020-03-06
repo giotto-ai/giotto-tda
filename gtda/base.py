@@ -142,7 +142,7 @@ class PlotterMixin:
         Returns
         -------
         Xt : ndarray of shape (n_samples, ...)
-            Transformed input.
+            Transformed input sample.
 
         """
         Xt = self.transform(X[sample:sample+1], y[sample:sample+1])
