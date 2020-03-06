@@ -4,7 +4,8 @@ Advanced
 
 This page contains advanced examples
 
-.. toctree::
+..
+   toctree::
    :maxdepth: 2
    :hidden:
 

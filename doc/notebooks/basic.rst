@@ -4,7 +4,8 @@ Basic
 
 This page contains basic examples.
 
-.. toctree::
+..
+   toctree::
    :maxdepth: 2
    :hidden:
 
