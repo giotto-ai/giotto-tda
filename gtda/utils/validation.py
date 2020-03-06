@@ -7,7 +7,7 @@ import types
 
 available_metrics = {
     'bottleneck': [('delta', numbers.Number, (0., 1.))],
-    'wasserstein': [('p', int, (1, np.inf)),
+    'wasserstein': [('p', numbers.Number, (1, np.inf)),
                     ('delta', numbers.Number, (1e-16, 1.))],
     'betti': [('p', numbers.Number, (1, np.inf)),
               ('n_bins', int, (1, np.inf))],
