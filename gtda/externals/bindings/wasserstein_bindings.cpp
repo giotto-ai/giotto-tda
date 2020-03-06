@@ -11,7 +11,7 @@
 
 double wasserstein_distance(const std::vector<std::pair<double, double>>& dgm1,
                             const std::vector<std::pair<double, double>>& dgm2,
-                            int q, double delta, double internal_p,
+                            double q, double delta, double internal_p,
                             double initial_eps, double eps_factor) {
   hera::AuctionParams<double> params;
   params.wasserstein_power = q;
@@ -27,11 +27,11 @@ double wasserstein_distance(const std::vector<std::pair<double, double>>& dgm1,
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(giotto_wasserstein, m) {
+PYBIND11_MODULE(gtda_wasserstein, m) {
   m.doc() = "wasserstein dionysus implementation";
   using namespace pybind11::literals;
   m.def("wasserstein_distance", &wasserstein_distance, "dgm1"_a, "dgm2"_a,
-        py::arg("q") = 2, py::arg("delta") = .01,
+        py::arg("q") = 2.0, py::arg("delta") = .01,
         py::arg("internal_p") = hera::get_infinity<double>(),
         py::arg("initial_eps") = 0., py::arg("eps_factor") = 0.,
         "compute Wasserstein distance between two persistence diagrams");

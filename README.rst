@@ -69,7 +69,7 @@ The latest stable version of giotto-tda requires:
 - Python (>= 3.6)
 - NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
-- joblib (>= 0.11)
+- joblib (>= 0.13)
 - scikit-learn (>= 0.22.0)
 - python-igraph (>= 0.7.1.post6)
 - matplotlib (>= 3.0.3)
@@ -164,7 +164,7 @@ To install:
 .. code-block:: bash
 
    cd giotto-tda
-   pip install -e ".[tests, doc]"
+   python -m pip install -e ".[dev]"
 
 This way, you can pull the library's latest changes and make them immediately available on your machine.
 Note: we recommend upgrading ``pip`` and ``setuptools`` to recent versions before installing in this way.

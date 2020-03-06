@@ -1,8 +1,8 @@
 # License: GNU AGPLv3
 
 import numpy as np
-from giotto_bottleneck import bottleneck_distance
-from giotto_wasserstein import wasserstein_distance
+from ..externals.modules.gtda_bottleneck import bottleneck_distance
+from ..externals.modules.gtda_wasserstein import wasserstein_distance
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.ndimage import gaussian_filter
 from scipy.spatial.distance import cdist, pdist, squareform
@@ -10,6 +10,23 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import _num_samples
 
 from ._utils import _subdiagrams, _sample_image
+
+
+def silhouettes(diagrams, sampling, order, **kwargs):
+    """Input: a batch of persistence diagrams with a sampling (3d array
+    returned by _bin) of a one-dimensional range.
+    """
+    sampling = np.transpose(sampling, axes=(1, 2, 0))
+    weights = np.diff(diagrams, axis=2)[:, :, [0]]
+    if order > 8.:
+        weights = weights/np.max(weights, axis=1, keepdims=True)
+    weights = weights**order
+    total_weights = np.sum(weights, axis=1)
+    midpoints = (diagrams[:, :, [1]] + diagrams[:, :, [0]]) / 2.
+    heights = (diagrams[:, :, [1]] - diagrams[:, :, [0]]) / 2.
+    fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
+    fibers_weighted_sum = np.sum(weights*fibers, axis=1)/total_weights
+    return fibers_weighted_sum
 
 
 def betti_curves(diagrams, sampling):
@@ -35,9 +52,9 @@ def landscapes(diagrams, sampling, n_layers):
     return fibers
 
 
-def _heat(heat, sampled_diag, sigma):
-    _sample_image(heat, sampled_diag)  # modifies `heat` inplace
-    heat = gaussian_filter(heat, sigma, mode="reflect")
+def _heat(image, sampled_diag, sigma):
+    _sample_image(image, sampled_diag)  # modifies `heat` inplace
+    image[:] = gaussian_filter(image, sigma, mode="reflect")
 
 
 def heats(diagrams, sampling, step_size, sigma):
@@ -57,6 +74,17 @@ def heats(diagrams, sampling, step_size, sigma):
     return heats_
 
 
+def silhouette_distances(diagrams_1, diagrams_2, sampling, step_size,
+                         p=2., **kwargs):
+    silhouette_1 = silhouettes(diagrams_1, sampling, p)
+    if np.array_equal(diagrams_1, diagrams_2):
+        unnorm_dist = squareform(pdist(silhouette_1, 'minkowski', p=p))
+    else:
+        silhouette_2 = silhouettes(diagrams_2, sampling, p)
+        unnorm_dist = cdist(silhouette_1, silhouette_2, 'minkowski', p=p)
+    return (step_size ** (1 / p)) * unnorm_dist
+
+
 def persistence_images(diagrams, sampling, step_size, weights, sigma):
     persistence_images_ = np.zeros((diagrams.shape[0],
                                     sampling.shape[0], sampling.shape[0]))
@@ -73,11 +101,18 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
         diagrams[:, :, axis] = np.array(
             (diagrams[:, :, axis] - sampling[0, axis]) / step_size[axis],
             dtype=int)
+    # Sample the image
+    [_sample_image(persistence_images_[i], sampled_diag)
+     for i, sampled_diag in enumerate(diagrams)]
 
-    [_heat(persistence_images_[i], sampled_diag, sigma)
-        for i, sampled_diag in enumerate(diagrams)]
-
+    # Apply the weights
     persistence_images_ *= weights / np.max(weights)
+
+    # Smoothen the weighted-image
+    for i, image in enumerate(persistence_images_):
+        persistence_images_[i] = gaussian_filter(image, sigma,
+                                                 mode="reflect")
+
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
     return persistence_images_
 
@@ -131,13 +166,12 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
 
 def heat_distances(diagrams_1, diagrams_2, sampling, step_size,
                    sigma=1.0, p=2.0, **kwargs):
-    sampling_ = np.copy(sampling.reshape((-1,)))
-    heat_1 = heats(diagrams_1, sampling_, step_size, sigma).reshape(
+    heat_1 = heats(diagrams_1, sampling, step_size, sigma).reshape(
         diagrams_1.shape[0], -1)
     if np.array_equal(diagrams_1, diagrams_2):
         unnorm_dist = squareform(pdist(heat_1, "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heats(diagrams_2, sampling_, step_size, sigma).reshape(
+    heat_2 = heats(diagrams_2, sampling, step_size, sigma).reshape(
         diagrams_2.shape[0], -1)
     unnorm_dist = cdist(heat_1, heat_2, "minkowski", p=p)
     return (step_size ** (1 / p)) * unnorm_dist
@@ -170,6 +204,7 @@ implemented_metric_recipes = {
     "betti": betti_distances,
     "heat": heat_distances,
     "persistence_image": persistence_image_distances,
+    'silhouette': silhouette_distances,
 }
 
 
@@ -207,6 +242,11 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
                                   for i in range(len(homology_dimensions))],
                                  axis=2)
     return distance_matrices
+
+
+def silhouette_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
+    sht = silhouettes(diagrams, sampling, p)
+    return (step_size ** (1 / p)) * np.linalg.norm(sht, axis=1, ord=p)
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2.0, **kwargs):
@@ -251,6 +291,7 @@ implemented_amplitude_recipes = {
     "betti": betti_amplitudes,
     "heat": heat_amplitudes,
     "persistence_image": persistence_images,
+    'silhouette': silhouette_amplitudes,
 }
 
 

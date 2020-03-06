@@ -3,21 +3,33 @@
 \usepackage{enumerate}
 \usepackage{tikz-cd}
 \usepackage{bm}
+\usepackage[bookmarks=true,
+bookmarksnumbered=true, breaklinks=true,
+pdfstartview=FitH, hyperfigures=false,
+plainpages=false, naturalnames=true,
+colorlinks=true, pagebackref=true,
+pdfpagelabels]{hyperref}
+\hypersetup{
+	colorlinks,
+	citecolor=blue,
+	linkcolor=blue,
+	urlcolor=blue}
+
 
 \begin{document}
 	
-	\section{Symbols}
+	\section{Symbols}	
 	
 	\begin{tabular}{ l l l}
-		$\Bbbk$ & :  & An arbitrary field. \\
+		$\Bbbk$ & : & An arbitrary field. \\
 		$\mathbb R^d$ & : & The vector space of $d$-tuples of real numbers. \\
 		$\mathbb N$ & : & The counting numbers $0,1,2, \dots$ as a subset of $\mathbb R$. \\
-		$\Delta$ & : & The \underline{multiset} $\{(s,s)\,;\ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
+		$\Delta$ & : & The \hyperref[multiset]{multiset} $\{(s,s)\,;\ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
 	\end{tabular}
-
+	
 	\section{Homology}
 	
-	\subsection*{Cubical complex}
+	\subsection*{Cubical complex} \label{cubical complex}
 	
 	An \textbf{elementary interval} $I_a$ is a subset of $\mathbb{R}$ of the form $[a, a+1]$ or $[a,a] = \{a\}$ for some $a \in \mathbb{R}$. These two types are called respectively \textbf{non-degenerate} and \textbf{degenerate}. To a non-degenerate elementary interval we assign two degenerate elementary intervals
 	\begin{equation*}
@@ -38,9 +50,10 @@
 	
 	A \textbf{cubical complex} is a finite set of elementary cubes of $\mathbb{R}^N$, and a \textbf{subcomplex} of $X$ is a cubical complex whose elementary cubes are also in $X$. We denote the set of $n$-dimensional cubes as $X_n$.
 	
-	\paragraph{Reference:} \cite{mischaikow04computational}
+	\paragraph{\\ Reference:} \cite{mischaikow04computational}
 	
-	\subsection*{Simplicial complex}
+	\subsection*{Simplicial complex} \label{simplicial complex}
+
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textbf{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textbf{simplex}, explicitly
 	\begin{equation*}
 	[v_0,\dots,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
@@ -51,9 +64,9 @@
 	\end{equation*}
 	where $\widehat{v}_i$ denotes the absence of $v_i$ from the set.
 	
-	A \textbf{simplicial complex} $X$ is a finite union of simplices in $\mathbb{R}^N$ satisfying that every face of a simplex in $X$ is in $X$ and that the non-empty intersection of two simplices in $X$ is a face of each. Every simplicial complex defines an \underline{abstract simplicial complex}.
+	A \textbf{simplicial complex} $X$ is a finite union of simplices in $\mathbb{R}^N$ satisfying that every face of a simplex in $X$ is in $X$ and that the non-empty intersection of two simplices in $X$ is a face of each. Every simplicial complex defines an \hyperref[abstract simplicial complex]{abstract simplicial complex}.
 	
-	\subsection*{Abstract simplicial complex:} \label{simplicial complex}
+	\subsection*{Abstract simplicial complex:} \label{abstract simplicial complex}
 	
 	An \textit{abstract simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being subsets of $V$ such that: 
 	\begin{enumerate}
@@ -69,157 +82,195 @@
 	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
 	
 	A simplicial complex $X$ is a \textit{subcomplex} of a simplicial complex $Y$ if every simplex of $X$ is a simplex of $Y$.
+
+	Given a finite abstract simplicial complex $X = (V, X)$ we can choose a bijection from $V$ to a geometrically independent subset of $\mathbb R^N$ and associate a \hyperref[simplicial complex]{simplicial complex} to $X$ called its \textit{geometric realization}.
 	
-	Given a finite abstract simplicial complex $X = (V, X)$ we can choose a bijection from $V$ to a geometrically independent subset of $\mathbb R^N$ and associate a \underline{simplicial complex} to $X$ called its \textit{geometric realization}.
+	\subsection*{Ordered simplicial complex:} \label{ordered simplical complex}
 	
-	\subsection*{Ordered simplicial complex:} 
-	
-	An \textit{ordered simplicial complex} is an \underline{abstract simplicial complex} where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $[v_0, \dots, v_n]$.
+	An \textit{ordered simplicial complex} is an \hyperref[abstract simplicial complex]{abstract simplicial complex} where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $[v_0, \dots, v_n]$.
 	
 	A \textit{simplicial map} between ordered simplicial complexes is a simplicial map $f$ between their underlying simplicial complexes preserving the order, i.e., $v \leq w$ implies $f(v) \leq f(w)$.
 	
-	\subsection*{Directed simplicial complex:} A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that: 
+	\subsection*{Directed simplicial complex:}  \label{directed simplicial complex}
+	
+	A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that: 
 	\begin{enumerate}
 		\item for every $v$ in $V$, the tuple $v$ is in $X$ and
 		\item if $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$. 
 	\end{enumerate}
-	With appropriate modifications the same terminology and notation introduced for \underline{ordered simplicial complex} applies to directed simplicial complex.
+
+	With appropriate modifications the same terminology and notation introduced for \hyperref[ordered simplicial complex]{ordered simplicial complex} applies to directed simplicial complex.
 	
-	\subsection*{Clique or flag complexes:} Let $G$ be a $1$-dimensional simplicial complex, abstract or otherwise. The complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. 
+	\subsection*{Clique or flag complexes:} \label{clique or flag complexes}
+	
+	Let $G$ be a $1$-dimensional simplicial complex, abstract or otherwise. The complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. 
 	
 	Let $G$ be a $1$-dimensional directed simplicial complex. The directed simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $(v_0, \dots, v_n)$ is a simplex in $\langle G \rangle$ if an only if $(v_i, v_j) \in G$ for each pair of vertices $v_i, v_j$ with $i < j$. 
 	
 	A (directed) simplicial complex $X$ is a \textit{clique complex} a.k.a. \textit{flag complex} if $X = \langle X_1 \rangle$ where $X_1$ is the $1$-skeleton of $X$. 
 	
-	\subsection*{Chain complex:} A \textit{chain complex} of is a pair $(C_*, \partial)$ where
-	$$
-	C_* = \bigoplus_{n \in \mathbb Z} C_n \quad \mathrm{and} \quad \partial = \bigoplus_{n \in \mathbb Z} \partial_n
-	$$
-	with  $C_n$ a $\Bbbk$-vector space and $\partial_n : C_{n+1} \to C_n$ is a $\Bbbk$-linear map such that $\partial_{n+1} \partial_n = 0$. We refer to $\partial$ as the \textit{boundary map} of the chain complex.
+	\subsection*{Chain complex:} \label{chain complex}
 	
-	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of \underline{homology}.
+	A \textit{chain complex} of is a pair $(C_*, \partial)$ where
+	\begin{equation*}
+	C_* = \bigoplus_{n \in \mathbb Z} C_n \quad \mathrm{and} \quad \partial = \bigoplus_{n \in \mathbb Z} \partial_n
+	\end{equation*}
+	with  $C_n$ a $\Bbbk$-vector space and $\partial_n : C_{n+1} \to C_n$ is a $\Bbbk$-linear map such that $\partial_{n+1} \partial_n = 0$. We refer to $\partial$ as the \textit{boundary map} of the chain complex.
+
+	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of \hyperref[homology]{homology}.
 	
 	A \textit{chain map} is a $\Bbbk$-linear map $f : C \to C'$ between chain complexes such that $f(C_n) \subseteq C'_n$ and $\partial f = f \partial$.
 	
 	Given a chain complex $(C_*, \partial)$, its linear dual $C^*$ is also a chain complex with $C^{-n} = \mathrm{Hom_\Bbbk}(C_n, \Bbbk)$ and boundary map $\delta$ defined by $\delta(\alpha)(c) = \alpha(\partial c)$ for any $\alpha \in C^*$ and $c \in C_*$.
 	
-	\subsection*{Homology and cohomology:} Let $(C_*, \partial)$ be a \underline{chain complex}. Its \textit{$n$-th homology group} is the quotient of the subspace of $n$-cycles by the subspace of $n$-boundaries, that is, $H_n(C_*) = \mathrm{ker}(\partial_n)/ \mathrm{im}(\partial_{n+1})$. The \textit{homology} of $(C, \partial)$ is defined by $H_*(C) = \bigoplus_{n \in \mathbb Z} H_n(C)$.
+	\subsection*{Homology and cohomology:} \label{homology and cohomology}
+	
+	Let $(C_*, \partial)$ be a \hyperref[chain complex]{chain complex}. Its \textit{$n$-th homology group} is the quotient of the subspace of $n$-cycles by the subspace of $n$-boundaries, that is, $H_n(C_*) = \mathrm{ker}(\partial_n)/ \mathrm{im}(\partial_{n+1})$. The \textit{homology} of $(C, \partial)$ is defined by $H_*(C) = \bigoplus_{n \in \mathbb Z} H_n(C)$.
 	
 	When the chain complex under consideration is the linear dual of a chain complex we sometimes refer to its homology as the \textit{cohomology} of the predual complex and write $H^n$ for $H_{-n}$.
 	
 	A chain map $f : C \to C'$ induces a map between the associated homologies.
 	
-	\subsection*{Simplicial chains and simplicial homology:} Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
-	$$
+	\subsection*{Simplicial chains and simplicial homology:} \label{simplicial chains and simplicial homology}
+	
+	Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
+	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
-	$$
-	and its \textit{homology and cohomology with $\Bbbk$-coefficients} as the \underline{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	\end{equation*}
+	and its \textit{homology and cohomology with $\Bbbk$-coefficients} as the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
 	
-	A \underline{simplicial map} induces a \underline{chain map} between the associated simplicial chain complexes and, therefore, between the associated simplicial (co)homologies.
+	A \hyperref[abstract simplicial complex]{simplicial map} induces a \hyperref[chain complex]{chain map} between the associated simplicial chain complexes and, therefore, between the associated simplicial (co)homologies.
 	
-	\subsection*{Cubical chains and cubical homology:} Let $X$ be a cubical complex. Define its \textit{cubical chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
+	\subsection*{Cubical chains and cubical homology:} \label{cubical chains and cubical homology}
+	
+	Let $X$ be a cubical complex. Define its \textit{cubical chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
 	where $x = I_1 \times \cdots \times I_N$ and $s(i)$ is the dimension of $I_1 \times \cdots \times I_i$.
-	Its \textit{homology and cohomology with $\Bbbk$-coefficients} is the \underline{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	Its \textit{homology and cohomology with $\Bbbk$-coefficients} is the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
 	
-	\subsection*{Filtered complex:}
+	\subsection*{Filtered complex:} \label{filtered complex}
+	
 	A \textit{filtered complex} is a collection of simplicial or of cubical complexes $\{X(n)\}_{n \in \mathbb N}$ such that $X(n)$ is a subcomplex of $X(n+1)$ for each $n \geq 0$.
 	
-	\subsection*{Cellwise filtration:}
-	A \underline{filtered complex} such that $X(n+1)$ contains exactly one more simplex or elementary cube than $X(n)$. \par
-	The data of a simplexwise filtration is equivalent to a complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$.
+	\subsection*{Cellwise filtration:} \label{cellwise filtration}
 	
-	\subsection*{Persistence module:}
+	A \hyperref[filtered complex]{filtered complex} such that $X(n+1)$ contains exactly one more simplex or elementary cube than $X(n)$. \par
+	The data of a cellwise filtration is equivalent to a complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$.
+	
+	\subsection*{Persistence module:} \label{persistence module}
+	
 	A \textit{persistence module} is a collection containing a $\Bbbk$-vector spaces $V(s)$ for each real number $s$ together with $\Bbbk$-linear maps $f_{st} : V(s) \to V(t)$, referred to as \textit{structure maps}, for each pair $s \leq t$, satisfying	naturality, i.e., if $r \leq s \leq t$, then $f_{rt} = f_{st} \circ f_{rs}$ and tameness, i.e., all but finitely many structure maps are isomorphisms.
 	
 	A \textit{morphism of persistence modules} $F : V \to W$ is a collection of linear maps $F(s) : V(s) \to W(s)$ such that $F(t) \circ f_{st} = f_{st} \circ F(s)$ for each par of reals $s \leq t$.	We say that $F$ is an \textit{isomorphisms} if each $F(s)$ is.
 	
-	\subsection*{Persistent simplicial (co)homology:} 
+	\subsection*{Persistent simplicial (co)homology:} \label{persistent simplicial (co)homology}
+	
 	Let $\{X(s)\}_{s \in \mathbb R} $ be a collection of ordered or directed simplicial complexes together with simplicial maps $f_{st} : X(s) \to X(t)$ for each pair $s \leq t$, such that if $r \leq s \leq t$, then $f_{rt} = f_{st} \circ f_{rs}$. Its \textit{persistent simplicial homology with $\Bbbk$-coefficients} is the persistence module
 	\begin{equation*}
 	H_*(X(s); \Bbbk)
 	\end{equation*}
-	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not satisfy the tameness condition of a \underline{persistence module}, but we restrict attention to the cases where it does.
+	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not satisfy the tameness condition of a \hyperref[persistence module]{persistence module}, but we restrict attention to the cases where it does.
 	
 	\textit{Persistence simplicial cohomology with $\Bbbk$-coefficients} is defined analogously.
 	
-	\subsection*{Vietoris-Rips complex and Vietoris-Rips homology:}
-	The \textit{Vietoris-Rips complex} of a \underline{finite metric space} $(X, d)$ is given by the following construction: let $s \geq 0$, define the {\underline{simplicial complex}} $VR_X(s)$ to have vertices the set $X$ and declare a subset $\{x_0, \dots, x_n\}$ of distinct points in $X$ to be a simplex if $d(x_i, x_j) \leq s$ for all $x_i, x_j$, explicitly
+	\subsection*{Vietoris-Rips complex and Vietoris-Rips homology:} \label{vietoris-rips complex and vietoris-rips homology}
+	
+	The \textit{Vietoris-Rips complex} of a \hyperref[finite metric spaces and point clouds]{finite metric space} $(X, d)$ is given by the following construction: let $s \geq 0$, define the {\hyperref[abstract simplicial complex]{abstract simplicial complex}} $VR_X(s)$ to have vertices the set $X$ and declare a subset $\{x_0, \dots, x_n\}$ of distinct points in $X$ to be a simplex if $d(x_i, x_j) \leq s$ for all $x_i, x_j$, explicitly
 	\begin{equation*}
 	VR_X(s) = \big\{ [v_0,\dots,v_n]\ |\ d(v_i,v_j) \leq s \text{ for all } i,j = 0,\dots n \big\}.
 	\end{equation*}
 	
-	We equipped this collection of complexes with the inclusion maps $VR_X(s) \to VR_X(t)$ for each $s \leq t$ and define the Vietoris-Rips homology of $(X, d)$ to be the \underline{persistent simplicial homology} of this collection.
+	We equipped this collection of complexes with the inclusion maps $VR_X(s) \to VR_X(t)$ for each $s \leq t$ and define the Vietoris-Rips homology of $(X, d)$ to be the \hyperref[persistent simplicial (co)homology]{persistent simplicial homology} of this collection.
 	
-	\subsection*{Multiset:}
+	\subsection*{Multiset:} \label{multiset}
+	
 	A \textit{multiset} is a pair $(S, \phi)$ where $S$ is a set and  $\phi : S \to \mathbb N  \cup \{+\infty\}$ is a function attaining positive values. For $s \in S$ we refer to $\phi(s)$ as its \textit{multiplicity}. The \textit{union} of two multisets $(S_1, \phi_1), (S_2, \phi_2)$ is the multiset $(S_1 \cup S_2, \phi_1 \cup \phi_2)$ with
-	$$
+	\begin{equation*}
 	(\phi_1 \cup \phi_2)(s) = 
 	\begin{cases}
 	\phi_1(s) & s \in S_1, s \not\in S_2 \\
 	\phi_2(s) & s \in S_2, s \not\in S_1 \\
 	\phi_1(s) + \phi_2(s) & s \in S_1, s \in S_2. \\
 	\end{cases}
-	$$
+	\end{equation*}
 	
-	\subsection*{Persistence diagram:}
-	A \textit{persistence diagram} is a \underline{multiset} of points in $\mathbb R \times \mathbb{R} \cup \{+\infty\}$.
+	\subsection*{Persistence diagram:} \label{persistence diagram}
 	
-	Given a \underline{persistence module} its associated persistence diagram is determined by the following condition: for each pair $s,t$ the number counted with multiplicity of points $(b,d)$ in the multiset, satisfying $b \leq s \leq t < d$ is equal to the rank of $f_{st.}$
+	A \textit{persistence diagram} is a \hyperref[multiset]{multiset} of points in $\mathbb R \times \mathbb{R} \cup \{+\infty\}$.
+	
+	Given a \hyperref[persistence module]{persistence module} its associated persistence diagram is determined by the following condition: for each pair $s,t$ the number counted with multiplicity of points $(b,d)$ in the multiset, satisfying $b \leq s \leq t < d$ is equal to the rank of $f_{st.}$
 	
 	A well known result establishes that there exists an isomorphism between two persistence module if and only if their persistence diagrams are equal.
 	% \paragraph{References:}
 	
-	\subsection*{Wasserstein and bottleneck distance:}	
+	\subsection*{Wasserstein and bottleneck distance:}	\label{wasserstein and bottleneck distance}
+	
 	The \textit{$p$-Wasserstein distance} between two persistence diagrams $D_1$ and $D_2$ is the infimum over all bijections $\gamma: D_1 \cup \Delta \to D_2 \cup \Delta$ of
-	$$
+	\begin{equation*}
 	\sum_{x \in D_1 \cup \Delta} \Big(||x - \gamma(x)||_\infty^p \Big)^{1/p}
-	$$
+	\end{equation*}
 	where $||-||_\infty$ is defined for $(x,y) \in \mathbb R^2$ by $\max\{|x|, |y|\}$. 
 	
 	The limit $p \to \infty$ defines the \textit{bottleneck distance}. More explicitly, it is the infimum over the same set of bijections of the value
-	$$
-	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
-	$$
-	\paragraph{Reference:} \cite{kerber2017geometry}
-	
-	\subsection*{Persistence  landscape:}
-	A \textit{persistence  landscape} is a continuous function
 	\begin{equation*}
-	\lambda : \mathbb N \times  \mathbb R \to \mathbb R \cup \{+\infty\}
+	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
+	\end{equation*}
+
+	\paragraph{\\ Reference:} \cite{kerber2017geometry}
+	
+	\subsection*{Persistence  landscape:} \label{persistence landscape}
+
+	A \textit{persistence landscape} is a continuous function
+	\begin{equation*}
+	\lambda : \mathbb N \times \mathbb R \to \mathbb R \cup \{+\infty\}
 	\end{equation*}
 	and the function $\lambda_k(s) = \lambda(k,s)$ is refered to as the \textit{$k$-layer of the persistence diagram}.
-	
-	Let $\{(b_i, d_i)\}_{i \in I}$ be the persistence diagram of a \underline{persistence module}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting
-	$\lambda_k(t)$ be  $k$-th largest value of 
-	$$
-	\min_{i \in I}\{t-b_i, d_i-t\}_+
-	$$
-	where $c_+$ denotes $max(c,0)$.
+
+  Let ${(b_i, d_i)}{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k(t)$ be the $k$-th largest value of the collection ${ \Lambda_i(t) }{i \in I}$, where
+	\begin{equation*}
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
+	\end{equation*}
+	and $c_+ := \max(c,0)$.
 	
 	Intuitively, we can describe the graph of this persistence landscape by first joining each of the points in the multiset to the diagonal via a horizontal as well as a vertical line, then rotating the figure 45 degrees clockwise, and rescaling by $1/\sqrt{2}$.
-	\paragraph{References:}  \cite{bubenik2015statistical}
+
+	\paragraph{\\ Reference:} \cite{bubenik2015statistical}
 	
-	\subsection*{Persistence  landscape norm:}
+	\subsection*{Persistence landscape norm:} \label{persistence landscape norm}
+	
 	Given a function $f : \mathbb R \to \overline{\mathbb R} = [-\infty, +\infty]$ define
 	\begin{equation*}
 	||f||_p = \left( \int_{\mathbb R} f^p(x)\, dx \right)^{1/p}
 	\end{equation*}
 	whenever the right hand side exists and is finite.
 	
-	The \textit{persistence landscape $p$-norm} of a \underline{persistence landscape} $\lambda : \mathbb N \times \mathbb R \to \overline{\mathbb R}$ is defined to be
+	The \textit{persistence landscape $p$-norm} of a \hyperref[persistence landscape]{persistence landscape} $\lambda : \mathbb N \times \mathbb R \to \overline{\mathbb R}$ is defined to be
 	\begin{equation*}
 	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
 	\end{equation*}
-	whenever the right hand side exists and is finite. 
+	whenever the right hand side exists and is finite.
+
 	\paragraph{References:} \cite{stein2011functional, bubenik2015statistical}
+
+	\subsection*{Weighted silhouettes:} \label{weighted silhouettes}
+
+	Let $D = {(b_i, d_i)}_{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. A \textit{weighted silhouette} associated to $D$ is a continuous function $\phi : \mathbb R \to \mathbb R$ of the form
+	\begin{equation*}
+	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},
+	\end{equation*}
+	where $\{w_i\}_{i \in I}$ is a collection of positive weights, and $\Lambda_i(t)$ is as defined for \hyperref[persistence landscapes]{persistence landscapes}.  The particular choice $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ is referred to as \textit{power-weighted silhouettes}.
+
+	\paragraph{References:}  \cite{chazal2014stochastic}
 	
-	\subsection*{Amplitude} Given a function assigning a real number to a pair of persistence diagrams. We define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \underline{Wasserstein and bottleneck distances} and \underline{landscape distance}.
+	\subsection*{Amplitude:} \label{amplitude}
+
+	Given a function assigning a real number to a pair of persistence diagrams, we define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \hyperref[wasserstein and bottleneck distance]{Wasserstein and bottleneck distances} and \hyperref[persistence landscape norm]{landscape distance}.
 	
-	\subsection*{Persistence entropy:}
-	Intuitively, this is a measure of the entropy of the points in a \underline{persistence diagram}. Precisely, let $D = \{(b_i, d_i)\}_{i \in I}$ be a persistence diagram with each $d_i < +\infty$. The \textit{persistence entropy} of $D$ is defined by
+	\subsection*{Persistence entropy:} \label{persistence entropy}
+	
+	Intuitively, this is a measure of the entropy of the points in a \hyperref[persistence diagram]{persistence diagram}. Precisely, let $D = \{(b_i, d_i)\}_{i \in I}$ be a persistence diagram with each $d_i < +\infty$. The \textit{persistence entropy} of $D$ is defined by
 	\begin{equation*}
 	E(D) = - \sum_{i \in I} p_i \log(p_i)
 	\end{equation*}
@@ -227,26 +278,36 @@
 	\begin{equation*}
 	p_i = \frac{(d_i - b_i)}{L_D} \qquad \text{and} \qquad L_D = \sum_{i \in I} (d_i - b_i) . 
 	\end{equation*}
+	
 	\paragraph{References:} \cite{rucco2016characterisation}
 	
-	\subsection*{Betti curve:}
-	Let $D$ be a \underline{persistence diagram}. Its \textit{Betti curve} is the function $\beta_D : \mathbb R \to \mathbb N$ whose value on $s \in \mathbb R$ is the number, counted with multiplicity, of points $(b_i,d_i)$ in $D$ such that $b_i \leq s <d_i$.
+	\subsection*{Betti curve:} \label{betti curve}
+	
+	Let $D$ be a \hyperref[persistence diagram]{persistence diagram}. Its \textit{Betti curve} is the function $\beta_D : \mathbb R \to \mathbb N$ whose value on $s \in \mathbb R$ is the number, counted with multiplicity, of points $(b_i,d_i)$ in $D$ such that $b_i \leq s <d_i$.
 	
 	The name is inspired from the case when the persistence diagram comes from persistent homology.
 	
-	\subsection*{Metric space:}
+	\subsection*{Metric space:} \label{metric space}
+	
 	A  pair $(X, d)$ where $X$ is a set and $d$ is a function 
-	$$
+	\begin{equation*}
 	d : X \times X \to \mathbb R
-	$$
+	\end{equation*}
 	attaining non-negative values is called a \textit{metric space} if
-	$$d(x,y) = 0\ \Leftrightarrow\  x = y$$
-	$$d(x,y) = d(y,x)$$
-	$$d(x,z) \leq d(x,y) + d(y, z)$$
+  \begin{equation*}
+	d(x,y) = 0\ \Leftrightarrow\  x = y
+  \end{equation*}
+	\begin{equation*}
+  d(x,y) = d(y,x)
+  \end{equation*}
+	\begin{equation*}
+  d(x,z) \leq d(x,y) + d(y, z)
+  \end{equation*}
 	
 	In this case, the function $d$ is refer to as the \textit{metric} and the value $d(x,y)$ is called the \textit{distance} between $x$ and $y$. 
 	
-	\subsection*{Euclidean distance and norm:}
+	\subsection*{Euclidean distance and norm:} \label{euclidean distance and norm}
+	
 	The set $\mathbb R^n$ defines a metric space with euclidean distance
 	\begin{equation*}
 	d(x,y) = \sqrt{(x_1-y_1)^2 + \cdots + (x_n-y_n)^2}.
@@ -254,13 +315,16 @@
 	
 	The norm $||x||$ of a vector $x$ is defined as its distance to the $0$ vector.
 	
-	\subsection*{Finite metric spaces and point clouds:} A \textit{finite metric space} is a finite set together with a \underline{metric}. A \textit{distance matrix} associated to a finite metric space is obtained by choosing a total order on the finite set and setting the $(i,j)$-entry to be equal to the distance between the $i$-th and $j$-th elements. 
+	\subsection*{Finite metric spaces and point clouds:} \label{finite metric spaces and point clouds}
 	
-	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the \underline{eucliden distance}.
+	A \textit{finite metric space} is a finite set together with a \hyperref[metric space]{metric}. A \textit{distance matrix} associated to a finite metric space is obtained by choosing a total order on the finite set and setting the $(i,j)$-entry to be equal to the distance between the $i$-th and $j$-th elements. 
+	
+	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the \hyperref[euclidean distance and norm]{eucliden distance}.
 	
 	\section{Time series}
 	
-	\subsection*{Time series:}
+	\subsection*{Time series:} \label{time series}
+	
 	A \textit{time series} is a sequence $\{y_i\}_{i = 0}^n$ of real numbers. 
 	
 	A common construction of a times series $\{x_i\}_{i = 0}^n$ is given by choosing $x_0$ arbitrarily as well as a step parameter $h$ and setting
@@ -283,8 +347,9 @@
 	\end{equation*}
 	for an arbitrarily chosen $m \in M$.
 	
-	\subsection*{Takens embedding:}	
-	Let $M \subset \mathbb R^d$ be a \underline{compact manifold} of dimension $n$. Let
+	\subsection*{Takens embedding:}	\label{takens embedding}
+	
+	Let $M \subset \mathbb R^d$ be a \hyperref[manifold]{compact manifold} of dimension $n$. Let
 	\begin{equation*}
 	\varphi : \mathbb R  \times M \to M
 	\end{equation*} 
@@ -305,17 +370,21 @@
 	x_i = \varphi(i \cdot \tau, x)
 	\end{equation*}
 	is an injective map with full rank. 
-	\paragraph{\textit{Reference}:} \cite{takens1981detecting}
+  
+  \paragraph{\\ Reference:} \cite{takens1981detecting}
 	
-	\subsection*{Manifold:} Intuitively, a manifold of dimension $n$ is a space locally equivalent to $\mathbb R^n$. Formally, a subset $M$ of $\mathbb R^d$ is an $n$-dimensional manifold if for each $x \in M$ there exists an 
-	open ball $B(x) = \{ y \in M\,;\ d(x,y) < \epsilon\}$ and a smooth function with smooth inverse 
+	\subsection*{Manifold:} \label{manifold}
+	
+	Intuitively, a manifold of dimension $n$ is a space locally equivalent to $\mathbb R^n$. Formally, a subset $M$ of $\mathbb R^d$ is an $n$-dimensional manifold if for each $x \in M$ there exists an open ball $B(x) = \{ y \in M\,;\ d(x,y) < \epsilon\}$ and a smooth function with smooth inverse 
 	\begin{equation*}
 	\phi_x : B(x) \to \{v \in \mathbb R^n\,;\ ||v||<1\}.
 	\end{equation*}
-	\paragraph{\textit{References}:}  \cite{milnor1997topology,guillemin2010differential}
 	
-	\subsection*{Compact subset:}	A subset $K$ of a metric space $(X,d)$ is said to be \textit{bounded} if there exist a real number $D$ such that for each pair of elements in $K$ the distance between them is less than $D$. It is said to be \textit{complete} if for any $x \in X$ it is the case that $x \in K$ if for any $\epsilon > 0$ the intersection between $K$ and $\{y \,;\ d(x,y) < \epsilon \}$ is not empty. It is said to be \textit{compact} if it is both bounded and complete.
+	\paragraph{\\ References:}  \cite{milnor1997topology,guillemin2010differential}
 	
+	\subsection*{Compact subset:}	\label{compact subset}
+	
+	A subset $K$ of a metric space $(X,d)$ is said to be \textit{bounded} if there exist a real number $D$ such that for each pair of elements in $K$ the distance between them is less than $D$. It is said to be \textit{complete} if for any $x \in X$ it is the case that $x \in K$ if for any $\epsilon > 0$ the intersection between $K$ and $\{y \,;\ d(x,y) < \epsilon \}$ is not empty. It is said to be \textit{compact} if it is both bounded and complete.
 	
 	\bibliography{bibliography}{}
 	\bibliographystyle{alpha}

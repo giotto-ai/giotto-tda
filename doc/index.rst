@@ -102,7 +102,9 @@ Utilities
    :template: class.rst
 
    homology.VietorisRipsPersistence
-   homology.ConsistentRescaling
+   homology.SparseRipsPersistence
+   homology.EuclideanCechPersistence
+   homology.CubicalPersistence
 
 
 :mod:`gtda.diagrams`: Persistence diagrams
@@ -134,8 +136,22 @@ Distances
 
    diagrams.PairwiseDistance
 
-Diagram features
-----------------
+Representations
+---------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   diagrams.PersistenceLandscape
+   diagrams.BettiCurve
+   diagrams.HeatKernel
+   diagrams.PersistenceImage
+   diagrams.Silhouette
+
+Features
+--------
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -144,9 +160,6 @@ Diagram features
 
    diagrams.Amplitude
    diagrams.PersistenceEntropy
-   diagrams.PersistenceLandscape
-   diagrams.BettiCurve
-   diagrams.HeatKernel
 
 
 :mod:`gtda.time_series`: Time series
@@ -209,6 +222,23 @@ Multivariate
    time_series.PearsonDissimilarity
 
 
+:mod:`gtda.point_clouds`: Point clouds
+======================================
+
+.. automodule:: gtda.point_clouds
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   point_clouds.ConsistentRescaling
+   point_clouds.ConsecutiveRescaling
+
+
 :mod:`gtda.graphs`: Graphs
 ==========================
 
@@ -236,6 +266,41 @@ Graph processing
    :template: class.rst
 
    graphs.GraphGeodesicDistance
+
+
+:mod:`gtda.images`: Images
+==========================
+
+.. automodule:: gtda.images
+   :no-members:
+   :no-inherited-members:
+
+Image preprocessing
+-------------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   images.Binarizer
+   images.Inverter
+   images.Padder
+   images.ImageToPointCloud
+
+Binary image filtrations
+------------------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   images.HeightFiltration
+   images.RadialFiltration
+   images.DilationFiltration
+   images.ErosionFiltration
+   images.SignedDistanceFiltration
 
 
 :mod:`gtda.base`: Base
@@ -310,50 +375,3 @@ Graph processing
    utils.check_diagram
    utils.validate_params
    utils.validate_metric_params
-
-..
-   :mod:`gtda.images`: Images
-   ==========================
-
-..
-   automodule:: gtda.images
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: gtda
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   images.ImageInverter
-   images.HeightFiltration
-   images.RadialFiltration
-   images.DilationFiltration
-   images.ErosionFiltration
-   images.SignedDistanceFiltration
-   images.DensityFiltration
-
-
-..
-   :mod:`gtda.manifold`: Manifold learning
-   =======================================
-
-..
-   automodule:: gtda.manifold
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: gtda
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   manifold.StatefulMDS
-
-   manifold.Kinematics
