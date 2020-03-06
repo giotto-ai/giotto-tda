@@ -117,11 +117,13 @@ html_theme_options = {
 }
 
 # List versions
+current_version = os.environ['VERSION']
+html_theme_options.update({'current_version': current_version})
 with open('versions') as f:
-    _versions = f.read().splitlines()
-html_theme_options.update({'versions': [(c, f'../{c[:-1]}/index.html')
-                                        for c in _versions]})
-html_theme_options.update({'current_version': os.environ['VERSION']})
+    _versions = [c[2:] for c in f.read().splitlines()]
+_versions = list(filter(lambda c: not(c.startswith('.')), _versions))
+html_theme_options.update({'versions': [(c, f'../{c}/index.html')
+                                        for c in set(_versions).union([current_version])]})
 
 # Get logo
 path_to_image = "images/tda_logo.svg"
