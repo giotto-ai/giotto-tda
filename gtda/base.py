@@ -85,12 +85,10 @@ class TransformerResamplerMixin:
         return self.fit(X, y, **fit_params).transform_resample(X, y)
 
 
-class TransformerPlotterMixin(TransformerMixin):
-    """Mixin class for all transformers-plotters in giotto-tda."""
+class PlotterMixin:
+    """Mixin class for all plotters in giotto-tda."""
 
-    _estimator_type = 'transformer_plotter'
-
-    def fit_transform_plot(self, X, y=None, sample=0, **fit_params, **plot_params):
+    def fit_transform_plot(self, X, y=None, sample=0, **plot_params):
         """Fit to data, then transform it.
 
         Fits transformer to `X` and `y` with optional parameters `fit_params`
@@ -112,7 +110,7 @@ class TransformerPlotterMixin(TransformerMixin):
             Transformed input sample.
 
         """
-        Xt = self.fit_transform(X, y, **fit_params)
+        Xt = self.fit_transform(X, y)
 
         self.plot(Xt, sample, **plot_params)
         return Xt
@@ -140,58 +138,3 @@ class TransformerPlotterMixin(TransformerMixin):
 
         self.plot(Xt, sample, **plot_params)
         return Xt
-
-class TransformerResamplerPlotterMixin(TransformerPlotterMixin):
-    """Mixin class for all transformers-resamplers in giotto-tda."""
-
-    _estimator_type = 'transformer_resampler_plotter'
-
-    def transform_resample_plot(self, X, y, sample=0, **plot_params):
-        """Fit to data, then transform it.
-
-        Fits transformer to `X` and `y` with optional parameters `fit_params`
-        and returns a transformed version of `X`.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, ...)
-            Input data.
-        y : ndarray of shape (n_samples, )
-            Target data.
-
-        Returns
-        -------
-        Xt : ndarray of shape (n_samples, ...)
-            Transformed input.
-
-        """
-        Xt, yt = self.transform(X), self.resample(y, X)
-
-        self.plot(Xt, sample, **plot_params)
-        return Xt, yr
-
-    def fit_transform_resample_plot(self, X, y, sample=0, **fit_params,
-                                    **plot_params):
-        """Fit to data, then transform the input and resample the target.
-        Fits transformer to X and y with optional parameters fit_params
-        and returns a transformed version of X ans a resampled version of y.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, ...)
-            Input data.
-        y : ndarray of shape (n_samples, )
-            Target data.
-
-        Returns
-        -------
-        Xt : ndarray of shape (n_samples, ...)
-            Transformed input.
-        yr : ndarray of shape (n_samples, ...)
-            Resampled target.
-
-        """
-        Xt, yr =  self.fit(X, y, **fit_params).transform_resample(X, y)
-
-        self.plot(Xt, sample, **plot_params)
-        return Xt, yr
