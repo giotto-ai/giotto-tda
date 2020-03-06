@@ -218,19 +218,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
-    def plot(self, X, sample=0, **layout):
+    def plot(self, Xt, sample=0, **layout):
         """Plot a single persistence diagram.
 
         Parameters
         ----------
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Array of persistence diagrams computed from the feature arrays or
+            distance matrices in `X`. ``n_features`` equals
+            :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
+            topological features in dimension :math:`q` across all samples in
+            `X`.
 
         sample : int, optional, default: ``0``
             Index of the sample to be plotted.
@@ -705,7 +704,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                     dict with compatible properties
 
         """
-        return plot_diagram(X[sample],
+        return plot_diagram(Xt[sample],
                             homology_dimensions=self.homology_dimensions,
                             **layout)
 
