@@ -19,7 +19,7 @@ _AVAILABLE_METRICS = {
     'bottleneck': {
         'delta': {'type': Real, 'in': Interval(0, 1, closed='both')}},
     'wasserstein': {
-        'p': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='left')},
         'delta': {'type': Real, 'in': Interval(0, 1, closed='right')}},
     'betti': {
         'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
