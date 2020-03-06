@@ -533,11 +533,11 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
     birth-death-dimension triples [b, d, q], the equivalent diagrams of
     birth-persistence-dimension [b, d-b, q] triples are computed and
     subdiagrams corresponding to distinct homology dimensions are considered
-    separately and regarded as sums of Dirac deltas.
-    Then, the convolution with a Gaussian kernel is computed over
-    a rectangular grid of locations evenly sampled from appropriate ranges
-    of the `filtration parameter <https://giotto.ai/theory>`_.
-    The result can be thought of as a raster image.
+    separately and regarded as sums of Dirac deltas. Then, the convolution
+    with a Gaussian kernel is computed over a rectangular grid of locations
+    evenly sampled from appropriate ranges of the `filtration parameter
+    <https://giotto.ai/theory>`_. The result can be thought of as a raster
+    image.
 
     Parameters
     ----------
@@ -548,10 +548,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    weight_function : fct 1d array -> 1d array, default: ``None``
-        Function mapping a 1d-array of persistence of the points of a diagram
-        to a 1d array of their weight. The default value ``None`` is
-        equivalent to passing ``lambda p: p``.
+    weight_function : callable or None, default: ``None``
+        Function mapping the 1D array of persistence values of the points of an
+        input diagram to a 1D array of weights. ``None`` is equivalent to passing
+        the identity function.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -560,9 +560,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    effective_weight_function_ : fct 1d array -> 1d array
-        Effective function mapping a 1d-array of persistence of the points of a
-        diagram to a 1d array of their weight.
+    effective_weight_function_ : callable
+        Effective function corresponding to `weight_function`. Set in
+        :meth:`fit`.
 
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`.
