@@ -570,8 +570,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
 
     weight_function : callable or None, default: ``None``
         Function mapping the 1D array of persistence values of the points of an
-        input diagram to a 1D array of weights. ``None`` is equivalent to passing
-        the identity function.
+        input diagram to a 1D array of weights. ``None`` is equivalent to
+        passing the identity function.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
