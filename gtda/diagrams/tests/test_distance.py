@@ -213,21 +213,21 @@ X_2 = np.array([
 X_bottleneck = np.array([
     [[0, 1, 0.],
      [0, 0, 0.],
-     [0, 4, 1.]],  # Expected bottleneck ampl: [sqrt(2)/2, 2*sqrt(2)]
+     [0, 4, 1.]],  # Expected bottleneck ampl: [1/2, 2]
 
     [[0, 2, 0.],
      [0, 1, 0.],
-     [0, 0, 1.]],  # Expected bottleneck ampl: [sqrt(2), 0]
+     [0, 0, 1.]],  # Expected bottleneck ampl: [1, 0]
 
     [[3, 3.5, 0.],
      [0, 0, 0.],
-     [5, 9, 1.]]  # Expected bottleneck ampl: [0.5*sqrt(2)/2, 2*sqrt(2)]
+     [5, 9, 1.]]  # Expected bottleneck ampl: [1/4, 2]
 ])
 
 X_bottleneck_res_exp = np.array([
- [np.sqrt(2)/2, 2*np.sqrt(2)],
- [np.sqrt(2), 0],
- [np.sqrt(2)/4, 2*np.sqrt(2)]
+ [1/2, 2],
+ [1, 0],
+ [1/4, 2]
 ])
 
 
