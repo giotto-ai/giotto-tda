@@ -195,7 +195,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     Parameters
     ----------
     parameters_type : ``'search'`` | ``'fixed'``, optional, default: \
-                      ``'search'``
+        ``'search'``
         If set to ``'fixed'``, the values of `time_delay` and `dimension`
         are used directly in :meth:`transform`. If set to ``'search'``,
         those values are only used as upper bounds in a search as follows:

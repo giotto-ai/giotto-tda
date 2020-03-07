@@ -46,8 +46,7 @@ class EntropyGenerator(BaseEstimator, TransformerMixin):
         detected.
 
     scaler_metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-                    ``'betti'`` | ``'heat'``, optional, default: \
-                    ``'bottleneck'``
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 
@@ -214,8 +213,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         detected.
 
     scaler_metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-                    ``'betti'`` | ``'heat'``, optional, default: \
-                    ``'bottleneck'``
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 
@@ -332,7 +330,7 @@ class BettiCurveGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-             n_bins)
+            n_bins)
             For each point cloud in `X`, one discretised Betti curve
             per homology dimension in `homology_dimensions`.
 
@@ -378,8 +376,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         detected.
 
     scaler_metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-                    ``'betti'`` | ``'heat'``, optional, default: \
-                    ``'bottleneck'``
+        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the diagonal diagram:
 
@@ -501,7 +498,7 @@ class LandscapeGenerator(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-             n_layers, n_bins)
+            n_layers, n_bins)
             For each point cloud in `X`, one discretised persistence landscape
             per homology dimension in `homology_dimensions`, consisting of
             `n_layers` layers.
