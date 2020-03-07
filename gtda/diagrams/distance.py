@@ -18,8 +18,7 @@ from ..utils.validation import check_diagram, validate_params
 @adapt_fit_transform_docs
 class PairwiseDistance(BaseEstimator, TransformerMixin):
     """`Distances <https://giotto.ai/theory>`_ between pairs of persistence
-    diagrams, constructed from the distances between their respective
-    subdiagrams with constant homology dimension.
+    diagrams.
 
     Given two collections of persistence diagrams consisting of
     birth-death-dimension triples [b, d, q], a collection of distance
@@ -56,13 +55,14 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
           Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
-        Additional keyword arguments for the metric function:
+        Additional keyword arguments for the metric function (passing
+        ``None`` is equivalent to passing the defaults described below):
 
         - If ``metric == 'bottleneck'`` the only argument is `delta` (float,
           default: ``0.01``). When equal to ``0.``, an exact algorithm is
           used; otherwise, a faster approximate algorithm is used.
         - If ``metric == 'wasserstein'`` the available arguments are `p`
-          (int, default: ``2``) and `delta` (float, default: ``0.01``).
+          (float, default: ``2.``) and `delta` (float, default: ``0.01``).
           Unlike the case of ``'bottleneck'``, `delta` cannot be set to
           ``0.`` and an exact algorithm is not available.
         - If ``metric == 'betti'`` the available arguments are `p` (float,
@@ -79,7 +79,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         - If ``metric == 'persistence_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``),
           `n_bins` (int, default: ``100``) and `weight_function`
-          (func, default x -> x).
+          (callable or None, default: ``None``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each pair of diagrams a
@@ -200,8 +200,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples_fit, n_samples, \
-             n_homology_dimensions) if `order` is ``None``, else \
-             (n_samples_fit, n_samples)
+            n_homology_dimensions) if `order` is ``None``, else \
+            (n_samples_fit, n_samples)
             Distance matrix or collection of distance matrices between
             diagrams in `X` and diagrams seen in :meth:`fit`. In the
             second case, index i along axis 2 corresponds to the i-th
@@ -228,31 +228,27 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Amplitude(BaseEstimator, TransformerMixin):
-    """`Amplitudes <https://giotto.ai/theory>`_ of persistence diagrams,
-    constructed from the amplitudes of their subdiagrams with constant
-    homology dimension.
+    """`Amplitudes <https://giotto.ai/theory>`_ of persistence diagrams.
 
-    Given a single persistence diagram consisting of birth-death-dimension
-    triples [b, d, q], a vector of amplitudes or a single scalar amplitude is
-    calculated according to the following steps:
+    For each persistence diagram in a collection, a vector of amplitudes or a
+    single scalar amplitude is calculated according to the following steps:
 
-        1. All diagrams are partitioned into subdiagrams corresponding to
-           distinct homology dimensions.
+        1. The diagram is partitioned into subdiagrams according to homology
+           dimension.
         2. The amplitude of each subdiagram is calculated according to the
            parameters `metric` and `metric_params`. This gives a vector of
-           amplitudes, :math:`\\mathbf{a} = (a_{q_1}, \\ldots, a_{q_n})`.
+           amplitudes, :math:`\\mathbf{a} = (a_{q_1}, \\ldots, a_{q_n})` where
+           the :math:`q_i` range over the available homology dimensions.
         3. The final result is either :math:`\\mathbf{a}` itself or
-           a norm of :math:`\\mathbf{a}`.
+           a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
 
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'`` | ``'silhouette'``| \
+        ``'betti'`` | ``'heat'`` | ``'silhouette'`` | \
         ``'persistence_image'``, optional, default: ``'landscape'``
-        optional, default: ``'landscape'``
-
         Distance or dissimilarity function used to define the amplitude of
-        a subdiagram as its distance from the diagonal diagram:
+        a subdiagram as its distance from the (trivial) diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
           perfect-matching--based notions of distance.
@@ -267,16 +263,17 @@ class Amplitude(BaseEstimator, TransformerMixin):
           Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
-        Additional keyword arguments for the metric function:
+        Additional keyword arguments for the metric function (passing
+        ``None`` is equivalent to passing the defaults described below):
 
         - If ``metric == 'bottleneck'`` there are no available arguments.
-        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
-          default: ``2``).
-        - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_bins` (int, default: ``100``).
+        - If ``metric == 'wasserstein'`` the only argument is `p` (float,
+          default: ``2.``).
         - If ``metric == 'landscape'`` the available arguments are `p`
           (float, default: ``2.``), `n_bins` (int, default: ``100``) and
           `n_layers` (int, default: ``1``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_bins` (int, default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
           (int, default: ``100``).
@@ -286,7 +283,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'persistence_image'`` the available arguments are `p`
           (float, default: ``2.``), `sigma` (float, default: ``1.``),
           `n_bins` (int, default: ``100``) and `weight_function`
-          (func, default x -> x).
+          (callable or None, default: ``None``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each diagram a vector of
@@ -400,7 +397,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions) if `order` \
-             is ``None``, else (n_samples, 1)
+            is ``None``, else (n_samples, 1)
             Amplitudes or amplitude vectors of the diagrams in `X`. In the
             second case, index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
