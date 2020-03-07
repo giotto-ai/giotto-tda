@@ -144,6 +144,10 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     Notes
     -----
+    When `metric` is ``'bottleneck'`` and `function` is ``numpy.max``,
+    :meth:`fit_transform` has the effect of making the lifetime of the most
+    persistent point across all diagrams and homology dimensions equal to 2.
+
     To compute scaling factors without first splitting the computation between
     different homology dimensions, data should be first transformed by an
     instance of :class:`ForgetDimension`.
