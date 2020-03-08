@@ -62,7 +62,6 @@ def betti_curves(diagrams, sampling):
 
 def landscapes(diagrams, sampling, n_layers):
     n_points = diagrams.shape[1]
-
     midpoints = (diagrams[:, :, 1] + diagrams[:, :, 0]) / 2.
     heights = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
@@ -97,17 +96,17 @@ def heats(diagrams, sampling, step_size, sigma):
 
 
 def persistence_images(diagrams, sampling, step_size, weights, sigma):
-    persistence_images_ = np.zeros((diagrams.shape[0],
-                                    sampling.shape[0], sampling.shape[0]))
+    persistence_images_ = np.zeros(
+        (diagrams.shape[0], sampling.shape[0], sampling.shape[0]))
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
 
     for axis in [0, 1]:
         # Set the values outside of the sampling range to the sampling range.
-        diagrams[:, :, axis][diagrams[:, :, axis]
-                             < sampling[0, axis]] = sampling[0, axis]
-        diagrams[:, :, axis][diagrams[:, :, axis]
-                             > sampling[-1, axis]] = sampling[-1, axis]
+        diagrams[:, :, axis][diagrams[:, :, axis] < sampling[0, axis]] = \
+            sampling[0, axis]
+        diagrams[:, :, axis][diagrams[:, :, axis] > sampling[-1, axis]] = \
+            sampling[-1, axis]
         # Convert into pixel
         diagrams[:, :, axis] = np.array(
             (diagrams[:, :, axis] - sampling[0, axis]) / step_size[axis],
@@ -277,13 +276,13 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
 
 
 def bottleneck_amplitudes(diagrams, **kwargs):
-    dists_to_diago = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
-    return np.linalg.norm(dists_to_diago, axis=1, ord=np.inf)
+    half_lifetimes = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
+    return np.linalg.norm(half_lifetimes, axis=1, ord=np.inf)
 
 
 def wasserstein_amplitudes(diagrams, p=2., **kwargs):
-    dists_to_diago = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
-    return np.linalg.norm(dists_to_diago, axis=1, ord=p)
+    half_lifetimes = (diagrams[:, :, 1] - diagrams[:, :, 0]) / 2.
+    return np.linalg.norm(half_lifetimes, axis=1, ord=p)
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
