@@ -9,7 +9,7 @@ import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
@@ -372,7 +372,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        #Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
+        # Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
         Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
         Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
         return Xpts

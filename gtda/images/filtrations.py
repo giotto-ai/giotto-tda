@@ -11,7 +11,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils import gen_even_slices
 
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ._utils import _dilate, _erode
 from ..utils._docs import adapt_fit_transform_docs

@@ -2,9 +2,9 @@
 # License: GNU AGPLv3
 
 import numpy as np
-import types
 
 from sklearn.utils.validation import check_array
+
 
 def check_diagram(X, copy=False):
     """Input validation on a persistence diagram.
