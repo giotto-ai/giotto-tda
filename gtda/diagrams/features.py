@@ -569,8 +569,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         dimension, to sample during :meth:`fit`.
 
     weight_function : callable or None, default: ``None``
-        Function mapping the 1D array of persistence values of the points of
-        an input diagram to a 1D array of weights. ``None`` is equivalent to
+        Function mapping the 1D array of persistence values of the points of an
+        input diagram to a 1D array of weights. ``None`` is equivalent to
         passing the identity function.
 
     n_jobs : int or None, optional, default: ``None``
