@@ -1,14 +1,18 @@
-"""Image preprocessing."""
+"""Image preprocessing module."""
 # License: GNU AGPLv3
 
-import numbers
 from functools import reduce
+from numbers import Real
+from warnings import warn
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
 from joblib import Parallel, delayed, effective_n_jobs
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_array
+
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_list_of_images
 
 
@@ -44,8 +48,11 @@ class Binarizer(BaseEstimator, TransformerMixin):
     gtda.homology.CubicalPersistence
 
     """
-    _hyperparameters = {'threshold': [numbers.Number, (1e-16, 1)],
-                        'normalize': [bool, [False, True]]}
+
+    _hyperparameters = {
+        'threshold': {'type': Real, 'in': Interval(0, 1, closed='right')},
+        'normalize': {'type': bool}
+    }
 
     def __init__(self, threshold=0.5, normalize=False, n_jobs=None):
         self.threshold = threshold
@@ -83,10 +90,14 @@ class Binarizer(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
         X = check_list_of_images(X, allow_nd=True)
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        self.n_dimensions_ = len(X.shape) - 1
         self.max_value_ = np.max(X)
 
         return self
@@ -132,7 +143,6 @@ class Binarizer(BaseEstimator, TransformerMixin):
 @adapt_fit_transform_docs
 class Inverter(BaseEstimator, TransformerMixin):
     """Invert all 2D/3D binary images in a collection.
-
 
     Parameters
     ----------
@@ -233,8 +243,13 @@ class Padder(BaseEstimator, TransformerMixin):
        Effective padding along each of the axis. Set in :meth:`fit`.
 
     """
-    _hyperparameters = {'paddings_': [np.ndarray, (int, None)],
-                        'activated': [bool, [True, False]]}
+
+    _hyperparameters = {
+        'paddings': {
+            'type': (np.ndarray, type(None)),
+            'of': {'type': int}},
+        'activated': {'type': bool}
+    }
 
     def __init__(self, paddings=None, activated=False, n_jobs=None):
         self.paddings = paddings
@@ -263,20 +278,22 @@ class Padder(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_list_of_images(X, allow_nd=True)
+        n_dimensions = X.ndim - 1
+        if n_dimensions < 2 or n_dimensions > 3:
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.paddings is None:
-            self.paddings_ = np.ones(len(X.shape[1:]), dtype=np.int)
+            self.paddings_ = np.ones((n_dimensions,), dtype=np.int)
+        elif len(self.paddings) != n_dimensions:
+            raise ValueError(
+                f"`paddings` has length {self.paddings} while the input "
+                f"data requires it to have length equal to {n_dimensions}.")
         else:
             self.paddings_ = self.paddings
-
-        n_dimensions = len(X.shape) - 1
-
-        validate_params({**self.get_params(),
-                         'paddings_': self.paddings_,
-                         'paddings_dim': len(self.paddings_)},
-                        {**self._hyperparameters,
-                         'paddings_dim': [int, [n_dimensions]]})
-
-        check_list_of_images(X, allow_nd=True)
 
         self._pad_width = ((0, 0),
                            *[(self.paddings_[axis], self.paddings_[axis])
@@ -341,8 +358,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
         n_dimensions)
         Mesh image for which each pixel value is its coordinates in a
-        `n_dimensions` space, where `n_dimensions` is the dimension of the
-        images of the input collection. Set in meth:`fit`.
+        ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
+        dimension of the images of the input collection. Set in meth:`fit`.
 
     See also
     --------
@@ -350,11 +367,14 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
     gtda.homology.EuclideanCechPersistence
 
     """
+
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
+        #Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
+        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
+        Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
         return Xpts
 
     def fit(self, X, y=None):
@@ -379,8 +399,11 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         """
         _ = check_list_of_images(X, allow_nd=True)
         self.is_fitted_ = True
+        n_dimensions = X.ndim - 1
+        if n_dimensions < 2 or n_dimensions > 3:
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self.n_dimensions_}.")
 
-        n_dimensions = len(X.shape) - 1
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
                            for i in axis_order[:n_dimensions]]
@@ -411,7 +434,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
             n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
-            point cloud in a `n_dimensions` dimensional space.
+            point cloud in ``n_dimensions``-dimensional space.
 
         """
         check_is_fitted(self)

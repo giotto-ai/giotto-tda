@@ -1,7 +1,7 @@
 """Construct transition graphs from dynamical systems."""
 # License: GNU AGPLv3
 
-import types
+from types import FunctionType
 import warnings
 
 import numpy as np
@@ -15,10 +15,10 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
 
-def _identity(X):
+def identity(x):
     """The identity function.
     """
-    return X
+    return x
 
 
 @adapt_fit_transform_docs
@@ -111,7 +111,10 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'_func': [types.FunctionType, None]}
+    _hyperparameters = {
+        'func': {'type': (FunctionType, type(None))},
+        'func_params': {'type': (dict, type(None))}
+    }
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):
         self.func = func
@@ -154,8 +157,11 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         """
         check_array(X, allow_nd=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.func is None:
-            self._func = _identity
+            self._func = identity
         else:
             self._func = self.func
 
@@ -163,9 +169,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
             self.effective_func_params_ = {}
         else:
             self.effective_func_params_ = self.func_params.copy()
-
-        validate_params({**self.get_params(), '_func': self._func},
-                        self._hyperparameters)
 
         return self
 

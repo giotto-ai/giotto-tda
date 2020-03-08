@@ -1,18 +1,23 @@
 """Persistent homology on point clouds or finite metric spaces."""
 # License: GNU AGPLv3
 
-import numbers
+from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
+
 from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
+
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_list_of_point_clouds
+
 
 
 @adapt_fit_transform_docs
@@ -44,7 +49,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
@@ -77,7 +82,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    SparseRipsPersistence, ConsistentRescaling
+    SparseRipsPersistence, EuclideanCechPersistence, CubicalPersistence,
+    ConsistentRescaling
 
     Notes
     -----
@@ -98,13 +104,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'max_edge_length': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))}
+    }
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), coeff=2, infinity_values=None,
+    def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
+                 coeff=2, max_edge_length=np.inf, infinity_values=None,
                  n_jobs=None):
         self.metric = metric
         self.homology_dimensions = homology_dimensions
@@ -154,20 +165,17 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_list_of_point_clouds(X, ensure_2d=False, allow_nd=True,
+                                   force_all_finite=False)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_list_of_point_clouds(X, ensure_2d=False, allow_nd=True,
-                                   force_all_finite=False)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -249,7 +257,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
@@ -287,7 +295,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, EuclideanCechPersistence, CubicalPersistence,
+    ConsistentRescaling
 
     Notes
     -----
@@ -306,14 +315,20 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         cohomology.html>`_.
 
     """
-    _hyperparameters = {'epsilon': [numbers.Number, (0., 1.)],
-                        'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), coeff=2, epsilon=0.1,
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'epsilon': {'type': Real, 'in': Interval(0, 1, closed='both')},
+        'max_edge_length': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))}
+    }
+
+    def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
+                 coeff=2, epsilon=0.1, max_edge_length=np.inf,
                  infinity_values=None, n_jobs=None):
         self.metric = metric
         self.homology_dimensions = homology_dimensions
@@ -373,21 +388,18 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_list_of_point_clouds(X, ensure_2d=False,
+                                   allow_nd=True,
+                                   force_all_finite=False)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_list_of_point_clouds(X, ensure_2d=False,
-                                   allow_nd=True,
-                                   force_all_finite=False)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -454,7 +466,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
@@ -487,7 +499,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, SparseRipsPersistence, CubicalPersistence,
+    ConsistentRescaling
 
     Notes
     -----
@@ -506,13 +519,21 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         cohomology.html>`_.
 
     """
-    _hyperparameters = {'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, max_edge_length=np.inf, homology_dimensions=(0, 1),
-                 coeff=2, infinity_values=None, n_jobs=None):
+    _hyperparameters = {
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'max_edge_length': {
+            'type': Real, 'in': Interval(0, np.inf, closed='right')},
+        'infinity_values': {
+            'type': (Real, type(None)),
+            'in': Interval(0, np.inf, closed='neither')},
+    }
+
+    def __init__(self, homology_dimensions=(0, 1), coeff=2,
+                 max_edge_length=np.inf, infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.max_edge_length = max_edge_length
@@ -562,19 +583,16 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_list_of_point_clouds(X, ensure_2d=False, allow_nd=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_list_of_point_clouds(X, ensure_2d=False, allow_nd=True)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
