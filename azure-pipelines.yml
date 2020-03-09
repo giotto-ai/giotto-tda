@@ -35,7 +35,7 @@ jobs:
         ccache -s
       displayName: 'Install dependencies and dev environement'
 
-    - script:
+    - script: |
         set -e
         mkdir tmp
         cd tmp
@@ -49,14 +49,13 @@ jobs:
         brew install pandoc pandoc-citeproc
       displayName: 'Install additional stuff to build docs'
 
-    - script:
+    - script: |
         cd doc
         make all-gh
       displayName: 'Build the docs'
       failOnStderr: true
 
-    - script:
-        ls tmp/
+    - script: |
         cd tmp/gtda-docs/
         git config --local user.name "Azure Pipelines"
         git config --local user.email "azuredevops@microsoft.com"
