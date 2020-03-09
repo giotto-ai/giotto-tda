@@ -42,5 +42,15 @@ gtda/externals/pybind11
 .pytest_cache/
 .hypothesis/
 
+# Latex
+*.aux
+*.bbl
+*.blg
+*.brf
+*.log
+*.pdf
+*.synctex.gz
+doc/theory/glossary_backup
+
 # development
-gtda/mapper/scratch/*
+tda/mapper/scratch/
