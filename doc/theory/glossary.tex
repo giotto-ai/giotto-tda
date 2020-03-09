@@ -289,11 +289,11 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Heat kernel:} \label{heat kernel}
 	
-	Given a set $\xi$, a kernel $k:\xi \times \xi \rightarrow \mathbb{R}$ is a kernel, if there exists a Hilbert space $H$ with inner product $\langle \cdot, \cdot \rangle$ and a function $\phi: \xi \rightarrow H$, such that $k(x,y) = \langle \phi(x), \phi(y) \rangle$.
+	Given a set $\xi$, $k:\xi \times \xi \rightarrow \mathbb{R}$ is a kernel, if there exists a Hilbert space $H$ with inner product $\langle \cdot, \cdot \rangle$ and a function $\phi: \xi \rightarrow H$, such that $k(x,y) = \langle \phi(x), \phi(y) \rangle$.
 	
-	In contrast to vectorisation methods, kernel methods do not give an explicit feature map nor a vector representation. Nevertheless,such methods remain popular for tasks like classification.
+	In contrast to vectorisation methods, kernel methods do not give an explicit feature map. Nevertheless, such methods remain popular for tasks like classification.
 	
-	Let $D, D'$ be two \hyperref[persistence diagram]{persistence diagrams}. Then, the persistence scale-space kernel, often called the \textit{heat kernel}, is defined by
+	Let $D, D'$ be two \hyperref[persistence diagram]{persistence diagrams}. Then, the \textit{persistence scale-space kernel}, often called the \textit{heat kernel}, is defined by
 	\begin{equation*}
 	k_\sigma(D,\, D') = \frac{1}{8\pi\sigma}\sum_{p\in D,\, q \in D'}
 	\exp\left(\frac{-\Vert p-q\Vert^2}{8\sigma}\right) -
