@@ -49,14 +49,12 @@ jobs:
         cd doc
         make all-gh
       displayName: 'Build the docs'
-      failOnStderr: false
+      failOnStderr: true
 
     - script:
-        cd $GITDIR
-        git config --local user.name "Azure Pipelines"
-        git config --local user.email "azuredevops@microsoft.com"
-        git commit -m "Update docs - AZURE"
-        git push origin master
+        git config --global user.name "Azure Pipelines"
+        git config --global user.email "azuredevops@microsoft.com"
+        make gh-commit
       displayName:  'Commit the docs'
       failOnStderr: false
 
