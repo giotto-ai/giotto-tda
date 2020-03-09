@@ -102,13 +102,30 @@ pdfpagelabels]{hyperref}
 	
 	With appropriate modifications the same terminology and notation introduced for \hyperref[ordered simplicial complex]{ordered simplicial complex} applies to directed simplicial complex.
 	
-	\subsection*{Clique or flag complexes:} \label{clique or flag complexes}
+	\subsection*{Flag complexes:} \label{flag complexes}
 	
-	Let $G$ be a $1$-dimensional simplicial complex, abstract or otherwise. The complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. 
+	Let $G$ be a $1$-dimensional abstract (resp. directed) simplicial complex. The complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ \big(resp. $(v_0, \dots, v_n)$\big) is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\}$ \big(resp. $(v_i, v_j)$\big) is in $G$ for each pair of vertices $v_i, v_j$. 
 	
-	Let $G$ be a $1$-dimensional directed simplicial complex. The directed simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $(v_0, \dots, v_n)$ is a simplex in $\langle G \rangle$ if an only if $(v_i, v_j) \in G$ for each pair of vertices $v_i, v_j$ with $i < j$. 
+	A (directed) simplicial complex $X$ is a \textit{(directed) flag complex} if $X = \langle G \rangle$ for some $G$.
 	
-	A (directed) simplicial complex $X$ is a \textit{clique complex} a.k.a. \textit{flag complex} if $X = \langle X_1 \rangle$ where $X_1$ is the $1$-skeleton of $X$. 
+	Given a collection of weights in $G$, i.e., a function
+	\begin{equation*}
+	w : G \to \mathbb R,
+	\end{equation*}
+	consider the extension
+	\begin{equation*}
+	w : \langle G \rangle \to \mathbb R
+	\end{equation*}
+	given by
+	\begin{equation*}
+	w(\sigma) = \max(\{ w(e)\ |\ e \in G \cap \sigma\})
+	\end{equation*}
+	and define the \hyperref[filtered complex]{filtered complex} $\{\langle G \rangle_{s}\}_{s \in \mathbb R}$ by
+	\begin{equation*}
+	\langle G \rangle_s = \{\sigma \in \langle G \rangle\ |\ w(\sigma) \leq s\}.
+	\end{equation*}
+	
+	A filtered complex $\{X_s\}_{s \in \mathbb R}$ is a \textit{(directed) filtered flag complex} if $X_s = \langle G \rangle_s$ for some $(G,w)$.
 	
 	\subsection*{Chain complex:} \label{chain complex}
 	
