@@ -1,39 +1,14 @@
 """Utilities for input validation."""
 # License: GNU AGPLv3
 
-import numbers
 import numpy as np
-import types
-
-available_metrics = {
-    'bottleneck': [('delta', numbers.Number, (0., 1.))],
-    'wasserstein': [('p', int, (1, np.inf)),
-                    ('delta', numbers.Number, (1e-16, 1.))],
-    'betti': [('p', numbers.Number, (1, np.inf)),
-              ('n_bins', int, (1, np.inf))],
-    'landscape': [('p', numbers.Number, (1, np.inf)),
-                  ('n_bins', int, (1, np.inf)),
-                  ('n_layers', int, (1, np.inf))],
-    'heat': [('p', numbers.Number, (1, np.inf)),
-             ('n_bins', int, (1, np.inf)),
-             ('sigma', numbers.Number, (0., np.inf))],
-    'persistence_image': [('p', numbers.Number, (1, np.inf)),
-                          ('n_bins', int, (1, np.inf)),
-                          ('sigma', numbers.Number, (0., np.inf)),
-                          ('weight_function', types.FunctionType,
-                           None)],
-    'silhouette': [('order', numbers.Number, (0, np.inf)),
-                   ('n_bins', int, (1, np.inf))]}
-
-available_metric_params = {metric: [p[0] for p in param_lst]
-                           for metric, param_lst in available_metrics.items()}
 
 
 def check_diagram(X, copy=False):
     """Input validation on a persistence diagram.
 
     """
-    if len(X.shape) != 3:
+    if X.ndim != 3:
         raise ValueError(f"X should be a 3d np.array: X.shape = {X.shape}.")
     if X.shape[2] != 3:
         raise ValueError(
@@ -76,143 +51,106 @@ def check_graph(X):
     return X
 
 
-# Check the type and range of numerical parameters
-def validate_params(parameters, references):
-    """Function to automate the validation of hyperparameters.
+def _validate_params_single(parameter, reference, name):
+    if reference is None:
+        return
+
+    ref_type = reference.get('type', None)
+
+    # Check that parameter has the correct type
+    if (ref_type is not None) and (not isinstance(parameter, ref_type)):
+        raise TypeError(
+            f"Parameter `{name}` is of type {type(parameter)} while "
+            f"it should be of type {ref_type}.")
+
+    # If the reference type parameter is not list, tuple, np.ndarray or dict,
+    # the checks are performed on the parameter object directly.
+    elif ref_type not in [list, tuple, np.ndarray, dict]:
+        ref_in = reference.get('in', None)
+        ref_other = reference.get('other', None)
+        if parameter is not None:
+            if (ref_in is not None) and (parameter not in ref_in):
+                raise ValueError(
+                    f"Parameter `{name}` is {parameter}, which is not in "
+                    f"{ref_in}.")
+        # Perform any other checks via the callable ref_others
+        if ref_other is not None:
+            return ref_other(parameter)
+
+    # Explicitly return the type of reference if one of list, tuple, np.ndarray
+    # or dict.
+    else:
+        return ref_type
+
+
+def _validate_params(parameters, references, rec_name=None):
+    for name, parameter in parameters.items():
+        if name not in references.keys():
+            name_extras = "" if rec_name is None else f" in `{rec_name}`"
+            raise KeyError(
+                f"`{name}`{name_extras} is not an available parameter. "
+                f"Available parameters are in {list(references.keys())}.")
+
+        reference = references[name]
+        ref_type = _validate_params_single(parameter, reference, name)
+        if ref_type:
+            ref_of = reference.get('of', None)
+            if ref_type == dict:
+                _validate_params(parameter, ref_of, rec_name=name)
+            else:  # List, tuple or ndarray type
+                for i, parameter_elem in enumerate(parameter):
+                    _validate_params_single(
+                        parameter_elem, ref_of, f"{name}[{i}]")
+
+
+def validate_params(parameters, references, exclude=None):
+    """Function to automate the validation of (hyper)parameters.
 
     Parameters
     ----------
     parameters : dict, required
-        Dictionary in which the keys are hyperparameter names and the
-        corresponding values are hyperparameter values.
+        Dictionary in which the keys parameter names (as strings) and the
+        corresponding values are parameter values. Unless `exclude` (see
+        below) contains some of the keys in this dictionary, all parameters
+        are checked against `references`.
 
     references : dict, required
-        Dictionary in which the keys are hyperparameter names and the
-        corresponding values are lists. The first element of that list is a
-        type. If that type is not an iterable, the second element can be one
-        of:
+        Dictionary in which the keys are parameter names (as strings). Let
+        ``name`` and ``parameter`` denote a key-value pair in `parameters`.
+        Since ``name`` should also be a key in `references`, let ``reference``
+        be the corresponding value there. Then, ``reference`` must be a
+        dictionary containing any of the following keys:
 
-        - ``None``, when only the type should be checked.
-        - A tuple of two numbers, when the type is numerical. In this case,
-          the first (resp. second) entry in the tuple defines a lower
-          (resp. upper) bound constraining the value of the corresponding
-          hyperparameter.
-        - A list containing all possible allowed values for the
-          corresponding hyperparameter.
+        - ``'type'``, mapping to a class or tuple of classes. ``parameter``
+          is checked to be an instance of this class or tuple of classes.
 
-        If that type is an iterable, the second element is a list that provides
-        information to validate each element of that iterable. The first
-        element of that list is the type of the elements of the iterable and
-        the second element of that list can be one of:
+        - ``'in'``, mapping to a dictionary, when the value of ``'type'`` is
+          not one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
+          Letting ``ref_in`` denote that dictionary, the following check is
+          performed: ``parameter in ref_in``.
 
-        - ``None``, when only the type of the iterable elements should be
-          checked.
-        - A tuple of two numbers, when the type is numerical. In this case,
-          the first (resp. second) entry in the tuple defines a lower
-          (resp. upper) bound constraining the value of the corresponding
-          iterable element.
-        - A list containing all possible allowed values for the
-          corresponding iterable element.
+        - ``'of'``, mapping to a dictionary, when the value of ``'type'``
+          is one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
+          Let ``ref_of`` denote that dictionary. Then:
+
+          a) If ``reference['type'] == dict`` – meaning that ``parameter``
+             should be a dictionary – ``ref_of`` should have a similar
+             structure as `references`, and :func:`validate_params` is called
+             recursively on ``(parameter, ref_of)``.
+          b) Otherwise, ``ref_of`` should have a similar structure as
+             ``reference`` and each entry in ``parameter`` is checked to
+             satisfy the constraints in ``ref_of``.
+
+        - ``'other'``, which should map to a callable defining custom checks on
+          ``parameter``.
+
+    exclude : list of str, or None, optional, default: ``None``
+        List of parameter names which are among the keys in `parameters` but
+        should be excluded from validation. ``None`` is equivalent to
+        passing the empty list.
 
     """
-    for key in references.keys():
-        # Check type
-        if not isinstance(parameters[key], references[key][0]):
-            raise TypeError(
-                f"Parameter {key} is of type {type(parameters[key])} while it "
-                f"should be of type {references[key][0]}.")
-
-        # If the key is a list, tuple, or numpy array, check element by element
-        if references[key][0] == list or references[key][0] == tuple or \
-           references[key][0] == np.ndarray:
-            for parameter in parameters[key]:
-                # If an element has to be an int, it can be passed as a float
-                # that has no decimals, else we check the type of the element
-                if references[key][1][0] == int:
-                    if not isinstance(parameter, numbers.Number):
-                        raise TypeError(
-                            f"Parameter {key} is a {type(parameters[key])} of "
-                            f"{references[key][1][0]} but contains an "
-                            f"element of type {type(parameter)}.")
-                    if not float(parameter).is_integer():
-                        raise TypeError(
-                            f"Parameter {key} is a {type(parameters[key])} of "
-                            f"int but contains an element of type "
-                            f"{type(parameter)} that is not an integer.")
-                else:
-                    # Otherwise just check for the type
-                    if not isinstance(parameter, references[key][1][0]):
-                        raise TypeError(
-                            f"Parameter {key} is a {type(parameters[key])} of "
-                            f"{references[key][1][0]}  but contains an "
-                            f"element of type {type(parameter)}.")
-
-                # If there is no parameter range to check, continue
-                if references[key][1][1] is None:
-                    continue
-                # Check element range indicated by a tuple of 2 values
-                if isinstance(references[key][1][1], tuple):
-                    if (parameter < references[key][1][1][0] or
-                            parameter > references[key][1][1][1]):
-                        raise ValueError(
-                            f"Parameter {key} is a {type(parameters[key])} "
-                            f"containing {parameter} which should be in the "
-                            f"range [{references[key][1][1][0]}, "
-                            f"{references[key][1][1][1]}].")
-                # Check if element is in a list
-                elif isinstance(references[key][1][1], list):
-                    if parameter not in references[key][1][1]:
-                        raise ValueError(
-                            f"Parameter {key} is a {type(parameters[key])} "
-                            f"containing {parameter}, while it should only "
-                            f"contain one of the following: "
-                            f"{references[key][1][1]}.")
-        else:
-            # If only the type should be checked, continue
-            if references[key][1] is None:
-                continue
-
-            # Check parameter range indicated by a tuple of 2 values
-            if isinstance(references[key][1], tuple):
-                if (parameters[key] < references[key][1][0] or
-                        parameters[key] > references[key][1][1]):
-                    raise ValueError(
-                        f"Parameter {key} is {parameters[key]}, while it  "
-                        f"should be in the range [{references[key][1][0]}, "
-                        f"{references[key][1][1]}].")
-            # Check if parameter is in a list
-            elif isinstance(references[key][1], list):
-                if parameters[key] not in references[key][1]:
-                    raise ValueError(
-                        f"Parameter {key} is {parameters[key]}, while it "
-                        f"should be one of the following: "
-                        f"{references[key][1]}.")
-
-
-def validate_metric_params(metric, metric_params):
-    if metric not in available_metrics.keys():
-        raise ValueError(
-            f"No metric called {metric}. Available metrics are "
-            f"{list(available_metrics.keys())}.")
-
-    for (param, param_type, param_values) in available_metrics[metric]:
-        if param in metric_params.keys():
-            input_param = metric_params[param]
-            if not isinstance(input_param, param_type):
-                raise TypeError(
-                    f"{param} in params_metric is of type {type(input_param)} "
-                    f" but must be an {param_type}.")
-            if param_values is not None:
-                if input_param < param_values[0] or \
-                   input_param > param_values[1]:
-                    raise ValueError(
-                        f"{param} in param_metric should be between "
-                        f"{param_values[0]} and {param_values[1]} but has "
-                        f"been set to {input_param}.")
-
-    for param in metric_params.keys():
-        if param not in available_metric_params[metric]:
-            raise ValueError(
-                f"{param} in metric_param is not an available parameter. "
-                f"Available metric_params are: "
-                f"{available_metric_params[metric]}.")
+    exclude_ = [] if exclude is None else exclude
+    parameters_ = {key: value for key, value in parameters.items()
+                   if key not in exclude_}
+    return _validate_params(parameters_, references)
