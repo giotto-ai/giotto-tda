@@ -11,7 +11,7 @@ jobs:
         python.version: '3.8'
   variables:
     EXECUTE: 'true'
-    GITDIR: tmp/gtda-docs
+    GITDIR: ../tmp/gtda-docs
     RUNNOTEBOOKS: TRUE
     VERSION: master
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
