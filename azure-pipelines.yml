@@ -39,7 +39,7 @@ jobs:
         set -e
         mkdir tmp
         cd tmp
-        git clone https://giotto-learn:$(github_pswd)@giotto-ai/gtda-docs.git
+        git clone https://github.com/giotto-ai/gtda-docs.git
       displayName: "Clone the docs repo"
       failOnStderr: true
 
@@ -56,7 +56,7 @@ jobs:
     - script: |
         cd tmp/gtda-docs/
         make gh-commit
-        git push https://giotto-learn:$(github_pswd)@giotto-ai/gtda-docs.git
+        git push https://giotto-learn:$(github_psw)@giotto-ai/gtda-docs.git
       displayName:  'Commit the docs'
       failOnStderr: false
 
