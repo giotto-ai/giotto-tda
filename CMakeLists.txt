@@ -20,7 +20,7 @@ endif()
 target_compile_definitions(gtda_ripser PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1 _hypot=hypot)
 
 if(MSVC)
-    target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: /O2>)
+    target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2 /arch:AVX2>)
     target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: -O3 -march=native -D_GLIBCXX_PARALLEL>)
@@ -36,7 +36,7 @@ target_link_libraries(gtda_wasserstein LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_wasserstein PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
 if(MSVC)
-    target_compile_options(gtda_wasserstein PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)
+    target_compile_options(gtda_wasserstein PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2> /arch:AVX2)
     target_compile_options(gtda_wasserstein PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_wasserstein PUBLIC $<$<CONFIG:RELEASE>: -Wall -O3>)
@@ -52,7 +52,7 @@ target_link_libraries(gtda_bottleneck LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_bottleneck PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
 if(MSVC)
-    target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)
+    target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2 /arch:AVX2>)
     target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:RELEASE>: -Wall -O3>)
@@ -78,7 +78,7 @@ target_include_directories(gtda_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/Bitmap
 target_include_directories(gtda_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 
 if(MSVC)
-    target_compile_options(gtda_cubical_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_cubical_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_cubical_complex PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_cubical_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -104,7 +104,7 @@ target_include_directories(gtda_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/
 target_include_directories(gtda_persistent_cohomology PRIVATE "${GUDHI_SRC_DIR}/python/include")
 
 if(MSVC)
-    target_compile_options(gtda_persistent_cohomology PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_persistent_cohomology PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_persistent_cohomology PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_persistent_cohomology PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -132,7 +132,7 @@ target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Subsampli
 target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/python/include")
 
 if(MSVC)
-    target_compile_options(gtda_simplex_tree PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_simplex_tree PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_simplex_tree PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_simplex_tree PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -158,7 +158,7 @@ target_include_directories(gtda_periodic_cubical_complex PRIVATE "${GUDHI_SRC_DI
 target_include_directories(gtda_periodic_cubical_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
 
 if(MSVC)
-    target_compile_options(gtda_periodic_cubical_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_periodic_cubical_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_periodic_cubical_complex PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_periodic_cubical_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -186,7 +186,7 @@ target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/python
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
 
 if(MSVC)
-    target_compile_options(gtda_witness_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_witness_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_witness_complex PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_witness_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -214,7 +214,7 @@ target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
 
 if(MSVC)
-    target_compile_options(gtda_strong_witness_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_strong_witness_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_strong_witness_complex PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_strong_witness_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -243,7 +243,7 @@ target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/Su
 target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 
 if(MSVC)
-    target_compile_options(gtda_sparse_rips_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_sparse_rips_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_sparse_rips_complex PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_sparse_rips_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
@@ -270,7 +270,7 @@ target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/python/in
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
 
 if(MSVC)
-    target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict /arch:AVX2>)
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
 else()
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math -march=native -D_GLIBCXX_PARALLEL>)
