@@ -83,7 +83,7 @@ gh-stage:
 
 gh-commit:
 	@make gh-stage
-	@cd "$(CURRENTDOCFOLDER)"; git commit -a -m "Update docs"; git push origin
+	@cd "$(CURRENTDOCFOLDER)"; git commit -a -m "Update docs";
 
 # Put it first so that "make" without argument is like "make help".
 help:

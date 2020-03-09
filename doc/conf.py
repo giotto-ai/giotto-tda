@@ -119,7 +119,7 @@ html_theme_options = {
 # List versions
 current_version = os.environ['VERSION']
 html_theme_options.update({'current_version': current_version})
-with open('versions') as f:
+with open('versions', 'r') as f:
     _versions = [c[2:] for c in f.read().splitlines()]
 _versions = list(filter(lambda c: not(c.startswith('.')), _versions))
 html_theme_options.update({'versions': [(c, f'../{c}/index.html')
