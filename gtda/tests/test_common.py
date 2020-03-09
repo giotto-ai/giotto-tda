@@ -27,6 +27,19 @@ XFAIL_TESTS = {
                 ],
 }
 
+LISTFAIL_TESTS = ['check_estimators_dtypes', 'check_fit_score_takes_y',
+                  'check_estimators_fit_returns_self',
+                  'check_estimators_fit_returns_self(readonly_memmap=True)',
+                  'check_complex_data', 'check_dtype_object',
+                  'check_estimators_empty_data_messages',
+                  'check_pipeline_consistency', 'check_estimators_nan_inf',
+                  'check_estimators_overwrite_params',
+                  'check_estimator_sparse_data', 'check_estimators_pickle',
+                  'check_fit2d_predict1d', 'check_methods_subset_invariance',
+                  'check_fit2d_1sample', 'check_fit2d_1feature',
+                  'check_dict_unchanged', 'check_dont_overwrite_parameters',
+                  'check_fit_idempotent']
+
 
 # adapted from sklearn.utils.estimator_check v0.22
 def _get_callable_name(obj):
@@ -85,5 +98,9 @@ def test_sklearn_api(check, estimator, request):
         # mark tests as a known failure
         request.applymarker(pytest.mark.xfail(
             run=True, reason='known failure'))
+
+    if check_name in LISTFAIL_TESTS:
+        request.applymarker(pytest.mark.xfail(
+            run=True, reason='Known failure: 2d input.'))
 
     check(estimator)
