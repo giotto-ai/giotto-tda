@@ -2,63 +2,63 @@
 # Additional checks can be manually triggered
 jobs:
 
-  - job: 'Documentation'
-    pool:
-      vmImage: 'macOS-10.14'
-    strategy:
-      matrix:
-        Python38:
-          python.version: '3.8'
-    variables:
-      EXECUTE: 'true'
-      GITDIR: ../gtda-docs
-      RUNNOTEBOOKS: TRUE
-      VERSION: master
-      CCACHE_DIR: $(Pipeline.Workspace)/ccache
+- job: 'Documentation'
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python38:
+        python.version: '3.8'
+  variables:
+    EXECUTE: 'true'
+    GITDIR: ../gtda-docs
+    RUNNOTEBOOKS: TRUE
+    VERSION: master
+    CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
-    steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '$(python.version)'
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
 
-      - script: |
-          set -e
-          brew update
-          brew install boost ccache
-        displayName: 'Install system dependencies'
+    - script: |
+        set -e
+        brew update
+        brew install boost ccache
+      displayName: 'Install system dependencies'
 
-      - script: |
-          set -e
-          python -m pip install --upgrade pip setuptools
-          source .azure-ci/setup_ccache.sh
-          python -m pip install -e ".[dev]"
-          ccache -s
-        displayName: 'Install dependencies and dev environement'
+    - script: |
+        set -e
+        python -m pip install --upgrade pip setuptools
+        source .azure-ci/setup_ccache.sh
+        python -m pip install -e ".[dev]"
+        ccache -s
+      displayName: 'Install dependencies and dev environement'
 
-      - script:
-          set -e
-          cd ..
-          git clone git@github.com:giotto-ai/gtda-docs.git
-        displayName: "Clone the docs repo"
+    - script:
+        set -e
+        cd ..
+        git clone git@github.com:giotto-ai/gtda-docs.git
+      displayName: "Clone the docs repo"
 
-      - script: |
-          brew install pandoc pandoc-citeproc
-        displayName: 'Install additional stuff to build docs'
+    - script: |
+        brew install pandoc pandoc-citeproc
+      displayName: 'Install additional stuff to build docs'
 
-      - script:
-          cd doc
-          make all-gh
-        displayName: 'Build the docs'
-        failOnStderr: false
+    - script:
+        cd doc
+        make all-gh
+      displayName: 'Build the docs'
+      failOnStderr: false
 
-      - script:
-          cd $GITDIR
-          git config --local user.name "Azure Pipelines"
-          git config --local user.email "azuredevops@microsoft.com"
-          git commit -m "Update docs - AZURE"
-          git push origin master
-        displayName:  'Commit the docs'
-        failOnStderr: false
+    - script:
+        cd $GITDIR
+        git config --local user.name "Azure Pipelines"
+        git config --local user.email "azuredevops@microsoft.com"
+        git commit -m "Update docs - AZURE"
+        git push origin master
+      displayName:  'Commit the docs'
+      failOnStderr: false
 
 - job: 'manylinux2010'
   pool:
