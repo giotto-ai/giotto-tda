@@ -41,7 +41,7 @@ jobs:
         cd tmp
         git clone https://github.com/giotto-ai/gtda-docs.git
       displayName: "Clone the docs repo"
-      failOnStderr: true
+      failOnStderr: false
 
     - script: |
         brew install pandoc pandoc-citeproc
