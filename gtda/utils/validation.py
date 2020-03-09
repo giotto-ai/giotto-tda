@@ -159,8 +159,8 @@ def validate_params(parameters, references, exclude=None):
 
 
 def check_list_of_images(X, **kwargs):
-    """Check a list of arrays representing images, by integrating
-    through the input one by one. To pass a test when `kwargs` is ``None``,
+    """Check a list of arrays representing images, by iterating through
+    the input one by one. To pass a test when `kwargs` is empty,
     all images ``x``, ``y`` in `X` must satisfy:
         - ``x.ndim >= 2``,
         - ``all(np.isfinite(x))``,
@@ -171,7 +171,7 @@ def check_list_of_images(X, **kwargs):
     X : list of ndarray
         Each entry of `X` corresponds to an image.
 
-    kwargs : dict or None, optional, default: ``None``
+    kwargs : dict, optional, default: {}
         Parameters accepted by
         :func:`~gtda.utils.validation.check_list_of_arrays`.
 
@@ -200,7 +200,7 @@ def check_list_of_images(X, **kwargs):
 
 def check_list_of_point_clouds(X, **kwargs):
     """Check a list of arrays representing point clouds, by integrating
-    through the input one by one. To pass a test when `kwargs` is ``None``,
+    through the input one by one. To pass a test when `kwargs` is empty,
     all point clouds ``x``, ``y`` in X must satisfy:
         - ``x.ndim == 2``,
         - ``len(y.shape[1:]) == len(y.shape[1:])``.
@@ -210,7 +210,7 @@ def check_list_of_point_clouds(X, **kwargs):
     X : list of ndarray, such that ``X[i].ndim==2`` (n_points, n_dimensions),
         or an array `X.dim==3`
 
-    kwargs : dict or None, optional, default: ``None``
+    kwargs : dict, optional, default: {}
         Parameters accepted by
         :func:`~`gtda.utils.validation.check_list_of_arrays``.
 
@@ -270,7 +270,7 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
         The checks are applied in the order they are provided, only until
         the first failure.
 
-    kwargs : dict or None, optional, default: ``None``
+    kwargs : dict, optional, default: {}
         Parameters accepted by :func:`~sklearn.utils.validation.check_array`.
 
     Returns
