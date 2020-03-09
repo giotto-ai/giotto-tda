@@ -155,14 +155,15 @@ def make_mapper_pipeline(scaler=None,
     steps. [1]_
 
     The role of this function's key parameters is illustrated in `this diagram
-    </mapper_pipeline.svg>`_. All computational steps may be arbitrary
-    scikit-learn Pipeline objects. The scaling and cover steps must be
-    transformers implementing a ``fit_transform`` method. The filter
-    function step may be a transformer implementing a ``fit_transform``,
-    or a callable acting on one-dimensional arrays -- in the latter case,
-    a transformer is internally created whose ``fit_transform`` applies this
-    callable independently on each row of the data. The clustering step need
-    only implement a ``fit`` method storing clustering labels.
+    <../../../../_images/mapper_pipeline_object.svg>`_. All computational
+    steps may be arbitrary scikit-learn Pipeline objects. The scaling and cover
+    steps must be transformers implementing a ``fit_transform`` method.
+    The filter function step may be a transformer implementing
+    a ``fit_transform``, or a callable acting on one-dimensional arrays.
+    In the latter case, a transformer is internally created whose
+    ``fit_transform`` applies this callable independently on each row of the
+    data. The clustering step need only implement a ``fit`` method storing
+    clustering labels.
 
     Parameters
     ----------
