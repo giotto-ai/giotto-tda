@@ -3,14 +3,13 @@
 
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal
-from sklearn.exceptions import NotFittedError
-
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
+from numpy.testing import assert_almost_equal
+from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, HeatKernel,\
+from gtda.diagrams import PersistenceEntropy, HeatKernel, \
     PersistenceImage, Silhouette
 
 diagram = np.array([[[0, 1, 0], [2, 3, 0], [4, 6, 1], [2, 6, 1]]])
@@ -70,7 +69,7 @@ def test_pi_positive(pts):
 
 
 def test_silhouette_transform():
-    sht = Silhouette(n_bins=31, order=1.)
+    sht = Silhouette(n_bins=31, power=1.)
     X_sht_res = np.array([0., 0.05, 0.1, 0.15, 0.2, 0.25, 0.2, 0.15, 0.1,
                           0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0., 0.05,
                           0.1, 0.15, 0.2, 0.25, 0.2, 0.15, 0.1, 0.05, 0.])
@@ -80,7 +79,7 @@ def test_silhouette_transform():
 
 def test_silhouette_big_order():
     diagrams = np.array([[[0, 2, 0], [1, 4, 0]]])
-    sht_10 = Silhouette(n_bins=41, order=10.)
+    sht_10 = Silhouette(n_bins=41, power=10.)
     X_sht_res = np.array([0., 0.00170459, 0.00340919, 0.00511378, 0.00681837,
                           0.00852296, 0.01022756, 0.01193215, 0.01363674,
                           0.01534133, 0.01704593, 0.11363674, 0.21022756,

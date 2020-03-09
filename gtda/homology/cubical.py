@@ -1,15 +1,17 @@
 """Persistent homology on grids."""
 # License: GNU AGPLv3
 
-import numpy as np
-import numbers
-from sklearn.base import BaseEstimator, TransformerMixin
-from joblib import Parallel, delayed
-from sklearn.utils.validation import check_array, check_is_fitted
-from ._utils import _pad_diagram
-from ..utils.validation import validate_params
+from numbers import Real
 
+import numpy as np
+from joblib import Parallel, delayed
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_array, check_is_fitted
+
+from ._utils import _pad_diagram
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
+from ..utils.intervals import Interval
+from ..utils.validation import validate_params
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
@@ -24,7 +26,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
@@ -33,13 +35,14 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    periodic_dimensions : boolean ndarray of shape (n_dimensions, ), optional,
-        default: ``np.zeros((n_dimensions, ), dtype=np.bool)``
+    periodic_dimensions : boolean ndarray of shape (n_dimensions,) or None, \
+        optional, default: ``None``
         Periodicity of the boundaries along each of the axis, where
         ``n_dimensions`` is the dimension of the images of the collection. The
         boolean in the `d`th position expresses whether the boundaries along
-        the `d`th axis are periodic. By default, none of the boundaries are
-        periodic.
+        the `d`th axis are periodic. The default ``None`` is equivalent to
+        passing ``numpy.zeros((n_dimensions,), dtype=np.bool)``, i.e. none of
+        the boundaries are periodic.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
@@ -53,7 +56,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    periodic_dimensions_ : boolean ndarray of shape (n_dimensions, )
+    periodic_dimensions_ : boolean ndarray of shape (n_dimensions,)
        Effective periodicity of the boundaries along each of the axis.
        Set in :meth:`fit`.
 
@@ -63,7 +66,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    VietorisRipsPersistence, SparseRipsPersistence, EuclideanCechPersistence
 
     Notes
     -----
@@ -81,10 +84,16 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
     <http://gudhi.gforge.inria.fr/doc/latest/group__cubical__complex.html>`_.
 
     """
-    _hyperparameters = {'_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)],
-                        'periodic_dimensions_': [np.ndarray, (np.bool_, None)],
-                        'infinity_values_': [numbers.Number, None]}
+
+    _hyperparameters = {
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'periodic_dimensions': {
+            'type': (np.ndarray, type(None)),
+            'of': {'type': np.bool_}},
+        'infinity_values': {'type': (Real, type(None))}}
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
                  periodic_dimensions=None, infinity_values=None, n_jobs=None):
@@ -134,11 +143,15 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         self._filtration_kwargs = {}
         if self.periodic_dimensions is None or \
            np.sum(self.periodic_dimensions) == 0:
             self._filtration = CubicalComplex
-            self.periodic_dimensions_ = np.zeros((len(X) - 1,), dtype=np.bool)
+            self.periodic_dimensions_ = np.zeros(len(X) - 1, dtype=np.bool)
         else:
             self._filtration = PeriodicCubicalComplex
             self.periodic_dimensions_ = np.array(self.periodic_dimensions,
@@ -152,14 +165,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'periodic_dimensions_': self.periodic_dimensions_,
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_array(X, allow_nd=True)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
