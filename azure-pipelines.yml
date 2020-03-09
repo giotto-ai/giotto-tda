@@ -55,8 +55,9 @@ jobs:
       failOnStderr: true
 
     - script:
-        git config --global user.name "Azure Pipelines"
-        git config --global user.email "azuredevops@microsoft.com"
+        cd tmp/gtda-docs/
+        git config --local user.name "Azure Pipelines"
+        git config --local user.email "azuredevops@microsoft.com"
         make gh-commit
       displayName:  'Commit the docs'
       failOnStderr: false
