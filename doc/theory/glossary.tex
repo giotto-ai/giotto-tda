@@ -296,8 +296,10 @@ pdfpagelabels]{hyperref}
 	Let $D, D'$ be two \hyperref[persistence diagram]{persistence diagrams}. Then, the \textit{persistence scale-space kernel}, often called the \textit{heat kernel}, is defined by
 	\begin{equation*}
 	k_\sigma(D,\, D') = \frac{1}{8\pi\sigma}\sum_{p\in D,\, q \in D'}
+	\left(
 	\exp\left(\frac{-\Vert p-q\Vert^2}{8\sigma}\right) -
-	\exp\left(\frac{-\Vert p-\bar{q}\Vert^2}{8\sigma}\right),
+	\exp\left(\frac{-\Vert p-\bar{q}\Vert^2}{8\sigma}\right)
+	\right),
 	\end{equation*}
 	where $\bar{q} = (d,b)$ for a point $q=(b,d)$.
 	
