@@ -73,7 +73,6 @@ all-gh:
 	   cp ../examples/*.py notebooks/;\
 	   make convert-notebooks;\
 	fi
-	@echo Making Docs
 	@make github
 
 gh-remove:
