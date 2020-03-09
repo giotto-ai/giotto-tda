@@ -13,4 +13,3 @@
 
    utils.check_diagram
    utils.validate_params
-   utils.validate_metric_params

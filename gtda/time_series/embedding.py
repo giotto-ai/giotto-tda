@@ -10,6 +10,7 @@ from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 
 from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
@@ -71,8 +72,10 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     """
 
-    _hyperparameters = {'width': [int, (1, np.inf)],
-                        'stride': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, width=10, stride=1):
         self.width = width
@@ -107,8 +110,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         self
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
         check_array(X, ensure_2d=False, allow_nd=True)
+        validate_params(self.get_params(), self._hyperparameters)
 
         self._is_fitted = True
         return self
@@ -192,7 +195,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     Parameters
     ----------
     parameters_type : ``'search'`` | ``'fixed'``, optional, default: \
-                      ``'search'``
+        ``'search'``
         If set to ``'fixed'``, the values of `time_delay` and `dimension`
         are used directly in :meth:`transform`. If set to ``'search'``,
         those values are only used as upper bounds in a search as follows:
@@ -297,10 +300,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     """
 
-    _hyperparameters = {'parameters_type': [str, ['fixed', 'search']],
-                        'time_delay': [int, (1, np.inf)],
-                        'dimension': [int, (1, np.inf)],
-                        'stride': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'parameters_type': {'type': str, 'in': ['fixed', 'search']},
+        'time_delay': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'dimension': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, parameters_type='search', time_delay=1, dimension=5,
                  stride=1, n_jobs=None):
@@ -344,7 +349,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         distance = distances[:, 1]
         X_first_nbhrs = X[indices[:, 1]]
 
-        epsilon = 2.0 * np.std(X)
+        epsilon = 2. * np.std(X)
         tolerance = 10
 
         neg_dim_delay = - dimension * time_delay
@@ -389,8 +394,10 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
         X = check_array(X, ensure_2d=False)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if X.ndim == 1:
             X = X[:, None]
 
