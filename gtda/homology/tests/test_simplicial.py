@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence, FlagPersistence
+    EuclideanCechPersistence, FlagserPersistence
 
 pc = np.array([[[2., 2.47942554], [2.47942554, 2.84147098],
                [2.98935825, 2.79848711], [2.79848711, 2.41211849],
@@ -101,14 +101,14 @@ def test_cp_transform():
 
 def test_fp_params():
     coeff = 'not_defined'
-    fp = FlagPersistence(coeff=coeff)
+    fp = FlagserPersistence(coeff=coeff)
 
     with pytest.raises(ValueError):
         fp.fit_transform(pc)
 
 
 def test_fp_not_fitted():
-    fp = FlagPersistence()
+    fp = FlagserPersistence()
 
     with pytest.raises(NotFittedError):
         fp.transform(pc)
@@ -120,6 +120,6 @@ pc_fp_res = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
 
 
 def test_fp_transform():
-    fp = FlagPersistence()
+    fp = FlagserPersistence()
 
     assert_almost_equal(fp.fit_transform(pc), pc_fp_res)

@@ -78,7 +78,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    SparseRipsPersistence, ConsistentRescaling
+    FlagserPersistence, SparseRipsPersistence, EuclideanCechPersistence, \
+    ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
@@ -285,7 +286,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, FlagserPersistence, EuclideanCechPersistence, \
+    ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
@@ -481,7 +483,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, FlagserPersistence, SparseRipsPersistence, \
+    ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
@@ -616,7 +619,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class FlagPersistence(BaseEstimator, TransformerMixin):
+class FlagserPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `filtrations of directed or undirected flag complexes
     <https://giotto.ai/theory>`_.
@@ -668,7 +671,8 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPeristence
+    VietorisRipsPersistence, SparseRipsPersistence, EuclideanCechPersistence, \
+    ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
