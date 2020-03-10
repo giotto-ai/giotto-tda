@@ -289,21 +289,39 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Heat kernel:} \label{heat kernel}
 	
-	Given a set $\xi$, $k:\xi \times \xi \rightarrow \mathbb{R}$ is said to be a \textit{kernel} if there exists a Hilbert space $H$ with inner product $\langle \cdot, \cdot \rangle$ and a function $\phi: \xi \rightarrow H$, such that $k(x,y) = \langle \phi(x), \phi(y) \rangle$.
-	
-	In contrast to vectorisation methods, kernel methods do not give an explicit feature map. Nevertheless, such methods remain popular for tasks like classification.
-	
-	Let $D, D'$ be two \hyperref[persistence diagram]{persistence diagrams}. Then, the \textit{persistence scale-space kernel}, often called the \textit{heat kernel}, is defined by
+	Let $(\xi, k)$ be a pair with $\xi$ a set and
 	\begin{equation*}
-	k_\sigma(D,\, D') = \frac{1}{8\pi\sigma}\sum_{p\in D,\, q \in D'}
-	\left(
-	\exp\left(\frac{-\Vert p-q\Vert^2}{8\sigma}\right) -
-	\exp\left(\frac{-\Vert p-\bar{q}\Vert^2}{8\sigma}\right)
-	\right),
+		k:\xi \times \xi \rightarrow \mathbb{R}
+	\end{equation*}
+	a function.	 A \textit{kernel} for this pair is a function
+	\begin{equation*}
+		\phi: \xi \rightarrow H
+	\end{equation*}
+	where $\big( H, \langle -, - \rangle \big)$ is an \hyperref[inner product and 			metric spaces]{inner product space} and $\phi$ satisfies
+	\begin{equation*}
+		k(x,y) = \big\langle \phi(x), \phi(y) \big\rangle.
+	\end{equation*}
+	Let $\xi$ be the set of \hyperref[persistence diagram]{persistence diagrams} 	and $\sigma$ a positive real number. Denoting
+	\begin{equation*}
+		\Omega = \big\{ (x_1,x_2) \in \mathbb R^2\ |\ x_1 \leq x_2 \big\}
+	\end{equation*}
+	consider the inner product space of square integrable function $L^2(\Omega)$ and the map $\phi_\sigma : \xi \to L^2(\Omega)$ described next. Given a persistence diagram $D$, the function $\phi_\sigma(D)$ is the time $\sigma$ solution to the heat equation with initial condition specified by the sum of Dirac delta functions concentrated over the off diagonal points of $D$. More explicitly, the function $\phi_\sigma(D)$ is the time $\sigma$ solution to
+	\begin{align*}
+		\Delta_x(u) &= \partial_t u && \text{on } \Omega \times \mathbb R_{>0} \\
+		u &= 0 && \text{on } \{x_1 = x_2\} \times \mathbb R_{\geq 0} \\
+		u &= \sum_{p \in D} \delta_p && \text{on } \Omega \times {0}.
+	\end{align*}
+	The \textit{heat kernel} is defined by the function $\phi_\sigma$ on the set of 		persistence diagrams together with the function
+	\begin{equation*}
+		k_\sigma(D,\, D') = \frac{1}{8\pi\sigma}\sum_{p\in D,\, q \in D'}
+		\left(
+		\exp\left(\frac{-\Vert p-q\Vert^2}{8\sigma}\right) -
+		\exp\left(\frac{-\Vert p-\bar{q}\Vert^2}{8\sigma}\right)
+		\right)
 	\end{equation*}
 	where $\bar{q} = (d,b)$ for a point $q=(b,d)$.
-	
-	\paragraph{References:} \cite{reininghaus2014stable}
+
+	\paragraph{\\ References:} \cite{reininghaus2014stable}
 	
 	\subsection*{Metric space:} \label{metric space}
 	
