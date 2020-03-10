@@ -139,6 +139,8 @@ html_logo = path_to_image
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['source/_static/style.css']  # []  # ['_static']
 
+html_sourcelink_suffix = ''
+
 rst_epilog = """
 .. |ProjectVersion| replace:: Foo Project, version {versionnum}
 """.format(
