@@ -51,7 +51,7 @@ jobs:
         cd doc
         make all-gh
       displayName: 'Build the docs'
-      failOnStderr: true
+      failOnStderr: false
 
     - script: |
         cd tmp/gtda-docs/

@@ -10,7 +10,7 @@ GITDIR    = ../../../projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = 0.1.4
+VERSION = stable
 endif
 
 ifndef RUNNOTEBOOKS
