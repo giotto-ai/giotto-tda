@@ -14,7 +14,8 @@ A clear and concise description of what the problem is. Eg. "I'm always frustrat
 
 **Describe the solution you'd like**
 <!--
-A clear and concise description of what you want to happen.
+A clear and concise description of what you want to happen. If you have ideas on how to implement
+your solution with (pseudo-)code, include them here.
 -->
 
 **Describe alternatives you've considered**
