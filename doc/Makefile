@@ -10,7 +10,7 @@ GITDIR    = ../../../projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = dev
+VERSION = 0.1.4
 endif
 
 ifndef RUNNOTEBOOKS
@@ -51,7 +51,7 @@ github:
 	@make togit
 
 theory-gl:
-	@pandoc theory/glossary.tex -f latex -t rst --toc --include-before-body=theory/before_glossary.rst -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
+	@pandoc theory/glossary.tex -f latex -t rst --toc -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
 
 convert-notebooks:
 	@jupyter nbconvert notebooks/*.ipynb --execute --to rst
@@ -64,6 +64,7 @@ clean-gh:
 update-versions-list:
 	@cd $(GITDIR); find . -type d -depth 1 > versions
 	@mv $(GITDIR)/versions versions
+	@python3 update_versions.py $(GITDIR)
 
 all-gh:
 	@make clean-gh
