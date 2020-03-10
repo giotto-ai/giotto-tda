@@ -17,8 +17,8 @@ from ..utils.validation import check_diagram, validate_params
 
 @adapt_fit_transform_docs
 class PairwiseDistance(BaseEstimator, TransformerMixin):
-    """:ref:`Distances <wasserstein and bottleneck distance>` between pairs of persistence
-    diagrams.
+    """:ref:`Distances <wasserstein and bottleneck distance>` between pairs
+    of persistence diagrams.
 
     Given two collections of persistence diagrams consisting of
     birth-death-dimension triples [b, d, q], a collection of distance
