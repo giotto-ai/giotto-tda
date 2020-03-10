@@ -49,7 +49,7 @@ class TransformerResamplerMixin:
         X : ndarray of shape (n_samples, ...)
             Input data.
 
-        y : ndarray of shape (n_samples, )
+        y : ndarray of shape (n_samples,)
             Target data.
 
         Returns
@@ -73,7 +73,7 @@ class TransformerResamplerMixin:
         X : ndarray of shape (n_samples, ...)
             Input data.
 
-        y : ndarray of shape (n_samples, )
+        y : ndarray of shape (n_samples,)
             Target data.
 
         Returns
@@ -130,7 +130,7 @@ class PlotterMixin:
         X : ndarray of shape (n_samples, ...)
             Input data.
 
-        y : ndarray of shape (n_samples, )
+        y : ndarray of shape (n_samples,)
             Target data.
 
         sample : int

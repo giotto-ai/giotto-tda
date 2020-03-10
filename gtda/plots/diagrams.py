@@ -20,7 +20,7 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
         If ``None``, all available dimensions will be used.
 
     samplings : ndarray of shape (n_homology_dimension, n_values), \
-                default: ``None``
+        default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on
         the y-axis. If ``None``, the samplings will start at 0 with step 1.
@@ -79,7 +79,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
     Parameters
     ----------
     betti_curves : ndarray of shape (n_samples, n_homology_dimensions, \
-                   n_values)
+        n_values)
         ``n_samples`` collections of discretised Betti curves. There are
         ``n_homology_dimension`` curves in each collection. Index i along axis
         1 should yield all Betti curves in homology dimension i.
@@ -89,7 +89,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         If ``None``, all available dimensions will be used.
 
     samplings : ndarray of shape (n_homology_dimension, n_values), \
-                default: ``None``
+        default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on the
         y-axis. If ``None``, the samplings will start at 0 with step 1.
@@ -151,7 +151,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         If ``None``, all available dimensions will be used.
 
     samplings : ndarray of shape (n_homology_dimension, n_layers, n_values), \
-                default: ``None``
+        default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `landscapes` on
         the y-axis. If ``None``, the samplings will start at 0 with step 1.

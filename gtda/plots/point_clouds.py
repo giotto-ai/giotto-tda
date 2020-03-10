@@ -16,10 +16,9 @@ def plot_point_cloud(point_cloud, dimension=None):
         Data points to be represented in a 2D or 3D scatter plot. Only the
         first 2 or 3 dimensions will be considered for plotting.
 
-    dimension : int or None, default : ``None``
-        This parameter sets the dimension of the resulting plot. If ``None``,
-        the dimension will be chosen between 2 and 3 depending on
-        ``n_dimensions`` see Input).
+    dimension : int or None, default: ``None``
+        Sets the dimension of the resulting plot. If ``None``, the dimension
+        will be chosen between 2 and 3 depending on the shape of `point_cloud`.
 
     """
     if dimension is None:
