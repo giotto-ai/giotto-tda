@@ -113,21 +113,23 @@ in your system. In the
 this documentation, the most recent version of boost is `1.72.0`. If you go
 into the folder, you'll find different executables - choose the version
 corresponding to your system (32, 64 bits). In our case, we downloaded `boost_1_72_0-msvc-14.2-64.exe`.
-Follow the installation instructions, and when prompted to specify the folder to install boost, go for `C:\local\`.
+Follow the installation instructions, and when prompted to specify the folder to install boost, go for `C:\\local\\`.
 
 Source code
 -----------
 
 Boost proposes to `download <https://www.boost.org/users/download/>`_ directly the source code of boost.
 You can choose from different sources (compressed in `.7z` or `.zip`).
-Download one and uncompress it in `C:\local\`, so you should have something like `C:\local\boost_x_y_z\<boost_files>`.
+Download one and uncompress it in `C:\\local\\`, so you should have something like `C:\\local\\boost_x_y_z\\<boost_files>`.
 
 Already installed boost version
 -------------------------------
 
 If by some obscure reason, you have boost installed in your system but the installation procedure cannot find it (can happen, no control on cmake ...).
-You can help the installation script by adding the path to your installation in the following place `gtda/cmake/HelperBoost.cmake`.
-In `HelperBoost.cmake` file, line 7, you can add your path between the quotation marks (e.g. `list(APPEND BOOST_ROOT "C:\<path_to_your_boost_installation>")`).
+You can help the installation script by adding the path to your installation in the following place `gtda\\cmake\\HelperBoost.cmake`.
+In `HelperBoost.cmake` file, line 7, you can add your path between the quotation marks, e.g.::
+
+   list(APPEND BOOST_ROOT "C:\\<path_to_your_boost_installation>").
 
 
 Source code
