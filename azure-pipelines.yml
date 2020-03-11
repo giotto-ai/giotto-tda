@@ -17,6 +17,13 @@ jobs:
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
   steps:
+    - task: InstallSSHKey@0
+      inputs:
+        knownHostsEntry: github.com
+        sshPublicKey: $(KEY_GTDA-DOCS_PUB)
+        #sshPassphrase: # Optional
+        sshKeySecureFile: $(KEY_GTDA-DOCS)
+
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(python.version)'
@@ -56,7 +63,7 @@ jobs:
     - script: |
         cd tmp/gtda-docs/
         make gh-commit
-        git push --repo "https://giotto-learn:${GITHUB_PSW}@github.com/giotto-ai/gtda-docs.git"
+        git push git@github.com:giotto-ai/gtda-docs.git
       displayName:  'Commit the docs'
       failOnStderr: false
 
