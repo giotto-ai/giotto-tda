@@ -9,6 +9,9 @@ include_directories(${Boost_INCLUDE_DIR})
 
 find_package(OpenMP)
 
+set(RIPSER_SRC_DIR "gtda/externals/ripser")
+set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
+
 #######################################################################
 #                               Ripser                                #
 #######################################################################
@@ -17,7 +20,9 @@ pybind11_add_module(gtda_ripser "${BINDINGS_DIR}/ripser_bindings.cpp")
 if(OpenMP_FOUND)
   target_link_libraries(gtda_ripser PRIVATE OpenMP::OpenMP_CXX)
 endif()
-target_compile_definitions(gtda_ripser PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1 _hypot=hypot)
+target_compile_definitions(gtda_ripser PRIVATE ASSEMBLE_REDUCTION_MATRIX=1)
+
+target_include_directories(gtda_ripser PRIVATE "${RIPSER_SRC_DIR}/ripser")
 
 if(MSVC)
     target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2 /arch:AVX2>)
@@ -25,6 +30,26 @@ if(MSVC)
 else()
     target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: -O3 -march=native -D_GLIBCXX_PARALLEL>)
     target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:DEBUG>: -O2 -ggdb -D_GLIBCXX_DEBUG>)
+endif()
+
+#######################################################################
+#                     Ripser - Coefficient enable                     #
+#######################################################################
+
+pybind11_add_module(gtda_ripser_coeff "${BINDINGS_DIR}/ripser_bindings.cpp")
+if(OpenMP_FOUND)
+  target_link_libraries(gtda_ripser_coeff PRIVATE OpenMP::OpenMP_CXX)
+endif()
+target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
+
+target_include_directories(gtda_ripser_coeff PRIVATE "${RIPSER_SRC_DIR}/ripser")
+
+if(MSVC)
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2 /arch:AVX2>)
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
+else()
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: -O3 -march=native -D_GLIBCXX_PARALLEL>)
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>: -O2 -ggdb -D_GLIBCXX_DEBUG>)
 endif()
 
 #######################################################################
@@ -58,8 +83,6 @@ else()
     target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:RELEASE>: -Wall -O3>)
     target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 endif()
-
-set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
 
 #######################################################################
 #                           Cubical Complex                           #
