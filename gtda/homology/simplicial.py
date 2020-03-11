@@ -632,26 +632,30 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class FlagserPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `filtrations of directed or undirected flag complexes
-    <https://giotto.ai/theory>`_.
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    :ref:`filtrations <filtered complex>` of :ref:`directed or undirected flag
+    complexes <clique or flag complexes>`.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
-    distance matrix, information about the appearance and disappearance of
-    topological features (technically, `homology classes
-    <https://giotto.ai/theory>`_) of various dimensions and at different
-    scales is summarised in the corresponding persistence diagram.
+    Given a weighted directed or undirected graph, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology and cohomology>`) of various dimension
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     Parameters
     ----------
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
     directed : bool, optional, default: ``True``
-        If true, computes the directed flag complex. Otherwise it
-        computes the undirected flag complex.
+        If ``True``, :meth:`transform` computes the persistence diagrams of
+        filtered directed flag complexes arising from weighted directed
+        graphs. Otherwise, it computes the persistence diagrams of filtered
+        flag complexes arising from weighted undirected graphs. Hence, in
+        the latter case :meth:`transform` computes the same quantity as the
+        ``transform`` method of a :class:`VietorisRipsPersistence` object
+        instantiated with ``metric=precomputed``.
 
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
@@ -659,27 +663,34 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
         :math:`p` equals `coeff`.
 
     max_entries : int, optional, default: ``-1``
-        Number of entries above which all cells creating columns in the
-        reduction matrix are skipped. Use this for hard problems, a good
-        value is often `100,000`. Increase for higher precision, decrease
-        for faster computation. A negative value computes highest possible
-        precision.
+        Number controlling the degree of precision in the matrix
+        reductions performed by the the backend. Corresponds to the parameter
+        ``approximation`` in :func:`pyflagser.flagser`. Increase for higher
+        precision, decrease for faster computation. A good value is often
+        ``100000`` in hard problems.  A negative value computes highest
+        possible precision.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological features at scales
-        larger than this value will not be detected.
+        Upper bound on the maximum value of the filtration parameter. Points
+        whose distance is greater than this value will never be connected by
+        an edge, and topological features at scales larger than this value
+        will not be detected.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
-        as `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this
+        death value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    Attributes
+    ----------
+    infinity_values_ : float
+        Effective death value to assign to features which are still alive at
+        filtration value `max_edge_length`.
 
     See also
     --------
@@ -689,8 +700,9 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
     Notes
     -----
     The `pyflagser <https://github.com/giotto-ai/pyflagser>`_ Python package
-    is used for bindings `Flagser <https://github.com/luetge/flagser>`_, a C++
-    backend for computing Flag complexes persistent homology.
+    is used for binding `Flagser <https://github.com/luetge/flagser>`_, a C++
+    backend for computing the (persistent) homology of (filtered) directed
+    flag complexes.
 
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
@@ -704,12 +716,16 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'directed': [bool, [True, False]],
-                        'max_entries': [int, None],
-                        'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
+    _hyperparameters = {
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'directed': {'type': bool},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'max_entries': {'type': int},
+        'max_edge_length': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))}
+    }
 
     def __init__(self, homology_dimensions=(0, 1), directed=True, coeff=2,
                  max_entries=-1, max_edge_length=np.inf, infinity_values=None,
@@ -742,20 +758,16 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
         return Xdgms
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`infinity_values_`. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray of shape (n_samples, n_points, n_points)
+            Input array. Each entry along axis 0 is the adjacency matrix of a
+            weighted directed or undirected graph.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -766,44 +778,37 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True, force_all_finite=False)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_array(X, allow_nd=True)
-
         self._min_homology_dimension = self._homology_dimensions[0]
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
     def transform(self, X, y=None):
-        """For each point cloud or distance matrix in `X`, compute the
-        relevant persistence diagram as an array of triples [b, d, q]. Each
-        triple represents a persistent topological feature in dimension q
-        (belonging to `homology_dimensions`) which is born at b and dies at d.
-        Only triples in which b < d are meaningful. Triples in which b and d
-        are equal ("diagonal elements") may be artificially introduced during
-        the computation for padding purposes, since the number of non-trivial
+        """For each adjacency matrix in `X`, compute the relevant persistence
+        diagram as an array of triples [b, d, q]. Each triple represents a
+        persistent topological feature in dimension q (belonging to
+        `homology_dimensions`) which is born at b and dies at d. Only triples
+        in which b < d are meaningful. Triples in which b and d are equal
+        ("diagonal elements") may be artificially introduced during the
+        computation for padding purposes, since the number of non-trivial
         persistent topological features is typically not constant across
         samples. They carry no information and hence should be effectively
         ignored by any further computation.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray of shape (n_samples, n_points, n_points)
+            Input array. Each entry along axis 0 is the adjacency matrix of a
+            weighted directed or undirected graph.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -819,7 +824,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
             `X`.
 
         """
-        # Check if fit had been called
+        check_is_fitted(self)
         Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._flagser_diagram)(Xt[i])
