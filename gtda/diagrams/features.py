@@ -555,8 +555,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
     subdiagrams corresponding to distinct homology dimensions are considered
     separately and regarded as sums of Dirac deltas. Then, the convolution
     with a Gaussian kernel is computed over a rectangular grid of locations
-    evenly sampled from appropriate ranges of the `filtration parameter
-    <https://giotto.ai/theory>`_. The result can be thought of as a raster
+    evenly sampled from appropriate ranges of the :ref:`filtration parameter
+    <filtered complex>`. The result can be thought of as a raster
     image.
 
     Parameters
@@ -732,8 +732,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
     birth-death-dimension triples [b, d, q], subdiagrams corresponding to
     distinct homology dimensions are considered separately, and their
     respective silhouette by sampling the silhouette function over evenly
-    spaced locations from appropriate ranges
-    of the :ref:`filtration parameter <filtered>`.
+    spaced locations from appropriate ranges of the :ref:`filtration parameter
+    <filtered complex>`.
 
     Parameters
     ----------

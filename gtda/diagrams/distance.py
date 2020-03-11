@@ -228,9 +228,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Amplitude(BaseEstimator, TransformerMixin):
-    """:ref:`Amplitudes <amplitude>` of persistence diagrams,
-    constructed from the amplitudes of their subdiagrams with constant
-    homology dimension.
+    """:ref:`Amplitudes <amplitude>` of persistence diagrams.
 
     For each persistence diagram in a collection, a vector of amplitudes or a
     single scalar amplitude is calculated according to the following steps:
