@@ -17,8 +17,10 @@ PYBIND11_MODULE(gtda_ripser_coeff, m) {
 #else
 PYBIND11_MODULE(gtda_ripser, m) {
 #endif
+
+  using namespace pybind11::literals;
   m.doc() = "Ripser python interface";
-  
+
   // Because `ripser` could have two different modules after compilation
   // It's necessary to add `py::module_local()` to prevent following issue:
   // ImportError: generic_type: type "ripserResults" is already registered!
@@ -36,6 +38,7 @@ PYBIND11_MODULE(gtda_ripser, m) {
               rips_dm(&D[0], N, modulus, dim_max, threshold, do_cocycles);
           return ret;
         },
+        "D"_a, "N"_a, "modulus"_a, "dim_max"_a, "threshold"_a, "do_cocycles"_a,
         "ripser distance matrix");
   m.def("rips_dm_sparse",
         [](std::vector<int> I, std::vector<int> J, std::vector<float> V,
@@ -46,6 +49,7 @@ PYBIND11_MODULE(gtda_ripser, m) {
                              threshold, do_cocycles);
           return ret;
         },
-        "ripser sparse distance matrix");
+        "I"_a, "J"_a, "V"_a, "NEdges"_a, "N"_a, "modulus"_a, "dim_max"_a,
+        "threshold"_a, "do_cocycles"_a, "ripser sparse distance matrix");
 }
 
