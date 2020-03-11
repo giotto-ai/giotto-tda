@@ -235,8 +235,17 @@ Html
 
 This is the step where `Sphinx` is actually used.
 We use the standard `make html` command, which also takes the configuration from `conf.py`.
-In particular, we use the `sphinx-rtd-theme <https://github.com/readthedocs/sphinx_rtd_theme>`_.
+In particular, we use `a fork of the sphinx-rtd-theme <https://github.com/wreise/sphinx_rtd_theme>`_.
 For details, please see the documentation of `Sphinx` and the extensions listed in `conf.py`.
+
+Versions
+~~~~~~~~
+
+Multiple versions of the documentation are available, in a *ReadTheDocs-style* menu. Technically, to achieve this,
+we detect the folders present in the `gtda-docs` repository and add
+the currently-built version - either a new folder, or replace entirely the content of the existing folder with the same version name.
+It is easy to build the documentation with the new list of versions, and redirect from that version to the previously-existing ones.
+Redirecting to other versions from **previous** versions is achieved by updating the sections of all `*.html` files, using the `update_versions.py` script.
 
 Move to git and commit
 ~~~~~~~~~~~~~~~~~~~~~~
