@@ -12,9 +12,18 @@
 
 namespace py = pybind11;
 
+#if defined USE_COEFFICIENTS
+PYBIND11_MODULE(gtda_ripser_coeff, m) {
+#else
 PYBIND11_MODULE(gtda_ripser, m) {
+#endif
   m.doc() = "Ripser python interface";
-  py::class_<ripserResults>(m, "ripserResults")
+  
+  // Because `ripser` could have two different modules after compilation
+  // It's necessary to add `py::module_local()` to prevent following issue:
+  // ImportError: generic_type: type "ripserResults" is already registered!
+  // When same python module imports gtda_ripser and gtda_ripser_coeff
+  py::class_<ripserResults>(m, "ripserResults", py::module_local())
       .def_readwrite("births_and_deaths_by_dim",
                      &ripserResults::births_and_deaths_by_dim)
       .def_readwrite("cocycles_by_dim", &ripserResults::cocycles_by_dim)
@@ -39,3 +48,4 @@ PYBIND11_MODULE(gtda_ripser, m) {
         },
         "ripser sparse distance matrix");
 }
+

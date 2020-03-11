@@ -24,7 +24,24 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_options(gtda_ripser PUBLIC -march=native -D_GLIBCXX_PARALLEL)
   target_link_libraries(gtda_ripser PRIVATE)
 endif()
-target_compile_definitions(gtda_ripser PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
+target_compile_definitions(gtda_ripser PRIVATE ASSEMBLE_REDUCTION_MATRIX=1)
+
+#######################################################################
+#                     Ripser - Coefficient enable                     #
+#######################################################################
+
+pybind11_add_module(gtda_ripser_coeff "${BINDINGS_DIR}/ripser_bindings.cpp")
+if(OpenMP_FOUND)
+  target_link_libraries(gtda_ripser_coeff PRIVATE OpenMP::OpenMP_CXX)
+endif()
+target_compile_options(gtda_ripser_coeff PUBLIC -O3 -D_hypot=hypot)
+target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
+# Cannot have two inlined namespace !
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_options(gtda_ripser_coeff PUBLIC -march=native -D_GLIBCXX_PARALLEL)
+  target_link_libraries(gtda_ripser_coeff PRIVATE)
+endif()
+target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
 
 #######################################################################
 #                             Wasserstein                             #
