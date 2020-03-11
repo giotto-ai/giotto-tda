@@ -35,14 +35,15 @@ pybind11_add_module(gtda_ripser_coeff "${BINDINGS_DIR}/ripser_bindings.cpp")
 if(OpenMP_FOUND)
   target_link_libraries(gtda_ripser_coeff PRIVATE OpenMP::OpenMP_CXX)
 endif()
-target_compile_options(gtda_ripser_coeff PUBLIC -O3 -D_hypot=hypot)
-target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
-# Cannot have two inlined namespace !
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_options(gtda_ripser_coeff PUBLIC -march=native -D_GLIBCXX_PARALLEL)
-  target_link_libraries(gtda_ripser_coeff PRIVATE)
-endif()
 target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
+
+if(MSVC)
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2 /arch:AVX2>)
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
+else()
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: -O3 -march=native -D_GLIBCXX_PARALLEL>)
+    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>: -O2 -ggdb -D_GLIBCXX_DEBUG>)
+endif()
 
 #######################################################################
 #                             Wasserstein                             #
