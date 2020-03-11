@@ -21,8 +21,7 @@ jobs:
       inputs:
         knownHostsEntry: github.com
         sshPublicKey: $(KEY_GTDA-DOCS_PUB)
-        #sshPassphrase: # Optional
-        sshKeySecureFile: $(KEY_GTDA-DOCS)
+        sshKeySecureFile: KEY_GTDA-DOCS
 
     - task: UsePythonVersion@0
       inputs:
