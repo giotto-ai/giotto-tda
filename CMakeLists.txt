@@ -4,7 +4,7 @@ project(gtda_bindings LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gtda/externals/pybind11)
 set(BINDINGS_DIR "gtda/externals/bindings")
 
-find_package(Boost 1.56 REQUIRED)
+include(cmake/HelperBoost.cmake)
 include_directories(${Boost_INCLUDE_DIR})
 
 find_package(OpenMP)
