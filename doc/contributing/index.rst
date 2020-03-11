@@ -233,6 +233,8 @@ if the `.rst` files for notebooks are not present.
 Html
 ~~~~
 
+**This step requires `wreise/sphinx_rtd_theme <https://github.com/wreise/sphinx_rtd_theme>`_ as an additional dependency.**
+
 This is the step where `Sphinx` is actually used.
 We use the standard `make html` command, which also takes the configuration from `conf.py`.
 In particular, we use `a fork of the sphinx-rtd-theme <https://github.com/wreise/sphinx_rtd_theme>`_.
