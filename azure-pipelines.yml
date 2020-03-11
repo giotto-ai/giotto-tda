@@ -56,7 +56,7 @@ jobs:
     - script: |
         cd tmp/gtda-docs/
         make gh-commit
-        git push --repo https://giotto-learn:$GITHUB_PSW@github.com/giotto-ai/gtda-docs.git
+        git push --repo "https://giotto-learn:${GITHUB_PSW}@github.com/giotto-ai/gtda-docs.git"
       displayName:  'Commit the docs'
       failOnStderr: false
 
