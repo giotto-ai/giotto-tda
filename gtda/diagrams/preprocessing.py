@@ -1,18 +1,18 @@
 """Persistence diagram preprocessing."""
 # License: GNU AGPLv3
 
-import numbers
-import types
+from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import _parallel_amplitude
+from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import (check_diagram, validate_params,
-                                validate_metric_params)
+from ..utils.intervals import Interval
+from ..utils.validation import check_diagram, validate_params
 
 
 @adapt_fit_transform_docs
@@ -25,7 +25,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, Amplitude, Scaler, Filtering
 
     """
 
@@ -54,7 +54,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        check_diagram(X)
 
         self._is_fitted = True
         return self
@@ -91,11 +91,12 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 class Scaler(BaseEstimator, TransformerMixin):
     """Linear scaling of persistence diagrams.
 
-    A positive scale factor is calculated during :meth:`fit` by considering all
-    available persistence diagrams and homology dimensions. During
-    :meth:`transform`, all birth-death pairs are divided by this factor.
+    A positive scale factor :attr:`scale_` is calculated during :meth:`fit` by
+    considering all available persistence diagrams partitioned according to
+    homology dimensions. During :meth:`transform`, all birth-death pairs are
+    divided by :attr:`scale_`.
 
-    The value of the scale factor depends on two things:
+    The value of :attr:`scale_` depends on two things:
 
         - A way of computing, for each homology dimension, the `amplitude
           <https://giotto.ai/theory>`_ in that dimension of a persistence
@@ -103,46 +104,22 @@ class Scaler(BaseEstimator, TransformerMixin):
           Together, `metric` and `metric_params` define this in the same way as
           in :class:`Amplitude`.
         - A scalar-valued function which is applied to the resulting
-          two-dimensional array of amplitudes.
+          two-dimensional array of amplitudes (one per diagram and homology
+          dimension) to obtain :attr:`scale_`.
 
     Parameters
     ----------
-    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, default: ``'bottleneck'``
-        Distance or dissimilarity function used to define the amplitude of
-        a subdiagram as its distance from the diagonal diagram:
-
-        - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-          perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to the :math:`L^p` distance between
-          persistence landscapes.
-        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
-        - ``'heat'`` refers to the :math:`L^p` distance between
-          Gaussian-smoothed diagrams.
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
+        ``'landscape'`` | ``'heat'`` | ``'persistence_image'`` | \
+        ``'silhouette'``, optional, default: ``'bottleneck'``
+        See the corresponding parameter in :class:`Amplitude`.
 
     metric_params : dict or None, optional, default: ``None``
-        Additional keyword arguments for the metric function:
-
-        - If ``metric == 'bottleneck'`` there are no available arguments.
-        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
-          default: ``2``).
-        - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_bins` (int, default: ``100``).
-        - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
-          `n_layers` (int, default: ``1``).
-        - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
-          (int, default: ``100``).
-        - If ``metric == 'persistence_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_bins` (int, default: ``100``) and `weight_function`
-          (func, default x -> x).
-
+        See the corresponding parameter in :class:`Amplitude`.
 
     function : callable, optional, default: ``numpy.max``
         Function used to extract a positive scalar from the collection of
-        amplitude vectors in :meth:`fit`.
+        amplitude vectors in :meth:`fit`. Must map 2D arrays to scalars.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1
@@ -163,18 +140,25 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Filtering, Amplitude, PairwiseDistance, \
-    gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, ForgetDimension, Filtering, Amplitude
 
     Notes
     -----
+    When `metric` is ``'bottleneck'`` and `function` is ``numpy.max``,
+    :meth:`fit_transform` has the effect of making the lifetime of the most
+    persistent point across all diagrams and homology dimensions equal to 2.
+
     To compute scaling factors without first splitting the computation between
     different homology dimensions, data should be first transformed by an
     instance of :class:`ForgetDimension`.
 
     """
 
-    _hyperparameters = {'function': [types.FunctionType]}
+    _hyperparameters = {
+        'metric': {'type': str, 'in': _AVAILABLE_AMPLITUDE_METRICS.keys()},
+        'metric_params': {'type': (dict, type(None))},
+        'function': {'type': (FunctionType, type(None))}
+    }
 
     def __init__(self, metric='bottleneck', metric_params=None,
                  function=np.max, n_jobs=None):
@@ -204,15 +188,17 @@ class Scaler(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
+        X = check_diagram(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
+        validate_params(self.effective_metric_params_,
+                        _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        validate_metric_params(self.metric, self.effective_metric_params_)
-        X = check_diagram(X)
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
         self.effective_metric_params_['samplings'], \
@@ -283,18 +269,19 @@ class Scaler(BaseEstimator, TransformerMixin):
 class Filtering(BaseEstimator, TransformerMixin):
     """Filtering of persistence diagrams.
 
-    Filtering a diagram means removing all points whose distance from the
-    diagonal is less than or equal to a certain cutoff value which can be
-    interpreted as (:math:`1/\\sqrt{2}` times) the "minimum amount of
-    persistence" required from points in the filtered diagram.
+    Filtering a diagram means discarding all points [b, d, q] representing
+    topological features whose lifetime d - b is less than or equal to a
+    cutoff value. Technically, discarded points are replaced by points on the
+    diagonal (i.e. whose birth and death values coincide), which carry no
+    information.
 
     Parameters
     ----------
-    homology_dimensions : iterable or None, optional, default: ``None``
+    homology_dimensions : list, tuple, or None, optional, default: ``None``
         When set to ``None``, subdiagrams corresponding to all homology
         dimensions seen in :meth:`fit` will be filtered.
-        Otherwise, it contains the homology dimensions at which filtering
-        should occur.
+        Otherwise, it contains the homology dimensions (as non-negative
+        integers) at which filtering should occur.
 
     epsilon : float, optional, default: ``0.01``
         The cutoff value controlling the amount of filtering.
@@ -309,13 +296,16 @@ class Filtering(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Scaling, Amplitude, PairwiseDistance, \
-    gtda.homology.VietorisRipsPersistence
+    PairwiseDistance, ForgetDimension, Scaler, Amplitude
 
     """
 
-    _hyperparameters = {'homology_dimensions_': [list, [int, (0, np.inf)]],
-                        'epsilon': [numbers.Number, (0., np.inf)]}
+    _hyperparameters = {
+        'homology_dimensions': {
+            'type': (list, tuple, type(None)),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'epsilon': {'type': Real, 'in': Interval(0, np.inf, closed='left')}
+    }
 
     def __init__(self, homology_dimensions=None, epsilon=0.01):
         self.homology_dimensions = homology_dimensions
@@ -345,19 +335,14 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
+        validate_params(
+            self.get_params(), self._hyperparameters)
 
         if self.homology_dimensions is None:
             self.homology_dimensions_ = [int(dim) for dim in set(X[0, :, 2])]
         else:
             self.homology_dimensions_ = self.homology_dimensions
         self.homology_dimensions_ = sorted(self.homology_dimensions_)
-
-        validate_params({**self.get_params(),
-                         'homology_dimensions_': self.homology_dimensions_},
-                        self._hyperparameters)
-
-        self.homology_dimensions_ = \
-            [float(dim) for dim in self.homology_dimensions_]
 
         return self
 

@@ -1,4 +1,4 @@
-"""Testing for ForgetDimension and Scaler"""
+"""Testing for ForgetDimension and Scaler."""
 # License: GNU AGPLv3
 
 import numpy as np
@@ -229,7 +229,7 @@ def test_dst_transform(X):
     assert X_res.shape == X.shape
 
 
-parameters = [('wasserstein', {'p': 2, 'delta': 0.1}),
+parameters = [('wasserstein', {'p': 2}),
               ('betti', {'n_bins': 10}),
               ('bottleneck', None)]
 

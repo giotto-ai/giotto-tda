@@ -25,7 +25,7 @@ class OutputWidgetHandler(logging.Handler):
             'output_type': 'stream',
             'text': formatted_record+'\n'
         }
-        self.out.outputs = (new_output, ) + self.out.outputs
+        self.out.outputs = (new_output,) + self.out.outputs
 
     def show_logs(self):
         """Show the logs"""

@@ -213,21 +213,21 @@ X_2 = np.array([
 X_bottleneck = np.array([
     [[0, 1, 0.],
      [0, 0, 0.],
-     [0, 4, 1.]],  # Expected bottleneck ampl: [sqrt(2)/2, 2*sqrt(2)]
+     [0, 4, 1.]],  # Expected bottleneck ampl: [1/2, 2]
 
     [[0, 2, 0.],
      [0, 1, 0.],
-     [0, 0, 1.]],  # Expected bottleneck ampl: [sqrt(2), 0]
+     [0, 0, 1.]],  # Expected bottleneck ampl: [1, 0]
 
     [[3, 3.5, 0.],
      [0, 0, 0.],
-     [5, 9, 1.]]  # Expected bottleneck ampl: [0.5*sqrt(2)/2, 2*sqrt(2)]
+     [5, 9, 1.]]  # Expected bottleneck ampl: [1/4, 2]
 ])
 
 X_bottleneck_res_exp = np.array([
- [np.sqrt(2)/2, 2*np.sqrt(2)],
- [np.sqrt(2), 0],
- [np.sqrt(2)/4, 2*np.sqrt(2)]
+ [1/2, 2],
+ [1, 0],
+ [1/4, 2]
 ])
 
 
@@ -242,15 +242,15 @@ def test_not_fitted():
         da.transform(X_1)
 
 
-parameters = [('bottleneck', None),
-              ('wasserstein', {'p': 2, 'delta': 0.1}),
-              ('betti', {'p': 2.1, 'n_bins': 10}),
-              ('landscape', {'n_bins': 10}),
-              ('heat', {'n_bins': 10})  # See issue #63
-              ]
+parameters_distance = [
+    ('bottleneck', None),
+    ('wasserstein', {'p': 2, 'delta': 0.1}),
+    ('betti', {'p': 2.1, 'n_bins': 10}),
+    ('landscape', {'n_bins': 10}),
+    ('heat', {'n_bins': 10})]
 
 
-@pytest.mark.parametrize(('metric', 'metric_params'), parameters)
+@pytest.mark.parametrize(('metric', 'metric_params'), parameters_distance)
 @pytest.mark.parametrize('n_jobs', [1, 2, 4])
 @pytest.mark.parametrize('order', [2, None])
 def test_dd_transform(metric, metric_params, order, n_jobs):
@@ -275,7 +275,15 @@ def test_dd_transform(metric, metric_params, order, n_jobs):
     assert (X_res.shape[0], X_res.shape[1]) == (X_1.shape[0], X_2.shape[0])
 
 
-@pytest.mark.parametrize(('metric', 'metric_params'), parameters)
+parameters_amplitude = [
+    ('bottleneck', None),
+    ('wasserstein', {'p': 2}),
+    ('betti', {'p': 2.1, 'n_bins': 10}),
+    ('landscape', {'n_bins': 10}),
+    ('heat', {'n_bins': 10})]
+
+
+@pytest.mark.parametrize(('metric', 'metric_params'), parameters_amplitude)
 @pytest.mark.parametrize('n_jobs', [1, 2, 4])
 def test_da_transform(metric, metric_params, n_jobs):
     da = Amplitude(metric=metric, metric_params=metric_params,
