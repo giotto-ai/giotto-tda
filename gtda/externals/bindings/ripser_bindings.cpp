@@ -4,7 +4,7 @@
  * License:          TBD
  *****************************************************************************/
 
-#include "../ripser/ripser/ripser.cpp"
+#include <ripser.cpp>
 
 // PYBIND11
 #include <pybind11/pybind11.h>
