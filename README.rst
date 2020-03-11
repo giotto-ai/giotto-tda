@@ -46,8 +46,7 @@ business@l2f.ch.
 Documentation
 =============
 
-- API reference (stable release): https://docs-tda.giotto.ai
-- Theory glossary: https://giotto.ai/theory
+Please visit https://giotto-ai.github.io/gtda-docs and navigate to the version you are interested in.
 
 Getting started
 ===============
