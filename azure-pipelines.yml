@@ -45,6 +45,7 @@ jobs:
 
     - script: |
         brew install pandoc pandoc-citeproc
+        python -m pip install https://github.com/wreise/sphinx_rtd_theme/archive/master.zip
       displayName: 'Install additional stuff to build docs'
 
     - script: |

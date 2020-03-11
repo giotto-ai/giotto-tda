@@ -62,7 +62,6 @@ EXTRAS_REQUIRE = {
         'sphinx',
         'nbconvert',
         'sphinx-issues',
-        'sphinx_rtd_theme',
         'numpydoc'],
     'examples': [
         'jupyter',
