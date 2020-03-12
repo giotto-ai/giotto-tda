@@ -5,10 +5,10 @@ from .cluster import FirstHistogramGap, FirstSimpleGap
 from .cover import CubicalCover, OneDimensionalCover
 from .filter import Eccentricity, Entropy, Projection
 from .pipeline import make_mapper_pipeline
-from .visualization import (
-    plot_static_mapper_graph, plot_interactive_mapper_graph)
 from .utils.decorators import method_to_transform
 from .utils.pipeline import transformer_from_callable_on_rows
+from .visualization import plot_static_mapper_graph, \
+    plot_interactive_mapper_graph
 
 __all__ = [
     'Projection',
