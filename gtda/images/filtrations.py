@@ -11,10 +11,11 @@ from sklearn.utils.validation import check_is_fitted, check_array
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 from ._utils import _dilate, _erode
+from ..plots.image import ImagePlotterMixin
 
 
 @adapt_fit_transform_docs
-class HeightFiltration(BaseEstimator, TransformerMixin):
+class HeightFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Filtrations of 2D/3D binary images based on distances to lines/planes.
 
     The height filtration assigns to each activated pixel of a binary image a
@@ -165,7 +166,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class RadialFiltration(BaseEstimator, TransformerMixin):
+class RadialFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Filtrations of 2D/3D binary images based on distances to a reference
     pixel.
 
@@ -355,7 +356,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class DilationFiltration(BaseEstimator, TransformerMixin):
+class DilationFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Filtrations of 2D/3D binary images based on the dilation of activated
     regions.
 
@@ -489,7 +490,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class ErosionFiltration(BaseEstimator, TransformerMixin):
+class ErosionFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Filtrations of 2D/3D binary images based on the erosion of activated
     regions.
 
@@ -623,7 +624,8 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
+class SignedDistanceFiltration(BaseEstimator, TransformerMixin,
+                               ImagePlotterMixin):
     """Filtrations of 2D/3D binary images based on the dilation and the erosion
     of activated regions.
 

@@ -15,6 +15,8 @@ from ._metrics import betti_curves, landscapes, heats,\
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params, check_diagram
+from ..base import PlotterMixin
+from ..plots import plot_betti_surfaces, plot_landscapes, plot_image
 
 
 @adapt_fit_transform_docs
@@ -124,7 +126,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class BettiCurve(BaseEstimator, TransformerMixin):
+class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     """`Betti curves <https://giotto.ai/theory>`_ of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
@@ -246,6 +248,28 @@ class BettiCurve(BaseEstimator, TransformerMixin):
             reshape(self._n_dimensions, X.shape[0], -1).\
             transpose((1, 0, 2))
         return Xt
+
+    def plot(self, Xt, sample=0, **layout):
+        """Plot betti curves, one per homology dimensions. If :param:`sample`
+        is a list, betti surfaces are plotted.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
+            Betti curves: as returned by :meth:`transform`.
+            One curve (represented as a one-dimensional array
+            of integer values) per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+        sample : int or list of int, optional, default: ``0``
+            Index(/indices) of the sample(s) to be plotted. If multiple indices
+            are provided, a betti surface using those is plotted.
+        """
+        if isinstance(sample, int):
+            sample = [sample]
+        return plot_betti_surfaces(
+            Xt[sample], homology_dimensions=self.homology_dimensions_,
+            samplings=self.samplings_, **layout)
 
 
 @adapt_fit_transform_docs
@@ -532,7 +556,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class PersistenceImage(BaseEstimator, TransformerMixin):
+class PersistenceImage(BaseEstimator, TransformerMixin, ):
     """`Persistence images <https://giotto.ai/theory>`_ of persistence
     diagrams.
 
