@@ -3,7 +3,8 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from .image import plot_image
+from ._plot import _plot_image
+
 
 def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
     """Plot the Betti curves of a single persistence diagram by homology
@@ -84,9 +85,10 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         ``n_homology_dimension`` curves in each collection. Index i along axis
         1 should yield all Betti curves in homology dimension i.
 
-    homology_dimensions : list of int or None, default: ``None``
+    homology_dimensions : list of int, int, or None, default: ``None``
         Homology dimensions for which the Betti surfaces should be plotted.
-        If ``None``, all available dimensions will be used.
+        If ``None``, all available dimensions will be used. If int, betti
+        curves are plotted instead.
 
     samplings : ndarray of shape (n_homology_dimension, n_values), \
         default: ``None``
@@ -213,8 +215,9 @@ def plot_persistence_image(images, homology_dimension=None, samplings=None):
     ----------
     images : ndarray of shape (n_homology_dimension, n_values, n_values)
         Collection of ``n_homology_dimension`` discretised persistence
-        images. Each image is an image of size ``(n_values, n_values)``. Entry i along
-        axis 0 should be the persistence image in homology dimension i.
+        images. Each image is an image of size ``(n_values, n_values)``.
+        Entry i along axis 0 should be the persistence image in homology
+        dimension i.
 
     homology_dimension : int or None, default: ``None``
         Homology dimension for which the persistence image should be plotted.
@@ -231,6 +234,6 @@ def plot_persistence_image(images, homology_dimension=None, samplings=None):
 
     if homology_dimension is None:
         homology_dimension = 0
-    plot_image(images[homology_dimension])
-
-
+    fig = _plot_image(images[homology_dimension])
+    fig.update_layout({'title': 'Persistence Image'})
+    fig.show()
