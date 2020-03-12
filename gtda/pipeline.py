@@ -291,13 +291,13 @@ class Pipeline(pipeline.Pipeline):
 
         Parameters
         ----------
-        y : array-like, shape = (n_samples, )
+        y : array-like, shape = (n_samples,)
             Data to resample. Must fulfill input requirements of first step
             of the pipeline.
 
         Returns
         -------
-        yr : array-like, shape = (n_samples_new, )
+        yr : array-like, shape = (n_samples_new,)
         """
         # _final_estimator is None or has transform, otherwise attribute error
         if self._final_estimator != 'passthrough':
@@ -327,7 +327,7 @@ class Pipeline(pipeline.Pipeline):
         Returns
         -------
         Xt : array-like, shape = (n_samples_new, n_transformed_features)
-        yr : array-like, shape = (n_samples_new, )
+        yr : array-like, shape = (n_samples_new,)
         """
         # _final_estimator is None or has transform, otherwise attribute error
         final_estimator = self._final_estimator

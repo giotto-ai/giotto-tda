@@ -225,33 +225,3 @@ def test_cubical_fit_A_transform_consistent_with_OneD(filter, kind,
     x_one_d = one_d.fit(filter).transform(filter)
     x_cubical = cubical.fit(filter).transform(filter)
     assert_almost_equal(x_one_d, x_cubical)
-
-# @given(
-#     filter_values=arrays(dtype=np.float,
-#                          elements=floats(allow_nan=False,
-#                                          allow_infinity=False,
-#                                          min_value=-1e10,
-#                                          max_value=1e10),
-#                          shape=array_shapes(min_dims=1, max_dims=1,
-#                                             min_side=2),
-#                          unique=True),
-#     n_intervals=integers(min_value=4, max_value=50),
-#     overlap_frac=floats(allow_nan=False,
-#                         allow_infinity=False,
-#                         min_value=0.01,
-#                         max_value=1.)
-# )
-# def test_overlap_fraction(filter_values, n_intervals, overlap_frac):
-#     cover = OneDimensionalCover(kind='uniform',
-#                                 n_intervals=n_intervals,
-#                                 overlap_frac=overlap_frac)
-#     cover.fit(filter_values)
-
-#     lower_limits = cover.left_limits_[1:-1]
-#     upper_limits = cover.right_limits_[1:-1]
-#     lengths = (upper_limits[:-1] - lower_limits[:-1])
-
-#     overlap_array = (upper_limits[:-1] - lower_limits[1:]) / lengths
-#     expected_overlap_array = np.array([overlap_frac] * (n_intervals - 3))
-
-#     assert_allclose(overlap_array, expected_overlap_array, rtol=1e-5)

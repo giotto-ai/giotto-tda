@@ -17,7 +17,7 @@ def _get_node_size(node_elements):
 
 def _get_node_text(graph):
     return [
-        f"Node ID:{node_id}<br>Node size:{len(node_elements)}"
+        f"Node ID: {node_id}<br>Node size: {len(node_elements)}"
         for node_id, node_elements in zip(
             graph["node_metadata"]["node_id"],
             graph["node_metadata"]["node_elements"])

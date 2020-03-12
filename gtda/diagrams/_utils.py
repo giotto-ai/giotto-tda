@@ -4,16 +4,6 @@
 import numpy as np
 
 
-def _rotate_clockwise(X):
-    rot_mat = (np.sqrt(2) / 2.) * np.array([[1, -1, 0], [1, 1, 0], [0, 0, 1]])
-    return np.dot(X, rot_mat)
-
-
-def _rotate_anticlockwise(X):
-    rot_mat = (np.sqrt(2) / 2.) * np.array([[1, 1, 0], [-1, 1, 0], [0, 0, 1]])
-    return np.dot(X, rot_mat)
-
-
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     for dim in homology_dimensions:
         Xs = X[X[:, :, 2] == dim]
@@ -57,7 +47,7 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
     for dim in filtered_homology_dimensions:
         Xdim = _subdiagrams(Xs, [dim])
         min_value = np.min(Xdim[:, :, 0])
-        mask = np.sqrt(2) / 2. * (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
+        mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
         Xdim[mask, :] = [min_value, min_value, dim]
         max_points = np.max(np.sum(Xs[:, :, 1] != 0, axis=1))
         Xdim = Xdim[:, :max_points, :]

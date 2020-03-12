@@ -1,8 +1,8 @@
 """Feature extraction from persistence diagrams."""
 # License: GNU AGPLv3
 
-import numbers
 import types
+from numbers import Real
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -10,13 +10,20 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats,\
+from ._metrics import betti_curves, landscapes, heats, \
     persistence_images, silhouettes
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagram
 from ..base import PlotterMixin
 from ..plots import plot_betti_surfaces, plot_landscapes, plot_image
+
+
+def identity(x):
+    """The identity function.
+    """
+    return x
 
 
 @adapt_fit_transform_docs
@@ -170,7 +177,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
     """
 
-    _hyperparameters = {'n_bins': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
 
     def __init__(self, n_bins=100, n_jobs=None):
         self.n_bins = n_bins
@@ -202,7 +210,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_diagram(X)
-        validate_params(self.get_params(), self._hyperparameters)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -323,8 +332,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'n_layers': [int, (1, np.inf)],
-                        'n_bins': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'n_layers': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
 
     def __init__(self, n_layers=1, n_bins=100, n_jobs=None):
         self.n_layers = n_layers
@@ -357,7 +367,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
-        validate_params(self.get_params(), self._hyperparameters)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -425,7 +436,7 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    sigma : float, optional default ``1.0``
+    sigma : float, optional default ``1.``
         Standard deviation for Gaussian kernel.
 
     n_bins : int, optional, default: ``100``
@@ -471,10 +482,11 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
-                        'n_bins': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')}}
 
-    def __init__(self, sigma=1.0, n_bins=100, n_jobs=None):
+    def __init__(self, sigma=1., n_bins=100, n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins
         self.n_jobs = n_jobs
@@ -505,7 +517,8 @@ class HeatKernel(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
-        validate_params(self.get_params(), self._hyperparameters)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -564,24 +577,25 @@ class PersistenceImage(BaseEstimator, TransformerMixin, ):
     birth-death-dimension triples [b, d, q], the equivalent diagrams of
     birth-persistence-dimension [b, d-b, q] triples are computed and
     subdiagrams corresponding to distinct homology dimensions are considered
-    separately and regarded as sums of Dirac deltas.
-    Then, the convolution with a Gaussian kernel is computed over
-    a rectangular grid of locations evenly sampled from appropriate ranges
-    of the `filtration parameter <https://giotto.ai/theory>`_.
-    The result can be thought of as a raster image.
+    separately and regarded as sums of Dirac deltas. Then, the convolution
+    with a Gaussian kernel is computed over a rectangular grid of locations
+    evenly sampled from appropriate ranges of the `filtration parameter
+    <https://giotto.ai/theory>`_. The result can be thought of as a raster
+    image.
 
     Parameters
     ----------
-    sigma : float, optional default ``1.0``
+    sigma : float, optional default ``1.``
         Standard deviation for Gaussian kernel.
 
     n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
 
-    weight_function : fct 1d array -> 1d array, default: ``lambda p: p``
-        Function mapping a 1d-array of persistence of the points of a diagram
-        to a 1d array of their weight.
+    weight_function : callable or None, default: ``None``
+        Function mapping the 1D array of persistence values of the points of an
+        input diagram to a 1D array of weights. ``None`` is equivalent to
+        passing the identity function.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -590,9 +604,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, ):
 
     Attributes
     ----------
-    effective_weight_function_ : fct 1d array -> 1d array
-        Effective function mapping a 1d-array of persistence of the points of a
-        diagram to a 1d array of their weight.
+    effective_weight_function_ : callable
+        Effective function corresponding to `weight_function`. Set in
+        :meth:`fit`.
 
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`.
@@ -631,12 +645,12 @@ class PersistenceImage(BaseEstimator, TransformerMixin, ):
 
     """
 
-    _hyperparameters = {'sigma': [numbers.Number, (1e-16, np.inf)],
-                        'n_bins': [int, (1, np.inf)],
-                        'effective_weight_function_': [types.FunctionType,
-                                                       None]}
+    _hyperparameters = {
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
+        'weight_function': {'type': (types.FunctionType, type(None))}}
 
-    def __init__(self, sigma=1.0, n_bins=100, weight_function=None,
+    def __init__(self, sigma=1., n_bins=100, weight_function=None,
                  n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins
@@ -670,15 +684,13 @@ class PersistenceImage(BaseEstimator, TransformerMixin, ):
         """
         X = check_diagram(X)
 
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.weight_function is None:
-            self.effective_weight_function_ = lambda p: p
+            self.effective_weight_function_ = identity
         else:
             self.effective_weight_function_ = self.weight_function
-
-        validate_params({
-            **self.get_params(),
-            'effective_weight_function_': self.effective_weight_function_},
-                        self._hyperparameters)
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -749,7 +761,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
      Parameters
     ----------
-    order: float, optional, default: ``1.``
+    power: float, optional, default: ``1.``
         The power to which persistence values are raised to define the
         `power-weighted silhouettes <https://giotto.ai/theory>`_.
 
@@ -796,11 +808,12 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'order': [float, (0., np.inf)],
-                        'n_bins': [int, (1., np.inf)]}
+    _hyperparameters = {
+        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'power': {'type': Real, 'in': Interval(0, np.inf, closed='right')}}
 
-    def __init__(self, order=1., n_bins=100, n_jobs=None):
-        self.order = order
+    def __init__(self, power=1., n_bins=100, n_jobs=None):
+        self.power = power
         self.n_bins = n_bins
         self.n_jobs = n_jobs
 
@@ -830,7 +843,8 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagram(X)
-        validate_params(self.get_params(), self._hyperparameters)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -869,7 +883,7 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
         Xt = (Parallel(n_jobs=self.n_jobs)
               (delayed(silhouettes)(_subdiagrams(X, [dim], remove_dim=True)[s],
-                                    self._samplings[dim], order=self.order)
+                                    self._samplings[dim], power=self.power)
               for dim in self.homology_dimensions_
               for s in gen_even_slices(X.shape[0],
                                        effective_n_jobs(self.n_jobs))))
