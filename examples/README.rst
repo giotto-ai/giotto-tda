@@ -1,4 +1,4 @@
-.. image:: https://www.giotto.ai/static/vector/logo.svg
+.. image:: https://www.giotto.ai/static/vector/logo-tda.svg
    :width: 850
 
 Examples, tutorials and plotting utilities
