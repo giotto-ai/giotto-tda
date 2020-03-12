@@ -2,6 +2,54 @@
 # Additional checks can be manually triggered
 jobs:
 
+- job: 'Documentation'
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python38:
+        python.version: '3.8'
+  variables:
+    EXECUTE: 'true'
+    GITDIR: ../tmp/gtda-docs
+    RUNNOTEBOOKS: TRUE
+    VERSION: master
+
+  steps:
+    - task: InstallSSHKey@0
+      inputs:
+        knownHostsEntry: github.com
+        sshPublicKey: $(KEY_GTDA-DOCS_PUB)
+        sshKeySecureFile: KEY_GTDA-DOCS
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+
+    - script: |
+        set -e
+        brew update
+        brew install boost
+      displayName: 'Install system dependencies'
+
+    - script: |
+        set -e
+        python -m pip install --upgrade pip setuptools
+        python -m pip install -e ".[dev]"
+      displayName: 'Install dependencies and dev environment'
+
+    - script: |
+        set -e
+        mkdir tmp
+        cd tmp
+        git clone https://github.com/giotto-ai/gtda-docs.git
+        cd gtda-docs
+        mkdir test_push
+        git add -A
+        git commit -m "Add test folder"
+        git push git@github.com:giotto-ai/gtda-docs.git
+      displayName:  'Commit the docs'
+
 - job: 'manylinux2010'
   pool:
     vmImage: 'ubuntu-16.04'
