@@ -9,11 +9,11 @@ jobs:
     matrix:
       Python38:
         python.version: '3.8'
-  variables:
-    EXECUTE: 'true'
-    GITDIR: ../tmp/gtda-docs
-    RUNNOTEBOOKS: TRUE
-    VERSION: master
+#  variables:
+#    EXECUTE: 'true'
+#    GITDIR: ../tmp/gtda-docs
+#    RUNNOTEBOOKS: TRUE
+#    VERSION: master
 
   steps:
     - task: InstallSSHKey@0
@@ -25,18 +25,18 @@ jobs:
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(python.version)'
-
-    - script: |
-        set -e
-        brew update
-        brew install boost
-      displayName: 'Install system dependencies'
-
-    - script: |
-        set -e
-        python -m pip install --upgrade pip setuptools
-        python -m pip install -e ".[dev]"
-      displayName: 'Install dependencies and dev environment'
+#
+#    - script: |
+#        set -e
+#        brew update
+#        brew install boost
+#      displayName: 'Install system dependencies'
+#
+#    - script: |
+#        set -e
+#        python -m pip install --upgrade pip setuptools
+#        python -m pip install -e ".[dev]"
+#      displayName: 'Install dependencies and dev environment'
 
     - script: |
         set -e
