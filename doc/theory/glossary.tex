@@ -152,7 +152,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Cellwise filtration} \label{cellwise filtration}
 	
-	A \textit{cellwise filtration} is a complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$. A cellwise filtration can be naturally thought of as a \hyperref[filtered complex]{filtered complex}.
+	A \textit{cellwise filtration} is a simplicial or cubical complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$. A cellwise filtration can be naturally thought of as a \hyperref[filtered complex]{filtered complex}.
 	
 	\subsection*{Clique and flag complexes} \label{clique and flag complexes}
 	
@@ -168,10 +168,11 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	w : \langle G \rangle \to \mathbb R \cup \{\infty\}
 	\end{equation*}
-	given by
-	\begin{equation*}
-	w(\sigma) = \max(\{ w(e)\ |\ e \in G \cap \sigma\})
-	\end{equation*}
+	defined respectively by 
+	\begin{align*}
+	w\{v_0, \dots, v_n\} & = \max\{ w\{v_i, v_j\}\ |\ i < j\} \\
+	w(v_0, \dots, v_n) & = \max\{ w(v_i, v_j)\ |\ i < j\}
+	\end{align*}
 	and define the \hyperref[filtered complex]{filtered complex} $\{\langle G \rangle_{s}\}_{s \in \mathbb R}$ by
 	\begin{equation*}
 	\langle G \rangle_s = \{\sigma \in \langle G \rangle\ |\ w(\sigma) \leq s\}.
