@@ -32,7 +32,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.09" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.03.12" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -87,7 +87,7 @@ jobs:
     displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+      artifactName: 'wheel'
 
   - bash: |
       set -e
@@ -127,7 +127,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.09" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.03.12" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -188,22 +188,6 @@ jobs:
       done
     displayName: 'Test jupyter notebooks with papermill'
 
-  - script: |
-      set -e
-      cd doc/
-      make html
-    displayName: 'Build sphinx doc'
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: doc/build
-      includeRootFolder: true
-      archiveType: 'zip'
-      tarCompression: 'gz'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      replaceExistingArchive: true
-    displayName: 'Archive doc'
-
   - task: CopyFiles@2
     displayName: 'Copy files'
     inputs:
@@ -214,7 +198,7 @@ jobs:
     displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+      artifactName: 'wheel'
 
   - bash: |
       set -e
@@ -299,7 +283,7 @@ jobs:
     displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+      artifactName: 'wheel'
 
   - bash: |
       set -e
