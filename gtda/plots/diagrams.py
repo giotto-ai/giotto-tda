@@ -1,9 +1,9 @@
-"""Persistence diagrams-retated plotting functions """
+"""Persistence diagrams-related plotting functions """
 # License: GNU AGPLv3
 
 import numpy as np
 import plotly.graph_objs as gobj
-
+from .image import plot_image
 
 def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
     """Plot the Betti curves of a single persistence diagram by homology
@@ -204,3 +204,33 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
                                        name="layer {}".format(layer + 1)))
 
         fig.show()
+
+
+def plot_persistence_image(images, homology_dimension=None, samplings=None):
+    """Plot persistence_images by homology dimension.
+
+    Parameters
+    ----------
+    images : ndarray of shape (n_homology_dimension, n_values, n_values)
+        Collection of ``n_homology_dimension`` discretised persistence
+        images. Each image is an image of size ``(n_values, n_values)``. Entry i along
+        axis 0 should be the persistence image in homology dimension i.
+
+    homology_dimension : int or None, default: ``None``
+        Homology dimension for which the persistence image should be plotted.
+        If ``None``, the first available dimension will be used.
+
+    samplings : ndarray of shape (n_homology_dimension, n_values, n_values), \
+        default: ``None``
+        For each homology dimension, (filtration parameter and persistence)
+        values to be used on the x-axis against the corresponding values in
+        `images` on the y-axis. If ``None``, the samplings will start at 0
+        with step 1.
+
+    """
+
+    if homology_dimension is None:
+        homology_dimension = 0
+    plot_image(images[homology_dimension])
+
+
