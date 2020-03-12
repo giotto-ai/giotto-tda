@@ -1,5 +1,5 @@
 """The module :mod:`gtda.plotting` implements function to plot giotto-tda
-transformers' input/output."""
+transformers' output."""
 
 from .point_clouds import plot_point_cloud
 from .homology import plot_diagram
