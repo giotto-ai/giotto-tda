@@ -347,7 +347,7 @@ def plot_persistence_image(images, homology_dimension=None, samplings=None):
         with step 1.
 
     """
-
+    # TODO: use the samplings for axes
     if homology_dimension is None:
         homology_dimension = 0
     fig = _plot_image(images[homology_dimension])

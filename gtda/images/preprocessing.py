@@ -14,8 +14,8 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
-from ..plots.image import ImagePlotterMixin
-from ..plots import plot_point_cloud
+from ..plotting.image import ImagePlotterMixin
+from ..plotting import plot_point_cloud
 from ..base import PlotterMixin
 
 

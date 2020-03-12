@@ -17,7 +17,8 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagram
 from ..base import PlotterMixin
-from ..plots import plot_betti_surfaces, plot_landscapes, plot_image
+from ..plotting import plot_betti_curves, plot_landscapes, plot_heat_kernel,\
+    plot_persistence_image, plot_silhouettes
 
 
 def identity(x):
@@ -258,9 +259,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2))
         return Xt
 
-    def plot(self, Xt, sample=0, **layout):
-        """Plot betti curves, one per homology dimensions. If :param:`sample`
-        is a list, betti surfaces are plotted.
+    def plot(self, Xt, sample=0):
+        """Plot betti curves, one per homology dimensions.
 
         Parameters
         ----------
@@ -270,19 +270,18 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             of integer values) per sample and per homology dimension seen
             in :meth:`fit`. Index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
+
         sample : int or list of int, optional, default: ``0``
-            Index(/indices) of the sample(s) to be plotted. If multiple indices
-            are provided, a betti surface using those is plotted.
+            Index of the sample to be plotted.
+
         """
-        if isinstance(sample, int):
-            sample = [sample]
-        return plot_betti_surfaces(
+        return plot_betti_curves(
             Xt[sample], homology_dimensions=self.homology_dimensions_,
-            samplings=self.samplings_, **layout)
+            samplings=self.samplings_)
 
 
 @adapt_fit_transform_docs
-class PersistenceLandscape(BaseEstimator, TransformerMixin):
+class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence landscapes <persistence landscape>` of persistence
     diagrams.
 
@@ -419,9 +418,32 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
+    def plot(self, Xt, sample=0, **layout):
+        """Plot persistence landscapes, one per homology dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
+            n_layers, n_bins)
+            Betti curves: as returned by :meth:`transform`.
+            One curve (represented as a one-dimensional array
+            of integer values) per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        if isinstance(sample, int):
+            sample = [sample]
+        return plot_landscapes(
+            Xt[sample], homology_dimensions=self.homology_dimensions_,
+            samplings=self.samplings_)
+
 
 @adapt_fit_transform_docs
-class HeatKernel(BaseEstimator, TransformerMixin):
+class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     """Convolution of persistence diagrams with a Gaussian kernel.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -566,6 +588,28 @@ class HeatKernel(BaseEstimator, TransformerMixin):
                                         self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
+
+    def plot(self, Xt, sample=0, homology_dimension=0):
+        """Plot a chosen heat kernel in a given dimension, the output of
+        :meth:`transform`.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
+            n_bins)
+            Raster images: one image per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+
+        sample : int, optional, default: ``0``
+            Sample for which the heat kernel should be plotted.
+
+        homology_dimension : int, optional, default: ``0``
+            Homology dimension in which the heat kernel should be plotted.
+
+        """
+        return plot_heat_kernel(Xt[sample], homology_dimension,
+                                samplings=self.samplings_)
 
 
 @adapt_fit_transform_docs
@@ -746,9 +790,33 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
+    def plot(self, Xt, sample=0, homology_dimension=0):
+        """Plot a chosen persistence image in a given dimension, the output of
+        :meth:`transform`.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
+            n_bins)
+            Raster images: one image per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+
+        sample : int, optional, default: ``0``
+            Sample for which the persistence image should be plotted.
+
+        homology_dimension : int, optional, default: ``0``
+            Homology dimension in which the persistence image should be
+            plotted.
+
+        """
+        # TODO: use the samplings for axes
+        return plot_persistence_image(Xt[sample],
+                                      homology_dimension=homology_dimension)
+
 
 @adapt_fit_transform_docs
-class Silhouette(BaseEstimator, TransformerMixin):
+class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Power-weighted silhouettes <weighted silhouette>` of persistence
     diagrams.
 
@@ -892,3 +960,23 @@ class Silhouette(BaseEstimator, TransformerMixin):
             reshape(self._n_dimensions, X.shape[0], -1). \
             transpose((1, 0, 2))
         return Xt
+
+    def plot(self, Xt, sample):
+        """Plot silhouettes, one per homology dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
+            Silhouettes: as returned by :meth:`transform`.
+            One curve (represented as a one-dimensional array
+            of integer values) per sample and per homology dimension seen
+            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
+
+        sample : int or list of int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        return plot_silhouettes(
+            Xt[sample], homology_dimensions=self.homology_dimensions_,
+            samplings=self.samplings_)

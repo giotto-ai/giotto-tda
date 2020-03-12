@@ -16,7 +16,7 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 from ._utils import _dilate, _erode
-from ..plots.image import ImagePlotterMixin
+from ..plotting.image import ImagePlotterMixin
 
 
 @adapt_fit_transform_docs
