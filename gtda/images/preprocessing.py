@@ -10,9 +10,13 @@ from sklearn.utils.validation import check_is_fitted, check_array
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import validate_params
 
+from ..plots.image import ImagePlotterMixin
+from ..plots import plot_point_cloud
+from ..base import PlotterMixin
+
 
 @adapt_fit_transform_docs
-class Binarizer(BaseEstimator, TransformerMixin):
+class Binarizer(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Binarize all 2D/3D grayscale images in a collection.
 
     Parameters
@@ -129,7 +133,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class Inverter(BaseEstimator, TransformerMixin):
+class Inverter(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Invert all 2D/3D binary images in a collection.
 
 
@@ -206,7 +210,7 @@ class Inverter(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class Padder(BaseEstimator, TransformerMixin):
+class Padder(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Pad all 2D/3D binary images in a collection.
 
     Parameters
@@ -319,7 +323,7 @@ class Padder(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class ImageToPointCloud(BaseEstimator, TransformerMixin):
+class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
@@ -423,3 +427,19 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
         return Xt
+
+    def plot(self, Xt, sample=0):
+        """ Plot a point cloud, from a collection of point clouds, resulting
+        from applying :meth:`transform` to a collection of binary images.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
+            n_dimensions)
+            Transformed collection of images. Each entry along axis 0 is a
+            point cloud in a `n_dimensions` dimensional space.
+
+        sample: int, optional, default: ``0``
+            Indicates which point cloud in the collection :param:`Xt` to plot.
+        """
+        return plot_point_cloud(Xt[sample], dimension=None)
