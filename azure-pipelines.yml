@@ -47,7 +47,7 @@ jobs:
         touch foo.bar
         git add -A
         git commit -m "Add test folder"
-        git push git@github.com:giotto-ai/gtda-docs.git
+        git push
       displayName:  'Commit the docs'
 
 - job: 'manylinux2010'
