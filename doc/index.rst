@@ -356,7 +356,6 @@ Binary image filtrations
 
    utils.check_diagram
    utils.validate_params
-   utils.validate_metric_params
 
 
 :mod:`gtda.plots`: Plotting
