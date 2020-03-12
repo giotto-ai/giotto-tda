@@ -1,11 +1,16 @@
 from scipy import sparse
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
-from ..modules.gtda_ripser import rips_dm, rips_dm_sparse
+from ..modules import gtda_ripser, gtda_ripser_coeff
 
 
 def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
-    ret = rips_dm(DParam, DParam.shape[0], coeff, maxHomDim, thresh, do_cocycles)
+    if coeff == 2:
+        ret = gtda_ripser.rips_dm(DParam, DParam.shape[0], coeff, maxHomDim,
+                                  thresh, do_cocycles)
+    else:
+        ret = gtda_ripser_coeff.rips_dm(DParam, DParam.shape[0], coeff,
+                                        maxHomDim, thresh, do_cocycles)
     ret_rips = {}
     ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
     ret_rips.update({"num_edges": ret.num_edges})
@@ -13,7 +18,12 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
 
 
 def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
-    ret = rips_dm_sparse(I, J, V, I.size, N, coeff, maxHomDim, thresh, do_cocycles)
+    if coeff == 2:
+        ret = gtda_ripser.rips_dm_sparse(I, J, V, I.size, N, coeff, maxHomDim,
+                                         thresh, do_cocycles)
+    else:
+        ret = gtda_ripser_coeff.rips_dm_sparse(I, J, V, I.size, N, coeff,
+                                               maxHomDim, thresh, do_cocycles)
     ret_rips = {}
     ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
     ret_rips.update({"num_edges": ret.num_edges})
