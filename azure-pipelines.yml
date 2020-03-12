@@ -44,7 +44,7 @@ jobs:
         cd tmp
         git clone https://github.com/giotto-ai/gtda-docs.git
         cd gtda-docs
-        mkdir test_push
+        touch foo.bar
         git add -A
         git commit -m "Add test folder"
         git push git@github.com:giotto-ai/gtda-docs.git
