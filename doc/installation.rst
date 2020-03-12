@@ -131,6 +131,24 @@ In `HelperBoost.cmake` file, line 7, you can add your path between the quotation
 
    list(APPEND BOOST_ROOT "C:\\<path_to_your_boost_installation>").
 
+Troubleshooting
+---------------
+
+If you need to understand where the compiler tries to look for ``boost`` headers,
+you can install ``giotto-tda`` with::
+
+   pip install -e . -v
+
+Then you can look at the output for lines starting with::
+
+   Boost_INCLUDE_DIR: <path>
+   Boost_INCLUDE_DIRS: <path>
+
+Also, if you have installed different versions of ``boost`` in the process of trying to instal ``giotto-tda``,
+make sure to clear CMake cache entries::
+
+    rm -rf build/
+
 
 Source code
 ===========
