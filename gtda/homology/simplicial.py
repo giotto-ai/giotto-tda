@@ -20,7 +20,7 @@ from ..plotting.homology import plot_diagram
 
 
 @adapt_fit_transform_docs
-class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
+class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
     homology>`.
