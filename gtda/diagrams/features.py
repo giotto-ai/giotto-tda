@@ -425,11 +425,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
             n_layers, n_bins)
-            Betti curves: as returned by :meth:`transform`.
-            One curve (represented as a one-dimensional array
-            of integer values) per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Array of betti curves such as the result of a call to
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Index of the sample to be plotted.
@@ -595,9 +592,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Raster images: one image per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Array of heat kernels such as the result of a call to
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Sample for which the heat kernel should be plotted.
@@ -796,9 +792,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Raster images: one image per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Array of persistence images such as the result of a call to
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Sample for which the persistence image should be plotted.
@@ -965,11 +960,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            Silhouettes: as returned by :meth:`transform`.
-            One curve (represented as a one-dimensional array
-            of integer values) per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Array of silhouettes such as the result of a call to
+            :meth:`transform`.
 
         sample : int or list of int, optional, default: ``0``
             Index of the sample to be plotted.
