@@ -10,15 +10,17 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..base import PlotterMixin
 from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
+from ..plotting.homology import plot_diagram
 
 
 @adapt_fit_transform_docs
-class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
+class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
     `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
 
@@ -220,6 +222,22 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
+
+    def plot(self, Xt, sample=0):
+        """Plot a single persistence diagram.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Array of persistence diagrams such as the result of a call to
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        return plot_diagram(Xt[sample],
+                            homology_dimensions=self.homology_dimensions)
 
 
 @adapt_fit_transform_docs
