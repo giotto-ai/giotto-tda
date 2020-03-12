@@ -4,6 +4,25 @@
 import numpy as np
 import plotly.graph_objs as gobj
 from gtda.diagrams._utils import _subdiagrams
+from ..base import PlotterMixin
+
+
+class HomologyPlotterMixin(PlotterMixin):
+    """Mixin class for modules that return persistent homology groups."""
+
+    def plot(self, Xt, sample=0):
+        """ Plot a persistence diagram, with homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_points, s3)
+            Collection of persistence diagrams.
+
+        sample: int, optional, default: ``0``
+            Indicates which point cloud in the collection :param:`Xt` to plot.
+        """
+        # TODO: increase the marker size
+        return plot_diagram(Xt[sample], homology_dimensions=None)
 
 
 def plot_diagram(diagram, homology_dimensions=None, **input_layout):

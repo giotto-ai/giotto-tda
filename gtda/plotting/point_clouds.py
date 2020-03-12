@@ -3,6 +3,25 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
+from ..base import PlotterMixin
+
+
+class PointCloudPlotterMixin(PlotterMixin):
+    """Mixin class for modules that return point clouds"""
+
+    def plot(self, Xt, sample=0):
+        """ Plot a point cloud, from a collection of point clouds.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+            Collection of point clouds.
+
+        sample: int, optional, default: ``0``
+            Indicates which point cloud in the collection :param:`Xt` to plot.
+        """
+        # TODO: increase the marker size
+        return plot_point_cloud(Xt[sample], dimension=None)
 
 
 def plot_point_cloud(point_cloud, dimension=None):

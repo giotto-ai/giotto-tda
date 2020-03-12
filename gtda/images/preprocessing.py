@@ -14,9 +14,8 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
-from ..plotting.image import ImagePlotterMixin
-from ..plotting import plot_point_cloud
-from ..base import PlotterMixin
+from ..plotting import ImagePlotterMixin
+from ..plotting import PointCloudPlotterMixin
 
 
 @adapt_fit_transform_docs
@@ -340,7 +339,8 @@ class Padder(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 
 @adapt_fit_transform_docs
-class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
+class ImageToPointCloud(BaseEstimator, TransformerMixin,
+                        PointCloudPlotterMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
@@ -448,19 +448,3 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
         return Xt
-
-    def plot(self, Xt, sample=0):
-        """ Plot a point cloud, from a collection of point clouds, resulting
-        from applying :meth:`transform` to a collection of binary images.
-
-        Parameters
-        ----------
-        Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
-            n_dimensions)
-            Transformed collection of images. Each entry along axis 0 is a
-            point cloud in a `n_dimensions` dimensional space.
-
-        sample: int, optional, default: ``0``
-            Indicates which point cloud in the collection :param:`Xt` to plot.
-        """
-        return plot_point_cloud(Xt[sample], dimension=None)
