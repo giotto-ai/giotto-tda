@@ -234,6 +234,7 @@ Html
 ~~~~
 
 **This step requires `wreise/sphinx_rtd_theme <https://github.com/wreise/sphinx_rtd_theme>`_ as an additional dependency.**
+**Please make sure to uninstall the `sphinx_rtd_theme`, part of the default developer installation of `giotto-tda`.**
 
 This is the step where `Sphinx` is actually used.
 We use the standard `make html` command, which also takes the configuration from `conf.py`.
