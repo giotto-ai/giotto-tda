@@ -84,7 +84,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin, HomologyPlotterMixin):
         X = check_diagram(X)
 
         Xt = X.copy()
-        Xt[:, :, 2] = np.inf
+        Xt[:, :, 2] = np.inf  # TODO: for plotting, replace the dimension with a tag
         return Xt
 
 
