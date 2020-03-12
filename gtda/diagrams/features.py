@@ -218,7 +218,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, _ = _bin(X, metric='betti', n_bins=self.n_bins)
-        self.samplings_ = {dim: s
+        self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
         return self
 
@@ -373,7 +373,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, _ = _bin(X, metric="landscape", n_bins=self.n_bins)
-        self.samplings_ = {dim: s
+        self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
         return self
@@ -435,8 +435,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             Index of the sample to be plotted.
 
         """
-        if isinstance(sample, int):
-            sample = [sample]
         return plot_landscapes(
             Xt[sample], homology_dimensions=self.homology_dimensions_,
             samplings=self.samplings_)

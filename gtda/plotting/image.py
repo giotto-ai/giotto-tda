@@ -38,4 +38,4 @@ class ImagePlotterMixin(PlotterMixin):
         if X_to_plot.ndim > 3:
             raise RuntimeError("Plotting images in more than 2 dimensions"
                                " is not supported.")
-        return plot_image(X_to_plot)
+        return plot_image(X_to_plo)

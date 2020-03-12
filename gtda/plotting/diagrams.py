@@ -81,7 +81,7 @@ def plot_silhouettes(silhouettes, homology_dimensions=None, samplings=None):
     if samplings is None:
         samplings = np.arange(0, silhouettes.shape[1])
     layout = {
-        "title": "Betti curves",
+        "title": "Silhouette",
         "xaxis1": {
             "title": "Epsilon",
             "side": "bottom",
@@ -94,7 +94,7 @@ def plot_silhouettes(silhouettes, homology_dimensions=None, samplings=None):
             "exponentformat": "e"
         },
         "yaxis1": {
-            "title": "Betti number",
+            "title": "Silhouette",
             "side": "left",
             "type": "linear",
             "ticks": "outside",
@@ -113,10 +113,11 @@ def plot_silhouettes(silhouettes, homology_dimensions=None, samplings=None):
                      mirror=False)
 
     for i, dimension in enumerate(homology_dimensions):
-        fig.add_trace(gobj.Scatter(x=samplings,
+        fig.add_trace(gobj.Scatter(x=samplings[dimension],
                                    y=silhouettes[i, :],
-                                   mode='lines', showlegend=False,
-                                   hoverinfo='none'))
+                                   mode='lines', showlegend=True,
+                                   hoverinfo='none',
+                                   name=f'dim{dimension}'))
 
     fig.show()
 
@@ -179,10 +180,11 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
                      mirror=False)
 
     for i, dimension in enumerate(homology_dimensions):
-        fig.add_trace(gobj.Scatter(x=samplings,
+        fig.add_trace(gobj.Scatter(x=samplings[dimension],
                                    y=betti_curves[i, :],
-                                   mode='lines', showlegend=False,
-                                   hoverinfo='none'))
+                                   mode='lines', showlegend=True,
+                                   hoverinfo='none',
+                                   name=f'dim{dimension}'))
 
     fig.show()
 
@@ -258,8 +260,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
 
     Parameters
     ----------
-    landscapes : ndarray of shape (n_samples, n_homology_dimensions, \
-            n_layers, n_bins)
+    landscapes : ndarray of shape (n_homology_dimensions, n_layers, n_bins)
         Collection of ``n_homology_dimension`` discretised persistence
         landscapes. Each landscape contains ``n_layers`` layers. Entry i along
         axis 0 should be the persistence landscape in homology dimension i.
@@ -268,7 +269,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimension, n_layers, n_values), \
+    samplings : ndarray of shape (n_homology_dimensions, n_layers, n_values), \
         default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `landscapes` on
@@ -315,11 +316,11 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
 
         n_layers = landscapes.shape[1]
         for layer in range(n_layers):
-            fig.add_trace(gobj.Scatter(x=samplings,
+            fig.add_trace(gobj.Scatter(x=samplings[dimension],
                                        y=landscapes[i, layer, :],
-                                       mode='lines', showlegend=False,
+                                       mode='lines', showlegend=True,
                                        hoverinfo='none',
-                                       name="layer {}".format(layer + 1)))
+                                       name=f"layer {layer + 1}"))
 
         fig.show()
 
