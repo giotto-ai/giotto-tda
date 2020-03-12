@@ -13,7 +13,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
     ----------
     diagram : ndarray of shape (n_points, 3)
         The persistence diagram to plot, where the third dimension along axis 1
-        contains homology dimensions, and the other two contain (birth, death)
+        contains homology dimensions, and the first two contain (birth, death)
         pairs to be used as coordinates in the two-dimensional plot.
 
     homology_dimensions : list of int or None, default: ``None``
@@ -24,7 +24,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
 
-    maximum_persistence = np.where(np.isinf(diagram), -np.inf, diagram).max()
+    max_filt_param = np.where(np.isinf(diagram), -np.inf, diagram).max()
 
     layout = {
         "title": "Persistence diagram",
@@ -34,7 +34,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
             "title": "Birth",
             "side": "bottom",
             "type": "linear",
-            "range": [0, 1.1 * maximum_persistence],
+            "range": [0, 1.1 * max_filt_param],
             "ticks": "outside",
             "anchor": "y1",
             "showline": True,
@@ -46,7 +46,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
             "title": "Death",
             "side": "left",
             "type": "linear",
-            "range": [0, 1.1 * maximum_persistence],
+            "range": [0, 1.1 * max_filt_param],
             "ticks": "outside",
             "anchor": "x1",
             "showline": True,
@@ -65,10 +65,10 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
     fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
                      mirror=False)
 
-    fig.add_trace(gobj.Scatter(x=np.array([-100 * maximum_persistence,
-                                           100 * maximum_persistence]),
-                               y=np.array([-100 * maximum_persistence,
-                                           100 * maximum_persistence]),
+    fig.add_trace(gobj.Scatter(x=np.array([-100 * max_filt_param,
+                                           100 * max_filt_param]),
+                               y=np.array([-100 * max_filt_param,
+                                           100 * max_filt_param]),
                                mode='lines',
                                line=dict(dash='dash', width=1, color='black'),
                                showlegend=False, hoverinfo='none'))

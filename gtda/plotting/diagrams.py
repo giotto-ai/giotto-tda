@@ -1,4 +1,6 @@
-"""Persistence diagrams-retated plotting functions """
+"""Plotting functions for featurizations or representations of persistence
+diagrams, coming in particular from the outputs of some classes in
+:mod:`gtda.diagrams`."""
 # License: GNU AGPLv3
 
 import numpy as np
