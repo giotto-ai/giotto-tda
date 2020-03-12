@@ -8,15 +8,15 @@
    **DEPRECATED**
 
 
-.. currentmodule:: {{ module }}
+.. currentmodule:: {{module}}
 
-.. autoclass:: {{ objname }}
+.. autoclass:: {{objname}}
 
    {% block methods %}
    .. automethod:: __init__
    {% endblock %}
 
-.. include:: {{module}}.{{objname}}.examples
+.. include:: {{module}}.{{objname}}.{{examples}}
 
 .. raw:: html
 

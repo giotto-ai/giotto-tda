@@ -15,12 +15,12 @@ from ..utils.validation import validate_params
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `filtered cubical complexes <https://giotto.ai/theory>`_.
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    :ref:`filtered cubical complexes <cubical complex>`.
 
-    Given a `grayscale image <https://giotto.ai/theory>`_, information
-    about the appearance and disappearance of topological features
-    (technically, `homology classes <https://giotto.ai/theory>`_) of various
+    Given a :ref:`grayscale image <cubical chains and cubical homology>`,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology and cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
