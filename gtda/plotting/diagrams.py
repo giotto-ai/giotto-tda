@@ -8,8 +8,9 @@ import plotly.graph_objs as gobj
 from ._plot import _plot_image
 
 
-def plot_heat_kernel(heat_kernel, homology_dimension=0, samplings=None):
+def plot_heat_kernel(heat_kernel, samplings, homology_dimension=0):
     """Plot the heat kernel of a single persistence diagram in a single dimension.
+
     Parameters
     ----------
     heat_kernel : ndarray of shape (homology_dimensions, n_bins, \
@@ -27,35 +28,16 @@ def plot_heat_kernel(heat_kernel, homology_dimension=0, samplings=None):
         on the x- and y-axes.
 
     """
-    if samplings is None:
-        samplings = np.arange(0, heat_kernel.shape[1])
-
-    layout = {
-        "title": "HeatKernel",
-        "xaxis1": {
-            "title": "Birth",
-        },
-        "yaxis1": {
-            "title": "Death",
-        },
-        "plot_bgcolor": "white"
-    }
-
-    fig = gobj.Figure(layout=layout)
-    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
-                     mirror=False)
-    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
-                     mirror=False)
-
-    fig = gobj.Figure(data=gobj.Contour(
-        z=heat_kernel[homology_dimension],
-        x=samplings[homology_dimension],  # horizontal axis
-        y=samplings[homology_dimension]  # vertical axis
-    ))
+    if homology_dimension is None:
+        homology_dimension = 0
+    samplings_x = samplings[homology_dimension]
+    fig = _plot_image(heat_kernel[homology_dimension, ::-1, :],
+                      samplings_x, samplings_x)
+    fig.update_layout({'title': 'Heat Kernel'})
     fig.show()
 
 
-def plot_silhouettes(silhouettes, homology_dimensions=None, samplings=None):
+def plot_silhouettes(silhouettes, samplings, homology_dimensions=None):
     """Plot the Silhouettes of a single persistence diagram by homology
     dimension.
 
@@ -69,17 +51,14 @@ def plot_silhouettes(silhouettes, homology_dimensions=None, samplings=None):
         Homology dimensions for which the silhouettes should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values), \
-        default: ``None``
+    samplings : ndarray of shape (n_homology_dimension, n_values),
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `silhouettes` on
-        the y-axis. If ``None``, the samplings will start at 0 with step 1.
+        the y-axis.
 
     """
     if homology_dimensions is None:
         homology_dimensions = np.arange(0, silhouettes.shape[0])
-    if samplings is None:
-        samplings = np.arange(0, silhouettes.shape[1])
     layout = {
         "title": "Silhouette",
         "xaxis1": {
@@ -122,7 +101,7 @@ def plot_silhouettes(silhouettes, homology_dimensions=None, samplings=None):
     fig.show()
 
 
-def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
+def plot_betti_curves(betti_curves, samplings, homology_dimensions=None):
     """Plot the Betti curves of a single persistence diagram by homology
     dimension.
 
@@ -136,17 +115,14 @@ def plot_betti_curves(betti_curves, homology_dimensions=None, samplings=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values), \
-        default: ``None``
+    samplings : ndarray of shape (n_homology_dimension, n_values),
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on
-        the y-axis. If ``None``, the samplings will start at 0 with step 1.
+        the y-axis.
 
     """
     if homology_dimensions is None:
         homology_dimensions = np.arange(0, betti_curves.shape[0])
-    if samplings is None:
-        samplings = np.arange(0, betti_curves.shape[1])
     layout = {
         "title": "Betti curves",
         "xaxis1": {
@@ -207,17 +183,14 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         If ``None``, all available dimensions will be used. If int, betti
         curves are plotted instead.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values), \
-        default: ``None``
+    samplings : ndarray of shape (n_homology_dimension, n_values),
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on the
-        y-axis. If ``None``, the samplings will start at 0 with step 1.
+        y-axis.
 
     """
     if homology_dimensions is None:
         homology_dimensions = np.arange(0, betti_curves.shape[1])
-    if samplings is None:
-        samplings = np.arange(0, betti_curves.shape[2])
 
     scene = {
         "xaxis": {
@@ -255,7 +228,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
             fig.show()
 
 
-def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
+def plot_landscapes(landscapes, samplings, homology_dimensions=None):
     """Plot landscapes by homology dimension.
 
     Parameters
@@ -273,13 +246,11 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `landscapes` on
-        the y-axis. If ``None``, the samplings will start at 0 with step 1.
+        the y-axis.
 
     """
     if homology_dimensions is None:
         homology_dimensions = np.arange(0, landscapes.shape[0])
-    if samplings is None:
-        samplings = np.arange(0, landscapes.shape[2])
     layout = {
         "xaxis1": {
             "side": "bottom",
@@ -325,7 +296,7 @@ def plot_landscapes(landscapes, homology_dimensions=None, samplings=None):
         fig.show()
 
 
-def plot_persistence_image(images, homology_dimension=None, samplings=None):
+def plot_persistence_image(images, samplings, homology_dimension=None):
     """Plot persistence_images by homology dimension.
 
     Parameters
@@ -336,21 +307,19 @@ def plot_persistence_image(images, homology_dimension=None, samplings=None):
         Entry i along axis 0 should be the persistence image in homology
         dimension i.
 
+    samplings : ndarray of shape (n_homology_dimension, 2, n_values),
+        For each homology dimension, (filtration parameter and persistence)
+        values to be used on the x-axis against the corresponding values in
+        `images` on the y-axis.
+
     homology_dimension : int or None, default: ``None``
         Homology dimension for which the persistence image should be plotted.
         If ``None``, the first available dimension will be used.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values, n_values), \
-        default: ``None``
-        For each homology dimension, (filtration parameter and persistence)
-        values to be used on the x-axis against the corresponding values in
-        `images` on the y-axis. If ``None``, the samplings will start at 0
-        with step 1.
-
     """
-    # TODO: use the samplings for axes
     if homology_dimension is None:
         homology_dimension = 0
-    fig = _plot_image(images[homology_dimension])
+    samplings_x, samplings_y = samplings[homology_dimension]
+    fig = _plot_image(images[homology_dimension], samplings_x, samplings_y)
     fig.update_layout({'title': 'Persistence Image'})
     fig.show()

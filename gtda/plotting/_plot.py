@@ -1,9 +1,10 @@
 
 import plotly.graph_objects as gobj
 from sklearn.utils.validation import check_array
+import numpy as np
 
 
-def _plot_image(image):
+def _plot_image(image, samplings_x=None, samplings_y=None):
     """Plot a 2d image.
 
     Parameters
@@ -18,6 +19,11 @@ def _plot_image(image):
 
     """
     check_array(image, ensure_2d=True)
+
+    if samplings_x is None:
+        samplings_x = np.arange(image.shape[0])-0.5
+    if samplings_y is None:
+        samplings_y = np.arange(image.shape[1])-0.5
     layout = {
         "title": "Image",
         "plot_bgcolor": "white"
@@ -25,8 +31,9 @@ def _plot_image(image):
     fig = gobj.Figure(layout=layout)
 
     fig.add_trace(gobj.Heatmap(z=image,
-                               x0=0, dx=1,
-                               y0=0, dy=1,
-                               colorscale='blues'),
+                               x=samplings_x,
+                               y=samplings_y,
+                               colorscale='blues'
+                               ),
                   )
     return fig

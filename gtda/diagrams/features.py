@@ -542,7 +542,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._samplings, self._step_size = _bin(
             X, metric='heat', n_bins=self.n_bins)
-        self.samplings_ = {dim: s
+        self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
         return self
 
@@ -602,8 +602,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             Homology dimension in which the heat kernel should be plotted.
 
         """
-        return plot_heat_kernel(Xt[sample], homology_dimension,
-                                samplings=self.samplings_)
+        return plot_heat_kernel(Xt[sample], samplings=self.samplings_,
+                                homology_dimension=homology_dimension)
 
 
 @adapt_fit_transform_docs
@@ -735,7 +735,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._samplings, self._step_size = _bin(
             X, metric='persistence_image', n_bins=self.n_bins)
-        self.samplings_ = {dim: s
+        self.samplings_ = {dim: s.transpose()
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.effective_weight_function_,
                                            self._samplings)
@@ -803,9 +803,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             plotted.
 
         """
-        # TODO: use the samplings for axes
         return plot_persistence_image(Xt[sample],
-                                      homology_dimension=homology_dimension)
+                                      homology_dimension=homology_dimension,
+                                      samplings=self.samplings_)
 
 
 @adapt_fit_transform_docs
