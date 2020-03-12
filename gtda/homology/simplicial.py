@@ -237,8 +237,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         return plot_diagram(Xt[sample],
-                            homology_dimensions=self.homology_dimensions,
-                            **layout)
+                            homology_dimensions=self.homology_dimensions)
 
 
 @adapt_fit_transform_docs
