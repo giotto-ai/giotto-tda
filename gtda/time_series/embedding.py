@@ -438,7 +438,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_points, n_dimension)
+        Xt : ndarray of shape (n_points, n_dimensions)
             Output point cloud in Euclidean space of dimension given by
             :attr:`dimension_`. ``n_points = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.
