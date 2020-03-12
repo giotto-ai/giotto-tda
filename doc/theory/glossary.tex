@@ -105,14 +105,6 @@ pdfpagelabels]{hyperref}
 	
 	With appropriate modifications the same terminology and notation introduced for \hyperref[ordered simplicial complex]{ordered simplicial complex} applies to directed simplicial complex.
 	
-	\subsection*{Clique or flag complexes} \label{clique or flag complexes}
-	
-	Let $G$ be a $1$-dimensional simplicial complex, abstract or otherwise. The complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\} \in G$ for each pair of vertices $v_i, v_j$. 
-	
-	Let $G$ be a $1$-dimensional directed simplicial complex. The directed simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $(v_0, \dots, v_n)$ is a simplex in $\langle G \rangle$ if an only if $(v_i, v_j) \in G$ for each pair of vertices $v_i, v_j$ with $i < j$. 
-	
-	A (directed) simplicial complex $X$ is a \textit{clique complex} a.k.a. \textit{flag complex} if $X = \langle X_1 \rangle$ where $X_1$ is the $1$-skeleton of $X$. 
-	
 	\subsection*{Chain complex} \label{chain complex}
 	
 	A \textit{chain complex} of is a pair $(C_*, \partial)$ where
@@ -160,7 +152,33 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Cellwise filtration} \label{cellwise filtration}
 	
-	A \textit{cellwise filtration} is a complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$. A cellwise filtration can be naturally thought of as a \hyperref[filtered complex]{filtered complex}.
+	A \textit{cellwise filtration} is a simplicial or cubical complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$. A cellwise filtration can be naturally thought of as a \hyperref[filtered complex]{filtered complex}.
+	
+	\subsection*{Clique and flag complexes} \label{clique and flag complexes}
+	
+	Let $G$ be a $1$-dimensional abstract (resp. directed) simplicial complex. The abstract (resp. directed) simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ \big(resp. $(v_0, \dots, v_n)$\big) is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\}$ \big(resp. $(v_i, v_j)$\big) is in $G$ for each pair of vertices $v_i, v_j$. 
+	
+	An abstract (resp. directed) simplicial complex $X$ is a \textit{clique (resp. flag) complex} if $X = \langle G \rangle$ for some $G$.
+	
+	Given a function
+	\begin{equation*}
+	w : G \to \mathbb R \cup \{\infty\}
+	\end{equation*}
+	consider the extension
+	\begin{equation*}
+	w : \langle G \rangle \to \mathbb R \cup \{\infty\}
+	\end{equation*}
+	defined respectively by 
+	\begin{align*}
+	w\{v_0, \dots, v_n\} & = \max\{ w\{v_i, v_j\}\ |\ i \neq j\} \\
+	w(v_0, \dots, v_n) & = \max\{ w(v_i, v_j)\ |\ i < j\}
+	\end{align*}
+	and define the \hyperref[filtered complex]{filtered complex} $\{\langle G \rangle_{s}\}_{s \in \mathbb R}$ by
+	\begin{equation*}
+	\langle G \rangle_s = \{\sigma \in \langle G \rangle\ |\ w(\sigma) \leq s\}.
+	\end{equation*}
+	
+	A filtered complex $\{X_s\}_{s \in \mathbb R}$ is a \textit{filtered clique (resp. flag) complex} if $X_s = \langle G \rangle_s$ for some $(G,w)$.
 	
 	\subsection*{Persistence module} \label{persistence module}
 	
@@ -186,7 +204,14 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	VR_s(X) = \Big\{ [v_0,\dots,v_n]\ \Big|\ \forall i,j\ \,d(v_i, v_j) \leq s \Big\}.
 	\end{equation*}
-	The \textit{Vietoris-Rips persistence} of $(X, d)$ is the \hyperref[persistent simplicial (co)homology]{persistent simplicial (co)ho-mology} of $VR_s(X)$.
+	The \textit{Vietoris-Rips persistence} of $(X, d)$ is the \hyperref[persistent simplicial (co)homology]{persistent simplicial (co)homology} of $VR_s(X)$.
+	
+	A more general version is obtained by replacing the distance function with an arbitrary function
+	\begin{equation*}
+	w : X \times X \to \mathbb R \cup \{\infty\}
+	\end{equation*}
+	and defining $VR_s(X)$ as the \hyperref[clique and flag complexes]{filtered clique complex} associated to $(X \times X ,w)$.
+	
 	
 	\subsection*{\v{C}ech complex and \v{C}ech persistence} \label{cech complex and cech persistence}
 	
