@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..base import PlotterMixin
+from ..plotting import HomologyPlotterMixin
 from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
@@ -20,7 +20,8 @@ from ..plotting.homology import plot_diagram
 
 
 @adapt_fit_transform_docs
-class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+class VietorisRipsPersistence(BaseEstimator, TransformerMixin,
+                              HomologyPlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
     homology>`.
@@ -242,7 +243,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
 
 @adapt_fit_transform_docs
-class SparseRipsPersistence(BaseEstimator, TransformerMixin):
+class SparseRipsPersistence(BaseEstimator, TransformerMixin,
+                            HomologyPlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Sparse Vietoris-Rips filtrations <vietoris-rips complex and \
     vietoris-rips homology>`.
@@ -465,7 +467,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
+class EuclideanCechPersistence(BaseEstimator, TransformerMixin,
+                               HomologyPlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     `Cech filtrations <>`_.
 

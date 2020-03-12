@@ -14,10 +14,11 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
+from ..plotting import ImagePlotterMixin
 
 
 @adapt_fit_transform_docs
-class ConsistentRescaling(BaseEstimator, TransformerMixin):
+class ConsistentRescaling(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
 
@@ -192,7 +193,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
+class ConsecutiveRescaling(BaseEstimator, TransformerMixin, ImagePlotterMixin):
     """Rescaling of distances between consecutive pairs of points by a fixed
     factor.
 
