@@ -17,8 +17,8 @@ from ..utils.validation import check_diagram, validate_params
 
 @adapt_fit_transform_docs
 class PairwiseDistance(BaseEstimator, TransformerMixin):
-    """`Distances <https://giotto.ai/theory>`_ between pairs of persistence
-    diagrams.
+    """:ref:`Distances <wasserstein and bottleneck distance>` between pairs
+    of persistence diagrams.
 
     Given two collections of persistence diagrams consisting of
     birth-death-dimension triples [b, d, q], a collection of distance
@@ -228,7 +228,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Amplitude(BaseEstimator, TransformerMixin):
-    """`Amplitudes <https://giotto.ai/theory>`_ of persistence diagrams.
+    """:ref:`Amplitudes <amplitude>` of persistence diagrams.
 
     For each persistence diagram in a collection, a vector of amplitudes or a
     single scalar amplitude is calculated according to the following steps:

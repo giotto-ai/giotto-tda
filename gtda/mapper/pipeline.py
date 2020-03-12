@@ -154,39 +154,42 @@ def make_mapper_pipeline(scaler=None,
     """Construct a MapperPipeline object according to the specified Mapper
     steps. [1]_
 
-    The role of this function's key parameters is illustrated in `this diagram
-    </mapper_pipeline.svg>`_. All computational steps may be arbitrary
-    scikit-learn Pipeline objects. The scaling and cover steps must be
-    transformers implementing a ``fit_transform`` method. The filter
-    function step may be a transformer implementing a ``fit_transform``,
-    or a callable acting on one-dimensional arrays -- in the latter case,
-    a transformer is internally created whose ``fit_transform`` applies this
-    callable independently on each row of the data. The clustering step need
-    only implement a ``fit`` method storing clustering labels.
+    The role of this function's main parameters is illustrated in `this diagram
+    <../../../../_images/mapper_pipeline.svg>`_. All computational steps may
+    be scikit-learn estimators, including Pipeline objects.
 
     Parameters
     ----------
     scaler : object or None, optional, default: ``None``
-        Scaling transformer. If ``None``, no scaling is performed.
+        If ``None``, no scaling is performed. Otherwise, it must be an
+        object with a ``fit_transform`` method.
 
     filter_func : object, callable or None, optional, default: ``None``
-        Filter function to apply to the scaled data. ``None`` means using PCA
-        (:meth:`sklearn.decomposition.PCA`) with 2 components.
+        If `None``, PCA (:class:`sklearn.decomposition.PCA`) with 2
+        components and default parameters is used as a default filter
+        function. Otherwise, it may be an object with a ``fit_transform``
+        method, or a callable acting on one-dimensional arrays -- in which
+        case the callable is applied independently to each row of the
+        (scaled) data.
 
     cover : object or None, optional, default: ``None``
-        Covering transformer. ``None`` means using a cubical cover
-        (:meth:`~gtda.mapper.CubicalCover`) with its default parameters.
+        Covering transformer, e.g. an instance of
+        :class:`~gtda.mapper.OneDimensionalCover` or of
+        :class:`~gtda.mapper.CubicalCover`. ``None`` is equivalent to passing
+        an instance of :class:`~gtda.mapper.CubicalCover` with its default
+        parameters.
 
     clustering_preprocessing : object or None, optional, default: ``None``
         If not ``None``, it is a transformer which is applied to the
         data independently to the `scaler` -> `filter_func` -> `cover`
         pipeline. Clustering is then performed on portions (determined by
-        the `scaler` -> `filter_func` -> `cover` pipeline) of the
-        transformed data.
+        the `scaler` -> `filter_func` -> `cover` pipeline) of the transformed
+        data.
 
     clusterer : object or None, optional, default: ``None``
-        Clustering object. ``None`` means using DBSCAN
-        (:meth:`sklearn.cluster.DBSCAN`) with its default parameters.
+        Clustering object with a ``fit`` method which stores cluster labels.
+        ``None`` is equivalent to passing an instance of
+        :class:`sklearn.cluster.DBSCAN` with its default parameters.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use in a joblib-parallel application of the

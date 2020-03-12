@@ -1,8 +1,16 @@
+
+#############
+Release Notes
+#############
+
+.. _stable:
+
+*************
 Release 0.1.4
-=============
+*************
 
 Library name change
--------------------
+===================
 The library and GitHub repository have been renamed to ``giotto-tda``! While the
 new name is meant to better convey the library's focus on Topology-powered
 machine learning and Data Analysis, the commitment to seamless integration with
@@ -19,12 +27,12 @@ Short summary: install via ::
 and ``import gtda`` in your scripts or notebooks!
 
 Change of license
------------------
+=================
 
 The license changes from Apache 2.0 to GNU AGPLv3 from this release on.
 
 Major Features and Improvements
--------------------------------
+===============================
 -  Added a ``mapper`` submodule implementing the Mapper algorithm of Singh, Mémoli and Carlsson. The main tools are the
    functions ``make_mapper_pipeline``, ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph``. The first
    creates an object of class ``MapperPipeline`` which can be fit-transformed to data to create a Mapper graph in the
@@ -47,18 +55,18 @@ Major Features and Improvements
 -  Added support for Python 3.8.
 
 Bug Fixes
----------
+=========
 -  Fixed consistently incorrect documentation for the ``fit_transform`` methods. This has been achieved by introducing a
    class decorator ``adapt_fit_transform_docs`` which is defined in the newly introduced ``gtda.utils._docs.py``.
 
 Backwards-Incompatible Changes
-------------------------------
+==============================
 -  The library name change and the change in the name of the main module ``giotto``
    are important major changes.
 -  There are now additional dependencies in the ``python-igraph``, ``matplotlib``, ``plotly``, and ``ipywidgets`` libraries.
 
 Thanks to our Contributors
---------------------------
+==========================
 
 This release contains contributions from many people:
 
@@ -67,24 +75,24 @@ Umberto Lupo, Lewis Tunstall, Guillaume Tauzin, Philipp Weiler, Julian Burella P
 We are also grateful to all who filed issues or helped resolve them, asked and
 answered questions, and were part of inspiring discussions.
 
-
+*************
 Release 0.1.3
-=============
+*************
 
 Major Features and Improvements
--------------------------------
+===============================
 None
 
 Bug Fixes
----------
+=========
 -  Fixed a bug in ``diagrams.Amplitude`` causing the transformed array to be wrongly filled and added adequate test.
 
 Backwards-Incompatible Changes
-------------------------------
+==============================
 None.
 
 Thanks to our Contributors
---------------------------
+==========================
 
 This release contains contributions from many people:
 
@@ -95,22 +103,22 @@ answered questions, and were part of inspiring discussions.
 
 
 Release 0.1.2
-=============
+*************
 
 Major Features and Improvements
--------------------------------
+===============================
 -  Added support for Python 3.5.
 
 Bug Fixes
----------
+=========
 None.
 
 Backwards-Incompatible Changes
-------------------------------
+==============================
 None.
 
 Thanks to our Contributors
---------------------------
+==========================
 
 This release contains contributions from many people:
 
@@ -119,12 +127,12 @@ Matteo Caorsi, Henry Tom (@henrytomsf), Guillaume Tauzin.
 We are also grateful to all who filed issues or helped resolve them, asked and
 answered questions, and were part of inspiring discussions.
 
-
+*************
 Release 0.1.1
-=============
+*************
 
 Major Features and Improvements
--------------------------------
+===============================
 -  Improved documentation.
 -  Improved features of class ``Labeller``.
 -  Improved features of class ``PearsonDissimilarities``.
@@ -132,16 +140,16 @@ Major Features and Improvements
 -  Improved CI.
 
 Bug Fixes
----------
+=========
 Fixed minor bugs from the first release.
 
 Backwards-Incompatible Changes
-------------------------------
+==============================
 The following class were renamed:
 -  class ``PearsonCorrelation`` was renamed to class ``PearsonDissimilarities``
 
 Thanks to our Contributors
---------------------------
+==========================
 
 This release contains contributions from many people:
 
@@ -150,12 +158,12 @@ Umberto Lupo, Guillaume Tauzin, Matteo Caorsi, Olivier Morel.
 We are also grateful to all who filed issues or helped resolve them, asked and
 answered questions, and were part of inspiring discussions.
 
-
+*************
 Release 0.1.0
-=============
+*************
 
 Major Features and Improvements
--------------------------------
+===============================
 
 The following submodules where added:
 
@@ -170,15 +178,15 @@ The following submodules where added:
 
 
 Bug Fixes
----------
-
+=========
+None
 
 Backwards-Incompatible Changes
-------------------------------
-
+==============================
+None
 
 Thanks to our Contributors
---------------------------
+==========================
 
 This release contains contributions from many people:
 
@@ -191,8 +199,8 @@ prototype of a Mapper implementation; although very different from the current o
 adopted an early form of caching to avoid recomputation in refitting, which was an inspiration
 for this implementation.
 
-
+**************
 Release 0.1a.0
-==============
+**************
 
 Initial release of the library, original named ``giotto-learn``.
