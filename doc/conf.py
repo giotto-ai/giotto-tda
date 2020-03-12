@@ -126,13 +126,7 @@ html_theme_options.update({'versions': [(c, f'../{c}/index.html')
                                         for c in set(_versions).union([current_version])]})
 
 # Get logo
-path_to_image = "images/tda_logo.svg"
-if not(os.path.exists(path_to_image)):
-    import requests
-    r = requests.get('https://www.giotto.ai/static/vector/logo-tda.svg')
-    with open(path_to_image, 'wb') as f:
-        f.write(r.content)
-html_logo = path_to_image
+html_logo = "images/tda_logo.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
