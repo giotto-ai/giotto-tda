@@ -12,10 +12,11 @@ from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
+from ..plotting import PointCloudPlotter
 
 
 @adapt_fit_transform_docs
-class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
+class SlidingWindow(BaseEstimator, TransformerResamplerMixin, PointCloudPlotter):
     """Sliding windows onto the data.
 
     Useful in time series analysis to convert a sequence of objects (scalar

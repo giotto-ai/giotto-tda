@@ -11,10 +11,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..utils._docs import adapt_fit_transform_docs
+from ..utils._docs importr adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-from gtda.plotting import ImagePlotter
+from ..plotting import ImagePlotter
 
 
 @adapt_fit_transform_docs
