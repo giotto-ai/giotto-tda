@@ -12,12 +12,11 @@ from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-from ..plotting import PointCloudPlotter
+from..plotting import plot_point_cloud
 
 
 @adapt_fit_transform_docs
-class SlidingWindow(BaseEstimator, TransformerResamplerMixin,
-                    PointCloudPlotter):
+class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """Sliding windows onto the data.
 
     Useful in time series analysis to convert a sequence of objects (scalar
@@ -172,6 +171,21 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin,
         yr = np.flip(yr)
         yr = np.flip(yr[:-self.width:self.stride])
         return yr
+
+    def plot(self, Xt, sample):
+        """
+        Plot a point cloud from a chosen window.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+            Collection of point clouds, in windows.
+
+        sample: int, optional, default: ``0``
+            Indicates which point cloud in the collection :param:`Xt` to plot.
+        """
+        return plot_point_cloud(Xt[sample])
+
 
 
 @adapt_fit_transform_docs

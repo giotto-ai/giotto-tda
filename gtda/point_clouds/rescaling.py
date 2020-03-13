@@ -191,6 +191,21 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
         Xt = np.array(Xt)
         return Xt
 
+    def plot(self, Xt, sample=0):
+        """Plot a single distance matrix.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of distance matrices. Each entry along axis 0 is a
+            distance matrix.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        return super(ConsistentRescaling, self).plot(Xt[:, ::-1, :])
+
 
 @adapt_fit_transform_docs
 class ConsecutiveRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
@@ -347,3 +362,18 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
             for i in range(Xt.shape[0]))
         Xt = np.array(Xt)
         return Xt
+
+    def plot(self, Xt, sample=0):
+        """Plot a single distance matrix.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of distance matrices. Each entry along axis 0 is a
+            distance matrix.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        return super(ConsecutiveRescaling, self).plot(Xt[:, ::-1, :])
