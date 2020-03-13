@@ -18,8 +18,8 @@ class CechComplex:
         self.thisref = Cech_complex_interface(points, max_radius)
 
     def __del__(self):
-        if self.thisptr is not None:
-            del self.thisptr
+        if self.thisref is not None:
+            del self.thisref
 
     def create_simplex_tree(self, max_dimension=1):
         """
