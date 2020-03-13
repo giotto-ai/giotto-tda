@@ -44,7 +44,7 @@ jobs:
         cd tmp
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
-        git clone https://github.com/giotto-ai/gtda-docs.git
+        git clone ssh://git@github.com.org:giotto-ai/gtda-docs.git
         cd gtda-docs
         touch foo.bar
         git add -A
