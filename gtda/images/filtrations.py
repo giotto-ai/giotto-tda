@@ -56,7 +56,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         Grayscale image corresponding to the height filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -238,7 +238,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         Grayscale image corresponding to the radial filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -406,7 +406,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -547,7 +547,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         Effective number of iterations in the erosion process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -690,7 +690,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 

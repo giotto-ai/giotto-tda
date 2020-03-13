@@ -38,7 +38,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
     n_dimensions_ : int
         Dimension of the images. Set in meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in meth:`fit`.
 
