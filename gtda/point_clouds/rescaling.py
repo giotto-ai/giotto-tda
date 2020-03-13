@@ -78,7 +78,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    ConsecutiveRescaling
 
     References
     ----------
@@ -251,7 +251,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    ConsistentRescaling
 
     """
 

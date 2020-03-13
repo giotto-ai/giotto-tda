@@ -11,25 +11,29 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.utils.validation import check_is_fitted
 
+from ..base import PlotterMixin
 from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
 
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_list_of_point_clouds
+from ..plotting.homology import plot_diagram
 
 
 @adapt_fit_transform_docs
-class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
+class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
+    homology>`.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
-    distance matrix, information about the appearance and disappearance of
-    topological features (technically, `homology classes
-    <https://giotto.ai/theory>`_) of various dimensions and at different
-    scales is summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Euclidean space, or an abstract :ref:`metric space <finite metric spaces
+    and point clouds>` encoded by a distance matrix, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology and cohomology>`) of various dimension
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     Parameters
     ----------
@@ -226,18 +230,36 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
+    def plot(self, Xt, sample=0):
+        """Plot a single persistence diagram.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Array of persistence diagrams such as the result of a call to
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        return plot_diagram(Xt[sample],
+                            homology_dimensions=self.homology_dimensions)
+
 
 @adapt_fit_transform_docs
 class SparseRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Sparse Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    :ref:`Sparse Vietoris-Rips filtrations <vietoris-rips complex and \
+    vietoris-rips homology>`.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
-    distance matrix, information about the appearance and disappearance of
-    topological features (technically, `homology classes
-    <https://giotto.ai/theory>`_) of various dimensions and at different
-    scales is summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Euclidean space, or an abstract :ref:`metric space <finite metric spaces
+    and point clouds>` encoded by a distance matrix, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology and cohomology>`) of various dimensions
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     Parameters
     ----------
@@ -454,14 +476,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Cech filtrations <https://giotto.ai/theory>`_.
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    `Cech filtrations <>`_.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    information about the appearance and disappearance of topological
-    features (technically, `homology classes <https://giotto.ai/theory>`_) of
-    various dimensions and at different scales is summarised in the
-    corresponding persistence diagram.
+    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Euclidean space, information about the appearance and disappearance of
+    topological features (technically, :ref:`homology classes <homology and
+    cohomology>`) of various dimensions and at different scales is
+    summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
