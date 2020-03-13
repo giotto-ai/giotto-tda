@@ -38,7 +38,7 @@ def plot_heat_kernel(heat_kernel, samplings, homology_dimension=0):
 
 
 def plot_silhouettes(silhouettes, samplings, homology_dimensions=None):
-    """Plot the Silhouettes of a single persistence diagram by homology
+    """Plot the silhouettes of a single persistence diagram by homology
     dimension.
 
     Parameters
@@ -51,7 +51,7 @@ def plot_silhouettes(silhouettes, samplings, homology_dimensions=None):
         Homology dimensions for which the silhouettes should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimensions, n_bins),
+    samplings : ndarray of shape (n_homology_dimensions, n_bins)
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `silhouettes` on
         the y-axis.
@@ -297,14 +297,14 @@ def plot_landscapes(landscapes, samplings, homology_dimensions=None):
 
 
 def plot_persistence_image(images, samplings, homology_dimension=None):
-    """Plot persistence_images by homology dimension.
+    """Plot persistence images by homology dimension.
 
     Parameters
     ----------
     images : ndarray of shape (n_homology_dimensions, n_bins, n_bins)
         Collection of ``n_homology_dimension`` discretised persistence
-        images. Each image is an image of size ``(n_bins, n_bins)``.
-        Entry i along axis 0 should be the persistence image in homology
+        images. Each image is an an array of shape ``(n_bins, n_bins)``.
+        Entry i along axis 0 should be the persistence image in homologys
         dimension i.
 
     samplings : ndarray of shape (n_homology_dimensions, 2, n_bins),
