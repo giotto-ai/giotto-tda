@@ -33,7 +33,7 @@ Guiding principles
 
 For installation instructions, see :ref:`the installation instructions <installation>`.
 
-The functionalities of Giotto-TDA are provided in ``scikit-learn``--style transformers.
+The functionalities of Giotto-TDA are provided in ``scikit-learn``–style transformers.
 This allows you to jump in the familiar way of generating features from your data. Here is an example of `VietorisRipsPersistence`,
 
 .. code-block:: python

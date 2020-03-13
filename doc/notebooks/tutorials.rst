@@ -1,8 +1,8 @@
-#####
-Basic
-#####
+#########
+Tutorials
+#########
 
-This page contains basic examples.
+This page contains tutorials to help you get started with ``giotto-tda``.
 
 ..
    toctree::
