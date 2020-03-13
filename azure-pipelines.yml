@@ -44,6 +44,8 @@ jobs:
         cd tmp
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
+        git config --global --unset http.proxy
+        git config --global --unset https.proxy
         git clone ssh://git@github.com:giotto-ai/gtda-docs.git
         cd gtda-docs
         touch foo.bar
