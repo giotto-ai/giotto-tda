@@ -3,12 +3,10 @@
 Overview
 ########
 
-**A high performance topological machine learning toolbox in Python.**
+**A high-performance topological machine learning toolbox in Python**
 
-Giotto-tda is a high performance topological machine learning toolbox in Python built on top of
-scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
-
-**Read our paper on arXiv!**
+``Giotto-tda`` is a high performance topological machine learning toolbox in Python built on top of
+``scikit-learn`` and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
 
 .. _guiding_principles:
 
@@ -16,17 +14,17 @@ scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the 
 Guiding principles
 ******************
 
- * | **Seamless integration with widely used ML frameworks: Python + scikit-learn.**
+ * | **Seamless integration with widely used ML frameworks: Python + scikit-learn**
    | Inherit their strengths and allow for creation of heterogeneous ML pipelines.
- * | **Code modularity: Algorithms as transformers.**
+ * | **Code modularity: Algorithms as transformers**
    | “Lego blocks” approach.
- * | **User-friendliness and familiarity to the broad data science community.**
-   | Strict adherence to scikit-learn API and developer guidelines, “fit-transform” paradigm
- * | **Standardisation.**
+ * | **User-friendliness and familiarity to the broad data science community**
+   | Strict adherence to the ``scikit-learn`` API and developer guidelines, “fit-transform” paradigm
+ * | **Standardisation**
    | Allow for integration of most available techniques into a generic framework.  Consistency of API across different modules
- * | **Performance within the language constraints.**
+ * | **Performance within the language constraints**
    | Vectorized code, parallelism (likely in future: just-in-time compilation and more)
- * | **Data structures.**
+ * | **Data structures**
    | Support for time series, graphs, images.
 
 ***********************
@@ -35,7 +33,7 @@ Guiding principles
 
 For installation instructions, see :ref:`the installation instructions <installation>`.
 
-The functionalities of Giotto-TDA are provided in `scikit-learn`-style transformers.
+The functionalities of Giotto-TDA are provided in ``scikit-learn``--style transformers.
 This allows you to jump in the familiar way of generating features from your data. Here is an example of `VietorisRipsPersistence`,
 
 .. code-block:: python
@@ -43,7 +41,7 @@ This allows you to jump in the familiar way of generating features from your dat
   from gtda.homology import VietorisRipsPersistence
   vietorisrips_tr = VietorisRipsPersistence()
 
-which calculates :ref:`persistent diagrams <persistence diagram>` from a :ref:`point cloud <finite metric spaces and point clouds>`.
+which calculates :ref:`persistence diagrams <persistence diagram>` from a :ref:`point cloud <finite metric spaces and point clouds>`.
 
 .. code-block:: python
 

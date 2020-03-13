@@ -33,7 +33,7 @@ Pull requests
 -------------
 
 If you have improvements to ``giotto-tda``, do not hesitate to send us pull requests!
-Please follow the Github how to (https://help.github.com/articles/using-pull-requests/) and
+Please follow the `Github how to <https://help.github.com/articles/using-pull-requests>`_ and
 make sure you followed this checklist *before* submitting yor pull request:
 
 - Make sure you have signed the `contributor license agreement (CLA) <https://cla-assistant.io/giotto-ai/giotto-tda>`_.

@@ -1,4 +1,4 @@
-.. image:: https://www.giotto.ai/static/vector/logo-tda.svg
+.. image:: doc/images/logo-tda.svg
    :width: 850
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
@@ -62,7 +62,7 @@ The latest stable version of ``giotto-tda`` requires:
 
 - Python (>= 3.6)
 - NumPy (>= 1.17.0)
-- SciPy` (>= 0.17.0)
+- SciPy (>= 0.17.0)
 - joblib (>= 0.13)
 - scikit-learn (>= 0.22.0)
 - python-igraph (>= 0.7.1.post6)
