@@ -22,7 +22,7 @@ def plot_heat_kernel(heat_kernel, samplings, homology_dimension=0):
     homology_dimension : int or None, default: ``0``
         Homology dimension for which the heat kernel should be plotted.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values), \
+    samplings : ndarray of shape (n_homology_dimensions, n_bins), \
         default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x- and y-axes.
@@ -43,7 +43,7 @@ def plot_silhouettes(silhouettes, samplings, homology_dimensions=None):
 
     Parameters
     ----------
-    silhouettes : ndarray of shape (n_homology_dimension, n_values)
+    silhouettes : ndarray of shape (n_homology_dimensions, n_bins)
         Collection of ``n_homology_dimension`` discretised Silhouettes.
         Entry i along axis 0 should be the silhouette in homology dimension i.
 
@@ -51,7 +51,7 @@ def plot_silhouettes(silhouettes, samplings, homology_dimensions=None):
         Homology dimensions for which the silhouettes should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values),
+    samplings : ndarray of shape (n_homology_dimensions, n_bins),
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `silhouettes` on
         the y-axis.
@@ -107,7 +107,7 @@ def plot_betti_curves(betti_curves, samplings, homology_dimensions=None):
 
     Parameters
     ----------
-    betti_curves : ndarray of shape (n_homology_dimension, n_values)
+    betti_curves : ndarray of shape (n_homology_dimensions, n_bins)
         Collection of ``n_homology_dimension`` discretised Betti curves.
         Entry i along axis 0 should be the Betti curve in homology dimension i.
 
@@ -115,7 +115,7 @@ def plot_betti_curves(betti_curves, samplings, homology_dimensions=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values),
+    samplings : ndarray of shape (n_homology_dimensions, n_bins),
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on
         the y-axis.
@@ -173,7 +173,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
     Parameters
     ----------
     betti_curves : ndarray of shape (n_samples, n_homology_dimensions, \
-        n_values)
+        n_bins)
         ``n_samples`` collections of discretised Betti curves. There are
         ``n_homology_dimension`` curves in each collection. Index i along axis
         1 should yield all Betti curves in homology dimension i.
@@ -183,7 +183,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         If ``None``, all available dimensions will be used. If int, betti
         curves are plotted instead.
 
-    samplings : ndarray of shape (n_homology_dimension, n_values),
+    samplings : ndarray of shape (n_homology_dimensions, n_bins),
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on the
         y-axis.
@@ -242,7 +242,7 @@ def plot_landscapes(landscapes, samplings, homology_dimensions=None):
         Homology dimensions for which the Betti curves should be plotted.
         If ``None``, all available dimensions will be used.
 
-    samplings : ndarray of shape (n_homology_dimensions, n_layers, n_values), \
+    samplings : ndarray of shape (n_homology_dimensions, n_layers, n_bins), \
         default: ``None``
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `landscapes` on
@@ -301,13 +301,13 @@ def plot_persistence_image(images, samplings, homology_dimension=None):
 
     Parameters
     ----------
-    images : ndarray of shape (n_homology_dimension, n_values, n_values)
+    images : ndarray of shape (n_homology_dimensions, n_bins, n_bins)
         Collection of ``n_homology_dimension`` discretised persistence
-        images. Each image is an image of size ``(n_values, n_values)``.
+        images. Each image is an image of size ``(n_bins, n_bins)``.
         Entry i along axis 0 should be the persistence image in homology
         dimension i.
 
-    samplings : ndarray of shape (n_homology_dimension, 2, n_values),
+    samplings : ndarray of shape (n_homology_dimensions, 2, n_bins),
         For each homology dimension, (filtration parameter and persistence)
         values to be used on the x-axis against the corresponding values in
         `images` on the y-axis.
