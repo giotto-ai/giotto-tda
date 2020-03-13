@@ -26,6 +26,7 @@ pdfpagelabels]{hyperref}
 	\begin{tabular}{ l l l}
 		$\Bbbk$ & : & An arbitrary field. \\
 		$\mathbb R$ & : & The field of real numbers. \\
+		$\overline{\mathbb R}$ & : & The two point compactification $[-\infty, +\infty]$ of the real numbers. \\
 		$\mathbb N$ & : & The counting numbers $0,1,2, \ldots$ as a subset of $\mathbb R$. \\
 		$\mathbb R^d$ & : & The vector space of $d$-tuples of real numbers. \\
 		$\Delta$ & : & The \hyperref[multiset]{multiset} $\{(s,s)\,;\ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
@@ -260,32 +261,31 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Persistence landscape} \label{persistence landscape}
 	
-	A \textit{persistence landscape} is a continuous function
-	
+	A \textit{persistence landscape} isa set $\{\lambda_k\}_{k \in \mathbb N}$ of functions
 	\begin{equation*}
-	\lambda : \mathbb N \times \mathbb R \to \mathbb R \cup \{+\infty\}
+	\lambda : \mathbb R \to \overline{\mathbb R}
 	\end{equation*}
-	and the function $\lambda_k(s) = \lambda(k,s)$ is refered to as the \textit{$k$-layer of the persistence diagram}.
+	where $\lambda_k$ is referred to as the \textit{$k$-layer of the persistence landscape}.
 	
-	Let ${(b_i, d_i)}{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k(t)$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where
+	Let $\{(b_i, d_i)\}_{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where
 	\begin{equation*}
 	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
 	\end{equation*}
 	and $c_+ := \max(c,0)$.
 	
-	Intuitively, we can describe the graph of this persistence landscape by first joining each of the points in the multiset to the diagonal via a horizontal as well as a vertical line, then rotating the figure 45 degrees clockwise, and rescaling by $1/\sqrt{2}$.
+	Intuitively, we can describe the set of graphs of a persistence landscape by first joining each of the points in the multiset to the diagonal via a horizontal as well as a vertical line, then clockwise rotating the figure 45 degrees and rescaling it by $1/\sqrt{2}$.
 	
 	\paragraph{\\ Reference:} \cite{bubenik2015statistical}
 	
 	\subsection*{Persistence landscape norm} \label{persistence landscape norm}
 	
-	Given a function $f : \mathbb R \to \overline{\mathbb R} = [-\infty, +\infty]$ define
+	Given a function $f : \mathbb R \to \overline{\mathbb R}$ define
 	\begin{equation*}
 	||f||_p = \left( \int_{\mathbb R} f^p(x)\, dx \right)^{1/p}
 	\end{equation*}
 	whenever the right hand side exists and is finite.
 	
-	The \textit{persistence landscape $p$-norm} of a \hyperref[persistence landscape]{persistence landscape} $\lambda : \mathbb N \times \mathbb R \to \overline{\mathbb R}$ is defined to be
+	The \textit{$p$-norm} of a \hyperref[persistence landscape]{persistence landscape} $\lambda = \{\lambda_k\}_{k \in \mathbb N}$ is defined to be
 	
 	\begin{equation*}
 	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
@@ -304,7 +304,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*} \label{equation: lambda for persistence landscapes}
 	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
 	\end{equation*}
-	and $c_+ := \max(c,0)$. The particular choice $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ is referred to as \textit{power-weighted silhouettes}.
+	with $c_+ := \max(c,0)$. The particular choice $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ is referred to as \textit{power-weighted silhouettes}.
 	
 	\paragraph{\\ References:} \cite{chazal2014stochastic}
 	
