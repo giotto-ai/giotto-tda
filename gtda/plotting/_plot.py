@@ -5,7 +5,7 @@ import numpy as np
 
 
 def _plot_image(image, samplings_x=None, samplings_y=None):
-    """Plot a 2d image.
+    """Low-level function to plot a 2d image.
 
     Parameters
     ----------

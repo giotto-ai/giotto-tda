@@ -3,7 +3,6 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from gtda.diagrams._utils import _subdiagrams
 from ..base import PlotterMixin
 
 
@@ -40,6 +39,8 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
         homology dimensions which appear in `diagram` will be plotted.
 
     """
+    from ..diagrams._utils import _subdiagrams
+
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
 
