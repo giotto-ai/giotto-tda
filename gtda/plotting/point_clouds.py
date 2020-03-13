@@ -6,7 +6,7 @@ import plotly.graph_objs as gobj
 from ..base import PlotterMixin
 
 
-class PointCloudPlotterMixin(PlotterMixin):
+class PointCloudPlotter(PlotterMixin):
     """Mixin class for modules that return point clouds"""
 
     def plot(self, Xt, sample=0):

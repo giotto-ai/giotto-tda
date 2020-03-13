@@ -6,7 +6,7 @@ import plotly.graph_objs as gobj
 from ..base import PlotterMixin
 
 
-class HomologyPlotterMixin(PlotterMixin):
+class HomologyPlotter(PlotterMixin):
     """Mixin class for modules that return persistent homology groups."""
 
     def plot(self, Xt, sample=0):

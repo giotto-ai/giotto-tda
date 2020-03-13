@@ -13,11 +13,11 @@ from ._utils import _sort, _filter, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagram, validate_params
-from ..plotting import HomologyPlotterMixin
+from ..plotting import HomologyPlotter
 
 
 @adapt_fit_transform_docs
-class ForgetDimension(BaseEstimator, TransformerMixin, HomologyPlotterMixin):
+class ForgetDimension(BaseEstimator, TransformerMixin, HomologyPlotter):
     """Replaces all homology dimensions in persistence diagrams with
     ``numpy.inf``.
 
@@ -84,12 +84,13 @@ class ForgetDimension(BaseEstimator, TransformerMixin, HomologyPlotterMixin):
         X = check_diagram(X)
 
         Xt = X.copy()
-        Xt[:, :, 2] = np.inf  # TODO: for plotting, replace the dimension with a tag
+        Xt[:, :, 2] = np.inf
+        # TODO: for plotting, replace the dimension with a tag
         return Xt
 
 
 @adapt_fit_transform_docs
-class Scaler(BaseEstimator, TransformerMixin, HomologyPlotterMixin):
+class Scaler(BaseEstimator, TransformerMixin, HomologyPlotter):
     """Linear scaling of persistence diagrams.
 
     A positive scale factor :attr:`scale_` is calculated during :meth:`fit` by
@@ -266,7 +267,7 @@ class Scaler(BaseEstimator, TransformerMixin, HomologyPlotterMixin):
 
 
 @adapt_fit_transform_docs
-class Filtering(BaseEstimator, TransformerMixin, HomologyPlotterMixin):
+class Filtering(BaseEstimator, TransformerMixin, HomologyPlotter):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing

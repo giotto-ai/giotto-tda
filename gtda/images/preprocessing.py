@@ -14,12 +14,12 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
-from ..plotting import ImagePlotterMixin
-from ..plotting import PointCloudPlotterMixin
+from ..plotting import ImagePlotter
+from ..plotting import PointCloudPlotter
 
 
 @adapt_fit_transform_docs
-class Binarizer(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class Binarizer(BaseEstimator, TransformerMixin, ImagePlotter):
     """Binarize all 2D/3D grayscale images in a collection.
 
     Parameters
@@ -143,7 +143,7 @@ class Binarizer(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 
 @adapt_fit_transform_docs
-class Inverter(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class Inverter(BaseEstimator, TransformerMixin, ImagePlotter):
     """Invert all 2D/3D binary images in a collection.
 
     Parameters
@@ -219,7 +219,7 @@ class Inverter(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 
 @adapt_fit_transform_docs
-class Padder(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class Padder(BaseEstimator, TransformerMixin, ImagePlotter):
     """Pad all 2D/3D binary images in a collection.
 
     Parameters
@@ -340,7 +340,7 @@ class Padder(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 @adapt_fit_transform_docs
 class ImageToPointCloud(BaseEstimator, TransformerMixin,
-                        PointCloudPlotterMixin):
+                        PointCloudPlotter):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated

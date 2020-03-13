@@ -16,11 +16,11 @@ from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 from ._utils import _dilate, _erode
-from ..plotting.image import ImagePlotterMixin
+from ..plotting.image import ImagePlotter
 
 
 @adapt_fit_transform_docs
-class HeightFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class HeightFiltration(BaseEstimator, TransformerMixin, ImagePlotter):
     """Filtrations of 2D/3D binary images based on distances to lines/planes.
 
     The height filtration assigns to each activated pixel of a binary image a
@@ -175,7 +175,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 
 @adapt_fit_transform_docs
-class RadialFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class RadialFiltration(BaseEstimator, TransformerMixin, ImagePlotter):
     """Filtrations of 2D/3D binary images based on distances to a reference
     pixel.
 
@@ -370,7 +370,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 
 @adapt_fit_transform_docs
-class DilationFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class DilationFiltration(BaseEstimator, TransformerMixin, ImagePlotter):
     """Filtrations of 2D/3D binary images based on the dilation of activated
     regions.
 
@@ -511,7 +511,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 
 @adapt_fit_transform_docs
-class ErosionFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
+class ErosionFiltration(BaseEstimator, TransformerMixin, ImagePlotter):
     """Filtrations of 2D/3D binary images based on the erosion of activated
     regions.
 
@@ -653,7 +653,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, ImagePlotterMixin):
 
 @adapt_fit_transform_docs
 class SignedDistanceFiltration(BaseEstimator, TransformerMixin,
-                               ImagePlotterMixin):
+                               ImagePlotter):
     """Filtrations of 2D/3D binary images based on the dilation and the erosion
     of activated regions.
 

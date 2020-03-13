@@ -304,7 +304,7 @@ def plot_persistence_image(images, samplings, homology_dimension=None):
     images : ndarray of shape (n_homology_dimensions, n_bins, n_bins)
         Collection of ``n_homology_dimension`` discretised persistence
         images. Each image is an an array of shape ``(n_bins, n_bins)``.
-        Entry i along axis 0 should be the persistence image in homologys
+        Entry i along axis 0 should be the persistence image in homology
         dimension i.
 
     samplings : ndarray of shape (n_homology_dimensions, 2, n_bins),

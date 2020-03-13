@@ -18,7 +18,7 @@ def plot_image(image):
     fig.show()
 
 
-class ImagePlotterMixin(PlotterMixin):
+class ImagePlotter(PlotterMixin):
     """Mixin class for modules that return images"""
 
     def plot(self, Xt, sample=0):
