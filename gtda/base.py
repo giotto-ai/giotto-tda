@@ -117,8 +117,8 @@ class PlotterMixin:
 
         """
         self.fit(X, y)
-        Xt = self.transform_plot(X, sample=sample, **plot_params)
-        return Xt
+        Xt0 = self.transform_plot(X, sample=sample, **plot_params)
+        return Xt0
 
     def transform_plot(self, X, sample=0, **plot_params):
         """Transform and plot a sample in the input collection.
@@ -147,4 +147,4 @@ class PlotterMixin:
         Xt = self.transform(X[[sample]])
         self.plot(Xt, sample=0, **plot_params)
 
-        return Xt
+        return Xt[0]
