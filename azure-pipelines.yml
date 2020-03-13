@@ -40,8 +40,7 @@ jobs:
 
     - script: |
         set -e
-        mkdir tmp
-        cd tmp
+        cd ..
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
         git config --global --unset http.proxy
