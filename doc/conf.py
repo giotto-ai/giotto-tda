@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
 
 from gtda import __version__
 
@@ -35,25 +36,20 @@ release = __version__
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'numpydoc',
+    # 'numpydoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.imgconverter',
-    # 'sphinx_gallery.gen_gallery',
     'sphinx_issues',
+    'sphinx_rtd_theme',
+    'sphinx.ext.napoleon'
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
 
-# Add mappings
-intersphinx_mapping = {
-    'sklearn': ('http://scikit-learn.org/stable', None),
-    'plotly': ('https://plot.ly/python-api-reference/', None)
-}
-
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
-numpydoc_class_members_toctree = False
+numpydoc_class_members_toctree = True
 
 # For maths, use mathjax by default and svg if NO_MATHJAX env variable is set
 # (useful for viewing the doc offline)
@@ -68,7 +64,7 @@ else:
 autodoc_default_options = {'members': True, 'inherited-members': True}
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['templates']
+templates_path = ['templates/']
 
 # generate autosummary even if no references
 autosummary_generate = True
@@ -87,6 +83,8 @@ master_doc = 'index'
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
     '**neural_network**',
+    'templates/*.rst',
+    'theory/before_glossary.rst'
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -110,9 +108,41 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'nature'
+html_theme = "sphinx_rtd_theme"
+
+html_theme_options = {
+    'collapse_navigation': False,
+    'sticky_navigation': True,
+    'logo_only': True,
+}
+
+# List versions
+current_version = os.environ['VERSION']
+html_theme_options.update({'current_version': current_version})
+with open('versions', 'r') as f:
+    _versions = [c[2:] for c in f.read().splitlines()]
+_versions = list(filter(lambda c: not(c.startswith('.')), _versions))
+html_theme_options.update({'versions': [(c, f'../{c}/index.html')
+                                        for c in set(_versions).union([current_version])]})
+
+# Get logo
+path_to_image = "images/tda_logo.svg"
+if not(os.path.exists(path_to_image)):
+    import requests
+    r = requests.get('https://www.giotto.ai/static/vector/logo-tda.svg')
+    with open(path_to_image, 'wb') as f:
+        f.write(r.content)
+html_logo = path_to_image
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []  # ['_static']
+html_static_path = ['source/_static/style.css']  # []  # ['_static']
+
+html_sourcelink_suffix = ''
+
+rst_epilog = """
+.. |ProjectVersion| replace:: Foo Project, version {versionnum}
+""".format(
+    versionnum=release,
+)
