@@ -4,22 +4,21 @@ Tutorials
 
 This page contains tutorials to help you get started with ``giotto-tda``.
 
-..
-   toctree::
-   :maxdepth: 2
-   :hidden:
+.. toctree::
+   :maxdepth: 1
 
    vietoris_rips_quickstart
    mapper_quickstart
 
-.. include:: vietoris_rips_quickstart.rst
+..
+   include:: vietoris_rips_quickstart.rst
    :end-before: Import libraries
 
-Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/vietoris_rips_quickstart.ipynb>`__ for full interactivity,
-or check `the static version <vietoris_rips_quickstart.html>`__.
+    Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/vietoris_rips_quickstart.ipynb>`__ for full interactivity,
+    or check `the static version <vietoris_rips_quickstart.html>`__.
 
-.. include:: mapper_quickstart.rst
-   :end-before: Import libraries
+    .. include:: mapper_quickstart.rst
+       :end-before: Import libraries
 
-Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/mapper_quickstart.ipynb>`__ for full interactivity,
-or check `the static version <mapper_quickstart.html>`__.
+    Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/mapper_quickstart.ipynb>`__ for full interactivity,
+    or check `the static version <mapper_quickstart.html>`__.
