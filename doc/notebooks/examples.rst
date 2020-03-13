@@ -1,8 +1,8 @@
 ########
-Advanced
+Examples
 ########
 
-This page contains advanced examples
+This page contains examples of use of ``giotto-tda``.
 
 ..
    toctree::
