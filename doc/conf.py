@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath('../'))
 project = 'giotto-tda'
 copyright = '2020, L2F'
 author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina, ' \
-         'Lewis Tunstall'
+         'Lewis Tunstall, Wojciech Reise'
 
 # The full version, including alpha/beta/rc tags
 release = __version__
@@ -107,7 +107,6 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
 html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
@@ -122,8 +121,12 @@ html_theme_options.update({'current_version': current_version})
 with open('versions', 'r') as f:
     _versions = [c[2:] for c in f.read().splitlines()]
 _versions = list(filter(lambda c: not(c.startswith('.')), _versions))
-html_theme_options.update({'versions': [(c, f'../{c}/index.html')
-                                        for c in set(_versions).union([current_version])]})
+html_theme_options.update({
+    'versions': [
+        (c, f'../{c}/index.html')
+        for c in set(_versions).union([current_version])
+    ]
+})
 
 # Get logo
 html_logo = "images/tda_logo.svg"
