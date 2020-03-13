@@ -16,7 +16,8 @@ from ..plotting import PointCloudPlotter
 
 
 @adapt_fit_transform_docs
-class SlidingWindow(BaseEstimator, TransformerResamplerMixin, PointCloudPlotter):
+class SlidingWindow(BaseEstimator, TransformerResamplerMixin,
+                    PointCloudPlotter):
     """Sliding windows onto the data.
 
     Useful in time series analysis to convert a sequence of objects (scalar
