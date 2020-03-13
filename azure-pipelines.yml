@@ -41,7 +41,7 @@ jobs:
     - script: |
         set -e
         cd ..
-        git clone ssh://git@github.com:giotto-ai/gtda-docs.git
+        git clone ssh://git@github.com:giotto-learn/gtda-docs.git
         cd gtda-docs
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
