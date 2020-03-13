@@ -1,4 +1,4 @@
-.. image:: ../doc/images/logo-tda.svg
+.. image:: ../doc/images/tda_logo.svg
    :width: 850
 
 Examples, tutorials and plotting utilities

@@ -1,4 +1,4 @@
-.. image:: doc/images/logo-tda.svg
+.. image:: doc/images/tda_logo.svg
    :width: 850
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
