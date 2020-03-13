@@ -35,11 +35,12 @@ Pull requests
 If you have improvements to ``giotto-tda``, do not hesitate to send us pull requests!
 Please follow the Github how to (https://help.github.com/articles/using-pull-requests/) and
 make sure you followed this checklist *before* submitting yor pull request:
-  - Make sure you have signed the `contributor license agreement (CLA) <https://cla-assistant.io/giotto-ai/giotto-tda>`_.
-  - Read the :ref:`Contribution guidelines and standards <contribution_guidelines_standards>`.
-  - Read the `code of conduct <https://github.com/giotto-ai/giotto-tda/blob/master/CODE_OF_CONDUCT.rst>`_.
-  - Check that the changes are consistent with the guidelines and coding styles.
-  - Run unit tests.
+
+- Make sure you have signed the `contributor license agreement (CLA) <https://cla-assistant.io/giotto-ai/giotto-tda>`_.
+- Read the :ref:`Contribution guidelines and standards <contribution_guidelines_standards>`.
+- Read the `code of conduct <https://github.com/giotto-ai/giotto-tda/blob/master/CODE_OF_CONDUCT.rst>`_.
+- Check that the changes are consistent with the guidelines and coding styles.
+- Run unit tests.
 
 The ``giotto-tda`` team will review your pull requests. Once the pull requests are approved
 and pass continuous integration checks, the ``giotto-tda`` team will work on getting your pull
