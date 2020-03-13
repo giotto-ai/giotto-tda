@@ -147,4 +147,4 @@ class PlotterMixin:
         Xt = self.transform(X[[sample]])
         self.plot(Xt, sample=0, **plot_params)
 
-        return Xt[0]
+        return Xt
