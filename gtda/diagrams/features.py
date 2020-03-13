@@ -260,18 +260,14 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0):
-        """Plot betti curves, one per homology dimensions.
+        """Plot one Betti curve per homology dimension in a sample.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            Betti curves: as returned by :meth:`transform`.
-            One curve (represented as a one-dimensional array
-            of integer values) per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Array of Betti curves, as returned by :meth:`transform`.
 
-        sample : int or list of int, optional, default: ``0``
+        sample : int, optional, default: ``0``
             Index of the sample to be plotted.
 
         """
@@ -418,15 +414,14 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, **layout):
-        """Plot persistence landscapes, one per homology dimensions.
+    def plot(self, Xt, sample=0):
+        """Plot one persistence landscape per homology dimension in a sample.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, \
             n_layers, n_bins)
-            Array of betti curves such as the result of a call to
-            :meth:`transform`.
+            Array of persistence landscapes, as returned by :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Index of the sample to be plotted.
@@ -585,15 +580,13 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimension=0):
-        """Plot a chosen heat kernel in a given dimension, the output of
-        :meth:`transform`.
+        """Plot the heat kernel for a chosen homology dimension in a sample.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Array of heat kernels such as the result of a call to
-            :meth:`transform`.
+            Array of heat kernels, as returned by :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Sample for which the heat kernel should be plotted.
@@ -785,15 +778,14 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimension=0):
-        """Plot a chosen persistence image in a given dimension, the output of
-        :meth:`transform`.
+        """Plot the persistence image for a chosen homology dimension in a
+        sample.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Array of persistence images such as the result of a call to
-            :meth:`transform`.
+            Array of persistence images, as returned by :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Sample for which the persistence image should be plotted.
@@ -955,13 +947,12 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample):
-        """Plot silhouettes, one per homology dimensions.
+        """Plot one silhouette per homology dimension in a sample.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            Array of silhouettes such as the result of a call to
-            :meth:`transform`.
+            Array of silhouettes, as returned by :meth:`transform`.
 
         sample : int or list of int, optional, default: ``0``
             Index of the sample to be plotted.
