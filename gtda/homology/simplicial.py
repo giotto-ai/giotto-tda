@@ -753,7 +753,8 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         Xl = self._subsample(X, self.n_landmarks)
         X = pairwise_distances(X, Xl, metric=self.metric, **self.metric_params)
 
-        return X
+        return np.stack([np.argsort(X, axis=1), np.sort(X, axis=1)], axis=2)
+
 
     def _gudhi_diagram(self, X):
         X = self._create_nearest_landmark_table(X)
