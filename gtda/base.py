@@ -93,7 +93,7 @@ class PlotterMixin:
 
     def fit_transform_plot(self, X, y=None, sample=0, **plot_params):
         """Fit to data, then transform and plot a sample in the input
-        collection. Return the transformed sample input.
+        collection. Return the transformed sample.
 
         Parameters
         ----------
@@ -112,17 +112,17 @@ class PlotterMixin:
 
         Returns
         -------
-        Xt : numpy array of shape (1, ...)
+        Xt : ndarray
             Transformed input sample.
 
         """
         self.fit(X, y)
-        Xt0 = self.transform_plot(X, sample=sample, **plot_params)
-        return Xt0
+        Xt = self.transform_plot(X, sample=sample, **plot_params)
+        return Xt
 
     def transform_plot(self, X, sample=0, **plot_params):
         """Transform and plot a sample in the input collection.
-        Return the transformed sample input.
+        Return the transformed sample.
 
         Parameters
         ----------
@@ -140,7 +140,7 @@ class PlotterMixin:
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, ...)
+        Xt : ndarray
             Transformed input sample.
 
         """
