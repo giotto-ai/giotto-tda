@@ -1,9 +1,9 @@
-:mod:`{{module}}`.{{objname}}
+{{objname}}
 {{ underline }}====================
 
-.. currentmodule:: {{ module }}
+.. currentmodule:: {{module}}
 
-.. autofunction:: {{ objname }}
+.. autofunction:: {{objname}}
 
 ..
     Exclude sphinx-gallery generated examples since we use binder for now

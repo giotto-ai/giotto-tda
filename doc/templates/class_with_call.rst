@@ -1,16 +1,16 @@
-:mod:`{{module}}`.{{objname}}
-{{ underline }}===============
+{{objname}}
+{{underline}}==============
 
-.. currentmodule:: {{ module }}
+.. currentmodule:: {{module}}
 
-.. autoclass:: {{ objname }}
+.. autoclass:: {{objname}}
 
    {% block methods %}
    .. automethod:: __init__
    .. automethod:: __call__
    {% endblock %}
 
-.. include:: {{module}}.{{objname}}.examples
+.. include:: {{module}}.{{objname}}.{{examples}}
 
 .. raw:: html
 

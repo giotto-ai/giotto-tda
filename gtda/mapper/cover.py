@@ -1,9 +1,9 @@
 """Covering schemes for one or several dimensions."""
 # License: GNU AGPLv3
 
+import warnings
 from functools import partial
 from itertools import product
-import warnings
 
 import numpy as np
 from scipy.stats import rankdata
@@ -12,9 +12,10 @@ from sklearn.exceptions import DataDimensionalityWarning, NotFittedError
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .utils._cover import (_check_has_one_column,
-                           _remove_empty_and_duplicate_intervals)
+from .utils._cover import _check_has_one_column, \
+    _remove_empty_and_duplicate_intervals
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
@@ -83,9 +84,11 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
-                        'n_intervals': [int, (1, np.inf)],
-                        'overlap_frac': [float, (0., 1.)]}
+    _hyperparameters = {
+        'kind': {'type': str, 'in': ['uniform', 'balanced']},
+        'n_intervals': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'overlap_frac': {'type': float, 'in': Interval(0, 1, closed='neither')}
+    }
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
@@ -142,8 +145,9 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
         X = check_array(X, ensure_2d=False)
+        validate_params(self.get_params(), self._hyperparameters)
+
         if X.ndim == 2:
             _check_has_one_column(X)
 
@@ -374,9 +378,11 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'kind': [str, ['uniform', 'balanced']],
-                        'n_intervals': [int, (1, np.inf)],
-                        'overlap_frac': [float, (0, 1)]}
+    _hyperparameters = {
+        'kind': {'type': str, 'in': ['uniform', 'balanced']},
+        'n_intervals': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'overlap_frac': {'type': float, 'in': Interval(0, 1, closed='neither')}
+    }
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
@@ -432,12 +438,12 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        X = check_array(X, ensure_2d=False)
         validate_params(self.get_params(), self._hyperparameters)
+
         # reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
-
-        X = check_array(X)
 
         return self._fit(X)
 
@@ -474,23 +480,23 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, '_coverers')
         # Reshape filter function values derived from FunctionTransformer
-        if X.ndim == 1:
-            X = X[:, None]
+        Xt = check_array(X, ensure_2d=False)
+        if Xt.ndim == 1:
+            Xt = Xt[:, None]
 
-        X = check_array(X)
         n_features_fit = self._n_features_fit
-        n_features = X.shape[1]
+        n_features = Xt.shape[1]
         if n_features != n_features_fit:
             raise DataDimensionalityWarning(
-                f"Different number of columns between 'fit' ({n_features_fit})"
-                f" and 'transform' ({n_features}).")
+                f"Different number of columns between `fit` ({n_features_fit})"
+                f" and `transform` ({n_features}).")
 
         if self.kind == 'balanced':
             # Test on the first coverer whether the left_limits_ and
             # right_limits_ attributes are present
             self._coverers[0]._check_limit_attrs()
 
-        Xt = self._transform(X)
+        Xt = self._transform(Xt)
         return Xt
 
     def fit_transform(self, X, y=None, **fit_params):
@@ -515,29 +521,28 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         """
         validate_params(self.get_params(), self._hyperparameters)
         # reshape filter function values derived from FunctionTransformer
-        if X.ndim == 1:
-            X = X[:, None]
-
-        X = check_array(X)
+        Xt = check_array(X, ensure_2d=False)
+        if Xt.ndim == 1:
+            Xt = Xt[:, None]
 
         if self.kind == 'uniform':
-            Xt = self._fit(X)._transform(X)
+            Xt = self._fit(Xt)._transform(Xt)
             return Xt
 
         # Calculate 1D cover for each column
         coverer = OneDimensionalCover(kind=self.kind,
                                       n_intervals=self.n_intervals,
                                       overlap_frac=self.overlap_frac)
-        coverers = [clone(coverer) for i in range(X.shape[1])]
+        coverers = [clone(coverer) for i in range(Xt.shape[1])]
         fit_transformer = '_fit_transform_balanced'
         covers = [
             partial(self._clone_and_apply_to_column,
-                    X, coverer, fit_transformer)(i)
+                    Xt, coverer, fit_transformer)(i)
             for i, coverer in enumerate(coverers)
         ]
         # Only store attributes if above succeeds
         self._coverers = coverers
-        self._n_features_fit = X.shape[1]
+        self._n_features_fit = Xt.shape[1]
         Xt = self._combine_one_dim_covers(covers)
         return Xt
 

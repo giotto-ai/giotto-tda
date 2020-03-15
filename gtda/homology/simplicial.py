@@ -1,34 +1,39 @@
 """Persistent homology on point clouds or finite metric spaces."""
 # License: GNU AGPLv3
 
-import numbers
-import types
+from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..base import PlotterMixin
 from ._utils import _postprocess_diagrams
-from ._subsamplings import *
+from ._subsamplings import SUBSAMPLING_FUNCTIONS
 from ..externals.python import ripser, SparseRipsComplex, CechComplex, \
-    WitnessComplex
+    WitnessComplex, StrongWitnessComplex
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
+from ..plotting.homology import plot_diagram
 
 
 @adapt_fit_transform_docs
-class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
+class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
+    homology>`.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
-    distance matrix, information about the appearance and disappearance of
-    topological features (technically, `homology classes
-    <https://giotto.ai/theory>`_) of various dimensions and at different
-    scales is summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Euclidean space, or an abstract :ref:`metric space <finite metric spaces
+    and point clouds>` encoded by a distance matrix, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology and cohomology>`) of various dimension
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     Parameters
     ----------
@@ -47,7 +52,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
@@ -80,7 +85,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    SparseRipsPersistence, ConsistentRescaling
+    SparseRipsPersistence, EuclideanCechPersistence, CubicalPersistence,
+    ConsistentRescaling
 
     Notes
     -----
@@ -101,15 +107,23 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict},
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'max_edge_length': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))}
+    }
 
-    def __init__(self, metric='euclidean', max_edge_length=np.inf,
-                 homology_dimensions=(0, 1), coeff=2, infinity_values=None,
+    def __init__(self, metric='euclidean', metric_params={},
+                 homology_dimensions=(0, 1), coeff=2,
+                 max_edge_length=np.inf, infinity_values=None,
                  n_jobs=None):
         self.metric = metric
+        self.metric_params = metric_params
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.max_edge_length = max_edge_length
@@ -157,19 +171,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True, force_all_finite=False)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_array(X, allow_nd=True, force_all_finite=False)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -219,18 +230,36 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin):
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
+    def plot(self, Xt, sample=0):
+        """Plot a single persistence diagram.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Array of persistence diagrams such as the result of a call to
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        """
+        return plot_diagram(Xt[sample],
+                            homology_dimensions=self.homology_dimensions)
+
 
 @adapt_fit_transform_docs
 class SparseRipsPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Sparse Vietoris-Rips filtrations <https://giotto.ai/theory>`_.
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    :ref:`Sparse Vietoris-Rips filtrations <vietoris-rips complex and \
+    vietoris-rips homology>`.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    or an abstract `metric space <https://giotto.ai/theory>`_ encoded by a
-    distance matrix, information about the appearance and disappearance of
-    topological features (technically, `homology classes
-    <https://giotto.ai/theory>`_) of various dimensions and at different
-    scales is summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Euclidean space, or an abstract :ref:`metric space <finite metric spaces
+    and point clouds>` encoded by a distance matrix, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology and cohomology>`) of various dimensions
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     Parameters
     ----------
@@ -290,7 +319,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, EuclideanCechPersistence, CubicalPersistence,
+    ConsistentRescaling
 
     Notes
     -----
@@ -309,15 +339,21 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         cohomology.html>`_.
 
     """
-    _hyperparameters = {'epsilon': [numbers.Number, (0., 1.)],
-                        'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict},
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'epsilon': {'type': Real, 'in': Interval(0, 1, closed='both')},
+        'max_edge_length': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))}
+    }
 
     def __init__(self, metric='euclidean', metric_params={},
-                 max_edge_length=np.inf, homology_dimensions=(0, 1),
-                 coeff=2, epsilon=0.1, infinity_values=None, n_jobs=None):
+                 homology_dimensions=(0, 1), coeff=2, epsilon=0.1,
+                 max_edge_length=np.inf, infinity_values=None, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.homology_dimensions = homology_dimensions
@@ -377,19 +413,16 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True, force_all_finite=False)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_array(X, allow_nd=True, force_all_finite=False)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -443,18 +476,18 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
-    """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
-    `Cech filtrations <https://giotto.ai/theory>`_.
+    """:ref:`Persistence diagrams <persistence diagram>` resulting from
+    `Cech filtrations <>`_.
 
-    Given a `point cloud <https://giotto.ai/theory>`_ in Euclidean space,
-    information about the appearance and disappearance of topological
-    features (technically, `homology classes <https://giotto.ai/theory>`_) of
-    various dimensions and at different scales is summarised in the
-    corresponding persistence diagram.
+    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Euclidean space, information about the appearance and disappearance of
+    topological features (technically, :ref:`homology classes <homology and
+    cohomology>`) of various dimensions and at different scales is
+    summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
-    homology_dimensions : iterable, optional, default: ``(0, 1)``
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
 
@@ -487,7 +520,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, ConsistentRescaling
+    VietorisRipsPersistence, SparseRipsPersistence, CubicalPersistence
 
     Notes
     -----
@@ -506,13 +539,21 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         cohomology.html>`_.
 
     """
-    _hyperparameters = {'max_edge_length': [numbers.Number, None],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
 
-    def __init__(self, max_edge_length=np.inf, homology_dimensions=(0, 1),
-                 coeff=2, infinity_values=None, n_jobs=None):
+    _hyperparameters = {
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'max_edge_length': {
+            'type': Real, 'in': Interval(0, np.inf, closed='right')},
+        'infinity_values': {
+            'type': (Real, type(None)),
+            'in': Interval(0, np.inf, closed='neither')},
+    }
+
+    def __init__(self, homology_dimensions=(0, 1), coeff=2,
+                 max_edge_length=np.inf, infinity_values=None, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.max_edge_length = max_edge_length
@@ -562,19 +603,16 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
         else:
             self.infinity_values_ = self.infinity_values
 
         self._homology_dimensions = sorted(self.homology_dimensions)
-
-        validate_params({**self.get_params(),
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_array(X, allow_nd=True)
-
         self._max_homology_dimension = self._homology_dimensions[-1]
         return self
 
@@ -716,7 +754,8 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    [1] S. Kachanovich, "Witness complex", 2015; `GUDHI User and Reference Manual \
+    [1] S. Kachanovich, "Witness complex", 2015; \
+        `GUDHI User and Reference Manual \
         <http://gudhi.gforge.inria.fr/doc/latest/group__witness__complex.html>`_.
 
     [2] V. de Silva and G. Carlsson, "Topological estimation using witness \
@@ -725,21 +764,31 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         <https://doi.org/10.5555/2386332.2386359>`_.
 
     """
-    _hyperparameters = {'n_landmarks':  [int, (1, np.inf)],
-                        '_subsample': [types.FunctionType, None],
-                        'strong': [bool, [True, False]],
-                        'relaxation': [numbers.Number, (0, np.inf)],
-                        'infinity_values_': [numbers.Number, None],
-                        '_homology_dimensions': [list, [int, (0, np.inf)]],
-                        'coeff': [int, (2, np.inf)]}
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict},
+        'homology_dimensions': {
+            'type': (list, tuple), 'of': {
+                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
+        'max_edge_length': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))},
+        'n_landmarks':  {'type': int,
+                         'in': Interval(1, np.inf, closed='left')},
+        'subsampling': {'type': (str, FunctionType)},
+        'subsampling_params': {'type': dict},
+        'strong': {'type': bool},
+        'relaxation': {'type': Real, 'in': Interval(0, np.inf, closed='left')},
+    }
 
     def __init__(self, n_landmarks=5, strong=False, relaxation=0.,
                  subsampling='random', subsampling_params={},
-                 metric='euclidean', metric_params= {},
+                 metric='euclidean', metric_params={},
                  homology_dimensions=(0, 1), coeff=2, infinity_values=None,
                  n_jobs=None):
         self.n_landmarks = n_landmarks
         self.subsampling = subsampling
+        self.subsampling_params = subsampling_params
         self.strong = strong
         self.relaxation = relaxation
         self.metric = metric
@@ -752,9 +801,10 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
     def _create_nearest_landmark_table(self, X):
         Xl = self._subsample(X, self.n_landmarks)
         X = pairwise_distances(X, Xl, metric=self.metric, **self.metric_params)
-
-        return np.stack([np.argsort(X, axis=1), np.sort(X, axis=1)], axis=2)
-
+        L = np.argsort(X, axis=1)
+        X = np.sort(X, axis=1)
+        return [[(L[w][k], X[w][k]) for k in range(X.shape[1])]
+                for w in range(X.shape[0])]
 
     def _gudhi_diagram(self, X):
         X = self._create_nearest_landmark_table(X)
@@ -762,8 +812,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         simplex_tree = witness_complex.create_simplex_tree(
             max_alpha_square=self.relaxation**2)
         Xdgms = simplex_tree.persistence(
-            homology_coeff_field=self.coeff,
-            min_persistence=self._min_homology_dimension)
+            homology_coeff_field=self.coeff, min_persistence=0)
 
         # Separate diagrams by homology dimensions
         Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
@@ -797,7 +846,10 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        self._subsample = SUBSAMPLING_FUNCTIONS[self.subsampling]
+
+        validate_params(self.get_params(), self._hyperparameters,
+                        exclude=['n_jobs'])
+        check_array(X, allow_nd=True)
 
         if self.infinity_values is None:
             self.infinity_values_ = np.max(X)
@@ -806,12 +858,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
 
-        validate_params({**self.get_params(),
-                         '_subsample': self._subsample,
-                         'infinity_values_': self.infinity_values_,
-                         '_homology_dimensions': self._homology_dimensions},
-                        self._hyperparameters)
-        check_array(X, allow_nd=True)
+        self._subsample = SUBSAMPLING_FUNCTIONS[self.subsampling]
 
         if self.strong:
             self._filtration = StrongWitnessComplex

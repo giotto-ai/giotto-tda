@@ -2,7 +2,9 @@
 # License: GNU AGPLv3
 
 import itertools
-import numbers
+from numbers import Real
+from types import FunctionType
+
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -10,6 +12,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
@@ -66,7 +69,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.homology import ConsistentRescaling
+    >>> from gtda.point_clouds import ConsistentRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsistentRescaling()
     >>> X_rescaled = cr.fit_transform(X)
@@ -75,7 +78,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    ConsecutiveRescaling
 
     References
     ----------
@@ -85,7 +88,13 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
-    _hyperparameters = {'neighbor_rank': [int, (1, np.inf)]}
+
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': (dict, type(None))},
+        'neighbor_rank': {
+            'type': int, 'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, metric='euclidean', metric_params=None, neighbor_rank=1,
                  n_jobs=None):
@@ -136,13 +145,14 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
-
-        validate_params(self.get_params(), self._hyperparameters)
-        check_array(X, allow_nd=True)
 
         return self
 
@@ -172,11 +182,11 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consistent_rescaling)(X[i])
-            for i in range(X.shape[0]))
+            delayed(self._consistent_rescaling)(Xt[i])
+            for i in range(Xt.shape[0]))
         Xt = np.array(Xt)
         return Xt
 
@@ -232,7 +242,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.homology import ConsecutiveRescaling
+    >>> from gtda.point_clouds import ConsecutiveRescaling
     >>> X = np.array([[[0, 0], [1, 2], [5, 6]]])
     >>> cr = ConsecutiveRescaling()
     >>> X_rescaled = cr.fit_transform(X)
@@ -241,10 +251,16 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    VietorisRipsPersistence
+    ConsistentRescaling
 
     """
-    _hyperparameters = {'factor': [numbers.Number, (0., np.inf)]}
+
+    _hyperparameters = {
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': (dict, type(None))},
+        'factor': {
+            'type': Real, 'in': Interval(0, np.inf, closed='both')}
+    }
 
     def __init__(self, metric='euclidean', metric_params=None, factor=0.,
                  n_jobs=None):
@@ -286,13 +302,14 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        check_array(X, allow_nd=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
         if self.metric_params is None:
             self.effective_metric_params_ = {}
         else:
             self.effective_metric_params_ = self.metric_params.copy()
-
-        validate_params(self.get_params(), self._hyperparameters)
-        check_array(X, allow_nd=True)
 
         return self
 
@@ -322,10 +339,10 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consecutive_rescaling)(X[i])
-            for i in range(X.shape[0]))
+            delayed(self._consecutive_rescaling)(Xt[i])
+            for i in range(Xt.shape[0]))
         Xt = np.array(Xt)
         return Xt

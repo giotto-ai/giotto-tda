@@ -114,15 +114,11 @@ def test_wit_not_fitted():
         wit.transform(pc)
 
 
-pc_wit_res = np.array([[[0., 0.43094373, 0],
-                        [0., 0.5117411, 0],
-                        [0., 0.60077095, 0],
-                        [0., 0.62186205, 0],
-                        [0.69093919, 0.80131882, 1]]])
+pc_wit_res = np.array([[[0., 2.98935825, 0],
+                        [0., 0., 1]]])
 
 
 def test_wit_transform():
     wit = WitnessPersistence()
-    print(wit.fit_transform(pc))
-    assert false
-    #assert_almost_equal(wit.fit_transform(X), X_vrp_wit)
+
+    assert_almost_equal(wit.fit_transform(pc), pc_wit_res)
