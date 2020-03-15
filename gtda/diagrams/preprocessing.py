@@ -10,14 +10,14 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
-from ..plotting import HomologyPlotter
+from ..plotting import DiagramPlotter
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagram, validate_params
 
 
 @adapt_fit_transform_docs
-class ForgetDimension(BaseEstimator, TransformerMixin, HomologyPlotter):
+class ForgetDimension(BaseEstimator, TransformerMixin, DiagramPlotter):
     """Replaces all homology dimensions in persistence diagrams with
     ``numpy.inf``.
 
@@ -90,7 +90,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin, HomologyPlotter):
 
 
 @adapt_fit_transform_docs
-class Scaler(BaseEstimator, TransformerMixin, HomologyPlotter):
+class Scaler(BaseEstimator, TransformerMixin, DiagramPlotter):
     """Linear scaling of persistence diagrams.
 
     A positive scale factor :attr:`scale_` is calculated during :meth:`fit` by
@@ -267,7 +267,7 @@ class Scaler(BaseEstimator, TransformerMixin, HomologyPlotter):
 
 
 @adapt_fit_transform_docs
-class Filtering(BaseEstimator, TransformerMixin, HomologyPlotter):
+class Filtering(BaseEstimator, TransformerMixin, DiagramPlotter):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing

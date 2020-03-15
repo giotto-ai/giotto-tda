@@ -1,4 +1,4 @@
-"""Persistent homology-retated plotting functions """
+"""Persistent-homology–related plotting functions and classes."""
 # License: GNU AGPLv3
 
 import numpy as np
@@ -6,8 +6,8 @@ import plotly.graph_objs as gobj
 from ..base import PlotterMixin
 
 
-class HomologyPlotter(PlotterMixin):
-    """Mixin class for modules that return persistent homology groups."""
+class DiagramPlotter(PlotterMixin):
+    """Mixin class implementing plotting methods for persistence diagrams."""
 
     def plot(self, Xt, sample=0):
         """ Plot a persistence diagram, with homology in multiple dimensions.
