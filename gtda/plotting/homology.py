@@ -9,19 +9,25 @@ from ..base import PlotterMixin
 class DiagramPlotter(PlotterMixin):
     """Mixin class implementing plotting methods for persistence diagrams."""
 
-    def plot(self, Xt, sample=0):
-        """ Plot a persistence diagram, with homology in multiple dimensions.
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a persistence diagram, with homology in multiple dimensions.
 
         Parameters
         ----------
-        Xt : ndarray, shape (n_samples, n_points, s3)
+        Xt : ndarray of shape (n_samples, n_points, 3)
             Collection of persistence diagrams.
 
-        sample: int, optional, default: ``0``
-            Indicates which point cloud in the collection :param:`Xt` to plot.
+        sample : int, optional, default: ``0``
+            Indicates which persistence diagram in the collection `Xt` to plot.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
         """
         # TODO: increase the marker size
-        return plot_diagram(Xt[sample], homology_dimensions=None)
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
 
 
 def plot_diagram(diagram, homology_dimensions=None, **input_layout):
