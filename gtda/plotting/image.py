@@ -1,4 +1,4 @@
-"""Image-retated plotting functions """
+"""Image-related plotting functions and classes."""
 # License: GNU AGPLv3
 
 from ._plot import _plot_image
@@ -6,7 +6,7 @@ from ..base import PlotterMixin
 
 
 def plot_image(image):
-    """Plot a 2d image.
+    """Plot a 2D image.
 
     Parameters
     ----------
@@ -19,23 +19,22 @@ def plot_image(image):
 
 
 class ImagePlotter(PlotterMixin):
-    """Mixin class for modules that return images"""
+    """Mixin class implementing plotting methods for 2D images."""
 
     def plot(self, Xt, sample=0):
-        """Plot a single image.
+        """Plot an image from a collection.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
-            Transformed collection of images. Each entry along axis 0 is a
-            2D image.
+            Collection of 2D images.
 
         sample : int, optional, default: ``0``
-            Index of the sample to be plotted.
+            Index of the sample in `Xt` to be plotted.
 
         """
         X_to_plot = Xt[sample]
         if X_to_plot.ndim > 3:
-            raise RuntimeError("Plotting images in more than 2 dimensions"
-                               " is not supported.")
+            raise RuntimeError("Plotting images in more than 2 dimensions "
+                               "is not supported.")
         return plot_image(X_to_plot.astype(float))

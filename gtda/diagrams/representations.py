@@ -22,8 +22,7 @@ from ..utils.validation import validate_params, check_diagram
 
 
 def identity(x):
-    """The identity function.
-    """
+    """The identity function."""
     return x
 
 

@@ -1,4 +1,4 @@
-"""Point clouds-related plotting functions """
+"""Point-cloud–related plotting functions and classes."""
 # License: GNU AGPLv3
 
 import numpy as np
@@ -7,27 +7,30 @@ from ..base import PlotterMixin
 
 
 class PointCloudPlotter(PlotterMixin):
-    """Mixin class for modules that return point clouds"""
+    """Mixin class implementing plotting methods for point clouds."""
 
     def plot(self, Xt, sample=0):
-        """ Plot a point cloud, from a collection of point clouds.
+        """Plot a point cloud, from a collection of point clouds. If the
+        point cloud is in more than 3 dimensions, only the first 3 coordinates
+        are plotted.
 
         Parameters
         ----------
         Xt : ndarray, shape (n_samples, n_points, n_dimensions)
-            Collection of point clouds.
+            Collection of point clouds in ``n_dimension``-dimensional space.
 
-        sample: int, optional, default: ``0``
-            Indicates which point cloud in the collection :param:`Xt` to plot.
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
         """
         # TODO: increase the marker size
         return plot_point_cloud(Xt[sample], dimension=None)
 
 
 def plot_point_cloud(point_cloud, dimension=None):
-    """Plot the first 2 or 3 coordinates of the point cloud.
+    """Plot the first 2 or 3 coordinates of a point cloud.
 
-     This function will not work on 1-dimensional arrays.
+     This function will not work on 1D arrays.
 
     Parameters
     ----------

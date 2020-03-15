@@ -10,7 +10,8 @@ class DiagramPlotter(PlotterMixin):
     """Mixin class implementing plotting methods for persistence diagrams."""
 
     def plot(self, Xt, sample=0, homology_dimensions=None):
-        """Plot a persistence diagram, with homology in multiple dimensions.
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
 
         Parameters
         ----------
@@ -18,7 +19,7 @@ class DiagramPlotter(PlotterMixin):
             Collection of persistence diagrams.
 
         sample : int, optional, default: ``0``
-            Indicates which persistence diagram in the collection `Xt` to plot.
+            Index of the sample in `Xt` to be plotted.
 
         homology_dimensions : list, tuple or None, optional, default: ``None``
             Which homology dimensions to include in the plot. ``None`` means
@@ -40,7 +41,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
         contains homology dimensions, and the first two contain (birth, death)
         pairs to be used as coordinates in the two-dimensional plot.
 
-    homology_dimensions : list of int or None, default: ``None``
+    homology_dimensions : list of int or None, optional, default: ``None``
         Homology dimensions which will appear on the plot. If ``None``, all
         homology dimensions which appear in `diagram` will be plotted.
 
