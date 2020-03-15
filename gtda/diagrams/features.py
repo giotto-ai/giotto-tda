@@ -16,12 +16,6 @@ from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagram
 
 
-def identity(x):
-    """The identity function.
-    """
-    return x
-
-
 @adapt_fit_transform_docs
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """:ref:`Persistence entropies <persistence entropy>` of persistence

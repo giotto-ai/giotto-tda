@@ -10,10 +10,10 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
+from ..plotting import HomologyPlotter
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagram, validate_params
-from ..plotting import HomologyPlotter
 
 
 @adapt_fit_transform_docs
