@@ -1,7 +1,5 @@
 # License: GNU AGPLv3
 
-import numpy as np
-
 import random
 
 
