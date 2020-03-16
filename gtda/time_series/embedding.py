@@ -187,7 +187,6 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return plot_point_cloud(Xt[sample])
 
 
-
 @adapt_fit_transform_docs
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a univariate time series as a time series of
