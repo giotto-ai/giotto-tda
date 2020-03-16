@@ -1,5 +1,11 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+trigger:
+- master
+
+pr:
+- master
+
 jobs:
 
 - job: 'manylinux2010'
