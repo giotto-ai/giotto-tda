@@ -3,28 +3,6 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from ..base import PlotterMixin
-
-
-class PointCloudPlotter(PlotterMixin):
-    """Mixin class implementing plotting methods for point clouds."""
-
-    def plot(self, Xt, sample=0):
-        """Plot a point cloud, from a collection of point clouds. If the
-        point cloud is in more than 3 dimensions, only the first 3 coordinates
-        are plotted.
-
-        Parameters
-        ----------
-        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
-            Collection of point clouds in ``n_dimension``-dimensional space.
-
-        sample : int, optional, default: ``0``
-            Index of the sample in `Xt` to be plotted.
-
-        """
-        # TODO: increase the marker size
-        return plot_point_cloud(Xt[sample], dimension=None)
 
 
 def plot_point_cloud(point_cloud, dimension=None):
@@ -43,12 +21,13 @@ def plot_point_cloud(point_cloud, dimension=None):
         will be chosen between 2 and 3 depending on the shape of `point_cloud`.
 
     """
+    # TODO: increase the marker size
     if dimension is None:
         dimension = np.min((3, point_cloud.shape[1]))
 
     # Check consistency between point_cloud and dimension
     if point_cloud.shape[1] < dimension:
-        raise ValueError("Not enough dimensions available in the input point"
+        raise ValueError("Not enough dimensions available in the input point "
                          "cloud.")
 
     if dimension == 2:

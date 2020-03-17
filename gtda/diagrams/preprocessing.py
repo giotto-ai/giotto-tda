@@ -11,7 +11,7 @@ from sklearn.utils.validation import check_is_fitted
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
 from ..base import PlotterMixin
-from ..plotting.homology import plot_diagram
+from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagram, validate_params
@@ -91,8 +91,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0):
-        """Plot a persistence diagram from a collection, with homology in
-        multiple dimensions.
+        """Plot a sample from a collection of persistence diagrams.
 
         Parameters
         ----------
@@ -285,8 +284,8 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xs
 
     def plot(self, Xt, sample=0, homology_dimensions=None):
-        """Plot a persistence diagram from a collection, with homology in
-        multiple dimensions.
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
 
         Parameters
         ----------
@@ -422,8 +421,8 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None):
-        """Plot a persistence diagram from a collection, with homology in
-        multiple dimensions.
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
 
         Parameters
         ----------

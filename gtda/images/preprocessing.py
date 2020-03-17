@@ -10,12 +10,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 
+from ..base import PlotterMixin
+from ..plotting import ImagePlotter, plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-
-from ..plotting import ImagePlotter
-from ..plotting import PointCloudPlotter
 
 
 @adapt_fit_transform_docs
@@ -339,8 +338,7 @@ class Padder(BaseEstimator, TransformerMixin, ImagePlotter):
 
 
 @adapt_fit_transform_docs
-class ImageToPointCloud(BaseEstimator, TransformerMixin,
-                        PointCloudPlotter):
+class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
@@ -448,3 +446,20 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin,
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0):
+        """Plot a sample from a collection of point clouds. If the point cloud
+        is in more than three dimensions, only the first three are plotted.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+            Collection of point clouds in ``n_dimension``-dimensional space,
+            such as returned by :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        """
+        return plot_point_cloud(Xt[sample])

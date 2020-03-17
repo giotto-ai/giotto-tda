@@ -225,8 +225,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, homology_dimensions=None):
-        """Plot a persistence diagram from a collection, with homology in
-        multiple dimensions.
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
 
         Parameters
         ----------

@@ -1,11 +1,11 @@
-"""The module :mod:`gtda.plotting` implements function to plot giotto-tda
-transformers' output."""
+"""The module :mod:`gtda.plotting` implements function to plot the
+outputs of giotto-tda transformers."""
 
-from .point_clouds import plot_point_cloud, PointCloudPlotter
-from .homology import plot_diagram
-from .diagrams import plot_betti_curves, plot_betti_surfaces, plot_landscapes,\
-    plot_persistence_image, plot_silhouettes, plot_heat_kernel
-from .image import ImagePlotter
+from .point_clouds import plot_point_cloud
+from .persistence_diagrams import plot_diagram
+from .diagram_representations import plot_betti_curves, plot_betti_surfaces, \
+    plot_landscapes, plot_persistence_image, plot_silhouettes, plot_heat_kernel
+from .images import ImagePlotter
 
 __all__ = [
     'plot_point_cloud',
@@ -16,6 +16,5 @@ __all__ = [
     'plot_persistence_image',
     'plot_silhouettes',
     'plot_heat_kernel',
-    'ImagePlotter',
-    'PointCloudPlotter'
+    'ImagePlotter'
 ]
