@@ -41,6 +41,7 @@ gtda/externals/pybind11
 # Unit test
 .pytest_cache/
 .hypothesis/
+test-output.xml
 
 # Latex
 *.aux
