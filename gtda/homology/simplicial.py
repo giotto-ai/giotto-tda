@@ -10,9 +10,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..plotting import plot_diagram
 from ._utils import _postprocess_diagrams
+from ..base import PlotterMixin
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
+from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params

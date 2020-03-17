@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _pad_diagram
+from ..base import PlotterMixin
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 from ..plotting import plot_diagram
 from ..utils.intervals import Interval
