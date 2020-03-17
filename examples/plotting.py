@@ -22,7 +22,7 @@ def plot_point_cloud(point_cloud, dimension=None):
     dimension : int or None, default : ``None``
         This parameter sets the dimension of the resulting plot. If ``None``,
         the dimension will be chosen between 2 and 3 depending on
-        ``n_dimensions`` see Input).
+        ``n_dimensions``, see Parameters).
 
     """
     if dimension is None:

@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 from inspect import signature
+from numbers import Real
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -15,6 +16,7 @@ except ImportError:
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
 
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 
@@ -396,8 +398,14 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     """
 
-    _hyperparameters = {'relative_gap_size': [float, (0, 1)],
-                        'max_fraction': [float, (0, 1)]}
+    _hyperparameters = {
+        'relative_gap_size': {
+            'type': Real, 'in': Interval(0, 1, closed='right')},
+        'max_fraction': {
+            'type': (Real, type(None)), 'in': Interval(0, 1, closed='right')},
+        'affinity': {'type': str},
+        'linkage': {'type': str}
+    }
 
     def __init__(self, relative_gap_size=0.3, max_fraction=None,
                  affinity='euclidean', memory=None, linkage='single'):
@@ -427,11 +435,11 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         self
 
         """
-        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
-        validate_params({'relative_gap_size': self.relative_gap_size,
-                         'max_fraction': _max_fraction},
-                        self._hyperparameters)
         X = check_array(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['memory'])
+
+        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
 
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
@@ -442,7 +450,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         min_gap_size = self.relative_gap_size * self.distances_[-1]
         self.n_clusters_ = _num_clusters_simple(
-            self.distances_, min_gap_size, self.max_fraction)
+            self.distances_, min_gap_size, _max_fraction)
 
         # Cut the tree to find labels
         # TODO: Verify whether Daniel Mullner's implementation of this step
@@ -543,9 +551,16 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     """
 
-    _hyperparameters = {'freq_threshold': [int, (0, np.inf)],
-                        'max_fraction': [float, (0, 1)],
-                        'n_bins_start': [int, (1, np.inf)]}
+    _hyperparameters = {
+        'freq_threshold': {
+            'type': int, 'in': Interval(0, np.inf, closed='left')},
+        'max_fraction': {
+            'type': (Real, type(None)), 'in': Interval(0, 1, closed='right')},
+        'n_bins_start': {
+            'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'affinity': {'type': str},
+        'linkage': {'type': str}
+    }
 
     def __init__(self, freq_threshold=0, max_fraction=None, n_bins_start=5,
                  affinity='euclidean', memory=None, linkage='single'):
@@ -576,12 +591,12 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         self
 
         """
-        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
-        validate_params({'freq_threshold': self.freq_threshold,
-                         'max_fraction': _max_fraction,
-                         'n_bins_start': self.n_bins_start},
-                        self._hyperparameters)
         X = check_array(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['memory'])
+
+        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
+
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
             self.n_clusters_ = 1
@@ -591,7 +606,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         self.n_clusters_ = _num_clusters_histogram(
             self.distances_, self.freq_threshold, self.n_bins_start,
-            self.max_fraction)
+            _max_fraction)
 
         # Cut the tree to find labels
         # TODO: Verify whether Daniel Mullner's implementation of this step

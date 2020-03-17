@@ -1,8 +1,8 @@
 """Time series labelling."""
 # License: GNU AGPLv3
 
-import numbers
-import types
+from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -11,6 +11,7 @@ from sklearn.utils.validation import check_is_fitted, column_or_1d
 from .embedding import SlidingWindow
 from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
+from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
@@ -31,11 +32,11 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     func : callable, optional, default: ``numpy.std``
         Function to be applied to each window.
 
-    func_params : dict, optional, default: ``{}``
+    func_params : dict or None, optional, default: ``None``
         Additional keyword arguments for `func`.
 
-    percentiles : list of ordered floats between 0 and 1 or None, optional, \
-                  default: ``None``
+    percentiles : list of real numbers between 0 and 100 inclusive, or \
+        None, optional, default: ``None``
         If ``None``, creates a target for a regression task. Otherwise,
         creates a target for an n-class classification task where
         ``n = len(percentiles) + 1``.
@@ -74,12 +75,18 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     """
 
     _hyperparameters = {
-        'func': [types.FunctionType],
-        '_percentiles': [list, [numbers.Number, (0., 100.)]],
-        'n_steps_future': [int, [1, np.inf]]}
+        'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'func': {'type': FunctionType},
+        'func_params': {'type': (dict, type(None))},
+        'percentiles': {
+            'type': (list, type(None)),
+            'of': {'type': Real, 'in': Interval(0, 100, closed='both')}},
+        'n_steps_future': {
+            'type': int, 'in': Interval(1, np.inf, closed='left')}
+    }
 
     def __init__(self, width=10, func=np.std,
-                 func_params={}, percentiles=None, n_steps_future=1):
+                 func_params=None, percentiles=None, n_steps_future=1):
         self.width = width
         self.func = func
         self.func_params = func_params
@@ -103,25 +110,24 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        if self.percentiles is None:
-            _percentiles = [0.]
-        else:
-            _percentiles = self.percentiles
-
-        validate_params({**self.get_params(), '_percentiles': _percentiles},
-                        self._hyperparameters)
         X = column_or_1d(X)
+        validate_params(self.get_params(), self._hyperparameters)
 
         self._sliding_window = SlidingWindow(width=self.width, stride=1).fit(X)
-
         _X = self._sliding_window.transform(X)
-        _X = self.func(_X, axis=1, **self.func_params).reshape(-1, 1)
+        if self.func_params is None:
+            self._effective_func_params = {}
+        else:
+            self._effective_func_params = self.func_params
+        _X = self.func(
+            _X, axis=1, **self._effective_func_params).reshape(-1, 1)
 
-        if self.percentiles is not None:
+        if self.percentiles is None:
+            self.thresholds_ = None
+        else:
             self.thresholds_ = [np.percentile(np.abs(_X.flatten()), percentile)
                                 for percentile in self.percentiles]
-        else:
-            self.thresholds_ = None
+
         return self
 
     def transform(self, X, y=None):
@@ -143,9 +149,9 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         """
         check_is_fitted(self)
-        X = column_or_1d(X)
+        Xt = column_or_1d(X)
 
-        Xt = X[:-self.n_steps_future]
+        Xt = Xt[:-self.n_steps_future]
 
         if self.n_steps_future < self.width:
             Xt = Xt[self.width - self.n_steps_future:]
@@ -173,7 +179,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         y = column_or_1d(y)
 
         yr = self._sliding_window.transform(y)
-        yr = self.func(yr, axis=1, **self.func_params).reshape(-1, 1)
+        yr = self.func(
+            yr, axis=1, **self._effective_func_params).reshape(-1, 1)
 
         if self.thresholds_ is not None:
             yr = np.abs(yr)

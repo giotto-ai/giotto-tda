@@ -4,14 +4,16 @@
 import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal
+from scipy.spatial.distance import pdist, squareform
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence, FlagPersistence
+    EuclideanCechPersistence, FlagserPersistence
 
 pc = np.array([[[2., 2.47942554], [2.47942554, 2.84147098],
                [2.98935825, 2.79848711], [2.79848711, 2.41211849],
                [2.41211849, 1.92484888]]])
+pc_dist = squareform(pdist(pc[0])).reshape(*pc.shape[:2], pc.shape[1])
 
 
 def test_vrp_params():
@@ -101,14 +103,14 @@ def test_cp_transform():
 
 def test_fp_params():
     coeff = 'not_defined'
-    fp = FlagPersistence(coeff=coeff)
+    fp = FlagserPersistence(coeff=coeff)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         fp.fit_transform(pc)
 
 
 def test_fp_not_fitted():
-    fp = FlagPersistence()
+    fp = FlagserPersistence()
 
     with pytest.raises(NotFittedError):
         fp.transform(pc)
@@ -120,6 +122,6 @@ pc_fp_res = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
 
 
 def test_fp_transform():
-    fp = FlagPersistence()
+    fp = FlagserPersistence(directed=False)
 
-    assert_almost_equal(fp.fit_transform(pc), pc_fp_res)
+    assert_almost_equal(fp.fit_transform(pc_dist), pc_fp_res)

@@ -1,16 +1,18 @@
-"""Tests for validation functions"""
+"""Tests for validation functions."""
 # License: GNU AGPLv3
 
 import numpy as np
 import pytest
 
-from gtda.utils.validation import (check_diagram, validate_metric_params,
-                                   validate_params)
+from gtda.utils.validation import check_diagram, validate_params
 
 
 # Testing for validate_params
 def test_validate_params():
-    references = {'par1': [int, [0, 1]]}
+    """These tests should fail because either the type of parameters[
+    parameter_name] is incorrect, or because parameter not in references[
+    parameter_name]['in']."""
+    references = {'par1': {'type': int, 'in': [0, 1]}}
     parameters = {'par1': 0.5}
 
     with pytest.raises(TypeError):
@@ -23,6 +25,19 @@ def test_validate_params():
     parameters = {'par0': 1}
     with pytest.raises(KeyError):
         validate_params(parameters, references)
+
+
+# Testing for validate_params when one of the parameters is of list type
+def test_validate_params_list():
+    """Test the behaviour of validate_params on parameters which are of list
+    type. Each entry in the list should satisfy the constraints described by
+    references[parameter_name]['of']."""
+    references = {
+        'par1': {'type': list, 'of': {'type': float, 'in': [1., 2.]}}
+    }
+    parameters = {'par1': [1.]}
+
+    validate_params(parameters, references)
 
 
 # Testing check_diagram
@@ -39,80 +54,3 @@ def test_inputs_arrayStruc_V():
 
     with pytest.raises(ValueError):
         check_diagram(X)
-
-
-# Testing validate_metric_params
-# Test for the wrong metric value
-def test_metric_V():
-    with pytest.raises(ValueError, match="No metric called"):
-        validate_metric_params('blah', metric_params={
-            'n_bins': 200, 'delta': 0.01})
-
-
-# Test for the wrong n_values type
-def test_n_values_T():
-    with pytest.raises(TypeError, match=" in params_metric is of type "):
-        validate_metric_params('landscape',
-                               metric_params={'n_bins': 'a',
-                                              'delta': 0.01})
-
-
-# Test for the wrong n_values value
-def test_n_values_V():
-    with pytest.raises(ValueError, match=" in param_metric should be between"):
-        validate_metric_params('landscape',
-                               metric_params={'n_bins': -2,
-                                              'delta': 0.01})
-
-
-# Test for the wrong delta value
-def test_delta_V():
-    with pytest.raises(ValueError, match=" in param_metric should be between"):
-        validate_metric_params('bottleneck',
-                               metric_params={'n_bins': 200,
-                                              'delta': -1})
-
-
-# Test for the wrong delta value
-def test_delta_T():
-    with pytest.raises(TypeError, match=" in params_metric is of type"):
-        validate_metric_params('bottleneck',
-                               metric_params={'n_bins': 200,
-                                              'delta': 'a'})
-
-
-# Test for the wrong order value
-def test_order_V():
-    with pytest.raises(ValueError, match=" in param_metric should be between"):
-        validate_metric_params('heat',
-                               metric_params={'n_bins': 200,
-                                              'p': -1})
-
-
-# Test for the wrong order type
-def test_order_T():
-    with pytest.raises(TypeError, match=" in params_metric is of type"):
-        validate_metric_params('heat',
-                               metric_params={'n_bins': 200,
-                                              'p': 'a'})
-
-
-# Test for the wrong sigma value
-def test_sigma_V():
-    with pytest.raises(ValueError, match=" in param_metric should be between"):
-        validate_metric_params('heat',
-                               metric_params={'n_bins': 200,
-                                              'sigma': -1})
-
-
-# Test for the wrong sigma type
-def test_sigma_T():
-    with pytest.raises(TypeError, match=" in params_metric is of type"):
-        validate_metric_params('heat', metric_params={'n_bins': 200,
-                                                      'sigma': 'a'})
-
-
-# Undefined metric_params
-def test_validate():
-    with pytest.raises(ValueError):
-        validate_metric_params('heat', metric_params={'blah': 200})
