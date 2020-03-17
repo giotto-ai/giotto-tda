@@ -111,7 +111,7 @@ class PlotterMixin:
         Returns
         -------
         Xt : ndarray of shape (1, ...)
-            Transformed input sample.
+            Transformed one-sample slice from the input.
 
         """
         self.fit(X, y)
@@ -119,8 +119,8 @@ class PlotterMixin:
         return Xt
 
     def transform_plot(self, X, sample=0, **plot_params):
-        """Take a one-sample slice of the input collection and transform it.
-        Before returning the transformed object, plot its 0th entry.
+        """Take a one-sample slice from the input collection and transform it.
+        Before returning the transformed object, plot the transformed sample.
 
         Parameters
         ----------
@@ -136,7 +136,7 @@ class PlotterMixin:
         Returns
         -------
         Xt : ndarray of shape (1, ...)
-            Transformed input sample.
+            Transformed one-sample slice from the input.
 
         """
         Xt = self.transform(X[[sample]])
