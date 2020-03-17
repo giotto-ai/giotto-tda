@@ -10,14 +10,15 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
-from ..plotting import DiagramPlotter
+from ..base import PlotterMixin
+from ..plotting.homology import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagram, validate_params
 
 
 @adapt_fit_transform_docs
-class ForgetDimension(BaseEstimator, TransformerMixin, DiagramPlotter):
+class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
     """Replaces all homology dimensions in persistence diagrams with
     ``numpy.inf``.
 
@@ -88,9 +89,27 @@ class ForgetDimension(BaseEstimator, TransformerMixin, DiagramPlotter):
         # TODO: for plotting, replace the dimension with a tag
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0):
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=[np.inf])
+
 
 @adapt_fit_transform_docs
-class Scaler(BaseEstimator, TransformerMixin, DiagramPlotter):
+class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
     """Linear scaling of persistence diagrams.
 
     A positive scale factor :attr:`scale_` is calculated during :meth:`fit` by
@@ -265,9 +284,35 @@ class Scaler(BaseEstimator, TransformerMixin, DiagramPlotter):
         Xs[:, :, :2] *= self.scale_
         return Xs
 
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` is
+            equivalent to passing :attr:`homology_dimensions_`.
+
+        """
+        if homology_dimensions is None:
+            _homology_dimensions = self.homology_dimensions_
+        else:
+            _homology_dimensions = homology_dimensions
+
+        return plot_diagram(
+            Xt[sample], homology_dimensions=_homology_dimensions)
+
 
 @adapt_fit_transform_docs
-class Filtering(BaseEstimator, TransformerMixin, DiagramPlotter):
+class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing
@@ -375,3 +420,29 @@ class Filtering(BaseEstimator, TransformerMixin, DiagramPlotter):
         X = _sort(X)
         Xt = _filter(X, self.homology_dimensions_, self.epsilon)
         return Xt
+
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` is
+            equivalent to passing :attr:`homology_dimensions_`.
+
+        """
+        if homology_dimensions is None:
+            _homology_dimensions = self.homology_dimensions_
+        else:
+            _homology_dimensions = homology_dimensions
+
+        return plot_diagram(
+            Xt[sample], homology_dimensions=_homology_dimensions)

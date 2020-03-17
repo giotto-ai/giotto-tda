@@ -2,7 +2,7 @@
 transformers' output."""
 
 from .point_clouds import plot_point_cloud, PointCloudPlotter
-from .homology import plot_diagram, DiagramPlotter
+from .homology import plot_diagram
 from .diagrams import plot_betti_curves, plot_betti_surfaces, plot_landscapes,\
     plot_persistence_image, plot_silhouettes, plot_heat_kernel
 from .image import ImagePlotter
@@ -17,6 +17,5 @@ __all__ = [
     'plot_silhouettes',
     'plot_heat_kernel',
     'ImagePlotter',
-    'PointCloudPlotter',
-    'DiagramPlotter'
+    'PointCloudPlotter'
 ]

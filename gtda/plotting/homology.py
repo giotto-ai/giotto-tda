@@ -3,32 +3,6 @@
 
 import numpy as np
 import plotly.graph_objs as gobj
-from ..base import PlotterMixin
-
-
-class DiagramPlotter(PlotterMixin):
-    """Mixin class implementing plotting methods for persistence diagrams."""
-
-    def plot(self, Xt, sample=0, homology_dimensions=None):
-        """Plot a persistence diagram from a collection, with homology in
-        multiple dimensions.
-
-        Parameters
-        ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
-            Collection of persistence diagrams.
-
-        sample : int, optional, default: ``0``
-            Index of the sample in `Xt` to be plotted.
-
-        homology_dimensions : list, tuple or None, optional, default: ``None``
-            Which homology dimensions to include in the plot. ``None`` means
-            plotting all dimensions present in ``Xt[sample]``.
-
-        """
-        # TODO: increase the marker size
-        return plot_diagram(
-            Xt[sample], homology_dimensions=homology_dimensions)
 
 
 def plot_diagram(diagram, homology_dimensions=None, **input_layout):
@@ -46,6 +20,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
         homology dimensions which appear in `diagram` will be plotted.
 
     """
+    # TODO: increase the marker size
     from ..diagrams._utils import _subdiagrams
 
     if homology_dimensions is None:
