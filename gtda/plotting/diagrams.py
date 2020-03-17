@@ -220,7 +220,7 @@ def plot_betti_surfaces(betti_curves, samplings=None,
             fig.update_layout(scene=scene,
                               title="Betti surface for homology "
                               "dimension {}".format(int(dimension)))
-            fig.add_trace(gobj.Surface(x=samplings,
+            fig.add_trace(gobj.Surface(x=samplings[i],
                                        y=np.arange(betti_curves.shape[0]),
                                        z=betti_curves[:, i, :],
                                        connectgaps=True, hoverinfo='none'))
