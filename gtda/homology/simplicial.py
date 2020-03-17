@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..plotting import DiagramPlotter, plot_diagram
+from ..plotting import plot_diagram
 from ._utils import _postprocess_diagrams
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..utils._docs import adapt_fit_transform_docs
@@ -19,8 +19,7 @@ from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class VietorisRipsPersistence(BaseEstimator, TransformerMixin,
-                              DiagramPlotter):
+class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
     homology>`.
@@ -225,25 +224,31 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
-    def plot(self, Xt, sample=0):
-        """Plot a single persistence diagram.
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_features, 3)
-            Array of persistence diagrams such as the result of a call to
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
         sample : int, optional, default: ``0``
-            Index of the sample to be plotted.
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
         """
-        return plot_diagram(Xt[sample],
-                            homology_dimensions=self.homology_dimensions)
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
 
 
 @adapt_fit_transform_docs
-class SparseRipsPersistence(BaseEstimator, TransformerMixin,
-                            DiagramPlotter):
+class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Sparse Vietoris-Rips filtrations <vietoris-rips complex and \
     vietoris-rips homology>`.
@@ -464,10 +469,31 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
+
 
 @adapt_fit_transform_docs
-class EuclideanCechPersistence(BaseEstimator, TransformerMixin,
-                               DiagramPlotter):
+class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     `Cech filtrations <>`_.
 
@@ -650,3 +676,25 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin,
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a persistence diagram from a collection, with homology in
+        multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
