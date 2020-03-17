@@ -331,13 +331,13 @@ pdfpagelabels]{hyperref}
 	
 	The name is inspired from the case when the persistence diagram comes from persistent homology.
 	
-	\subsection*{Metric space} \label{metric space}
+	\subsection*{Distances, inner products and kernels} \label{metric, inner product and kernel}
 	
-	A pair $(X, d)$ where $X$ is a set and $d$ is a function 
+	A set $X$ with a function
 	\begin{equation*}
 	d : X \times X \to \mathbb R
 	\end{equation*}
-	attaining non-negative values is called a \textit{metric space} if
+	is called a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
 	\begin{equation*}
 	d(x,y) = 0\ \Leftrightarrow\ x = y
 	\end{equation*}
@@ -345,19 +345,49 @@ pdfpagelabels]{hyperref}
 	d(x,y) = d(y,x)
 	\end{equation*}
 	\begin{equation*}
-	d(x,z) \leq d(x,y) + d(y, z)
+	d(x,z) \leq d(x,y) + d(y, z).
+	\end{equation*}
+	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.
+	
+	A vector space $V$ together with a function
+	\begin{equation*}
+	\langle -, - \rangle : V \times V \to \mathbb R
+	\end{equation*}
+	is called and \textit{inner product space} if for all $u,v,w \in V$
+	\begin{equation*}
+	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 
+	\end{equation*}
+	\begin{equation*}
+	\langle u, v\rangle = \langle v, u\rangle
+	\end{equation*}
+	\begin{equation*}
+	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.
+	\end{equation*}
+	In this case the function $\langle -, - \rangle$ is referred to as the \textit{inner product} and the function given by
+	\begin{equation*}
+	||u|| = \sqrt{\langle u, u \rangle}
+	\end{equation*}
+	as its associated \textit{norm}. An inner product space is naturally a metric space with distance function
+	\begin{equation*}
+	d(u,v) = ||u-v||.
 	\end{equation*}
 	
-	In this case, the function $d$ is refer to as the \textit{metric} and the value $d(x,y)$ is called the \textit{distance} between $x$ and $y$. 
+	A \textit{kernel} on a set $X$ is a function
+	\begin{equation*}
+	k : X \times X
+	\end{equation*}
+	for which there exists a function $\phi : X \to V$ to an inner product space such that
+	\begin{equation*}
+	k(x, y) = \langle \phi(x), \phi(y) \rangle.
+	\end{equation*}
 	
 	\subsection*{Euclidean distance and norm} \label{euclidean distance and norm}
 	
-	The set $\mathbb R^n$ defines a metric space with euclidean distance
+	The vector space $\mathbb R^n$ is an \hyperref[metric, inner product and kernel]{inner product space} with inner product 
 	\begin{equation*}
-	d(x,y) = \sqrt{(x_1-y_1)^2 + \cdots + (x_n-y_n)^2}.
+	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
 	\end{equation*}
-	
-	The norm $||x||$ of a vector $x$ is defined as its distance to the $0$ vector.
+	The associated norm and distance function are referred to as \textit{euclidean norm} and \textit{euclidean distance}.  
 	
 	\subsection*{Finite metric spaces and point clouds} \label{finite metric spaces and point clouds}
 	
