@@ -16,7 +16,6 @@ This pages contains a list of available features in the library.
    graphs.rst
    base.rst
    pipeline.rst
-   meta_transformers.rst
    validation.rst
    images.rst
 
