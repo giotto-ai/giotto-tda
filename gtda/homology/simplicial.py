@@ -638,6 +638,16 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
         If true, computes the directed flag complex. Otherwise it
         computes the undirected flag complex.
 
+    filtration : string, optional, default: ``'max'``
+        Algorithm determining the filtration. Warning: if an edge filtration is
+        specified, it is assumed that the resulting filtration is consistent,
+        meaning that the filtration value of every simplex of dimension at
+        least two should evaluate to a value that is at least the maximal value
+        of the filtration values of its containing edges. For performance
+        reasons, this is not checked automatically.  Possible values are:
+        ['dimension', 'zero', 'max', 'max3', 'max_plus_one', 'product', 'sum',
+        'pmean', 'pmoment', 'remove_edges', 'vertex_degree']
+
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
@@ -676,9 +686,14 @@ class FlagPersistence(BaseEstimator, TransformerMixin):
     is used for bindings `Flagser <https://github.com/luetge/flagser>`_, a C++
     backend for computing Flag complexes persistent homology.
 
+    For more details, please refer to the `flagser documentation \
+    <https://github.com/luetge/flagser/blob/master/docs/\
+    documentation_flagser.pdf>`_.
+
     Persistence diagrams produced by this class must be interpreted with
     care due to the presence of padding triples which carry no information.
     See :meth:`transform` for additional information.
+
 
     References
     ----------
