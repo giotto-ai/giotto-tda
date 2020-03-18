@@ -11,6 +11,7 @@ find_package(OpenMP)
 
 set(RIPSER_SRC_DIR "gtda/externals/ripser")
 set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
+set(HERA_DIR "gtda/externals/hera")
 
 #######################################################################
 #                               Ripser                                #
@@ -56,9 +57,16 @@ endif()
 #                             Wasserstein                             #
 #######################################################################
 
-pybind11_add_module(gtda_wasserstein "${BINDINGS_DIR}/wasserstein_bindings.cpp")
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# include (GenerateExportHeader)
+
+pybind11_add_module(gtda_wasserstein ${BINDINGS_DIR}/wasserstein_bindings.cpp)
 target_link_libraries(gtda_wasserstein LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_wasserstein PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+
+target_include_directories(gtda_wasserstein PRIVATE "${HERA_DIR}")
+target_include_directories(gtda_wasserstein PRIVATE "${HERA_DIR}/wasserstein/include")
 
 if(MSVC)
     target_compile_options(gtda_wasserstein PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)
@@ -75,6 +83,9 @@ endif()
 pybind11_add_module(gtda_bottleneck "${BINDINGS_DIR}/bottleneck_bindings.cpp")
 target_link_libraries(gtda_bottleneck LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_bottleneck PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+
+target_include_directories(gtda_bottleneck PRIVATE "${HERA_DIR}")
+target_include_directories(gtda_wasserstein PRIVATE "${HERA_DIR}/bottleneck/include")
 
 if(MSVC)
     target_compile_options(gtda_bottleneck PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)

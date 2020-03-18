@@ -4,19 +4,21 @@
  * License:          Apache 2.0
  *****************************************************************************/
 
-#include "../hera/bottleneck/bottleneck.h"
+// #include "../hera/bottleneck/include/bottleneck.h"
+#include <bottleneck/include/bottleneck.h>
 
 // PYBIND11
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-double bottleneck_distance(const std::vector<std::pair<double, double>>& dgm1,
-                           const std::vector<std::pair<double, double>>& dgm2,
+double bottleneck_distance(std::vector<std::pair<double, double>>& dgm1,
+                           std::vector<std::pair<double, double>>& dgm2,
                            double delta) {
   if (delta == 0.0)
     return hera::bottleneckDistExact(dgm1, dgm2);
   else
     return hera::bottleneckDistApprox(dgm1, dgm2, delta);
+  return -1;
 }
 
 namespace py = pybind11;
