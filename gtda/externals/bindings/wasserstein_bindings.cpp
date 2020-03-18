@@ -19,12 +19,11 @@ double wasserstein_distance(const std::vector<std::pair<double, double>>& dgm1,
   params.delta = delta;
   params.internal_p = internal_p;
   params.max_bids_per_round = max_bids_per_round;
+  params.epsilon_common_ratio = eps_factor;
 
   if (initial_eps != 0) params.initial_epsilon = initial_eps;
 
-  if (eps_factor != 0.) params.epsilon_common_ratio = eps_factor;
-
-  return hera::wasserstein_dist(dgm1, dgm2, params);
+  return hera::wasserstein_dist<>(dgm1, dgm2, params);
 }
 
 namespace py = pybind11;
