@@ -1,14 +1,15 @@
-"""The module :mod:`gtda.plotting` implements function to plot giotto-tda
-transformers' output."""
+"""The module :mod:`gtda.plotting` implements function to plot the
+outputs of giotto-tda transformers."""
 
 from .point_clouds import plot_point_cloud
-from .homology import plot_diagram
-from .diagrams import plot_betti_curves, plot_betti_surfaces, plot_landscapes
+from .persistence_diagrams import plot_diagram
+from .diagram_representations import plot_betti_curves, plot_betti_surfaces
+from .images import plot_heatmap
 
 __all__ = [
     'plot_point_cloud',
     'plot_diagram',
+    'plot_heatmap',
     'plot_betti_curves',
-    'plot_betti_surfaces',
-    'plot_landscapes'
+    'plot_betti_surfaces'
 ]

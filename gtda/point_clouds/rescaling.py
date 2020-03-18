@@ -11,13 +11,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..base import PlotterMixin
+from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class ConsistentRescaling(BaseEstimator, TransformerMixin):
+class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
 
@@ -190,9 +192,29 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
         Xt = np.array(Xt)
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale)
+
 
 @adapt_fit_transform_docs
-class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
+class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """Rescaling of distances between consecutive pairs of points by a fixed
     factor.
 
@@ -346,3 +368,23 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
             for i in range(Xt.shape[0]))
         Xt = np.array(Xt)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale)
