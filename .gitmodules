@@ -5,3 +5,7 @@
 	path = gtda/externals/gudhi-devel
 	url = https://github.com/giotto-ai/gudhi-devel
 	branch = giotto
+[submodule "gtda/externals/hera"]
+	path = gtda/externals/hera
+	url = https://github.com/grey-narn/hera
+	branch = master
