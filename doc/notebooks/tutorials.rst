@@ -8,6 +8,7 @@ This page contains tutorials to help you get started with ``giotto-tda``.
    :maxdepth: 1
 
    vietoris_rips_quickstart
+   plotting_api
    mapper_quickstart
 
 ..
