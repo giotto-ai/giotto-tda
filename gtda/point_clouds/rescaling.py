@@ -11,14 +11,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..base import PlotterMixin
+from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-from ..plotting import ImagePlotter
 
 
 @adapt_fit_transform_docs
-class ConsistentRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
+class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
 
@@ -191,24 +192,29 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
         Xt = np.array(Xt)
         return Xt
 
-    def plot(self, Xt, sample=0):
-        """Plot a single distance matrix.
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
-            Collection of distance matrices. Each entry along axis 0 is a
-            distance matrix.
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Index of the sample to be plotted.
 
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
         """
-        return super(ConsistentRescaling, self).plot(Xt[:, ::-1, :])
+        return plot_heatmap(Xt[sample], colorscale=colorscale)
 
 
 @adapt_fit_transform_docs
-class ConsecutiveRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
+class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """Rescaling of distances between consecutive pairs of points by a fixed
     factor.
 
@@ -363,17 +369,22 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, ImagePlotter):
         Xt = np.array(Xt)
         return Xt
 
-    def plot(self, Xt, sample=0):
-        """Plot a single distance matrix.
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
-            Collection of distance matrices. Each entry along axis 0 is a
-            distance matrix.
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
             Index of the sample to be plotted.
 
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
         """
-        return super(ConsecutiveRescaling, self).plot(Xt[:, ::-1, :])
+        return plot_heatmap(Xt[sample], colorscale=colorscale)

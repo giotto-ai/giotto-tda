@@ -20,7 +20,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`filtered cubical complexes <cubical complex>`.
 
-    Given a :ref:`grayscale image <cubical chains and cubical homology>`,
+    Given a :ref:`greyscale image <cubical chains and cubical homology>`,
     information about the appearance and disappearance of topological features
     (technically, :ref:`homology classes <homology and cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding

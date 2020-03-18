@@ -5,6 +5,7 @@ import types
 from numbers import Real
 
 import numpy as np
+import plotly.graph_objects as gobj
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
@@ -14,8 +15,7 @@ from ._metrics import betti_curves, landscapes, heats, \
     persistence_images, silhouettes
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..base import PlotterMixin
-from ..plotting import plot_betti_curves, plot_landscapes, plot_heat_kernel, \
-    plot_persistence_image, plot_silhouettes
+from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagram
@@ -152,21 +152,80 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2))
         return Xt
 
-    def plot(self, Xt, sample=0):
-        """Plot one Betti curve per homology dimension in a sample.
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of Betti curves arranged as in
+        the output of :meth:`transform`. Include homology in multiple
+        dimensions.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            Array of Betti curves, as returned by :meth:`transform`.
+            Collection of Betti curves, such as returned by :meth:`transform`.
 
         sample : int, optional, default: ``0``
-            Index of the sample to be plotted.
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in :attr:`homology_dimensions_`.
 
         """
-        return plot_betti_curves(
-            Xt[sample], homology_dimensions=self.homology_dimensions_,
-            samplings=self.samplings_)
+        check_is_fitted(self)
+
+        if homology_dimensions is None:
+            _homology_dimensions = list(enumerate(self.homology_dimensions_))
+        else:
+            _homology_dimensions = []
+            for dim in homology_dimensions:
+                if dim not in self.homology_dimensions_:
+                    raise ValueError(
+                        f'All homology dimensions must be in '
+                        f'self.homology_dimensions_ which is '
+                        f'{self.homology_dimensions_}. {dim} is not.')
+                else:
+                    homology_dimensions_arr = np.array(
+                        self.homology_dimensions_)
+                    ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
+                    _homology_dimensions.append((ix, dim))
+
+        layout = {
+            "xaxis1": {
+                "title": "Filtration parameter",
+                "side": "bottom",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "x1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+            },
+            "yaxis1": {
+                "title": "Betti number",
+                "side": "left",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "y1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+            },
+            "plot_bgcolor": "white"
+        }
+        fig = gobj.Figure(layout=layout)
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
+
+        for ix, dim in _homology_dimensions:
+            fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
+                                       y=Xt[sample][ix],
+                                       mode='lines', showlegend=True,
+                                       name=f'H{int(dim)}'))
+
+        fig.show()
 
 
 @adapt_fit_transform_docs
@@ -307,22 +366,89 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0):
-        """Plot one persistence landscape per homology dimension in a sample.
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence landscapes arranged
+        as in the output of :meth:`transform`. Include homology in multiple
+        dimensions.
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-            n_layers, n_bins)
-            Array of persistence landscapes, as returned by :meth:`transform`.
+        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_layers, \
+            n_bins
+            Collection of persistence landscapes, such as returned by
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
-            Index of the sample to be plotted.
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Homology dimensions for which the landscape should be plotted.
+            ``None`` means plotting all dimensions present in
+            :attr:`homology_dimensions_`.
 
         """
-        return plot_landscapes(
-            Xt[sample], homology_dimensions=self.homology_dimensions_,
-            samplings=self.samplings_)
+        check_is_fitted(self)
+
+        if homology_dimensions is None:
+            _homology_dimensions = list(enumerate(self.homology_dimensions_))
+        else:
+            _homology_dimensions = []
+            for dim in homology_dimensions:
+                if dim not in self.homology_dimensions_:
+                    raise ValueError(
+                        f'All homology dimensions must be in '
+                        f'self.homology_dimensions_ which is '
+                        f'{self.homology_dimensions_}. {dim} is not.')
+                else:
+                    homology_dimensions_arr = np.array(
+                        self.homology_dimensions_)
+                    ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
+                    _homology_dimensions.append((ix, dim))
+
+        layout = {
+            "xaxis1": {
+                "side": "bottom",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "y1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+            },
+            "yaxis1": {
+                "side": "left",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "x1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+            },
+            "plot_bgcolor": "white"
+        }
+
+        Xt_sample = Xt[sample]
+        for ix, dim in _homology_dimensions:
+            layout_dim = layout.copy()
+            layout_dim['title'] = "Persistence landscape for homology " + \
+                                  "dimension {}".format(int(dim))
+            fig = gobj.Figure(layout=layout_dim)
+            fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                             mirror=False)
+            fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                             mirror=False)
+
+            n_layers = Xt_sample.shape[1]
+            for layer in range(n_layers):
+                fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
+                                           y=Xt_sample[ix, layer],
+                                           mode='lines', showlegend=True,
+                                           hoverinfo='none',
+                                           name=f"Layer {layer + 1}"))
+
+            fig.show()
 
 
 @adapt_fit_transform_docs
@@ -337,7 +463,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     ranges of the :ref:`filtration parameter <filtered complex>`. The
     same is done with the reflected images of the subdiagrams about the
     diagonal, and the difference between the results of the two convolutions is
-    computed. The result can be thought of as a raster image.
+    computed. The result can be thought of as a (multi-channel) raster image.
 
     Parameters
     ----------
@@ -435,8 +561,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute raster images obtained from diagrams in `X` by convolution
-        with a Gaussian kernel.
+        """Compute multi-channel raster images from diagrams in `X` by
+        convolution with a Gaussian kernel and reflection about the diagonal.
 
         Parameters
         ----------
@@ -453,9 +579,10 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Raster images: one image per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Multi-channel raster images: one image per sample and one
+            channel per homology dimension seen in :meth:`fit`. Index i
+            along axis 1 corresponds to the i-th homology dimension in
+            :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
@@ -472,24 +599,37 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension=0):
-        """Plot the heat kernel for a chosen homology dimension in a sample.
+    def plot(self, Xt, sample=0, homology_dimension_ix=None,
+             colorscale='blues'):
+        """Plot a single channel – corresponding to a given homology
+        dimension – in a sample from a collection of heat kernel images.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Array of heat kernels, as returned by :meth:`transform`.
+            Collection of multi-channel raster images, such as returned by
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
-            Sample for which the heat kernel should be plotted.
+            Index of the sample in `Xt` to be selected.
 
-        homology_dimension : int, optional, default: ``0``
-            Homology dimension in which the heat kernel should be plotted.
+        homology_dimension_ix : int, optional, default: ``0``
+            Index of the channel in the selected sample to be plotted. If
+            `Xt` is the result of a call to :meth:`transform` and this
+            index is i, the plot corresponds to the homology dimension given by
+            the i-th entry in :attr:`homology_dimensions_`.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
 
         """
-        return plot_heat_kernel(Xt[sample], samplings=self.samplings_,
-                                homology_dimension=homology_dimension)
+        check_is_fitted(self)
+        return plot_heatmap(Xt[sample][homology_dimension_ix],
+                            x=self.samplings_[homology_dimension_ix],
+                            y=self.samplings_[homology_dimension_ix],
+                            colorscale=colorscale)
 
 
 @adapt_fit_transform_docs
@@ -504,8 +644,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     separately and regarded as sums of Dirac deltas. Then, the convolution
     with a Gaussian kernel is computed over a rectangular grid of locations
     evenly sampled from appropriate ranges of the :ref:`filtration parameter
-    <filtered complex>`. The result can be thought of as a raster
-    image.
+    <filtered complex>`. The result can be thought of as a (multi-channel)
+    raster image.
 
     Parameters
     ----------
@@ -628,8 +768,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute raster images obtained from diagrams in `X` by convolution
-        with a Gaussian kernel.
+        """Compute multi-channel raster images from diagrams in `X` by
+        convolution with a Gaussian kernel.
 
         Parameters
         ----------
@@ -646,9 +786,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
              n_bins)
-            Raster images: one image per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            Multi-channel raster images: one image per sample and one channel
+            per homology dimension seen in :meth:`fit`. Index i along axis 1
+            corresponds to the i-th homology dimension in
+            :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
@@ -670,27 +811,37 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension=0):
-        """Plot the persistence image for a chosen homology dimension in a
-        sample.
+    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues'):
+        """Plot a single channel – corresponding to a given homology
+        dimension – in a sample from a collection of persistence images.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
             n_bins)
-            Array of persistence images, as returned by :meth:`transform`.
+            Collection of multi-channel raster images, such as returned by
+            :meth:`transform`.
 
         sample : int, optional, default: ``0``
-            Sample for which the persistence image should be plotted.
+            Index of the sample in `Xt` to be selected.
 
-        homology_dimension : int, optional, default: ``0``
-            Homology dimension in which the persistence image should be
-            plotted.
+        homology_dimension_ix : int, optional, default: ``0``
+            Index of the channel in the selected sample to be plotted. If
+            `Xt` is the result of a call to :meth:`transform` and this
+            index is i, the plot corresponds to the homology dimension given by
+            the i-th entry in :attr:`homology_dimensions_`.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
 
         """
-        return plot_persistence_image(Xt[sample],
-                                      homology_dimension=homology_dimension,
-                                      samplings=self.samplings_)
+        check_is_fitted(self)
+        samplings_x, samplings_y = self.samplings_[homology_dimension_ix]
+        return plot_heatmap(Xt[sample][homology_dimension_ix],
+                            x=samplings_x,
+                            y=samplings_y,
+                            colorscale=colorscale)
 
 
 @adapt_fit_transform_docs
@@ -802,7 +953,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute silhouettes of diagrams in X.
+        """Compute silhouettes of diagrams in `X`.
 
         Parameters
         ----------
@@ -839,18 +990,77 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2))
         return Xt
 
-    def plot(self, Xt, sample):
-        """Plot one silhouette per homology dimension in a sample.
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of silhouettes arranged as in
+        the output of :meth:`transform`. Include homology in multiple
+        dimensions.
 
         Parameters
         ----------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            Array of silhouettes, as returned by :meth:`transform`.
+            Collection of silhouettes, such as returned by :meth:`transform`.
 
-        sample : int or list of int, optional, default: ``0``
-            Index of the sample to be plotted.
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in :attr:`homology_dimensions_`.
 
         """
-        return plot_silhouettes(
-            Xt[sample], homology_dimensions=self.homology_dimensions_,
-            samplings=self.samplings_)
+        check_is_fitted(self)
+
+        if homology_dimensions is None:
+            _homology_dimensions = list(enumerate(self.homology_dimensions_))
+        else:
+            _homology_dimensions = []
+            for dim in homology_dimensions:
+                if dim not in self.homology_dimensions_:
+                    raise ValueError(
+                        f'All homology dimensions must be in '
+                        f'self.homology_dimensions_ which is '
+                        f'{self.homology_dimensions_}. {dim} is not.')
+                else:
+                    homology_dimensions_arr = np.array(
+                        self.homology_dimensions_)
+                    ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
+                    _homology_dimensions.append((ix, dim))
+
+        layout = {
+            "xaxis1": {
+                "title": "Filtration parameter",
+                "side": "bottom",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "x1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+            },
+            "yaxis1": {
+                "side": "left",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "y1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+            },
+            "plot_bgcolor": "white"
+        }
+        fig = gobj.Figure(layout=layout)
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+                         mirror=False)
+
+        for ix, dim in _homology_dimensions:
+            fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
+                                       y=Xt[sample][ix],
+                                       mode='lines', showlegend=True,
+                                       hoverinfo='none',
+                                       name=f'H{int(dim)}'))
+
+        fig.show()

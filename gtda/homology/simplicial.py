@@ -22,7 +22,7 @@ from ..utils.validation import validate_params
 @adapt_fit_transform_docs
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
+    :ref:`Vietoris–Rips filtrations <vietoris-rips complex and vietoris-rips \
     homology>`.
 
     Given a :ref:`point cloud <finite metric spaces and point clouds>` in
@@ -60,7 +60,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`p` equals `coeff`.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
+        Upper bound on the maximum value of the Vietoris–Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
@@ -89,7 +89,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris-Rips persistent homology. Python bindings were
+    for computing Vietoris–Rips persistent homology. Python bindings were
     modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
@@ -99,7 +99,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris-Rips persistence \
+    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
         barcodes", 2019; `arXiv:1908.02518 \
         <https://arxiv.org/abs/1908.02518>`_.
 
@@ -251,7 +251,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`Sparse Vietoris-Rips filtrations <vietoris-rips complex and \
+    :ref:`Sparse Vietoris–Rips filtrations <vietoris-rips complex and \
     vietoris-rips homology>`.
 
     Given a :ref:`point cloud <finite metric spaces and point clouds>` in
@@ -289,12 +289,12 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`p` equals `coeff`.
 
     epsilon : float between 0. and 1., optional, default: ``0.1``
-        Parameter controlling the approximation to the exact Vietoris-Rips
+        Parameter controlling the approximation to the exact Vietoris–Rips
         filtration. If set to `0.`, :class:`SparseRipsPersistence` leads to
         the same results as :class:`VietorisRipsPersistence` but is slower.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
+        Upper bound on the maximum value of the Vietoris–Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
@@ -323,7 +323,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing sparse Vietoris-Rips persistent homology. Python bindings
+    for computing sparse Vietoris–Rips persistent homology. Python bindings
     were modified for performance.
 
     Persistence diagrams produced by this class must be interpreted with
@@ -516,7 +516,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`p` equals `coeff`.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
+        Upper bound on the maximum value of the Vietoris–Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.

@@ -20,16 +20,15 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
         homology dimensions which appear in `diagram` will be plotted.
 
     """
-    # TODO: increase the marker size
-    from ..diagrams._utils import _subdiagrams
+    from ..diagrams._utils import _subdiagrams  # To avoid circular imports
 
+    # TODO: increase the marker size
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
 
     max_filt_param = np.where(np.isinf(diagram), -np.inf, diagram).max()
 
     layout = {
-        "title": "Persistence diagram",
         "width": 500,
         "height": 500,
         "xaxis1": {
@@ -75,9 +74,9 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
                                line=dict(dash='dash', width=1, color='black'),
                                showlegend=False, hoverinfo='none'))
 
-    for i, dimension in enumerate(homology_dimensions):
-        name = "H{}".format(int(dimension))
-        subdiagram = _subdiagrams(np.asarray([diagram]), [dimension],
+    for dim in homology_dimensions:
+        name = "H{}".format(int(dim))
+        subdiagram = _subdiagrams(np.asarray([diagram]), [dim],
                                   remove_dim=True)[0]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
         subdiagram = subdiagram[diff]
