@@ -49,7 +49,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     Attributes
     ----------
     n_dimensions_ : ``2`` or ``3``
-        Dimension of the images. Set in :meth:`fit`.
+        Dimension of the 1910.08345images. Set in :meth:`fit`.
 
     direction_ : ndarray of shape (n_dimensions_,)
         Effective direction of the height filtration. Set in :meth:`fit`.
@@ -65,6 +65,13 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -273,6 +280,13 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+
     """
 
     _hyperparameters = {
@@ -466,6 +480,13 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer
 
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+
     """
 
     _hyperparameters = {
@@ -631,6 +652,13 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -800,6 +828,13 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer, ErosionFiltration, \
     DilationFiltration
+
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
