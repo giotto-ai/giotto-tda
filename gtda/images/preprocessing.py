@@ -45,6 +45,13 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     gtda.homology.CubicalPersistence
 
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+
     """
 
     _hyperparameters = {
@@ -170,6 +177,13 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+
     """
 
     def __init__(self, n_jobs=None):
@@ -286,6 +300,13 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
     ----------
     paddings_ : int ndarray of shape (padding_x, padding_y [, padding_z])
        Effective padding along each of the axis. Set in :meth:`fit`.
+
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -437,6 +458,13 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     gtda.homology.VietorisRipsPersistence, gtda.homology.SparseRipsPersistence,
     gtda.homology.EuclideanCechPersistence
+
+    References
+    ----------
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+           Classification  of MNIST  using  TDA"; 19th International \
+           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
