@@ -38,7 +38,7 @@ def check_diagrams(X, copy=False):
             f"Input should be a 3D ndarray with a 3rd dimension of 3 "
             f"components, but there are {X_array.shape[2]} components.")
 
-    X_array = X_array.astype(float)
+    X_array = X_array.astype(float, copy=False)
     homology_dimensions = sorted(list(set(X_array[0, :, 2])))
     for dim in homology_dimensions:
         if dim == np.inf:
