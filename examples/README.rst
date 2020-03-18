@@ -11,7 +11,7 @@ Classifying Shapes
 
 This tutorial is about generating classical surfaces, such as tori and 2-spheres, and study their cohomological properites.
 Non-orientable surfaces, such as the Klein bottle, are approximated by a grid and the reciprocal distances between the grid
-vertices forms the input of the Vietoris-Rips algorithm.
+vertices forms the input of the Vietoris–Rips algorithm.
 
 Lorenz attractor
 ----------------
@@ -27,5 +27,5 @@ The Mapper algorithm was introduced in v0.1.5, and allows you to visualize compl
 Can there be non trivial H\ :sub:`2` in 2 dimensions?
 -----------------------------------------------------
 
-This is a simple riddle that shows how the Vietoris-Rips algorithm may find counterintuitive patters in point-clouds.
+This is a simple riddle that shows how the Vietoris–Rips algorithm may find counterintuitive patters in point-clouds.
 The second homology group, H\ :sub:`2`, describes and counts voids: for example, the 2-sphere has a non-trivial H\ :sub:`2`. Therefore, we would not expect to find voids in 2-dimensional flat space! On the other hand, it is enough to carefully position 6 points on the plane to get a nontrivial H\ :sub:`2`: check the example out for an empirical proof!

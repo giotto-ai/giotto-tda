@@ -11,5 +11,5 @@
    :toctree: generated/utils
    :template: function.rst
 
-   utils.check_diagram
+   utils.check_diagrams
    utils.validate_params
