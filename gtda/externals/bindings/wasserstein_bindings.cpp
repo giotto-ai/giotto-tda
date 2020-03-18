@@ -3,8 +3,7 @@
  * License:          Apache 2.0
  *****************************************************************************/
 
-// #include <wasserstein/include/wasserstein.h>
-#include "../hera/wasserstein/include/wasserstein.h"
+#include <wasserstein/include/wasserstein.h>
 
 // PYBIND11
 #include <pybind11/pybind11.h>

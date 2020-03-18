@@ -4,7 +4,6 @@
  * License:          Apache 2.0
  *****************************************************************************/
 
-// #include "../hera/bottleneck/include/bottleneck.h"
 #include <bottleneck/include/bottleneck.h>
 
 // PYBIND11
