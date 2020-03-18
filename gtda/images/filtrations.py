@@ -49,7 +49,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     Attributes
     ----------
     n_dimensions_ : ``2`` or ``3``
-        Dimension of the 1910.08345images. Set in :meth:`fit`.
+        Dimension of the images. Set in :meth:`fit`.
 
     direction_ : ndarray of shape (n_dimensions_,)
         Effective direction of the height filtration. Set in :meth:`fit`.
