@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from gtda.utils.validation import check_diagram, validate_params
+from gtda.utils.validation import check_diagrams, validate_params
 
 
 # Testing for validate_params
@@ -40,12 +40,12 @@ def test_validate_params_list():
     validate_params(parameters, references)
 
 
-# Testing check_diagram
+# Testing check_diagrams
 # Test for the wrong array key value
 def test_inputs_keys_V():
     X = np.array([[[1, 1, 0], [2, 2, -1]]])
     with pytest.raises(ValueError):
-        check_diagram(X)
+        check_diagrams(X)
 
 
 # Test for the wrong structure dimension
@@ -53,4 +53,4 @@ def test_inputs_arrayStruc_V():
     X = np.array([[[[1, 1, 0], [2, 2, 1]]]])
 
     with pytest.raises(ValueError):
-        check_diagram(X)
+        check_diagrams(X)

@@ -12,6 +12,7 @@ from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
+from..plotting import plot_point_cloud
 
 
 @adapt_fit_transform_docs
@@ -170,6 +171,29 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         yr = np.flip(yr)
         yr = np.flip(yr[:-self.width:self.stride])
         return yr
+
+    @staticmethod
+    def plot(Xt, sample=0):
+        """Plot a sample from a collection of sliding windows, as a point
+        cloud in 2D or 3D. If points in the window have more than three
+        dimensions, only the first three are plotted.
+
+        Important: when using on the result `Xt` of calling :meth:`transform`
+        on ``X``, ensure that each sample in ``X`` is a point in
+        ``n_dimensions``-dimensional space with ``n_dimensions > 1``.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+            Collection of sliding windows, each containing ``n_points``
+            points in ``n_dimensions``-dimensional space, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        """
+        return plot_point_cloud(Xt[sample])
 
 
 @adapt_fit_transform_docs
