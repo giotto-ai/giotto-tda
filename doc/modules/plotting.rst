@@ -9,10 +9,10 @@
 
 .. autosummary::
    :toctree: generated/plotting
-   :template: plotting.rst
+   :template: function.rst
 
    plotting.plot_point_cloud
    plotting.plot_heatmap
    plotting.plot_diagram
    plotting.plot_betti_curves
-   plotting.plot_surfaces
+   plotting.plot_betti_surfaces
