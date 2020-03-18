@@ -14,7 +14,7 @@ from ..base import PlotterMixin
 from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import check_diagram, validate_params
+from ..utils.validation import check_diagrams, validate_params
 
 
 @adapt_fit_transform_docs
@@ -56,7 +56,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_diagram(X)
+        check_diagrams(X)
 
         self._is_fitted = True
         return self
@@ -82,9 +82,8 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        X = check_diagram(X)
+        Xt = check_diagrams(X, copy=True)
 
-        Xt = X.copy()
         Xt[:, :, 2] = np.inf
         # TODO: for plotting, replace the dimension with a tag
         return Xt
@@ -207,7 +206,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -258,7 +257,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagram(X)
+        Xs = check_diagrams(X)
         Xs[:, :, :2] /= self.scale_
         return Xs
 
@@ -279,7 +278,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagram(X)
+        Xs = check_diagrams(X)
         Xs[:, :, :2] *= self.scale_
         return Xs
 
@@ -379,7 +378,7 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters)
 
@@ -414,7 +413,7 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         X = _sort(X)
         Xt = _filter(X, self.homology_dimensions_, self.epsilon)

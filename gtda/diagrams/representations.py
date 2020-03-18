@@ -18,7 +18,7 @@ from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_diagram
+from ..utils.validation import validate_params, check_diagrams
 
 
 def identity(x):
@@ -103,7 +103,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -139,7 +139,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
                 _subdiagrams(X, [dim], remove_dim=True)[s],
@@ -313,7 +313,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -352,7 +352,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
                 _subdiagrams(X, [dim], remove_dim=True)[s],
@@ -547,7 +547,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -586,7 +586,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X, copy=True)
+        X = check_diagrams(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
@@ -746,7 +746,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
@@ -793,7 +793,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X, copy=True)
+        X = check_diagrams(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(persistence_images)(_subdiagrams(X, [dim],
@@ -939,7 +939,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -976,7 +976,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         Xt = (Parallel(n_jobs=self.n_jobs)
               (delayed(silhouettes)(_subdiagrams(X, [dim], remove_dim=True)[s],

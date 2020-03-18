@@ -4,18 +4,42 @@
 import numpy as np
 
 
-def check_diagram(X, copy=False):
-    """Input validation on a persistence diagram.
+def check_diagrams(X, copy=False):
+    """Input validation for collections of persistence diagrams.
+
+    Basic type and sanity checks are run on the input collection and the
+    array is converted to float type before returning. In particular,
+    the input is checked to be an ndarray of shape ``(n_samples, n_points,
+    3)``.
+
+    Parameters
+    ----------
+    X : object
+        Input object to check/convert.
+
+    copy : bool, optional, default: ``False``
+        Whether a forced copy should be triggered.
+
+    Returns
+    -------
+    X_validated : ndarray of shape (n_samples, n_points, 3)
+        The converted and validated array of persistence diagrams.
 
     """
-    if X.ndim != 3:
-        raise ValueError(f"X should be a 3d np.array: X.shape = {X.shape}.")
-    if X.shape[2] != 3:
+    X_array = np.asarray(X)
+    if X_array.ndim == 0:
         raise ValueError(
-            f"X should be a 3d np.array with a 3rd dimension of 3 components: "
-            f"X.shape[2] = {X.shape[2]}.")
+            f"Expected 3D array, got scalar array instead:\narray={X_array}.")
+    if X_array.ndim != 3:
+        raise ValueError(
+            f"Input should be a 3D ndarray, the shape is {X_array.shape}.")
+    if X_array.shape[2] != 3:
+        raise ValueError(
+            f"Input should be a 3D ndarray with a 3rd dimension of 3 "
+            f"components, but there are {X_array.shape[2]} components.")
 
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    X_array = X_array.astype(float)
+    homology_dimensions = sorted(list(set(X_array[0, :, 2])))
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:
@@ -33,21 +57,22 @@ def check_diagram(X, copy=False):
                     f"All homology dimensions should be integer valued: "
                     f"{dim} can't be cast to an int of the same value.")
 
-    n_points_above_diag = np.sum(X[:, :, 1] >= X[:, :, 0])
-    n_points_global = X.shape[0] * X.shape[1]
+    n_points_above_diag = np.sum(X_array[:, :, 1] >= X_array[:, :, 0])
+    n_points_global = X_array.shape[0] * X_array.shape[1]
     if n_points_above_diag != n_points_global:
         raise ValueError(
             f"All points of all persistence diagrams should be above the "
-            f"diagonal, X[:,:,1] >= X[:,:,0]. "
+            f"diagonal, i.e. X[:,:,1] >= X[:,:,0]. "
             f"{n_points_global - n_points_above_diag} points are under the "
             f"diagonal.")
     if copy:
-        return np.copy(X)
-    else:
-        return X
+        X_array = np.copy(X_array)
+
+    return X_array
 
 
 def check_graph(X):
+    # TODO
     return X
 
 

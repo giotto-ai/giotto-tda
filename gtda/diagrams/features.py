@@ -13,7 +13,7 @@ from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_diagram
+from ..utils.validation import validate_params, check_diagrams
 
 
 @adapt_fit_transform_docs
@@ -79,7 +79,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -109,7 +109,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         with np.errstate(divide='ignore', invalid='ignore'):
             Xt = Parallel(n_jobs=self.n_jobs)(
@@ -253,7 +253,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -300,7 +300,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_diagram(X, copy=True)
+        Xt = check_diagrams(X, copy=True)
 
         Xt = _parallel_amplitude(Xt, self.metric,
                                  self.effective_metric_params_,

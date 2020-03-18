@@ -11,7 +11,7 @@ from ._metrics import _AVAILABLE_METRICS, _parallel_pairwise
 from ._utils import _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import check_diagram, validate_params
+from ..utils.validation import check_diagrams, validate_params
 
 
 @adapt_fit_transform_docs
@@ -157,7 +157,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -208,7 +208,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X, copy=True)
+        X = check_diagrams(X, copy=True)
 
         if np.array_equal(X, self._X):
             X2 = None

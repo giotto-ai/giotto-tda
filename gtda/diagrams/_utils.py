@@ -6,10 +6,7 @@ import numpy as np
 
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     for dim in homology_dimensions:
-        if not np.isposinf(dim):
-            Xs = X[X[:, :, 2] == dim]
-        else:  # Needed for e.g. ForgetDimension
-            Xs = X[np.isposinf(X[:, :, 2])]
+        Xs = X[X[:, :, 2] == dim]
         Xs = Xs.reshape(X.shape[0], -1, 3)
     if remove_dim:
         Xs = Xs[:, :, :2]
