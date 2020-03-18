@@ -39,25 +39,24 @@ This allows you to jump in the familiar way of generating features from your dat
 .. code-block:: python
 
   from gtda.homology import VietorisRipsPersistence
-  vietorisrips_tr = VietorisRipsPersistence()
+  VR = VietorisRipsPersistence()
 
 which calculates :ref:`persistence diagrams <persistence diagram>` from a :ref:`point cloud <finite metric spaces and point clouds>`.
 
 .. code-block:: python
 
-  diagrams = vietorisrips_tr.fit_transform(point_clouds)
+  diagrams = VR.fit_transform(point_clouds)
 
 You can create features from the persistence diagrams in a similar way, using, for example, the :ref:`BettiCurve <BettiCurve>` transformer.
 
 .. code-block:: python
 
   from gtda.diagrams import PersistenceEntropy
-  image_tr = PersistenceEntropy()
-  features = image_tr.fit_transform(diagrams)
+  PR = PersistenceEntropy()
+  features = PE.fit_transform(diagrams)
 
-Extraction of topological features phrased in terms of transformers allows you to use the standard tools from scikit-learn,
-combining topological features with standard models and
-like grid-search or cross-validate your model.
+Extraction of topological features phrased in terms of transformers allows you to use the standard tools from ``scikit-learn``,
+combining topological features with standard models and like grid-search or cross-validate your model.
 
 .. code-block:: python
 
