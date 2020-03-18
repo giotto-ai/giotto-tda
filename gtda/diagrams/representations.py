@@ -599,7 +599,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=None,
+    def plot(self, Xt, sample=0, homology_dimension_ix=0,
              colorscale='blues'):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of heat kernel images.
