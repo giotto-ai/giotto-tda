@@ -12,11 +12,13 @@
 double wasserstein_distance(const std::vector<std::pair<double, double>>& dgm1,
                             const std::vector<std::pair<double, double>>& dgm2,
                             double q, double delta, double internal_p,
-                            double initial_eps, double eps_factor) {
+                            double initial_eps, double eps_factor,
+                            int max_bids_per_round) {
   hera::AuctionParams<double> params;
   params.wasserstein_power = q;
   params.delta = delta;
   params.internal_p = internal_p;
+  params.max_bids_per_round = max_bids_per_round;
 
   if (initial_eps != 0) params.initial_epsilon = initial_eps;
 
@@ -34,5 +36,6 @@ PYBIND11_MODULE(gtda_wasserstein, m) {
         py::arg("q") = 2.0, py::arg("delta") = .01,
         py::arg("internal_p") = hera::get_infinity<double>(),
         py::arg("initial_eps") = 0., py::arg("eps_factor") = 0.,
+        py::arg("max_bids_per_round") = 1,
         "compute Wasserstein distance between two persistence diagrams");
 }
