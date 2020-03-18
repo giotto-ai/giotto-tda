@@ -8,4 +8,3 @@
 [submodule "gtda/externals/hera"]
 	path = gtda/externals/hera
 	url = https://github.com/grey-narn/hera
-	branch = master
