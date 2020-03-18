@@ -61,11 +61,11 @@ pdfpagelabels]{hyperref}
 	
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textit{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textit{simplex}, explicitly
 	\begin{equation*}
-	[v_0,\dots ,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
+	[v_0, \ldots ,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
 	\end{equation*}
-	and to $n$ as its \textit{dimension}. The \textit{$i$-th face} of $[v_0, \dots, v_n]$ is defined by
+	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $[v_0, \dots, v_n]$ is defined by
 	\begin{equation*}
-	d_i[v_0, \dots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
+	d_i[v_0, \ldots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
 	\end{equation*}
 	where $\widehat{v}_i$ denotes the absence of $v_i$ from the set.
 	
@@ -82,7 +82,7 @@ pdfpagelabels]{hyperref}
 	
 	The elements of $X$ are called \textit{simplices} and the \textit{dimension} of a simplex $x$ is defined by $|x| = \# x - 1$ where $\# x$ denotes the cardinality of $x$. Simplices of dimension $d$ are called $d$-simplices. We abuse terminology and refer to the elements of $V$ and to their associated $0$-simplices both as \textit{vertices}.
 	
-	The \textit{$k$-skeleton }$X_k$ of a simplicial complex $X$ is the subcomplex containing all simplices of dimension at most $k$. A simplicial complex is said to be \textit{$d$-dimensional} if $d$ is the smallest integer satisfying $X = X_d$.
+	The $k$\textit{-skeleton} $X_k$ of a simplicial complex $X$ is the subcomplex containing all simplices of dimension at most $k$. A simplicial complex is said to be $d$\textit{-dimensional} if $d$ is the smallest integer satisfying $X = X_d$.
 	
 	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
 	
@@ -122,7 +122,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Homology and cohomology} \label{homology and cohomology}
 	
-	Let $(C_*, \partial)$ be a \hyperref[chain complex]{chain complex}. Its \textit{$n$-th homology group} is the quotient of the subspace of $n$-cycles by the subspace of $n$-boundaries, that is, $H_n(C_*) = \mathrm{ker}(\partial_n)/ \mathrm{im}(\partial_{n+1})$. The \textit{homology} of $(C, \partial)$ is defined by $H_*(C) = \bigoplus_{n \in \mathbb Z} H_n(C)$.
+	Let $(C_*, \partial)$ be a \hyperref[chain complex]{chain complex}. Its $n$\textit{-th homology group} is the quotient of the subspace of $n$-cycles by the subspace of $n$-boundaries, that is, $H_n(C_*) = \mathrm{ker}(\partial_n)/ \mathrm{im}(\partial_{n+1})$. The \textit{homology} of $(C, \partial)$ is defined by $H_*(C) = \bigoplus_{n \in \mathbb Z} H_n(C)$.
 	
 	When the chain complex under consideration is the linear dual of a chain complex we sometimes refer to its homology as the \textit{cohomology} of the predual complex and write $H^n$ for $H_{-n}$.
 	
@@ -130,22 +130,22 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Simplicial chains and simplicial homology} \label{simplicial chains and simplicial homology}
 	
-	Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
+	Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
 	\end{equation*}
-	and its \textit{homology and cohomology with $\Bbbk$-coefficients} as the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	and its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} as the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
 	
 	A \hyperref[abstract simplicial complex]{simplicial map} induces a \hyperref[chain complex]{chain map} between the associated simplicial chain complexes and, therefore, between the associated simplicial (co)homologies.
 	
 	\subsection*{Cubical chains and cubical homology} \label{cubical chains and cubical homology}
 	
-	Let $X$ be a cubical complex. Define its \textit{cubical chain complex with $\Bbbk$-coefficients} $C_*(X; \Bbbk)$ by 
+	Let $X$ be a cubical complex. Define its \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
 	where $x = I_1 \times \cdots \times I_N$ and $s(i)$ is the dimension of $I_1 \times \cdots \times I_i$.
-	Its \textit{homology and cohomology with $\Bbbk$-coefficients} is the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	Its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} is the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
 	
 	\subsection*{Filtered complex} \label{filtered complex}
 	
@@ -159,7 +159,7 @@ pdfpagelabels]{hyperref}
 	
 	Let $G$ be a $1$-dimensional abstract (resp. directed) simplicial complex. The abstract (resp. directed) simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ \big(resp. $(v_0, \dots, v_n)$\big) is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\}$ \big(resp. $(v_i, v_j)$\big) is in $G$ for each pair of vertices $v_i, v_j$. 
 	
-	An abstract (resp. directed) simplicial complex $X$ is a \textit{clique (resp. flag) complex} if $X = \langle G \rangle$ for some $G$.
+	An abstract (resp. directed) simplicial complex $X$ is a \textit{clique (resp.\ flag) complex} if $X = \langle G \rangle$ for some $G$.
 	
 	Given a function
 	\begin{equation*}
@@ -179,7 +179,7 @@ pdfpagelabels]{hyperref}
 	\langle G \rangle_s = \{\sigma \in \langle G \rangle\ |\ w(\sigma) \leq s\}.
 	\end{equation*}
 	
-	A filtered complex $\{X_s\}_{s \in \mathbb R}$ is a \textit{filtered clique (resp. flag) complex} if $X_s = \langle G \rangle_s$ for some $(G,w)$.
+	A filtered complex $\{X_s\}_{s \in \mathbb R}$ is a \textit{filtered clique (resp.\ flag) complex} if $X_s = \langle G \rangle_s$ for some $(G,w)$.
 	
 	\subsection*{Persistence module} \label{persistence module}
 	
@@ -193,11 +193,11 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	r \leq s \leq t\ \quad\text{implies} \quad f_{rt} = f_{st} \circ f_{rs}
 	\end{equation*}
-	for example, a \hyperref[filtered complex]{filtered complex}. Its \textit{persistent simplicial homology with $\Bbbk$-coefficients} is the persistence module
+	for example, a \hyperref[filtered complex]{filtered complex}. Its \textit{persistent simplicial homology with} $\Bbbk$\textit{-coefficients} is the persistence module
 	\begin{equation*}
 	H_*(X(s); \Bbbk)
 	\end{equation*}
-	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not satisfy the tameness condition of a \hyperref[persistence module]{persistence module}, but we restrict attention to the cases where it does. Its \textit{persistence simplicial cohomology with $\Bbbk$-coefficients} is defined analogously.
+	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not satisfy the tameness condition of a \hyperref[persistence module]{persistence module}, but we restrict attention to the cases where it does. Its \textit{persistence simplicial cohomology with} $\Bbbk$\textit{-coefficients} is defined analogously.
 	
 	\subsection*{Vietoris-Rips complex and Vietoris-Rips persistence} \label{vietoris-rips complex and vietoris-rips persistence}
 	
@@ -246,7 +246,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Wasserstein and bottleneck distance}	\label{wasserstein and bottleneck distance}
 	
-	The \textit{$p$-Wasserstein distance} between two persistence diagrams $D_1$ and $D_2$ is the infimum over all bijections $\gamma: D_1 \cup \Delta \to D_2 \cup \Delta$ of
+	The $p$\textit{-Wasserstein distance} between two persistence diagrams $D_1$ and $D_2$ is the infimum over all bijections $\gamma: D_1 \cup \Delta \to D_2 \cup \Delta$ of
 	\begin{equation*}
 	\Big(\sum_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_\infty^p \Big)^{1/p}
 	\end{equation*}
@@ -265,7 +265,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\lambda : \mathbb R \to \overline{\mathbb R}
 	\end{equation*}
-	where $\lambda_k$ is referred to as the \textit{$k$-layer of the persistence landscape}.
+	where $\lambda_k$ is referred to as the $k$\textit{-layer of the persistence landscape}.
 	
 	Let $\{(b_i, d_i)\}_{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where
 	\begin{equation*}
@@ -285,7 +285,7 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	whenever the right hand side exists and is finite.
 	
-	The \textit{$p$-norm} of a \hyperref[persistence landscape]{persistence landscape} $\lambda = \{\lambda_k\}_{k \in \mathbb N}$ is defined to be
+	The $p$\textit{-norm} of a \hyperref[persistence landscape]{persistence landscape} $\lambda = \{\lambda_k\}_{k \in \mathbb N}$ is defined to be
 	
 	\begin{equation*}
 	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
@@ -387,7 +387,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
 	\end{equation*}
-	The associated norm and distance function are referred to as \textit{euclidean norm} and \textit{euclidean distance}.  
+	The associated norm and distance function are referred to as \textit{Euclidean norm} and \textit{Euclidean distance}.  
 	
 	\subsection*{Finite metric spaces and point clouds} \label{finite metric spaces and point clouds}
 	
