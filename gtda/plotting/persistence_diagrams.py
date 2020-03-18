@@ -28,35 +28,35 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
 
     max_filt_param = np.where(np.isinf(diagram), -np.inf, diagram).max()
 
-    layout = {
-        "width": 500,
-        "height": 500,
-        "xaxis1": {
-            "title": "Birth",
-            "side": "bottom",
-            "type": "linear",
-            "range": [0, 1.1 * max_filt_param],
-            "ticks": "outside",
-            "anchor": "y1",
-            "showline": True,
-            "zeroline": True,
-            "showexponent": "all",
-            "exponentformat": "e"
-        },
-        "yaxis1": {
-            "title": "Death",
-            "side": "left",
-            "type": "linear",
-            "range": [0, 1.1 * max_filt_param],
-            "ticks": "outside",
-            "anchor": "x1",
-            "showline": True,
-            "zeroline": True,
-            "showexponent": "all",
-            "exponentformat": "e"
-        },
-        "plot_bgcolor": "white"
-    }
+    layout = dict(
+        width=500,
+        height=500,
+        xaxis1=dict(
+            title='Birth',
+            side='bottom',
+            type='linear',
+            range=[0, 1.1 * max_filt_param],
+            ticks='outside',
+            anchor='y1',
+            showline=True,
+            zeroline=True,
+            showexponent='all',
+            exponentformat='e'
+        ),
+        yaxis1=dict(
+            title='Death',
+            side='left',
+            type='linear',
+            range=[0, 1.1 * max_filt_param],
+            ticks='outside',
+            anchor='x1',
+            showline=True,
+            zeroline=True,
+            showexponent='all',
+            exponentformat='e'
+        ),
+        plot_bgcolor='white'
+    )
 
     layout.update(input_layout)
 
@@ -75,7 +75,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
                                showlegend=False, hoverinfo='none'))
 
     for dim in homology_dimensions:
-        name = "H{}".format(int(dim))
+        name = f'H{int(dim)}' if dim != np.inf else 'Any homology dimension'
         subdiagram = _subdiagrams(np.asarray([diagram]), [dim],
                                   remove_dim=True)[0]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
