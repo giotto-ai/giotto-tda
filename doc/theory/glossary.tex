@@ -29,7 +29,7 @@ pdfpagelabels]{hyperref}
 		$\overline{\mathbb R}$ & : & The two point compactification $[-\infty, +\infty]$ of the real numbers. \\
 		$\mathbb N$ & : & The counting numbers $0,1,2, \ldots$ as a subset of $\mathbb R$. \\
 		$\mathbb R^d$ & : & The vector space of $d$-tuples of real numbers. \\
-		$\Delta$ & : & The \hyperref[multiset]{multiset} $\{(s, s) \, : \ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
+		$\Delta$ & : & The \nameref{multiset} $\{(s, s) \, : \ s \in \mathbb R\}$ with multiplicity $(s,s) \mapsto +\infty$.
 	\end{tabular}
 	
 	\section{Homology}
@@ -61,7 +61,7 @@ pdfpagelabels]{hyperref}
 	
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textit{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textit{simplex}, explicitly
 	\begin{equation*}
-	[v_0, \ldots ,v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
+	\lbrack v_0, \ldots , v_n \rbrack = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
 	\end{equation*}
 	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $[v_0, \dots, v_n]$ is defined by
 	\begin{equation*}
@@ -100,7 +100,7 @@ pdfpagelabels]{hyperref}
 	
 	A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that: 
 	\begin{enumerate}
-		\item for every $v$ in $V$, the tuple $v$ is in $X$ and
+		\item for every $v$ in $V$, the tuple $v$ is in $X$
 		\item if $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$. 
 	\end{enumerate}
 	
@@ -132,7 +132,7 @@ pdfpagelabels]{hyperref}
 	
 	Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
-	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
+	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
 	\end{equation*}
 	and its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} as the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
 	
@@ -142,7 +142,7 @@ pdfpagelabels]{hyperref}
 	
 	Let $X$ be a cubical complex. Define its \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
-	C_n(X; \Bbbk) = \Bbbk\{X_n\} \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
+	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
 	where $x = I_1 \times \cdots \times I_N$ and $s(i)$ is the dimension of $I_1 \times \cdots \times I_i$.
 	Its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} is the \hyperref[homology and cohomology]{homology and cohomology} of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
@@ -294,7 +294,7 @@ pdfpagelabels]{hyperref}
 
 	\paragraph{\\ References:} \cite{stein2011functional, bubenik2015statistical}
 	
-	\subsection*{Weighted silhouette} \label{weighted silhouettes}
+	\subsection*{Weighted silhouette} \label{weighted silhouette}
 	
 	Let $D = {(b_i, d_i)}_{i \in I}$ be a \hyperref[persistence diagram] {persistence diagram}. A \textit{weighted silhouette} associated to $D$ is a continuous function $\phi : \mathbb R \to \mathbb R$ of the form
 	\begin{equation*}
@@ -308,7 +308,8 @@ pdfpagelabels]{hyperref}
 	
 	\paragraph{\\ References:} \cite{chazal2014stochastic}
 	
-	\subsection*{Amplitude} \label{amplitude}
+	\subsection*{Amplitude}
+	\label{amplitude}
 	
 	Given a function assigning a real number to a pair of persistence diagrams, we define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: \hyperref[wasserstein and bottleneck distance]{Wasserstein and bottleneck distances} and \hyperref[persistence landscape norm]{landscape distance}.
 	
@@ -417,7 +418,7 @@ pdfpagelabels]{hyperref}
 	\end{equation*} 
 	using a function $f : M \to \mathbb R$ as follows: let $\{t_i\}_{i=0}^n$ be a time series taking values in $U$, then
 	\begin{equation*}
-	\{f(\varphi(t_i, m))\}_{i=0}^n.
+	\{f(\varphi(t_i, m))\}_{i=0}^n
 	\end{equation*}
 	for an arbitrarily chosen $m \in M$.
 	
