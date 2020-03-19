@@ -41,7 +41,7 @@ This allows you to jump in the familiar way of generating features from your dat
   from gtda.homology import VietorisRipsPersistence
   VR = VietorisRipsPersistence()
 
-which calculates :ref:`persistence diagrams <persistence diagram>` from a :ref:`point cloud <finite metric spaces and point clouds>`.
+which calculates :ref:`persistence diagrams <persistence_diagram>` from a :ref:`point cloud <finite_metric_spaces_and_point_clouds>`.
 
 .. code-block:: python
 
