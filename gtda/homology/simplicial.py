@@ -23,7 +23,7 @@ from ..utils.validation import validate_params
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Vietoris–Rips filtrations <vietoris-rips complex and vietoris-rips \
-    homology>`.
+    persistence>`.
 
     Given a :ref:`point cloud <finite metric spaces and point clouds>` in
     Euclidean space, or an abstract :ref:`metric space <finite metric spaces
@@ -252,7 +252,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`Sparse Vietoris–Rips filtrations <vietoris-rips complex and \
-    vietoris-rips homology>`.
+    vietoris-rips persistence>`.
 
     Given a :ref:`point cloud <finite metric spaces and point clouds>` in
     Euclidean space, or an abstract :ref:`metric space <finite metric spaces
