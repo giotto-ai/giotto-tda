@@ -221,8 +221,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Parameters
     ----------
-    center : ndarray of shape (:attr:`n_dimensions_`,) or None, optional, default: \
-        ``None``
+    center : ndarray of shape (:attr:`n_dimensions_`,) or None, optional,\
+        default: ``None``
         Coordinates of the center pixel, where ``n_dimensions`` is the
         dimension of the images of the collection (2 or 3). ``None`` is
         equivalent to passing ``np.zeros(n_dimensions,)```.
