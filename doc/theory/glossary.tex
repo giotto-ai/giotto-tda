@@ -400,27 +400,26 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Time series} \label{time series}
 	
-	A \textit{time series} is a sequence $\{y_i\}_{i = 0}^n$ of real numbers. 
+	A \textit{time series} is a sequence $\{y_t\}_{t = 0}^n$ of real numbers, indexed by a discrete ``time'' parameter.
 	
-	A common construction of a times series $\{x_i\}_{i = 0}^n$ is given by choosing $x_0$ arbitrarily as well as a step parameter $h$ and setting
+	A common construction of a times series $\{x_t\}_{t = 0}^n$ is given by choosing $x_0$ arbitrarily as well as a step parameter $h$, and setting
 	\begin{equation*}
-	x_i = x_0 + h\cdot i.
+	x_t = x_0 + h\cdot t.
 	\end{equation*}
-	Another usual construction is as follows: given a time series $\{x_i\}_{i = 0}^n \subseteq U$ and a function
+	Another usual construction is as follows: given a time series $\{x_t\}_{t = 0}^n \subseteq U$ and a function
 	\begin{equation*}
-	f : U \subseteq \mathbb R \to \mathbb R
+	f : U \subseteq \mathbb R \to \mathbb R,
 	\end{equation*}
-	we obtain a new time series $\{f(x_i)\}_{i = 0.}^n$
+	we obtain a new time series $\{f(x_t)\}_{t = 0.}^n$
 	
-	Generalizing the previous construction we can define a time series from a function 
+	Generalizing the previous construction we can define a time series from a function
 	\begin{equation*}
-	\varphi : U \times M \to M, \qquad U \subseteq \mathbb R, \qquad M \subseteq \mathbb R^d
+	\varphi : \{0, \ldots, n\} \time M \to M, \qquad M \subseteq \mathbb R^d
 	\end{equation*} 
-	using a function $f : M \to \mathbb R$ as follows: let $\{t_i\}_{i=0}^n$ be a time series taking values in $U$, then
+	using a function $f : M \to \mathbb R$ and an arbitrarily chosen $m \in M$. This is
 	\begin{equation*}
-	\{f(\varphi(t_i, m))\}_{i=0}^n
+	\{y^{(m)}_t\}_{t = 0}^n = \{ f(\varphi(t, m)) \}_{t=0}^n.
 	\end{equation*}
-	for an arbitrarily chosen $m \in M$.
 	
 	\subsection*{Takens embedding}	\label{takens embedding}
 	
