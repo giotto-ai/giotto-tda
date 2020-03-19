@@ -496,7 +496,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    `Cech filtrations <>`_.
+    `Cech filtrations <TODO>`_.
 
     Given a :ref:`point cloud <finite metric spaces and point clouds>` in
     Euclidean space, information about the appearance and disappearance of
