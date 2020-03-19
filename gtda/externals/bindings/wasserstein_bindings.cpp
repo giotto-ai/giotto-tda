@@ -38,5 +38,5 @@ PYBIND11_MODULE(gtda_wasserstein, m) {
         py::arg("max_bids_per_round") = 1,
         "compute Wasserstein distance between two persistence diagrams");
   m.def("hera_get_infinity", hera::get_infinity<double>,
-        "hera inifinity is not equal float('inf'), but -1, be careful");
+        "hera infinity is not equal float('inf'), but -1, be careful");
 }

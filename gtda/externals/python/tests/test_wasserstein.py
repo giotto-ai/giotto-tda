@@ -22,7 +22,9 @@ def test_trivial_empty_diagram():
 
 
 def test_trivial_1():
-    "trivial: one empty diagram, one single-point diagram"
+    """
+    trivial: one empty diagram, one single-point diagram
+    """
     diagram_a = [[1.0, 2.0]]
     diagram_b = []
     q = 1.0
@@ -58,7 +60,9 @@ def test_trivial_1():
 
 
 def test_trivial_2():
-    "trivial: two single-point diagrams-1"
+    """
+    trivial: two single-point diagrams-1
+    """
     diagram_a = [[10.0, 20.0]]
     diagram_b = [[13.0, 19.0]]
     q = 1.0
@@ -82,7 +86,9 @@ def test_trivial_2():
 
 
 def test_inf_1():
-    "two points at infinity, no finite points"
+    """
+    two points at infinity, no finite points
+    """
     # edge cost 1.0
     diagram_a = [[1, float('inf')]]
     diagram_b = [[2, float('inf')]]
@@ -104,7 +110,9 @@ def test_inf_1():
 
 
 def test_inf_2():
-    "two points at infinity"
+    """
+    two points at infinity
+    """
     # edge cost 3.0
     diagram_a = [[10.0, 20.0]]
     diagram_b = [[13.0, 19.0]]
@@ -129,7 +137,9 @@ def test_inf_2():
 
 
 def test_inf_3():
-    "simple small example with finite answer"
+    """
+    simple small example with finite answer
+    """
     diagram_a = [[1, float('inf')]]
     diagram_b = [[2, float('inf')]]
 

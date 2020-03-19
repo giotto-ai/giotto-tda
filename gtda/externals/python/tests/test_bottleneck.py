@@ -47,7 +47,9 @@ def test_trivial_two_point_diagram_2():
 
 
 def test_inf_1():
-    "two points at infinity, no finite points"
+    """
+    two points at infinity, no finite points
+    """
 
     delta = 0.01
     diagram_a = [[1.0, float('inf')]]
@@ -63,7 +65,9 @@ def test_inf_1():
 
 
 def test_inf_2():
-    "two points at infinity"
+    """
+    two points at infinity
+    """
 
     delta = 0.01
     # edge cost 1.0
@@ -83,7 +87,9 @@ def test_inf_2():
 
 
 def test_inf_3():
-    "all four corners at infinity, with finite points, infinite answer-1"
+    """
+    all four corners at infinity, with finite points, infinite answer-1
+    """
 
     delta = 0.01
 
@@ -112,7 +118,9 @@ def test_inf_3():
 
 
 def test_inf_4():
-    "simple small example with finite answer"
+    """
+    simple small example with finite answer
+    """
 
     diagram_a = [[1.0, float('inf')]]
     diagram_b = [[2.0, float('inf')]]

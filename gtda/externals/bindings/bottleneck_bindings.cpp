@@ -26,7 +26,6 @@ double bottleneck_distance(std::vector<std::pair<double, double>>& dgm1,
     return hera::bottleneckDistExact(dgm1, dgm2);
   else
     return hera::bottleneckDistApprox(dgm1, dgm2, delta);
-  return -1;
 }
 
 namespace py = pybind11;

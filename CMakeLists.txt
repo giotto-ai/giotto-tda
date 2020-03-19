@@ -57,10 +57,6 @@ endif()
 #                             Wasserstein                             #
 #######################################################################
 
-# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# include (GenerateExportHeader)
-
 pybind11_add_module(gtda_wasserstein ${BINDINGS_DIR}/wasserstein_bindings.cpp)
 target_link_libraries(gtda_wasserstein LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_wasserstein PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
