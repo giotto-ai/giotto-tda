@@ -28,12 +28,12 @@ def identity(x):
 
 @adapt_fit_transform_docs
 class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Betti curves <betti curve>` of persistence diagrams.
+    """:ref:`Betti curves <betti_curve>` of persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective Betti curves are obtained by
-    evenly sampling the :ref:`filtration parameter <filtered complex>`.
+    evenly sampling the :ref:`filtration parameter <filtered_complex>`.
 
     Parameters
     ----------
@@ -230,14 +230,14 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence landscapes <persistence landscape>` of persistence
+    """:ref:`Persistence landscapes <persistence_landscape>` of persistence
     diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and layers of their respective persistence
     landscapes are obtained by evenly sampling the :ref:`filtration parameter
-    <filtered complex>`.
+    <filtered_complex>`.
 
     Parameters
     ----------
@@ -460,7 +460,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     distinct homology dimensions are considered separately and regarded as sums
     of Dirac deltas. Then, the convolution with a Gaussian kernel is computed
     over a rectangular grid of locations evenly sampled from appropriate
-    ranges of the :ref:`filtration parameter <filtered complex>`. The
+    ranges of the :ref:`filtration parameter <filtered_complex>`. The
     same is done with the reflected images of the subdiagrams about the
     diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a (multi-channel) raster image.
@@ -634,7 +634,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence images <persistence image>` of persistence
+    """:ref:`Persistence images <persistence_image>` of persistence
     diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -644,7 +644,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     separately and regarded as sums of Dirac deltas. Then, the convolution
     with a Gaussian kernel is computed over a rectangular grid of locations
     evenly sampled from appropriate ranges of the :ref:`filtration parameter
-    <filtered complex>`. The result can be thought of as a (multi-channel)
+    <filtered_complex>`. The result can be thought of as a (multi-channel)
     raster image.
 
     Parameters
@@ -846,7 +846,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Power-weighted silhouettes <weighted silhouette>` of persistence
+    """:ref:`Power-weighted silhouettes <weighted_silhouette>` of persistence
     diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -854,13 +854,13 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     distinct homology dimensions are considered separately, and their
     respective silhouette by sampling the silhouette function over evenly
     spaced locations from appropriate ranges of the :ref:`filtration parameter
-    <filtered complex>`.
+    <filtered_complex>`.
 
     Parameters
     ----------
     power: float, optional, default: ``1.``
         The power to which persistence values are raised to define the
-        :ref:`power-weighted silhouettes <weighted silhouette>`.
+        :ref:`power-weighted silhouettes <weighted_silhouette>`.
 
     n_bins : int, optional, default: ``100``
         The number of filtration parameter values, per available homology
