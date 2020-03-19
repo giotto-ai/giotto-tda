@@ -47,7 +47,7 @@ which calculates :ref:`persistence diagrams <persistence diagram>` from a :ref:`
 
   diagrams = VR.fit_transform(point_clouds)
 
-You can create features from the persistence diagrams in a similar way, using, for example, the :ref:`BettiCurve <BettiCurve>` transformer.
+You can create features from the persistence diagrams in a similar way, using, for example, the :class:`BettiCurve` transformer.
 
 .. code-block:: python
 
