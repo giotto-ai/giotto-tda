@@ -150,14 +150,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         Covering radius of the subsampled points.
         If n_perm <= 0, then the full point cloud was used and this is 0
     }
-    Examples
-    --------
-    .. code:: python
-        from ripser import ripser, plot_dgms
-        from sklearn import datasets
-        data = datasets.make_circles(n_samples=110)[0]
-        dgms = ripser(data)['dgms']
-        plot_dgms(dgms)
+
     """
     if n_perm and sparse.issparse(X):
         raise Exception(
