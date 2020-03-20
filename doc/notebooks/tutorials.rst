@@ -2,7 +2,8 @@
 Tutorials
 #########
 
-This page contains tutorials to help you get started with ``giotto-tda``.
+This page contains tutorials to help you get started with ``giotto-tda``. Additionally, the `post <https://towardsdatascience.com/getting-started-with-giotto-learn-a-python-library-for-topological-machine-learning-451d88d2c4bc>`_
+by Lewis Tunstall provides a friendly introduction to the philosophy of ``giotto-tda`` and to some of its main features.
 
 .. toctree::
    :maxdepth: 1
