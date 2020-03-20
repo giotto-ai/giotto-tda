@@ -685,7 +685,6 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
-<<<<<<< HEAD
 
 class WitnessPersistence(BaseEstimator, TransformerMixin):
     """`Persistence diagrams <https://giotto.ai/theory>`_ resulting from
@@ -937,7 +936,7 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
-=======
+
     @staticmethod
     def plot(Xt, sample=0, homology_dimensions=None):
         """Plot a sample from a collection of persistence diagrams, with
@@ -959,4 +958,3 @@ class WitnessPersistence(BaseEstimator, TransformerMixin):
         """
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions)
->>>>>>> eea7b238b8028e18ed74aae8631667dfeaa14a24
