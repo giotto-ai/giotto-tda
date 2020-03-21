@@ -14,7 +14,7 @@ from ..base import PlotterMixin
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 from ..plotting import plot_diagram
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_list_of_images
+from ..utils.validation import validate_params, check_images
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
@@ -146,7 +146,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_list_of_images(X, allow_nd=True)
+        check_images(X, allow_nd=True)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 

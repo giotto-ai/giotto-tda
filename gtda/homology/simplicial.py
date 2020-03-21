@@ -18,7 +18,7 @@ from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_list_of_point_clouds
+from ..utils.validation import validate_params, check_point_clouds
 
 
 @adapt_fit_transform_docs
@@ -169,8 +169,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_list_of_point_clouds(X, ensure_2d=False, allow_nd=True,
-                                   force_all_finite=False)
+        check_point_clouds(X, ensure_2d=False, allow_nd=True,
+                           force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -220,9 +220,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_point_clouds(X, ensure_2d=False,
-                                       allow_nd=True,
-                                       force_all_finite=False)
+        X = check_point_clouds(X, ensure_2d=False,
+                               allow_nd=True,
+                               force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
                                           for i in range(len(X)))
@@ -417,9 +417,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_list_of_point_clouds(X, ensure_2d=False,
-                                   allow_nd=True,
-                                   force_all_finite=False)
+        check_point_clouds(X, ensure_2d=False,
+                           allow_nd=True,
+                           force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -469,9 +469,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_point_clouds(X, ensure_2d=False,
-                                       allow_nd=True,
-                                       force_all_finite=False)
+        X = check_point_clouds(X, ensure_2d=False,
+                               allow_nd=True,
+                               force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
@@ -635,7 +635,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_list_of_point_clouds(X, ensure_2d=False, allow_nd=True)
+        check_point_clouds(X, ensure_2d=False, allow_nd=True)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -680,8 +680,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_list_of_point_clouds(X, ensure_2d=False,
-                                       allow_nd=True,)
+        X = check_point_clouds(X, ensure_2d=False,
+                               allow_nd=True, )
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(

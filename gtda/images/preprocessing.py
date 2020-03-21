@@ -15,7 +15,7 @@ from ..base import PlotterMixin
 from ..plotting import plot_point_cloud, plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_list_of_images
+from ..utils.validation import validate_params, check_images
 
 
 @adapt_fit_transform_docs
@@ -91,7 +91,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_list_of_images(X, allow_nd=True)
+        X = check_images(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             warn(f"Input of `fit` contains arrays of dimension "
@@ -127,7 +127,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_list_of_images(X, allow_nd=True, copy=True)
+        Xt = check_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._binarize)(Xt[s])
@@ -211,7 +211,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_list_of_images(X, allow_nd=True)
+        X = check_images(X, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -239,7 +239,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_list_of_images(X, allow_nd=True, copy=True)
+        Xt = check_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(Xt[s])
@@ -345,7 +345,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_list_of_images(X, allow_nd=True)
+        check_images(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
@@ -391,7 +391,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_list_of_images(X, allow_nd=True, copy=True)
+        Xt = check_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(Xt[s], pad_width=self._pad_width,
@@ -497,7 +497,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        _ = check_list_of_images(X, allow_nd=True)
+        _ = check_images(X, allow_nd=True)
         self.is_fitted_ = True
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
@@ -538,7 +538,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_list_of_images(X, allow_nd=True, copy=True)
+        Xt = check_images(X, allow_nd=True, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._embed)(Xt[s])

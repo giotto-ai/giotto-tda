@@ -183,7 +183,7 @@ def validate_params(parameters, references, exclude=None):
     return _validate_params(parameters_, references)
 
 
-def check_list_of_images(X, **kwargs):
+def check_images(X, **kwargs):
     """Check a list of arrays representing images, by iterating through
     the input one by one. To pass a test when `kwargs` is empty,
     all images ``x``, ``y`` in `X` must satisfy:
@@ -196,7 +196,7 @@ def check_list_of_images(X, **kwargs):
     X : list of ndarray
         Each entry of `X` corresponds to an image.
 
-    kwargs :
+    kwargs
         Keyword arguments. For a list of accepted values, see the documentation
         of :func:`~gtda.utils.validation.check_list_of_arrays`.
 
@@ -223,7 +223,7 @@ def check_list_of_images(X, **kwargs):
         return check_list_of_arrays(X, **kwargs_default)
 
 
-def check_list_of_point_clouds(X, **kwargs):
+def check_point_clouds(X, **kwargs):
     """Check a list of arrays representing point clouds, by integrating
     through the input one by one. To pass a test when `kwargs` is empty,
     all point clouds ``x``, ``y`` in X must satisfy:
@@ -235,7 +235,7 @@ def check_list_of_point_clouds(X, **kwargs):
     X : list of ndarray, such that ``X[i].ndim==2`` (n_points, n_dimensions),
         or an array `X.dim==3`
 
-    kwargs :
+    kwargs
         Keyword arguments. For a list of accepted values, see the documentation
         of :func:`~`gtda.utils.validation.check_list_of_arrays``.
 
@@ -306,7 +306,6 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
         :func:`~sklearn.utils.validation.check_array`
 
     """
-
     # if restrictions on the dimensions of the input are imposed
     for (test_name, get_property, err_message) in check_shapes:
         if check_dimensions(X, get_property):
@@ -318,7 +317,7 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
     messages = []
     for i, x in enumerate(X):
         try:
-            # TODO: verifythe behavior depending on copy.
+            # TODO: verify the behavior depending on copy.
             X[i] = check_array(x.reshape(1, *x.shape),
                                **kwargs).reshape(*x.shape)
             messages = ['']
