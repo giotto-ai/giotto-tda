@@ -18,12 +18,12 @@ from ..utils.validation import validate_params, check_list_of_images
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`filtered cubical complexes <cubical complex>`.
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`filtered cubical complexes <cubical_complex>`.
 
-    Given a :ref:`greyscale image <cubical chains and cubical homology>`,
+    Given a :ref:`greyscale image <cubical_chains_and_cubical_homology>`,
     information about the appearance and disappearance of topological features
-    (technically, :ref:`homology classes <homology and cohomology>`) of various
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 

@@ -11,3 +11,4 @@
    :template: class.rst
 
    base.TransformerResamplerMixin
+   base.PlotterMixin

@@ -41,7 +41,6 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         dimension of the images of the collection (2 or 3). ``None`` is
         equivalent to passing ``numpy.ones(n_dimensions)``.
 
-
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -52,14 +51,14 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
-    direction_ : ndarray of shape (n_dimensions_,)
+    direction_ : ndarray of shape (:attr:`n_dimensions_`,)
         Effective direction of the height filtration. Set in :meth:`fit`.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
         greyscale image corresponding to the height filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -69,10 +68,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -223,11 +222,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Parameters
     ----------
-    center : ndarray of shape (n_dimensions,) or None, optional, default: \
-        ``None``
+    center : ndarray of shape (:attr:`n_dimensions_`,) or None, optional,\
+        default: ``None``
         Coordinates of the center pixel, where ``n_dimensions`` is the
         dimension of the images of the collection (2 or 3). ``None`` is
-        equivalent to passing ``np.zeros(n_dimensions,)``.
+        equivalent to passing ``np.zeros(n_dimensions,)```.
 
     radius : float or None, default: ``None``
         The radius of the ball centered in `center` inside which activated
@@ -261,7 +260,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
-    center_ : ndarray of shape (n_dimensions_,)
+    center_ : ndarray of shape (:attr:`n_dimensions_`,)
         Effective center of the radial filtration. Set in :meth:`fit`.
 
     effective_metric_params_ : dict
@@ -273,7 +272,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         greyscale image corresponding to the radial filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -283,10 +282,10 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -473,7 +472,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -483,10 +482,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -647,7 +646,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         Effective number of iterations in the erosion process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -657,10 +656,10 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -822,7 +821,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -833,10 +832,10 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 

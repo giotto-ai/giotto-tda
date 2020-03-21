@@ -206,7 +206,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
     of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
     \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
-    This set is called the :ref:`Takens embedding <takens embedding>`
+    This set is called the :ref:`Takens embedding <takens_embedding>`
     of the time series and can be interpreted as a point cloud.
 
     The difference between :math:`t_{i+1}` and :math:`t_i` is called the
