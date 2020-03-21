@@ -13,7 +13,8 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ..base import PlotterMixin
 from ._utils import _postprocess_diagrams
 from ._subsamplings import SUBSAMPLING_FUNCTIONS
-from ..externals.python import ripser, SparseRipsComplex, CechComplex
+from ..externals.python import ripser, SparseRipsComplex, CechComplex, \
+    WitnessComplex, StrongWitnessComplex
 from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
