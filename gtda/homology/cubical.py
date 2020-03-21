@@ -9,18 +9,20 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _pad_diagram
+from ..base import PlotterMixin
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
+from ..plotting import plot_diagram
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
-class CubicalPersistence(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`filtered cubical complexes <cubical complex>`.
+class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`filtered cubical complexes <cubical_complex>`.
 
-    Given a :ref:`grayscale image <cubical chains and cubical homology>`,
+    Given a :ref:`greyscale image <cubical_chains_and_cubical_homology>`,
     information about the appearance and disappearance of topological features
-    (technically, :ref:`homology classes <homology and cohomology>`) of various
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
@@ -220,3 +222,25 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         Xt = np.stack(Xt)
         Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)

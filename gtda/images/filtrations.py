@@ -1,4 +1,4 @@
-"""Binary image filtration."""
+"""Filtrations of 2D/3D binary images."""
 # License: GNU AGPLv3
 
 from numbers import Real
@@ -13,17 +13,19 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 
 from ._utils import _dilate, _erode
+from ..base import PlotterMixin
+from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class HeightFiltration(BaseEstimator, TransformerMixin):
+class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtrations of 2D/3D binary images based on distances to lines/planes.
 
     The height filtration assigns to each activated pixel of a binary image a
-    grayscale value equal to the distance between the pixel and the hyperplane
+    greyscale value equal to the distance between the pixel and the hyperplane
     defined by a direction vector and the first seen edge of the image
     following that direction. Deactivated pixels are assigned the value of the
     maximum distance between any pixel of the image and the hyperplane, plus
@@ -38,7 +40,6 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         dimension of the images of the collection (2 or 3). ``None`` is
         equivalent to passing ``numpy.ones(n_dimensions)``.
 
-
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -49,20 +50,27 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
-    direction_ : ndarray of shape (n_dimensions_,)
+    direction_ : ndarray of shape (:attr:`n_dimensions_`,)
         Effective direction of the height filtration. Set in :meth:`fit`.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
-        Grayscale image corresponding to the height filtration of a binary
+        greyscale image corresponding to the height filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -138,10 +146,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
-        corresponding grayscale image based on the distance of its pixels to
+        corresponding greyscale image based on the distance of its pixels to
         the hyperplane defined by the `direction` vector and the first seen
         edge of the images following that `direction`. Return the collection
-        of grayscale images.
+        of greyscale images.
 
         Parameters
         ----------
@@ -158,7 +166,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_pixels_x,
             n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
-            2D or 3D grayscale image.
+            2D or 3D greyscale image.
 
         """
         check_is_fitted(self)
@@ -172,13 +180,38 @@ class HeightFiltration(BaseEstimator, TransformerMixin):
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class RadialFiltration(BaseEstimator, TransformerMixin):
+class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtrations of 2D/3D binary images based on distances to a reference
     pixel.
 
-    The radial filtration assigns to each pixel of a binary image a grayscale
+    The radial filtration assigns to each pixel of a binary image a greyscale
     value computed as follows in terms of a reference pixel, called the
     "center", and of a "radius": if the binary pixel is active and lies
     within a ball defined by this center and this radius, then the assigned
@@ -188,11 +221,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    center : ndarray of shape (n_dimensions,) or None, optional, default: \
-        ``None``
+    center : ndarray of shape (:attr:`n_dimensions_`,) or None, optional,\
+        default: ``None``
         Coordinates of the center pixel, where ``n_dimensions`` is the
         dimension of the images of the collection (2 or 3). ``None`` is
-        equivalent to passing ``np.zeros(n_dimensions,)``.
+        equivalent to passing ``np.zeros(n_dimensions,)```.
 
     radius : float or None, default: ``None``
         The radius of the ball centered in `center` inside which activated
@@ -226,7 +259,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
-    center_ : ndarray of shape (n_dimensions_,)
+    center_ : ndarray of shape (:attr:`n_dimensions_`,)
         Effective center of the radial filtration. Set in :meth:`fit`.
 
     effective_metric_params_ : dict
@@ -235,16 +268,23 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         the empty dictionary.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
-        Grayscale image corresponding to the radial filtration of a binary
+        greyscale image corresponding to the radial filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -335,8 +375,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
-        corresponding grayscale image based on the distance of its pixels to
-        the center. Return the collection of grayscale images.
+        corresponding greyscale image based on the distance of its pixels to
+        the center. Return the collection of greyscale images.
 
         Parameters
         ----------
@@ -353,7 +393,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_pixels_x,
             n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
-            2D or 3D grayscale image.
+            2D or 3D greyscale image.
 
         """
         check_is_fitted(self)
@@ -367,9 +407,34 @@ class RadialFiltration(BaseEstimator, TransformerMixin):
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class DilationFiltration(BaseEstimator, TransformerMixin):
+class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtrations of 2D/3D binary images based on the dilation of activated
     regions.
 
@@ -377,12 +442,12 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
     image processing and relies on the `scipy.ndimage \
     <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_ module.
 
-    This filtration assigns to each pixel in an image a grayscale value
+    This filtration assigns to each pixel in an image a greyscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any activated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
     in particular, activated pixels are assigned a value of 0.
-    Otherwise, the assigned grayscale value is the sum of the lengths
+    Otherwise, the assigned greyscale value is the sum of the lengths
     along all axes of the image – equivalently, it is the maximum
     Manhattan distance between any two pixels in the image. The name of
     this filtration comes from the fact that these values can be computed
@@ -406,13 +471,20 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -475,9 +547,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
-        corresponding grayscale image based on the distance of its pixels to
+        corresponding greyscale image based on the distance of its pixels to
         their closest activated neighboring pixel. Return the collection
-        of grayscale images.
+        of greyscale images.
 
         Parameters
         ----------
@@ -494,7 +566,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_pixels_x,
             n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
-            2D or 3D grayscale image.
+            2D or 3D greyscale image.
 
         """
         check_is_fitted(self)
@@ -508,9 +580,34 @@ class DilationFiltration(BaseEstimator, TransformerMixin):
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class ErosionFiltration(BaseEstimator, TransformerMixin):
+class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtrations of 2D/3D binary images based on the erosion of activated
     regions.
 
@@ -518,12 +615,12 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
     image processing and relies on the `scipy.ndimage \
     <https://docs.scipy.org/doc/scipy/reference/ndimage.html>`_ module.
 
-    This filtration assigns to each pixel in an image a grayscale value
+    This filtration assigns to each pixel in an image a greyscale value
     calculated as follows. If the minimum Manhattan distance between the
     pixel and any deactivated pixel in the image is less than or equal to
     the parameter `n_iterations`, the assigned value is this distance –
     in particular, deactivated pixels are assigned a value of 0.
-    Otherwise, the assigned grayscale value is the sum of the lengths
+    Otherwise, the assigned greyscale value is the sum of the lengths
     along all axes of the image – equivalently, it is the maximum
     Manhattan distance between any two pixels in the image. The name of
     this filtration comes from the fact that these values can be computed
@@ -547,13 +644,20 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         Effective number of iterations in the erosion process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
     See also
     --------
     gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -616,9 +720,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
-        corresponding grayscale image based on the distance of its pixels to
+        corresponding greyscale image based on the distance of its pixels to
         their closest activated neighboring pixel. Return the collection
-        of grayscale images.
+        of greyscale images.
 
         Parameters
         ----------
@@ -635,7 +739,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_pixels_x,
             n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
-            2D or 3D grayscale image.
+            2D or 3D greyscale image.
 
         """
         check_is_fitted(self)
@@ -649,23 +753,48 @@ class ErosionFiltration(BaseEstimator, TransformerMixin):
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
+class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtrations of 2D/3D binary images based on the dilation and the erosion
     of activated regions.
 
-    This filtration assigns to each pixel in an image a grayscale value
+    This filtration assigns to each pixel in an image a greyscale value
     calculated as follows. For activated pixels, if the minimum Manhattan
     distance between the pixel and any deactivated pixel in the image is less
     than or equal to the parameter `n_iterations`, the assigned value is
-    this distance minus 1. Otherwise, the assigned grayscale value is the sum
+    this distance minus 1. Otherwise, the assigned greyscale value is the sum
     of the lengths along all axes of the image – equivalently, it is the
     maximum Manhattan distance between any two pixels in the image, minus 1.
     For deactivated pixels, if the minimum Manhattan distance between the pixel
     and any activated pixel in the image is less than or equal to the parameter
     `n_iterations`, the assigned value is the opposite of this distance.
-    Otherwise, the assigned grayscale value is the opposite of the maximum
+    Otherwise, the assigned greyscale value is the opposite of the maximum
     Manhattan distance between any two pixels in the image.
 
     The name of this filtration comes from the fact that it is a a negatively
@@ -690,7 +819,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in :meth:`fit`.
 
@@ -698,6 +827,13 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence, Binarizer, ErosionFiltration, \
     DilationFiltration
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -767,9 +903,9 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """For each binary image in the collection `X`, calculate a
-        corresponding grayscale image based on the distance of its pixels to
+        corresponding greyscale image based on the distance of its pixels to
         their closest activated neighboring pixel. Return the collection
-        of grayscale images.
+        of greyscale images.
 
         Parameters
         ----------
@@ -786,7 +922,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_pixels_x,
             n_pixels_y [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
-            2D or 3D grayscale image.
+            2D or 3D greyscale image.
 
         """
         check_is_fitted(self)
@@ -799,3 +935,28 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin):
         Xt = np.concatenate(Xt)
 
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
