@@ -18,7 +18,7 @@ from ..utils.validation import validate_params, check_diagrams
 
 @adapt_fit_transform_docs
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence entropies <persistence entropy>` of persistence
+    """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
     Given a persistence diagrams consisting of birth-death-dimension triples
