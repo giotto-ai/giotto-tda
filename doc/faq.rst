@@ -3,8 +3,8 @@
 FAQ
 ===
 
-I am a researcher. Can I use giotto-tda in my project?
-------------------------------------------------------
+I am a researcher. Can I use ``giotto-tda`` in my project?
+----------------------------------------------------------
 .. _L2F team: business@l2f.ch
 
 Of course! The `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_ is very permissive.
@@ -23,7 +23,7 @@ including the closed ones, and open a new one in case you did not find help.
 There are many TDA libraries available. How is ``giotto-tda`` different?
 ------------------------------------------------------------------------
 
-``Giotto-tda`` is oriented towards machine learning (for details, see the :ref:`guiding principles <guiding_principles>`).
+``giotto-tda`` is oriented towards machine learning (for details, see the :ref:`guiding principles <guiding_principles>`).
 This philosophy is in contrast with other reference libraries, like `GUDHI <https://gudhi.inria.fr/doc/latest/index.html>`_,
 which provide more low-level functionality at the expense of being less adapted to e.g. batch processing, or of
 being tightly integrated with ``scikit-learn``.
