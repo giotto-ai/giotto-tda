@@ -237,7 +237,7 @@ def check_point_clouds(X, **kwargs):
 
     kwargs
         Keyword arguments. For a list of accepted values, see the documentation
-        of :func:`~`gtda.utils.validation.check_list_of_arrays``.
+        of :func:`~gtda.utils.validation.check_list_of_arrays`.
 
     Returns
     -------
@@ -248,11 +248,12 @@ def check_point_clouds(X, **kwargs):
     if hasattr(X, 'shape'):
         return check_array(X, **kwargs)
     else:
-        kwargs_default = {'ensure_2d': False, 'force_all_finite': False,
-                          'check_shapes': [('embedding_dimension',
-                                            lambda x: x.shape[1:],
-                                            'Not all point clouds have the '
-                                            'same embedding dimension.')]}
+        kwargs_default = {
+            'ensure_2d': True,
+            'force_all_finite': False,
+            'check_shapes': [
+                (lambda x: x.shape[1:], "Not all point clouds have the same "
+                                        "embedding dimension.")]}
         kwargs_default.update(kwargs)
         return check_list_of_arrays(X, **kwargs_default)
 
@@ -260,15 +261,19 @@ def check_point_clouds(X, **kwargs):
 def check_dimensions(X, get_property):
     """Check the dimensions of X are consistent, where the check is defined
     by get_property 'sample-wise'.
+
     Parameters
     ----------
-    X: list of ndarray,
+    X : list of ndarray,
         Usually represents point clouds or images- see
-        :func:`~`gtda.utils.validation.check_list_of_arrays``.
+        :func:`~gtda.utils.validation.check_list_of_arrays`.
 
-    get_property: function: ndarray -> _,
+    get_property : function: ndarray -> _,
         Defines a property to be conserved, across all arrays (samples)
         in X.
+
+    Returns
+    -------
 
     """
     from functools import reduce
@@ -307,10 +312,8 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
 
     """
     # if restrictions on the dimensions of the input are imposed
-    for (test_name, get_property, err_message) in check_shapes:
-        if check_dimensions(X, get_property):
-            continue
-        else:
+    for get_property, err_message in check_shapes:
+        if not check_dimensions(X, get_property):
             raise ValueError(err_message)
 
     is_check_failed = False
@@ -327,5 +330,4 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
     if is_check_failed:
         raise ValueError("The following errors were raised" +
                          "by the inputs: \n" + "\n".join(messages))
-    else:
-        return X
+    return X

@@ -100,7 +100,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
 
         Xt = np.empty((X.shape[0], X.shape[2], X.shape[2]))
         for i, sample in enumerate(X):

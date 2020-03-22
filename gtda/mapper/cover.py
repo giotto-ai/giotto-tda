@@ -182,11 +182,12 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, ensure_2d=False)
-        if X.ndim == 2:
-            _check_has_one_column(X)
+        Xt = check_array(X, ensure_2d=False)
+
+        if Xt.ndim == 2:
+            _check_has_one_column(Xt)
         else:
-            X = X[:, None]
+            Xt = Xt[:, None]
 
         if self.kind == 'balanced':
             # Test whether self.left_limits_ and self.right_limits_ have
@@ -194,7 +195,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             # fit_transform but not after fit.
             self._check_limit_attrs()
 
-        Xt = self._transform(X)
+        Xt = self._transform(Xt)
         Xt = _remove_empty_and_duplicate_intervals(Xt)
         return Xt
 
@@ -242,14 +243,15 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             or duplicated cover sets are removed.
 
         """
+        Xt = check_array(X, ensure_2d=False)
         validate_params(self.get_params(), self._hyperparameters)
-        X = check_array(X, ensure_2d=False)
-        if X.ndim == 2:
-            _check_has_one_column(X)
-        else:
-            X = X[:, None]
 
-        Xt = self._fit_transform(X)
+        if Xt.ndim == 2:
+            _check_has_one_column(Xt)
+        else:
+            Xt = Xt[:, None]
+
+        Xt = self._fit_transform(Xt)
         Xt = _remove_empty_and_duplicate_intervals(Xt)
         return Xt
 
@@ -441,7 +443,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         X = check_array(X, ensure_2d=False)
         validate_params(self.get_params(), self._hyperparameters)
 
-        # reshape filter function values derived from FunctionTransformer
+        # Reshape filter function values derived from FunctionTransformer
         if X.ndim == 1:
             X = X[:, None]
 
@@ -479,8 +481,9 @@ class CubicalCover(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_coverers')
-        # Reshape filter function values derived from FunctionTransformer
         Xt = check_array(X, ensure_2d=False)
+
+        # Reshape filter function values derived from FunctionTransformer
         if Xt.ndim == 1:
             Xt = Xt[:, None]
 
@@ -519,9 +522,10 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             n_features` as empty or duplicated cover sets are removed.
 
         """
-        validate_params(self.get_params(), self._hyperparameters)
-        # reshape filter function values derived from FunctionTransformer
         Xt = check_array(X, ensure_2d=False)
+        validate_params(self.get_params(), self._hyperparameters)
+
+        # Reshape filter function values derived from FunctionTransformer
         if Xt.ndim == 1:
             Xt = Xt[:, None]
 

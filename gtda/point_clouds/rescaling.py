@@ -184,11 +184,10 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consistent_rescaling)(Xt[i])
-            for i in range(Xt.shape[0]))
+            delayed(self._consistent_rescaling)(x) for x in Xt)
         Xt = np.array(Xt)
         return Xt
 
@@ -291,13 +290,6 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         self.factor = factor
         self.n_jobs = n_jobs
 
-    def _consecutive_rescaling(self, X):
-        Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
-                                **self.effective_metric_params_)
-
-        Xm[range(Xm.shape[0]-1), range(1, Xm.shape[0])] *= self.factor
-        return Xm
-
     def fit(self, X, y=None):
         """Calculate :attr:`effective_metric_params_`. Then, return the
         estimator.
@@ -361,12 +353,21 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        is_precomputed = self.metric == 'precomputed'
+        X = check_array(X, allow_nd=True, copy=is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consecutive_rescaling)(Xt[i])
-            for i in range(Xt.shape[0]))
-        Xt = np.array(Xt)
+            delayed(pairwise_distances)(
+                x, metric=self.metric, n_jobs=1,
+                **self.effective_metric_params_)
+            for x in X)
+
+        if is_precomputed:
+            # Parallel loop above serves only as additional input validation
+            Xt = X
+        else:
+            Xt = np.array(Xt)
+        Xt[:, range(Xt.shape[1] - 1), range(1, Xt.shape[1])] *= self.factor
         return Xt
 
     @staticmethod
