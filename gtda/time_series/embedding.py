@@ -12,6 +12,7 @@ from ..base import TransformerResamplerMixin
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
+from..plotting import plot_point_cloud
 
 
 @adapt_fit_transform_docs
@@ -171,6 +172,29 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         yr = np.flip(yr[:-self.width:self.stride])
         return yr
 
+    @staticmethod
+    def plot(Xt, sample=0):
+        """Plot a sample from a collection of sliding windows, as a point
+        cloud in 2D or 3D. If points in the window have more than three
+        dimensions, only the first three are plotted.
+
+        Important: when using on the result `Xt` of calling :meth:`transform`
+        on ``X``, ensure that each sample in ``X`` is a point in
+        ``n_dimensions``-dimensional space with ``n_dimensions > 1``.
+
+        Parameters
+        ----------
+        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+            Collection of sliding windows, each containing ``n_points``
+            points in ``n_dimensions``-dimensional space, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        """
+        return plot_point_cloud(Xt[sample])
+
 
 @adapt_fit_transform_docs
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
@@ -182,7 +206,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
     of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
     \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
-    This set is called the `Takens embedding <https://giotto.ai/theory>`_
+    This set is called the :ref:`Takens embedding <takens_embedding>`
     of the time series and can be interpreted as a point cloud.
 
     The difference between :math:`t_{i+1}` and :math:`t_i` is called the
@@ -438,7 +462,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_points, n_dimension)
+        Xt : ndarray of shape (n_points, n_dimensions)
             Output point cloud in Euclidean space of dimension given by
             :attr:`dimension_`. ``n_points = (n_samples - time_delay *
             (dimension - 1) - 1) // stride + 1``.

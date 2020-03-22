@@ -8,11 +8,11 @@
    **DEPRECATED**
 
 
-.. currentmodule:: {{ module }}
+.. currentmodule:: {{smodule}}
 
-.. autoclass:: {{ objname }}
+.. autoclass:: {{objname}}
 
-.. include:: {{module}}.{{objname}}.examples
+.. include:: {{module}}.{{objname}}.{{examples}}
 
 .. raw:: html
 

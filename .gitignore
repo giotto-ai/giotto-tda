@@ -22,6 +22,9 @@ data/*
 # Built docs
 doc/build
 doc/generated
+doc/gallery
+doc/notebooks/*.ipynb
+doc/notebooks/*.py
 
 # Pybind11
 gtda/externals/pybind11

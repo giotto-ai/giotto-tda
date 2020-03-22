@@ -10,13 +10,15 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _sort, _filter, _bin, _calculate_weights
+from ..base import PlotterMixin
+from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import check_diagram, validate_params
+from ..utils.validation import check_diagrams, validate_params
 
 
 @adapt_fit_transform_docs
-class ForgetDimension(BaseEstimator, TransformerMixin):
+class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
     """Replaces all homology dimensions in persistence diagrams with
     ``numpy.inf``.
 
@@ -54,7 +56,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_diagram(X)
+        check_diagrams(X)
 
         self._is_fitted = True
         return self
@@ -80,15 +82,32 @@ class ForgetDimension(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        X = check_diagram(X)
+        Xt = check_diagrams(X, copy=True)
 
-        Xt = X.copy()
         Xt[:, :, 2] = np.inf
+        # TODO: for plotting, replace the dimension with a tag
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0):
+        """Plot a sample from a collection of persistence diagrams.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=[np.inf])
 
 
 @adapt_fit_transform_docs
-class Scaler(BaseEstimator, TransformerMixin):
+class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
     """Linear scaling of persistence diagrams.
 
     A positive scale factor :attr:`scale_` is calculated during :meth:`fit` by
@@ -98,11 +117,10 @@ class Scaler(BaseEstimator, TransformerMixin):
 
     The value of :attr:`scale_` depends on two things:
 
-        - A way of computing, for each homology dimension, the `amplitude
-          <https://giotto.ai/theory>`_ in that dimension of a persistence
-          diagram consisting of birth-death-dimension triples [b, d, q].
-          Together, `metric` and `metric_params` define this in the same way as
-          in :class:`Amplitude`.
+        - A way of computing, for each homology dimension, the :ref:`amplitude
+          <amplitude>` in that dimension of a persistence diagram consisting
+          of birth-death-dimension triples [b, d, q]. Together, `metric` and
+          `metric_params` define this in the same way as in :class:`Amplitude`.
         - A scalar-valued function which is applied to the resulting
           two-dimensional array of amplitudes (one per diagram and homology
           dimension) to obtain :attr:`scale_`.
@@ -188,7 +206,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -239,7 +257,7 @@ class Scaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagram(X)
+        Xs = check_diagrams(X)
         Xs[:, :, :2] /= self.scale_
         return Xs
 
@@ -260,13 +278,39 @@ class Scaler(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagram(X)
+        Xs = check_diagrams(X)
         Xs[:, :, :2] *= self.scale_
         return Xs
 
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` is
+            equivalent to passing :attr:`homology_dimensions_`.
+
+        """
+        if homology_dimensions is None:
+            _homology_dimensions = self.homology_dimensions_
+        else:
+            _homology_dimensions = homology_dimensions
+
+        return plot_diagram(
+            Xt[sample], homology_dimensions=_homology_dimensions)
+
 
 @adapt_fit_transform_docs
-class Filtering(BaseEstimator, TransformerMixin):
+class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing
@@ -334,7 +378,7 @@ class Filtering(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters)
 
@@ -369,8 +413,34 @@ class Filtering(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         X = _sort(X)
         Xt = _filter(X, self.homology_dimensions_, self.epsilon)
         return Xt
+
+    def plot(self, Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` is
+            equivalent to passing :attr:`homology_dimensions_`.
+
+        """
+        if homology_dimensions is None:
+            _homology_dimensions = self.homology_dimensions_
+        else:
+            _homology_dimensions = homology_dimensions
+
+        return plot_diagram(
+            Xt[sample], homology_dimensions=_homology_dimensions)

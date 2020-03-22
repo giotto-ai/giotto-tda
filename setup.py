@@ -58,8 +58,9 @@ EXTRAS_REQUIRE = {
         'flake8',
         'hypothesis'],
     'doc': [
+        'openml',
         'sphinx',
-        'sphinx-gallery',
+        'nbconvert',
         'sphinx-issues',
         'sphinx_rtd_theme',
         'numpydoc'],
