@@ -9,13 +9,13 @@ import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import PlotterMixin
 from ..plotting import plot_point_cloud, plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_images
+from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
@@ -91,7 +91,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_images(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             warn(f"Input of `fit` contains arrays of dimension "
@@ -127,12 +127,11 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_images(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._binarize)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         if self.n_dimensions_ == 2:
@@ -211,7 +210,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_images(X, allow_nd=True)
+        check_array(X, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -239,12 +238,11 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_images(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -345,7 +343,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_images(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
@@ -391,13 +389,12 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_images(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(Xt[s], pad_width=self._pad_width,
                     constant_values=self.activated)
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -435,9 +432,10 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
     The coordinates of each point is calculated as follows. For each activated
     pixel, assign coordinates that are the pixel position on this image.
-    This transformer is meant to transform a collection of images to a point
-    cloud so that collection of point clouds-based persistent homology module
-    can be applied.
+
+    This transformer is meant to transform a collection of images to a
+    collection of point clouds so that persistent homology calculations can be
+    performed.
 
     Parameters
     ----------
@@ -477,9 +475,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xpts
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
-        This method is here to implement the usual scikit-learn API and hence
-        work in pipelines.
+        """Compute :attr:`mesh_`, and return the estimator.
 
         Parameters
         ----------
@@ -496,7 +492,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_images(X, allow_nd=True)
+        check_array(X, allow_nd=True)
 
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
@@ -537,12 +533,11 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_images(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._embed)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
 
         Xt = reduce(sum, Xt, [])
         return Xt

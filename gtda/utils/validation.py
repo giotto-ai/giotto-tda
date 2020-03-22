@@ -183,46 +183,6 @@ def validate_params(parameters, references, exclude=None):
     return _validate_params(parameters_, references)
 
 
-def check_images(X, **kwargs):
-    """Check a list of arrays representing images, by iterating through
-    the input one by one. To pass a test when `kwargs` is empty,
-    all images ``x``, ``y`` in `X` must satisfy:
-        - ``x.ndim >= 2``,
-        - ``all(np.isfinite(x))``,
-        - ``x.shape == y.shape``.
-
-    Parameters
-    ----------
-    X : list of ndarray
-        Each entry of `X` corresponds to an image.
-
-    kwargs
-        Keyword arguments. For a list of accepted values, see the documentation
-        of :func:`~gtda.utils.validation.check_list_of_arrays`.
-
-    Returns
-    -------
-    X : list of ndarray
-        as modified by :func:`~sklearn.utils.validation.check_array`
-
-    """
-    if hasattr(X, 'shape'):
-        if X.ndim < 3:
-            raise ValueError(f"An image in the collection X should be at "
-                             f"least of dimension 2, while it has dimension "
-                             f"{X.ndim - 1}.")
-        return check_array(X, **kwargs)
-    else:
-        kwargs_default = {'force_all_finite': True,
-                          'ensure_2d': False, 'allow_nd': True,
-                          'check_shapes': [('embedding_dimension',
-                                            lambda x: x.shape,
-                                            'The images should have exactly'
-                                            'the same shape')]}
-        kwargs_default.update(kwargs)
-        return check_list_of_arrays(X, **kwargs_default)
-
-
 def check_point_clouds(X, **kwargs):
     """Check a list of arrays representing point clouds, by integrating
     through the input one by one. To pass a test when `kwargs` is empty,
@@ -258,49 +218,27 @@ def check_point_clouds(X, **kwargs):
         return check_list_of_arrays(X, **kwargs_default)
 
 
-def check_dimensions(X, get_property):
-    """Check the dimensions of X are consistent, where the check is defined
-    by get_property 'sample-wise'.
-
-    Parameters
-    ----------
-    X : list of ndarray,
-        Usually represents point clouds or images- see
-        :func:`~gtda.utils.validation.check_list_of_arrays`.
-
-    get_property : function: ndarray -> _,
-        Defines a property to be conserved, across all arrays (samples)
-        in X.
-
-    Returns
-    -------
-
-    """
-    from functools import reduce
-    from operator import and_
-    reference = get_property(X[0])
-    return reduce(and_, map(lambda x: get_property(x) == reference, X[1:]),
-                  True)
-
-
 def check_list_of_arrays(X, check_shapes=list(), **kwargs):
-    """Input validation on a list of lists, arrays, sparse matrices, or similar.
+    """Input validation on a list of arrays, sparse matrices, or similar.
 
-    The constraints are to be specified in `kwargs`. On top of
-    parameters from :func:`~sklearn.utils.validation.check_array`,
-    the optional parameters are listed below.
+    Each entry in the list is validated using
+    :func:`~sklearn.utils.validation.check_array`. Optionally, some shared
+    shapes of
+    all
+    optional
+    parameters are
+    are listed below.
 
     Parameters
     ----------
     X : list
         Input list of objects to check / convert.
 
-    check_shapes: list of tuples t, where t = (str, function to pass to
-        check_dimensions, error message if test fails).
+    check_shapes : list of tuple
         The checks are applied in the order they are provided, only until
         the first failure.
 
-    kwargs :
+    kwargs
         Keyword arguments. For a list of accepted values, see the documentation
         of :func:`~sklearn.utils.validation.check_array`.
 
@@ -311,6 +249,31 @@ def check_list_of_arrays(X, check_shapes=list(), **kwargs):
         :func:`~sklearn.utils.validation.check_array`
 
     """
+
+    def check_dimensions(X, get_property):
+        """Check the dimensions of X are consistent, where the check is defined
+        by get_property 'sample-wise'.
+
+        Parameters
+        ----------
+        X : list of ndarray,
+            Usually represents point clouds or images- see
+            :func:`~gtda.utils.validation.check_list_of_arrays`.
+
+        get_property : function: ndarray -> _,
+            Defines a property to be conserved, across all arrays (samples)
+            in X.
+
+        Returns
+        -------
+
+        """
+        from functools import reduce
+        from operator import and_
+        reference = get_property(X[0])
+        return reduce(and_, map(lambda x: get_property(x) == reference, X[1:]),
+                      True)
+
     # if restrictions on the dimensions of the input are imposed
     for get_property, err_message in check_shapes:
         if not check_dimensions(X, get_property):
