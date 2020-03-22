@@ -133,7 +133,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_1, ..., n_pixels_d)
+        X : ndarray of shape (n_samples, n_pixels_1, ..., n_pixels_d)
             Input data. Array of d-dimensional images.
 
         y : None
@@ -184,7 +184,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_1, ..., n_pixels_d)
+        X : ndarray of shape (n_samples, n_pixels_1, ..., n_pixels_d)
             Input data. Array of d-dimensional images.
 
         y : None
@@ -193,7 +193,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. ``n_features`` equals
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of

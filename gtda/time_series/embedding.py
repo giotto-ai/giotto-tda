@@ -184,7 +184,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+        Xt : ndarray of shape (n_samples, n_points, n_dimensions)
             Collection of sliding windows, each containing ``n_points``
             points in ``n_dimensions``-dimensional space, such as returned by
             :meth:`transform`.

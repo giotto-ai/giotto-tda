@@ -446,7 +446,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
+    mesh_ : ndarray of shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
         n_dimensions)
         Mesh image for which each pixel value is its coordinates in a
         ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
@@ -479,7 +479,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -516,7 +516,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -526,7 +526,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
+        Xt : ndarray of shape (n_samples, n_pixels_x * n_pixels_y [* \
+            n_pixels_z],
             n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
             point cloud in ``n_dimensions``-dimensional space.
@@ -549,7 +550,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+        Xt : ndarray of shape (n_samples, n_points, n_dimensions)
             Collection of point clouds in ``n_dimension``-dimensional space,
             such as returned by :meth:`transform`.
 
