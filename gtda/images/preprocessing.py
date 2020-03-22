@@ -472,7 +472,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        # Xpts = [np.stack(np.nonzero(x), axis=1) for x in X]
         Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
         Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
         return Xpts
@@ -497,8 +496,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        _ = check_images(X, allow_nd=True)
-        self.is_fitted_ = True
+        check_images(X, allow_nd=True)
+
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
