@@ -12,4 +12,5 @@
    :template: function.rst
 
    utils.check_diagrams
+   utils.check_point_clouds
    utils.validate_params
