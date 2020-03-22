@@ -37,7 +37,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
     n_dimensions_ : int
         Dimension of the images. Set in meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in meth:`fit`.
 
@@ -47,10 +47,10 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -179,10 +179,10 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+        Classification  of MNIST  using  TDA"; 19th International \
+        IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+        2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -303,10 +303,10 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -461,10 +461,10 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson: \
-           Classification  of MNIST  using  TDA"; 19th International \
-           IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
-           2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
