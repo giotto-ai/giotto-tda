@@ -108,6 +108,7 @@ External modules and HPC improvements
 
 A substantial effort has been put in improving the quality of the high-performance components contained in ``gtda.externals``.
 The end result is a cleaner packaging as well as faster execution of C++ functions due to improved bindings. In particular:
+
 -  Two binaries are now shipped for ``ripser``, one of them being optimised for calculations with mod 2 coefficients.
 -  Recent improvements by the authors of the ``hera`` C++ library have been integrated in ``giotto-tda``.
 -  Compiler optimisations for Windows-based systems have been added.
