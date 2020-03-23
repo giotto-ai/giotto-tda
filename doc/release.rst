@@ -120,7 +120,7 @@ Thanks to our Contributors
 
 This release contains contributions from many people:
 
-Umberto Lupo, Guillaume Tauzin, Wojciech Reise, Julian Burella Pérez and Lewis Tunstall.
+Umberto Lupo, Guillaume Tauzin, Wojciech Reise, Julian Burella Pérez, Lewis Tunstall and Adélie Garin.
 
 We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of
 inspiring discussions.
