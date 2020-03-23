@@ -39,7 +39,7 @@ pdfpagelabels]{hyperref}
 	
 	An \textit{elementary interval} $I_a$ is a subset of $\mathbb{R}$ of the form $[a, a+1]$ or $[a,a] = \{a\}$ for some $a \in \mathbb{R}$. These two types are called respectively \textit{non-degenerate} and \textit{degenerate}. To a non-degenerate elementary interval we assign two degenerate elementary intervals
 	\begin{equation*}
-	d^+ I_a = [a+1, a+1] \qquad \text{and} \qquad d^- I_a = [a, a].
+	d^+ I_a = \lbrack a+1, a+1 \rbrack \qquad \text{and} \qquad d^- I_a = \lbrack a, a \rbrack.
 	\end{equation*}
 	An \textit{elementary cube} is a subset of the form 
 	\begin{equation*}
@@ -62,9 +62,9 @@ pdfpagelabels]{hyperref}
 	
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textit{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textit{simplex}, explicitly
 	\begin{equation*}
-	[v_0, \dots , v_n] = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
+	\lbrack v_0, \dots , v_n \rbrack = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
 	\end{equation*}
-	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $[v_0, \dots, v_n]$ is defined by
+	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $\lbrack v_0, \dots, v_n \rbrack$ is defined by
 	\begin{equation*}
 	d_i[v_0, \ldots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
 	\end{equation*}
@@ -101,7 +101,7 @@ pdfpagelabels]{hyperref}
 	
 	An \textit{ordered simplicial complex} is an 
 	% \hyperref[abstract_simplicial_complex]{abstract simplicial complex}
-	abstract simplicial complex where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $[v_0, \dots, v_n]$.
+	abstract simplicial complex where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $\lbrack v_0, \dots, v_n \rbrack$.
 	
 	A \textit{simplicial map} between ordered simplicial complexes is a simplicial map $f$ between their underlying simplicial complexes preserving the order, i.e., $v \leq w$ implies $f(v) \leq f(w)$.
 	
@@ -237,7 +237,7 @@ pdfpagelabels]{hyperref}
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $VR_s(X)$ that contains a subset of $X$ as a simplex if all pairwise distances in the subset are less than or equal to $s$, explicitly
 	\begin{equation*}
-	VR_s(X) = \Big\{ [v_0,\dots,v_n]\ \Big|\ \forall i,j\ \,d(v_i, v_j) \leq s \Big\}.
+	VR_s(X) = \Big\{ \lbrack v_0,\dots,v_n \rbrack \ \Big|\ \forall i,j\ \,d(v_i, v_j) \leq s \Big\}.
 	\end{equation*}
 	The \textit{Vietoris-Rips persistence} of $(X, d)$ is the 
 	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homology}
@@ -260,7 +260,7 @@ pdfpagelabels]{hyperref}
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $\check{C}_s(X)$ that is empty if $s<0$ and, if $s \geq 0$, contains a subset of $X$ as a simplex if the balls of radius $s$ with centers in the subset have a non-empty intersection, explicitly
 	\begin{equation*}
-	\check{C}_s(X) = \Big\{ [v_0,\dots,v_n]\ \Big|\ \bigcap_{i=0}^n B_s(x_i) \neq \emptyset \Big\}.
+	\check{C}_s(X) = \Big\{ \lbrack v_0,\dots,v_n \rbrack \ \Big|\ \bigcap_{i=0}^n B_s(x_i) \neq \emptyset \Big\}.
 	\end{equation*}
 	The \textit{\v Cech persistence (co)homology} of $(X,d)$ is the 
 	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homology}
