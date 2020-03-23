@@ -140,7 +140,7 @@ Thanks to our Contributors
 
 This release contains contributions from many people:
 
-Umberto Lupo, Guillaume Tauzin, Wojciech Reise, Julian Burella Pérez, Lewis Tunstall, Anibal Medina-Mardones, and Adélie Garin.
+Umberto Lupo, Guillaume Tauzin, Wojciech Reise, Julian Burella Pérez, Roman Yurchak, Lewis Tunstall, Anibal Medina-Mardones, and Adélie Garin.
 
 We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of
 inspiring discussions.
