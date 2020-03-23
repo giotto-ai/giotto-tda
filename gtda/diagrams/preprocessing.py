@@ -314,10 +314,10 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing
-    topological features whose lifetime d - b is less than or equal to a
-    cutoff value. Technically, discarded points are replaced by points on the
-    diagonal (i.e. whose birth and death values coincide), which carry no
-    information.
+    topological features based on whether their lifetimes d - b is below or a
+    above a cutoff value. Technically, discarded points are replaced by points
+    on the diagonal (i.e. whose birth and death values coincide), which carry
+    no information.
 
     Parameters
     ----------
@@ -329,6 +329,9 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
 
     epsilon : float, optional, default: ``0.01``
         The cutoff value controlling the amount of filtering.
+
+    below : bool, optional, default: ``True``
+        If ``True``, filter subdiagram points below the cutoff.
 
     Attributes
     ----------
@@ -348,12 +351,14 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         'homology_dimensions': {
             'type': (list, tuple, type(None)),
             'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}},
-        'epsilon': {'type': Real, 'in': Interval(0, np.inf, closed='left')}
+        'epsilon': {'type': Real, 'in': Interval(0, np.inf, closed='left')},
+        'below': {'type': bool}
     }
 
-    def __init__(self, homology_dimensions=None, epsilon=0.01):
+    def __init__(self, homology_dimensions=None, epsilon=0.01, below=True):
         self.homology_dimensions = homology_dimensions
         self.epsilon = epsilon
+        self.below = below
 
     def fit(self, X, y=None):
         """Store relevant homology dimensions in
@@ -416,7 +421,7 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_diagrams(X)
 
         X = _sort(X)
-        Xt = _filter(X, self.homology_dimensions_, self.epsilon)
+        Xt = _filter(X, self.homology_dimensions_, self.epsilon, self.below)
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None):

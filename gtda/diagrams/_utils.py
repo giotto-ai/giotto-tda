@@ -34,7 +34,7 @@ def _sample_image(image, sampled_diag):
     image[unique] = counts
 
 
-def _filter(Xs, filtered_homology_dimensions, cutoff):
+def _filter(Xs, filtered_homology_dimensions, cutoff, below):
     homology_dimensions = sorted(list(set(Xs[0, :, 2])))
     unfiltered_homology_dimensions = sorted(list(
         set(homology_dimensions) - set(filtered_homology_dimensions)))
@@ -47,7 +47,10 @@ def _filter(Xs, filtered_homology_dimensions, cutoff):
     for dim in filtered_homology_dimensions:
         Xdim = _subdiagrams(Xs, [dim])
         min_value = np.min(Xdim[:, :, 0])
-        mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
+        if below:
+            mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
+        else:
+            mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) >= cutoff
         Xdim[mask, :] = [min_value, min_value, dim]
         max_points = np.max(np.sum(Xs[:, :, 1] != 0, axis=1))
         Xdim = Xdim[:, :max_points, :]
