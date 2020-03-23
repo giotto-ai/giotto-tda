@@ -43,11 +43,23 @@ New ``images`` subpackage
 
 The new ``gtda.images`` subpackage contains classes which, together with ``gtda.homology.CubicalPersistence``, extend
 the capabilities of ``giotto-tda`` to computer vision, by handling input representing binary or greyscale 2D/3D images
-represented as arrays. The classes in ``gtda.images.filtrations`` are responsible for converting binary image input into
-greyscale images in a variety of ways, as the greyscale output can then be fed to ``gtda.homology.CubicalPersistence``
-to extract topological signature in the form of persistence diagrams. The classes in ``gtda.images.preprocessing`` perform
-a variety of preprocessing steps on either binary or greyscale image input (binarizing, inverting, padding), as well
-as conversion to point cloud format in the case of ``ImageToPointCloud``.
+represented as arrays.
+
+The classes in ``gtda.images.filtrations`` are responsible for converting binary image input into greyscale images in a
+variety of ways. The greyscale output can then be fed to ``gtda.homology.CubicalPersistence`` to extract topological
+signatures in the form of persistence diagrams. These classes are:
+-  ``HeightFiltration``,
+-  ``RadialFiltration``,
+-  ``DilationFiltration``,
+-  ``ErosionFiltration``,
+-  ``SignedDistanceFiltration``.
+
+The classes in ``gtda.images.preprocessing`` perform a variety of preprocessing steps on either binary or greyscale image
+input, as well as conversion to point cloud format. They are:
+-  ``Binarizer``,
+-  ``Inverter``,
+-  ``Padder``,
+-  ``ImageToPointCloud``.
 
 New ``point_clouds`` subpackage
 -------------------------------
