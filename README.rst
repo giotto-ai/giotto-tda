@@ -38,7 +38,9 @@ and the `Institute of Reconfigurable & Embedded Digital Systems (REDS) <https://
 
 License
 =======
+
 .. _L2F team: business@l2f.ch
+
 ``giotto-tda`` is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_.
 If you need a different distribution license, please contact the `L2F team`_.
 
