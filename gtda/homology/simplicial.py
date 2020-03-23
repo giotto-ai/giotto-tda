@@ -169,10 +169,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_point_clouds(X, ensure_2d=False, allow_nd=True,
-                           force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -220,12 +220,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, ensure_2d=False,
-                               allow_nd=True,
-                               force_all_finite=False)
+        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
-                                          for i in range(len(X)))
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._ripser_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
@@ -417,11 +415,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_point_clouds(X, ensure_2d=False,
-                           allow_nd=True,
-                           force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -469,13 +466,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, ensure_2d=False,
-                               allow_nd=True,
-                               force_all_finite=False)
+        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
@@ -635,7 +629,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_point_clouds(X, ensure_2d=False, allow_nd=True)
+        check_point_clouds(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -680,12 +674,10 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, ensure_2d=False,
-                               allow_nd=True, )
+        X = check_point_clouds(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)

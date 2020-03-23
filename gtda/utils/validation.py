@@ -1,8 +1,11 @@
 """Utilities for input validation."""
 # License: GNU AGPLv3
 
-import numpy as np
+from functools import reduce
+from operator import and_
+from warnings import warn
 
+import numpy as np
 from sklearn.utils.validation import check_array
 
 
@@ -183,114 +186,63 @@ def validate_params(parameters, references, exclude=None):
     return _validate_params(parameters_, references)
 
 
-def check_point_clouds(X, **kwargs):
-    """Check a list of arrays representing point clouds, by integrating
-    through the input one by one. To pass a test when `kwargs` is empty,
-    all point clouds ``x``, ``y`` in X must satisfy:
-        - ``x.ndim == 2``,
-        - ``len(y.shape[1:]) == len(y.shape[1:])``.
+def check_point_clouds(X, distance_matrix=False, **kwargs):
+    """Input validation on an array or list representing a collection of point
+    clouds or distance matrices.
+
+    The input is checked to be either a single 3D array using a single call
+    to :func:`~sklearn.utils.validation.check_array`, or a list of 2D arrays by
+    calling :func:`~sklearn.utils.validation.check_array` on each entry. In
+    the latter case, warnings are issued when not all point clouds are in
+    the same Euclidean space.
+
+    Conversions and copies may be triggered as per
+    :func:`~gtda.utils.validation.check_list_of_arrays`.
 
     Parameters
     ----------
-    X : list of ndarray, such that ``X[i].ndim==2`` (n_points, n_dimensions),
-        or an array `X.dim==3`
+    X : object
+        Input object to check / convert.
+
+    distance_matrix : bool, optional, default: ``False``
+        Whether the input represents a collection of distance matrices or of
+        concrete point clouds in Euclidean space. In the first case, entries
+        are allowed to be infinite unless otherwise specified in `kwargs`.
 
     kwargs
-        Keyword arguments. For a list of accepted values, see the documentation
-        of :func:`~gtda.utils.validation.check_list_of_arrays`.
+        Keyword arguments accepted by
+        :func:`~gtda.utils.validation.check_list_of_arrays`.
 
     Returns
     -------
-    X : list of input arrays
-        as modified by :func:`~sklearn.utils.validation.check_array`
+    Xnew : ndarray or list
+        The converted and validated object.
 
     """
+    kwargs_ = {'force_all_finite': not distance_matrix}
+    kwargs_.update(kwargs)
     if hasattr(X, 'shape'):
-        return check_array(X, **kwargs)
+        if X.ndim != 3:
+            raise ValueError("ndarray input must be 3D.")
+        return check_array(X, allow_nd=True, **kwargs_)
     else:
-        kwargs_default = {
-            'ensure_2d': True,
-            'force_all_finite': False,
-            'check_shapes': [
-                (lambda x: x.shape[1:], "Not all point clouds have the same "
-                                        "embedding dimension.")]}
-        kwargs_default.update(kwargs)
-        return check_list_of_arrays(X, **kwargs_default)
+        if not distance_matrix:
+            reference = X[0].shape[1]  # Embedding dimension of first sample
+            if not reduce(
+                    and_, (x.shape[1] == reference for x in X[1:]), True):
+                warn("Not all point clouds have the same embedding dimension.")
 
-
-def check_list_of_arrays(X, check_shapes=list(), **kwargs):
-    """Input validation on a list of arrays, sparse matrices, or similar.
-
-    Each entry in the list is validated using
-    :func:`~sklearn.utils.validation.check_array`. Optionally, some shared
-    shapes of
-    all
-    optional
-    parameters are
-    are listed below.
-
-    Parameters
-    ----------
-    X : list
-        Input list of objects to check / convert.
-
-    check_shapes : list of tuple
-        The checks are applied in the order they are provided, only until
-        the first failure.
-
-    kwargs
-        Keyword arguments. For a list of accepted values, see the documentation
-        of :func:`~sklearn.utils.validation.check_array`.
-
-    Returns
-    -------
-    X : list
-        Output list of objects, each checked / converted by
-        :func:`~sklearn.utils.validation.check_array`
-
-    """
-
-    def check_dimensions(X, get_property):
-        """Check the dimensions of X are consistent, where the check is defined
-        by get_property 'sample-wise'.
-
-        Parameters
-        ----------
-        X : list of ndarray,
-            Usually represents point clouds or images- see
-            :func:`~gtda.utils.validation.check_list_of_arrays`.
-
-        get_property : function: ndarray -> _,
-            Defines a property to be conserved, across all arrays (samples)
-            in X.
-
-        Returns
-        -------
-
-        """
-        from functools import reduce
-        from operator import and_
-        reference = get_property(X[0])
-        return reduce(and_, map(lambda x: get_property(x) == reference, X[1:]),
-                      True)
-
-    # if restrictions on the dimensions of the input are imposed
-    for get_property, err_message in check_shapes:
-        if not check_dimensions(X, get_property):
-            raise ValueError(err_message)
-
-    is_check_failed = False
+    has_check_failed = False
     messages = []
+    Xnew = []
     for i, x in enumerate(X):
         try:
-            # TODO: verify the behavior depending on copy.
-            X[i] = check_array(x.reshape(1, *x.shape),
-                               **kwargs).reshape(*x.shape)
+            Xnew.append(check_array(x, **kwargs_))
             messages = ['']
         except ValueError as e:
-            is_check_failed = True
+            has_check_failed = True
             messages.append(str(e))
-    if is_check_failed:
-        raise ValueError("The following errors were raised" +
-                         "by the inputs: \n" + "\n".join(messages))
-    return X
+    if has_check_failed:
+        raise ValueError("The following errors were raised by the inputs: \n"
+                         "\n".join(messages))
+    return Xnew
