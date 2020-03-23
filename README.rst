@@ -98,7 +98,7 @@ the same environment.
 Developer installation
 ----------------------
 
-Please consult the `relevant page <https://giotto-ai.github.io/gtda-docs/latest/installation.html#developer-installation>`_
+Please consult the `dedicate page <https://giotto-ai.github.io/gtda-docs/latest/installation.html#developer-installation>`_
 for detailed instructions on how to build ``giotto-tda`` from sources across different platforms.
 
 .. _contributing-section:
@@ -108,14 +108,14 @@ Contributing
 
 We welcome new contributors of all experience levels. The Giotto
 community goals are to be helpful, welcoming, and effective. To learn more about
-making a contribution to ``giotto-tda``, please consult the `relevant page
+making a contribution to ``giotto-tda``, please consult `this page
 <https://giotto-ai.github.io/gtda-docs/latest/contributing/index.html>`_.
 
 Testing
 -------
 
 After installation, you can launch the test suite from outside the
-source directory::
+source directory   ::
 
     pytest gtda
 
