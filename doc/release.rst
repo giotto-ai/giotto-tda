@@ -13,7 +13,7 @@ Major Features and Improvements
 ===============================
 
 This is a major release which substantially broadens the scope of ``giotto-tda`` and introduces several improvements.
-The library's documentation has been greatly improved and is now hosted `via GitHub pages <giotto-ai.github.io/gtda-docs/>`_.
+The library's documentation has been greatly improved and is now hosted `via GitHub pages <https://giotto-ai.github.io/gtda-docs/>`_.
 It includes rendered jupyter notebooks from the repository's ``examples`` folder, as well as an improved theory glossary,
 more detailed installation instructions, improved guidelines for contributing, and an FAQ.
 
