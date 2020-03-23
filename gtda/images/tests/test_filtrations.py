@@ -7,7 +7,8 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import HeightFiltration, RadialFiltration, \
-   DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+   DilationFiltration, ErosionFiltration, SignedDistanceFiltration, \
+   DensityFiltration
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],
@@ -252,4 +253,46 @@ def test_signed_transform(n_iterations, images, expected):
     signed = SignedDistanceFiltration(n_iterations=n_iterations)
 
     assert_almost_equal(signed.fit_transform(images),
+                        expected)
+
+
+def test_density_not_fitted():
+    density = DensityFiltration()
+    with pytest.raises(NotFittedError):
+        density.transform(images_2D)
+
+
+def test_density_errors():
+    radius = 'a'
+    density = DensityFiltration(radius=radius)
+    with pytest.raises(TypeError):
+        density.fit(images_2D)
+
+
+images_2D_density = np.array(
+    [[[6., 8., 8., 6.], [7., 10., 10., 7.], [6., 8., 8., 6.]],
+     [[5., 5., 3., 1.], [6., 6., 4., 1.], [5., 5., 3., 1.]],
+     [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]]])
+
+
+images_3D_density = np.array(
+    [[[[10., 10.], [14., 14.], [14., 14.], [10., 10.]],
+      [[13., 13.], [19., 19.], [19., 19.], [13., 13.]],
+      [[10., 10.], [14., 14.], [14., 14.], [10., 10.]]],
+     [[[9., 9.], [9., 9.], [5., 5.], [1., 1.]],
+      [[12., 12.], [12., 12.], [7., 7.], [1., 1.]],
+      [[9., 9.], [9., 9.], [5., 5.], [1., 1.]]],
+     [[[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]]]])
+
+
+@pytest.mark.parametrize("radius, images, expected",
+                         [(2., images_2D, images_2D_density),
+                          (2.2, images_2D, images_2D_density),
+                          (2., images_3D, images_3D_density)])
+def test_density_transform(radius, images, expected):
+    density = DensityFiltration(radius=radius)
+
+    assert_almost_equal(density.fit_transform(images),
                         expected)
