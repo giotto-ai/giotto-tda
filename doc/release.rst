@@ -34,6 +34,7 @@ submodules, ``simplicial`` and ``cubical``. ``simplicial`` contains the ``Vietor
 following new classes:
 -  ``SparseRipsPersistence``,
 -  ``EuclideanCechPersistence``.
+
 The ``cubical`` submodule contains ``CubicalPersistence``, a new class for computing persistent homology of filtered cubical
 complexes such as those coming from 2D or 3D greyscale images.
 
@@ -89,7 +90,6 @@ External modules and HPC improvements
 
 A substantial effort has been put in improving the quality of the high-performance components contained in ``gtda.externals``.
 The end result is a cleaner packaging as well as faster execution of C++ functions due to improved bindings. In particular:
-
 -  Two binaries are now shipped for ``ripser``, one of them being optimised for calculations with mod 2 coefficients.
 -  Recent improvements by the authors of the ``hera`` C++ library have been integrated in ``giotto-tda``.
 -  Compiler optimisations for Windows-based systems have been added.
@@ -103,6 +103,7 @@ Bug Fixes
 -  Inconsistencies in between the meaning of "bottleneck amplitude" in the theory and in the code have been ironed out.
    The code has been modified to agree with the theory glossary. The outputs of the ``gtda.diagrams`` classes
    ``Amplitude``, ``Scaler`` and ``Filtering`` is affected.
+-  Fixed bugs affecting color normalization in Mapper graph plots.
 
 Backwards-Incompatible Changes
 ==============================
