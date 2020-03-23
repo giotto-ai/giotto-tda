@@ -197,7 +197,6 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._make_adjacency_matrix)(Xt[i]) for i in
-            range(Xt.shape[0]))
+            delayed(self._make_adjacency_matrix)(x) for x in Xt)
         Xt = np.asarray(Xt)
         return Xt
