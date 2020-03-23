@@ -139,7 +139,7 @@ class PlotterMixin:
             Transformed one-sample slice from the input.
 
         """
-        Xt = self.transform(X[[sample]])
+        Xt = self.transform(X[sample:sample+1])
         self.plot(Xt, sample=0, **plot_params)
 
         return Xt

@@ -109,10 +109,10 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, _ = _bin(X, metric='betti', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
+
         return self
 
     def transform(self, X, y=None):
@@ -319,7 +319,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, _ = _bin(X, metric="landscape", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
@@ -553,11 +552,11 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, self._step_size = _bin(
             X, metric='heat', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
+
         return self
 
     def transform(self, X, y=None):
@@ -747,7 +746,6 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_diagrams(X)
-
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -758,13 +756,13 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, self._step_size = _bin(
             X, metric='persistence_image', n_bins=self.n_bins)
         self.samplings_ = {dim: s.transpose()
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.effective_weight_function_,
                                            self._samplings)
+
         return self
 
     def transform(self, X, y=None):
@@ -945,7 +943,6 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, _ = _bin(X, metric='silhouette', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}

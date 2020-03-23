@@ -1,6 +1,8 @@
 """Image preprocessing module."""
 # License: GNU AGPLv3
 
+from functools import reduce
+from operator import iconcat
 from numbers import Real
 from warnings import warn
 
@@ -8,7 +10,7 @@ import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import PlotterMixin
 from ..plotting import plot_point_cloud, plot_heatmap
@@ -126,12 +128,11 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._binarize)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         if self.n_dimensions_ == 2:
@@ -210,7 +211,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
+        check_array(X, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -238,12 +239,11 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -344,7 +344,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
@@ -390,13 +390,12 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(Xt[s], pad_width=self._pad_width,
                     constant_values=self.activated)
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -433,11 +432,12 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
-    pixel, assign coordinates that are the pixel position on this image. All
-    deactivated pixels are given infinite coordinates in that space.
-    This transformer is meant to transform a collection of images to a point
-    cloud so that collection of point clouds-based persistent homology module
-    can be applied.
+    pixel, assign coordinates that are the pixel index on this image, after
+    flipping the rows and then swapping between rows and columns.
+
+    This transformer is meant to transform a collection of images to a
+    collection of point clouds so that persistent homology calculations can be
+    performed.
 
     Parameters
     ----------
@@ -445,14 +445,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
-
-    Attributes
-    ----------
-    mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
-        n_dimensions)
-        Mesh image for which each pixel value is its coordinates in a
-        ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
-        dimension of the images of the input collection. Set in meth:`fit`.
 
     See also
     --------
@@ -472,9 +464,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
-        Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
-        return Xpts
+        return [np.argwhere(x) for x in X]
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -483,7 +473,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -496,20 +486,14 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
+        check_array(X, allow_nd=True)
+
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
                  f"{self.n_dimensions_}.")
 
-        axis_order = [2, 1, 3]
-        mesh_range_list = [np.arange(0, X.shape[i])
-                           for i in axis_order[:n_dimensions]]
-
-        self.mesh_ = np.flip(np.stack(np.meshgrid(*mesh_range_list),
-                                      axis=n_dimensions),
-                             axis=0).reshape((-1, n_dimensions))
-
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -519,7 +503,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -529,20 +513,21 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
+        Xt : ndarray of shape (n_samples, n_pixels_x * n_pixels_y [* \
+            n_pixels_z],
             n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
             point cloud in ``n_dimensions``-dimensional space.
 
         """
-        check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        check_is_fitted(self, '_is_fitted')
+        Xt = check_array(X, allow_nd=True)
 
+        Xt = np.swapaxes(np.flip(Xt, axis=1), 1, 2)
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._embed)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt)
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
+        Xt = reduce(iconcat, Xt, [])
         return Xt
 
     @staticmethod
@@ -552,7 +537,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+        Xt : ndarray of shape (n_samples, n_points, n_dimensions)
             Collection of point clouds in ``n_dimension``-dimensional space,
             such as returned by :meth:`transform`.
 

@@ -133,7 +133,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_1, ..., n_pixels_d)
+        X : ndarray of shape (n_samples, n_pixels_1, ..., n_pixels_d)
             Input data. Array of d-dimensional images.
 
         y : None
@@ -145,7 +145,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -184,7 +184,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_1, ..., n_pixels_d)
+        X : ndarray of shape (n_samples, n_pixels_1, ..., n_pixels_d)
             Input data. Array of d-dimensional images.
 
         y : None
@@ -193,7 +193,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. ``n_features`` equals
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
@@ -201,24 +201,23 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             `X`.
         """
         check_is_fitted(self)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in Xt)
 
         max_n_points = {
-            dim: max(1, np.max([Xt[i][dim].shape[0] for i in range(len(
-                Xt))])) for dim in self.homology_dimensions}
-        min_values = {
-            dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size else
-                      np.inf for i in range(len(Xt))]) for dim in
+            dim: max(1, np.max([x[dim].shape[0] for x in Xt])) for dim in
             self.homology_dimensions}
+        min_values = {
+            dim: min([np.min(x[dim][:, 0]) if x[dim].size else np.inf for x
+                      in Xt]) for dim in self.homology_dimensions}
         min_values = {
             dim: min_values[dim] if min_values[dim] != np.inf else 0 for dim
             in self.homology_dimensions}
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
-            Xt[i], self._homology_dimensions, max_n_points, min_values)
-            for i in range(len(Xt)))
+            x, self._homology_dimensions, max_n_points, min_values)
+            for x in Xt)
         Xt = np.stack(Xt)
         Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
         return Xt
