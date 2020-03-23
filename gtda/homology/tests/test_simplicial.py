@@ -105,7 +105,10 @@ def test_vrp_list_of_arrays():
     pc_2 = np.array([[0, 1], [1, 2]])
     pc_list = [pc[0].copy(), pc_2]
     vrp = VietorisRipsPersistence()
-    vrp.fit(pc_list)def test_fp_params():
+    vrp.fit(pc_list)
+
+    
+def test_fp_params():
     coeff = 'not_defined'
     fp = FlagserPersistence(coeff=coeff)
 
