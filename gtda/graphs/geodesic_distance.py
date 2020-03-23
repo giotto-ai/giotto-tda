@@ -121,7 +121,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._geodesic_distance)(X[i]) for i in range(X.shape[0]))
+            delayed(self._geodesic_distance)(x) for x in X)
         Xt = np.array(Xt)
         return Xt
 

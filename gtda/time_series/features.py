@@ -49,7 +49,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     def _permutation_entropy(self, X):
         Xo = np.argsort(X, axis=2)
-        Xo = np.stack([self._entropy(Xo[i]) for i in range(Xo.shape[0])])
+        Xo = np.stack([self._entropy(x) for x in Xo])
         return Xo.reshape(-1, 1)
 
     def fit(self, X, y=None):
@@ -97,10 +97,10 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        X = check_array(X, allow_nd=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._permutation_entropy)(X[s])
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+            self._permutation_entropy)(Xt[s])
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
         return Xt

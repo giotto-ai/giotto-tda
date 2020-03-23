@@ -2,7 +2,6 @@
 # License: GNU AGPLv3
 
 import plotly.graph_objects as gobj
-from sklearn.utils.validation import check_array
 
 
 def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
@@ -33,7 +32,6 @@ def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
         Title of the resulting figure.
 
     """
-    check_array(data, ensure_2d=True)
     autorange = True if origin == 'lower' else 'reversed'
     layout = dict(
         xaxis=dict(scaleanchor='y', constrain='domain'),

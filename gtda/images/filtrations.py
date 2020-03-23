@@ -10,7 +10,7 @@ from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _dilate, _erode
 from ..base import PlotterMixin
@@ -86,7 +86,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     def _calculate_height(self, X):
         Xh = np.full(X.shape, self.max_value_)
 
-        for i in range(Xh.shape[0]):
+        for i in range(len(Xh)):
             Xh[i][np.where(X[i])] = np.dot(self.mesh_[np.where(X[i])],
                                            self.direction_).reshape((-1,))
 
@@ -170,12 +170,11 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_height)(X[s])
-            for s in gen_even_slices(Xt.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -397,12 +396,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_radial)(X[s])
-            for s in gen_even_slices(Xt.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -529,6 +527,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
+
         n_dimensions = X.ndim - 1
         if (n_dimensions < 2) or (n_dimensions > 3):
             warn(f"Input of `fit` contains arrays of dimension "
@@ -570,12 +569,11 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_dilation)(X[s])
-            for s in gen_even_slices(Xt.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -743,12 +741,11 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_erosion)(X[s])
-            for s in gen_even_slices(Xt.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
@@ -926,12 +923,11 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._calculate_signed_distance)(X[s])
-            for s in gen_even_slices(Xt.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt

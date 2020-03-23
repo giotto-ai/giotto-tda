@@ -8,16 +8,18 @@ import numpy as np
 from joblib import Parallel, delayed
 from pyflagser import flagser
 from sklearn.base import BaseEstimator, TransformerMixin
+
 from sklearn.metrics.pairwise import pairwise_distances
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 from ._utils import _postprocess_diagrams
 from ..base import PlotterMixin
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
 from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
+
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params
+from ..utils.validation import validate_params, check_point_clouds
 
 
 @adapt_fit_transform_docs
@@ -38,7 +40,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, input data is to be interpreted as a
+        If set to ``'precomputed'``, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
         and `metric` determines a rule with which to calculate distances
@@ -151,13 +153,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -168,9 +172,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True, force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -195,13 +200,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -218,10 +225,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True, force_all_finite=False)
+        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
-                                          for i in range(len(X)))
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._ripser_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
@@ -268,7 +275,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, input data is to be interpreted as a
+        If set to ``'precomputed'``, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
         and `metric` determines a rule with which to calculate distances
@@ -396,13 +403,15 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -413,9 +422,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True, force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -440,13 +450,15 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -463,11 +475,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True, force_all_finite=False)
+        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
@@ -614,9 +625,13 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
-            Input data. Each entry along axis 0 is a point cloud of
-            ``n_points`` row vectors in ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays. The rows of
+            elements in `X` are interpreted as vectors in Euclidean space and.
+            and, when `X` is a list, warnings are issued when the number of
+            columns (dimension of the Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -627,7 +642,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        check_point_clouds(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -655,8 +670,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_points, n_dimensions)
-            Input data. Each entry along axis 0 is a point cloud of
-            ``n_points`` row vectors in ``n_dimensions``-dimensional space.
+            Input data representing a collection of point clouds. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays. The rows of
+            elements in `X` are interpreted as vectors in Euclidean space and.
+            and, when `X` is a list, warnings are issued when the number of
+            columns (dimension of the Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -672,11 +691,10 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        X = check_point_clouds(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)

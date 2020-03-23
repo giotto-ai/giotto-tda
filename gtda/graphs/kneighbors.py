@@ -33,7 +33,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     n_neighbors : int, optional, default: ``4``
         Number of neighbors to use.
 
-    metric : string or callable, default ``'minkowski'``
+    metric : string or callable, optional, default: ``'euclidean'``
         Metric to use for distance computation. Any metric from scikit-learn
         or :mod:`scipy.spatial.distance` can be used.
         If metric is a callable function, it is called on each
@@ -56,13 +56,14 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         See the documentation for :mod:`scipy.spatial.distance` for details on
         these metrics.
 
-    metric_params : dict, optional, default: ``{}``
+    metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     p : int, optional, default: ``2``
         Parameter for the Minkowski (i.e. :math:`\\ell^p`) metric from
-        :func:`sklearn.metrics.pairwise.pairwise_distances`. `p` = 1 is the
-        Manhattan distance and `p` = 2 is the Euclidean distance.
+        :func:`sklearn.metrics.pairwise.pairwise_distances`. Only relevant
+        when `metric` is ``'minkowski'``. `p` = 1 is the Manhattan distance,
+        and `p` = 2 reduces to the Euclidean distance.
 
     metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
@@ -90,9 +91,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    # TODO: Consider using an immutable default value for metric_params.
     def __init__(self, n_neighbors=4, metric='euclidean',
-                 p=2, metric_params={}, n_jobs=None):
+                 p=2, metric_params=None, n_jobs=None):
         self.n_neighbors = n_neighbors
         self.metric = metric
         self.p = p
@@ -158,10 +158,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_nearest_neighbors')
-        X = check_array(X, allow_nd=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._make_adjacency_matrix)(X[i]) for i in
-            range(X.shape[0]))
+            delayed(self._make_adjacency_matrix)(x) for x in Xt)
         Xt = np.array(Xt)
         return Xt

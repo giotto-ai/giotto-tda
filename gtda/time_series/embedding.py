@@ -137,11 +137,11 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        X = check_array(X, ensure_2d=False, allow_nd=True)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True)
 
-        window_slices = self._slice_windows(X)
+        window_slices = self._slice_windows(Xt)
 
-        Xt = np.stack([X[begin:end] for begin, end in window_slices])
+        Xt = np.stack([Xt[begin:end] for begin, end in window_slices])
         return Xt
 
     def resample(self, y, X=None):
@@ -184,7 +184,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Parameters
         ----------
-        Xt : ndarray, shape (n_samples, n_points, n_dimensions)
+        Xt : ndarray of shape (n_samples, n_points, n_dimensions)
             Collection of sliding windows, each containing ``n_points``
             points in ``n_dimensions``-dimensional space, such as returned by
             :meth:`transform`.
@@ -470,6 +470,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """
         check_is_fitted(self)
         Xt = check_array(X, ensure_2d=False)
+
         if Xt.ndim == 1:
             Xt = Xt[:, None]
         Xt = self._embed(Xt, self.time_delay_, self.dimension_, self.stride)
