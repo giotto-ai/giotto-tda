@@ -4,6 +4,7 @@
 from numbers import Real
 from types import FunctionType
 from warnings import warn
+import itertools
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -13,6 +14,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _dilate, _erode
+from .preprocessing import Padder
 from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
@@ -929,6 +931,213 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             delayed(self._calculate_signed_distance)(X[s])
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
+
+        return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+
+
+@adapt_fit_transform_docs
+class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
+    """Filtrations of 2D/3D binary images based on the number of neighboring
+    activated pixels.
+
+    The density filtration assigns to each pixel of a binary image a greyscale
+    value equal to the number of activated pixels with a ball centered around
+    it.
+
+    Parameters
+    ----------
+    radius : float, default: ``1``
+        The radius of the ball within which the number of activated pixels is
+        considered.
+
+    metric : string, or callable, optional, default: ``'euclidean'``
+        Determines a rule with which to calculate distances between
+        pairs of pixels.
+        If ``metric`` is a string, it must be one of the options allowed by
+        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including
+        "euclidean", "manhattan", or "cosine".
+        If ``metric`` is a callable function, it is called on each pair of
+        instances and the resulting value recorded. The callable should take
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    metric_params : dict, optional, default: ``{}``
+        Additional keyword arguments for the metric function.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    mask_ : ndarray of shape
+        The mask applied around each pixel to calculate the number of its
+        activated neighbors. It is obtained from the choice of the ``radius``
+        and ``metric``. Set in :meth:`fit`.
+
+    See also
+    --------
+    gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
+
+    """
+
+    _hyperparameters = {
+        'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': (dict, type(None))},
+    }
+
+    def __init__(self, radius=3, metric='euclidean', metric_params={},
+                 n_jobs=None):
+        self.radius = radius
+        self.metric = metric
+        self.metric_params = metric_params
+        self.n_jobs = n_jobs
+
+    def _calculate_density(self, X):
+        Xd = np.zeros(X.shape)
+
+        for i, j, k in self._iterator:
+            Xd += np.roll(np.roll(
+                np.roll(X, k, axis=3), j, axis=2), i, axis=1) \
+                * self.mask_[self._range + i, self._range + j,
+                             self._range + k]
+        return Xd
+
+    def fit(self, X, y=None):
+        """Calculate :attr:`mask_` from a collection of binary images. Then,
+        return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_array(X, allow_nd=True)
+        self._n_dimensions = X.ndim - 1
+        if (self._n_dimensions < 2) or (self._n_dimensions > 3):
+            warn(f"Input of `fit` contains arrays of dimension "
+                 f"{self._n_dimensions}.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
+        self._range = int(np.ceil(self.radius))
+
+        iterator_range_list = [range(-self._range, self._range + 1)
+                               for _ in range(self._n_dimensions)] \
+            + [[0] for _ in range(3 - self._n_dimensions)]
+        self._iterator = tuple(itertools.product(*iterator_range_list))
+
+        # The mask is always 3D but not the iterator.
+        self.mask_ = np.ones(tuple(2 * self._range + 1 for _ in range(3)),
+                             dtype=np.bool)
+        mesh_range_list = [np.arange(0, 2 * self._range + 1) for _ in range(3)]
+        self.mesh_ = np.stack(
+            np.meshgrid(*mesh_range_list), axis=3).reshape((-1, 3))
+
+        center = self._range * np.ones((1, 3))
+        self.mask_ = pairwise_distances(
+            center, self.mesh_, metric=self.metric,
+            n_jobs=1, **self.metric_params).reshape(self.mask_.shape)
+
+        self.mask_ = self.mask_ <= self.radius
+
+        padding = np.asarray(
+            [*[self._range for _ in range(self._n_dimensions)],
+             *[0 for _ in range(3 - self._n_dimensions)]])
+        self._padder = Padder(paddings=padding)
+        self._padder.fit(X.reshape((*X.shape[:3], -1)))
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each binary image in the collection `X`, calculate a
+        corresponding greyscale image based on the density of its pixels.
+        Return the collection of greyscale images.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_pixels_x,
+            n_pixels_y [, n_pixels_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D greyscale image.
+
+        """
+        check_is_fitted(self)
+        Xt = check_array(X, allow_nd=True, copy=True)
+
+        Xt = Xt.reshape((*X.shape[:3], -1))
+        Xt = self._padder.transform(Xt)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._calculate_density)(Xt[s])
+            for s in gen_even_slices(Xt.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        Xt = Xt[:, self._range: -self._range, self._range: -self._range]
+
+        if self._n_dimensions == 3:
+            Xt = Xt[:, :, :, self._range: -self._range]
+
+        Xt = Xt.reshape(X.shape)
 
         return Xt
 

@@ -5,7 +5,8 @@ that can be used to apply Topological Data Analysis to images.
 
 from .preprocessing import Binarizer, Inverter, Padder, ImageToPointCloud
 from .filtrations import HeightFiltration, RadialFiltration, \
-    DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+    DilationFiltration, ErosionFiltration, SignedDistanceFiltration, \
+    DensityFiltration
 
 __all__ = [
     'Binarizer',
@@ -17,4 +18,5 @@ __all__ = [
     'DilationFiltration',
     'ErosionFiltration',
     'SignedDistanceFiltration',
+    'DensityFiltration',
 ]
