@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 from functools import reduce
+from operator import iconcat
 from numbers import Real
 from warnings import warn
 
@@ -431,7 +432,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
-    pixel, assign coordinates that are the pixel position on this image.
+    pixel, assign coordinates that are the pixel index on this image, after
+    flipping the rows and then swapping between rows and columns.
 
     This transformer is meant to transform a collection of images to a
     collection of point clouds so that persistent homology calculations can be
@@ -443,14 +445,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
-
-    Attributes
-    ----------
-    mesh_ : ndarray of shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
-        n_dimensions)
-        Mesh image for which each pixel value is its coordinates in a
-        ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
-        dimension of the images of the input collection. Set in meth:`fit`.
 
     See also
     --------
@@ -470,12 +464,12 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
-        Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
-        return Xpts
+        return [np.argwhere(x) for x in X]
 
     def fit(self, X, y=None):
-        """Compute :attr:`mesh_`, and return the estimator.
+        """Do nothing and return the estimator unchanged.
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
 
         Parameters
         ----------
@@ -499,14 +493,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
             warn(f"Input of `fit` contains arrays of dimension "
                  f"{self.n_dimensions_}.")
 
-        axis_order = [2, 1, 3]
-        mesh_range_list = [np.arange(0, X.shape[i])
-                           for i in axis_order[:n_dimensions]]
-
-        self.mesh_ = np.flip(np.stack(np.meshgrid(*mesh_range_list),
-                                      axis=n_dimensions),
-                             axis=0).reshape((-1, n_dimensions))
-
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -533,14 +520,14 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
             point cloud in ``n_dimensions``-dimensional space.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         Xt = check_array(X, allow_nd=True)
 
+        Xt = np.swapaxes(np.flip(Xt, axis=1), 1, 2)
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._embed)(Xt[s])
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
-
-        Xt = reduce(sum, Xt, [])
+        Xt = reduce(iconcat, Xt, [])
         return Xt
 
     @staticmethod
