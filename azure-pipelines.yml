@@ -1,5 +1,11 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+trigger:
+- master
+
+pr:
+- master
+
 jobs:
 
 - job: 'manylinux2010'
@@ -32,7 +38,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -127,7 +133,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 

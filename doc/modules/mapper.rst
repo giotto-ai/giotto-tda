@@ -22,6 +22,7 @@ Filters
 
 Covers
 -------
+
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -33,6 +34,7 @@ Covers
 
 Clustering
 ----------
+
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -44,6 +46,7 @@ Clustering
 
 Pipeline
 --------
+
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -61,6 +64,7 @@ Pipeline
 
 Visualization
 -------------
+
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -75,7 +79,7 @@ Utilities
 .. currentmodule:: gtda
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated/mapper/utils
    :template: function.rst
 
    mapper.utils.decorators.method_to_transform

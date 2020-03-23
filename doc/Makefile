@@ -6,7 +6,7 @@
 ########## Config
 
 ifndef GITDIR
-GITDIR    = ../../../projects/gtda-docs
+GITDIR    = ../../gtda-docs
 endif
 
 ifndef VERSION

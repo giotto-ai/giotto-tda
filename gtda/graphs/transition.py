@@ -16,8 +16,7 @@ from ..utils.validation import validate_params
 
 
 def identity(x):
-    """The identity function.
-    """
+    """The identity function."""
     return x
 
 
@@ -195,10 +194,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, copy=True, allow_nd=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._make_adjacency_matrix)(Xt[i]) for i in
-            range(Xt.shape[0]))
+            delayed(self._make_adjacency_matrix)(x) for x in Xt)
         Xt = np.asarray(Xt)
         return Xt

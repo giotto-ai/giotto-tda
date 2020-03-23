@@ -66,7 +66,7 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $[v_0, \dots, v_n]$ is defined by
 	\begin{equation*}
-	d_i[v_0, \dots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
+	d_i[v_0, \ldots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
 	\end{equation*}
 	where $\widehat{v}_i$ denotes the absence of $v_i$ from the set.
 	
@@ -109,7 +109,7 @@ pdfpagelabels]{hyperref}
 	
 	A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that: 
 	\begin{enumerate}
-		\item for every $v$ in $V$, the tuple $v$ is in $X$ and
+		\item for every $v$ in $V$, the tuple $v$ is in $X$
 		\item if $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$. 
 	\end{enumerate}
 	
@@ -304,7 +304,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
 	\end{equation*}
-	
+
 	The set of persistence diagrams together with any of the distances above is a
 	%\hyperref[metric space]{metric space}.
 	metric space.
@@ -342,6 +342,7 @@ pdfpagelabels]{hyperref}
 	is finite. In this case we refer to (\ref{equation: persistence landscape norm}) as the
 	%\hyperref[vectorization, kernel and amplitude]{amplitude}
 	\textit{landscape} $p$-\textit{amplitude} of $D$.
+
 	
 	\paragraph{\\ References:} \cite{bubenik2015statistical}
 	
@@ -461,7 +462,7 @@ pdfpagelabels]{hyperref}
 	\subsection*{$L^p$-norm:} \label{l^p_norm}	
 	
 	...
-	
+  
 	\subsection*{Vectorization, kernel and amplitude} \label{vectorization_kernel_and_amplitude}	
 	Let $X$ be a set, for example, the set of all
 	%\hyperref[persistence_diagram]{persistence diagrams}
@@ -565,12 +566,10 @@ pdfpagelabels]{hyperref}
 	\paragraph{\\ References:} \cite{milnor1997topology,guillemin2010differential}
 	
 	\subsection*{Compact subset}	\label{compact_subset}
-	
 	A subset $K$ of a metric space $(X,d)$ is said to be \textit{bounded} if there exist a real number $D$ such that for each pair of elements in $K$ the distance between them is less than $D$. It is said to be \textit{complete} if for any $x \in X$ it is the case that $x \in K$ if for any $\epsilon > 0$ the intersection between $K$ and $\{y \,;\ d(x,y) < \epsilon \}$ is not empty. It is said to be \textit{compact} if it is both bounded and complete.
 	
 	\section{Bibliography}
 	\bibliography{bibliography}{}
 	\bibliographystyle{alpha}
-	
 	
 \end{document}

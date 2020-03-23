@@ -7,36 +7,39 @@ from types import FunctionType
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics.pairwise import pairwise_distances
-from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..base import PlotterMixin
+from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.utils.validation import check_is_fitted
+
 from ._utils import _postprocess_diagrams
+from ..base import PlotterMixin
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
+from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
+
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params
-from ..plotting.homology import plot_diagram
+from ..utils.validation import validate_params, check_point_clouds
 
 
 @adapt_fit_transform_docs
 class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`Vietoris-Rips filtrations <vietoris-rips complex and vietoris-rips \
-    homology>`.
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`Vietoris–Rips filtrations
+    <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
-    Euclidean space, or an abstract :ref:`metric space <finite metric spaces
-    and point clouds>` encoded by a distance matrix, information about the
-    appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology and cohomology>`) of various dimension
+    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Euclidean space, or an abstract
+    :ref:`metric space <finite_metric_spaces_and_point_clouds>` encoded by a
+    distance matrix, information about the appearance and disappearance of
+    topological features (technically,
+    :ref:`homology classes <homology_and_cohomology>`) of various dimension
     and at different scales is summarised in the corresponding persistence
     diagram.
 
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, input data is to be interpreted as a
+        If set to ``'precomputed'``, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
         and `metric` determines a rule with which to calculate distances
@@ -60,7 +63,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`p` equals `coeff`.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
+        Upper bound on the maximum value of the Vietoris–Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
@@ -89,7 +92,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris-Rips persistent homology. Python bindings were
+    for computing Vietoris–Rips persistent homology. Python bindings were
     modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
@@ -99,7 +102,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris-Rips persistence \
+    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
         barcodes", 2019; `arXiv:1908.02518 \
         <https://arxiv.org/abs/1908.02518>`_.
 
@@ -149,13 +152,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -166,9 +171,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True, force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -193,13 +199,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -216,50 +224,57 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True, force_all_finite=False)
+        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(X[i])
-                                          for i in range(len(X)))
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._ripser_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
-    def plot(self, Xt, sample=0):
-        """Plot a single persistence diagram.
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_features, 3)
-            Array of persistence diagrams such as the result of a call to
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
         sample : int, optional, default: ``0``
-            Index of the sample to be plotted.
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
 
         """
-        return plot_diagram(Xt[sample],
-                            homology_dimensions=self.homology_dimensions)
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
 
 
 @adapt_fit_transform_docs
-class SparseRipsPersistence(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`Sparse Vietoris-Rips filtrations <vietoris-rips complex and \
-    vietoris-rips homology>`.
+class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`Sparse Vietoris–Rips filtrations
+    <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
-    Euclidean space, or an abstract :ref:`metric space <finite metric spaces
-    and point clouds>` encoded by a distance matrix, information about the
-    appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology and cohomology>`) of various dimensions
+    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Euclidean space, or an abstract
+    :ref:`metric space <finite_metric_spaces_and_point_clouds>`
+    encoded by a distance matrix, information about the appearance and
+    disappearance of topological features (technically,
+    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
     and at different scales is summarised in the corresponding persistence
     diagram.
 
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
-        If set to `'precomputed'`, input data is to be interpreted as a
+        If set to ``'precomputed'``, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays),
         and `metric` determines a rule with which to calculate distances
@@ -283,12 +298,12 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         :math:`p` equals `coeff`.
 
     epsilon : float between 0. and 1., optional, default: ``0.1``
-        Parameter controlling the approximation to the exact Vietoris-Rips
+        Parameter controlling the approximation to the exact Vietoris–Rips
         filtration. If set to `0.`, :class:`SparseRipsPersistence` leads to
         the same results as :class:`VietorisRipsPersistence` but is slower.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
+        Upper bound on the maximum value of the Vietoris–Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
@@ -317,7 +332,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing sparse Vietoris-Rips persistent homology. Python bindings
+    for computing sparse Vietoris–Rips persistent homology. Python bindings
     were modified for performance.
 
     Persistence diagrams produced by this class must be interpreted with
@@ -387,13 +402,15 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -404,9 +421,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True, force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -431,13 +449,15 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points) or \
-            (n_samples, n_points, n_dimensions)
-            Input data. If ``metric == 'precomputed'``, the input should be an
-            ndarray whose each entry along axis 0 is a distance matrix of shape
-            ``(n_points, n_points)``. Otherwise, each such entry will be
-            interpreted as an ndarray of ``n_points`` row vectors in
-            ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds or of distance
+            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
+            If ``metric == 'precomputed'``, elements of `X` must be square
+            arrays representing distance matrices; otherwise, their rows are
+            interpreted as vectors in Euclidean space and, when `X` is a list,
+            warnings are issued when the number of columns (dimension of the
+            Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -454,27 +474,49 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True, force_all_finite=False)
+        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
+
 
 @adapt_fit_transform_docs
-class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    `Cech filtrations <>`_.
+class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    `Cech filtrations <TODO>`_.
 
-    Given a :ref:`point cloud <finite metric spaces and point clouds>` in
+    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
     Euclidean space, information about the appearance and disappearance of
-    topological features (technically, :ref:`homology classes <homology and
-    cohomology>`) of various dimensions and at different scales is
-    summarised in the corresponding persistence diagram.
+    topological features (technically,
+    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     Parameters
     ----------
@@ -488,7 +530,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         :math:`p` equals `coeff`.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris-Rips filtration
+        Upper bound on the maximum value of the Vietoris–Rips filtration
         parameter. Points whose distance is greater than this value will
         never be connected by an edge, and topological features at scales
         larger than this value will not be detected.
@@ -582,9 +624,13 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
-            Input data. Each entry along axis 0 is a point cloud of
-            ``n_points`` row vectors in ``n_dimensions``-dimensional space.
+        X : ndarray or list
+            Input data representing a collection of point clouds. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays. The rows of
+            elements in `X` are interpreted as vectors in Euclidean space and.
+            and, when `X` is a list, warnings are issued when the number of
+            columns (dimension of the Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -595,7 +641,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        check_point_clouds(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -623,8 +669,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_points, n_dimensions)
-            Input data. Each entry along axis 0 is a point cloud of
-            ``n_points`` row vectors in ``n_dimensions``-dimensional space.
+            Input data representing a collection of point clouds. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays. The rows of
+            elements in `X` are interpreted as vectors in Euclidean space and.
+            and, when `X` is a list, warnings are issued when the number of
+            columns (dimension of the Euclidean space) differs among samples.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -640,12 +690,33 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X, allow_nd=True)
+        X = check_point_clouds(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)

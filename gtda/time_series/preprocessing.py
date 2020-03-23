@@ -88,7 +88,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        Xt = check_array(X, ensure_2d=False, allow_nd=True)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True, copy=True)
+
         if Xt.ndim == 1:
             Xt = Xt[: None]
         Xt = Xt[::self.period]
@@ -209,6 +210,7 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
         """
         check_is_fitted(self, '_is_fitted')
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
+
         if Xt.ndim == 1:
             Xt = Xt[:, None]
 

@@ -1,4 +1,4 @@
-"""Point clouds-related plotting functions """
+"""Point-cloud–related plotting functions and classes."""
 # License: GNU AGPLv3
 
 import numpy as np
@@ -6,9 +6,9 @@ import plotly.graph_objs as gobj
 
 
 def plot_point_cloud(point_cloud, dimension=None):
-    """Plot the first 2 or 3 coordinates of the point cloud.
+    """Plot the first 2 or 3 coordinates of a point cloud.
 
-     This function will not work on 1-dimensional arrays.
+     This function will not work on 1D arrays.
 
     Parameters
     ----------
@@ -21,21 +21,21 @@ def plot_point_cloud(point_cloud, dimension=None):
         will be chosen between 2 and 3 depending on the shape of `point_cloud`.
 
     """
+    # TODO: increase the marker size
     if dimension is None:
         dimension = np.min((3, point_cloud.shape[1]))
 
     # Check consistency between point_cloud and dimension
     if point_cloud.shape[1] < dimension:
-        raise ValueError("Not enough dimensions available in the input point"
+        raise ValueError("Not enough dimensions available in the input point "
                          "cloud.")
 
     if dimension == 2:
         layout = {
-            "title": "Point Cloud",
             "width": 800,
             "height": 800,
             "xaxis1": {
-                "title": "First coordinate",
+                "title": "0th",
                 "side": "bottom",
                 "type": "linear",
                 "ticks": "outside",
@@ -46,7 +46,7 @@ def plot_point_cloud(point_cloud, dimension=None):
                 "exponentformat": "e"
             },
             "yaxis1": {
-                "title": "Second coordinate",
+                "title": "1st",
                 "side": "left",
                 "type": "linear",
                 "ticks": "outside",
@@ -75,22 +75,21 @@ def plot_point_cloud(point_cloud, dimension=None):
                                                opacity=0.8)))
         fig.show()
     elif dimension == 3:
-
         scene = {
             "xaxis": {
-                "title": "First coordinate",
+                "title": "0th",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e"
             },
             "yaxis": {
-                "title": "Second coordinate",
+                "title": "1st",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e"
             },
             "zaxis": {
-                "title": "Third coordinate",
+                "title": "2nd",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e"
@@ -98,7 +97,7 @@ def plot_point_cloud(point_cloud, dimension=None):
         }
 
         fig = gobj.Figure()
-        fig.update_layout(scene=scene, title="Point cloud")
+        fig.update_layout(scene=scene)
 
         fig.add_trace(gobj.Scatter3d(x=point_cloud[:, 0],
                                      y=point_cloud[:, 1],
