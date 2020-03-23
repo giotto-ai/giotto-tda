@@ -21,6 +21,7 @@ Plotting functions and plotting API
 -----------------------------------
 
 This version introduces built-in plotting capabilities to ``giotto-tda``. These come in the form of:
+
 -  a new ``plotting`` subpackage populated with plotting functions for common data structures;
 -  a new ``PlotterMixin`` and a class-level plotting API based on newly introduced ``plot``, ``transform_plot`` and
    ``fit_transform_plot`` methods which are now available in several of ``giotto-tda``'s transformers.
@@ -32,6 +33,7 @@ The internal structure of this subpackage has been changed. ``ConsistentRescalin
 subpackage (see below), and ``gtda.homology`` no longer contains a ``point_clouds`` submodule. Instead, it contains two
 submodules, ``simplicial`` and ``cubical``. ``simplicial`` contains the ``VietorisRipsPersistence`` class as well as the
 following new classes:
+
 -  ``SparseRipsPersistence``,
 -  ``EuclideanCechPersistence``.
 
@@ -48,6 +50,7 @@ represented as arrays.
 The classes in ``gtda.images.filtrations`` are responsible for converting binary image input into greyscale images in a
 variety of ways. The greyscale output can then be fed to ``gtda.homology.CubicalPersistence`` to extract topological
 signatures in the form of persistence diagrams. These classes are:
+
 -  ``HeightFiltration``,
 -  ``RadialFiltration``,
 -  ``DilationFiltration``,
@@ -56,6 +59,7 @@ signatures in the form of persistence diagrams. These classes are:
 
 The classes in ``gtda.images.preprocessing`` perform a variety of preprocessing steps on either binary or greyscale image
 input, as well as conversion to point cloud format. They are:
+
 -  ``Binarizer``,
 -  ``Inverter``,
 -  ``Padder``,
@@ -79,10 +83,12 @@ Changes and additions to ``gtda.diagrams``
 ------------------------------------------
 
 The ``diagrams`` subpackage contains the following new classes:
+
 -  ``PersistenceImage``
 -  ``Silhouette``
 
 Additionally, the subpackage has been reorganised as follows:
+
 -  The ``features`` submodule now only contains the *scalar* feature generation classes ``Amplitude`` (moved there from
    ``distance``) and ``PersistenceEntropy``.
 -  Classes which produce *vector* representations from persistence diagrams have been moved to the new ``representations``
