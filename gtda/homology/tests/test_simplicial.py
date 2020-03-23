@@ -100,17 +100,7 @@ def test_cp_transform():
 
 
 def test_vrp_list_of_arrays():
-    """Verify that a list of point clouds"""
     pc_2 = np.array([[0, 1], [1, 2]])
     pc_list = [pc[0].copy(), pc_2]
     vrp = VietorisRipsPersistence()
     vrp.fit(pc_list)
-
-
-def test_vrp_list_invalid_arrays():
-    pc_2 = np.array([[0, 1, 2]])
-    pc_invalid = [pc[0].copy(), pc_2]
-
-    vrp = VietorisRipsPersistence()
-    with pytest.raises(ValueError):
-        vrp.fit(pc_invalid)
