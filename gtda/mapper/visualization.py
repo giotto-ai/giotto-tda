@@ -176,7 +176,8 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                                   layout_dim=2, color_variable=None,
                                   node_color_statistic=None,
                                   color_by_columns_dropdown=False,
-                                  plotly_kwargs=None):
+                                  plotly_kwargs=None,
+                                  in_place=False):
     """Plotting function for interactive Mapper graphs.
 
     Provides functionality to interactively update parameters from the cover
@@ -232,6 +233,9 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the Plotly Figure.
 
+    in_place : bool, optional, default: ``False``
+        Specify whether to modify the pipeline or not.
+
     Returns
     -------
     box : :class:`ipywidgets.VBox` object
@@ -248,7 +252,10 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     """
 
     # clone pipeline to avoid side effects from in-place parameter changes
-    pipe = clone(pipeline)
+    if not(in_place):
+        pipe = clone(pipeline)
+    else:
+        pipe = pipeline
 
     if node_color_statistic is not None:
         _node_color_statistic = node_color_statistic
