@@ -93,3 +93,27 @@ class TestInteractivePlot(TestCaseNoTemplate):
                           for l in g['node_metadata']['node_elements']]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
+
+    def test_is_cloned(self):
+        """Verify that the pipeline is changed on interaction, if and only if
+        `in_place` is True."""
+
+        def inner(is_change_in_place):
+            expected = 'manhattan' if is_change_in_place else 'euclidean'
+
+            pipe = make_mapper_pipeline(clusterer=FirstSimpleGap(
+                affinity='euclidean'))
+            warnings.simplefilter("ignore")
+            fig = plot_interactive_mapper_graph(pipe, X,
+                                                in_place=is_change_in_place)
+            # Get widget and change the cover type
+            w_text = self._get_widget_by_trait(fig, 'description', 'affinity')
+            d = w_text.get_state()
+            d.update({'value': 'manhattan'})
+            w_text.set_state(d)
+
+            assert pipe.get_mapper_params()['clusterer__affinity'] == expected
+
+        for do_change in [False, True]:
+            with self.subTest(do_change=do_change):
+                inner(do_change)
