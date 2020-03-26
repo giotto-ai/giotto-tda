@@ -234,7 +234,8 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         Keyword arguments to configure the Plotly Figure.
 
     in_place : bool, optional, default: ``False``
-        Specify whether to modify the pipeline or not.
+        Specify whether the `pipeline` is modified on change of
+        parameters through the interface.
 
     Returns
     -------
