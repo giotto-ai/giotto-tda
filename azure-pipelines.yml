@@ -306,9 +306,14 @@ jobs:
 #    VERSION: master
 
   steps:
+    - script: |
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      displayName: 'Create .ssh/known_hosts'
+
+
     - task: InstallSSHKey@0
       inputs:
-        knownHostsEntry: github.com
+        knownHostsEntry: invalid
         sshPublicKey: $(KEY_GTDA-DOCS_PUB)
         sshKeySecureFile: KEY_GTDA-DOCS
 
