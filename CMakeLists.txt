@@ -313,23 +313,28 @@ target_compile_definitions(gtda_cech_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYP
 #                             Subsampling                             #
 #######################################################################
 
-# pybind11_add_module(gtda_subsampling "${BINDINGS_DIR}/subsampling_bindings.cpp")
-# if(OpenMP_FOUND)
-#   target_link_libraries(gtda_subsampling PRIVATE OpenMP::OpenMP_CXX)
-# endif()
-# target_link_libraries(gtda_subsampling LINK_PUBLIC ${Boost_LIBRARIES})
-# target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/Spatial_searching/include")
-# target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/Subsampling/include")
-# target_include_directories(gtda_subsampling PRIVATE "gtda/externals/eigen")
-# target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/python/include")
-# target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/common/include")
-# target_compile_options(gtda_subsampling PUBLIC -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math)
-# target_compile_options(gtda_subsampling PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
+# Currently the module is disable because subsampling relies on CGAL
+# And Giotto-tda currently does not support CGAL
+if(0)
+    pybind11_add_module(gtda_subsampling "${BINDINGS_DIR}/subsampling_bindings.cpp")
+    if(OpenMP_FOUND)
+        target_link_libraries(gtda_subsampling PRIVATE OpenMP::OpenMP_CXX)
+    endif()
+    target_link_libraries(gtda_subsampling LINK_PUBLIC ${Boost_LIBRARIES})
+    target_compile_definitions(gtda_subsampling PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
-# # Cannot have two inlined namespace !
-# if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-#   target_compile_options(gtda_subsampling PUBLIC -march=native -D_GLIBCXX_PARALLEL)
-#   target_link_libraries(gtda_subsampling PRIVATE)
-# endif()
+    target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/Spatial_searching/include")
+    target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/Subsampling/include")
+    target_include_directories(gtda_subsampling PRIVATE "gtda/externals/eigen")
+    target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/python/include")
+    target_include_directories(gtda_subsampling PRIVATE "${GUDHI_SRC_DIR}/common/include")
 
-# target_compile_definitions(gtda_subsampling PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+    if(MSVC)
+        target_compile_options(gtda_subsampling PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+        target_compile_options(gtda_subsampling PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
+    else()
+        target_compile_options(gtda_subsampling PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math>)
+        target_compile_options(gtda_subsampling PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
+    endif()
+endif()
+
