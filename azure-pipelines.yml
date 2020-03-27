@@ -332,14 +332,14 @@ jobs:
     - script: |
         ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
       displayName: 'Create .ssh/known_hosts'
-      condition: ne(variables['Build.Reason'], 'PullRequest'))
+      condition: ne(variables['Build.Reason'], 'PullRequest')
 
     - task: InstallSSHKey@0
       inputs:
         knownHostsEntry: ~/.ssh/known_hosts
         sshPublicKey: $(KEY_GTDA-DOCS_PUB)
         sshKeySecureFile: KEY_GTDA-DOCS
-      condition: ne(variables['Build.Reason'], 'PullRequest'))
+      condition: ne(variables['Build.Reason'], 'PullRequest')
 
     - script: |
         set -e
@@ -349,8 +349,8 @@ jobs:
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
         # TODO: copy docs to the right folder and git add them
-        git commit -m "Test empty commit" --allow-empty
+        git commit -m "Test empty commit (azure pipelines)" --allow-empty
         git push -u origin master
         cd -
       displayName:  'Commit the docs'
-      condition: ne(variables['Build.Reason'], 'PullRequest'))
+      condition: ne(variables['Build.Reason'], 'PullRequest')
