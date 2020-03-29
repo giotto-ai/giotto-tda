@@ -1,14 +1,8 @@
 [run]
 omit =
     */gtda/externals/*
-    **/setup.py
-
-    */gtda/compose/*
-    */gtda/datasets/*
-    */gtda/images/*
-    */gtda/neural_network/*
-    */gtda/model_selection/*
 
     **/base.py
     **/pipeline.py
+    **/setup.py
     **/_version.py
