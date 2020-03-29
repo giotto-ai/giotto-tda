@@ -1,11 +1,12 @@
-"""Testing for ForgetDimension and Scaler."""
+"""Testing for diagram preprocessing tools."""
 # License: GNU AGPLv3
 
 import numpy as np
 import pytest
+from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import ForgetDimension, Scaler
+from gtda.diagrams import ForgetDimension, Scaler, Filtering
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],
@@ -211,6 +212,7 @@ X_2 = np.array([[[0., 0.36905774, 0],
 def test_not_fitted():
     dst = ForgetDimension()
     dsc = Scaler()
+    dfil = Filtering()
 
     with pytest.raises(NotFittedError):
         dst.transform(X_1)
@@ -221,6 +223,9 @@ def test_not_fitted():
     with pytest.raises(NotFittedError):
         dsc.inverse_transform(X_1)
 
+    with pytest.raises(NotFittedError):
+        dfil.transform(X_1)
+
 
 @pytest.mark.parametrize('X', [X_1, X_2])
 def test_dst_transform(X):
@@ -229,18 +234,34 @@ def test_dst_transform(X):
     assert X_res.shape == X.shape
 
 
-parameters = [('wasserstein', {'p': 2}),
-              ('betti', {'n_bins': 10}),
-              ('bottleneck', None)]
+parameters_sc = [('wasserstein', {'p': 2}),
+                 ('betti', {'n_bins': 10}),
+                 ('bottleneck', None)]
 
 
-@pytest.mark.parametrize(('metric', 'metric_params'), parameters)
+@pytest.mark.parametrize(('metric', 'metric_params'), parameters_sc)
 @pytest.mark.parametrize('X', [X_1, X_2])
 def test_dd_transform(X, metric, metric_params):
     dsc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
     X_res = dsc.fit_transform(X)
     assert X_res.shape == X.shape
 
-    dsc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
-    X_inv_res = dsc.fit(X_res).inverse_transform(X_res)
-    assert X_inv_res.shape == X.shape
+    X_inv_res = dsc.inverse_transform(X_res)
+    assert_almost_equal(X_inv_res, X)
+
+
+lifetimes_1 = X_1[:, :, 1] - X_1[:, :, 0]
+epsilons_1 = np.linspace(np.min(lifetimes_1), np.max(lifetimes_1), num=3)
+
+
+@pytest.mark.parametrize('epsilon', epsilons_1)
+@pytest.mark.parametrize('X', [X_1, X_2])
+def test_dfil_transform(X, epsilon):
+    dfil = Filtering(epsilon=0.)
+    X_res = dfil.fit_transform(X[:, [0], :])
+    assert_almost_equal(X_res, X[:, [0], :])
+
+    dfil = Filtering(epsilon=epsilon)
+    X_res_1 = dfil.fit_transform(X_1)
+    lifetimes_res_1 = X_res_1[:, :, 1] - X_res_1[:, :, 0]
+    assert not ((lifetimes_res_1 > 0.) & (lifetimes_res_1 <= epsilon)).any()
