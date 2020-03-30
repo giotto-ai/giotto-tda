@@ -154,7 +154,7 @@ jobs:
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+    displayName: 'Test dev install with pytest, upload coverage report'
 
   - script: |
       set -e
@@ -252,7 +252,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml || exit /b
+      pytest gtda --no-cov --no-coverage-upload || exit /b
     displayName: 'Test dev install with pytest'
 
   - script: |
