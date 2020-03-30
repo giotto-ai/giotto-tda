@@ -90,8 +90,8 @@ def test_window_params():
 
 def test_window_transform():
     windows = SlidingWindow(width=3, stride=2)
-    x_windows = windows.fit_transform(signal_embedded_search)
-    assert (x_windows.shape == (8, 4, 2))
+    X_windows = windows.fit_transform(signal_embedded_search)
+    assert (X_windows.shape == (8, 4, 2))
 
 
 def test_window_resample():
@@ -99,3 +99,9 @@ def test_window_resample():
     windows.fit(y)
     y_resampled = windows.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])
+
+
+def test_window_plot():
+    windows = SlidingWindow(width=3, stride=2)
+    X_windows = windows.fit_transform(signal_embedded_search)
+    windows.plot(X_windows, sample=0)
