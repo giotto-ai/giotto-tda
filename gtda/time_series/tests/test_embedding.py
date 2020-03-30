@@ -2,12 +2,14 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.time_series import TakensEmbedding
-from gtda.time_series import SlidingWindow
+from gtda.time_series import SlidingWindow, TakensEmbedding
+
+pio.renderers.default = 'plotly_mimetype'
 
 signal = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
 

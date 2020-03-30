@@ -2,11 +2,14 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.diagrams import ForgetDimension, Scaler, Filtering
+
+pio.renderers.default = 'plotly_mimetype'
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],

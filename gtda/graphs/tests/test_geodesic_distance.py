@@ -1,11 +1,14 @@
 """Testing for GraphGeodesicDistance."""
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.graphs import GraphGeodesicDistance
+
+pio.renderers.default = 'plotly_mimetype'
 
 X_ggd = np.array([
     np.array(

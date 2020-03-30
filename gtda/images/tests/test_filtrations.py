@@ -2,12 +2,15 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import HeightFiltration, RadialFiltration, \
-   DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+    DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+
+pio.renderers.default = 'plotly_mimetype'
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],

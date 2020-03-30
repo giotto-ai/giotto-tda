@@ -2,11 +2,14 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import CubicalPersistence
+
+pio.renderers.default = 'plotly_mimetype'
 
 X = np.array([[[2., 2.47942554],
                [2.47942554, 2.84147098],

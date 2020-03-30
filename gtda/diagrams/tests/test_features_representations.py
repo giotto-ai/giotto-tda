@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
@@ -11,6 +12,8 @@ from sklearn.exceptions import NotFittedError
 
 from gtda.diagrams import PersistenceEntropy, BettiCurve, \
     PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette
+
+pio.renderers.default = 'plotly_mimetype'
 
 X = np.array([[[0., 1., 0.], [2., 3., 0.], [4., 6., 1.], [2., 6., 1.]]])
 
@@ -36,7 +39,7 @@ def test_not_fitted():
 
 
 @pytest.mark.parametrize('hom_dim_ix', [0, 1])
-def test_fit_transform_plot_1(hom_dim_ix):
+def test_fit_transform_plot_one_hom_dim(hom_dim_ix):
     HeatKernel().fit_transform_plot(
         X, sample=0, homology_dimension_ix=hom_dim_ix)
     PersistenceImage().fit_transform_plot(
@@ -44,7 +47,7 @@ def test_fit_transform_plot_1(hom_dim_ix):
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
-def test_fit_transform_plot_2(hom_dims):
+def test_fit_transform_plot_many_hom_dims(hom_dims):
     BettiCurve().fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims)
     PersistenceLandscape().fit_transform_plot(
