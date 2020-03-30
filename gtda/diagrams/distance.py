@@ -102,9 +102,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Amplitude, Scaler, Filtering, \
-    BettiCurve, PersistenceLandscape, \
-    HeatKernel, Silhouette, \
+    Amplitude, Scaler, Filtering, BettiCurve, PersistenceLandscape, \
+    PersistenceImage, HeatKernel, Silhouette, \
     gtda.homology.VietorisRipsPersistence
 
     Notes

@@ -2,12 +2,15 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import HeightFiltration, RadialFiltration, \
-   DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+    DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+
+pio.renderers.default = 'plotly_mimetype'
 
 images_2D = np.stack([np.ones((3, 4)),
                       np.concatenate([np.ones((3, 2)), np.zeros((3, 2))],
@@ -78,6 +81,10 @@ def test_height_transform(direction, images, expected):
                         expected)
 
 
+def test_height_fit_transform_plot():
+    HeightFiltration().fit_transform_plot(images_2D, sample=0)
+
+
 def test_radial_not_fitted():
     radial = RadialFiltration()
     with pytest.raises(NotFittedError):
@@ -130,6 +137,10 @@ def test_radial_transform(center, images, expected):
                         expected)
 
 
+def test_radial_fit_transform_plot():
+    RadialFiltration().fit_transform_plot(images_2D, sample=0)
+
+
 def test_dilation_not_fitted():
     dilation = DilationFiltration()
     with pytest.raises(NotFittedError):
@@ -170,6 +181,10 @@ def test_dilation_transform(n_iterations, images, expected):
 
     assert_almost_equal(dilation.fit_transform(images),
                         expected)
+
+
+def test_dilation_fit_transform_plot():
+    DilationFiltration().fit_transform_plot(images_2D, sample=0)
 
 
 def test_erosion_not_fitted():
@@ -214,6 +229,10 @@ def test_erosion_transform(n_iterations, images, expected):
                         expected)
 
 
+def test_erosion_fit_transform_plot():
+    ErosionFiltration().fit_transform_plot(images_2D, sample=0)
+
+
 def test_signed_not_fitted():
     signed = SignedDistanceFiltration()
     with pytest.raises(NotFittedError):
@@ -253,3 +272,7 @@ def test_signed_transform(n_iterations, images, expected):
 
     assert_almost_equal(signed.fit_transform(images),
                         expected)
+
+
+def test_signed_fit_transform_plot():
+    SignedDistanceFiltration().fit_transform_plot(images_2D, sample=0)
