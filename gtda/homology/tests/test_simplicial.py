@@ -17,7 +17,7 @@ X = np.array([[[2., 2.47942554], [2.47942554, 2.84147098],
                [2.98935825, 2.79848711], [2.79848711, 2.41211849],
                [2.41211849, 1.92484888]]])
 
-X_dist = squareform(pdist(X[0])).reshape(*pc.shape[:2], pc.shape[1])
+X_dist = squareform(pdist(X[0])).reshape(*X.shape[:2], X.shape[1])
 
 
 def test_vrp_params():
