@@ -38,7 +38,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.18" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -133,7 +133,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.18" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -154,7 +154,7 @@ jobs:
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+    displayName: 'Test dev install with pytest, upload coverage report'
 
   - script: |
       set -e
@@ -200,6 +200,12 @@ jobs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
+  - script: |
+      set -e
+      pip install twine
+      twine check dist/*
+    displayName: 'Check distribution with twine'
+
   - task: PublishBuildArtifacts@1
     displayName: 'Create download link'
     inputs:
@@ -208,7 +214,6 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
@@ -247,7 +252,7 @@ jobs:
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml || exit /b
+      pytest gtda --no-cov --no-coverage-upload || exit /b
     displayName: 'Test dev install with pytest'
 
   - script: |
