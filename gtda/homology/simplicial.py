@@ -724,7 +724,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
 
 @adapt_fit_transform_docs
-class FlagserPersistence(BaseEstimator, TransformerMixin):
+class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence diagram>` resulting from
     :ref:`filtrations <filtered complex>` of :ref:`directed or undirected flag
     complexes <clique or flag complexes>`.
@@ -920,8 +920,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_point_clouds(X, distance_matrix=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._flagser_diagram)(Xt[i])
-                                          for i in range(len(X)))
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._flagser_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
