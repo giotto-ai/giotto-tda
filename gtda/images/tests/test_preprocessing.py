@@ -42,6 +42,10 @@ def test_binarizer_transform(threshold, expected):
                         expected)
 
 
+def test_binarizer_fit_transform_plot():
+    Binarizer().fit_transform_plot(images_2D, sample=0)
+
+
 def test_inverter_not_fitted():
     inverter = Inverter()
     with pytest.raises(NotFittedError):
@@ -69,13 +73,17 @@ def test_inverter_transform(images, expected):
                         expected)
 
 
+def test_inverter_fit_transform_plot():
+    Inverter().fit_transform_plot(images_2D, sample=0)
+
+
 def test_padder_not_fitted():
     padder = Padder()
     with pytest.raises(NotFittedError):
         padder.transform(images_2D)
 
 
-@pytest.mark.parametrize("images, paddings, ",
+@pytest.mark.parametrize("images, paddings",
                          [(images_2D, np.array([1, 1], dtype=np.int)),
                           (images_2D, None),
                           (images_3D, np.array([2, 2, 2], dtype=np.int))])
@@ -89,6 +97,10 @@ def test_padder_transform(images, paddings):
 
     assert_equal(padder.fit_transform(images).shape[1:],
                  expected_shape)
+
+
+def test_padder_fit_transform_plot():
+    Padder().fit_transform_plot(images_2D, sample=0)
 
 
 images_2D_small = np.stack([
@@ -127,6 +139,16 @@ images_3D_img2pc = list(
      np.array([[]])])
 
 
+def compare_arrays_as_sets(a1, a2):
+    """ A helper function to compare two point_clouds.
+    They should have the same points, but not necessarily in the same order.
+    """
+    def to_set_of_elements(a):
+        return set([tuple(p) for p in a])
+    as1, as2 = [to_set_of_elements(a) for a in [a1, a2]]
+    return (as1 <= as2) and (as1 >= as2)
+
+
 @pytest.mark.parametrize("images, expected",
                          [(images_2D_small, images_2D_img2pc),
                           (images_3D_small, images_3D_img2pc)])
@@ -139,11 +161,6 @@ def test_img2pc_transform(images, expected):
                                  expected))
 
 
-def compare_arrays_as_sets(a1, a2):
-    """ A helper function to compare two point_clouds.
-    They should have the same points, but not necessarily in the same order.
-    """
-    def to_set_of_elements(a):
-        return set([tuple(p) for p in a])
-    as1, as2 = [to_set_of_elements(a) for a in [a1, a2]]
-    return (as1 <= as2) and (as1 >= as2)
+@pytest.mark.parametrize("images", [images_2D, images_3D])
+def test_img2pc_fit_transform_plot(images):
+    ImageToPointCloud().fit_transform_plot(images, sample=0)
