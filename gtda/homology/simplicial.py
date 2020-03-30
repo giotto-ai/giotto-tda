@@ -871,7 +871,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True, force_all_finite=False)
+        check_point_clouds(X, distance_matrix=True)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -918,7 +918,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        X = check_point_clouds(X, distance_matrix=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._flagser_diagram)(Xt[i])
                                           for i in range(len(X)))
