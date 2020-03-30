@@ -64,7 +64,7 @@ def test_pe_transform():
 def test_bc_transform_shape(n_bins):
     bc = BettiCurve(n_bins=n_bins)
     X_res = bc.fit_transform(X)
-    assert  X_res.shape == (1, bc._n_dimensions, n_bins)
+    assert X_res.shape == (1, bc._n_dimensions, n_bins)
 
 
 @pytest.mark.parametrize('n_bins', range(10, 51, 10))
@@ -72,7 +72,7 @@ def test_bc_transform_shape(n_bins):
 def test_pl_transform_shape(n_bins, n_layers):
     pl = PersistenceLandscape(n_bins=n_bins, n_layers=n_layers)
     X_res = pl.fit_transform(X)
-    assert  X_res.shape == (1, pl._n_dimensions, n_layers, n_bins)
+    assert X_res.shape == (1, pl._n_dimensions, n_layers, n_bins)
 
 
 @given(X=arrays(dtype=np.float, unique=True,
@@ -231,4 +231,3 @@ def test_hk_with_diag_points(pts):
                                  for x_ in [x, x_with_diag_points]]
 
     assert_almost_equal(x_with_diag_points_t, x_t, decimal=13)
-
