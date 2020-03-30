@@ -2,6 +2,8 @@
 omit =
     */gtda/externals/*
 
+    *tests*
+
     **/gtda/utils/intervals.py
     **/gtda/utils/_docs.py
     **/base.py
