@@ -157,6 +157,6 @@ def test_fp_transform_undirected():
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
-def test_cp_fit_transform_plot(hom_dims):
+def test_fp_fit_transform_plot(hom_dims):
     FlagserPersistence(directed=False).fit_transform_plot(
         X_dist, sample=0, homology_dimensions=hom_dims)
