@@ -82,7 +82,7 @@ def test_pl_transform_shape(n_bins, n_layers):
                 elements=integers(min_value=-1e10, max_value=1e6),
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
 def test_pi_null(X):
-    """Test that, if one trivial X (all pts on the diagonal) is provided,
+    """Test that, if one trivial diagram (all pts on the diagonal) is provided,
     (along with a non-trivial one), then its pi is null"""
     pi = PersistenceImage(sigma=1, n_bins=10)
     X = np.append(X, 1 + X[-1])
