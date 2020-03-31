@@ -1,10 +1,10 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
-trigger:
-- master
+# trigger:
+# - master
 
-pr:
-- master
+# pr:
+# - master
 
 jobs:
 
