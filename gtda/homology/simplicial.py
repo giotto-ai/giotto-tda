@@ -129,8 +129,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xdgms = ripser(X[X[:, 0] != np.inf],
-                       maxdim=self._max_homology_dimension,
+        Xdgms = ripser(X, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
                        metric=self.metric)['dgms']
 
