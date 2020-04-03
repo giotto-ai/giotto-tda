@@ -30,7 +30,7 @@ pdfpagelabels]{hyperref}
 		$\mathbb R^d$ & The vector space of $d$-tuples of real numbers. \\
 		$\Delta$ & The 
 		%\hyperref[multiset]{multiset}
-		multiset $ \lbrace (s, s) \mid  s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
+		multiset $ \lbrace (s, s) \mid s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
 	\end{tabular}
 	
 	\section{Homology}
@@ -325,7 +325,7 @@ pdfpagelabels]{hyperref}
 	\end{equation*}	
 	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the \textit{$k$-layer of the persistence landscape}.
 	
-	We describe the graph of each $\lambda_k$ intuitively. For each $i \in I$, draw an isosceles triangle with base the interval $(b_i, d_i)$ on the horizontal $t$-axis, and sides with  slope  1  and $-1$.  This  subdivides  the  plane  into  a  number  of  polygonal regions.  Label each of these regions by the number of triangles containing it.  If $P_k$ is the union of the polygonal regions with values at least $k$, then the graph of $\lambda_k$ is the upper contour of $P_k$, with $\lambda_k(a) = 0$ if the vertical line $t=a$ does not intersect $P_k$.
+	We describe the graph of each $\lambda_k$ intuitively. For each $i \in I$, draw an isosceles triangle with base the interval $(b_i, d_i)$ on the horizontal $t$-axis, and sides with slope 1 and $-1$. This subdivides the plane into a number of polygonal regions. Label each of these regions by the number of triangles containing it. If $P_k$ is the union of the polygonal regions with values at least $k$, then the graph of $\lambda_k$ is the upper contour of $P_k$, with $\lambda_k(a) = 0$ if the vertical line $t=a$ does not intersect $P_k$.
 	
 	The persistence landscape construction defines a
 	%\hyperref[vectorization, kernel and amplitude]{vectorization}
@@ -339,11 +339,10 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}	
 	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}	
 	\end{equation*}	
-	is finite. In this case we refer to (\eqref{equation:persistence_landscape_norm}) as the
+	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the
 	%\hyperref[vectorization, kernel and amplitude]{amplitude}
 	\textit{landscape} $p$-\textit{amplitude} of $D$.
 
-	
 	\paragraph{\\ References:} \cite{bubenik2015statistical}
 	
 	\subsection*{Weighted silhouette} \label{weighted_silhouette}
@@ -367,7 +366,7 @@ pdfpagelabels]{hyperref}
 	\subsection*{Persistence entropy} \label{persistence_entropy}
 	
 	Intuitively, this is a measure of the entropy of the points in a
-	%  \hyperref[persistence_diagram]{persistence diagram}
+	% \hyperref[persistence_diagram]{persistence diagram}
 	persistence diagram. Precisely, let $D = \{(b_i, d_i)\}_{i \in I}$ be a persistence diagram with each $d_i < +\infty$. The \textit{persistence entropy} of $D$ is defined by
 	\begin{equation*}
 	E(D) = - \sum_{i \in I} p_i \log(p_i)
@@ -459,11 +458,8 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{euclidean norm} and \textit{euclidean distance}.	
 	
-	\subsection*{$L^p$-norm:} \label{l^p_norm}	
-	
-	...
-  
 	\subsection*{Vectorization, kernel and amplitude} \label{vectorization_kernel_and_amplitude}	
+	
 	Let $X$ be a set, for example, the set of all
 	%\hyperref[persistence_diagram]{persistence diagrams}
 	persistence diagrams. A \textit{vectorization} for $X$ is a function	
