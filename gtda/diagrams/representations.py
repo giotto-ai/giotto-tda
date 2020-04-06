@@ -109,10 +109,10 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, _ = _bin(X, metric='betti', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
+
         return self
 
     def transform(self, X, y=None):
@@ -179,51 +179,51 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             for dim in homology_dimensions:
                 if dim not in self.homology_dimensions_:
                     raise ValueError(
-                        f'All homology dimensions must be in '
-                        f'self.homology_dimensions_ which is '
-                        f'{self.homology_dimensions_}. {dim} is not.')
+                        f"All homology dimensions must be in "
+                        f"self.homology_dimensions_ which is "
+                        f"{self.homology_dimensions_}. {dim} is not.")
                 else:
                     homology_dimensions_arr = np.array(
                         self.homology_dimensions_)
                     ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
                     _homology_dimensions.append((ix, dim))
 
-        layout = {
-            "xaxis1": {
-                "title": "Filtration parameter",
-                "side": "bottom",
-                "type": "linear",
-                "ticks": "outside",
-                "anchor": "x1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
-            },
-            "yaxis1": {
-                "title": "Betti number",
-                "side": "left",
-                "type": "linear",
-                "ticks": "outside",
-                "anchor": "y1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
-            },
-            "plot_bgcolor": "white"
-        }
+        layout = dict(
+            xaxis1=dict(
+                title="Filtration parameter",
+                side="bottom",
+                type="linear",
+                ticks="outside",
+                anchor="x1",
+                showline=True,
+                zeroline=True,
+                showexponent="all",
+                exponentformat="e"
+            ),
+            yaxis1=dict(
+                title="Betti number",
+                side="left",
+                type="linear",
+                ticks="outside",
+                anchor="y1",
+                showline=True,
+                zeroline=True,
+                showexponent="all",
+                exponentformat="e"
+            ),
+            plot_bgcolor="white"
+        )
         fig = gobj.Figure(layout=layout)
-        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
-        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
 
         for ix, dim in _homology_dimensions:
             fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
                                        y=Xt[sample][ix],
                                        mode='lines', showlegend=True,
-                                       name=f'H{int(dim)}'))
+                                       name=f"H{int(dim)}"))
 
         fig.show()
 
@@ -319,7 +319,6 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, _ = _bin(X, metric="landscape", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
@@ -396,38 +395,38 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             for dim in homology_dimensions:
                 if dim not in self.homology_dimensions_:
                     raise ValueError(
-                        f'All homology dimensions must be in '
-                        f'self.homology_dimensions_ which is '
-                        f'{self.homology_dimensions_}. {dim} is not.')
+                        f"All homology dimensions must be in "
+                        f"self.homology_dimensions_ which is "
+                        f"{self.homology_dimensions_}. {dim} is not.")
                 else:
                     homology_dimensions_arr = np.array(
                         self.homology_dimensions_)
                     ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
                     _homology_dimensions.append((ix, dim))
 
-        layout = {
-            "xaxis1": {
-                "side": "bottom",
-                "type": "linear",
-                "ticks": "outside",
-                "anchor": "y1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
-            },
-            "yaxis1": {
-                "side": "left",
-                "type": "linear",
-                "ticks": "outside",
-                "anchor": "x1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
-            },
-            "plot_bgcolor": "white"
-        }
+        layout = dict(
+            xaxis1=dict(
+                side="bottom",
+                type="linear",
+                ticks="outside",
+                anchor="y1",
+                showline=True,
+                zeroline=True,
+                showexponent="all",
+                exponentformat="e"
+            ),
+            yaxis1=dict(
+                side="left",
+                type="linear",
+                ticks="outside",
+                anchor="x1",
+                showline=True,
+                zeroline=True,
+                showexponent="all",
+                exponentformat="e"
+            ),
+            plot_bgcolor="white"
+        )
 
         Xt_sample = Xt[sample]
         for ix, dim in _homology_dimensions:
@@ -435,9 +434,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             layout_dim['title'] = "Persistence landscape for homology " + \
                                   "dimension {}".format(int(dim))
             fig = gobj.Figure(layout=layout_dim)
-            fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+            fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                              mirror=False)
-            fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+            fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                              mirror=False)
 
             n_layers = Xt_sample.shape[1]
@@ -553,11 +552,11 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, self._step_size = _bin(
             X, metric='heat', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
+
         return self
 
     def transform(self, X, y=None):
@@ -599,8 +598,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0,
-             colorscale='blues'):
+    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues'):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of heat kernel images.
 
@@ -747,7 +745,6 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_diagrams(X)
-
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -758,13 +755,13 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, self._step_size = _bin(
             X, metric='persistence_image', n_bins=self.n_bins)
         self.samplings_ = {dim: s.transpose()
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.effective_weight_function_,
                                            self._samplings)
+
         return self
 
     def transform(self, X, y=None):
@@ -945,7 +942,6 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-
         self._samplings, _ = _bin(X, metric='silhouette', n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
@@ -1017,50 +1013,50 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             for dim in homology_dimensions:
                 if dim not in self.homology_dimensions_:
                     raise ValueError(
-                        f'All homology dimensions must be in '
-                        f'self.homology_dimensions_ which is '
-                        f'{self.homology_dimensions_}. {dim} is not.')
+                        f"All homology dimensions must be in "
+                        f"self.homology_dimensions_ which is "
+                        f"{self.homology_dimensions_}. {dim} is not.")
                 else:
                     homology_dimensions_arr = np.array(
                         self.homology_dimensions_)
                     ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
                     _homology_dimensions.append((ix, dim))
 
-        layout = {
-            "xaxis1": {
-                "title": "Filtration parameter",
-                "side": "bottom",
-                "type": "linear",
-                "ticks": "outside",
-                "anchor": "x1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
-            },
-            "yaxis1": {
-                "side": "left",
-                "type": "linear",
-                "ticks": "outside",
-                "anchor": "y1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
-            },
-            "plot_bgcolor": "white"
-        }
+        layout = dict(
+            xaxis1=dict(
+                title="Filtration parameter",
+                side="bottom",
+                type="linear",
+                ticks="outside",
+                anchor="x1",
+                showline=True,
+                zeroline=True,
+                showexponent="all",
+                exponentformat="e"
+            ),
+            yaxis1=dict(
+                side="left",
+                type="linear",
+                ticks="outside",
+                anchor="y1",
+                showline=True,
+                zeroline=True,
+                showexponent="all",
+                exponentformat="e"
+            ),
+            plot_bgcolor="white"
+        )
         fig = gobj.Figure(layout=layout)
-        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
-        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
 
         for ix, dim in _homology_dimensions:
             fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
                                        y=Xt[sample][ix],
-                                       mode='lines', showlegend=True,
-                                       hoverinfo='none',
-                                       name=f'H{int(dim)}'))
+                                       mode="lines", showlegend=True,
+                                       hoverinfo="none",
+                                       name=f"H{int(dim)}"))
 
         fig.show()

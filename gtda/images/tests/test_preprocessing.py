@@ -2,11 +2,14 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal, assert_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import Binarizer, Inverter, Padder, ImageToPointCloud
+
+pio.renderers.default = 'plotly_mimetype'
 
 images_2D = np.stack([
     np.ones((7, 8)),
@@ -42,6 +45,10 @@ def test_binarizer_transform(threshold, expected):
                         expected)
 
 
+def test_binarizer_fit_transform_plot():
+    Binarizer().fit_transform_plot(images_2D, sample=0)
+
+
 def test_inverter_not_fitted():
     inverter = Inverter()
     with pytest.raises(NotFittedError):
@@ -69,13 +76,17 @@ def test_inverter_transform(images, expected):
                         expected)
 
 
+def test_inverter_fit_transform_plot():
+    Inverter().fit_transform_plot(images_2D, sample=0)
+
+
 def test_padder_not_fitted():
     padder = Padder()
     with pytest.raises(NotFittedError):
         padder.transform(images_2D)
 
 
-@pytest.mark.parametrize("images, paddings, ",
+@pytest.mark.parametrize("images, paddings",
                          [(images_2D, np.array([1, 1], dtype=np.int)),
                           (images_2D, None),
                           (images_3D, np.array([2, 2, 2], dtype=np.int))])
@@ -89,6 +100,10 @@ def test_padder_transform(images, paddings):
 
     assert_equal(padder.fit_transform(images).shape[1:],
                  expected_shape)
+
+
+def test_padder_fit_transform_plot():
+    Padder().fit_transform_plot(images_2D, sample=0)
 
 
 images_2D_small = np.stack([
@@ -108,33 +123,33 @@ def test_img2pc_not_fitted():
         img2pc.transform(images_2D)
 
 
-images_2D_img2pc = np.array(
-    [[[0., 2.], [1., 2.], [0., 1.],
-      [1., 1.], [0., 0.], [1., 0.]],
-     [[0., 2.], [np.inf, np.inf], [0., 1.],
-      [np.inf, np.inf], [0., 0.], [np.inf, np.inf]],
-     [[np.inf, np.inf], [np.inf, np.inf], [np.inf, np.inf],
-      [np.inf, np.inf], [np.inf, np.inf], [np.inf, np.inf]]])
+images_2D_img2pc = list(
+    [np.array([[0., 2.], [1., 2.], [0., 1.], [1., 1.], [0., 0.], [1., 0.]]),
+     np.array([[0., 2.], [0., 1.], [0., 0.]]),
+     np.array([[]])
+     ])
 
-images_3D_img2pc = np.array(
-    [[[0., 2., 0.], [0., 2., 1.],
-      [1., 2., 0.], [1., 2., 1.],
-      [0., 1., 0.], [0., 1., 1.],
-      [1., 1., 0.], [1., 1., 1.],
-      [0., 0., 0.], [0., 0., 1.],
-      [1., 0., 0.], [1., 0., 1.]],
-     [[0., 2., 0.], [0., 2., 1.],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [0., 1., 0.], [0., 1., 1.],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [0., 0., 0.], [0., 0., 1.],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf]],
-     [[np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf],
-      [np.inf, np.inf, np.inf], [np.inf, np.inf, np.inf]]])
+images_3D_img2pc = list(
+    [np.array([[0., 2., 0.], [0., 2., 1.],
+              [1., 2., 0.], [1., 2., 1.],
+              [0., 1., 0.], [0., 1., 1.],
+              [1., 1., 0.], [1., 1., 1.],
+              [0., 0., 0.], [0., 0., 1.],
+              [1., 0., 0.], [1., 0., 1.]]),
+     np.array([[0., 2., 0.], [0., 2., 1.],
+               [0., 1., 0.], [0., 1., 1.],
+               [0., 0., 0.], [0., 0., 1.]]),
+     np.array([[]])])
+
+
+def compare_arrays_as_sets(a1, a2):
+    """ A helper function to compare two point_clouds.
+    They should have the same points, but not necessarily in the same order.
+    """
+    def to_set_of_elements(a):
+        return set([tuple(p) for p in a])
+    as1, as2 = [to_set_of_elements(a) for a in [a1, a2]]
+    return (as1 <= as2) and (as1 >= as2)
 
 
 @pytest.mark.parametrize("images, expected",
@@ -142,6 +157,13 @@ images_3D_img2pc = np.array(
                           (images_3D_small, images_3D_img2pc)])
 def test_img2pc_transform(images, expected):
     img2pc = ImageToPointCloud()
+    results = img2pc.fit_transform(images)
 
-    assert_almost_equal(img2pc.fit_transform(images),
-                        expected)
+    all(compare_arrays_as_sets(res, expected)
+        for res, expected in zip(results,
+                                 expected))
+
+
+@pytest.mark.parametrize("images", [images_2D, images_3D])
+def test_img2pc_fit_transform_plot(images):
+    ImageToPointCloud().fit_transform_plot(images, sample=0)

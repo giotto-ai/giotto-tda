@@ -1,11 +1,15 @@
-"""Testing for ForgetDimension and Scaler."""
+"""Testing of preprocessing tools for persistence diagrams."""
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
+from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import ForgetDimension, Scaler
+from gtda.diagrams import ForgetDimension, Scaler, Filtering
+
+pio.renderers.default = 'plotly_mimetype'
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],
@@ -209,38 +213,71 @@ X_2 = np.array([[[0., 0.36905774, 0],
 
 
 def test_not_fitted():
-    dst = ForgetDimension()
-    dsc = Scaler()
+    with pytest.raises(NotFittedError):
+        ForgetDimension().transform(X_1)
 
     with pytest.raises(NotFittedError):
-        dst.transform(X_1)
+        Scaler().transform(X_1)
 
     with pytest.raises(NotFittedError):
-        dsc.transform(X_1)
+        Scaler().inverse_transform(X_1)
 
     with pytest.raises(NotFittedError):
-        dsc.inverse_transform(X_1)
+        Filtering().transform(X_1)
+
+
+def test_forg_fit_transform_plot():
+    ForgetDimension().fit_transform_plot(X_1, sample=0)
+
+
+@pytest.mark.parametrize('hom_dims', [None, (0,), (1,)])
+def test_fit_transform_plot(hom_dims):
+    Scaler().fit_transform_plot(
+        X_1, sample=0, homology_dimensions=hom_dims)
+
+    Filtering().fit_transform_plot(
+        X_1, sample=0, homology_dimensions=hom_dims)
 
 
 @pytest.mark.parametrize('X', [X_1, X_2])
-def test_dst_transform(X):
-    dst = ForgetDimension()
-    X_res = dst.fit_transform(X)
+def test_forg_transform_shape(X):
+    forg = ForgetDimension()
+    X_res = forg.fit_transform(X)
     assert X_res.shape == X.shape
 
 
-parameters = [('wasserstein', {'p': 2}),
-              ('betti', {'n_bins': 10}),
-              ('bottleneck', None)]
+parameters_sc = [('wasserstein', {'p': 2}),
+                 ('betti', {'n_bins': 10}),
+                 ('bottleneck', None)]
 
 
-@pytest.mark.parametrize(('metric', 'metric_params'), parameters)
+@pytest.mark.parametrize(('metric', 'metric_params'), parameters_sc)
 @pytest.mark.parametrize('X', [X_1, X_2])
-def test_dd_transform(X, metric, metric_params):
-    dsc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
-    X_res = dsc.fit_transform(X)
+def test_sc_transform_shape(X, metric, metric_params):
+    sc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
+    X_res = sc.fit_transform(X)
     assert X_res.shape == X.shape
 
-    dsc = Scaler(metric=metric, metric_params=metric_params, n_jobs=1)
-    X_inv_res = dsc.fit(X_res).inverse_transform(X_res)
-    assert X_inv_res.shape == X.shape
+    X_inv_res = sc.inverse_transform(X_res)
+    assert_almost_equal(X_inv_res, X)
+
+
+@pytest.mark.parametrize('X', [X_1, X_2])
+def test_filt_transform_zero(X):
+    filt = Filtering(epsilon=0.)
+    X_res = filt.fit_transform(X[:, [0], :])
+    assert_almost_equal(X_res, X[:, [0], :])
+
+
+lifetimes_1 = X_1[:, :, 1] - X_1[:, :, 0]
+epsilons_1 = np.linspace(np.min(lifetimes_1), np.max(lifetimes_1), num=3)
+
+
+@pytest.mark.parametrize('epsilon', epsilons_1)
+def test_filt_transform(epsilon):
+    filt = Filtering(epsilon=epsilon)
+    X_res_1 = filt.fit_transform(X_1)
+    assert X_res_1.shape == X_1.shape
+
+    lifetimes_res_1 = X_res_1[:, :, 1] - X_res_1[:, :, 0]
+    assert not ((lifetimes_res_1 > 0.) & (lifetimes_res_1 <= epsilon)).any()

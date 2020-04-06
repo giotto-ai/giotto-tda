@@ -1,7 +1,12 @@
 """Utilities for input validation."""
 # License: GNU AGPLv3
 
+from functools import reduce
+from operator import and_
+from warnings import warn
+
 import numpy as np
+from sklearn.utils.validation import check_array
 
 
 def check_diagrams(X, copy=False):
@@ -179,3 +184,65 @@ def validate_params(parameters, references, exclude=None):
     parameters_ = {key: value for key, value in parameters.items()
                    if key not in exclude_}
     return _validate_params(parameters_, references)
+
+
+def check_point_clouds(X, distance_matrix=False, **kwargs):
+    """Input validation on an array or list representing a collection of point
+    clouds or distance matrices.
+
+    The input is checked to be either a single 3D array using a single call
+    to :func:`~sklearn.utils.validation.check_array`, or a list of 2D arrays by
+    calling :func:`~sklearn.utils.validation.check_array` on each entry. In
+    the latter case, warnings are issued when not all point clouds are in
+    the same Euclidean space.
+
+    Conversions and copies may be triggered as per
+    :func:`~gtda.utils.validation.check_list_of_arrays`.
+
+    Parameters
+    ----------
+    X : object
+        Input object to check / convert.
+
+    distance_matrix : bool, optional, default: ``False``
+        Whether the input represents a collection of distance matrices or of
+        concrete point clouds in Euclidean space. In the first case, entries
+        are allowed to be infinite unless otherwise specified in `kwargs`.
+
+    kwargs
+        Keyword arguments accepted by
+        :func:`~gtda.utils.validation.check_list_of_arrays`.
+
+    Returns
+    -------
+    Xnew : ndarray or list
+        The converted and validated object.
+
+    """
+    kwargs_ = {'force_all_finite': not distance_matrix}
+    kwargs_.update(kwargs)
+    if hasattr(X, 'shape'):
+        if X.ndim != 3:
+            raise ValueError("ndarray input must be 3D.")
+        return check_array(X, allow_nd=True, **kwargs_)
+    else:
+        if not distance_matrix:
+            reference = X[0].shape[1]  # Embedding dimension of first sample
+            if not reduce(
+                    and_, (x.shape[1] == reference for x in X[1:]), True):
+                warn("Not all point clouds have the same embedding dimension.")
+
+    has_check_failed = False
+    messages = []
+    Xnew = []
+    for i, x in enumerate(X):
+        try:
+            Xnew.append(check_array(x, **kwargs_))
+            messages = ['']
+        except ValueError as e:
+            has_check_failed = True
+            messages.append(str(e))
+    if has_check_failed:
+        raise ValueError("The following errors were raised by the inputs: \n"
+                         "\n".join(messages))
+    return Xnew

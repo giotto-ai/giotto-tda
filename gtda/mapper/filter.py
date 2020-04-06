@@ -69,10 +69,12 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         #  may be computed. May be useful for supervised tasks with Mapper?
         #  Evaluate performance impact of doing this.
         check_array(X)
+
         if self.metric_params is None:
             self.effective_metric_params_ = dict()
         else:
             self.effective_metric_params_ = self.metric_params.copy()
+
         return self
 
     def transform(self, X, y=None):
@@ -95,13 +97,13 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_array(X)
-        if self.metric == 'precomputed':
-            Xt = X
-        else:
+        Xt = check_array(X)
+
+        if self.metric != 'precomputed':
             Xt = squareform(
-                pdist(X, metric=self.metric, **self.effective_metric_params_))
-        Xt = np.linalg.norm(Xt, axis=1, ord=self.exponent).reshape(-1, 1)
+                pdist(Xt, metric=self.metric, **self.effective_metric_params_))
+
+        Xt = np.linalg.norm(Xt, axis=1, ord=self.exponent, keepdims=True)
         return Xt
 
 
@@ -139,6 +141,7 @@ class Entropy(BaseEstimator, TransformerMixin):
 
         """
         check_array(X)
+
         self._is_fitted = True
         return self
 
@@ -165,15 +168,15 @@ class Entropy(BaseEstimator, TransformerMixin):
         #  consists of "probabilities" that sum to one. Consider normalisation
         #  in terms of bin counts?
         check_is_fitted(self, '_is_fitted')
-        X = check_array(X)
+        Xt = check_array(X)
 
-        if np.any(X < 0):
+        if np.any(Xt < 0):
             warnings.warn("Negative values detected in X! Taking absolute "
                           "value to calculate probabilities.")
-            X = np.abs(X)
+            Xt = np.abs(Xt)
 
-        probs = X / X.sum(axis=1, keepdims=True)
-        Xt = (entr(probs).sum(axis=1) / np.log(2)).reshape(-1, 1)
+        Xt = Xt / Xt.sum(axis=1, keepdims=True)
+        Xt = entr(Xt).sum(axis=1, keepdims=True) / np.log(2)
         return Xt
 
 
@@ -215,6 +218,7 @@ class Projection(BaseEstimator, TransformerMixin):
 
         """
         check_array(X)
+
         self._is_fitted = True
         return self
 
@@ -240,9 +244,9 @@ class Projection(BaseEstimator, TransformerMixin):
         # Simple duck typing to handle case of pandas dataframe input
         if hasattr(X, 'columns'):
             # NB in this case we do not check the health of other columns
-            Xt = check_array(X[self.columns], ensure_2d=False)
+            Xt = check_array(X[self.columns], ensure_2d=False, copy=True)
         else:
-            X = check_array(X)
-            Xt = X[:, self.columns]
-        Xt = Xt.reshape(len(X), -1)
+            Xt = check_array(X, copy=True)
+            Xt = Xt[:, self.columns]
+        Xt = Xt.reshape(len(Xt), -1)
         return Xt

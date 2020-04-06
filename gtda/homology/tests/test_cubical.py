@@ -2,11 +2,14 @@
 # License: GNU AGPLv3
 
 import numpy as np
+import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import CubicalPersistence
+
+pio.renderers.default = 'plotly_mimetype'
 
 X = np.array([[[2., 2.47942554],
                [2.47942554, 2.84147098],
@@ -29,6 +32,12 @@ def test_cp_not_fitted():
 
     with pytest.raises(NotFittedError):
         cp.transform(X)
+
+
+@pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
+def test_cp_fit_transform_plot(hom_dims):
+    CubicalPersistence().fit_transform_plot(
+        X, sample=0, homology_dimensions=hom_dims)
 
 
 @pytest.mark.parametrize("periodic_dimensions, expected",
