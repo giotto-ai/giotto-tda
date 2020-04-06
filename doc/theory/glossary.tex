@@ -15,14 +15,11 @@ pdfpagelabels]{hyperref}
 	linkcolor=blue,
 	urlcolor=blue}
 
-
 \begin{document}
-
+	
 	\title{Theory Glossary}
 	\maketitle
 	
-	\bibliography{bibliography}
-
 	\section{Symbols}
 	
 	\begin{tabular}{ l l}
@@ -33,7 +30,7 @@ pdfpagelabels]{hyperref}
 		$\mathbb R^d$ & The vector space of $d$-tuples of real numbers. \\
 		$\Delta$ & The 
 		%\hyperref[multiset]{multiset}
-		multiset $ \lbrace (s, s) \mid  s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
+		multiset $ \lbrace (s, s) \mid s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
 	\end{tabular}
 	
 	\section{Homology}
@@ -42,7 +39,7 @@ pdfpagelabels]{hyperref}
 	
 	An \textit{elementary interval} $I_a$ is a subset of $\mathbb{R}$ of the form $[a, a+1]$ or $[a,a] = \{a\}$ for some $a \in \mathbb{R}$. These two types are called respectively \textit{non-degenerate} and \textit{degenerate}. To a non-degenerate elementary interval we assign two degenerate elementary intervals
 	\begin{equation*}
-	d^+ I_a = [a+1, a+1] \qquad \text{and} \qquad d^- I_a = [a, a].
+	d^+ I_a = \lbrack a+1, a+1 \rbrack \qquad \text{and} \qquad d^- I_a = \lbrack a, a \rbrack.
 	\end{equation*}
 	An \textit{elementary cube} is a subset of the form 
 	\begin{equation*}
@@ -65,9 +62,9 @@ pdfpagelabels]{hyperref}
 	
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textit{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textit{simplex}, explicitly
 	\begin{equation*}
-	\lbrack v_0, \ldots , v_n \rbrack = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
+	\lbrack v_0, \dots , v_n \rbrack = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
 	\end{equation*}
-	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $[v_0, \dots, v_n]$ is defined by
+	and to $n$ as its \textit{dimension}. The $i$\textit{-th face} of $\lbrack v_0, \dots, v_n \rbrack$ is defined by
 	\begin{equation*}
 	d_i[v_0, \ldots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
 	\end{equation*}
@@ -104,7 +101,7 @@ pdfpagelabels]{hyperref}
 	
 	An \textit{ordered simplicial complex} is an 
 	% \hyperref[abstract_simplicial_complex]{abstract simplicial complex}
-	abstract simplicial complex where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $[v_0, \dots, v_n]$.
+	abstract simplicial complex where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $\lbrack v_0, \dots, v_n \rbrack$.
 	
 	A \textit{simplicial map} between ordered simplicial complexes is a simplicial map $f$ between their underlying simplicial complexes preserving the order, i.e., $v \leq w$ implies $f(v) \leq f(w)$.
 	
@@ -240,7 +237,7 @@ pdfpagelabels]{hyperref}
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $VR_s(X)$ that contains a subset of $X$ as a simplex if all pairwise distances in the subset are less than or equal to $s$, explicitly
 	\begin{equation*}
-	VR_s(X) = \Big\{ [v_0,\dots,v_n]\ \Big|\ \forall i,j\ \,d(v_i, v_j) \leq s \Big\}.
+	VR_s(X) = \Big\{ \lbrack v_0,\dots,v_n \rbrack \ \Big|\ \forall i,j\ \,d(v_i, v_j) \leq s \Big\}.
 	\end{equation*}
 	The \textit{Vietoris-Rips persistence} of $(X, d)$ is the 
 	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homology}
@@ -263,11 +260,11 @@ pdfpagelabels]{hyperref}
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $\check{C}_s(X)$ that is empty if $s<0$ and, if $s \geq 0$, contains a subset of $X$ as a simplex if the balls of radius $s$ with centers in the subset have a non-empty intersection, explicitly
 	\begin{equation*}
-	\check{C}_s(X) = \Big\{ [v_0,\dots,v_n]\ \Big|\ \bigcap_{i=0}^n B_s(x_i) \neq \emptyset \Big\}.
+	\check{C}_s(X) = \Big\{ \lbrack v_0,\dots,v_n \rbrack \ \Big|\ \bigcap_{i=0}^n B_s(x_i) \neq \emptyset \Big\}.
 	\end{equation*}
 	The \textit{\v Cech persistence (co)homology} of $(X,d)$ is the 
-	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homo-logy}
-	persistent simplicial (co)homo-logy of $\check{C}_s(X)$.
+	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homology}
+	persistent simplicial (co)homology of $\check{C}_s(X)$.
 	
 	\subsection*{Multiset} \label{multiset}
 	
@@ -307,76 +304,69 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
 	\end{equation*}
+
+	The set of persistence diagrams together with any of the distances above is a
+	%\hyperref[metric_space]{metric space}.
+	metric space.
 	
 	\paragraph{\\ Reference:} \cite{kerber2017geometry}
 	
-	\subsection*{Persistence landscape} \label{persistence_landscape}
-	
-	A \textit{persistence landscape} is a set $\{\lambda_k\}_{k \in \mathbb N}$ of functions
-	\begin{equation*}
-	\lambda : \mathbb R \to \overline{\mathbb R}
-	\end{equation*}
-	where $\lambda_k$ is referred to as the $k$\textit{-layer of the persistence landscape}.
+	\subsection*{Persistence landscape} \label{persistence_landscape}	
 	
 	Let $\{(b_i, d_i)\}_{i \in I}$ be a 
-	% \hyperref[persistence_diagram]{persistence diagram}
-	persistence diagram. Its \textit{associated persistence landscape} $\lambda$ is defined by letting $\lambda_k$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where
-	\begin{equation*}
-	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
-	\end{equation*}
-	and $c_+ := \max(c,0)$.
+	%\hyperref[persistence_diagram]{persistence diagram}
+	persistence diagram. Its \textit{persistence landscape} is the set $\{\lambda_k\}_{k \in \mathbb N}$ of functions	
+	\begin{equation*}	
+	\lambda_k : \mathbb R \to \overline{\mathbb R}	
+	\end{equation*}	
+	defined by letting $\lambda_k(t)$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where	
+	\begin{equation*}	
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
+	\end{equation*}	
+	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the \textit{$k$-layer of the persistence landscape}.
 	
-	Intuitively, we can describe the set of graphs of a persistence landscape by first joining each of the points in the multiset to the diagonal via a horizontal as well as a vertical line, then clockwise rotating the figure 45 degrees and rescaling it by $1/\sqrt{2}$.
+	We describe the graph of each $\lambda_k$ intuitively. For each $i \in I$, draw an isosceles triangle with base the interval $(b_i, d_i)$ on the horizontal $t$-axis, and sides with slope 1 and $-1$. This subdivides the plane into a number of polygonal regions. Label each of these regions by the number of triangles containing it. If $P_k$ is the union of the polygonal regions with values at least $k$, then the graph of $\lambda_k$ is the upper contour of $P_k$, with $\lambda_k(a) = 0$ if the vertical line $t=a$ does not intersect $P_k$.
 	
-	\paragraph{\\ Reference:} \cite{bubenik2015statistical}
-	
-	\subsection*{Persistence landscape norm} \label{persistence_landscape_norm}
-	
-	Given a function $f : \mathbb R \to \overline{\mathbb R}$ define
-	\begin{equation*}
-	||f||_p = \left( \int_{\mathbb R} f^p(x)\, dx \right)^{1/p}
-	\end{equation*}
-	whenever the right hand side exists and is finite.
-	
-	The $p$\textit{-norm} of a 
-	% \hyperref[persistence_landscape]{persistence landscape}
-	persistence landscape $\lambda = \{\lambda_k\}_{k \in \mathbb N}$ is defined to be
-	
-	\begin{equation*}
-	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
-	\end{equation*}
-	whenever the right hand side exists and is finite.
+	The persistence landscape construction defines a
+	%\hyperref[vectorization_kernel_and_amplitude]{vectorization}
+	vectorization of the set of persistence diagrams with target the vector space of real-valued function on $\mathbb N \times \mathbb R$. For any $p = 1,\dots,\infty$ we can restrict attention to persistence diagrams $D$ whose associated persistence landscape $\lambda$ is
+	%\hyperref[lp_norm]{$p$-integrable}
+	$p$-integrable, that is to say,	
+	\begin{equation} \label{equation:persistence_landscape_norm}	
+	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}	
+	\end{equation}	
+	where
+	\begin{equation*}	
+	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}	
+	\end{equation*}	
+	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the
+	%\hyperref[vectorization_kernel_and_amplitude]{amplitude}
+	\textit{landscape} $p$-\textit{amplitude} of $D$.
 
-	\paragraph{\\ References:} \cite{stein2011functional, bubenik2015statistical}
+	\paragraph{\\ References:} \cite{bubenik2015statistical}
 	
 	\subsection*{Weighted silhouette} \label{weighted_silhouette}
 	
-	Let $D = {(b_i, d_i)}_{i \in I}$ be a
-	% \hyperref[persistence_diagram] {persistence diagram}
-	persistence diagram. A \textit{weighted silhouette} associated to $D$ is a continuous function $\phi : \mathbb R \to \mathbb R$ of the form
+	Let $D = \{(b_i, d_i)\}_{i \in I}$ be a
+	%\hyperref[persistence_diagram]{persistence diagram}
+	persistence diagram and $w = \{w_i\}_{i \in I}$ a set of positive real numbers. The \textit{silhouette of $D$ weighted by $w$} is the function $\phi : \mathbb R \to \mathbb R$ defined by	
+	\begin{equation*}	
+	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},	
+	\end{equation*}	
+	where	
 	\begin{equation*}
-	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},
-	\end{equation*}
-	where $\{w_i\}_{i \in I}$ is a set of positive real numbers and
-	\begin{equation*} \label{equation:lambda_for_persistence_landscapes}
-	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
-	\end{equation*}
-	with $c_+ := \max(c,0)$. The particular choice $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ is referred to as \textit{power-weighted silhouettes}.
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
+	\end{equation*}	
+	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the \textit{$p$-power-weighted silhouette} of $D$. The silhouette construction defines a
+	%\hyperref[vectorization_kernel_and_amplitude]{vectorization}
+	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.	
 	
 	\paragraph{\\ References:} \cite{chazal2014stochastic}
-	
-	\subsection*{Amplitude}
-	\label{amplitude}
-	
-	Given a function assigning a real number to a pair of persistence diagrams, we define the \textit{amplitude} of a persistence diagram $D$ to be the value assigned to the pair $(D \cup \Delta, \Delta)$. Important examples of such functions are: %\hyperref[wasserstein_and_bottleneck_distance]{Wasserstein and bottleneck distances}
-	Wasserstein and bottleneck distances and 
-	% \hyperref[persistence_landscape_norm]{landscape distance}
-	landscape distance.
 	
 	\subsection*{Persistence entropy} \label{persistence_entropy}
 	
 	Intuitively, this is a measure of the entropy of the points in a
-	%  \hyperref[persistence_diagram]{persistence diagram}
+	% \hyperref[persistence_diagram]{persistence diagram}
 	persistence diagram. Precisely, let $D = \{(b_i, d_i)\}_{i \in I}$ be a persistence diagram with each $d_i < +\infty$. The \textit{persistence entropy} of $D$ is defined by
 	\begin{equation*}
 	E(D) = - \sum_{i \in I} p_i \log(p_i)
@@ -396,54 +386,66 @@ pdfpagelabels]{hyperref}
 	
 	The name is inspired from the case when the persistence diagram comes from persistent homology.
 	
-	\subsection*{Distances, inner products and kernels} \label{metric_inner_product_and_kernel}
+	\subsection*{Metric space} \label{metric_space}	
+	A set $X$ with a function	
+	\begin{equation*}	
+	d : X \times X \to \mathbb R	
+	\end{equation*}	
+	is said to be a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
+	\begin{equation*}	
+	d(x,y) = 0\ \Leftrightarrow\ x = y	
+	\end{equation*}	
+	\begin{equation*}	
+	d(x,y) = d(y,x)	
+	\end{equation*}	
+	\begin{equation*}	
+	d(x,z) \leq d(x,y) + d(y, z).	
+	\end{equation*}	
+	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.	
 	
-	A set $X$ with a function
-	\begin{equation*}
-	d : X \times X \to \mathbb R
-	\end{equation*}
-	is called a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
-	\begin{equation*}
-	d(x,y) = 0\ \Leftrightarrow\ x = y
-	\end{equation*}
-	\begin{equation*}
-	d(x,y) = d(y,x)
-	\end{equation*}
-	\begin{equation*}
-	d(x,z) \leq d(x,y) + d(y, z).
-	\end{equation*}
-	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.
+	\subsection*{Inner product and norm} \label{inner_product_and_norm}	
 	
 	A vector space $V$ together with a function
-	\begin{equation*}
-	\langle -, - \rangle : V \times V \to \mathbb R
+	\begin{equation*}	
+	\langle -, - \rangle : V \times V \to \mathbb R	
 	\end{equation*}
-	is called and \textit{inner product space} if for all $u,v,w \in V$
-	\begin{equation*}
-	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 
+	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
+	\begin{equation*}	
+	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 	
+	\end{equation*}	
+	\begin{equation*}	
+	\langle u, v\rangle = \langle v, u\rangle	
 	\end{equation*}
 	\begin{equation*}
-	\langle u, v\rangle = \langle v, u\rangle
-	\end{equation*}
-	\begin{equation*}
-	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.
-	\end{equation*}
-	In this case the function $\langle -, - \rangle$ is referred to as the \textit{inner product} and the function given by
-	\begin{equation*}
-	||u|| = \sqrt{\langle u, u \rangle}
-	\end{equation*}
-	as its associated \textit{norm}. An inner product space is naturally a metric space with distance function
-	\begin{equation*}
-	d(u,v) = ||u-v||.
-	\end{equation*}
+	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.	
+	\end{equation*}	
+	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
 	
-	A \textit{kernel} on a set $X$ is a function
-	\begin{equation*}
-	k : X \times X
-	\end{equation*}
-	for which there exists a function $\phi : X \to V$ to an inner product space such that
-	\begin{equation*}
-	k(x, y) = \langle \phi(x), \phi(y) \rangle.
+	A vector space $V$ together with a function	
+	\begin{equation*}	
+	||-|| : V \to \mathbb R	
+	\end{equation*}	
+	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$	
+	\begin{equation*}	
+	||v|| = 0\ \Leftrightarrow\ u = 0	
+	\end{equation*}	
+	\begin{equation*}	
+	||a u || = |a|\, ||u||	
+	\end{equation*}	
+	\begin{equation*}	
+	||u+v|| = ||u|| + ||v||.	
+	\end{equation*}	
+	The function $||-||$ is referred to as the \textit{norm}.
+	
+	An inner product space is naturally a norm space with	
+	\begin{equation*}	
+	||u|| = \sqrt{\langle u, u \rangle}	
+	\end{equation*}	
+	and a norm space is naturally a
+	%\hyperref[metric_space]{metric space}
+	metric space with distance function	
+	\begin{equation*}	
+	d(u,v) = ||u-v||.	
 	\end{equation*}
 	
 	\subsection*{Euclidean distance and norm} \label{euclidean_distance_and_norm}
@@ -454,7 +456,37 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
 	\end{equation*}
-	The associated norm and distance function are referred to as \textit{Euclidean norm} and \textit{Euclidean distance}.  
+	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{euclidean norm} and \textit{euclidean distance}.	
+	
+	\subsection*{Vectorization, kernel and amplitude} \label{vectorization_kernel_and_amplitude}	
+	
+	Let $X$ be a set, for example, the set of all
+	%\hyperref[persistence_diagram]{persistence diagrams}
+	persistence diagrams. A \textit{vectorization} for $X$ is a function	
+	\begin{equation*}	
+	\phi : X \to V	
+	\end{equation*}	
+	where $V$ is a vector space. A \textit{kernel} on the set $X$ is a function	
+	\begin{equation*}	
+	k : X \times X \to \mathbb R	
+	\end{equation*}	
+	for which there exists a vectorization $\phi : X \to V$ with $V$ an
+	%\hyperref[inner_product_and_norm]{inner product space}
+	inner product space such that	
+	\begin{equation*}	
+	k(x,y) = \langle \phi(x), \phi(y) \rangle	
+	\end{equation*}	
+	for each $x,y \in X$. Similarly, an \textit{amplitude} on $X$ is a function	
+	\begin{equation*}	
+	A : X \to \mathbb R	
+	\end{equation*}	
+	for which there exists a vectorization $\phi : X \to V$ with $V$ a
+	%\hyperref[inner_product_and_norm]{normed space}
+	normed space such that	
+	\begin{equation*}	
+	A(x) = ||\phi(x)||	
+	\end{equation*}	
+	for all $x \in X$.
 	
 	\subsection*{Finite metric spaces and point clouds} \label{finite_metric_spaces_and_point_clouds}
 	
@@ -530,12 +562,10 @@ pdfpagelabels]{hyperref}
 	\paragraph{\\ References:} \cite{milnor1997topology,guillemin2010differential}
 	
 	\subsection*{Compact subset}	\label{compact_subset}
-
 	A subset $K$ of a metric space $(X,d)$ is said to be \textit{bounded} if there exist a real number $D$ such that for each pair of elements in $K$ the distance between them is less than $D$. It is said to be \textit{complete} if for any $x \in X$ it is the case that $x \in K$ if for any $\epsilon > 0$ the intersection between $K$ and $\{y \,;\ d(x,y) < \epsilon \}$ is not empty. It is said to be \textit{compact} if it is both bounded and complete.
-
+	
 	\section{Bibliography}
 	\bibliography{bibliography}{}
 	\bibliographystyle{alpha}
 	
-
 \end{document}
