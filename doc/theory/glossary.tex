@@ -54,7 +54,7 @@ pdfpagelabels]{hyperref}
 	d_i^\pm I^N = I_{a_1} \times \cdots \times d^\pm I_{a_{k_i}} \times \cdots \times I_{a_{N.}}
 	\end{equation*}
 	
-	A \textit{cubical complex} is a finite set of elementary cubes of $\mathbb{R}^N$, and a \textit{subcomplex} of $X$ is a cubical complex whose elementary cubes are also in $X$. We denote the set of $n$-dimensional cubes as $X_n$.
+	A \textit{cubical complex} is a finite set of elementary cubes of $\mathbb{R}^N$, and a \textit{subcomplex} of $X$ is a cubical complex whose elementary cubes are also in $X$.
 	
 	\paragraph{\\ Reference:} \cite{mischaikow04computational}
 	
@@ -84,8 +84,6 @@ pdfpagelabels]{hyperref}
 	We abuse notation and denote the pair $(V, X)$ simply by $X$.
 	
 	The elements of $X$ are called \textit{simplices} and the \textit{dimension} of a simplex $x$ is defined by $|x| = \# x - 1$ where $\# x$ denotes the cardinality of $x$. Simplices of dimension $d$ are called $d$-simplices. We abuse terminology and refer to the elements of $V$ and to their associated $0$-simplices both as \textit{vertices}.
-	
-	The $k$\textit{-skeleton} $X_k$ of a simplicial complex $X$ is the subcomplex containing all simplices of dimension at most $k$. A simplicial complex is said to be $d$\textit{-dimensional} if $d$ is the smallest integer satisfying $X = X_d$.
 	
 	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
 	
@@ -145,7 +143,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Simplicial chains and simplicial homology} \label{simplicial_chains_and_simplicial_homology}
 	
-	Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
+	Let $X$ be an ordered or directed simplicial complex and denote the subset of $n$-simplices by $X_n$. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
 	\end{equation*}
@@ -161,7 +159,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Cubical chains and cubical homology} \label{cubical_chains_and_cubical_homology}
 	
-	Let $X$ be a cubical complex. Define its \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
+	Let $X$ be a cubical complex and denote the subset of $n$-cubes by $X_n$. Define the \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
