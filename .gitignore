@@ -50,6 +50,7 @@ gtda/externals/pybind11
 *.log
 *.pdf
 *.synctex.gz
+*.toc
 doc/theory/glossary_backup
 
 # development

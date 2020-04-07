@@ -20,6 +20,8 @@ pdfpagelabels]{hyperref}
 	\title{Theory Glossary}
 	\maketitle
 	
+	\tableofcontents
+	
 	\section{Symbols}
 	
 	\begin{tabular}{ l l}
@@ -32,6 +34,120 @@ pdfpagelabels]{hyperref}
 		%\hyperref[multiset]{multiset}
 		multiset $ \lbrace (s, s) \mid s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
 	\end{tabular}
+	
+	\section{Analysis}
+	
+	\subsection*{Metric space} \label{metric_space}	
+	A set $X$ with a function	
+	\begin{equation*}	
+	d : X \times X \to \mathbb R	
+	\end{equation*}	
+	is said to be a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
+	\begin{equation*}	
+	d(x,y) = 0\ \Leftrightarrow\ x = y	
+	\end{equation*}	
+	\begin{equation*}	
+	d(x,y) = d(y,x)	
+	\end{equation*}	
+	\begin{equation*}	
+	d(x,z) \leq d(x,y) + d(y, z).	
+	\end{equation*}	
+	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.	
+	
+	\subsection*{Inner product and norm} \label{inner_product_and_norm}	
+	
+	A vector space $V$ together with a function
+	\begin{equation*}	
+	\langle -, - \rangle : V \times V \to \mathbb R	
+	\end{equation*}
+	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
+	\begin{equation*}	
+	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 	
+	\end{equation*}	
+	\begin{equation*}	
+	\langle u, v\rangle = \langle v, u\rangle	
+	\end{equation*}
+	\begin{equation*}
+	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.	
+	\end{equation*}	
+	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
+	
+	A vector space $V$ together with a function	
+	\begin{equation*}	
+	||-|| : V \to \mathbb R	
+	\end{equation*}	
+	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$	
+	\begin{equation*}	
+	||v|| = 0\ \Leftrightarrow\ u = 0	
+	\end{equation*}	
+	\begin{equation*}	
+	||a u || = |a|\, ||u||	
+	\end{equation*}	
+	\begin{equation*}	
+	||u+v|| = ||u|| + ||v||.	
+	\end{equation*}	
+	The function $||-||$ is referred to as the \textit{norm}.
+	
+	An inner product space is naturally a norm space with	
+	\begin{equation*}	
+	||u|| = \sqrt{\langle u, u \rangle}	
+	\end{equation*}	
+	and a norm space is naturally a
+	%\hyperref[metric_space]{metric space}
+	metric space with distance function	
+	\begin{equation*}	
+	d(u,v) = ||u-v||.	
+	\end{equation*}
+	
+	\subsection*{Euclidean distance and norm} \label{euclidean_distance_and_norm}
+	
+	The vector space $\mathbb R^n$ is an 
+	% \hyperref[metric_inner_product_and_kernel]{inner product space}
+	inner product space with inner product 
+	\begin{equation*}
+	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
+	\end{equation*}
+	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{euclidean norm} and \textit{euclidean distance}.	
+	
+	\subsection*{Vectorization, kernel and amplitude} \label{vectorization_kernel_and_amplitude}	
+	
+	Let $X$ be a set, for example, the set of all
+	%\hyperref[persistence_diagram]{persistence diagrams}
+	persistence diagrams. A \textit{vectorization} for $X$ is a function	
+	\begin{equation*}	
+	\phi : X \to V	
+	\end{equation*}	
+	where $V$ is a vector space. A \textit{kernel} on the set $X$ is a function	
+	\begin{equation*}	
+	k : X \times X \to \mathbb R	
+	\end{equation*}	
+	for which there exists a vectorization $\phi : X \to V$ with $V$ an
+	%\hyperref[inner_product_and_norm]{inner product space}
+	inner product space such that	
+	\begin{equation*}	
+	k(x,y) = \langle \phi(x), \phi(y) \rangle	
+	\end{equation*}	
+	for each $x,y \in X$. Similarly, an \textit{amplitude} on $X$ is a function	
+	\begin{equation*}	
+	A : X \to \mathbb R	
+	\end{equation*}	
+	for which there exists a vectorization $\phi : X \to V$ with $V$ a
+	%\hyperref[inner_product_and_norm]{normed space}
+	normed space such that	
+	\begin{equation*}	
+	A(x) = ||\phi(x)||	
+	\end{equation*}	
+	for all $x \in X$.
+	
+	\subsection*{Finite metric spaces and point clouds} \label{finite_metric_spaces_and_point_clouds}
+	
+	A \textit{finite metric space} is a finite set together with a 
+	% \hyperref[metric_inner_product_and_kernel]{metric}
+	metric. A \textit{distance matrix} associated to a finite metric space is obtained by choosing a total order on the finite set and setting the $(i,j)$-entry to be equal to the distance between the $i$-th and $j$-th elements. 
+	
+	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
+	% \hyperref[euclidean_distance_and_norm]{eucliden distance}
+	euclidean distance.
 	
 	\section{Homology}
 	
@@ -167,6 +283,8 @@ pdfpagelabels]{hyperref}
 	Its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} is the 
 	% \hyperref[homology_and_cohomology]{homology and cohomology}
 	homology and cohomology of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	
+	\section{Persistence}
 	
 	\subsection*{Filtered complex} \label{filtered_complex}
 	
@@ -383,118 +501,6 @@ pdfpagelabels]{hyperref}
 	persistence diagram. Its \textit{Betti curve} is the function $\beta_D : \mathbb R \to \mathbb N$ whose value on $s \in \mathbb R$ is the number, counted with multiplicity, of points $(b_i,d_i)$ in $D$ such that $b_i \leq s <d_i$.
 	
 	The name is inspired from the case when the persistence diagram comes from persistent homology.
-	
-	\subsection*{Metric space} \label{metric_space}	
-	A set $X$ with a function	
-	\begin{equation*}	
-	d : X \times X \to \mathbb R	
-	\end{equation*}	
-	is said to be a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
-	\begin{equation*}	
-	d(x,y) = 0\ \Leftrightarrow\ x = y	
-	\end{equation*}	
-	\begin{equation*}	
-	d(x,y) = d(y,x)	
-	\end{equation*}	
-	\begin{equation*}	
-	d(x,z) \leq d(x,y) + d(y, z).	
-	\end{equation*}	
-	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.	
-	
-	\subsection*{Inner product and norm} \label{inner_product_and_norm}	
-	
-	A vector space $V$ together with a function
-	\begin{equation*}	
-	\langle -, - \rangle : V \times V \to \mathbb R	
-	\end{equation*}
-	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
-	\begin{equation*}	
-	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 	
-	\end{equation*}	
-	\begin{equation*}	
-	\langle u, v\rangle = \langle v, u\rangle	
-	\end{equation*}
-	\begin{equation*}
-	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.	
-	\end{equation*}	
-	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
-	
-	A vector space $V$ together with a function	
-	\begin{equation*}	
-	||-|| : V \to \mathbb R	
-	\end{equation*}	
-	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$	
-	\begin{equation*}	
-	||v|| = 0\ \Leftrightarrow\ u = 0	
-	\end{equation*}	
-	\begin{equation*}	
-	||a u || = |a|\, ||u||	
-	\end{equation*}	
-	\begin{equation*}	
-	||u+v|| = ||u|| + ||v||.	
-	\end{equation*}	
-	The function $||-||$ is referred to as the \textit{norm}.
-	
-	An inner product space is naturally a norm space with	
-	\begin{equation*}	
-	||u|| = \sqrt{\langle u, u \rangle}	
-	\end{equation*}	
-	and a norm space is naturally a
-	%\hyperref[metric_space]{metric space}
-	metric space with distance function	
-	\begin{equation*}	
-	d(u,v) = ||u-v||.	
-	\end{equation*}
-	
-	\subsection*{Euclidean distance and norm} \label{euclidean_distance_and_norm}
-	
-	The vector space $\mathbb R^n$ is an 
-	% \hyperref[metric_inner_product_and_kernel]{inner product space}
-	inner product space with inner product 
-	\begin{equation*}
-	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
-	\end{equation*}
-	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{euclidean norm} and \textit{euclidean distance}.	
-	
-	\subsection*{Vectorization, kernel and amplitude} \label{vectorization_kernel_and_amplitude}	
-	
-	Let $X$ be a set, for example, the set of all
-	%\hyperref[persistence_diagram]{persistence diagrams}
-	persistence diagrams. A \textit{vectorization} for $X$ is a function	
-	\begin{equation*}	
-	\phi : X \to V	
-	\end{equation*}	
-	where $V$ is a vector space. A \textit{kernel} on the set $X$ is a function	
-	\begin{equation*}	
-	k : X \times X \to \mathbb R	
-	\end{equation*}	
-	for which there exists a vectorization $\phi : X \to V$ with $V$ an
-	%\hyperref[inner_product_and_norm]{inner product space}
-	inner product space such that	
-	\begin{equation*}	
-	k(x,y) = \langle \phi(x), \phi(y) \rangle	
-	\end{equation*}	
-	for each $x,y \in X$. Similarly, an \textit{amplitude} on $X$ is a function	
-	\begin{equation*}	
-	A : X \to \mathbb R	
-	\end{equation*}	
-	for which there exists a vectorization $\phi : X \to V$ with $V$ a
-	%\hyperref[inner_product_and_norm]{normed space}
-	normed space such that	
-	\begin{equation*}	
-	A(x) = ||\phi(x)||	
-	\end{equation*}	
-	for all $x \in X$.
-	
-	\subsection*{Finite metric spaces and point clouds} \label{finite_metric_spaces_and_point_clouds}
-	
-	A \textit{finite metric space} is a finite set together with a 
-	% \hyperref[metric_inner_product_and_kernel]{metric}
-	metric. A \textit{distance matrix} associated to a finite metric space is obtained by choosing a total order on the finite set and setting the $(i,j)$-entry to be equal to the distance between the $i$-th and $j$-th elements. 
-	
-	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
-	% \hyperref[euclidean_distance_and_norm]{eucliden distance}
-	euclidean distance.
 	
 	\section{Time series}
 	
