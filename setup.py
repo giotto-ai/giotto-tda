@@ -86,6 +86,7 @@ class CMakeExtension(Extension):
         self.sourcedir = os.path.abspath(sourcedir)
 
 
+url = "https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.zip"
 class CMakeBuild(build_ext):
     def run(self):
         try:
@@ -103,11 +104,21 @@ class CMakeBuild(build_ext):
 
             # TO DELETE
             import os
-            for root, dirs, files in os.walk("C:/hostedtoolcache/windows/Boost/1.72.0/boost"):
-                for file in files:
-                    if file.endswith(".hpp"):
-                        print(os.path.join(root, file))
-            exit(-1)
+            from pathlib import Path
+            import urllib.request
+            import shutil
+            import zipfile
+
+            boost_folder = "C:/local"
+
+            Path(boost_folder).mkdir(parents=True, exist_ok=True)
+            file_name = os.path.join(boost_folder, "1_72_0")
+            with urllib.request.urlopen(url) as response, \
+                open(file_name+".zip", 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+
+            with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                zip_ref.extractall(file_name)
 
         self.install_dependencies()
 
