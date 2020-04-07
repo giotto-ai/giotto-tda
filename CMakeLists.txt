@@ -4,6 +4,19 @@ project(gtda_bindings LANGUAGES CXX)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gtda/externals/pybind11)
 set(BINDINGS_DIR "gtda/externals/bindings")
 
+# TO DELETE
+set(Boost_DEBUG ON)
+
+SET(Boost_USE_STATIC_LIBS OFF)
+IF( WIN32 )
+    # The auto-linking feature has problems with USE_STATIC_LIBS off, so we use
+    # BOOST_ALL_NO_LIB to turn it off.
+    # Several boost libraries headers aren't configured correctly if
+    # USE_STATIC_LIBS is off, so we explicitly say they are dynamic with the
+    # remaining definitions.
+    ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_IOSTREAMS_DYN_LINK -DBOOST_THREAD_DYN_LINK)
+ENDIF()
+
 include(cmake/HelperBoost.cmake)
 include_directories(${Boost_INCLUDE_DIRS})
 
