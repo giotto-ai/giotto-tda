@@ -4,6 +4,7 @@
 # The custom path will be at `C:\\local\`
 if(WIN32)
     list(APPEND BOOST_ROOT "C:/local")
+    list(APPEND BOOST_ROOT "/usr/local/share/boost/1.72.0")
     list(APPEND BOOST_ROOT "") # Add custom path to your boost installation
 endif()
 
