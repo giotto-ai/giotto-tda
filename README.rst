@@ -126,6 +126,23 @@ Important links
 - Download releases: https://pypi.org/project/giotto-tda/
 - Issue tracker: https://github.com/giotto-ai/giotto-tda/issues
 
+
+Citation
+--------
+
+If you use ``giotto-tda`` in a scientific publication, we would appreciate citations. You can use the following bibtex entry:
+
+.. code:: RST
+
+    @misc{tauzin2020giottotda,
+        title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+        author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+        year={2020},
+        eprint={2004.02551},
+        archivePrefix={arXiv},
+        primaryClass={cs.LG}
+    }
+
 Community
 =========
 
