@@ -103,8 +103,10 @@ class CMakeBuild(build_ext):
 
             # TO DELETE
             import os
-            for root, dirs, files in os.walk("C:/hostedtoolcache/windows/Boost/1.72.0"):
-                print(dirs)
+            for root, dirs, files in os.walk("C:/hostedtoolcache/windows/Boost/1.72.0/boost"):
+                for file in files:
+                    if file.endswith(".hpp"):
+                        print(os.path.join(root, file))
             exit(-1)
 
         self.install_dependencies()
