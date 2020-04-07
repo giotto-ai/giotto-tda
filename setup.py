@@ -30,7 +30,7 @@ MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-tda'
 LICENSE = 'GNU AGPLv3'
 DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.2.0'
-VERSION = __version__ # noqa
+VERSION = __version__  # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
@@ -86,7 +86,6 @@ class CMakeExtension(Extension):
         self.sourcedir = os.path.abspath(sourcedir)
 
 
-url = "https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.zip"
 class CMakeBuild(build_ext):
     def run(self):
         try:
@@ -101,24 +100,6 @@ class CMakeBuild(build_ext):
                                                    out.decode()).group(1))
             if cmake_version < '3.1.0':
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
-
-            # TO DELETE
-            import os
-            from pathlib import Path
-            import urllib.request
-            import shutil
-            import zipfile
-
-            boost_folder = "C:\local"
-
-            Path(boost_folder).mkdir(parents=True, exist_ok=True)
-            file_name = os.path.join(boost_folder, "1_72_0")
-            with urllib.request.urlopen(url) as response, \
-                open(file_name+".zip", 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
-
-            with zipfile.ZipFile(file_name+".zip", 'r') as zip_ref:
-                zip_ref.extractall(boost_folder)
 
         self.install_dependencies()
 
