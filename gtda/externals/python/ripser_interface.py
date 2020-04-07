@@ -163,7 +163,8 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         )
     if n_perm and n_perm < 0:
         raise Exception(
-            "Should be a strictly positive number of points in the greedy permutation"
+            "Should be a strictly positive number of points in the greedy "
+            "permutation"
         )
 
     idx_perm = np.arange(X.shape[0])
@@ -175,7 +176,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         r_cover = lambdas[-1]
         dm = dperm2all[:, idx_perm]
     else:
-        dm = pairwise_distances(X, metric=metric)
+        if metric == 'precomputed':
+            dm = X
+        else:
+            dm = pairwise_distances(X, metric=metric)
         dperm2all = dm
 
     n_points = dm.shape[0]
