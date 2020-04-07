@@ -117,8 +117,8 @@ class CMakeBuild(build_ext):
                 open(file_name+".zip", 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
 
-            with zipfile.ZipFile(file_name, 'r') as zip_ref:
-                zip_ref.extractall(file_name)
+            with zipfile.ZipFile(file_name+".zip", 'r') as zip_ref:
+                zip_ref.extractall(boost_folder)
 
         self.install_dependencies()
 
