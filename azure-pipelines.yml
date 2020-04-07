@@ -234,14 +234,13 @@ jobs:
         python_ver: '38'
         python.version: '3.8'
 
+  variables:
+    BOOST_ROOT : "/usr/local/share/boost/1.72.0"
+
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
-
-  - bash:
-    env:
-      BOOST_ROOT : "/usr/local/share/boost/1.72.0"
 
   - bash: |
       set -e
