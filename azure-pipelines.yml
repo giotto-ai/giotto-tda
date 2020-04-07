@@ -239,6 +239,10 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
+  - bash:
+    env:
+      BOOST_ROOT : "/usr/local/share/boost/1.72.0"
+
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
@@ -247,8 +251,6 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
-    env:
-      BOOST_ROOT : "/usr/local/share/boost/1.72.0"
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
