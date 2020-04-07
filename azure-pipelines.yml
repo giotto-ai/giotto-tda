@@ -220,6 +220,8 @@ jobs:
 
 
 - job: 'win2016'
+  env:
+    BOOST_ROOT : "/usr/local/share/boost/1.72.0"
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
