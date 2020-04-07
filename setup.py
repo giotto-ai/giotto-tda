@@ -109,7 +109,7 @@ class CMakeBuild(build_ext):
             import shutil
             import zipfile
 
-            boost_folder = "C:/local"
+            boost_folder = "C:\local"
 
             Path(boost_folder).mkdir(parents=True, exist_ok=True)
             file_name = os.path.join(boost_folder, "1_72_0")
