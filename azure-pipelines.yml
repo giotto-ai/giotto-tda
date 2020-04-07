@@ -38,7 +38,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -133,7 +133,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -245,6 +245,10 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
+
+  - script: |
+      python .azure-ci/install_boost.py || exit /b
+    displayName: 'Install boost'
 
   - script: |
       python -m pip install --upgrade pip setuptools
