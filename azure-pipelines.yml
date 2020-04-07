@@ -234,8 +234,6 @@ jobs:
         python_ver: '38'
         python.version: '3.8'
 
-  env:
-    BOOST_ROOT : "/usr/local/share/boost/1.72.0"
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -249,6 +247,8 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
+    env:
+      BOOST_ROOT : "/usr/local/share/boost/1.72.0"
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
