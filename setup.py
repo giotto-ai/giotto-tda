@@ -101,6 +101,12 @@ class CMakeBuild(build_ext):
             if cmake_version < '3.1.0':
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
+            # TO DELETE
+            import os
+            for root, dirs, files in os.walk("C:/hostedtoolcache/windows/Boost/1.72.0"):
+                print(dirs)
+            exit(-1)
+
         self.install_dependencies()
 
         for ext in self.extensions:
