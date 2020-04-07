@@ -10,10 +10,16 @@ plainpages=false, naturalnames=true,
 colorlinks=true, pagebackref=true,
 pdfpagelabels]{hyperref}
 \hypersetup{
+	linktocpage,
 	colorlinks,
 	citecolor=blue,
 	linkcolor=blue,
 	urlcolor=blue}
+
+\setcounter{tocdepth}{2}
+\makeatletter
+\def\l@subsection{\@tocline{2}{0pt}{2pc}{5pc}{}}
+\makeatother
 
 \begin{document}
 	
