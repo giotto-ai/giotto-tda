@@ -134,7 +134,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                        metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
 
         # Add dimension as the third elements of each (b, d) tuple
         Xdgms = {dim: np.hstack([Xdgms[dim],
@@ -386,7 +386,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
 
         # Add dimension as the third elements of each (b, d) tuple
         Xdgms = {dim: np.hstack([Xdgms[dim],
@@ -608,7 +608,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
 
         # Add dimension as the third elements of each (b, d) tuple
         Xdgms = {dim: np.hstack([Xdgms[dim],
