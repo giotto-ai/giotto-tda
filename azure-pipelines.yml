@@ -317,7 +317,8 @@ jobs:
   variables:
     EXECUTE: 'true'
     RUNNOTEBOOKS: TRUE
-    VERSION: master
+    VERSION: azure-test
+    GITDIR: /tmp/gtda-docs
 
   steps:
     - task: UsePythonVersion@0
@@ -338,9 +339,9 @@ jobs:
 
     - script: |
         set -e
-        cd doc/
-        make html
-      displayName: 'Build docs'
+        python -m pip uninstall sphinx-rtd-theme
+        python -m pip install git+https://github.com/wreise/sphinx_rtd_theme.git@aeafa25faef29b615aa496ed01a427b86412d26e
+      displayName: 'Install the custom sphinx_rtd_theme'
 
     - script: |
         ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
@@ -361,9 +362,24 @@ jobs:
         cd gtda-docs
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
+        git checkout -b deploytests
         # TODO: copy docs to the right folder and git add them
-        git commit -m "Test empty commit (azure pipelines)" --allow-empty
-        git push -u origin master
-        cd -
-      displayName:  'Commit the docs'
+        # git commit -m "Test empty commit (azure pipelines)" --allow-empty
+        # git push -u origin master
+        # cd -
+      displayName:  'Clone the docs and configure the username'
       condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        set -e
+        cd doc/
+        make all-gh
+        make gh-commit
+     displayName: 'Build and commit the docs'
+     condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        cd /tmp/gtda-docs
+        git push -u origin deploytests
+     displayName: 'Push the docs to master'
+     condition:
