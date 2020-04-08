@@ -40,18 +40,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
         If set to ``'precomputed'``, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and `metric` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
-        If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
-        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
-        including "euclidean", "manhattan", or "cosine".
-        If `metric` is a callable function, it is called on each pair of
-        instances and the resulting value recorded. The callable should take
-        two arrays from the entry in `X` as input, and return a value
-        indicating the distance between them.
+        collection of distance matrices or of adjacency matrices of weighted
+        undirected graphs. Otherwise, input data is to be interpreted as a
+        collection of point clouds (i.e. feature arrays), and `metric`
+        determines a rule with which to calculate distances between pairs of
+        points (i.e. row vectors). If `metric` is a string, it must be one
+        of the options allowed by :func:`scipy.spatial.distance.pdist` for
+        its metric parameter, or a metric listed in
+        :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
+        ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If `metric` is a
+        callable, it should take pairs of vectors (1D arrays) as input and, for
+        each two vectors in a pair, it should return a scalar indicating the
+        distance/dissimilarity between them.
 
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
@@ -129,13 +129,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xdgms = ripser(X[X[:, 0] != np.inf],
-                       maxdim=self._max_homology_dimension,
+        Xdgms = ripser(X, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
                        metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
 
         # Add dimension as the third elements of each (b, d) tuple
         Xdgms = {dim: np.hstack([Xdgms[dim],
@@ -153,14 +152,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray or list
-            Input data representing a collection of point clouds or of distance
-            matrices. Can be either a 3D ndarray whose zeroth dimension has
-            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            If ``metric == 'precomputed'``, elements of `X` must be square
-            arrays representing distance matrices; otherwise, their rows are
-            interpreted as vectors in Euclidean space and, when `X` is a list,
-            warnings are issued when the number of columns (dimension of the
-            Euclidean space) differs among samples.
+            Input data representing a collection of point clouds if `metric`
+            was not set to ``'precomputed'``, and of distance matrices or
+            adjacency matrices of weighted undirected graphs otherwise. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays. If `metric` was
+            set to ``'precomputed'``, each entry of `X` must be a square
+            array and should be compatible with a filtration, i.e. the value
+            at index (i, j) should be no smaller than the values at diagonal
+            indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -174,7 +174,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         self._is_precomputed = self.metric == 'precomputed'
-        check_point_clouds(X, distance_matrix=self._is_precomputed)
+        check_point_clouds(X, distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -200,14 +200,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray or list
-            Input data representing a collection of point clouds or of distance
-            matrices. Can be either a 3D ndarray whose zeroth dimension has
-            size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            If ``metric == 'precomputed'``, elements of `X` must be square
-            arrays representing distance matrices; otherwise, their rows are
-            interpreted as vectors in Euclidean space and, when `X` is a list,
-            warnings are issued when the number of columns (dimension of the
-            Euclidean space) differs among samples.
+            Input data representing a collection of point clouds if `metric`
+            was not set to ``'precomputed'``, and of distance matrices or
+            adjacency matrices of weighted undirected graphs otherwise. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays. If `metric` was
+            set to ``'precomputed'``, each entry of `X` must be a square
+            array and should be compatible with a filtration, i.e. the value
+            at index (i, j) should be no smaller than the values at diagonal
+            indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -224,7 +225,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
+        X = check_point_clouds(X, distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._ripser_diagram)(x) for x in X)
@@ -385,7 +386,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
 
         # Add dimension as the third elements of each (b, d) tuple
         Xdgms = {dim: np.hstack([Xdgms[dim],
@@ -424,7 +425,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         self._is_precomputed = self.metric == 'precomputed'
-        check_point_clouds(X, distance_matrix=self._is_precomputed)
+        check_point_clouds(X, distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -474,7 +475,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, distance_matrix=self._is_precomputed)
+        X = check_point_clouds(X, distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(x) for x in X)
@@ -607,7 +608,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
 
         # Add dimension as the third elements of each (b, d) tuple
         Xdgms = {dim: np.hstack([Xdgms[dim],

@@ -39,7 +39,7 @@ cd /io
 pip install -e ".[dev]"
 
 # Test dev install with pytest
-pytest gtda --cov --cov-report xml
+pytest gtda --no-cov --no-coverage-upload
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
 pip uninstall -y giotto-tda

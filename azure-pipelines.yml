@@ -38,7 +38,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -133,7 +133,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.23" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -154,7 +154,7 @@ jobs:
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+    displayName: 'Test dev install with pytest, upload coverage report'
 
   - script: |
       set -e
@@ -247,12 +247,16 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
+      python .azure-ci/install_boost.py || exit /b
+    displayName: 'Install boost'
+
+  - script: |
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml || exit /b
+      pytest gtda --no-cov --no-coverage-upload || exit /b
     displayName: 'Test dev install with pytest'
 
   - script: |
