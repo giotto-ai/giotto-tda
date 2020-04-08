@@ -120,7 +120,7 @@ source directory   ::
     pytest gtda
 
 Important links
----------------
+===============
 
 - Official source code repo: https://github.com/giotto-ai/giotto-tda
 - Download releases: https://pypi.org/project/giotto-tda/
