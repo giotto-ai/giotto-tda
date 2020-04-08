@@ -10,6 +10,25 @@ I am a researcher. Can I use ``giotto-tda`` in my project?
 Of course! The `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_ is very permissive.
 For more information, please contact the `L2F team`_.
 
+How do I cite ``giotto-tda``?
+-----------------------------
+We would appreciate citations to the following paper:
+
+   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://arxiv.org/abs/2004.02551>`_, Tauzin *et al*, arXiv:2004.02551, 2020.
+
+You can use the following BibTeX entry:
+
+.. code:: RST
+
+    @misc{tauzin2020giottotda,
+          title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+          author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+          year={2020},
+          eprint={2004.02551},
+          archivePrefix={arXiv},
+          primaryClass={cs.LG}
+    }
+
 I cannot install ``giotto-tda``
 -------------------------------
 
