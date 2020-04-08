@@ -128,7 +128,7 @@ Important links
 
 
 Citing giotto-tda
------------------
+=================
 
 If you use ``giotto-tda`` in a scientific publication, we would appreciate citations to the following paper:
 
