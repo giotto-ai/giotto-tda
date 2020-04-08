@@ -3,47 +3,46 @@
 FAQ
 ===
 
-How to cite?
-------------
-
-Cite the paper!
-
-.. code-block:: latex
-
-   @inproceedings{whatever_2014,
-   	address = {Moon},
-   	series = {{ABC}'14},
-   	title = {A fancy paper},
-   	isbn = {978-1-4503-2594-3},
-   	url = {https://doi.org/10.123/abs},
-   	doi = {123.12345},
-   	booktitle = {A fancy book},
-   	publisher = {Association for Computing Machinery},
-   	author = {Author, Well-Known},
-   	month = jun,
-   	year = {2014},
-   	keywords = {giotto},
-   	pages = {-1-4}
-   }
-
-
-I am a researcher. Can I use the giotto-tda in my project?
+I am a researcher. Can I use ``giotto-tda`` in my project?
 ----------------------------------------------------------
+.. _L2F team: business@l2f.ch
 
-Of course, the license is very permissive. For more information, please contact the L2F team at
-business@l2f.ch.
+Of course! The `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_ is very permissive.
+For more information, please contact the `L2F team`_.
 
-I cannot install `giotto-tda` on Windows.
------------------------------------------
+How do I cite ``giotto-tda``?
+-----------------------------
+We would appreciate citations to the following paper:
 
-We are trying our best to support a variety of most-used operating systems.
-If you experience any trouble, it is likely that others already have and reported it.
+   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://arxiv.org/abs/2004.02551>`_, Tauzin *et al*, arXiv:2004.02551, 2020.
+
+You can use the following BibTeX entry:
+
+.. code:: RST
+
+    @misc{tauzin2020giottotda,
+          title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+          author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+          year={2020},
+          eprint={2004.02551},
+          archivePrefix={arXiv},
+          primaryClass={cs.LG}
+    }
+
+I cannot install ``giotto-tda``
+-------------------------------
+
+We are trying our best to support a variety of widely-used operating systems. Please navigate to
+:ref:`Installation <installation>` and review the steps outlined there. Take care of the differences
+between a simple user installation and a more involved developer installation from sources.
+If you still experience issues, it is possible others also have encountered and reported them.
 Please consult the list of `issues <https://github.com/giotto-ai/giotto-tda/issues?q=is%3Aissue>`_,
 including the closed ones, and open a new one in case you did not find help.
 
-There are many TDA-libraries available. How is `giotto-tda` different?
-----------------------------------------------------------------------
+There are many TDA libraries available. How is ``giotto-tda`` different?
+------------------------------------------------------------------------
 
-Giotto-tda is oriented towards machine learning (for details, see the :ref:`guiding principles <guiding_principles>`).
-This philosophy is in contrast with other reference librairies, like `GUDHI <https://gudhi.inria.fr/doc/latest/index.html>`_,
-which provide more functionality, at the expense of being less adapted to, f.ex. batch processing, or having no unified API.
+``giotto-tda`` is oriented towards machine learning (for details, see the :ref:`guiding principles <guiding_principles>`).
+This philosophy is in contrast with other reference libraries, like `GUDHI <https://gudhi.inria.fr/doc/latest/index.html>`_,
+which provide more low-level functionality at the expense of being less adapted to e.g. batch processing, or of
+being tightly integrated with ``scikit-learn``.

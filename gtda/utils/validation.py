@@ -1,21 +1,52 @@
 """Utilities for input validation."""
 # License: GNU AGPLv3
 
+from functools import reduce
+from operator import and_
+from warnings import warn
+
 import numpy as np
 
+from sklearn.utils.validation import check_array
+from sklearn.exceptions import DataDimensionalityWarning
 
-def check_diagram(X, copy=False):
-    """Input validation on a persistence diagram.
+
+def check_diagrams(X, copy=False):
+    """Input validation for collections of persistence diagrams.
+
+    Basic type and sanity checks are run on the input collection and the
+    array is converted to float type before returning. In particular,
+    the input is checked to be an ndarray of shape ``(n_samples, n_points,
+    3)``.
+
+    Parameters
+    ----------
+    X : object
+        Input object to check/convert.
+
+    copy : bool, optional, default: ``False``
+        Whether a forced copy should be triggered.
+
+    Returns
+    -------
+    X_validated : ndarray of shape (n_samples, n_points, 3)
+        The converted and validated array of persistence diagrams.
 
     """
-    if X.ndim != 3:
-        raise ValueError(f"X should be a 3d np.array: X.shape = {X.shape}.")
-    if X.shape[2] != 3:
+    X_array = np.asarray(X)
+    if X_array.ndim == 0:
         raise ValueError(
-            f"X should be a 3d np.array with a 3rd dimension of 3 components: "
-            f"X.shape[2] = {X.shape[2]}.")
+            f"Expected 3D array, got scalar array instead:\narray={X_array}.")
+    if X_array.ndim != 3:
+        raise ValueError(
+            f"Input should be a 3D ndarray, the shape is {X_array.shape}.")
+    if X_array.shape[2] != 3:
+        raise ValueError(
+            f"Input should be a 3D ndarray with a 3rd dimension of 3 "
+            f"components, but there are {X_array.shape[2]} components.")
 
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    X_array = X_array.astype(float, copy=False)
+    homology_dimensions = sorted(list(set(X_array[0, :, 2])))
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:
@@ -33,21 +64,22 @@ def check_diagram(X, copy=False):
                     f"All homology dimensions should be integer valued: "
                     f"{dim} can't be cast to an int of the same value.")
 
-    n_points_above_diag = np.sum(X[:, :, 1] >= X[:, :, 0])
-    n_points_global = X.shape[0] * X.shape[1]
+    n_points_above_diag = np.sum(X_array[:, :, 1] >= X_array[:, :, 0])
+    n_points_global = X_array.shape[0] * X_array.shape[1]
     if n_points_above_diag != n_points_global:
         raise ValueError(
             f"All points of all persistence diagrams should be above the "
-            f"diagonal, X[:,:,1] >= X[:,:,0]. "
+            f"diagonal, i.e. X[:,:,1] >= X[:,:,0]. "
             f"{n_points_global - n_points_above_diag} points are under the "
             f"diagonal.")
     if copy:
-        return np.copy(X)
-    else:
-        return X
+        X_array = np.copy(X_array)
+
+    return X_array
 
 
 def check_graph(X):
+    # TODO
     return X
 
 
@@ -154,3 +186,124 @@ def validate_params(parameters, references, exclude=None):
     parameters_ = {key: value for key, value in parameters.items()
                    if key not in exclude_}
     return _validate_params(parameters_, references)
+
+
+def _check_array_mod(X, **kwargs):
+    """Modified version of :func:`~sklearn.utils.validation.check_array. When
+    keyword parameter `force_all_finite` is set to False, NaNs are not
+    accepted but infinity is."""
+    if not kwargs['force_all_finite']:
+        Xnew = check_array(X, **kwargs)
+        if np.isnan(Xnew).any():
+            raise ValueError(
+                "Input contains NaN. Only finite values and infinity are "
+                "allowed when parameter `force_all_finite` is False.")
+        return Xnew
+    return check_array(X, **kwargs)
+
+
+def check_point_clouds(X, distance_matrices=False, **kwargs):
+    """Input validation on arrays or lists representing collections of point
+    clouds or of distance/adjacency matrices.
+
+    The input is checked to be either a single 3D array using a single call
+    to :func:`~sklearn.utils.validation.check_array`, or a list of 2D arrays by
+    calling :func:`~sklearn.utils.validation.check_array` on each entry. In
+    the latter case, warnings are issued when not all point clouds are in
+    the same Euclidean space.
+
+    Conversions and copies may be triggered as per
+    :func:`~gtda.utils.validation.check_list_of_arrays`.
+
+    Parameters
+    ----------
+    X : object
+        Input object to check / convert.
+
+    distance_matrices : bool, optional, default: ``False``
+        Whether the input represents a collection of distance matrices or of
+        concrete point clouds in Euclidean space. In the first case, entries
+        are allowed to be infinite unless otherwise specified in `kwargs`.
+
+    kwargs
+        Keyword arguments accepted by
+        :func:`~sklearn.utils.validation.check_array`, with the following
+        caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) if not passed
+        explicitly, `force_all_finite` is set to be the boolean negation of
+        `distance_matrices`; 3) when `force_all_finite` is set to ``False``,
+        NaN inputs are not allowed; 4) `accept_sparse` and
+        `accept_large_sparse` are only meaningful in the case of lists of 2D
+        arrays, in which case they are passed to individual instances of
+        :func:`~sklearn.utils.validation.check_array` validating each entry
+        in the list.
+
+    Returns
+    -------
+    Xnew : ndarray or list
+        The converted and validated object.
+
+    """
+    kwargs_ = {'force_all_finite': not distance_matrices}
+    kwargs_.update(kwargs)
+    kwargs_.pop('allow_nd', None)
+    kwargs_.pop('ensure_2d', None)
+    if hasattr(X, 'shape') and hasattr(X, 'ndim'):
+        if X.ndim != 3:
+            if X.ndim == 2:
+                extra_2D = \
+                    "\nReshape your input X using X.reshape(1, *X.shape) or " \
+                    "X[None, :, :] if X is a single point cloud/distance " \
+                    "matrix/adjacency matrix of a weighted graph."
+            else:
+                extra_2D = ""
+            raise ValueError(
+                f"Input must be a single 3D array or a list of 2D arrays. "
+                f"Array of dimension {X.ndim} passed." + extra_2D)
+        if (X.shape[1] != X.shape[2]) and distance_matrices:
+            raise ValueError(
+                f"Input array X must have X.shape[1] == X.shape[2]: "
+                f"{X.shape[1]} != {X.shape[2]} passed.")
+        elif (X.shape[1] == X.shape[2]) and not distance_matrices:
+            warn(
+                "Input array X has X.shape[1] == X.shape[2]. This is "
+                "consistent with a collection of distance/adjacency "
+                "matrices, but the input is being treated as a collection "
+                "of vectors in Euclidean space.",
+                DataDimensionalityWarning, stacklevel=2)
+        Xnew = _check_array_mod(X, **kwargs_, allow_nd=True)
+    else:
+        has_check_failed = False
+        messages = []
+        Xnew = []
+        for i, x in enumerate(X):
+            try:
+                xnew = _check_array_mod(x, **kwargs_, ensure_2d=True)
+                if distance_matrices:
+                    if not x.shape[0] == x.shape[1]:
+                        raise ValueError(
+                            f"All arrays must be square: {x.shape[0]} rows "
+                            f"and {x.shape[1]} columns found in this array.")
+                Xnew.append(xnew)
+            except ValueError as e:
+                has_check_failed = True
+                messages.append(f"Entry {i}:\n{e}")
+        if has_check_failed:
+            raise ValueError(
+                "The following errors were raised by the inputs:\n\n" +
+                "\n\n".join(messages))
+
+        if not distance_matrices:
+            if reduce(and_, (x.shape[0] == x.shape[1] for x in X), True):
+                warn(
+                    "All arrays are square. This is consistent with a "
+                    "collection of distance/adjacency matrices, but the input "
+                    "is being treated as a collection of vectors in Euclidean "
+                    "space.", DataDimensionalityWarning, stacklevel=2)
+
+            ref_dim = X[0].shape[1]  # Embedding dimension of first sample
+            if not reduce(and_, (x.shape[1] == ref_dim for x in X[1:]), True):
+                warn(
+                    "Not all point clouds have the same embedding dimension.",
+                    DataDimensionalityWarning, stacklevel=2)
+
+    return Xnew

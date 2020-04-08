@@ -11,13 +11,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..base import PlotterMixin
+from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class ConsistentRescaling(BaseEstimator, TransformerMixin):
+class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """Rescaling of distances between pairs of points by the geometric mean
     of the distances to the respective :math:`k`-th nearest neighbours.
 
@@ -182,17 +184,36 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consistent_rescaling)(Xt[i])
-            for i in range(Xt.shape[0]))
+            delayed(self._consistent_rescaling)(x) for x in Xt)
         Xt = np.array(Xt)
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale)
+
 
 @adapt_fit_transform_docs
-class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
+class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """Rescaling of distances between consecutive pairs of points by a fixed
     factor.
 
@@ -269,13 +290,6 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
         self.factor = factor
         self.n_jobs = n_jobs
 
-    def _consecutive_rescaling(self, X):
-        Xm = pairwise_distances(X, metric=self.metric, n_jobs=1,
-                                **self.effective_metric_params_)
-
-        Xm[range(Xm.shape[0]-1), range(1, Xm.shape[0])] *= self.factor
-        return Xm
-
     def fit(self, X, y=None):
         """Calculate :attr:`effective_metric_params_`. Then, return the
         estimator.
@@ -339,10 +353,39 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        is_precomputed = self.metric == 'precomputed'
+        X = check_array(X, allow_nd=True, copy=is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._consecutive_rescaling)(Xt[i])
-            for i in range(Xt.shape[0]))
-        Xt = np.array(Xt)
+            delayed(pairwise_distances)(
+                x, metric=self.metric, n_jobs=1,
+                **self.effective_metric_params_)
+            for x in X)
+
+        if is_precomputed:
+            # Parallel loop above serves only as additional input validation
+            Xt = X
+        else:
+            Xt = np.array(Xt)
+        Xt[:, range(Xt.shape[1] - 1), range(1, Xt.shape[1])] *= self.factor
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale)

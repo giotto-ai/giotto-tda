@@ -4,14 +4,23 @@
  * License:          Apache 2.0
  *****************************************************************************/
 
-#include "../hera/bottleneck/bottleneck.h"
+/* ssize_t is not standard C, it is a typedef from Posix.
+ * Following solution is copy/pasted from solution found in
+ * https://stackoverflow.com/a/35368387
+ */
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
+#include <bottleneck/include/bottleneck.h>
 
 // PYBIND11
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-double bottleneck_distance(const std::vector<std::pair<double, double>>& dgm1,
-                           const std::vector<std::pair<double, double>>& dgm2,
+double bottleneck_distance(std::vector<std::pair<double, double>>& dgm1,
+                           std::vector<std::pair<double, double>>& dgm2,
                            double delta) {
   if (delta == 0.0)
     return hera::bottleneckDistExact(dgm1, dgm2);

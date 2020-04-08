@@ -9,18 +9,20 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _pad_diagram
+from ..base import PlotterMixin
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
+from ..plotting import plot_diagram
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
-class CubicalPersistence(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`filtered cubical complexes <cubical complex>`.
+class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`filtered cubical complexes <cubical_complex>`.
 
-    Given a :ref:`grayscale image <cubical chains and cubical homology>`,
+    Given a :ref:`greyscale image <cubical_chains_and_cubical_homology>`,
     information about the appearance and disappearance of topological features
-    (technically, :ref:`homology classes <homology and cohomology>`) of various
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
@@ -131,7 +133,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_1, ..., n_pixels_d)
+        X : ndarray of shape (n_samples, n_pixels_1, ..., n_pixels_d)
             Input data. Array of d-dimensional images.
 
         y : None
@@ -143,7 +145,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -182,7 +184,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_1, ..., n_pixels_d)
+        X : ndarray of shape (n_samples, n_pixels_1, ..., n_pixels_d)
             Input data. Array of d-dimensional images.
 
         y : None
@@ -191,7 +193,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Array of persistence diagrams computed from the feature arrays or
             distance matrices in `X`. ``n_features`` equals
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
@@ -199,24 +201,45 @@ class CubicalPersistence(BaseEstimator, TransformerMixin):
             `X`.
         """
         check_is_fitted(self)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(X[i, :, :]) for i in range(
-                X.shape[0]))
+            delayed(self._gudhi_diagram)(x) for x in Xt)
 
         max_n_points = {
-            dim: max(1, np.max([Xt[i][dim].shape[0] for i in range(len(
-                Xt))])) for dim in self.homology_dimensions}
-        min_values = {
-            dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size else
-                      np.inf for i in range(len(Xt))]) for dim in
+            dim: max(1, np.max([x[dim].shape[0] for x in Xt])) for dim in
             self.homology_dimensions}
+        min_values = {
+            dim: min([np.min(x[dim][:, 0]) if x[dim].size else np.inf for x
+                      in Xt]) for dim in self.homology_dimensions}
         min_values = {
             dim: min_values[dim] if min_values[dim] != np.inf else 0 for dim
             in self.homology_dimensions}
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
-            Xt[i], self._homology_dimensions, max_n_points, min_values)
-            for i in range(len(Xt)))
+            x, self._homology_dimensions, max_n_points, min_values)
+            for x in Xt)
         Xt = np.stack(Xt)
         Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions)
