@@ -339,7 +339,7 @@ jobs:
 
     - script: |
         set -e
-        python -m pip uninstall sphinx-rtd-theme
+        python -m pip uninstall -y sphinx-rtd-theme
         python -m pip install git+https://github.com/wreise/sphinx_rtd_theme.git@aeafa25faef29b615aa496ed01a427b86412d26e
       displayName: 'Install the custom sphinx_rtd_theme'
 
