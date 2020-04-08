@@ -1,6 +1,8 @@
 """Image preprocessing module."""
 # License: GNU AGPLv3
 
+from functools import reduce
+from operator import iconcat
 from numbers import Real
 from warnings import warn
 
@@ -8,25 +10,24 @@ import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
+from ..base import PlotterMixin
+from ..plotting import plot_point_cloud, plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class Binarizer(BaseEstimator, TransformerMixin):
-    """Binarize all 2D/3D grayscale images in a collection.
+class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
+    """Binarize all 2D/3D greyscale images in a collection.
 
     Parameters
     ----------
     threshold : float, default: 0.5
-        Percentage of the maximum pixel value `max_value_` from which to
+        Fraction of the maximum pixel value `max_value_` from which to
         binarize.
-
-    normalize: bool, optional, default: ``False``
-        If ``True``, divide every pixel value by `max_value_`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -38,7 +39,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
     n_dimensions_ : int
         Dimension of the images. Set in meth:`fit`.
 
-    max_value_: float
+    max_value_ : float
         Maximum pixel value among all pixels in all images of the collection.
         Set in meth:`fit`.
 
@@ -46,29 +47,31 @@ class Binarizer(BaseEstimator, TransformerMixin):
     --------
     gtda.homology.CubicalPersistence
 
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
+
     """
 
     _hyperparameters = {
-        'threshold': {'type': Real, 'in': Interval(0, 1, closed='right')},
-        'normalize': {'type': bool}
+        'threshold': {'type': Real, 'in': Interval(0, 1, closed='right')}
     }
 
-    def __init__(self, threshold=0.5, normalize=False, n_jobs=None):
+    def __init__(self, threshold=0.5, n_jobs=None):
         self.threshold = threshold
-        self.normalize = normalize
         self.n_jobs = n_jobs
 
     def _binarize(self, X):
         Xbin = X / self.max_value_ > self.threshold
 
-        if self.normalize:
-            Xbin = Xbin * self.max_value_
-
         return Xbin
 
     def fit(self, X, y=None):
         """Calculate :attr:`n_dimensions_` and :attr:`max_value_` from the
-        collection of grayscale images. Then, return the estimator.
+        collection of greyscale images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -78,7 +81,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y \
             [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            greyscale image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -102,7 +105,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each grayscale image in the collection `X`, calculate a
+        """For each greyscale image in the collection `X`, calculate a
         corresponding binary image by applying the `threshold`. Return the
         collection of binary images.
 
@@ -110,7 +113,7 @@ class Binarizer(BaseEstimator, TransformerMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            grayscale image.
+            greyscale image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -125,12 +128,11 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._binarize)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         if self.n_dimensions_ == 2:
@@ -138,9 +140,35 @@ class Binarizer(BaseEstimator, TransformerMixin):
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D binary images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D binary images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(
+            Xt[sample] * 1, colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class Inverter(BaseEstimator, TransformerMixin):
+class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
     """Invert all 2D/3D binary images in a collection.
 
     Parameters
@@ -149,6 +177,13 @@ class Inverter(BaseEstimator, TransformerMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+        Classification  of MNIST  using  TDA"; 19th International \
+        IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+        2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -176,7 +211,7 @@ class Inverter(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
+        check_array(X, allow_nd=True)
 
         self._is_fitted = True
         return self
@@ -204,19 +239,44 @@ class Inverter(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, ['_is_fitted'])
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.logical_not)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D binary images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D binary images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(
+            Xt[sample] * 1, colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class Padder(BaseEstimator, TransformerMixin):
+class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
     """Pad all 2D/3D binary images in a collection.
 
     Parameters
@@ -240,6 +300,13 @@ class Padder(BaseEstimator, TransformerMixin):
     ----------
     paddings_ : int ndarray of shape (padding_x, padding_y [, padding_z])
        Effective padding along each of the axis. Set in :meth:`fit`.
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -277,7 +344,7 @@ class Padder(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
@@ -323,28 +390,54 @@ class Padder(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(Xt[s], pad_width=self._pad_width,
                     constant_values=self.activated)
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
         return Xt
 
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+        """Plot a sample from a collection of 2D binary images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D binary images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        """
+        return plot_heatmap(
+            Xt[sample] * 1, colorscale=colorscale, origin=origin)
+
 
 @adapt_fit_transform_docs
-class ImageToPointCloud(BaseEstimator, TransformerMixin):
+class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     """Represent active pixels in 2D/3D binary images as points in 2D/3D space.
 
     The coordinates of each point is calculated as follows. For each activated
-    pixel, assign coordinates that are the pixel position on this image. All
-    deactivated pixels are given infinite coordinates in that space.
-    This transformer is meant to transform a collection of images to a point
-    cloud so that collection of point clouds-based persistent homology module
-    can be applied.
+    pixel, assign coordinates that are the pixel index on this image, after
+    flipping the rows and then swapping between rows and columns.
+
+    This transformer is meant to transform a collection of images to a
+    collection of point clouds so that persistent homology calculations can be
+    performed.
 
     Parameters
     ----------
@@ -353,18 +446,17 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    Attributes
-    ----------
-    mesh_ : ndarray, shape (n_pixels_x * n_pixels_y [* n_pixels_z], \
-        n_dimensions)
-        Mesh image for which each pixel value is its coordinates in a
-        ``n_dimensions``-dimensional space, where ``n_dimensions`` is the
-        dimension of the images of the input collection. Set in meth:`fit`.
-
     See also
     --------
     gtda.homology.VietorisRipsPersistence, gtda.homology.SparseRipsPersistence,
     gtda.homology.EuclideanCechPersistence
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -372,9 +464,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _embed(self, X):
-        Xpts = np.stack([self.mesh_ for _ in range(X.shape[0])]) * 1.
-        Xpts[np.logical_not(X.reshape((X.shape[0], -1))), :] += np.inf
-        return Xpts
+        return [np.argwhere(x) for x in X]
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -383,7 +473,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -396,20 +486,14 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
+        check_array(X, allow_nd=True)
+
         n_dimensions = X.ndim - 1
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
                  f"{self.n_dimensions_}.")
 
-        axis_order = [2, 1, 3]
-        mesh_range_list = [np.arange(0, X.shape[i])
-                           for i in axis_order[:n_dimensions]]
-
-        self.mesh_ = np.flip(np.stack(np.meshgrid(*mesh_range_list),
-                                      axis=n_dimensions),
-                             axis=0).reshape((-1, n_dimensions))
-
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -419,7 +503,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray, shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
             binary image.
 
@@ -429,18 +513,36 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray, shape (n_samples, n_pixels_x * n_pixels_y [* n_pixels_z],
+        Xt : ndarray of shape (n_samples, n_pixels_x * n_pixels_y [* \
+            n_pixels_z],
             n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
             point cloud in ``n_dimensions``-dimensional space.
 
         """
-        check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True, copy=True)
+        check_is_fitted(self, '_is_fitted')
+        Xt = check_array(X, allow_nd=True)
 
+        Xt = np.swapaxes(np.flip(Xt, axis=1), 1, 2)
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             self._embed)(Xt[s])
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt)
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
+        Xt = reduce(iconcat, Xt, [])
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0):
+        """Plot a sample from a collection of point clouds. If the point cloud
+        is in more than three dimensions, only the first three are plotted.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, n_dimensions)
+            Collection of point clouds in ``n_dimension``-dimensional space,
+            such as returned by :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        """
+        return plot_point_cloud(Xt[sample])

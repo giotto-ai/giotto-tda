@@ -1,4 +1,4 @@
-.. image:: https://www.giotto.ai/static/vector/logo-tda.svg
+.. image:: doc/images/tda_logo.svg
    :width: 850
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
@@ -25,38 +25,34 @@
 giotto-tda
 ==========
 
-giotto-tda is a high performance topological machine learning toolbox in Python built on top of
-scikit-learn and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
+``giotto-tda`` is a high-performance topological machine learning toolbox in Python built on top of
+``scikit-learn`` and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_
+family of open-source projects.
 
 Project genesis
 ===============
 
-giotto-tda is the result of a collaborative effort between `L2F SA
-<https://www.l2f.ch/>`_, the `Laboratory for Topology and Neuroscience
-<https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL, and the `Institute of Reconfigurable & Embedded Digital Systems (REDS)
-<https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
+``giotto-tda`` is the result of a collaborative effort between `L2F SA <https://www.l2f.ch/>`_,
+the `Laboratory for Topology and Neuroscience <https://www.epfl.ch/labs/hessbellwald-lab/>`_ at EPFL,
+and the `Institute of Reconfigurable & Embedded Digital Systems (REDS) <https://heig-vd.ch/en/research/reds>`_ of HEIG-VD.
 
 License
 =======
 
-giotto-tda is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_. 
-If you need a different distribution license, please contact the L2F team at 
-business@l2f.ch.
+.. _L2F team: business@l2f.ch
+
+``giotto-tda`` is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-tda/blob/master/LICENSE>`_.
+If you need a different distribution license, please contact the `L2F team`_.
 
 Documentation
 =============
 
-Please visit https://giotto-ai.github.io/gtda-docs and navigate to the version you are interested in.
+Please visit `https://giotto-ai.github.io/gtda-docs <https://giotto-ai.github.io/gtda-docs>`_ and navigate to the version you are interested in.
 
-Getting started
-===============
+Use cases
+=========
 
-To get started with giotto-tda, first follow the installations steps below. `This blog post <https://towardsdatascience.com/getting-started-with-giotto-learn-a-python-library-for-topological-machine-learning-451d88d2c4bc>`_, and references therein, offer a friendly introduction to the topic of topological machine learning and to the philosophy behind giotto-tda.
-
-Tutorials and use cases
------------------------
-
-Simple tutorials can be found in the `examples <https://github.com/giotto-ai/giotto-tda/tree/master/examples>`_ folder. For a wide selection of use cases and application domains, you can visit `this page <https://giotto.ai/learn/course-content>`_.
+For a wide selection of use cases and application domains, you can visit `this page <https://giotto.ai/learn/course-content>`_.
 
 Installation
 ============
@@ -64,7 +60,7 @@ Installation
 Dependencies
 ------------
 
-The latest stable version of giotto-tda requires:
+The latest stable version of ``giotto-tda`` requires:
 
 - Python (>= 3.6)
 - NumPy (>= 1.17.0)
@@ -81,7 +77,7 @@ To run the examples, jupyter is required.
 User installation
 -----------------
 
-The simplest way to install giotto-tda is using ``pip``   ::
+The simplest way to install ``giotto-tda`` is using ``pip``   ::
 
     pip install -U giotto-tda
 
@@ -93,11 +89,17 @@ bug fixes can be installed by running   ::
 
     pip install -U giotto-tda-nightly
 
-The main difference between giotto-tda-nightly and the developer installation (see the section
+The main difference between ``giotto-tda-nightly`` and the developer installation (see the section
 on contributing, below) is that the former is shipped with pre-compiled wheels (similarly to the stable
 release) and hence does not require any C++ dependencies. As the main library module is called ``gtda`` in
-both the stable and nightly versions, giotto-tda and giotto-tda-nightly should not be installed in
+both the stable and nightly versions, ``giotto-tda`` and ``giotto-tda-nightly`` should not be installed in
 the same environment.
+
+Developer installation
+----------------------
+
+Please consult the `dedicated page <https://giotto-ai.github.io/gtda-docs/latest/installation.html#developer-installation>`_
+for detailed instructions on how to build ``giotto-tda`` from sources across different platforms.
 
 .. _contributing-section:
 
@@ -106,95 +108,44 @@ Contributing
 
 We welcome new contributors of all experience levels. The Giotto
 community goals are to be helpful, welcoming, and effective. To learn more about
-making a contribution to giotto-tda, please see the `CONTRIBUTING.rst
-<https://github.com/giotto-ai/giotto-tda/blob/master/CONTRIBUTING.rst>`_ file.
-
-Developer installation
-----------------------
-
-Installing both the PyPI release and source of giotto-tda in the same environment is not recommended since it is
-known to cause conflicts with the C++ bindings.
-
-The developer installation requires three important C++ dependencies:
-
--  A C++14 compatible compiler
--  CMake >= 3.9
--  Boost >= 1.56
-
-Please refer to your system's instructions and to the `CMake <https://cmake.org/>`_ and
-`Boost <https://www.boost.org/doc/libs/1_72_0/more/getting_started/index.html>`_ websites for definitive guidance on how to install these dependencies. The instructions below are unofficial, please follow them at your own risk.
-
-Linux
-~~~~~
-
-Most Linux systems should come with a suitable compiler pre-installed. For the other two dependencies, you may consider using your distribution's package manager, e.g. by running
-
-.. code-block:: bash
-
-    sudo apt-get install cmake libboost-dev
-
-if ``apt-get`` is available in your system.
-
-macOS
-~~~~~
-
-On macOS, you may consider using ``brew`` (https://brew.sh/) to install the dependencies as follows:
-
-.. code-block:: bash
-
-    brew install gcc cmake boost
-
-Windows
-~~~~~~~
-
-On Windows, you will likely need to have `Visual Studio <https://visualstudio.microsoft.com/>`_ installed. At present,
-it appears to be important to have a recent version of the VS C++ compiler. One way to check whether this is the case
-is as follows: 1) open the VS Installer GUI; 2) under the "Installed" tab, click on "Modify" in the relevant VS
-version; 3) in the newly opened window, select "Individual components" and ensure that v14.24 or above of the MSVC
-"C++ x64/x86 build tools" is selected. The CMake and Boost dependencies are best installed using the latest binary
-executables from the websites of the respective projects.
-
-
-Source code
-~~~~~~~~~~~
-
-You can obtain the latest state of the source code with the command::
-
-    git clone https://github.com/giotto-ai/giotto-tda.git
-
-
-To install:
-~~~~~~~~~~~
-
-.. code-block:: bash
-
-   cd giotto-tda
-   python -m pip install -e ".[dev]"
-
-This way, you can pull the library's latest changes and make them immediately available on your machine.
-Note: we recommend upgrading ``pip`` and ``setuptools`` to recent versions before installing in this way.
+making a contribution to ``giotto-tda``, please consult `the relevant page
+<https://giotto-ai.github.io/gtda-docs/latest/contributing/index.html>`_.
 
 Testing
 -------
 
 After installation, you can launch the test suite from outside the
-source directory::
+source directory   ::
 
     pytest gtda
 
-
-Changelog
-=========
-
-See the `RELEASE.rst <https://github.com/giotto-ai/giotto-tda/blob/master/RELEASE.rst>`__ file
-for a history of notable changes to giotto-tda.
-
 Important links
----------------
+===============
 
 - Official source code repo: https://github.com/giotto-ai/giotto-tda
 - Download releases: https://pypi.org/project/giotto-tda/
 - Issue tracker: https://github.com/giotto-ai/giotto-tda/issues
+
+
+Citing giotto-tda
+=================
+
+If you use ``giotto-tda`` in a scientific publication, we would appreciate citations to the following paper:
+
+   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://arxiv.org/abs/2004.02551>`_, Tauzin *et al*, arXiv:2004.02551, 2020.
+
+You can use the following BibTeX entry:
+
+.. code:: RST
+
+    @misc{tauzin2020giottotda,
+          title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+          author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+          year={2020},
+          eprint={2004.02551},
+          archivePrefix={arXiv},
+          primaryClass={cs.LG}
+    }
 
 Community
 =========

@@ -6,7 +6,7 @@
 ########## Config
 
 ifndef GITDIR
-GITDIR    = ../../../projects/gtda-docs
+GITDIR    = ../../gtda-docs
 endif
 
 ifndef VERSION
@@ -29,18 +29,6 @@ PRODUCTION_DOMAIN = giotto-ai.github.io/gtda-docs/
 
 CURRENTDOCFOLDER = $(GITDIR)/$(VERSION)
 
-REQUIRED="pandoc pandoc-citeproc jupyter"
-
-check_installs:
-	@for cmd in ${REQUIRED};\
-	do
-		if ! command -v ${cmd} 2> /dev/null;\
-		then
-			echo Please install ${cmd}!;\
-			exit 1
-		fi;\
-	done;
-
 togit:
 	@mkdir -p "$(CURRENTDOCFOLDER)"
 	@cp -a build/html/ "$(CURRENTDOCFOLDER)"
@@ -54,7 +42,7 @@ theory-gl:
 	@pandoc theory/glossary.tex -f latex -t rst --toc -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
 
 convert-notebooks:
-	@jupyter nbconvert notebooks/*.ipynb --execute --to rst
+	@jupyter nbconvert notebooks/*.ipynb --execute --to rst --ExecutePreprocessor.timeout=1200
 
 clean-gh:
 	@make clean

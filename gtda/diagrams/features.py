@@ -1,7 +1,6 @@
 """Feature extraction from persistence diagrams."""
 # License: GNU AGPLv3
 
-import types
 from numbers import Real
 
 import numpy as np
@@ -10,23 +9,16 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ._metrics import betti_curves, landscapes, heats, \
-    persistence_images, silhouettes
+from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _subdiagrams, _bin, _calculate_weights
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_diagram
-
-
-def identity(x):
-    """The identity function.
-    """
-    return x
+from ..utils.validation import validate_params, check_diagrams
 
 
 @adapt_fit_transform_docs
 class PersistenceEntropy(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence entropies <persistence entropy>` of persistence
+    """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
     Given a persistence diagrams consisting of birth-death-dimension triples
@@ -87,7 +79,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -117,7 +109,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        X = check_diagrams(X)
 
         with np.errstate(divide='ignore', invalid='ignore'):
             Xt = Parallel(n_jobs=self.n_jobs)(
@@ -131,513 +123,116 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 
 @adapt_fit_transform_docs
-class BettiCurve(BaseEstimator, TransformerMixin):
-    """:ref:`Betti curves <betti curve>` of persistence diagrams.
+class Amplitude(BaseEstimator, TransformerMixin):
+    """:ref:`Amplitudes <amplitude>` of persistence diagrams.
 
-    Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately, and their respective Betti curves are obtained by
-    evenly sampling the :ref:`filtration parameter <filtered complex>`.
+    For each persistence diagram in a collection, a vector of amplitudes or a
+    single scalar amplitude is calculated according to the following steps:
+
+        1. The diagram is partitioned into subdiagrams according to homology
+           dimension.
+        2. The amplitude of each subdiagram is calculated according to the
+           parameters `metric` and `metric_params`. This gives a vector of
+           amplitudes, :math:`\\mathbf{a} = (a_{q_1}, \\ldots, a_{q_n})` where
+           the :math:`q_i` range over the available homology dimensions.
+        3. The final result is either :math:`\\mathbf{a}` itself or
+           a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
 
     Parameters
     ----------
-    n_bins : int, optional, default: ``100``
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
+        ``'betti'`` | ``'heat'`` | ``'silhouette'`` | \
+        ``'persistence_image'``, optional, default: ``'landscape'``
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the (trivial) diagonal diagram:
+
+        - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
+          perfect-matching--based notions of distance.
+        - ``'landscape'`` refers to the :math:`L^p` distance between
+          persistence landscapes.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
+        - ``'silhouette'`` refers to the :math:`L^p` distance between
+          silhouettes.
+        - ``'persistence_image'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams represented on birth-persistence axes.
+
+    metric_params : dict or None, optional, default: ``None``
+        Additional keyword arguments for the metric function (passing
+        ``None`` is equivalent to passing the defaults described below):
+
+        - If ``metric == 'bottleneck'`` there are no available arguments.
+        - If ``metric == 'wasserstein'`` the only argument is `p` (float,
+          default: ``2.``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_bins` (int, default: ``100``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
+          (int, default: ``100``).
+        - If ``metric == 'silhouette'`` the available arguments are `p`
+          (float, default: ``2.``), `order` (float, default: ``1.``) and
+          `n_bins` (int, default: ``100``).
+        - If ``metric == 'persistence_image'`` the available arguments are `p`
+          (float, default: ``2.``), `sigma` (float, default: ``1.``),
+          `n_bins` (int, default: ``100``) and `weight_function`
+          (callable or None, default: ``None``).
+
+    order : float or None, optional, default: ``2.``
+        If ``None``, :meth:`transform` returns for each diagram a vector of
+        amplitudes corresponding to the dimensions in
+        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
+        these vectors with :math:`p` equal to `order` is taken.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
+    effective_metric_params_ : dict
+        Dictionary containing all information present in `metric_params` as
+        well as on any relevant quantities computed in :meth:`fit`.
+
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
-    samplings_ : dict
-        For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during :meth:`fit` according to the
-        minimum birth and maximum death values observed across all samples.
-
     See also
     --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage,\
+    PairwiseDistance, Scaler, Filtering, \
+    BettiCurve, PersistenceLandscape, \
+    HeatKernel, Silhouette, \
     gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
-    The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the j-th entry of a Betti
-    curve in homology dimension q typically arises from a different parameter
-    values to the j-th entry of a curve in dimension q'.
+    To compute amplitudes without first splitting the computation between
+    different homology dimensions, data should be first transformed by an
+    instance of :class:`ForgetDimension`.
 
     """
 
     _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
-
-    def __init__(self, n_bins=100, n_jobs=None):
-        self.n_bins = n_bins
-        self.n_jobs = n_jobs
-
-    def fit(self, X, y=None):
-        """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
-
-        This method is here to implement the usual scikit-learn API and hence
-        work in pipelines.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        self : object
-
-        """
-        X = check_diagram(X)
-        validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
-        self._n_dimensions = len(self.homology_dimensions_)
-
-        self._samplings, _ = _bin(X, metric='betti', n_bins=self.n_bins)
-        self.samplings_ = {dim: s
-                           for dim, s in self._samplings.items()}
-        return self
-
-    def transform(self, X, y=None):
-        """Compute the Betti curves of diagrams in `X`.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            Betti curves: one curve (represented as a one-dimensional array
-            of integer values) per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
-
-        """
-        check_is_fitted(self)
-        X = check_diagram(X)
-
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
-                _subdiagrams(X, [dim], remove_dim=True)[s],
-                self._samplings[dim])
-            for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).\
-            reshape(self._n_dimensions, X.shape[0], -1).\
-            transpose((1, 0, 2))
-        return Xt
-
-
-@adapt_fit_transform_docs
-class PersistenceLandscape(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence landscapes <persistence landscape>` of persistence
-    diagrams.
-
-    Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately, and layers of their respective persistence
-    landscapes are obtained by evenly sampling the :ref:`filtration parameter
-    <filtered complex>`.
-
-    Parameters
-    ----------
-    n_layers : int, optional, default: ``1``
-        How many layers to consider in the persistence landscape.
-
-    n_bins : int, optional, default: ``100``
-        The number of filtration parameter values, per available
-        homology dimension, to sample during :meth:`fit`.
-
-    n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
-
-    Attributes
-    ----------
-    homology_dimensions_ : list
-        Homology dimensions seen in :meth:`fit`.
-
-    samplings_ : dict
-        For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during :meth:`fit` according to the
-        minimum birth and maximum death values observed across all samples.
-
-    See also
-    --------
-    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage, \
-    gtda.homology.VietorisRipsPersistence
-
-    Notes
-    -----
-    The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the j-th entry of the
-    k-layer of a persistence landscape in homology dimension q typically
-    arises from a different parameter value to the j-th entry of a k-layer in
-    dimension q'.
-
-    """
-
-    _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'n_layers': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
-
-    def __init__(self, n_layers=1, n_bins=100, n_jobs=None):
-        self.n_layers = n_layers
-        self.n_bins = n_bins
-        self.n_jobs = n_jobs
-
-    def fit(self, X, y=None):
-        """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
-
-        This method is here to implement the usual scikit-learn API and hence
-        work in pipelines.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        self : object
-
-        """
-        X = check_diagram(X)
-        validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
-        self._n_dimensions = len(self.homology_dimensions_)
-
-        self._samplings, _ = _bin(X, metric="landscape", n_bins=self.n_bins)
-        self.samplings_ = {dim: s
-                           for dim, s in self._samplings.items()}
-
-        return self
-
-    def transform(self, X, y=None):
-        """Compute the persistence landscapes of diagrams in `X`.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-            n_layers, n_bins)
-            Persistence lanscapes: one landscape (represented as a
-            two-dimensional array) per sample and per homology dimension seen
-            in :meth:`fit`. Each landscape contains a number `n_layers` of
-            layers. Index i along axis 1 corresponds to the i-th homology
-            dimension in :attr:`homology_dimensions_`.
-
-        """
-        check_is_fitted(self)
-        X = check_diagram(X)
-
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
-                _subdiagrams(X, [dim], remove_dim=True)[s],
-                self._samplings[dim],
-                self.n_layers)
-            for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_layers, self.n_bins).\
-            transpose((1, 0, 2, 3))
-        return Xt
-
-
-@adapt_fit_transform_docs
-class HeatKernel(BaseEstimator, TransformerMixin):
-    """Convolution of persistence diagrams with a Gaussian kernel.
-
-    Based on ideas in [1]_. Given a persistence diagram consisting of
-    birth-death-dimension triples [b, d, q], subdiagrams corresponding to
-    distinct homology dimensions are considered separately and regarded as sums
-    of Dirac deltas. Then, the convolution with a Gaussian kernel is computed
-    over a rectangular grid of locations evenly sampled from appropriate
-    ranges of the :ref:`filtration parameter <filtered complex>`. The
-    same is done with the reflected images of the subdiagrams about the
-    diagonal, and the difference between the results of the two convolutions is
-    computed. The result can be thought of as a raster image.
-
-    Parameters
-    ----------
-    sigma : float, optional default ``1.``
-        Standard deviation for Gaussian kernel.
-
-    n_bins : int, optional, default: ``100``
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
-
-    n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
-
-    Attributes
-    ----------
-    homology_dimensions_ : list
-        Homology dimensions seen in :meth:`fit`.
-
-    samplings_ : dict
-        For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during :meth:`fit` according to the
-        minimum birth and maximum death values observed across all samples.
-
-    See also
-    --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage, \
-    gtda.homology.VietorisRipsPersistence
-
-    Notes
-    -----
-    The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the (i, j)-th pixel
-    of an image in homology dimension q typically arises from a different
-    pair of parameter values to the (i, j)-th pixel of an image in
-    dimension q'.
-
-    References
-    ----------
-    .. [1] J. Reininghaus, S. Huber, U. Bauer, and R. Kwitt, "A Stable
-           Multi-Scale Kernel for Topological Machine Learning"; *2015 IEEE
-           Conference on Computer Vision and Pattern Recognition (CVPR)*,
-           pp. 4741--4748, 2015; doi: `10.1109/CVPR.2015.7299106
-           <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
-
-    """
-
-    _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')}}
-
-    def __init__(self, sigma=1., n_bins=100, n_jobs=None):
-        self.sigma = sigma
-        self.n_bins = n_bins
-        self.n_jobs = n_jobs
-
-    def fit(self, X, y=None):
-        """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
-
-        This method is here to implement the usual scikit-learn API and hence
-        work in pipelines.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        self : object
-
-        """
-        X = check_diagram(X)
-        validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
-        self._n_dimensions = len(self.homology_dimensions_)
-
-        self._samplings, self._step_size = _bin(
-            X, metric='heat', n_bins=self.n_bins)
-        self.samplings_ = {dim: s
-                           for dim, s in self._samplings.items()}
-        return self
-
-    def transform(self, X, y=None):
-        """Compute raster images obtained from diagrams in `X` by convolution
-        with a Gaussian kernel.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
-            n_bins)
-            Raster images: one image per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
-
-        """
-        check_is_fitted(self)
-        X = check_diagram(X, copy=True)
-
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
-                   self._samplings[dim], self._step_size[dim], self.sigma)
-            for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_bins, self.n_bins).\
-            transpose((1, 0, 2, 3))
-        return Xt
-
-
-@adapt_fit_transform_docs
-class PersistenceImage(BaseEstimator, TransformerMixin):
-    """:ref:`Persistence images <persistence image>` of persistence
-    diagrams.
-
-    Based on ideas in [1]_. Given a persistence diagram consisting of
-    birth-death-dimension triples [b, d, q], the equivalent diagrams of
-    birth-persistence-dimension [b, d-b, q] triples are computed and
-    subdiagrams corresponding to distinct homology dimensions are considered
-    separately and regarded as sums of Dirac deltas. Then, the convolution
-    with a Gaussian kernel is computed over a rectangular grid of locations
-    evenly sampled from appropriate ranges of the :ref:`filtration parameter
-    <filtered complex>`. The result can be thought of as a raster
-    image.
-
-    Parameters
-    ----------
-    sigma : float, optional default ``1.``
-        Standard deviation for Gaussian kernel.
-
-    n_bins : int, optional, default: ``100``
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
-
-    weight_function : callable or None, default: ``None``
-        Function mapping the 1D array of persistence values of the points of an
-        input diagram to a 1D array of weights. ``None`` is equivalent to
-        passing the identity function.
-
-    n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
-
-    Attributes
-    ----------
-    effective_weight_function_ : callable
-        Effective function corresponding to `weight_function`. Set in
-        :meth:`fit`.
-
-    homology_dimensions_ : list
-        Homology dimensions seen in :meth:`fit`.
-
-    samplings_ : dict
-        For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during :meth:`fit` according to the
-        minimum birth and maximum death values observed across all samples.
-
-    weights_ : dict
-        For each number in `homology_dimensions_`, an array of weights
-        corresponding to the persistence values obtained from `samplings_`
-        calculated during :meth:`fit` using the `weight_function`.
-
-    See also
-    --------
-    BettiCurve, PersistenceLandscape, PersistenceEntropy, HeatKernel, \
-    Amplitude, PairwiseDistance, gtda.homology.VietorisRipsPersistence
-
-    Notes
-    -----
-    The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the (i, j)-th pixel of a
-    persistence image in homology dimension q typically arises from a different
-    pair of parameter values to the (i, j)-th pixel of a persistence image in
-    dimension q'.
-
-    References
-    ----------
-    .. [1] H. Adams, T. Emerson, M. Kirby, R. Neville, C. Peterson, P. Shipman,
-           S. Chepushtanova, E. Hanson, F. Motta, and L. Ziegelmeier,
-           "Persistence Images: A Stable Vector Representation of Persistent
-           Homology"; *Journal of Machine Learning Research 18, 1*,
-           pp. 218-252, 2017; doi: `10.5555/3122009.3122017
-           <http://dx.doi.org/10.5555/3122009.3122017>`_.
-
-    """
-
-    _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
-        'weight_function': {'type': (types.FunctionType, type(None))}}
-
-    def __init__(self, sigma=1., n_bins=100, weight_function=None,
+        'metric': {'type': str, 'in': _AVAILABLE_AMPLITUDE_METRICS.keys()},
+        'order': {'type': (Real, type(None)),
+                  'in': Interval(0, np.inf, closed='right')},
+        'metric_params': {'type': (dict, type(None))}}
+
+    def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):
-        self.sigma = sigma
-        self.n_bins = n_bins
-        self.weight_function = weight_function
+        self.metric = metric
+        self.metric_params = metric_params
+        self.order = order
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
+        :attr:`homology_dimensions_` and compute
+        :attr:`effective_metric_params`. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -658,181 +253,31 @@ class PersistenceImage(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_diagram(X)
-
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        if self.weight_function is None:
-            self.effective_weight_function_ = identity
+        if self.metric_params is None:
+            self.effective_metric_params_ = {}
         else:
-            self.effective_weight_function_ = self.weight_function
+            self.effective_metric_params_ = self.metric_params.copy()
+        validate_params(self.effective_metric_params_,
+                        _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
-        self._n_dimensions = len(self.homology_dimensions_)
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
 
-        self._samplings, self._step_size = _bin(
-            X, metric='persistence_image', n_bins=self.n_bins)
-        self.samplings_ = {dim: s
-                           for dim, s in self._samplings.items()}
-        self.weights_ = _calculate_weights(X, self.effective_weight_function_,
-                                           self._samplings)
-        return self
+        self.effective_metric_params_['samplings'], \
+            self.effective_metric_params_['step_sizes'] = \
+            _bin(X, metric=self.metric, **self.effective_metric_params_)
 
-    def transform(self, X, y=None):
-        """Compute raster images obtained from diagrams in `X` by convolution
-        with a Gaussian kernel.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
-             n_bins)
-            Raster images: one image per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
-
-        """
-        check_is_fitted(self)
-        X = check_diagram(X, copy=True)
-
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(persistence_images)(_subdiagrams(X, [dim],
-                                                     remove_dim=True)[s],
-                                        self._samplings[dim],
-                                        self._step_size[dim],
-                                        self.weights_[dim],
-                                        self.sigma)
-            for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs))
-        )
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_bins, self.n_bins).\
-            transpose((1, 0, 2, 3))
-        return Xt
-
-
-@adapt_fit_transform_docs
-class Silhouette(BaseEstimator, TransformerMixin):
-    """:ref:`Power-weighted silhouettes <weighted silhouette>` of persistence
-    diagrams.
-
-    Based on ideas in [1]_. Given a persistence diagram consisting of
-    birth-death-dimension triples [b, d, q], subdiagrams corresponding to
-    distinct homology dimensions are considered separately, and their
-    respective silhouette by sampling the silhouette function over evenly
-    spaced locations from appropriate ranges of the :ref:`filtration parameter
-    <filtered complex>`.
-
-    Parameters
-    ----------
-    power: float, optional, default: ``1.``
-        The power to which persistence values are raised to define the
-        :ref:`power-weighted silhouettes <weighted silhouette>`.
-
-    n_bins : int, optional, default: ``100``
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
-
-    n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
-
-    Attributes
-    ----------
-    homology_dimensions_ : list
-        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
-
-    samplings_ : dict
-        For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during :meth:`fit` according to the
-        minimum birth and maximum death values observed across all samples.
-
-    See also
-    --------
-    PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, BettiCurve, gtda.homology.VietorisRipsPersistence
-
-    Notes
-    -----
-    The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the j-th entry of
-    a silhouette in homology dimension q typically arises from
-    a different parameter values to the j-th entry of a curve
-    in dimension q'.
-
-    References
-    ----------
-    .. [1] F. Chazal, B. T. Fasy, F. Lecci, A. Rinaldo, and L. Wasserman,
-           "Stochastic Convergence of Persistence Landscapes and Silhouettes";
-           *In Proceedings of the thirtieth annual symposium on Computational
-           Geometry*, Kyoto, Japan, 2014, pp. 474–483;
-           doi: `10.1145/2582112.2582128
-           <http://dx.doi.org/10.1145/2582112.2582128>`_.
-
-    """
-
-    _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'power': {'type': Real, 'in': Interval(0, np.inf, closed='right')}}
-
-    def __init__(self, power=1., n_bins=100, n_jobs=None):
-        self.power = power
-        self.n_bins = n_bins
-        self.n_jobs = n_jobs
-
-    def fit(self, X, y=None):
-        """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
-
-        This method is here to implement the usual scikit-learn API and hence
-        work in pipelines.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features, 3)
-            Input data. Array of persistence diagrams, each a collection of
-            triples [b, d, q] representing persistent topological features
-            through their birth (b), death (d) and homology dimension (q).
-
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
-
-        Returns
-        -------
-        self : object
-
-        """
-        X = check_diagram(X)
-        validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
-        self._n_dimensions = len(self.homology_dimensions_)
-
-        self._samplings, _ = _bin(X, metric='silhouette', n_bins=self.n_bins)
-        self.samplings_ = {dim: s.flatten()
-                           for dim, s in self._samplings.items()}
+        if self.metric == 'persistence_image':
+            self.effective_metric_params_['weights'] = \
+                _calculate_weights(X, **self.effective_metric_params_)
 
         return self
 
     def transform(self, X, y=None):
-        """Compute silhouettes of diagrams in X.
+        """Compute the amplitudes or amplitude vectors of diagrams in `X`.
 
         Parameters
         ----------
@@ -847,24 +292,21 @@ class Silhouette(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins)
-            One silhouette (represented as a one-dimensional array)
-            per sample and per homology dimension seen
-            in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+        Xt : ndarray of shape (n_samples, n_homology_dimensions) if `order` \
+            is ``None``, else (n_samples, 1)
+            Amplitudes or amplitude vectors of the diagrams in `X`. In the
+            second case, index i along axis 1 corresponds to the i-th
             homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
-        X = check_diagram(X)
+        Xt = check_diagrams(X, copy=True)
 
-        Xt = (Parallel(n_jobs=self.n_jobs)
-              (delayed(silhouettes)(_subdiagrams(X, [dim], remove_dim=True)[s],
-                                    self._samplings[dim], power=self.power)
-              for dim in self.homology_dimensions_
-              for s in gen_even_slices(X.shape[0],
-                                       effective_n_jobs(self.n_jobs))))
-
-        Xt = np.concatenate(Xt). \
-            reshape(self._n_dimensions, X.shape[0], -1). \
-            transpose((1, 0, 2))
+        Xt = _parallel_amplitude(Xt, self.metric,
+                                 self.effective_metric_params_,
+                                 self.homology_dimensions_,
+                                 self.n_jobs)
+        if self.order is None:
+            return Xt
+        Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
         return Xt

@@ -14,11 +14,11 @@ This pages contains a list of available features in the library.
    point_clouds.rst
    time_series.rst
    graphs.rst
+   images.rst
+   plotting.rst
    base.rst
    pipeline.rst
-   meta_transformers.rst
    validation.rst
-   images.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning

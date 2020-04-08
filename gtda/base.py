@@ -92,17 +92,15 @@ class PlotterMixin:
     """Mixin class for all plotters in giotto-tda."""
 
     def fit_transform_plot(self, X, y=None, sample=0, **plot_params):
-        """Fit to data, then transform and plot a sample in the input
-        collection. Return the transformed sample input.
+        """Fit to data, then apply :meth:`transform_plot`.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
 
-        y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
+        y : ndarray of shape (n_samples,) or None
+            Target values for supervised problems.
 
         sample : int
             Sample to be plotted.
@@ -112,8 +110,8 @@ class PlotterMixin:
 
         Returns
         -------
-        Xt : numpy array of shape (1, ...)
-            Transformed input sample.
+        Xt : ndarray of shape (1, ...)
+            Transformed one-sample slice from the input.
 
         """
         self.fit(X, y)
@@ -121,16 +119,13 @@ class PlotterMixin:
         return Xt
 
     def transform_plot(self, X, sample=0, **plot_params):
-        """Transform and plot a sample in the input collection.
-        Return the transformed sample input.
+        """Take a one-sample slice from the input collection and transform it.
+        Before returning the transformed object, plot the transformed sample.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, ...)
             Input data.
-
-        y : ndarray of shape (n_samples,)
-            Target data.
 
         sample : int
             Sample to be plotted.
@@ -140,10 +135,11 @@ class PlotterMixin:
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, ...)
-            Transformed input sample.
+        Xt : ndarray of shape (1, ...)
+            Transformed one-sample slice from the input.
 
         """
-        Xt = self.transform(X[[sample]])
-        self.plot(Xt, sample=sample, **plot_params)
+        Xt = self.transform(X[sample:sample+1])
+        self.plot(Xt, sample=0, **plot_params)
+
         return Xt

@@ -1,5 +1,11 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+trigger:
+- master
+
+pr:
+- master
+
 jobs:
 
 - job: 'manylinux2010'
@@ -32,7 +38,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -127,7 +133,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -148,7 +154,7 @@ jobs:
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+    displayName: 'Test dev install with pytest, upload coverage report'
 
   - script: |
       set -e
@@ -194,6 +200,12 @@ jobs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
+  - script: |
+      set -e
+      pip install twine
+      twine check dist/*
+    displayName: 'Check distribution with twine'
+
   - task: PublishBuildArtifacts@1
     displayName: 'Create download link'
     inputs:
@@ -202,7 +214,6 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
@@ -236,12 +247,16 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
+      python .azure-ci/install_boost.py || exit /b
+    displayName: 'Install boost'
+
+  - script: |
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml || exit /b
+      pytest gtda --no-cov --no-coverage-upload || exit /b
     displayName: 'Test dev install with pytest'
 
   - script: |
@@ -302,7 +317,8 @@ jobs:
   variables:
     EXECUTE: 'true'
     RUNNOTEBOOKS: TRUE
-    VERSION: master
+    VERSION: azure-test
+    GITDIR: /tmp/gtda-docs
 
   steps:
     - task: UsePythonVersion@0
@@ -323,9 +339,9 @@ jobs:
 
     - script: |
         set -e
-        cd doc/
-        make html
-      displayName: 'Build docs'
+        python -m pip uninstall sphinx-rtd-theme
+        python -m pip install git+https://github.com/wreise/sphinx_rtd_theme.git@aeafa25faef29b615aa496ed01a427b86412d26e
+      displayName: 'Install the custom sphinx_rtd_theme'
 
     - script: |
         ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
@@ -346,9 +362,24 @@ jobs:
         cd gtda-docs
         git config user.email "maintainers@giotto.ai"
         git config user.name "giotto-maintainers"
+        git checkout -b deploytests
         # TODO: copy docs to the right folder and git add them
-        git commit -m "Test empty commit (azure pipelines)" --allow-empty
-        git push -u origin master
-        cd -
-      displayName:  'Commit the docs'
+        # git commit -m "Test empty commit (azure pipelines)" --allow-empty
+        # git push -u origin master
+        # cd -
+      displayName:  'Clone the docs and configure the username'
       condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        set -e
+        cd doc/
+        make all-gh
+        make gh-commit
+      displayName: 'Build and commit the docs'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        cd /tmp/gtda-docs
+        git push -u origin deploytests
+      displayName: 'Push the docs to master'
+      condition:
