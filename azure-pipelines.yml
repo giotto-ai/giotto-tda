@@ -375,11 +375,11 @@ jobs:
         cd doc/
         make all-gh
         make gh-commit
-     displayName: 'Build and commit the docs'
-     condition: ne(variables['Build.Reason'], 'PullRequest')
+      displayName: 'Build and commit the docs'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
 
     - script: |
         cd /tmp/gtda-docs
         git push -u origin deploytests
-     displayName: 'Push the docs to master'
-     condition:
+      displayName: 'Push the docs to master'
+      condition:
