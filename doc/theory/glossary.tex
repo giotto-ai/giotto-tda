@@ -407,7 +407,6 @@ pdfpagelabels]{hyperref}
 	% \hyperref[clique_and_flag_complexes]{filtered clique complex}
 	filtered clique complex associated to $(X \times X ,w)$.
 	
-	
 	\subsection*{\v{C}ech complex and \v{C}ech persistence} \label{cech_complex_and_cech_persistence}
 	
 	Let $(X, d)$ be a 
@@ -520,9 +519,31 @@ pdfpagelabels]{hyperref}
 	\end{equation*}	
 	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the \textit{$p$-power-weighted silhouette} of $D$. The silhouette construction defines a
 	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
-	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.	
+	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.
 	
 	\paragraph{\\ References:} \cite{chazal2014stochastic}
+	
+	\subsection*{Heat vectorizations} \label{heat_vectorization}
+	
+	Considering the points in a persistence diagram as the support of Dirac deltas one can construct, for any $t > 0$,
+	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
+	two vectorizations of the set of persistence diagrams to the set of continuous real-valued function on the first quadrant $\mathbb{R}^2_{>0}$. The \textit{symmetry heat vectorization} is constructed for every persistence diagram $D$ by solving the heat equation
+	\begin{align} \label{equation: heat equation}
+	\Delta_x(u) &= \partial_t u && \text{on } \Omega \times \mathbb R_{>0} \nonumber \\
+	u &= 0 && \text{on } \{x_1 = x_2\} \times \mathbb R_{\geq 0} \\
+	u &= \sum_{p \in D} \delta_p && \text{on } \Omega \times {0} \nonumber
+	\end{align}
+	where $\Omega = \{(x_1, x_2) \in \mathbb R^2\ |\ x_1 \leq x_2\}$, then solving the same equation after precomposing the data of \eqref{equation: heat equation} with the change of coordinates $(x_1, x_2) \mapsto (x_2, x_1)$, and defining the image of $D$ to be the difference between these two solutions at the chosen time $t$.
+	
+	Similarly, the \textit{rotation heat vectorization} is defined by sending $D$ to the solution, evaluated at time $t$, of the equation obtained by precomposing the data of \eqref{equation: heat equation} with the change of coordinates $(x_1, x_2) \mapsto (x_1, x_2-x_1)$.
+	
+	We recall that the solution to the heat equation with initial condition given by a Dirac delta supported at $p \in \mathbb R^2$ is
+	\begin{equation*}
+	\frac{1}{4 \pi t} \exp\left(-\frac{||p-x||^2}{4t}\right)
+	\end{equation*} 
+	and, to highlight the connection with normally distributed random variables, it is customary to use the the change of variable $\sigma = \sqrt{2t}$.
+	
+	\paragraph{\\ References:} \cite{reininghaus2015stable,adams2017persistence}
 	
 	\subsection*{Persistence entropy} \label{persistence_entropy}
 	
