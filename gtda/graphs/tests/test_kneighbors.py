@@ -1,4 +1,4 @@
-"""Testing for KNeighborsGraph"""
+"""Testing for KNeighborsGraph."""
 
 import numpy as np
 import pytest
@@ -20,7 +20,7 @@ X_kng_res_k2 = np.array([csr_matrix(np.array([[0., 1., 1., 0.],
                                               [0., 1., 1., 0.]]))])
 
 
-def test_kneighbors_graph_not_fitted():
+def test_kng_not_fitted():
     kn_graph = KNeighborsGraph()
 
     with pytest.raises(NotFittedError):
@@ -29,13 +29,13 @@ def test_kneighbors_graph_not_fitted():
 
 @pytest.mark.parametrize(('n_neighbors', 'expected'),
                          [(1, X_kng_res), (2, X_kng_res_k2)])
-def test_kneighbors_graph_transform(n_neighbors, expected):
+def test_kng_transform(n_neighbors, expected):
     kn_graph = KNeighborsGraph(n_neighbors=n_neighbors)
 
     assert (kn_graph.fit_transform(X_kng)[0] != expected[0]).nnz == 0
 
 
-def test_parallel_kneighbors_graph_transform():
+def test_parallel_kng_transform():
     kn_graph = KNeighborsGraph(n_jobs=1, n_neighbors=2)
     kn_graph_parallel = KNeighborsGraph(n_jobs=2, n_neighbors=2)
 
