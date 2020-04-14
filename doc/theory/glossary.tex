@@ -102,7 +102,7 @@ pdfpagelabels]{hyperref}
 	\end{equation*}	
 	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
 	
-	An inner product space is naturally a norm space with	
+	An inner product space is naturally a normed space with	
 	\begin{equation*}	
 	||u|| = \sqrt{\langle u, u \rangle}.
 	\end{equation*}
@@ -161,11 +161,11 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	is a normed spaced and its norm is referred to as the $l^p$\textit{-norm}.
 	
-	\subsection*{Finite metric spaces and point clouds} \label{finite_metric_spaces_and_point_clouds}
+	\subsection*{Distance matrices and point clouds} \label{distance_matrices_and_point_clouds}
 	
-	A \textit{finite metric space} is a finite set together with a 
-	% \hyperref[metric_space]{metric}
-	metric. A \textit{distance matrix} associated to a finite metric space is obtained by choosing a total order on the finite set and setting the $(i,j)$-entry to be equal to the distance between the $i$-th and $j$-th elements. 
+	Let $(X, d)$ be a finite
+	% \hyperref[metric_space]{metric_space}
+	metric space. A \textit{distance matrix} associated to it is obtained by choosing a total order on $X = {x_1 < \cdots < x_m}$ and setting the $(i,j)$-entry to be equal to $d(x_i, x_j)$.
 	
 	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
 	% \hyperref[euclidean_distance_and_norm]{eucliden distance}
@@ -388,7 +388,7 @@ pdfpagelabels]{hyperref}
 	\subsection*{Vietoris-Rips complex and Vietoris-Rips persistence} \label{vietoris-rips_complex_and_vietoris-rips_persistence}
 	
 	Let $(X, d)$ be a 
-	% \hyperref[finite_metric_spaces_and_point_clouds]{finite metric space}
+	% \hyperref[distance_matrices_and_point_clouds]{finite metric space}
 	finite metric space. Define the Vietoris-Rips complex of $X$ as the
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $VR_s(X)$ that contains a subset of $X$ as a simplex if all pairwise distances in the subset are less than or equal to $s$, explicitly
@@ -410,7 +410,7 @@ pdfpagelabels]{hyperref}
 	\subsection*{\v{C}ech complex and \v{C}ech persistence} \label{cech_complex_and_cech_persistence}
 	
 	Let $(X, d)$ be a 
-	% \hyperref[finite_metric_spaces_and_point_clouds]{point cloud}
+	% \hyperref[distance_matrices_and_point_clouds]{point cloud}
 	point cloud. Define the \v{C}ech complex of $X$ as the 
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $\check{C}_s(X)$ that is empty if $s<0$ and, if $s \geq 0$, contains a subset of $X$ as a simplex if the balls of radius $s$ with centers in the subset have a non-empty intersection, explicitly
@@ -494,12 +494,11 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}	
 	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}	
 	\end{equation*}	
-	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the
-
-	The case $p = 2$ gives rise to the \textit{landscape kernel}
+	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the $p$-\textit{landscape norm} of $D$ and, for $p = 2$, define the value of the \textit{landscape kernel} on two persistence diagrams $D$ and $E$ as
 	\begin{equation*}
 	\langle \lambda, \mu \rangle = \left(\sum_{i \in \mathbb N} \int_{\mathbb R} |\lambda_i(x) - \mu_i(x)|^2\, dx\right)^{1/2}
 	\end{equation*}
+	where $\lambda$ and $\mu$ are their associated persistence landscapes.
 
 	\paragraph{\\ References:} \cite{bubenik2015statistical}
 	
