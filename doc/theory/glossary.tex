@@ -170,7 +170,7 @@ pdfpagelabels]{hyperref}
 	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
 	% \hyperref[euclidean_distance_and_norm]{eucliden distance}
 	euclidean distance.
-	
+
 	\subsection*{$L^p$-norms} \label{functional_lp}
 	
 	Let $U \subseteq \mathbb R^n$ and $C(U, \mathbb R)$ be the set of continuous real-valued functions on $U$. A function $f \in C(U, \mathbb R)$ is said to be $p$\textit{-integrable} if
@@ -478,7 +478,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}	
 	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
 	\end{equation*}	
-	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the \textit{$k$-layer of the persistence landscape}.
+	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the $k$-\textit{layer of the persistence landscape}.
 	
 	We describe the graph of each $\lambda_k$ intuitively. For each $i \in I$, draw an isosceles triangle with base the interval $(b_i, d_i)$ on the horizontal $t$-axis, and sides with slope 1 and $-1$. This subdivides the plane into a number of polygonal regions. Label each of these regions by the number of triangles containing it. If $P_k$ is the union of the polygonal regions with values at least $k$, then the graph of $\lambda_k$ is the upper contour of $P_k$, with $\lambda_k(a) = 0$ if the vertical line $t=a$ does not intersect $P_k$.
 	
@@ -506,7 +506,7 @@ pdfpagelabels]{hyperref}
 	
 	Let $D = \{(b_i, d_i)\}_{i \in I}$ be a
 	%\hyperref[persistence_diagram]{persistence diagram}
-	persistence diagram and $w = \{w_i\}_{i \in I}$ a set of positive real numbers. The \textit{silhouette of $D$ weighted by $w$} is the function $\phi : \mathbb R \to \mathbb R$ defined by	
+	persistence diagram and $w = \{w_i\}_{i \in I}$ a set of positive real numbers. The \textit{silhouette of} $D$ \textit{weighted by} $w$ is the function $\phi : \mathbb R \to \mathbb R$ defined by
 	\begin{equation*}	
 	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},	
 	\end{equation*}	
@@ -514,8 +514,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
 	\end{equation*}	
-	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the \textit{$p$-power-weighted silhouette} of $D$. The silhouette construction defines a
-
+	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the $p$-\textit{power-weighted silhouette} of $D$. The silhouette construction defines a
 	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
 	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.
 	
