@@ -5,7 +5,8 @@
 if(WIN32)
     list(APPEND BOOST_ROOT "C:/local")
     list(APPEND BOOST_ROOT "") # Add custom path to your boost installation
-    list(APPEND BOOST_ROOT $ENV{BOOST_ROOT})
+    file(TO_CMAKE_PATH "$ENV{BOOST_ROOT}" root)
+    list(APPEND BOOST_ROOT ${root})
     list(APPEND BOOST_INCLUDEDIR $ENV{BOOST_INCLUDEDIR})
     list(APPEND BOOST_LIBRARYDIR $ENV{BOOST_LIBRARYDIR})
 endif()
