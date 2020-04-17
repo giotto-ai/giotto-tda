@@ -261,12 +261,9 @@ jobs:
     displayName: 'Set boost variables for CMake'
 
   - script: |
-      SET BOOST_ROOT "%BOOST_ROOT_1_72_0%"
-      SET BOOST_INCLUDEDIR "%BOOST_ROOT_1_72_0%\boost\inlcude"
-      SET BOOST_LIBRARYDIR "%BOOST_ROOT_1_72_0%\lib"
-      echo %BOOST_ROOT%
-      echo %BOOST_INCLUDEDIR%
-      echo %BOOST_LIBRARYDIR%
+      setx BOOST_ROOT "%BOOST_ROOT_1_72_0%"
+      setx BOOST_INCLUDEDIR "%BOOST_ROOT_1_72_0%\boost\include"
+      setx BOOST_LIBRARYDIR "%BOOST_ROOT_1_72_0%\lib"
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
