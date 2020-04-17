@@ -247,9 +247,9 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
-      set BOOST_ROOT="%BOOST_ROOT_1_72_0%"
-      set BOOST_INCLUDEDIR="%BOOST_ROOT_1_72_0%\boost\include"
-      set BOOST_LIBRARYDIR="%BOOST_ROOT_1_72_0%\lib"
+      set BOOST_ROOT=%BOOST_ROOT_1_72_0%
+      set BOOST_INCLUDEDIR=%BOOST_ROOT_1_72_0%\boost\include
+      set BOOST_LIBRARYDIR=%BOOST_ROOT_1_72_0%\lib
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
