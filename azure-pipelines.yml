@@ -234,6 +234,11 @@ jobs:
         python_ver: '38'
         python.version: '3.8'
 
+  variables:
+    BOOST_ROOT: '$(BOOST_ROOT_1_72_0)'
+    BOOST_INCLUDEDIR: '$(BOOST_ROOT_1_72_0)\boost\inlcude'
+    BOOST_LIBRARYDIR: '$(BOOST_ROOT_1_72_0)\lib'
+
   steps:
   - task: UsePythonVersion@0
     inputs:
