@@ -234,10 +234,10 @@ jobs:
         python_ver: '38'
         python.version: '3.8'
 
-  variables:
-    BOOST_ROOT: '$(BOOST_ROOT_1_72_0)'
-    BOOST_INCLUDEDIR: '$(BOOST_ROOT_1_72_0)\boost\inlcude'
-    BOOST_LIBRARYDIR: '$(BOOST_ROOT_1_72_0)\lib'
+  # variables:
+  #   BOOST_ROOT: '$(BOOST_ROOT_1_72_0)'
+  #   BOOST_INCLUDEDIR: '$(BOOST_ROOT_1_72_0)\boost\inlcude'
+  #   BOOST_LIBRARYDIR: '$(BOOST_ROOT_1_72_0)\lib'
 
   steps:
   - task: UsePythonVersion@0
@@ -250,6 +250,12 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
+
+  - bash: |
+      export BOOST_ROOT=${BOOST_ROOT_1_72_0}
+      export BOOST_INCLUDEDIR=${BOOST_ROOT_1_72_0}\boost\inlcude
+      export BOOST_LIBRARYDIR=${BOOST_ROOT_1_72_0}\lib
+    displayName: 'Set boost variables for CMake'
 
   - script: |
       python -m pip install --upgrade pip setuptools
