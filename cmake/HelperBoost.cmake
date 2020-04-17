@@ -3,9 +3,11 @@
 # ease installation of giotto-tda on Windows platform
 # The custom path will be at `C:\\local\`
 if(WIN32)
-    cmake_policy(SET CMP0074 NEW)
     list(APPEND BOOST_ROOT "C:/local")
     list(APPEND BOOST_ROOT "") # Add custom path to your boost installation
+    list(APPEND BOOST_ROOT $ENV{BOOST_ROOT})
+    list(APPEND BOOST_INCLUDEDIR $ENV{BOOST_INCLUDEDIR})
+    list(APPEND BOOST_LIBRARYDIR $ENV{BOOST_LIBRARYDIR})
 endif()
 
 message(STATUS "BOOST_ROOT: ${BOOST_ROOT}")
