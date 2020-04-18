@@ -41,7 +41,7 @@ This allows you to generate topological features from your data in a familiar wa
   from gtda.homology import VietorisRipsPersistence
   VR = VietorisRipsPersistence()
 
-which computes topological summaries, called :ref:`persistence diagrams <persistence_diagram>`, from collections of :ref:`point clouds <finite_metric_spaces_and_point_clouds>` or weighted graphs, as follows:
+which computes topological summaries, called :ref:`persistence diagrams <persistence_diagram>`, from collections of :ref:`point clouds <distance_matrices_and_point_clouds>` or weighted graphs, as follows:
 
 .. code-block:: python
 
