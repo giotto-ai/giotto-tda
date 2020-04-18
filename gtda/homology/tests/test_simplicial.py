@@ -135,7 +135,7 @@ def test_fp_params():
     fp = FlagserPersistence(coeff=coeff)
 
     with pytest.raises(TypeError):
-        fp.fit_transform(X)
+        fp.fit_transform(X_dist)
 
 
 def test_fp_not_fitted():
