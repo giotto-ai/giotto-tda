@@ -6,11 +6,11 @@
 ########## Config
 
 ifndef GITDIR
-GITDIR    = ../../gtda-docs
+GITDIR    = ../../../projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = stable
+VERSION = latest
 endif
 
 ifndef RUNNOTEBOOKS
@@ -54,7 +54,7 @@ theory-gl:
 	@pandoc theory/glossary.tex -f latex -t rst --toc -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
 
 convert-notebooks:
-	@jupyter nbconvert notebooks/*.ipynb --execute --to rst
+	@jupyter nbconvert notebooks/*.ipynb --execute --to rst --ExecutePreprocessor.timeout=1200
 
 clean-gh:
 	@make clean
