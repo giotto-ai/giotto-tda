@@ -10,15 +10,23 @@ plainpages=false, naturalnames=true,
 colorlinks=true, pagebackref=true,
 pdfpagelabels]{hyperref}
 \hypersetup{
+	linktocpage,
 	colorlinks,
 	citecolor=blue,
 	linkcolor=blue,
 	urlcolor=blue}
 
+\setcounter{tocdepth}{2}
+\makeatletter
+\def\l@subsection{\@tocline{2}{0pt}{3.5pc}{5pc}{}}
+\makeatother
+
 \begin{document}
 	
 	\title{Theory Glossary}
 	\maketitle
+	
+	\tableofcontents
 	
 	\section{Symbols}
 	
@@ -33,6 +41,154 @@ pdfpagelabels]{hyperref}
 		multiset $ \lbrace (s, s) \mid s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
 	\end{tabular}
 	
+	\section{Analysis}
+	
+	\subsection*{Metric space} \label{metric_space}	
+	A set $X$ with a function	
+	\begin{equation*}	
+	d : X \times X \to \mathbb R	
+	\end{equation*}	
+	is said to be a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
+	\begin{equation*}	
+	d(x,y) = 0\ \Leftrightarrow\ x = y	
+	\end{equation*}	
+	\begin{equation*}	
+	d(x,y) = d(y,x)	
+	\end{equation*}	
+	\begin{equation*}	
+	d(x,z) \leq d(x,y) + d(y, z).	
+	\end{equation*}	
+	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.
+	
+	\subsection*{Normed space} \label{normed_space}
+	A vector space $V$ together with a function	
+	\begin{equation*}	
+	||-|| : V \to \mathbb R	
+	\end{equation*}	
+	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$	
+	\begin{equation*}	
+	||v|| = 0\ \Leftrightarrow\ u = 0	
+	\end{equation*}	
+	\begin{equation*}	
+	||a u || = |a|\, ||u||	
+	\end{equation*}	
+	\begin{equation*}	
+	||u+v|| = ||u|| + ||v||.	
+	\end{equation*}	
+	The function $||-||$ is referred to as the \textit{norm}.
+	
+	A normed space is naturally a
+	%\hyperref[metric_space]{metric space}
+	metric space with distance function	
+	\begin{equation*}	
+	d(u,v) = ||u-v||.	
+	\end{equation*}
+	
+	\subsection*{Inner product space} \label{inner_product_space}	
+	
+	A vector space $V$ together with a function
+	\begin{equation*}	
+	\langle -, - \rangle : V \times V \to \mathbb R	
+	\end{equation*}
+	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
+	\begin{equation*}	
+	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 	
+	\end{equation*}	
+	\begin{equation*}	
+	\langle u, v\rangle = \langle v, u\rangle	
+	\end{equation*}
+	\begin{equation*}
+	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.	
+	\end{equation*}	
+	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
+	
+	An inner product space is naturally a normed space with	
+	\begin{equation*}	
+	||u|| = \sqrt{\langle u, u \rangle}.
+	\end{equation*}
+	
+	\subsection*{Vectorization, amplitude and kernel} \label{vectorization_amplitude_and_kernel}	
+	
+	Let $X$ be a set, for example, the set of all
+	%\hyperref[persistence_diagram]{persistence diagrams}
+	persistence diagrams. A \textit{vectorization} for $X$ is a function	
+	\begin{equation*}	
+	\phi : X \to V	
+	\end{equation*}	
+	where $V$ is a vector space. 
+	
+	An \textit{amplitude} on $X$ is a function	
+	\begin{equation*}	
+	A : X \to \mathbb R	
+	\end{equation*}	
+	for which there exists a vectorization $\phi : X \to V$ with $V$ a
+	%\hyperref[normed_space]{normed space}
+	normed space such that	
+	\begin{equation*}	
+	A(x) = ||\phi(x)||	
+	\end{equation*}	
+	for all $x \in X$.
+	
+	A \textit{kernel} on the set $X$ is a function	
+	\begin{equation*}	
+	k : X \times X \to \mathbb R	
+	\end{equation*}	
+	for which there exists a vectorization $\phi : X \to V$ with $V$ an
+	%\hyperref[inner_product_and_norm]{inner product space}
+	inner product space such that	
+	\begin{equation*}	
+	k(x,y) = \langle \phi(x), \phi(y) \rangle	
+	\end{equation*}	
+	for each $x,y \in X$.
+	
+	\subsection*{Euclidean distance and $l^p$-norms} \label{euclidean_distance_and_norm}
+	
+	The vector space $\mathbb R^n$ is an 
+	% \hyperref[inner_product_space]{inner product space}
+	inner product space with inner product 
+	\begin{equation*}
+	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
+	\end{equation*}
+	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{euclidean norm} and \textit{euclidean distance}.
+	
+	For any $p \in (0,\infty]$ the pair $\mathbb R^n, ||-||_p$ with 
+	\begin{equation*}
+	||x||_p = (x_1^p + \cdots + x_n^p)^{1/p}
+	\end{equation*}
+	if $p$ is finite and 
+	\begin{equation*}
+	||x||_{\infty} = max\{x_i\ |\ i = 1,\dots,n\}
+	\end{equation*}
+	is a normed spaced and its norm is referred to as the $l^p$\textit{-norm}.
+	
+	\subsection*{Distance matrices and point clouds} \label{distance_matrices_and_point_clouds}
+	
+	Let $(X, d)$ be a finite
+	% \hyperref[metric_space]{metric space}
+	metric space. A \textit{distance matrix} associated to it is obtained by choosing a total order on $X = {x_1 < \cdots < x_m}$ and setting the $(i,j)$-entry to be equal to $d(x_i, x_j)$.
+	
+	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
+	% \hyperref[euclidean_distance_and_norm]{eucliden distance}
+	euclidean distance.
+
+	\subsection*{$L^p$-norms} \label{functional_lp}
+	
+	Let $U \subseteq \mathbb R^n$ and $C(U, \mathbb R)$ be the set of continuous real-valued functions on $U$. A function $f \in C(U, \mathbb R)$ is said to be $p$\textit{-integrable} if
+	\begin{equation*}
+	\int_U |f(x)|^p dx
+	\end{equation*}
+	is finite. The subset of $p$-integrable functions together with the assignment $||-||_p$
+	\begin{equation*}
+	f \mapsto \left( \int_U |f(x)|^p dx \right)^{1/p}
+	\end{equation*}
+	is a
+	% \hyperref[normed_space]{normed space}
+	normed space and $||-||_p$ is referred to as the $L^p$\textit{-norm}.
+	
+	The only $L^p$-norm that is induced from an inner product is $L^2$, and the inner product is given by
+	\begin{equation*}
+	\langle f, g \rangle = \left(\int_U |f(x)-g(x)|^2 dx\right)^{1/2}.
+	\end{equation*}
 	\section{Homology}
 	
 	\subsection*{Cubical complex} \label{cubical_complex}
@@ -51,10 +207,10 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	we define for $i = 1, \dots, n$ the following two elementary cubes
 	\begin{equation*}
-	d_i^\pm I^N = I_{a_1} \times \cdots \times d^\pm I_{a_{k_i}} \times \cdots \times I_{a_{N.}}
+	d_i^\pm I^N = I_{a_1} \times \cdots \times d^\pm I_{a_{k_i}} \times \cdots \times I_{a_{N}}.
 	\end{equation*}
 	
-	A \textit{cubical complex} is a finite set of elementary cubes of $\mathbb{R}^N$, and a \textit{subcomplex} of $X$ is a cubical complex whose elementary cubes are also in $X$. We denote the set of $n$-dimensional cubes as $X_n$.
+	A \textit{cubical complex} is a finite set of elementary cubes of $\mathbb{R}^N$, and a \textit{subcomplex} of $X$ is a cubical complex whose elementary cubes are also in $X$.
 	
 	\paragraph{\\ Reference:} \cite{mischaikow04computational}
 	
@@ -84,8 +240,6 @@ pdfpagelabels]{hyperref}
 	We abuse notation and denote the pair $(V, X)$ simply by $X$.
 	
 	The elements of $X$ are called \textit{simplices} and the \textit{dimension} of a simplex $x$ is defined by $|x| = \# x - 1$ where $\# x$ denotes the cardinality of $x$. Simplices of dimension $d$ are called $d$-simplices. We abuse terminology and refer to the elements of $V$ and to their associated $0$-simplices both as \textit{vertices}.
-	
-	The $k$\textit{-skeleton} $X_k$ of a simplicial complex $X$ is the subcomplex containing all simplices of dimension at most $k$. A simplicial complex is said to be $d$\textit{-dimensional} if $d$ is the smallest integer satisfying $X = X_d$.
 	
 	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
 	
@@ -145,7 +299,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Simplicial chains and simplicial homology} \label{simplicial_chains_and_simplicial_homology}
 	
-	Let $X$ be an ordered or directed simplicial complex. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
+	Let $X$ be an ordered or directed simplicial complex and denote the subset of $n$-simplices by $X_n$. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
 	\end{equation*}
@@ -161,7 +315,7 @@ pdfpagelabels]{hyperref}
 	
 	\subsection*{Cubical chains and cubical homology} \label{cubical_chains_and_cubical_homology}
 	
-	Let $X$ be a cubical complex. Define its \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
+	Let $X$ be a cubical complex and denote the subset of $n$-cubes by $X_n$. Define the \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
@@ -169,6 +323,8 @@ pdfpagelabels]{hyperref}
 	Its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} is the 
 	% \hyperref[homology_and_cohomology]{homology and cohomology}
 	homology and cohomology of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
+	
+	\section{Persistence}
 	
 	\subsection*{Filtered complex} \label{filtered_complex}
 	
@@ -225,14 +381,14 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	H_*(X(s); \Bbbk)
 	\end{equation*}
-	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st.}$ In general, the collection constructed this way needs not satisfy the tameness condition of a 
+	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st}.$ In general, the collection constructed this way needs not satisfy the tameness condition of a 
 	% \hyperref[persistence_module]{persistence module}
 	persistence module, but we restrict attention to the cases where it does. Its \textit{persistence simplicial cohomology with} $\Bbbk$\textit{-coefficients} is defined analogously.
 	
 	\subsection*{Vietoris-Rips complex and Vietoris-Rips persistence} \label{vietoris-rips_complex_and_vietoris-rips_persistence}
 	
 	Let $(X, d)$ be a 
-	% \hyperref[finite_metric_spaces_and_point_clouds]{finite metric space}
+	% \hyperref[distance_matrices_and_point_clouds]{finite metric space}
 	finite metric space. Define the Vietoris-Rips complex of $X$ as the
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $VR_s(X)$ that contains a subset of $X$ as a simplex if all pairwise distances in the subset are less than or equal to $s$, explicitly
@@ -251,11 +407,10 @@ pdfpagelabels]{hyperref}
 	% \hyperref[clique_and_flag_complexes]{filtered clique complex}
 	filtered clique complex associated to $(X \times X ,w)$.
 	
-	
 	\subsection*{\v{C}ech complex and \v{C}ech persistence} \label{cech_complex_and_cech_persistence}
 	
 	Let $(X, d)$ be a 
-	% \hyperref[finite_metric_spaces_and_point_clouds]{point cloud}
+	% \hyperref[distance_matrices_and_point_clouds]{point cloud}
 	point cloud. Define the \v{C}ech complex of $X$ as the 
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $\check{C}_s(X)$ that is empty if $s<0$ and, if $s \geq 0$, contains a subset of $X$ as a simplex if the balls of radius $s$ with centers in the subset have a non-empty intersection, explicitly
@@ -288,7 +443,7 @@ pdfpagelabels]{hyperref}
 	\end{equation*}	
 	Given a 
 	% \hyperref[persistence_module]{persistence module}
-	persistence module, its associated persistence diagram is determined by the following condition: for each pair $s,t$ the number counted with multiplicity of points $(b,d)$ in the multiset, satisfying $b \leq s \leq t < d$ is equal to the rank of $f_{st.}$
+	persistence module, its associated persistence diagram is determined by the following condition: for each pair $s,t$ the number counted with multiplicity of points $(b,d)$ in the multiset, satisfying $b \leq s \leq t < d$ is equal to the rank of $f_{st}.$
 	
 	A well known result establishes that there exists an isomorphism between two persistence module if and only if their persistence diagrams are equal.
 	
@@ -302,7 +457,7 @@ pdfpagelabels]{hyperref}
 	
 	The limit $p \to \infty$ defines the \textit{bottleneck distance}. More explicitly, it is the infimum over the same set of bijections of the value
 	\begin{equation*}
-	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty.}
+	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty}.
 	\end{equation*}
 
 	The set of persistence diagrams together with any of the distances above is a
@@ -323,12 +478,12 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}	
 	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
 	\end{equation*}	
-	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the \textit{$k$-layer of the persistence landscape}.
+	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the $k$-\textit{layer of the persistence landscape}.
 	
 	We describe the graph of each $\lambda_k$ intuitively. For each $i \in I$, draw an isosceles triangle with base the interval $(b_i, d_i)$ on the horizontal $t$-axis, and sides with slope 1 and $-1$. This subdivides the plane into a number of polygonal regions. Label each of these regions by the number of triangles containing it. If $P_k$ is the union of the polygonal regions with values at least $k$, then the graph of $\lambda_k$ is the upper contour of $P_k$, with $\lambda_k(a) = 0$ if the vertical line $t=a$ does not intersect $P_k$.
 	
 	The persistence landscape construction defines a
-	%\hyperref[vectorization_kernel_and_amplitude]{vectorization}
+	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
 	vectorization of the set of persistence diagrams with target the vector space of real-valued function on $\mathbb N \times \mathbb R$. For any $p = 1,\dots,\infty$ we can restrict attention to persistence diagrams $D$ whose associated persistence landscape $\lambda$ is
 	%\hyperref[lp_norm]{$p$-integrable}
 	$p$-integrable, that is to say,	
@@ -339,9 +494,11 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}	
 	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}	
 	\end{equation*}	
-	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the
-	%\hyperref[vectorization_kernel_and_amplitude]{amplitude}
-	\textit{landscape} $p$-\textit{amplitude} of $D$.
+	is finite. In this case we refer to (\ref{equation:persistence_landscape_norm}) as the $p$-\textit{landscape norm} of $D$ and, for $p = 2$, define the value of the \textit{landscape kernel} on two persistence diagrams $D$ and $E$ as
+	\begin{equation*}
+	\langle \lambda, \mu \rangle = \left(\sum_{i \in \mathbb N} \int_{\mathbb R} |\lambda_i(x) - \mu_i(x)|^2\, dx\right)^{1/2}
+	\end{equation*}
+	where $\lambda$ and $\mu$ are their associated persistence landscapes.
 
 	\paragraph{\\ References:} \cite{bubenik2015statistical}
 	
@@ -349,7 +506,7 @@ pdfpagelabels]{hyperref}
 	
 	Let $D = \{(b_i, d_i)\}_{i \in I}$ be a
 	%\hyperref[persistence_diagram]{persistence diagram}
-	persistence diagram and $w = \{w_i\}_{i \in I}$ a set of positive real numbers. The \textit{silhouette of $D$ weighted by $w$} is the function $\phi : \mathbb R \to \mathbb R$ defined by	
+	persistence diagram and $w = \{w_i\}_{i \in I}$ a set of positive real numbers. The \textit{silhouette of} $D$ \textit{weighted by} $w$ is the function $\phi : \mathbb R \to \mathbb R$ defined by
 	\begin{equation*}	
 	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},	
 	\end{equation*}	
@@ -357,11 +514,33 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
 	\end{equation*}	
-	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the \textit{$p$-power-weighted silhouette} of $D$. The silhouette construction defines a
-	%\hyperref[vectorization_kernel_and_amplitude]{vectorization}
-	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.	
+	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the $p$-\textit{power-weighted silhouette} of $D$. The silhouette construction defines a
+	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
+	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.
 	
 	\paragraph{\\ References:} \cite{chazal2014stochastic}
+	
+	\subsection*{Heat vectorizations} \label{heat_vectorization}
+	
+	Considering the points in a persistence diagram as the support of Dirac deltas one can construct, for any $t > 0$,
+	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
+	two vectorizations of the set of persistence diagrams to the set of continuous real-valued function on the first quadrant $\mathbb{R}^2_{>0}$. The \textit{symmetry heat vectorization} is constructed for every persistence diagram $D$ by solving the heat equation
+	\begin{align} \label{equation:heat_equation}
+	\Delta_x(u) &= \partial_t u && \text{on } \Omega \times \mathbb R_{>0} \nonumber \\
+	u &= 0 && \text{on } \{x_1 = x_2\} \times \mathbb R_{\geq 0} \\
+	u &= \sum_{p \in D} \delta_p && \text{on } \Omega \times {0} \nonumber
+	\end{align}
+	where $\Omega = \{(x_1, x_2) \in \mathbb R^2\ |\ x_1 \leq x_2\}$, then solving the same equation after precomposing the data of (\ref{equation:heat_equation}) with the change of coordinates $(x_1, x_2) \mapsto (x_2, x_1)$, and defining the image of $D$ to be the difference between these two solutions at the chosen time $t$.
+	
+	Similarly, the \textit{rotation heat vectorization} is defined by sending $D$ to the solution, evaluated at time $t$, of the equation obtained by precomposing the data of (\ref{equation:heat_equation}) with the change of coordinates $(x_1, x_2) \mapsto (x_1, x_2-x_1)$.
+	
+	We recall that the solution to the heat equation with initial condition given by a Dirac delta supported at $p \in \mathbb R^2$ is
+	\begin{equation*}
+	\frac{1}{4 \pi t} \exp\left(-\frac{||p-x||^2}{4t}\right)
+	\end{equation*} 
+	and, to highlight the connection with normally distributed random variables, it is customary to use the the change of variable $\sigma = \sqrt{2t}$.
+	
+	\paragraph{\\ References:} \cite{reininghaus2015stable,adams2017persistence}
 	
 	\subsection*{Persistence entropy} \label{persistence_entropy}
 	
@@ -386,118 +565,6 @@ pdfpagelabels]{hyperref}
 	
 	The name is inspired from the case when the persistence diagram comes from persistent homology.
 	
-	\subsection*{Metric space} \label{metric_space}	
-	A set $X$ with a function	
-	\begin{equation*}	
-	d : X \times X \to \mathbb R	
-	\end{equation*}	
-	is said to be a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
-	\begin{equation*}	
-	d(x,y) = 0\ \Leftrightarrow\ x = y	
-	\end{equation*}	
-	\begin{equation*}	
-	d(x,y) = d(y,x)	
-	\end{equation*}	
-	\begin{equation*}	
-	d(x,z) \leq d(x,y) + d(y, z).	
-	\end{equation*}	
-	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.	
-	
-	\subsection*{Inner product and norm} \label{inner_product_and_norm}	
-	
-	A vector space $V$ together with a function
-	\begin{equation*}	
-	\langle -, - \rangle : V \times V \to \mathbb R	
-	\end{equation*}
-	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
-	\begin{equation*}	
-	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 	
-	\end{equation*}	
-	\begin{equation*}	
-	\langle u, v\rangle = \langle v, u\rangle	
-	\end{equation*}
-	\begin{equation*}
-	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.	
-	\end{equation*}	
-	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
-	
-	A vector space $V$ together with a function	
-	\begin{equation*}	
-	||-|| : V \to \mathbb R	
-	\end{equation*}	
-	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$	
-	\begin{equation*}	
-	||v|| = 0\ \Leftrightarrow\ u = 0	
-	\end{equation*}	
-	\begin{equation*}	
-	||a u || = |a|\, ||u||	
-	\end{equation*}	
-	\begin{equation*}	
-	||u+v|| = ||u|| + ||v||.	
-	\end{equation*}	
-	The function $||-||$ is referred to as the \textit{norm}.
-	
-	An inner product space is naturally a norm space with	
-	\begin{equation*}	
-	||u|| = \sqrt{\langle u, u \rangle}	
-	\end{equation*}	
-	and a norm space is naturally a
-	%\hyperref[metric_space]{metric space}
-	metric space with distance function	
-	\begin{equation*}	
-	d(u,v) = ||u-v||.	
-	\end{equation*}
-	
-	\subsection*{Euclidean distance and norm} \label{euclidean_distance_and_norm}
-	
-	The vector space $\mathbb R^n$ is an 
-	% \hyperref[metric_inner_product_and_kernel]{inner product space}
-	inner product space with inner product 
-	\begin{equation*}
-	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
-	\end{equation*}
-	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{euclidean norm} and \textit{euclidean distance}.	
-	
-	\subsection*{Vectorization, kernel and amplitude} \label{vectorization_kernel_and_amplitude}	
-	
-	Let $X$ be a set, for example, the set of all
-	%\hyperref[persistence_diagram]{persistence diagrams}
-	persistence diagrams. A \textit{vectorization} for $X$ is a function	
-	\begin{equation*}	
-	\phi : X \to V	
-	\end{equation*}	
-	where $V$ is a vector space. A \textit{kernel} on the set $X$ is a function	
-	\begin{equation*}	
-	k : X \times X \to \mathbb R	
-	\end{equation*}	
-	for which there exists a vectorization $\phi : X \to V$ with $V$ an
-	%\hyperref[inner_product_and_norm]{inner product space}
-	inner product space such that	
-	\begin{equation*}	
-	k(x,y) = \langle \phi(x), \phi(y) \rangle	
-	\end{equation*}	
-	for each $x,y \in X$. Similarly, an \textit{amplitude} on $X$ is a function	
-	\begin{equation*}	
-	A : X \to \mathbb R	
-	\end{equation*}	
-	for which there exists a vectorization $\phi : X \to V$ with $V$ a
-	%\hyperref[inner_product_and_norm]{normed space}
-	normed space such that	
-	\begin{equation*}	
-	A(x) = ||\phi(x)||	
-	\end{equation*}	
-	for all $x \in X$.
-	
-	\subsection*{Finite metric spaces and point clouds} \label{finite_metric_spaces_and_point_clouds}
-	
-	A \textit{finite metric space} is a finite set together with a 
-	% \hyperref[metric_inner_product_and_kernel]{metric}
-	metric. A \textit{distance matrix} associated to a finite metric space is obtained by choosing a total order on the finite set and setting the $(i,j)$-entry to be equal to the distance between the $i$-th and $j$-th elements. 
-	
-	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
-	% \hyperref[euclidean_distance_and_norm]{eucliden distance}
-	euclidean distance.
-	
 	\section{Time series}
 	
 	\subsection*{Time series} \label{time_series}
@@ -512,7 +579,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	f : U \subseteq \mathbb R \to \mathbb R
 	\end{equation*}
-	we obtain a new time series $\{f(x_i)\}_{i = 0.}^n$
+	we obtain a new time series $\{f(x_i)\}_{i = 0}^n$.
 	
 	Generalizing the previous construction we can define a time series from a function 
 	\begin{equation*}

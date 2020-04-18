@@ -6,11 +6,11 @@
 ########## Config
 
 ifndef GITDIR
-GITDIR    = ../../gtda-docs
+GITDIR    = ../../../projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = stable
+VERSION = latest
 endif
 
 ifndef RUNNOTEBOOKS
