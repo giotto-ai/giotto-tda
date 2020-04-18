@@ -6,6 +6,45 @@ Release Notes
 .. _stable:
 
 *************
+Release 0.2.1
+*************
+
+Major Features and Improvements
+===============================
+
+-  The theory glossary has been improved to include the notions of vectorization, kernel and amplitude for persistence diagrams.
+-  The ``ripser`` function in ``gtda.externals.python.ripser_interface`` no longer uses scikit-learn's ``pairwise_distances`` when
+   ``metric`` is ``'precomputed'``, thus allowing square arrays with negative entries or infinities to be passed.
+-  ``check_point_clouds`` in ``gtda.utils.validation`` now checks for square array input when the input should be a collection of
+   distance-type matrices. Warnings guide the user to correctly setting the ``distance_matrices`` parameter. ``force_all_finite=False``
+   no longer means accepting NaN input (only infinite input is accepted).
+-  ``VietorisRipsPersistence`` in ``gtda.homology.simplicial`` no longer masks out infinite entries in the input to be fed to
+   ``ripser``.
+-  The docstrings for ``check_point_clouds`` and ``VietorisRipsPersistence`` have been improved to reflect these changes and the
+   extra level of generality for ``ripser``.
+
+Bug Fixes
+=========
+
+-  The variable used to indicate the location of Boost headers has been renamed from ``Boost_INCLUDE_DIR`` to ``Boost_INCLUDE_DIRS``
+   to address developer installation issues in some Linux systems.
+
+Backwards-Incompatible Changes
+==============================
+
+-  The keyword parameter ``distance_matrix`` in ``check_point_clouds`` has been renamed to ``distance_matrices``.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Anibal Medina-Mardones, Julian Burella Pérez, Guillaume Tauzin, and Wojciech Reise.
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of
+inspiring discussions.
+
+*************
 Release 0.2.0
 *************
 
