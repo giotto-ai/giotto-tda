@@ -25,6 +25,9 @@ doc/generated
 doc/gallery
 doc/notebooks/*.ipynb
 doc/notebooks/*.py
+doc/notebooks/*.rst
+doc/notebooks/voids_on_the_plane_files/
+doc/theory/glossary.rst
 
 # Pybind11
 gtda/externals/pybind11
