@@ -142,7 +142,7 @@ def test_fp_not_fitted():
     fp = FlagserPersistence()
 
     with pytest.raises(NotFittedError):
-        fp.transform(X)
+        fp.transform(X_dist)
 
 
 X_fp_undir_res = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
