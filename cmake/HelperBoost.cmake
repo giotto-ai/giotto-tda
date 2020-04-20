@@ -7,10 +7,10 @@ if(WIN32)
     list(APPEND BOOST_ROOT "") # Add custom path to your boost installation
 endif()
 
-# Changes induced in latest version of the azure pipelines
-# Produces compilations errors because It cannot find boost header files
+# Changes introduced in latest version of the giotto-tda Azure pipelines produce
+# compilation errors because CMake cannot find boost header files.
 # After discussing in https://github.com/actions/virtual-environments/issues/687
-# This solution is used due to custom paths in the azure pipeline
+# this solution is used due to custom paths in the Azure setup.
 message(STATUS "BOOST_ROOT_PIPELINE: $ENV{BOOST_ROOT_PIPELINE}")
 if(DEFINED ENV{BOOST_ROOT_PIPELINE})
     file(TO_CMAKE_PATH $ENV{BOOST_ROOT_PIPELINE} CMAKE_BOOST_ROOT)
