@@ -235,6 +235,12 @@ jobs:
         python.version: '3.8'
 
   steps:
+    # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
+    # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
+  - id: boostEnv 
+    run: echo "::set-env name=BOOST_ROOT_PIPELINE::$env:BOOST_ROOT_1_72_0"
+    displayName: 'Set env variable for boost version'
+
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
@@ -245,12 +251,6 @@ jobs:
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
-
-    # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
-    # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
-  - id: boostEnv 
-    run: echo "::set-env name=BOOST_ROOT_PIPELINE::$env:BOOST_ROOT_1_72_0"
-    displayName: 'Set env variable for boost version'
 
   - script: |
       python -m pip install --upgrade pip setuptools
