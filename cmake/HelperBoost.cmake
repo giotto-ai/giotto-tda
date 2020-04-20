@@ -11,6 +11,7 @@ endif()
 # Produces compilations errors because It cannot find boost header files
 # After discussing in https://github.com/actions/virtual-environments/issues/687
 # This solution is used due to custom paths in the azure pipeline
+message(STATUS "BOOST_ROOT_PIPELINE: $ENV{BOOST_ROOT_PIPELINE}")
 if(DEFINED $ENV{BOOST_ROOT_PIPELINE})
     list(APPEND BOOST_ROOT "$ENV{BOOST_ROOT_PIPELINE}")
     list(APPEND BOOST_INCLUDEDIR "$ENV{BOOST_ROOT_PIPELINE}\boost\include")
