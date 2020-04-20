@@ -249,7 +249,7 @@ jobs:
     # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
     # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
   - script: |
-      run: echo "::set-env name=BOOST_ROOT_PIPELINE::$env:BOOST_ROOT_1_72_0"
+      echo "::set-env name=BOOST_ROOT_PIPELINE::$env:BOOST_ROOT_1_72_0"
     displayName: 'Set env variable for boost version'
 
   - script: |
