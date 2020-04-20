@@ -7,6 +7,16 @@ if(WIN32)
     list(APPEND BOOST_ROOT "") # Add custom path to your boost installation
 endif()
 
+# Changes induced in latest version of the azure pipelines
+# Produces compilations errors because I cannot find boost header files
+# After discussing in https://github.com/actions/virtual-environments/issues/687
+# This solution was used due to custom paths
+if(DEFINED $ENV{BOOST_ROOT_PIPELINE})
+    list(APPEND BOOST_ROOT "$ENV{BOOST_ROOT_PIPELINE}")
+    list(APPEND BOOST_INCLUDEDIR "$ENV{BOOST_ROOT_PIPELINE}\boost\include")
+    list(APPEND BOOST_LIBRARYDIR "$ENV{BOOST_ROOT_PIPELINE}\lib")
+endif()
+
 message(STATUS "BOOST_ROOT: ${BOOST_ROOT}")
 
 find_package(Boost 1.56 REQUIRED)

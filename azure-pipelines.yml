@@ -246,9 +246,11 @@ jobs:
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Change name to giotto-tda-nightly'
 
+    # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
+    # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
   - script: |
-      python .azure-ci/install_boost.py || exit /b
-    displayName: 'Install boost'
+      run: echo "::set-env name=BOOST_ROOT_PIPELINE::$env:BOOST_ROOT_1_72_0"
+    displayName: 'Set env variable for boost version'
 
   - script: |
       python -m pip install --upgrade pip setuptools
