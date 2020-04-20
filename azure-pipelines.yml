@@ -233,13 +233,12 @@ jobs:
       Python38:
         python_ver: '38'
         python.version: '3.8'
-
-  steps:
+  variables:
     # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
     # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
-  - name: Set env variable for boost version 
-    run: echo "::set-env name=BOOST_ROOT_PIPELINE::$env:BOOST_ROOT_1_72_0"
+    BOOST_ROOT_PIPELINE: $($env:BOOST_ROOT_1_72_0)
 
+  steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
