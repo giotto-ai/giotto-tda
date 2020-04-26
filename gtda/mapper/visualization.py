@@ -10,15 +10,19 @@ from ipywidgets import Layout, widgets
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
-from .utils.visualization import (_calculate_graph_data,
-                                  _get_column_color_buttons)
+from .utils.visualization import (
+    _calculate_graph_data,
+    _get_column_color_buttons,
+    PLOT_OPTIONS_LAYOUT_DEFAULTS
+)
 
 
 def plot_static_mapper_graph(
-        pipeline, data, layout='kamada_kawai', layout_dim=2,
+        pipeline, data, layout="kamada_kawai", layout_dim=2,
         color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, plotly_kwargs=None,
-        clone_pipeline=True):
+        clone_pipeline=True
+):
     """Plotting function for static Mapper graphs.
 
     Nodes are colored according to :attr:`color_variable`. By default, the
@@ -28,12 +32,12 @@ def plot_static_mapper_graph(
     Parameters
     ----------
     pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
-        Mapper pipeline to act on to data.
+        Mapper pipeline to act onto data.
 
     data : array-like of shape (n_samples, n_features)
         Data used to generate the Mapper graph. Can be a pandas dataframe.
 
-    layout : None, str or callable, optional, default: ``'kamada-kawai'``
+    layout : None, str or callable, optional, default: ``"kamada-kawai"``
         Layout algorithm for the graph. Can be any accepted value for the
         ``layout`` parameter in the :meth:`layout` method of
         :class:`igraph.Graph`. [1]_
@@ -48,7 +52,7 @@ def plot_static_mapper_graph(
                must have the same length as `data` and is interpreted as
                a quantity of interest according to which node of the Mapper
                graph is to be colored (see `node_color_statistic`).
-            2. If ``None`` then equivalent to passing `data`.
+            2. ``None`` is equivalent to passing `data`.
             3. If an object implementing :meth:`transform` or
                :meth:`fit_transform`, e.g. a scikit-learn estimator or
                pipeline, it is applied to `data` to generate the quantity
@@ -58,20 +62,20 @@ def plot_static_mapper_graph(
 
     node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``None``
-        Specifies how to determine the colors of each node. If a
-        numpy array, it must have the same length as the number of nodes in
-        the Mapper graph, and its values are used directly for node
-        coloring, ignoring `color_variable`. Otherwise, it can be a
-        callable object which is used to obtain a summary statistic, within
-        each Mapper node, of the quantity specified by `color_variable`. The
-        default value ``None`` is equivalent to passing ``numpy.mean``.
+        Specifies how to determine the colors of each node. If a numpy array,
+        it must have the same length as the number of nodes in the Mapper
+        graph, and its values are used directly for node coloring, ignoring
+        `color_variable`. Otherwise, it can be a callable object which is used
+        to obtain a summary statistic, within each Mapper node, of the quantity
+        specified by `color_variable`. The default value ``None`` is equivalent
+        to passing :func:`numpy.mean`.
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
         color Mapper nodes according to any column in `data`.
 
     plotly_kwargs : dict, optional, default: ``None``
-        Keyword arguments to configure the Plotly Figure.
+        Keyword arguments to configure the plotly figure.
 
     clone_pipeline : bool, optional, default: ``True``
         If ``True``, the input `pipeline` is cloned before computing the
@@ -93,57 +97,35 @@ def plot_static_mapper_graph(
     """
 
     # Compute the graph and fetch the indices of points in each node
-    if clone_pipeline:
-        pipe = clone(pipeline)
-    else:
-        pipe = pipeline
+    pipe = clone(pipeline) if clone_pipeline else pipeline
 
-    if node_color_statistic is not None:
-        _node_color_statistic = node_color_statistic
-    else:
-        _node_color_statistic = np.mean
+    _node_color_statistic = node_color_statistic or np.mean
 
-    # Simple duck typing to determine whether data is a pandas dataframe
-    is_data_dataframe = hasattr(data, 'columns')
+    # Simple duck typing to determine whether data is likely a pandas dataframe
+    is_data_dataframe = hasattr(data, "columns")
 
-    node_trace, edge_trace, node_elements, _node_colors, plot_options = \
-        _calculate_graph_data(
-            pipe, data, layout, layout_dim,
-            color_variable, _node_color_statistic, plotly_kwargs)
+    (node_trace, edge_trace, node_elements, node_colors_color_variable,
+     color_variable_min, color_variable_max) = _calculate_graph_data(
+        pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
+        _node_color_statistic, plotly_kwargs
+    )
 
     # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
-        showlegend=plot_options['layout_showlegend'],
-        hovermode=plot_options['layout_hovermode'],
-        margin=plot_options['layout_margin'],
-        autosize=False
+        **PLOT_OPTIONS_LAYOUT_DEFAULTS["common"]
     )
 
-    fig = go.FigureWidget(data=[edge_trace, node_trace],
+    fig = go.FigureWidget(data=[node_trace, edge_trace],
                           layout=layout_options_common)
-
-    if layout_dim == 2:
-        layout_options_2d = {
-            'layout_xaxis': plot_options['layout_xaxis'],
-            'layout_xaxis_title': plot_options['layout_xaxis_title'],
-            'layout_yaxis': plot_options['layout_yaxis'],
-            'layout_yaxis_title': plot_options['layout_yaxis_title'],
-            'layout_template': 'simple_white',
-        }
-        fig.update(layout_options_2d)
-
-    elif layout_dim == 3:
-        layout_options_3d = {
-            'layout_scene': plot_options['layout_scene'],
-            'layout_annotations': plot_options['layout_annotations'],
-        }
-        fig.update(layout_options_3d)
+    fig.update_layout(PLOT_OPTIONS_LAYOUT_DEFAULTS[layout_dim])
 
     # Compute node colors according to data columns only if necessary
     if color_by_columns_dropdown:
         column_color_buttons = _get_column_color_buttons(
-            data, is_data_dataframe, node_elements, _node_colors,
-            plot_options['node_trace_marker_colorscale'])
+            data, is_data_dataframe, node_elements, node_colors_color_variable,
+            color_variable_min, color_variable_max, _node_color_statistic,
+            "viridis"  # TODO: Use input!
+        )
     else:
         column_color_buttons = None
 
@@ -156,7 +138,7 @@ def plot_static_mapper_graph(
                 pad={"r": 10, "t": 10},
                 showactive=True,
                 x=0.11,
-                xanchor='left',
+                xanchor="left",
                 y=button_height,
                 yanchor="top"
             ),
@@ -164,19 +146,25 @@ def plot_static_mapper_graph(
 
     if color_by_columns_dropdown:
         fig.add_annotation(
-            go.layout.Annotation(text="Color by:", x=0, xref="paper",
-                                 y=button_height - 0.045,
-                                 yref="paper", align="left", showarrow=False)
+            go.layout.Annotation(
+                text="Color by:",
+                x=0,
+                xref="paper",
+                y=button_height - 0.045,
+                yref="paper",
+                align="left",
+                showarrow=False
+            )
         )
 
     return fig
 
 
-def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
-                                  layout_dim=2, color_variable=None,
-                                  node_color_statistic=None,
-                                  color_by_columns_dropdown=False,
-                                  plotly_kwargs=None):
+def plot_interactive_mapper_graph(
+        pipeline, data, layout="kamada_kawai", layout_dim=2,
+        color_variable=None, node_color_statistic=None,
+        color_by_columns_dropdown=False, plotly_kwargs=None
+):
     """Plotting function for interactive Mapper graphs.
 
     Provides functionality to interactively update parameters from the cover
@@ -192,7 +180,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     data : array-like of shape (n_samples, n_features)
         Data used to generate the Mapper graph. Can be a pandas dataframe.
 
-    layout : None, str or callable, optional, default: ``'kamada-kawai'``
+    layout : None, str or callable, optional, default: ``"kamada-kawai"``
         Layout algorithm for the graph. Can be any accepted value for the
         ``layout`` parameter in the :meth:`layout` method of
         :class:`igraph.Graph`. [1]_
@@ -230,7 +218,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
         color Mapper nodes according to any column in `data`.
 
     plotly_kwargs : dict, optional, default: ``None``
-        Keyword arguments to configure the Plotly Figure.
+        Keyword arguments to configure the plotly figure.
 
     Returns
     -------
@@ -260,7 +248,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
             return (param, widgets.FloatText(
                 value=value,
                 step=0.05,
-                description=param.split('__')[1],
+                description=param.split("__")[1],
                 continuous_update=False,
                 disabled=False
             ))
@@ -268,14 +256,14 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
             return (param, widgets.IntText(
                 value=value,
                 step=1,
-                description=param.split('__')[1],
+                description=param.split("__")[1],
                 continuous_update=False,
                 disabled=False
             ))
         elif isinstance(value, str):
             return (param, widgets.Text(
                 value=value,
-                description=param.split('__')[1],
+                description=param.split("__")[1],
                 continuous_update=False,
                 disabled=False
             ))
@@ -322,11 +310,11 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                 update_figure(fig, edge_trace, node_trace, layout_dim)
 
                 # Update color by column buttons
-                is_data_dataframe = hasattr(data, 'columns')
+                is_data_dataframe = hasattr(data, "columns")
                 if color_by_columns_dropdown:
                     column_color_buttons = _get_column_color_buttons(
                         data, is_data_dataframe, node_elements, node_colors,
-                        plot_options['node_trace_marker_colorscale'])
+                        plot_options["node_trace_marker_colorscale"])
                 else:
                     column_color_buttons = None
 
@@ -339,7 +327,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                             pad={"r": 10, "t": 10},
                             showactive=True,
                             x=0.11,
-                            xanchor='left',
+                            xanchor="left",
                             y=button_height,
                             yanchor="top"
                         ),
@@ -354,7 +342,7 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     def observe_widgets(params, widgets):
         for param, value in params.items():
             if isinstance(value, (int, float, str)):
-                widgets[param].observe(on_parameter_change, names='value')
+                widgets[param].observe(on_parameter_change, names="value")
 
     # define output widget to capture logs
     out = widgets.Output()
@@ -371,17 +359,17 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     logger = logging.getLogger(__name__)
     handler = OutputWidgetHandler()
     handler.setFormatter(logging.Formatter(
-        '%(asctime)s - [%(levelname)s] %(message)s'))
+        "%(asctime)s - [%(levelname)s] %(message)s"))
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
     # initialise cover and cluster dictionaries of parameters and widgets
-    cover_params = dict(filter(lambda x: x[0].startswith('cover'),
+    cover_params = dict(filter(lambda x: x[0].startswith("cover"),
                                pipe.get_mapper_params().items()))
     cover_params_widgets = dict(
         filter(None, map(lambda x: get_widgets_per_param(*x),
                          cover_params.items())))
-    cluster_params = dict(filter(lambda x: x[0].startswith('clusterer'),
+    cluster_params = dict(filter(lambda x: x[0].startswith("clusterer"),
                                  pipe.get_mapper_params().items()))
     cluster_params_widgets = dict(
         filter(None, map(lambda x: get_widgets_per_param(*x),
@@ -390,13 +378,13 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     # initialise widgets for validating input parameters of pipeline
     valid = widgets.Valid(
         value=True,
-        description='Valid parameters',
-        style={'description_width': '100px'},
+        description="Valid parameters",
+        style={"description_width": "100px"},
     )
 
     # initialise widget for showing the logs
     logs_box = widgets.Checkbox(
-        description='Show logs: ',
+        description="Show logs: ",
         value=False,
         indent=False
     )
@@ -412,13 +400,13 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
     observe_widgets(cover_params, cover_params_widgets)
     observe_widgets(cluster_params, cluster_params_widgets)
 
-    logs_box.observe(click_box, names='value')
+    logs_box.observe(click_box, names="value")
 
     # define containers for input widgets
     container_cover = widgets.HBox(
         children=list(cover_params_widgets.values()))
 
-    container_cluster_layout = Layout(display='flex', flex_flow='row wrap')
+    container_cluster_layout = Layout(display="flex", flex_flow="row wrap")
 
     container_cluster = widgets.HBox(
         children=list(cluster_params_widgets.values()),
