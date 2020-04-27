@@ -338,4 +338,4 @@ def _calculate_graph_data(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
     return node_trace, edge_trace, node_elements, node_colors, \
-        color_variable_min, color_variable_max
+        color_variable_min, color_variable_max, colorscale

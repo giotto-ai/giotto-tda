@@ -105,26 +105,27 @@ def plot_static_mapper_graph(
     is_data_dataframe = hasattr(data, "columns")
 
     (node_trace, edge_trace, node_elements, node_colors_color_variable,
-     color_variable_min, color_variable_max) = _calculate_graph_data(
+     color_variable_min, color_variable_max, colorscale) = \
+        _calculate_graph_data(
         pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
         _node_color_statistic, plotly_kwargs
     )
 
-    # Define layout options that are common to 2D and 3D figures
-    layout_options_common = go.Layout(
-        **PLOT_OPTIONS_LAYOUT_DEFAULTS["common"]
+    # Define layout options
+    layout_options = go.Layout(
+        **PLOT_OPTIONS_LAYOUT_DEFAULTS["common"],
+        **PLOT_OPTIONS_LAYOUT_DEFAULTS[layout_dim]
     )
 
     fig = go.FigureWidget(data=[node_trace, edge_trace],
-                          layout=layout_options_common)
-    fig.update_layout(PLOT_OPTIONS_LAYOUT_DEFAULTS[layout_dim])
+                          layout=layout_options)
 
     # Compute node colors according to data columns only if necessary
     if color_by_columns_dropdown:
         column_color_buttons = _get_column_color_buttons(
             data, is_data_dataframe, node_elements, node_colors_color_variable,
             color_variable_min, color_variable_max, _node_color_statistic,
-            "viridis"  # TODO: Use input!
+            colorscale
         )
     else:
         column_color_buttons = None
