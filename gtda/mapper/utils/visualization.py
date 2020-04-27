@@ -113,10 +113,10 @@ def _get_column_color_buttons(
     column_color_buttons = [
         {
             "args": [{
-                "marker.color": [None, node_colors_color_variable],
-                "marker.cmin": [None, color_variable_min],
-                "marker.cmax": [None, color_variable_max],
-                "hoverlabel.bgcolor": [None, node_colors_color_variable]
+                "marker.color": [node_colors_color_variable],
+                "marker.cmin": [color_variable_min],
+                "marker.cmax": [color_variable_max],
+                "hoverlabel.bgcolor": [node_colors_color_variable]
             }],
             "label": "color_variable",
             "method": "restyle"
@@ -140,15 +140,16 @@ def _get_column_color_buttons(
         column_color_buttons.append(
             {
                 "args": [{
-                    "marker.color": [None, node_colors],
-                    "marker.cmin": [None, min_node_summary],
-                    "marker.cmax": [None, max_node_summary],
-                    "hoverlabel.bgcolor": [None, node_colors]
+                    "marker.color": [node_colors],
+                    "marker.cmin": [min_node_summary],
+                    "marker.cmax": [max_node_summary],
+                    "hoverlabel.bgcolor": [node_colors]
                 }],
                 "label": f"Column {column}",
                 "method": "restyle"
             }
         )
+
     return column_color_buttons
 
 
