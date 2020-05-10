@@ -109,7 +109,8 @@ def _infer_color_variable_kind(color_variable, data):
 
 def _get_node_colors(data, is_data_dataframe, node_elements,
                      is_node_colors_ndarray, node_color_statistic,
-                     color_variable, color_variable_kind):
+                     color_variable, color_variable_kind,
+                     normalize_node_colors=False):
     """Calculate node colors"""
     if is_node_colors_ndarray:
         node_colors = node_color_statistic
@@ -142,16 +143,18 @@ def _get_node_colors(data, is_data_dataframe, node_elements,
         warn('NaN values detected in the array of Mapper node colors!'
              'These values will be ignored in the color scale', RuntimeWarning)
 
-    # Normalise node colours in range [0,1] for colorscale mapping
-    node_colors = (node_colors - np.nanmin(node_colors)) / \
-        (np.nanmax(node_colors) - np.nanmin(node_colors))
+    # Optionally normalize node colours in range [0,1] for colorscale mapping
+    if normalize_node_colors:
+        node_colors = ((node_colors - np.nanmin(node_colors)) /
+                       (np.nanmax(node_colors) - np.nanmin(node_colors)))
 
     return node_colors
 
 
 def _calculate_graph_data(
         pipeline, data, layout, layout_dim,
-        color_variable, node_color_statistic, plotly_kwargs):
+        color_variable, node_color_statistic, plotly_kwargs,
+        normalize_node_colors=False):
     graph = pipeline.fit_transform(data)
     node_elements = graph['node_metadata']['node_elements']
 
@@ -175,7 +178,8 @@ def _calculate_graph_data(
     node_colors = _get_node_colors(
         data, is_data_dataframe, node_elements,
         is_node_colors_ndarray, node_color_statistic,
-        color_variable, color_variable_kind)
+        color_variable, color_variable_kind,
+        normalize_node_colors=normalize_node_colors)
 
     plot_options = {
         'edge_trace_mode': 'lines',
