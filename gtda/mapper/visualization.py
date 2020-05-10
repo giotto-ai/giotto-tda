@@ -18,7 +18,7 @@ def plot_static_mapper_graph(
         pipeline, data, layout='kamada_kawai', layout_dim=2,
         color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, plotly_kwargs=None,
-        clone_pipeline=True):
+        clone_pipeline=True, normalize_node_colors=False):
     """Plotting function for static Mapper graphs.
 
     Nodes are colored according to :attr:`color_variable`. By default, the
@@ -109,7 +109,8 @@ def plot_static_mapper_graph(
     node_trace, edge_trace, node_elements, _node_colors, plot_options = \
         _calculate_graph_data(
             pipe, data, layout, layout_dim,
-            color_variable, _node_color_statistic, plotly_kwargs)
+            color_variable, _node_color_statistic, plotly_kwargs,
+            normalize_node_colors=normalize_node_colors)
 
     # Define layout options that are common to 2D and 3D figures
     layout_options_common = go.Layout(
@@ -317,7 +318,8 @@ def plot_interactive_mapper_graph(pipeline, data, layout='kamada_kawai',
                 (node_trace, edge_trace, node_elements, node_colors,
                  plot_options) = _calculate_graph_data(
                     pipe, data, layout, layout_dim,
-                    color_variable, _node_color_statistic, plotly_kwargs
+                    color_variable, _node_color_statistic, plotly_kwargs,
+                    normalize_node_colors=False
                 )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
 
