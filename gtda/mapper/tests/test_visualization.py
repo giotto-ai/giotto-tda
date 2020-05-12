@@ -89,7 +89,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
                           ['_data'][0]['hovertext']]
 
         g = pipe.fit_transform(X)
-        node_size_real = [len(l)
-                          for l in g['node_metadata']['node_elements']]
+        node_size_real = [len(node)
+                          for node in g['node_metadata']['node_elements']]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
