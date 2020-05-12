@@ -275,7 +275,7 @@ def _calculate_graph_data(
         "edge_trace": deepcopy(PLOT_OPTIONS_EDGE_TRACE_DEFAULTS)
     }
 
-    plot_options["node_trace"]["text"] = _get_node_text(graph)
+    plot_options["node_trace"]["hovertext"] = _get_node_text(graph)
     plot_options["node_trace"]["marker"].update({
         "size": _get_node_size(node_elements),
         "sizeref": set_node_sizeref(node_elements),
