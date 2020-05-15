@@ -70,6 +70,15 @@ PLOT_OPTIONS_LAYOUT_DEFAULTS = {
 }
 
 
+def _round_to_n_sig_figs(x, n=3):
+    """Round a number x to n significant figures."""
+    if n is None:
+        return x
+    if not x:
+        return 0
+    return np.round(x, -int(np.floor(np.log10(np.abs(x)))) + (n - 1))
+
+
 def set_node_sizeref(node_elements, node_scale=12):
     # Formula from Plotly https://plot.ly/python/bubble-charts/
     return 2. * max(_get_node_size(node_elements)) / (node_scale ** 2)
@@ -80,10 +89,11 @@ def _get_node_size(node_elements):
     return list(map(len, node_elements))
 
 
-def _get_node_text(graph):
+def _get_node_text(graph, n_sig_figs):
     return [
         f"Node ID: {node_id}<br>Node size: {len(node_elements)}"
-        f"<br>Summary statistic: {node_summary_statistic}"
+        f"<br>Summary statistic: "
+        f"{_round_to_n_sig_figs(node_summary_statistic, n=n_sig_figs)}"
         for node_id, node_elements, node_summary_statistic in zip(
             graph["node_metadata"]["node_id"],
             graph["node_metadata"]["node_elements"],
@@ -230,7 +240,7 @@ def _convert_to_hex(colormap, x):
 
 def _calculate_graph_data(
         pipeline, data, is_data_dataframe, layout, layout_dim, color_variable,
-        node_color_statistic, plotly_kwargs
+        node_color_statistic, n_sig_figs, plotly_kwargs
 ):
     graph = pipeline.fit_transform(data)
     node_elements = graph["node_metadata"]["node_elements"]
@@ -275,7 +285,9 @@ def _calculate_graph_data(
         "edge_trace": deepcopy(PLOT_OPTIONS_EDGE_TRACE_DEFAULTS)
     }
 
-    plot_options["node_trace"]["hovertext"] = _get_node_text(graph)
+    plot_options["node_trace"]["hovertext"] = _get_node_text(
+        graph, n_sig_figs=n_sig_figs
+    )
     plot_options["node_trace"]["marker"].update({
         "size": _get_node_size(node_elements),
         "sizeref": set_node_sizeref(node_elements),

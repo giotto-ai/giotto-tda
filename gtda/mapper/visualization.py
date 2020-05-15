@@ -20,14 +20,15 @@ from .utils.visualization import (
 def plot_static_mapper_graph(
         pipeline, data, layout="kamada_kawai", layout_dim=2,
         color_variable=None, node_color_statistic=None,
-        color_by_columns_dropdown=False, plotly_kwargs=None,
-        clone_pipeline=True
+        color_by_columns_dropdown=False, clone_pipeline=True, n_sig_figs=3,
+        plotly_kwargs=None
 ):
     """Plotting function for static Mapper graphs.
 
-    Nodes are colored according to :attr:`color_variable`. By default, the
-    hovertext displays a globally unique ID and the number of elements
-    associated with a given node.
+    Nodes are colored according to `color_variable` and `node_color_statistic`.
+    By default, the hovertext on each node displays a globally unique ID for
+    the node, the number of data points associated with the node, and the
+    summary statistic which determines its color.
 
     Parameters
     ----------
@@ -74,13 +75,17 @@ def plot_static_mapper_graph(
         If ``True``, a dropdown widget is generated which allows the user to
         color Mapper nodes according to any column in `data`.
 
-    plotly_kwargs : dict, optional, default: ``None``
-        Keyword arguments to configure the plotly figure.
-
     clone_pipeline : bool, optional, default: ``True``
         If ``True``, the input `pipeline` is cloned before computing the
         Mapper graph to prevent unexpected side effects from in-place
         parameter updates.
+
+    n_sig_figs : int or None, optional, default: ``3``
+       If not ``None``, number of significant figures to which to round node
+       node summary statistics. If ``None``, no rounding is performed.
+
+    plotly_kwargs : dict, optional, default: ``None``
+        Keyword arguments to configure the plotly figure.
 
     Returns
     -------
@@ -108,7 +113,7 @@ def plot_static_mapper_graph(
      color_variable_min, color_variable_max, colorscale) = \
         _calculate_graph_data(
         pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
-        _node_color_statistic, plotly_kwargs
+        _node_color_statistic, n_sig_figs, plotly_kwargs
     )
 
     # Define layout options
@@ -164,14 +169,16 @@ def plot_static_mapper_graph(
 def plot_interactive_mapper_graph(
         pipeline, data, layout="kamada_kawai", layout_dim=2,
         color_variable=None, node_color_statistic=None,
-        color_by_columns_dropdown=False, plotly_kwargs=None
+        color_by_columns_dropdown=False, n_sig_figs=3, plotly_kwargs=None
 ):
     """Plotting function for interactive Mapper graphs.
 
     Provides functionality to interactively update parameters from the cover
-    and clustering steps defined in :attr:`pipeline`. Nodes are colored
-    according to :attr:`color_variable`. By default, the hovertext displays a
-    globally unique ID and the number of elements associated with a given node.
+    and clustering steps defined in `pipeline`. Nodes are colored according to
+    `color_variable` and `node_color_statistic`. By default, the hovertext on
+    each node displays a globally unique ID for the node, the number of data
+    points associated with the node, and the summary statistic which determines
+    its color.
 
     Parameters
     ----------
@@ -217,6 +224,10 @@ def plot_interactive_mapper_graph(
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
         color Mapper nodes according to any column in `data`.
+
+    n_sig_figs : int or None, optional, default: ``3``
+       If not ``None``, number of significant figures to which to round node
+       node summary statistics. If ``None``, no rounding is performed.
 
     plotly_kwargs : dict, optional, default: ``None``
         Keyword arguments to configure the plotly figure.
@@ -396,7 +407,7 @@ def plot_interactive_mapper_graph(
 
     fig = plot_static_mapper_graph(
         pipe, data, layout, layout_dim, color_variable, _node_color_statistic,
-        color_by_columns_dropdown, plotly_kwargs, clone_pipeline=False)
+        color_by_columns_dropdown, False, n_sig_figs, plotly_kwargs)
 
     observe_widgets(cover_params, cover_params_widgets)
     observe_widgets(cluster_params, cluster_params_widgets)
