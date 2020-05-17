@@ -58,8 +58,9 @@ def plot_static_mapper_graph(
                :meth:`fit_transform`, e.g. a scikit-learn estimator or
                pipeline, it is applied to `data` to generate the quantity
                of interest.
-            4. If an index or string, or list of indices / strings, equivalent
-               to selecting a column or subset of columns from `data`.
+            4. If an index or string, or list of indices/strings, it is
+               equivalent to selecting a column or subset of columns from
+               `data`.
 
     node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``None``
@@ -73,7 +74,8 @@ def plot_static_mapper_graph(
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
-        color Mapper nodes according to any column in `data`.
+        color Mapper nodes according to any column in `data` (still using
+        `node_color_statistic`) in addition to `color_variable`.
 
     clone_pipeline : bool, optional, default: ``True``
         If ``True``, the input `pipeline` is cloned before computing the
@@ -84,7 +86,7 @@ def plot_static_mapper_graph(
        If not ``None``, number of significant figures to which to round node
        node summary statistics. If ``None``, no rounding is performed.
 
-    plotly_kwargs : dict, optional, default: ``None``
+    plotly_kwargs : dict or None, optional, default: ``None``
         Keyword arguments to configure the plotly figure.
 
     Returns
@@ -109,11 +111,12 @@ def plot_static_mapper_graph(
     # Simple duck typing to determine whether data is likely a pandas dataframe
     is_data_dataframe = hasattr(data, "columns")
 
-    (node_trace, edge_trace, node_elements, node_colors_color_variable,
-     color_variable_min, color_variable_max, colorscale) = \
-        _calculate_graph_data(
-        pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
-        _node_color_statistic, n_sig_figs, plotly_kwargs
+    (
+        edge_trace, node_trace, node_elements, node_colors_color_variable,
+        color_variable_min, color_variable_max, colorscale
+    ) = _calculate_graph_data(
+            pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
+            _node_color_statistic, n_sig_figs, plotly_kwargs
     )
 
     # Define layout options
@@ -122,15 +125,15 @@ def plot_static_mapper_graph(
         **PLOT_OPTIONS_LAYOUT_DEFAULTS[layout_dim]
     )
 
-    fig = go.FigureWidget(data=[node_trace, edge_trace],
-                          layout=layout_options)
+    fig = go.FigureWidget(data=[edge_trace, node_trace], layout=layout_options)
 
     # Compute node colors according to data columns only if necessary
     if color_by_columns_dropdown:
+        hovertext_color_variable = node_trace.hovertext
         column_color_buttons = _get_column_color_buttons(
             data, is_data_dataframe, node_elements, node_colors_color_variable,
             color_variable_min, color_variable_max, _node_color_statistic,
-            colorscale
+            colorscale, hovertext_color_variable, n_sig_figs
         )
     else:
         column_color_buttons = None
@@ -203,15 +206,16 @@ def plot_interactive_mapper_graph(
                must have the same length as `data` and is interpreted as
                a quantity of interest according to which node of the Mapper
                graph is to be colored (see `node_color_statistic`).
-            2. If ``None`` then equivalent to passing `data`.
+            2. ``None`` is equivalent to passing `data`.
             3. If an object implementing :meth:`transform` or
                :meth:`fit_transform`, e.g. a scikit-learn estimator or
                pipeline, it is applied to `data` to generate the quantity
                of interest.
-            4. If an index or string, or list of indices / strings, equivalent
-               to selecting a column or subset of columns from `data`.
+            4. If an index or string, or list of indices/strings, it is
+               equivalent to selecting a column or subset of columns from
+               `data`.
 
-    node_color_statistic :None, callable, or ndarray of shape (n_nodes,) or \
+    node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``None``
         Specifies how to determine the colors of each node. If a
         numpy array, it must have the same length as the number of nodes in
@@ -219,25 +223,26 @@ def plot_interactive_mapper_graph(
         coloring, ignoring `color_variable`. Otherwise, it can be a
         callable object which is used to obtain a summary statistic, within
         each Mapper node, of the quantity specified by `color_variable`. The
-        default value ``None`` is equivalent to passing ``numpy.mean``.
+        default value ``None`` is equivalent to passing :func:`numpy.mean`.
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
-        color Mapper nodes according to any column in `data`.
+        color Mapper nodes according to any column in `data` (still using
+        `node_color_statistic`) in addition to `color_variable`.
 
     n_sig_figs : int or None, optional, default: ``3``
        If not ``None``, number of significant figures to which to round node
        node summary statistics. If ``None``, no rounding is performed.
 
-    plotly_kwargs : dict, optional, default: ``None``
+    plotly_kwargs : dict or None, optional, default: ``None``
         Keyword arguments to configure the plotly figure.
 
     Returns
     -------
     box : :class:`ipywidgets.VBox` object
-    A box containing the following widgets: parameters of the clustering
-    algorithm, parameters for the covering scheme, a Mapper graph arising
-    from those parameters, a validation box, and logs.
+        A box containing the following widgets: parameters of the clustering
+        algorithm, parameters for the covering scheme, a Mapper graph arising
+        from those parameters, a validation box, and logs.
 
     References
     ----------
@@ -250,10 +255,7 @@ def plot_interactive_mapper_graph(
     # clone pipeline to avoid side effects from in-place parameter changes
     pipe = clone(pipeline)
 
-    if node_color_statistic is not None:
-        _node_color_statistic = node_color_statistic
-    else:
-        _node_color_statistic = np.mean
+    _node_color_statistic = node_color_statistic or np.mean
 
     def get_widgets_per_param(param, value):
         if isinstance(value, float):
@@ -306,27 +308,38 @@ def plot_interactive_mapper_graph(
             for param, value in cover_params.items():
                 if isinstance(value, (int, float, str)):
                     pipe.set_params(
-                        **{param: cover_params_widgets[param].value})
+                        **{param: cover_params_widgets[param].value}
+                    )
             for param, value in cluster_params.items():
                 if isinstance(value, (int, float, str)):
                     pipe.set_params(
-                        **{param: cluster_params_widgets[param].value})
+                        **{param: cluster_params_widgets[param].value}
+                    )
 
-            logger.info("Updating figure ...")
+            logger.info("Updating figure...")
             with fig.batch_update():
-                (node_trace, edge_trace, node_elements, node_colors,
-                 plot_options) = _calculate_graph_data(
-                    pipe, data, layout, layout_dim,
-                    color_variable, _node_color_statistic, plotly_kwargs
+                is_data_dataframe = hasattr(data, "columns")
+                (
+                    edge_trace, node_trace, node_elements,
+                    node_colors_color_variable, color_variable_min,
+                    color_variable_max, colorscale
+                ) = _calculate_graph_data(
+                    pipe, data, is_data_dataframe, layout, layout_dim,
+                    color_variable, _node_color_statistic, n_sig_figs,
+                    plotly_kwargs
                 )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
 
                 # Update color by column buttons
-                is_data_dataframe = hasattr(data, "columns")
                 if color_by_columns_dropdown:
+                    hovertext_color_variable = node_trace.hovertext
                     column_color_buttons = _get_column_color_buttons(
-                        data, is_data_dataframe, node_elements, node_colors,
-                        plot_options["node_trace_marker_colorscale"])
+                        data, is_data_dataframe, node_elements,
+                        node_colors_color_variable, color_variable_min,
+                        color_variable_max, _node_color_statistic,
+                        fig.data[1].marker.colorscale,
+                        hovertext_color_variable, n_sig_figs
+                    )
                 else:
                     column_color_buttons = None
 
@@ -406,8 +419,12 @@ def plot_interactive_mapper_graph(
         plotly_kwargs = dict()
 
     fig = plot_static_mapper_graph(
-        pipe, data, layout, layout_dim, color_variable, _node_color_statistic,
-        color_by_columns_dropdown, False, n_sig_figs, plotly_kwargs)
+        pipe, data, layout=layout, layout_dim=layout_dim,
+        color_variable=color_variable,
+        node_color_statistic=_node_color_statistic,
+        color_by_columns_dropdown=False, clone_pipeline=True,
+        n_sig_figs=n_sig_figs, plotly_kwargs=plotly_kwargs
+    )
 
     observe_widgets(cover_params, cover_params_widgets)
     observe_widgets(cluster_params, cluster_params_widgets)
@@ -416,14 +433,17 @@ def plot_interactive_mapper_graph(
 
     # define containers for input widgets
     container_cover = widgets.HBox(
-        children=list(cover_params_widgets.values()))
+        children=list(cover_params_widgets.values())
+    )
 
     container_cluster_layout = Layout(display="flex", flex_flow="row wrap")
 
     container_cluster = widgets.HBox(
         children=list(cluster_params_widgets.values()),
-        layout=container_cluster_layout)
+        layout=container_cluster_layout
+    )
 
     box = widgets.VBox(
-        [container_cover, container_cluster, fig, valid, logs_box, out])
+        [container_cover, container_cluster, fig, valid, logs_box, out]
+    )
     return box

@@ -70,6 +70,11 @@ PLOT_OPTIONS_LAYOUT_DEFAULTS = {
 }
 
 
+def set_node_sizeref(node_elements, node_scale=12):
+    # Formula from Plotly https://plot.ly/python/bubble-charts/
+    return 2. * max(_get_node_size(node_elements)) / (node_scale ** 2)
+
+
 def _round_to_n_sig_figs(x, n=3):
     """Round a number x to n significant figures."""
     if n is None:
@@ -79,30 +84,24 @@ def _round_to_n_sig_figs(x, n=3):
     return np.round(x, -int(np.floor(np.log10(np.abs(x)))) + (n - 1))
 
 
-def set_node_sizeref(node_elements, node_scale=12):
-    # Formula from Plotly https://plot.ly/python/bubble-charts/
-    return 2. * max(_get_node_size(node_elements)) / (node_scale ** 2)
-
-
 def _get_node_size(node_elements):
     # TODO: Add doc strings to all functions
     return list(map(len, node_elements))
 
 
-def _get_node_text(graph, n_sig_figs):
+def _get_node_text(
+        node_ids, num_node_elements, node_summary_statistics
+):
     return [
-        f"Node ID: {node_id}<br>Node size: {len(node_elements)}"
-        f"<br>Summary statistic: "
-        f"{_round_to_n_sig_figs(node_summary_statistic, n=n_sig_figs)}"
-        for node_id, node_elements, node_summary_statistic in zip(
-            graph["node_metadata"]["node_id"],
-            graph["node_metadata"]["node_elements"],
-            graph["node_metadata"]["node_summary_statistic"],
+        f"Node ID: {node_id}<br>Node size: {num_elements}"
+        f"<br>Summary statistic: {node_summary_statistic}"
+        for node_id, num_elements, node_summary_statistic in zip(
+            node_ids, num_node_elements, node_summary_statistics
             )
         ]
 
 
-def _get_node_summary(data, node_elements, summary_statistic=np.mean):
+def _get_node_summary(data, node_elements, summary_statistic):
     return np.asarray(
         list(map(summary_statistic, [data[itr] for itr in node_elements]))
     )
@@ -110,11 +109,18 @@ def _get_node_summary(data, node_elements, summary_statistic=np.mean):
 
 def _get_column_color_buttons(
         data, is_data_dataframe, node_elements, node_colors_color_variable,
-        color_variable_min, color_variable_max, summary_statistic, colorscale
+        color_variable_min, color_variable_max, summary_statistic, colorscale,
+        hovertext_color_variable, n_sig_figs
 ):
     # TODO: Consider opting for just-in-time computation instead of computing
     # all node summary values ahead of time. Solution should preserve scroll
     # zoom functionality of 2D static visualisation.
+    def replace_summary_statistic(current_hovertext, new_statistic):
+        pos = current_hovertext.rfind(" ")
+        new_hovertext = current_hovertext[:pos] + \
+            f" {_round_to_n_sig_figs(new_statistic, n=n_sig_figs)}"
+        return new_hovertext
+
     if is_data_dataframe:
         columns_to_color = data.columns
     else:
@@ -126,7 +132,8 @@ def _get_column_color_buttons(
                 "marker.color": [node_colors_color_variable],
                 "marker.cmin": [color_variable_min],
                 "marker.cmax": [color_variable_max],
-                "hoverlabel.bgcolor": [node_colors_color_variable]
+                "hoverlabel.bgcolor": [node_colors_color_variable],
+                "hovertext": [hovertext_color_variable]
             }],
             "label": "color_variable",
             "method": "restyle"
@@ -141,6 +148,10 @@ def _get_column_color_buttons(
         node_summary_statistics = _get_node_summary(
             column_values, node_elements, summary_statistic
         )
+        hovertext = list(map(
+            replace_summary_statistic, hovertext_color_variable,
+            node_summary_statistics
+        ))
         node_colors, min_node_summary, max_node_summary = \
             _get_node_colors(node_summary_statistics)
         node_colors = list(
@@ -153,7 +164,8 @@ def _get_column_color_buttons(
                     "marker.color": [node_colors],
                     "marker.cmin": [min_node_summary],
                     "marker.cmax": [max_node_summary],
-                    "hoverlabel.bgcolor": [node_colors]
+                    "hoverlabel.bgcolor": [node_colors],
+                    "hovertext": [hovertext]
                 }],
                 "label": f"Column {column}",
                 "method": "restyle"
@@ -211,13 +223,10 @@ def _get_node_summary_statistics(
         else:
             color_data = data[:, color_variable]
 
-    return _get_node_summary(
-        color_data, node_elements, summary_statistic=node_color_statistic)
+    return _get_node_summary(color_data, node_elements, node_color_statistic)
 
 
-def _get_node_colors(
-        node_summary_statistics
-):
+def _get_node_colors(node_summary_statistics):
     """Calculate node color values in the range [0, 1] from raw node summary
     statistics by performing a min-max scaling."""
     # Check if node_summary_statistics contains NaNs
@@ -274,20 +283,27 @@ def _calculate_graph_data(
             data, is_data_dataframe, node_elements, node_color_statistic,
             color_variable
         )
-    graph["node_metadata"]["node_summary_statistic"] = node_summary_statistics
 
     # Obtain node colors as the node summary statistics normalised in [0, 1]
     node_colors, color_variable_min, color_variable_max = _get_node_colors(
-        node_summary_statistics)
+        node_summary_statistics
+    )
 
     plot_options = {
         "node_trace": deepcopy(PLOT_OPTIONS_NODE_TRACE_DEFAULTS),
         "edge_trace": deepcopy(PLOT_OPTIONS_EDGE_TRACE_DEFAULTS)
     }
 
-    plot_options["node_trace"]["hovertext"] = _get_node_text(
-        graph, n_sig_figs=n_sig_figs
+    # Generate hovertext
+    node_ids = graph["node_metadata"]["node_id"]
+    num_node_elements = map(len, graph["node_metadata"]["node_elements"])
+    node_summary_statistics = map(
+        partial(_round_to_n_sig_figs, n=n_sig_figs), node_summary_statistics
     )
+    plot_options["node_trace"]["hovertext"] = _get_node_text(
+        node_ids, num_node_elements, node_summary_statistics
+    )
+
     plot_options["node_trace"]["marker"].update({
         "size": _get_node_size(node_elements),
         "sizeref": set_node_sizeref(node_elements),
@@ -349,5 +365,5 @@ def _calculate_graph_data(
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
-    return node_trace, edge_trace, node_elements, node_colors, \
+    return edge_trace, node_trace, node_elements, node_colors, \
         color_variable_min, color_variable_max, colorscale
