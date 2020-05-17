@@ -15,22 +15,22 @@ PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
     "hoverinfo": "text",
     "marker": {
         "colorscale": "viridis",
+        "opacity": 1.,
         "showscale": True,
         "reversescale": False,
-        "line": {"width": .5, "color": "#888"},
+        "line": {"width": 1, "color": "#888"},
         "sizemode": "area",
         "sizemin": 4,
         "colorbar": {
             "thickness": 15, "title": "", "xanchor": "left",
             "titleside": "right"
-        },
-        "line_width": 2
+        }
     }
 }
 
 PLOT_OPTIONS_EDGE_TRACE_DEFAULTS = {
     "mode": "lines",
-    "line": {"color": "#888", "width": 1},
+    "line": {"width": 1, "color": "#888"},
     "hoverinfo": "none"
 }
 
