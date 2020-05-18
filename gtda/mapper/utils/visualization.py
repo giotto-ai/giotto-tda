@@ -100,9 +100,7 @@ def _get_node_text(
 
 
 def _get_node_summary(data, node_elements, summary_statistic):
-    return np.asarray(
-        list(map(summary_statistic, [data[itr] for itr in node_elements]))
-    )
+    return list(map(summary_statistic, [data[itr] for itr in node_elements]))
 
 
 def _get_column_color_buttons(

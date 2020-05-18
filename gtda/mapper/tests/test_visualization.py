@@ -56,9 +56,8 @@ class TestStaticPlot(TestCaseNoTemplate):
                        for c in ['x', 'y']]).transpose()
         assert X.shape >= xy.shape
 
-        len_real_colors = fig.get_state()['_data'][1]['marker']['color'][
-            "shape"][0]
-        assert len_real_colors == xy.shape[0]
+        real_colors = fig.get_state()['_data'][1]['marker']['color']
+        assert len(real_colors) == xy.shape[0]
 
 
 class TestInteractivePlot(TestCaseNoTemplate):
