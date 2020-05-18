@@ -140,6 +140,7 @@ def _get_column_color_buttons(
             column_values = data[column].to_numpy()
         else:
             column_values = data[:, column]
+
         node_colors = _get_node_summary(
             column_values, node_elements, summary_statistic
         )
@@ -216,38 +217,24 @@ def _get_node_summary_statistics(
 
 def _calculate_graph_data(
         pipeline, data, is_data_dataframe, layout, layout_dim, color_variable,
-        summary_statistic, n_sig_figs
+        node_color_statistic, n_sig_figs
 ):
     graph = pipeline.fit_transform(data)
     node_elements = graph["node_metadata"]["node_elements"]
 
-    # Determine whether layout is an array of node positions
-    is_layout_ndarray = hasattr(layout, "dtype")
-    if is_layout_ndarray:
-        if layout.shape[1] not in [2, 3]:
-            raise ValueError(
-                f"If an ndarray, `layout` must be 2D with 2 or 3 columns. "
-                f"Array with {layout.shape[1]} columns passed."
-            )
-        node_pos = layout
-    else:
-        if layout_dim not in [2, 3]:
-            raise ValueError(
-                f"`layout_dim` must be either 2 or 3. {layout_dim} entered."
-            )
-        node_pos = graph.layout(layout, dim=layout_dim)
-
-    # Determine whether node_colors is an array of node colors
-    is_node_color_statistic_ndarray = hasattr(summary_statistic, "dtype")
-    if not (is_node_color_statistic_ndarray or callable(summary_statistic)):
-        raise ValueError("node_color_statistic must be a callable or ndarray.")
+    # Determine whether node_color_statistic is an array of node colors
+    is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
+    if not (is_node_color_statistic_ndarray or callable(node_color_statistic)):
+        raise ValueError(
+            "`node_color_statistic` must be a callable or ndarray."
+        )
 
     # Compute the raw values of node summary statistics
     if is_node_color_statistic_ndarray:
-        node_colors = summary_statistic
+        node_colors_color_variable = node_color_statistic
     else:
-        node_colors = _get_node_summary_statistics(
-            data, is_data_dataframe, node_elements, summary_statistic,
+        node_colors_color_variable = _get_node_summary_statistics(
+            data, is_data_dataframe, node_elements, node_color_statistic,
             color_variable
         )
 
@@ -261,42 +248,58 @@ def _calculate_graph_data(
     plot_options["node_trace"]["marker"].update({
         "size": _get_node_size(node_elements),
         "sizeref": set_node_sizeref(node_elements),
-        "color": node_colors
+        "color": node_colors_color_variable
     })
 
     # Generate hovertext
     node_ids = graph["node_metadata"]["node_id"]
     num_node_elements = map(len, graph["node_metadata"]["node_elements"])
     node_colors_round = map(
-        partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors
+        partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors_color_variable
     )
     plot_options["node_trace"]["hovertext"] = _get_node_text(
         node_ids, num_node_elements, node_colors_round
     )
 
+    # Compute graph layout
+    is_layout_ndarray = hasattr(layout, "dtype")
+    if is_layout_ndarray:
+        if layout.shape[1] not in [2, 3]:
+            raise ValueError(
+                f"If an ndarray, `layout` must be 2D with 2 or 3 columns. "
+                f"Array with {layout.shape[1]} columns passed."
+            )
+        node_pos = layout
+    else:
+        if layout_dim not in [2, 3]:
+            raise ValueError(
+                f"`layout_dim` must be either 2 or 3. {layout_dim} entered."
+            )
+        node_pos = np.asarray(graph.layout(layout, dim=layout_dim).coords)
+
+    # Store x and y coordinates of edge endpoints
     edge_x = list(
         reduce(
             operator.iconcat, map(
-                lambda x: [node_pos[x[0]][0], node_pos[x[1]][0], None],
-                graph.get_edgelist()
+                lambda e: [node_pos[e.source, 0], node_pos[e.target, 0],
+                           None],
+                graph.es
             ), []
         )
     )
     edge_y = list(
         reduce(
             operator.iconcat, map(
-                lambda x: [node_pos[x[0]][1], node_pos[x[1]][1], None],
-                graph.get_edgelist()
+                lambda e: [node_pos[e.source, 1], node_pos[e.target, 1],
+                           None],
+                graph.es
             ), []
         )
     )
 
-    node_x = [node_pos[k][0] for k in range(graph.vcount())]
-    node_y = [node_pos[k][1] for k in range(graph.vcount())]
-
     if layout_dim == 2:
         node_trace = go.Scatter(
-            x=node_x, y=node_y, **plot_options["node_trace"]
+            x=node_pos[:, 0], y=node_pos[:, 1], **plot_options["node_trace"]
         )
 
         edge_trace = go.Scatter(
@@ -304,23 +307,21 @@ def _calculate_graph_data(
         )
 
     else:
-        node_z = [node_pos[k][2] for k in range(graph.vcount())]
         node_trace = go.Scatter3d(
-            x=node_x, y=node_y, z=node_z, **plot_options["node_trace"]
+            x=node_pos[:, 0], y=node_pos[:, 1], z=node_pos[:, 2],
+            **plot_options["node_trace"]
         )
 
         edge_z = list(
             reduce(
                 operator.iconcat, map(
-                    lambda x: [node_pos[x[0]][2], node_pos[x[1]][2], None],
-                    graph.get_edgelist()
+                    lambda e: [node_pos[e.source][2], node_pos[e.target][2],
+                               None],
+                    graph.es
                 ), []
             )
         )
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
-    # Record final colorscale
-    colorscale = node_trace.marker.colorscale
-
-    return edge_trace, node_trace, node_elements, node_colors, colorscale
+    return edge_trace, node_trace, node_elements, node_colors_color_variable

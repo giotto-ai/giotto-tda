@@ -111,13 +111,11 @@ def plot_static_mapper_graph(
     # Simple duck typing to determine whether data is likely a pandas dataframe
     is_data_dataframe = hasattr(data, "columns")
 
-    (
-        edge_trace, node_trace, node_elements, node_colors_color_variable,
-        colorscale
-    ) = _calculate_graph_data(
+    edge_trace, node_trace, node_elements, node_colors_color_variable = \
+        _calculate_graph_data(
             _pipeline, data, is_data_dataframe, layout, layout_dim,
             color_variable, _node_color_statistic, n_sig_figs
-    )
+        )
 
     # Define layout options
     layout_options = go.Layout(
