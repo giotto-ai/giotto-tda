@@ -840,7 +840,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     }
 
     def __init__(self, homology_dimensions=(0, 1), directed=True,
-                 filtration='max', coeff=2,max_edge_weight=np.inf,
+                 filtration='max', coeff=2, max_edge_weight=np.inf,
                  infinity_values=None, max_entries=-1, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.directed = directed
@@ -852,11 +852,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _flagser_diagram(self, X):
-        X[X >= self.max_edge_weight] = self.max_edge_weight
-
-        Xdgms = flagser_weighted(X, min_dimension=self._min_homology_dimension,
+        Xdgms = flagser_weighted(X, max_edge_weight=self.max_edge_weight,
+                                 min_dimension=self._min_homology_dimension,
                                  max_dimension=self._max_homology_dimension,
-                                 directed=self.directed, coeff=self.coeff,
+                                 directed=self.directed,
+                                 filtration=self.filtration, coeff=self.coeff,
                                  approximation=self.max_entries)['dgms']
 
         if 0 in self._homology_dimensions:
