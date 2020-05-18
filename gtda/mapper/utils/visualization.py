@@ -303,7 +303,7 @@ def _calculate_graph_data(
             x=edge_x, y=edge_y, **plot_options["edge_trace"]
         )
 
-    else layout_dim == 3:
+    else:
         node_z = [node_pos[k][2] for k in range(graph.vcount())]
         node_trace = go.Scatter3d(
             x=node_x, y=node_y, z=node_z, **plot_options["node_trace"]
