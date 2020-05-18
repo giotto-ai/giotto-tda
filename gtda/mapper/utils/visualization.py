@@ -9,6 +9,7 @@ import numpy as np
 import plotly.graph_objs as go
 
 PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
+    "name": "node_trace",
     "mode": "markers",
     "hoverinfo": "text",
     "marker": {
@@ -27,6 +28,7 @@ PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
 }
 
 PLOT_OPTIONS_EDGE_TRACE_DEFAULTS = {
+    "name": "edge_trace",
     "mode": "lines",
     "line": {"width": 1, "color": "#888"},
     "hoverinfo": "none"

@@ -87,7 +87,11 @@ def plot_static_mapper_graph(
        node summary statistics. If ``None``, no rounding is performed.
 
     plotly_params : dict or None, optional, default: ``None``
-        Custom parameters to configure the plotly figure.
+        Custom parameters to configure the plotly figure. Allowed keys are
+        ``"node_trace"``, ``"edge_trace"`` and ``"layout"``, and the
+        corresponding values should be dictionaries containing keyword
+        arguments as would be fed to the :meth:`update_traces` and
+        :meth:`update_layout` methods of :class:`plotly.graph_objects.Figure`.
 
     Returns
     -------
@@ -163,6 +167,24 @@ def plot_static_mapper_graph(
             )
         )
 
+    # Update traces and layout according to user input
+    if plotly_params:
+        node_trace_params = plotly_params.get("node_trace", None)
+        if node_trace_params:
+            fig.update_traces(
+                node_trace_params,
+                selector={"name": "node_trace"}
+            )
+        edge_trace_params = plotly_params.get("edge_trace", None)
+        if edge_trace_params:
+            fig.update_traces(
+                edge_trace_params,
+                selector={"name": "edge_trace"}
+            )
+        layout_params = plotly_params.get("layout", None)
+        if layout_params:
+            fig.update_layout(layout_params)
+
     return fig
 
 
@@ -232,7 +254,11 @@ def plot_interactive_mapper_graph(
        node summary statistics. If ``None``, no rounding is performed.
 
     plotly_params : dict or None, optional, default: ``None``
-        Custom parameters to configure the plotly figure.
+        Custom parameters to configure the plotly figure. Allowed keys are
+        ``"node_trace"``, ``"edge_trace"`` and ``"layout"``, and the
+        corresponding values should be dictionaries containing keyword
+        arguments as would be fed to the :meth:`update_traces` and
+        :meth:`update_layout` methods of :class:`plotly.graph_objects.Figure`.
 
     Returns
     -------
