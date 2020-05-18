@@ -107,8 +107,7 @@ def _get_node_summary(data, node_elements, summary_statistic):
 
 def _get_column_color_buttons(
         data, is_data_dataframe, node_elements, node_colors_color_variable,
-        color_variable_min, color_variable_max, summary_statistic, colorscale,
-        hovertext_color_variable, n_sig_figs
+        summary_statistic, hovertext_color_variable, n_sig_figs
 ):
     # TODO: Consider opting for just-in-time computation instead of computing
     # all node summary values ahead of time. Solution should preserve scroll
@@ -128,8 +127,6 @@ def _get_column_color_buttons(
         {
             "args": [{
                 "marker.color": [node_colors_color_variable],
-                # "marker.cmin": [color_variable_min],
-                # "marker.cmax": [color_variable_max],
                 "hoverlabel.bgcolor": [node_colors_color_variable],
                 "hovertext": [hovertext_color_variable]
             }],
@@ -143,27 +140,18 @@ def _get_column_color_buttons(
             column_values = data[column].to_numpy()
         else:
             column_values = data[:, column]
-        node_summary_statistics = _get_node_summary(
+        node_colors = _get_node_summary(
             column_values, node_elements, summary_statistic
         )
         hovertext = list(map(
             replace_summary_statistic, hovertext_color_variable,
-            node_summary_statistics
+            node_colors
         ))
-        # node_colors, min_node_summary, max_node_summary = \
-        #     _get_node_colors(node_summary_statistics)
-        # node_colors = list(
-        #     map(partial(_convert_to_hex, colorscale), node_colors)
-        # )
-        node_colors = node_summary_statistics
-
 
         column_color_buttons.append(
             {
                 "args": [{
                     "marker.color": [node_colors],
-                    # "marker.cmin": [min_node_summary],
-                    # "marker.cmax": [max_node_summary],
                     "hoverlabel.bgcolor": [node_colors],
                     "hovertext": [hovertext]
                 }],
@@ -198,7 +186,7 @@ def _infer_color_variable_kind(color_variable, data):
 
 
 def _get_node_summary_statistics(
-        data, is_data_dataframe, node_elements, node_color_statistic,
+        data, is_data_dataframe, node_elements, summary_statistic,
         color_variable
 ):
     """Calculate values of node summary statistics."""
@@ -223,33 +211,12 @@ def _get_node_summary_statistics(
         else:
             color_data = data[:, color_variable]
 
-    return _get_node_summary(color_data, node_elements, node_color_statistic)
-
-
-# def _get_node_colors(node_summary_statistics):
-#     """Calculate node color values in the range [0, 1] from raw node summary
-#     statistics by performing a min-max scaling."""
-#     # Check if node_summary_statistics contains NaNs
-#     if any(np.logical_not(np.isfinite(node_summary_statistics))):
-#         from warnings import warn
-#         warn("NaN values detected among the node summary statistics! These "
-#              "values will be ignored in the color scale", RuntimeWarning)
-#
-#     # Normalise in range [0, 1]
-#     nanmin = np.nanmin(node_summary_statistics)
-#     nanmax = np.nanmax(node_summary_statistics)
-#     return (node_summary_statistics - nanmin) / (nanmax - nanmin), nanmin, \
-#         nanmax
-
-
-# def _convert_to_hex(colormap, x):
-#     """Convert float `x` to hex values according to `colormap`"""
-#     return rgb2hex(get_cmap(colormap)(x))
+    return _get_node_summary(color_data, node_elements, summary_statistic)
 
 
 def _calculate_graph_data(
         pipeline, data, is_data_dataframe, layout, layout_dim, color_variable,
-        node_color_statistic, n_sig_figs, plotly_kwargs
+        summary_statistic, n_sig_figs
 ):
     graph = pipeline.fit_transform(data)
     node_elements = graph["node_metadata"]["node_elements"]
@@ -271,53 +238,41 @@ def _calculate_graph_data(
         node_pos = graph.layout(layout, dim=layout_dim)
 
     # Determine whether node_colors is an array of node colors
-    is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
-    if not (is_node_color_statistic_ndarray or callable(node_color_statistic)):
+    is_node_color_statistic_ndarray = hasattr(summary_statistic, "dtype")
+    if not (is_node_color_statistic_ndarray or callable(summary_statistic)):
         raise ValueError("node_color_statistic must be a callable or ndarray.")
 
     # Compute the raw values of node summary statistics
     if is_node_color_statistic_ndarray:
-        node_summary_statistics = node_color_statistic
+        node_colors = summary_statistic
     else:
-        node_summary_statistics = _get_node_summary_statistics(
-            data, is_data_dataframe, node_elements, node_color_statistic,
+        node_colors = _get_node_summary_statistics(
+            data, is_data_dataframe, node_elements, summary_statistic,
             color_variable
         )
 
-    # # Obtain node colors as the node summary statistics normalised in [0, 1]
-    # node_colors, color_variable_min, color_variable_max = _get_node_colors(
-    #     node_summary_statistics
-    # )
-    node_colors = node_summary_statistics
-
+    # Load defaults for node and edge traces
     plot_options = {
         "node_trace": deepcopy(PLOT_OPTIONS_NODE_TRACE_DEFAULTS),
         "edge_trace": deepcopy(PLOT_OPTIONS_EDGE_TRACE_DEFAULTS)
     }
 
-    # Generate hovertext
-    node_ids = graph["node_metadata"]["node_id"]
-    num_node_elements = map(len, graph["node_metadata"]["node_elements"])
-    node_summary_statistics = map(
-        partial(_round_to_n_sig_figs, n=n_sig_figs), node_summary_statistics
-    )
-    plot_options["node_trace"]["hovertext"] = _get_node_text(
-        node_ids, num_node_elements, node_summary_statistics
-    )
-
+    # Update size and color of nodes
     plot_options["node_trace"]["marker"].update({
         "size": _get_node_size(node_elements),
         "sizeref": set_node_sizeref(node_elements),
-        # "cmin": color_variable_min,
-        # "cmax": color_variable_max
+        "color": node_colors
     })
 
-    colorscale = plot_options["node_trace"]["marker"]["colorscale"]
-    # node_colors = list(map(partial(_convert_to_hex, colorscale), node_colors))
-    plot_options["node_trace"]["marker"]["color"] = node_colors
-
-    # if plotly_kwargs is not None:
-    #     plot_options.update(plotly_kwargs)
+    # Generate hovertext
+    node_ids = graph["node_metadata"]["node_id"]
+    num_node_elements = map(len, graph["node_metadata"]["node_elements"])
+    node_colors_round = map(
+        partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors
+    )
+    plot_options["node_trace"]["hovertext"] = _get_node_text(
+        node_ids, num_node_elements, node_colors_round
+    )
 
     edge_x = list(
         reduce(
@@ -362,9 +317,12 @@ def _calculate_graph_data(
                 ), []
             )
         )
-
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
+    else:
+        raise ValueError("`layout_dim` must be 2 or 3.")
 
-    return edge_trace, node_trace, node_elements, node_colors, \
-        2, 3, colorscale
+    # Record final colorscale
+    colorscale = node_trace.marker.colorscale
+
+    return edge_trace, node_trace, node_elements, node_colors, colorscale

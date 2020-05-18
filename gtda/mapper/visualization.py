@@ -113,10 +113,10 @@ def plot_static_mapper_graph(
 
     (
         edge_trace, node_trace, node_elements, node_colors_color_variable,
-        color_variable_min, color_variable_max, colorscale
+        colorscale
     ) = _calculate_graph_data(
             pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
-            _node_color_statistic, n_sig_figs, plotly_kwargs
+            _node_color_statistic, n_sig_figs
     )
 
     # Define layout options
@@ -132,8 +132,7 @@ def plot_static_mapper_graph(
         hovertext_color_variable = node_trace.hovertext
         column_color_buttons = _get_column_color_buttons(
             data, is_data_dataframe, node_elements, node_colors_color_variable,
-            color_variable_min, color_variable_max, _node_color_statistic,
-            colorscale, hovertext_color_variable, n_sig_figs
+            _node_color_statistic, hovertext_color_variable, n_sig_figs
         )
     else:
         column_color_buttons = None
@@ -321,12 +320,10 @@ def plot_interactive_mapper_graph(
                 is_data_dataframe = hasattr(data, "columns")
                 (
                     edge_trace, node_trace, node_elements,
-                    node_colors_color_variable, color_variable_min,
-                    color_variable_max, colorscale
+                    node_colors_color_variable, colorscale
                 ) = _calculate_graph_data(
                     pipe, data, is_data_dataframe, layout, layout_dim,
-                    color_variable, _node_color_statistic, n_sig_figs,
-                    plotly_kwargs
+                    color_variable, _node_color_statistic, n_sig_figs
                 )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
 
@@ -335,9 +332,7 @@ def plot_interactive_mapper_graph(
                     hovertext_color_variable = node_trace.hovertext
                     column_color_buttons = _get_column_color_buttons(
                         data, is_data_dataframe, node_elements,
-                        node_colors_color_variable, color_variable_min,
-                        color_variable_max, _node_color_statistic,
-                        fig.data[1].marker.colorscale,
+                        node_colors_color_variable, _node_color_statistic,
                         hovertext_color_variable, n_sig_figs
                     )
                 else:
