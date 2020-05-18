@@ -303,7 +303,7 @@ def _calculate_graph_data(
             x=edge_x, y=edge_y, **plot_options["edge_trace"]
         )
 
-    elif layout_dim == 3:
+    else layout_dim == 3:
         node_z = [node_pos[k][2] for k in range(graph.vcount())]
         node_trace = go.Scatter3d(
             x=node_x, y=node_y, z=node_z, **plot_options["node_trace"]
@@ -319,8 +319,6 @@ def _calculate_graph_data(
         )
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
-    else:
-        raise ValueError("`layout_dim` must be 2 or 3.")
 
     # Record final colorscale
     colorscale = node_trace.marker.colorscale
