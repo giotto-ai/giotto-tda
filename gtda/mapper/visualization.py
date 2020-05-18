@@ -425,7 +425,7 @@ def plot_interactive_mapper_graph(
     cluster_params = dict(
         filter(
             lambda x: x[0].startswith("clusterer"),
-               _pipeline.get_mapper_params().items()
+            _pipeline.get_mapper_params().items()
         )
     )
     cluster_params_widgets = dict(
