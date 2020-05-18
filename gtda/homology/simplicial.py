@@ -6,7 +6,7 @@ from types import FunctionType
 
 import numpy as np
 from joblib import Parallel, delayed
-from pyflagser import flagser
+from pyflagser import flagser_weighted
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from sklearn.metrics.pairwise import pairwise_distances
@@ -745,11 +745,14 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     directed : bool, optional, default: ``True``
         If ``True``, :meth:`transform` computes the persistence diagrams of
         filtered directed flag complexes arising from weighted directed
-        graphs. Otherwise, it computes the persistence diagrams of filtered
-        flag complexes arising from weighted undirected graphs. Hence, in
-        the latter case :meth:`transform` computes the same quantity as the
-        ``transform`` method of a :class:`VietorisRipsPersistence` object
-        instantiated with ``metric=precomputed``.
+        graphs. If False, computes the persistence diagrams of undirected
+        filtered flag complexes obtained by considering all weighted edges of
+        each weighted undirected graphs of the input collection as undirected,
+        and it is therefore sufficient (but not necessary) to pass a collection
+        of upper-triangular matrix. When ``False``, in each weighted undirected
+        graphs of the input collection, if two directed edges corresponding to
+        the same undirected edge are assigned different weights, only the one
+        on the upper triangular part of the adjacency matrix is considered.
 
     filtration : string, optional, default: ``'max'``
         Algorithm determining the filtration. Warning: if an edge filtration is
@@ -766,6 +769,17 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
+    max_edge_weight : float, optional, default: ``numpy.inf``
+        Maximum edge weight to be considered in the filtration. All edge
+        weights greater than that value will be considered as
+        infinitely-valued, i.e., absent from the filtration and topological
+        features at scales larger than this value will not be detected.
+
+    infinity_values : float or None, default : ``None``
+        Which death value to assign to features which are still alive at
+        filtration value `max_edge_weight`. ``None`` means that this
+        death value is declared to be equal to `max_edge_weight`.
+
     max_entries : int, optional, default: ``-1``
         Number controlling the degree of precision in the matrix
         reductions performed by the the backend. Corresponds to the parameter
@@ -773,17 +787,6 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         precision, decrease for faster computation. A good value is often
         ``100000`` in hard problems.  A negative value computes highest
         possible precision.
-
-    max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the filtration parameter. Points
-        whose distance is greater than this value will never be connected by
-        an edge, and topological features at scales larger than this value
-        will not be detected.
-
-    infinity_values : float or None, default : ``None``
-        Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this
-        death value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -794,7 +797,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value `max_edge_length`.
+        filtration value `max_edge_weight`.
 
     See also
     --------
@@ -831,29 +834,30 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                 'type': int, 'in': Interval(0, np.inf, closed='left')}},
         'directed': {'type': bool},
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'max_entries': {'type': int},
-        'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))}
+        'max_edge_weight': {'type': Real},
+        'infinity_values': {'type': (Real, type(None))},
+        'max_entries': {'type': int}
     }
 
-    def __init__(self, homology_dimensions=(0, 1), directed=True, coeff=2,
-                 max_entries=-1, max_edge_length=np.inf, infinity_values=None,
-                 n_jobs=None):
+    def __init__(self, homology_dimensions=(0, 1), directed=True,
+                 filtration='max', coeff=2,max_edge_weight=np.inf,
+                 infinity_values=None, max_entries=-1, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.directed = directed
+        self.filtration = filtration
         self.coeff = coeff
-        self.max_entries = max_entries
-        self.max_edge_length = max_edge_length
+        self.max_edge_weight = max_edge_weight
         self.infinity_values = infinity_values
+        self.max_entries = max_entries
         self.n_jobs = n_jobs
 
     def _flagser_diagram(self, X):
-        X[X >= self.max_edge_length] = self.max_edge_length
+        X[X >= self.max_edge_weight] = self.max_edge_weight
 
-        Xdgms = flagser(X, min_dimension=self._min_homology_dimension,
-                        max_dimension=self._max_homology_dimension,
-                        directed=self.directed, coeff=self.coeff,
-                        approximation=self.max_entries)['dgms']
+        Xdgms = flagser_weighted(X, min_dimension=self._min_homology_dimension,
+                                 max_dimension=self._max_homology_dimension,
+                                 directed=self.directed, coeff=self.coeff,
+                                 approximation=self.max_entries)['dgms']
 
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
@@ -873,9 +877,20 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points)
-            Input array. Each entry along axis 0 is the adjacency matrix of a
-            weighted directed or undirected graph.
+        X : ndarray of shape (n_samples, n_points, n_vertices) or list of \
+            n_samples ``scipy.sparse`` matrices of shape (n_vertices, \
+            n_vertices)
+            Input collection. Each entry along axis 0 is the adjacency matrix
+            of a weighted directed or undirected graph. In each of those
+            adjacency matrices, diagonal elements are vertex weights. The way
+            zero values are handled depends on the format of the matrix. If the
+            matrix is a dense ``numpy.ndarray``, zero values denote
+            zero-weighted edges. If the matrix is a sparse ``scipy.sparse``
+            matrix, explicitly stored off-diagonal zeros and all diagonal
+            zeros denote zero-weighted edges. Off-diagonal values that have not
+            been explicitely stored are treated by ``scipy.sparse`` as zeros
+            but will be understood as infinitely-valued edges, i.e., edges
+            absent from the filtration.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -888,10 +903,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_point_clouds(X, distance_matrices=True)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=['n_jobs',
+                                                               'filtration'])
 
         if self.infinity_values is None:
-            self.infinity_values_ = self.max_edge_length
+            self.infinity_values_ = self.max_edge_weight
         else:
             self.infinity_values_ = self.infinity_values
 
@@ -914,9 +930,20 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_points)
-            Input array. Each entry along axis 0 is the adjacency matrix of a
-            weighted directed or undirected graph.
+        X : ndarray of shape (n_samples, n_points, n_vertices) or list of \
+            n_samples ``scipy.sparse`` matrices of shape (n_vertices, \
+            n_vertices)
+            Input collection. Each entry along axis 0 is the adjacency matrix
+            of a weighted directed or undirected graph. In each of those
+            adjacency matrices, diagonal elements are vertex weights. The way
+            zero values are handled depends on the format of the matrix. If the
+            matrix is a dense ``numpy.ndarray``, zero values denote
+            zero-weighted edges. If the matrix is a sparse ``scipy.sparse``
+            matrix, explicitly stored off-diagonal zeros and all diagonal
+            zeros denote zero-weighted edges. Off-diagonal values that have not
+            been explicitely stored are treated by ``scipy.sparse`` as zeros
+            but will be understood as infinitely-valued edges, i.e., edges
+            absent from the filtration.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
