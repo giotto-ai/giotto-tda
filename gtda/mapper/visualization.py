@@ -104,7 +104,7 @@ def plot_static_mapper_graph(
     """
 
     # Compute the graph and fetch the indices of points in each node
-    pipe = clone(pipeline) if clone_pipeline else pipeline
+    _pipeline = clone(pipeline) if clone_pipeline else pipeline
 
     _node_color_statistic = node_color_statistic or np.mean
 
@@ -115,8 +115,8 @@ def plot_static_mapper_graph(
         edge_trace, node_trace, node_elements, node_colors_color_variable,
         colorscale
     ) = _calculate_graph_data(
-            pipe, data, is_data_dataframe, layout, layout_dim, color_variable,
-            _node_color_statistic, n_sig_figs
+            _pipeline, data, is_data_dataframe, layout, layout_dim,
+            color_variable, _node_color_statistic, n_sig_figs
     )
 
     # Define layout options
@@ -251,8 +251,8 @@ def plot_interactive_mapper_graph(
 
     """
 
-    # clone pipeline to avoid side effects from in-place parameter changes
-    pipe = clone(pipeline)
+    # Clone pipeline to avoid side effects from in-place parameter changes
+    _pipeline = clone(pipeline)
 
     _node_color_statistic = node_color_statistic or np.mean
 
@@ -306,12 +306,12 @@ def plot_interactive_mapper_graph(
         try:
             for param, value in cover_params.items():
                 if isinstance(value, (int, float, str)):
-                    pipe.set_params(
+                    _pipeline.set_params(
                         **{param: cover_params_widgets[param].value}
                     )
             for param, value in cluster_params.items():
                 if isinstance(value, (int, float, str)):
-                    pipe.set_params(
+                    _pipeline.set_params(
                         **{param: cluster_params_widgets[param].value}
                     )
 
@@ -322,7 +322,7 @@ def plot_interactive_mapper_graph(
                     edge_trace, node_trace, node_elements,
                     node_colors_color_variable, colorscale
                 ) = _calculate_graph_data(
-                    pipe, data, is_data_dataframe, layout, layout_dim,
+                    _pipeline, data, is_data_dataframe, layout, layout_dim,
                     color_variable, _node_color_statistic, n_sig_figs
                 )
                 update_figure(fig, edge_trace, node_trace, layout_dim)
@@ -387,7 +387,7 @@ def plot_interactive_mapper_graph(
     cover_params = dict(
         filter(
             lambda x: x[0].startswith("cover"),
-            pipe.get_mapper_params().items()
+            _pipeline.get_mapper_params().items()
         )
     )
     cover_params_widgets = dict(
@@ -401,7 +401,7 @@ def plot_interactive_mapper_graph(
     cluster_params = dict(
         filter(
             lambda x: x[0].startswith("clusterer"),
-               pipe.get_mapper_params().items()
+               _pipeline.get_mapper_params().items()
         )
     )
     cluster_params_widgets = dict(
@@ -429,11 +429,12 @@ def plot_interactive_mapper_graph(
 
     # initialise figure with initial pipeline and config
     fig = plot_static_mapper_graph(
-        pipe, data, layout=layout, layout_dim=layout_dim,
+        _pipeline, data, layout=layout, layout_dim=layout_dim,
         color_variable=color_variable,
         node_color_statistic=_node_color_statistic,
-        color_by_columns_dropdown=False, clone_pipeline=True,
-        n_sig_figs=n_sig_figs, plotly_kwargs=plotly_kwargs
+        color_by_columns_dropdown=color_by_columns_dropdown,
+        clone_pipeline=False, n_sig_figs=n_sig_figs,
+        plotly_kwargs=plotly_kwargs
     )
 
     observe_widgets(cover_params, cover_params_widgets)
