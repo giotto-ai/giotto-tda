@@ -7,12 +7,14 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
 
+from ..base import PlotterMixin
+from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import check_graph
 
 
 @adapt_fit_transform_docs
-class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
+class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
     """Distance matrices arising from geodesic distances on graphs.
 
     For each (possibly weighted and/or directed) graph in a collection, this
@@ -119,6 +121,26 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin):
         X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._geodesic_distance)(X[i]) for i in range(X.shape[0]))
+            delayed(self._geodesic_distance)(x) for x in X)
         Xt = np.array(Xt)
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='blues'):
+        """Plot a sample from a collection of distance matrices.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_points, n_points)
+            Collection of distance matrices, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample to be plotted.
+
+        colorscale : str, optional, default: ``'blues'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        """
+        return plot_heatmap(Xt[sample], colorscale=colorscale)

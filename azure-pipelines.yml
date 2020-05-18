@@ -1,5 +1,11 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+trigger:
+- master
+
+pr:
+- master
+
 jobs:
 
 - job: 'manylinux2010'
@@ -32,7 +38,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.11" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -87,7 +93,7 @@ jobs:
     displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+      artifactName: 'wheel'
 
   - bash: |
       set -e
@@ -127,7 +133,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.11" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.04.07" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -148,7 +154,7 @@ jobs:
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+    displayName: 'Test dev install with pytest, upload coverage report'
 
   - script: |
       set -e
@@ -188,37 +194,26 @@ jobs:
       done
     displayName: 'Test jupyter notebooks with papermill'
 
-  - script: |
-      set -e
-      cd doc/
-      make html
-    displayName: 'Build sphinx doc'
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: doc/build
-      includeRootFolder: true
-      archiveType: 'zip'
-      tarCompression: 'gz'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      replaceExistingArchive: true
-    displayName: 'Archive doc'
-
   - task: CopyFiles@2
     displayName: 'Copy files'
     inputs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
+  - script: |
+      set -e
+      pip install twine
+      twine check dist/*
+    displayName: 'Check distribution with twine'
+
   - task: PublishBuildArtifacts@1
     displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+      artifactName: 'wheel'
 
   - bash: |
       set -e
-      pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables['nightly_check'], 'true')
     displayName: 'Upload nightly wheels to PyPI'
@@ -252,12 +247,16 @@ jobs:
     displayName: 'Change name to giotto-tda-nightly'
 
   - script: |
+      python .azure-ci/install_boost.py || exit /b
+    displayName: 'Install boost'
+
+  - script: |
       python -m pip install --upgrade pip setuptools
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml || exit /b
+      pytest gtda --no-cov --no-coverage-upload || exit /b
     displayName: 'Test dev install with pytest'
 
   - script: |
@@ -299,7 +298,7 @@ jobs:
     displayName: 'Create download link'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+      artifactName: 'wheel'
 
   - bash: |
       set -e

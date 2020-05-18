@@ -1,6 +1,6 @@
 <!--
 Thanks for contributing a pull request! Please ensure you have taken a look at
-the guidelines for contributing: https://giotto-ai.github.io/gtda-docs/dev/contributing/#guidelines
+the guidelines for contributing: https://giotto-ai.github.io/gtda-docs/latest/contributing/#guidelines
 -->
 
 **Reference issues/PRs**
@@ -37,7 +37,7 @@ Describe your changes in detail.
 Go over all the following points, and put an `x` in all the boxes that apply. 
 If you're unsure about any of these, don't hesitate to ask. We're here to help!
 -->
-- [ ] I have read the [guidelines for contributing](https://giotto-ai.github.io/gtda-docs/dev/contributing/#guidelines).
+- [ ] I have read the [guidelines for contributing](https://giotto-ai.github.io/gtda-docs/latest/contributing/#guidelines).
 - [ ] My code follows the code style of this project. I used `flake8` to check my Python changes.
 - [ ] My change requires a change to the documentation.
 - [ ] I have updated the documentation accordingly.

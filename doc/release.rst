@@ -1,0 +1,385 @@
+
+#############
+Release Notes
+#############
+
+.. _stable:
+
+*************
+Release 0.2.1
+*************
+
+Major Features and Improvements
+===============================
+
+-  The theory glossary has been improved to include the notions of vectorization, kernel and amplitude for persistence diagrams.
+-  The ``ripser`` function in ``gtda.externals.python.ripser_interface`` no longer uses scikit-learn's ``pairwise_distances`` when
+   ``metric`` is ``'precomputed'``, thus allowing square arrays with negative entries or infinities to be passed.
+-  ``check_point_clouds`` in ``gtda.utils.validation`` now checks for square array input when the input should be a collection of
+   distance-type matrices. Warnings guide the user to correctly setting the ``distance_matrices`` parameter. ``force_all_finite=False``
+   no longer means accepting NaN input (only infinite input is accepted).
+-  ``VietorisRipsPersistence`` in ``gtda.homology.simplicial`` no longer masks out infinite entries in the input to be fed to
+   ``ripser``.
+-  The docstrings for ``check_point_clouds`` and ``VietorisRipsPersistence`` have been improved to reflect these changes and the
+   extra level of generality for ``ripser``.
+
+Bug Fixes
+=========
+
+-  The variable used to indicate the location of Boost headers has been renamed from ``Boost_INCLUDE_DIR`` to ``Boost_INCLUDE_DIRS``
+   to address developer installation issues in some Linux systems.
+
+Backwards-Incompatible Changes
+==============================
+
+-  The keyword parameter ``distance_matrix`` in ``check_point_clouds`` has been renamed to ``distance_matrices``.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Anibal Medina-Mardones, Julian Burella Pérez, Guillaume Tauzin, and Wojciech Reise.
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of
+inspiring discussions.
+
+*************
+Release 0.2.0
+*************
+
+Major Features and Improvements
+===============================
+
+This is a major release which substantially broadens the scope of ``giotto-tda`` and introduces several improvements.
+The library's documentation has been greatly improved and is now hosted `via GitHub pages <https://giotto-ai.github.io/gtda-docs/>`_.
+It includes rendered jupyter notebooks from the repository's ``examples`` folder, as well as an improved theory glossary,
+more detailed installation instructions, improved guidelines for contributing, and an FAQ.
+
+Plotting functions and plotting API
+-----------------------------------
+
+This version introduces built-in plotting capabilities to ``giotto-tda``. These come in the form of:
+
+-  a new ``plotting`` subpackage populated with plotting functions for common data structures;
+-  a new ``PlotterMixin`` and a class-level plotting API based on newly introduced ``plot``, ``transform_plot`` and
+   ``fit_transform_plot`` methods which are now available in several of ``giotto-tda``'s transformers.
+
+Changes and additions to ``gtda.homology``
+------------------------------------------
+
+The internal structure of this subpackage has been changed. ``ConsistentRescaling`` has been moved to a new ``point_clouds``
+subpackage (see below), and ``gtda.homology`` no longer contains a ``point_clouds`` submodule. Instead, it contains two
+submodules, ``simplicial`` and ``cubical``. ``simplicial`` contains the ``VietorisRipsPersistence`` class as well as the
+following new classes:
+
+-  ``SparseRipsPersistence``,
+-  ``EuclideanCechPersistence``.
+
+The ``cubical`` submodule contains ``CubicalPersistence``, a new class for computing persistent homology of filtered cubical
+complexes such as those coming from 2D or 3D greyscale images.
+
+New ``images`` subpackage
+-------------------------
+
+The new ``gtda.images`` subpackage contains classes which, together with ``gtda.homology.CubicalPersistence``, extend
+the capabilities of ``giotto-tda`` to computer vision, by handling input representing binary or greyscale 2D/3D images
+represented as arrays.
+
+The classes in ``gtda.images.filtrations`` are responsible for converting binary image input into greyscale images in a
+variety of ways. The greyscale output can then be fed to ``gtda.homology.CubicalPersistence`` to extract topological
+signatures in the form of persistence diagrams. These classes are:
+
+-  ``HeightFiltration``,
+-  ``RadialFiltration``,
+-  ``DilationFiltration``,
+-  ``ErosionFiltration``,
+-  ``SignedDistanceFiltration``.
+
+The classes in ``gtda.images.preprocessing`` perform a variety of preprocessing steps on either binary or greyscale image
+input, as well as conversion to point cloud format. They are:
+
+-  ``Binarizer``,
+-  ``Inverter``,
+-  ``Padder``,
+-  ``ImageToPointCloud``.
+
+New ``point_clouds`` subpackage
+-------------------------------
+
+``ConsistentRescaling`` is no longer placed in ``gtda.homology``. Instead, it is now in a ``point_clouds`` subpackage
+containing classes which process or modify the geometry of point cloud data. ``gtda.point_clouds`` also contains the new
+class ``ConsecutiveRescaling``, written with time series applications in mind.
+
+List of point cloud input
+-------------------------
+
+All classes in the ``homology`` subpackage (``VietorisRipsPersistence``, ``SparseRipsPersistence``, and ``EuclideanCechPersistence``)
+can now take as inputs to the ``fit`` and ``transform`` methods lists of 2D arrays instead of simply 3D arrays. In this
+way, collections of point clouds with varying numbers of points can be processed.
+
+Changes and additions to ``gtda.diagrams``
+------------------------------------------
+
+The ``diagrams`` subpackage contains the following new classes:
+
+-  ``PersistenceImage``
+-  ``Silhouette``
+
+Additionally, the subpackage has been reorganised as follows:
+
+-  The ``features`` submodule now only contains the *scalar* feature generation classes ``Amplitude`` (moved there from
+   ``distance``) and ``PersistenceEntropy``.
+-  Classes which produce *vector* representations from persistence diagrams have been moved to the new ``representations``
+   submodule.
+
+Changes and additions to ``gtda.utils``
+---------------------------------------
+
+-  ``validate_params`` has been thoroughly refactored, documented and exposed for the benefit of developers.
+-  ``check_diagrams`` has been modified, documented and exposed for the benefit of developers.
+-  The new ``check_point_clouds`` performs validation of inputs consisting of collections of point clouds of distance
+   matrices. It accepts both lists of 2D ndarrays and 3D ndarrays, and is used in the ``fit`` and ``transform``
+   methods of classes in ``gtda.homology.simplicial`` to allow for list input (see above).
+
+External modules and HPC improvements
+-------------------------------------
+
+A substantial effort has been put in improving the quality of the high-performance components contained in ``gtda.externals``.
+The end result is a cleaner packaging as well as faster execution of C++ functions due to improved bindings. In particular:
+
+-  Two binaries are now shipped for ``ripser``, one of them being optimised for calculations with mod 2 coefficients.
+-  Recent improvements by the authors of the ``hera`` C++ library have been integrated in ``giotto-tda``.
+-  Compiler optimisations for Windows-based systems have been added.
+-  The integration of ``pybind11`` has been improved and several issues arising with ``CMake`` and ``boost`` during
+   developer installations have been addressed.
+
+Bug Fixes
+=========
+
+-  Fixed a bug with ``TakensEmbedding``'s algorithm for search of optimal parameters.
+-  Inconsistencies in between the meaning of "bottleneck amplitude" in the theory and in the code have been ironed out.
+   The code has been modified to agree with the theory glossary. The outputs of the ``gtda.diagrams`` classes
+   ``Amplitude``, ``Scaler`` and ``Filtering`` is affected.
+-  Fixed bugs affecting color normalization in Mapper graph plots.
+
+Backwards-Incompatible Changes
+==============================
+
+-  Python 3.5 is no longer supported.
+-  Mac OS X versions below 10.14 are no longer supported by the wheels shipped via PyPI.
+-  ``ConsistentRescaling`` is no longer found in ``gtda.homology`` and is now part of ``gtda.point_clouds``.
+-  The outputs of the ``gtda.diagrams`` classes ``Amplitude``, ``Scaler`` and ``Filtering`` have changed due to sqrt(2)
+   factors (see Bug Fixes).
+-  The ``meta_transformers`` module has been removed.
+-  The ``plotting`` module has been removed from the ``examples`` folder of the repository.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Guillaume Tauzin, Wojciech Reise, Julian Burella Pérez, Roman Yurchak, Lewis Tunstall, Anibal Medina-Mardones, and Adélie Garin.
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of
+inspiring discussions.
+
+*************
+Release 0.1.4
+*************
+
+Library name change
+===================
+The library and GitHub repository have been renamed to ``giotto-tda``! While the
+new name is meant to better convey the library's focus on Topology-powered
+machine learning and Data Analysis, the commitment to seamless integration with
+``scikit-learn`` will remain just as strong and a defining feature of the project.
+Concurrently, the main module has been renamed from ``giotto`` to ``gtda`` in this
+version. ``giotto-learn`` will remain on PyPI as a legacy package (stuck at v0.1.3)
+until we have ensured that users and developers have fully migrated. The new PyPI
+package ``giotto-tda`` will start at v0.1.4 for project continuity.
+
+Short summary: install via ::
+
+    pip install -U giotto-tda
+
+and ``import gtda`` in your scripts or notebooks!
+
+Change of license
+=================
+
+The license changes from Apache 2.0 to GNU AGPLv3 from this release on.
+
+Major Features and Improvements
+===============================
+-  Added a ``mapper`` submodule implementing the Mapper algorithm of Singh, Mémoli and Carlsson. The main tools are the
+   functions ``make_mapper_pipeline``, ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph``. The first
+   creates an object of class ``MapperPipeline`` which can be fit-transformed to data to create a Mapper graph in the
+   form of an ``igraph.Graph`` object (see below). The ``MapperPipeline`` class itself is a simple subclass
+   of scikit-learn's ``Pipeline`` which is adapted to the precise structure of the Mapper algorithm, so that a
+   ``MapperPipeline`` object can be used as part of even larger scikit-learn pipelines, inside a meta-estimator, in a
+   grid search, etc. One also has access to other important features of scikit-learn's ``Pipeline``, such as memory
+   caching to avoid unnecessary recomputation of early steps when parameters involved in later steps are changed.
+   The clustering step can be parallelised over the pullback cover sets via ``joblib`` -- though this can actually
+   *lower* performance in small- and medium-size datasets. A range of pre-defined filter functions are also included,
+   as well as covers in one and several dimensions, agglomerative clustering algorithms based on stopping rules to
+   create flat cuts, and utilities for making transformers out of callables or out of other classes which have no
+   ``transform`` method. ``plot_static_mapper_graph`` allows the user to visualise (in 2D or 3D) the Mapper graph
+   arising from fit-transforming a ``MapperPipeline`` to data, and offers a range of colouring options to correlate the
+   graph's structure with exogenous or endogenous information. It relies on ``plotly`` for plotting and displaying
+   metadata. ``plot_interactive_mapper_graph`` adds interactivity to this, via ``ipywidgets``: specifically, the user
+   can fine-tune some parameters involved in the definition of the Mapper pipeline, and observe in real time how the
+   structure of the graph changes as a result. In this release, all hyperparameters involved in the covering and
+   clustering steps are supported. The ability to fine-tune other hyperparameters will be considered for future versions.
+-  Added support for Python 3.8.
+
+Bug Fixes
+=========
+-  Fixed consistently incorrect documentation for the ``fit_transform`` methods. This has been achieved by introducing a
+   class decorator ``adapt_fit_transform_docs`` which is defined in the newly introduced ``gtda.utils._docs.py``.
+
+Backwards-Incompatible Changes
+==============================
+-  The library name change and the change in the name of the main module ``giotto``
+   are important major changes.
+-  There are now additional dependencies in the ``python-igraph``, ``matplotlib``, ``plotly``, and ``ipywidgets`` libraries.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Lewis Tunstall, Guillaume Tauzin, Philipp Weiler, Julian Burella Pérez.
+
+We are also grateful to all who filed issues or helped resolve them, asked and
+answered questions, and were part of inspiring discussions.
+
+*************
+Release 0.1.3
+*************
+
+Major Features and Improvements
+===============================
+None
+
+Bug Fixes
+=========
+-  Fixed a bug in ``diagrams.Amplitude`` causing the transformed array to be wrongly filled and added adequate test.
+
+Backwards-Incompatible Changes
+==============================
+None.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo.
+
+We are also grateful to all who filed issues or helped resolve them, asked and
+answered questions, and were part of inspiring discussions.
+
+
+Release 0.1.2
+*************
+
+Major Features and Improvements
+===============================
+-  Added support for Python 3.5.
+
+Bug Fixes
+=========
+None.
+
+Backwards-Incompatible Changes
+==============================
+None.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Matteo Caorsi, Henry Tom (@henrytomsf), Guillaume Tauzin.
+
+We are also grateful to all who filed issues or helped resolve them, asked and
+answered questions, and were part of inspiring discussions.
+
+*************
+Release 0.1.1
+*************
+
+Major Features and Improvements
+===============================
+-  Improved documentation.
+-  Improved features of class ``Labeller``.
+-  Improved features of class ``PearsonDissimilarities``.
+-  Improved GitHub files.
+-  Improved CI.
+
+Bug Fixes
+=========
+Fixed minor bugs from the first release.
+
+Backwards-Incompatible Changes
+==============================
+The following class were renamed:
+-  class ``PearsonCorrelation`` was renamed to class ``PearsonDissimilarities``
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Guillaume Tauzin, Matteo Caorsi, Olivier Morel.
+
+We are also grateful to all who filed issues or helped resolve them, asked and
+answered questions, and were part of inspiring discussions.
+
+*************
+Release 0.1.0
+*************
+
+Major Features and Improvements
+===============================
+
+The following submodules where added:
+
+-  ``giotto.homology`` implements transformers to modify metric spaces or generate persistence diagrams.
+-  ``giotto.diagrams`` implements transformers to preprocess persistence diagrams or extract features from them.
+-  ``giotto.time_series`` implements transformers to preprocess time series or embed them in a higher dimensional space for persistent homology.
+-  ``giotto.graphs`` implements transformers to create graphs or extract metric spaces from graphs.
+-  ``giotto.meta_transformers`` implements convenience ``giotto.Pipeline`` transformers for direct topological feature generation.
+-  ``giotto.utils`` implements hyperparameters and input validation functions.
+-  ``giotto.base`` implements a ``TransformerResamplerMixin`` for transformers that have a resample method.
+-  ``giotto.pipeline`` extends scikit-learn's module by defining Pipelines that include ``TransformerResamplers``.
+
+
+Bug Fixes
+=========
+None
+
+Backwards-Incompatible Changes
+==============================
+None
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Guillaume Tauzin, Umberto Lupo, Philippe Nguyen, Matteo Caorsi, Julian Burella Pérez, Alessio Ghiraldello.
+
+We are also grateful to all who filed issues or helped resolve them, asked and
+answered questions, and were part of inspiring discussions. In particular, we would like
+to thank `Martino Milani <https://github.com/MartMilani/reportPACS>`_, who worked on an early
+prototype of a Mapper implementation; although very different from the current one, it
+adopted an early form of caching to avoid recomputation in refitting, which was an inspiration
+for this implementation.
+
+**************
+Release 0.1a.0
+**************
+
+Initial release of the library, original named ``giotto-learn``.
