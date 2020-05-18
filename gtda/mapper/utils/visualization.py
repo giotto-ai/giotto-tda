@@ -7,8 +7,6 @@ from functools import reduce, partial
 
 import numpy as np
 import plotly.graph_objs as go
-from matplotlib.cm import get_cmap
-from matplotlib.colors import rgb2hex
 
 PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
     "mode": "markers",
@@ -130,8 +128,8 @@ def _get_column_color_buttons(
         {
             "args": [{
                 "marker.color": [node_colors_color_variable],
-                "marker.cmin": [color_variable_min],
-                "marker.cmax": [color_variable_max],
+                # "marker.cmin": [color_variable_min],
+                # "marker.cmax": [color_variable_max],
                 "hoverlabel.bgcolor": [node_colors_color_variable],
                 "hovertext": [hovertext_color_variable]
             }],
@@ -152,18 +150,20 @@ def _get_column_color_buttons(
             replace_summary_statistic, hovertext_color_variable,
             node_summary_statistics
         ))
-        node_colors, min_node_summary, max_node_summary = \
-            _get_node_colors(node_summary_statistics)
-        node_colors = list(
-            map(partial(_convert_to_hex, colorscale), node_colors)
-        )
+        # node_colors, min_node_summary, max_node_summary = \
+        #     _get_node_colors(node_summary_statistics)
+        # node_colors = list(
+        #     map(partial(_convert_to_hex, colorscale), node_colors)
+        # )
+        node_colors = node_summary_statistics
+
 
         column_color_buttons.append(
             {
                 "args": [{
                     "marker.color": [node_colors],
-                    "marker.cmin": [min_node_summary],
-                    "marker.cmax": [max_node_summary],
+                    # "marker.cmin": [min_node_summary],
+                    # "marker.cmax": [max_node_summary],
                     "hoverlabel.bgcolor": [node_colors],
                     "hovertext": [hovertext]
                 }],
@@ -226,25 +226,25 @@ def _get_node_summary_statistics(
     return _get_node_summary(color_data, node_elements, node_color_statistic)
 
 
-def _get_node_colors(node_summary_statistics):
-    """Calculate node color values in the range [0, 1] from raw node summary
-    statistics by performing a min-max scaling."""
-    # Check if node_summary_statistics contains NaNs
-    if any(np.logical_not(np.isfinite(node_summary_statistics))):
-        from warnings import warn
-        warn("NaN values detected among the node summary statistics! These "
-             "values will be ignored in the color scale", RuntimeWarning)
+# def _get_node_colors(node_summary_statistics):
+#     """Calculate node color values in the range [0, 1] from raw node summary
+#     statistics by performing a min-max scaling."""
+#     # Check if node_summary_statistics contains NaNs
+#     if any(np.logical_not(np.isfinite(node_summary_statistics))):
+#         from warnings import warn
+#         warn("NaN values detected among the node summary statistics! These "
+#              "values will be ignored in the color scale", RuntimeWarning)
+#
+#     # Normalise in range [0, 1]
+#     nanmin = np.nanmin(node_summary_statistics)
+#     nanmax = np.nanmax(node_summary_statistics)
+#     return (node_summary_statistics - nanmin) / (nanmax - nanmin), nanmin, \
+#         nanmax
 
-    # Normalise in range [0, 1]
-    nanmin = np.nanmin(node_summary_statistics)
-    nanmax = np.nanmax(node_summary_statistics)
-    return (node_summary_statistics - nanmin) / (nanmax - nanmin), nanmin, \
-        nanmax
 
-
-def _convert_to_hex(colormap, x):
-    """Convert float `x` to hex values according to `colormap`"""
-    return rgb2hex(get_cmap(colormap)(x))
+# def _convert_to_hex(colormap, x):
+#     """Convert float `x` to hex values according to `colormap`"""
+#     return rgb2hex(get_cmap(colormap)(x))
 
 
 def _calculate_graph_data(
@@ -284,10 +284,11 @@ def _calculate_graph_data(
             color_variable
         )
 
-    # Obtain node colors as the node summary statistics normalised in [0, 1]
-    node_colors, color_variable_min, color_variable_max = _get_node_colors(
-        node_summary_statistics
-    )
+    # # Obtain node colors as the node summary statistics normalised in [0, 1]
+    # node_colors, color_variable_min, color_variable_max = _get_node_colors(
+    #     node_summary_statistics
+    # )
+    node_colors = node_summary_statistics
 
     plot_options = {
         "node_trace": deepcopy(PLOT_OPTIONS_NODE_TRACE_DEFAULTS),
@@ -307,12 +308,12 @@ def _calculate_graph_data(
     plot_options["node_trace"]["marker"].update({
         "size": _get_node_size(node_elements),
         "sizeref": set_node_sizeref(node_elements),
-        "cmin": color_variable_min,
-        "cmax": color_variable_max
+        # "cmin": color_variable_min,
+        # "cmax": color_variable_max
     })
 
     colorscale = plot_options["node_trace"]["marker"]["colorscale"]
-    node_colors = list(map(partial(_convert_to_hex, colorscale), node_colors))
+    # node_colors = list(map(partial(_convert_to_hex, colorscale), node_colors))
     plot_options["node_trace"]["marker"]["color"] = node_colors
 
     # if plotly_kwargs is not None:
@@ -366,4 +367,4 @@ def _calculate_graph_data(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
     return edge_trace, node_trace, node_elements, node_colors, \
-        color_variable_min, color_variable_max, colorscale
+        2, 3, colorscale
