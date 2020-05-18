@@ -52,11 +52,11 @@ class TestStaticPlot(TestCaseNoTemplate):
         fig = plot_static_mapper_graph(pipe, X,
                                        color_variable=colors,
                                        clone_pipeline=False)
-        xy = np.stack([fig.get_state()['_data'][0][c]
+        xy = np.stack([fig.get_state()['_data'][1][c]
                        for c in ['x', 'y']]).transpose()
         assert X.shape >= xy.shape
 
-        real_colors = fig.get_state()['_data'][0]['marker']['color']
+        real_colors = fig.get_state()['_data'][1]['marker']['color']
         assert len(real_colors) == xy.shape[0]
 
 
@@ -86,7 +86,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
 
         node_sizes_vis = [self._get_size_from_hovertext(s_)
                           for s_ in w_scatter.get_state()
-                          ['_data'][0]['hovertext']]
+                          ['_data'][1]['hovertext']]
 
         g = pipe.fit_transform(X)
         node_size_real = [len(node)
