@@ -126,9 +126,8 @@ def _get_column_color_buttons(
     column_color_buttons = [
         {
             "args": [{
-                "marker.color": [node_colors_color_variable],
-                "hoverlabel.bgcolor": [node_colors_color_variable],
-                "hovertext": [hovertext_color_variable]
+                "marker.color": [None, node_colors_color_variable],
+                "hovertext": [None, hovertext_color_variable]
             }],
             "label": "color_variable",
             "method": "restyle"
@@ -152,9 +151,8 @@ def _get_column_color_buttons(
         column_color_buttons.append(
             {
                 "args": [{
-                    "marker.color": [node_colors],
-                    "hoverlabel.bgcolor": [node_colors],
-                    "hovertext": [hovertext]
+                    "marker.color": [None, node_colors],
+                    "hovertext": [None, hovertext]
                 }],
                 "label": f"Column {column}",
                 "method": "restyle"
