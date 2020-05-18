@@ -384,16 +384,34 @@ def plot_interactive_mapper_graph(
     logger.setLevel(logging.INFO)
 
     # initialise cover and cluster dictionaries of parameters and widgets
-    cover_params = dict(filter(lambda x: x[0].startswith("cover"),
-                               pipe.get_mapper_params().items()))
+    cover_params = dict(
+        filter(
+            lambda x: x[0].startswith("cover"),
+            pipe.get_mapper_params().items()
+        )
+    )
     cover_params_widgets = dict(
-        filter(None, map(lambda x: get_widgets_per_param(*x),
-                         cover_params.items())))
-    cluster_params = dict(filter(lambda x: x[0].startswith("clusterer"),
-                                 pipe.get_mapper_params().items()))
+        filter(
+            None, map(
+                lambda x: get_widgets_per_param(*x),
+                cover_params.items()
+            )
+        )
+    )
+    cluster_params = dict(
+        filter(
+            lambda x: x[0].startswith("clusterer"),
+               pipe.get_mapper_params().items()
+        )
+    )
     cluster_params_widgets = dict(
-        filter(None, map(lambda x: get_widgets_per_param(*x),
-                         cluster_params.items())))
+        filter(
+            None, map(
+                lambda x: get_widgets_per_param(*x),
+                cluster_params.items()
+            )
+        )
+    )
 
     # initialise widgets for validating input parameters of pipeline
     valid = widgets.Valid(
@@ -410,9 +428,6 @@ def plot_interactive_mapper_graph(
     )
 
     # initialise figure with initial pipeline and config
-    if plotly_kwargs is None:
-        plotly_kwargs = dict()
-
     fig = plot_static_mapper_graph(
         pipe, data, layout=layout, layout_dim=layout_dim,
         color_variable=color_variable,
