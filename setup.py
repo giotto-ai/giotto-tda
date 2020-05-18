@@ -67,7 +67,8 @@ EXTRAS_REQUIRE = {
     'examples': [
         'jupyter',
         'pandas',
-        'openml']
+        'openml',
+        'matplotlib']
 }
 
 
