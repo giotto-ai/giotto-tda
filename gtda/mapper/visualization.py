@@ -21,7 +21,7 @@ def plot_static_mapper_graph(
         pipeline, data, layout="kamada_kawai", layout_dim=2,
         color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, clone_pipeline=True, n_sig_figs=3,
-        plotly_kwargs=None
+        plotly_params=None
 ):
     """Plotting function for static Mapper graphs.
 
@@ -86,8 +86,8 @@ def plot_static_mapper_graph(
        If not ``None``, number of significant figures to which to round node
        node summary statistics. If ``None``, no rounding is performed.
 
-    plotly_kwargs : dict or None, optional, default: ``None``
-        Keyword arguments to configure the plotly figure.
+    plotly_params : dict or None, optional, default: ``None``
+        Custom parameters to configure the plotly figure.
 
     Returns
     -------
@@ -171,7 +171,7 @@ def plot_static_mapper_graph(
 def plot_interactive_mapper_graph(
         pipeline, data, layout="kamada_kawai", layout_dim=2,
         color_variable=None, node_color_statistic=None,
-        color_by_columns_dropdown=False, n_sig_figs=3, plotly_kwargs=None
+        color_by_columns_dropdown=False, n_sig_figs=3, plotly_params=None
 ):
     """Plotting function for interactive Mapper graphs.
 
@@ -233,8 +233,8 @@ def plot_interactive_mapper_graph(
        If not ``None``, number of significant figures to which to round node
        node summary statistics. If ``None``, no rounding is performed.
 
-    plotly_kwargs : dict or None, optional, default: ``None``
-        Keyword arguments to configure the plotly figure.
+    plotly_params : dict or None, optional, default: ``None``
+        Custom parameters to configure the plotly figure.
 
     Returns
     -------
@@ -434,7 +434,7 @@ def plot_interactive_mapper_graph(
         node_color_statistic=_node_color_statistic,
         color_by_columns_dropdown=color_by_columns_dropdown,
         clone_pipeline=False, n_sig_figs=n_sig_figs,
-        plotly_kwargs=plotly_kwargs
+        plotly_params=plotly_params
     )
 
     observe_widgets(cover_params, cover_params_widgets)
