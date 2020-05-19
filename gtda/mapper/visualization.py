@@ -344,7 +344,7 @@ def plot_interactive_mapper_graph(
                 is_data_dataframe = hasattr(data, "columns")
                 (
                     edge_trace, node_trace, node_elements,
-                    node_colors_color_variable, colorscale
+                    node_colors_color_variable
                 ) = _calculate_graph_data(
                     _pipeline, data, is_data_dataframe, layout, layout_dim,
                     color_variable, _node_color_statistic, n_sig_figs
