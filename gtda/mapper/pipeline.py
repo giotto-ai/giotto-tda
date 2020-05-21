@@ -217,8 +217,8 @@ def make_mapper_pipeline(scaler=None,
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
         Used to cache the fitted transformers which make up the pipeline. This
-        is advantageous when fitting of early steps is time consuming and only
-        later steps in the pipeline are modified (e.g. using
+        is advantageous when the fitting of early steps is time consuming and
+        only later steps in the pipeline are modified (e.g. using
         :meth:`set_params`) before refitting on the same data. To be used
         used exactly as for :func:`sklearn.pipeline.make_pipeline`. By default,
         no caching is performed. If a string is given, it is the path to the
