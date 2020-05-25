@@ -70,9 +70,9 @@ PLOT_OPTIONS_LAYOUT_DEFAULTS = {
 }
 
 
-def set_node_sizeref(node_elements, node_scale=12):
+def _set_node_sizeref(node_sizes, node_scale=12):
     # Formula from Plotly https://plot.ly/python/bubble-charts/
-    return 2. * max(_get_node_size(node_elements)) / (node_scale ** 2)
+    return 2. * max(node_sizes) / (node_scale ** 2)
 
 
 def _round_to_n_sig_figs(x, n=3):
@@ -102,7 +102,7 @@ def _get_node_text(
 
 
 def _get_node_summary(data, node_elements, summary_statistic):
-    return list(map(summary_statistic, [data[itr] for itr in node_elements]))
+    return list(map(summary_statistic, (data[itr] for itr in node_elements)))
 
 
 def _get_column_color_buttons(
@@ -215,7 +215,7 @@ def _get_node_summary_statistics(
 
 def _calculate_graph_data(
         pipeline, data, is_data_dataframe, layout, layout_dim, color_variable,
-        node_color_statistic, n_sig_figs
+        node_color_statistic, n_sig_figs, node_scale
 ):
     graph = pipeline.fit_transform(data)
     node_elements = graph["node_metadata"]["node_elements"]
@@ -243,9 +243,10 @@ def _calculate_graph_data(
     }
 
     # Update size and color of nodes
+    node_sizes = _get_node_size(node_elements)
     plot_options["node_trace"]["marker"].update({
-        "size": _get_node_size(node_elements),
-        "sizeref": set_node_sizeref(node_elements),
+        "size": node_sizes,
+        "sizeref": _set_node_sizeref(node_sizes, node_scale=node_scale),
         "color": node_colors_color_variable
     })
 

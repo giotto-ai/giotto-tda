@@ -21,7 +21,7 @@ def plot_static_mapper_graph(
         pipeline, data, layout="kamada_kawai", layout_dim=2,
         color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, clone_pipeline=True, n_sig_figs=3,
-        plotly_params=None
+        node_scale=12, plotly_params=None
 ):
     """Plotting function for static Mapper graphs.
 
@@ -86,6 +86,12 @@ def plot_static_mapper_graph(
        If not ``None``, number of significant figures to which to round node
        node summary statistics. If ``None``, no rounding is performed.
 
+    node_scale : int or float, optional, default: ``12``
+        Sets the scale factor used to determine the rendered size of the
+        nodes. Increase for larger nodes. Implements a formula in the
+        `Plotly documentation \
+        <plotly.com/python/bubble-charts/#scaling-the-size-of-bubble-charts>`_.
+
     plotly_params : dict or None, optional, default: ``None``
         Custom parameters to configure the plotly figure. Allowed keys are
         ``"node_trace"``, ``"edge_trace"`` and ``"layout"``, and the
@@ -130,7 +136,7 @@ def plot_static_mapper_graph(
     edge_trace, node_trace, node_elements, node_colors_color_variable = \
         _calculate_graph_data(
             _pipeline, data, is_data_dataframe, layout, layout_dim,
-            color_variable, _node_color_statistic, n_sig_figs
+            color_variable, _node_color_statistic, n_sig_figs, node_scale
         )
 
     # Define layout options
@@ -202,8 +208,9 @@ def plot_static_mapper_graph(
 
 def plot_interactive_mapper_graph(
         pipeline, data, layout="kamada_kawai", layout_dim=2,
-        color_variable=None, node_color_statistic=None,
-        color_by_columns_dropdown=False, n_sig_figs=3, plotly_params=None
+        color_variable=None, node_color_statistic=None, clone_pipeline=True,
+        color_by_columns_dropdown=False, n_sig_figs=3, node_scale=12,
+        plotly_params=None
 ):
     """Plotting function for interactive Mapper graphs.
 
@@ -261,9 +268,20 @@ def plot_interactive_mapper_graph(
         color Mapper nodes according to any column in `data` (still using
         `node_color_statistic`) in addition to `color_variable`.
 
+    clone_pipeline : bool, optional, default: ``True``
+        If ``True``, the input `pipeline` is cloned before computing the
+        Mapper graph to prevent unexpected side effects from in-place
+        parameter updates.
+
     n_sig_figs : int or None, optional, default: ``3``
        If not ``None``, number of significant figures to which to round node
        node summary statistics. If ``None``, no rounding is performed.
+
+    node_scale : int or float, optional, default: ``12``
+        Sets the scale factor used to determine the rendered size of the
+        nodes. Increase for larger nodes. Implements a formula in the
+        `Plotly documentation \
+        <plotly.com/python/bubble-charts/#scaling-the-size-of-bubble-charts>`_.
 
     plotly_params : dict or None, optional, default: ``None``
         Custom parameters to configure the plotly figure. Allowed keys are
@@ -288,7 +306,7 @@ def plot_interactive_mapper_graph(
     """
 
     # Clone pipeline to avoid side effects from in-place parameter changes
-    _pipeline = clone(pipeline)
+    _pipeline = clone(pipeline) if clone_pipeline else pipeline
 
     _node_color_statistic = node_color_statistic or np.mean
 
@@ -400,7 +418,7 @@ def plot_interactive_mapper_graph(
             if isinstance(value, (int, float, str)):
                 widgets[param].observe(on_parameter_change, names="value")
 
-    # define output widget to capture logs
+    # Define output widget to capture logs
     out = widgets.Output()
 
     @out.capture()
@@ -411,7 +429,7 @@ def plot_interactive_mapper_graph(
         else:
             out.clear_output()
 
-    # initialise logging
+    # Initialise logging
     logger = logging.getLogger(__name__)
     handler = OutputWidgetHandler()
     handler.setFormatter(logging.Formatter(
@@ -419,7 +437,7 @@ def plot_interactive_mapper_graph(
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
-    # initialise cover and cluster dictionaries of parameters and widgets
+    # Initialise cover and cluster dictionaries of parameters and widgets
     cover_params = dict(
         filter(
             lambda x: x[0].startswith("cover"),
@@ -449,27 +467,27 @@ def plot_interactive_mapper_graph(
         )
     )
 
-    # initialise widgets for validating input parameters of pipeline
+    # Initialise widgets for validating input parameters of pipeline
     valid = widgets.Valid(
         value=True,
         description="Valid parameters",
         style={"description_width": "100px"},
     )
 
-    # initialise widget for showing the logs
+    # Initialise widget for showing the logs
     logs_box = widgets.Checkbox(
         description="Show logs: ",
         value=False,
         indent=False
     )
 
-    # initialise figure with initial pipeline and config
+    # Initialise figure with initial pipeline and config
     fig = plot_static_mapper_graph(
         _pipeline, data, layout=layout, layout_dim=layout_dim,
         color_variable=color_variable,
         node_color_statistic=_node_color_statistic,
         color_by_columns_dropdown=color_by_columns_dropdown,
-        clone_pipeline=False, n_sig_figs=n_sig_figs,
+        clone_pipeline=False, n_sig_figs=n_sig_figs, node_scale=node_scale,
         plotly_params=plotly_params
     )
 
@@ -478,7 +496,7 @@ def plot_interactive_mapper_graph(
 
     logs_box.observe(click_box, names="value")
 
-    # define containers for input widgets
+    # Define containers for input widgets
     container_cover = widgets.HBox(
         children=list(cover_params_widgets.values())
     )
