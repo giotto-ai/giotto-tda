@@ -749,10 +749,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         filtered flag complexes obtained by considering all weighted edges of
         each weighted undirected graphs of the input collection as undirected,
         and it is therefore sufficient (but not necessary) to pass a collection
-        of upper-triangular matrix. When ``False``, in each weighted undirected
-        graphs of the input collection, if two directed edges corresponding to
-        the same undirected edge are assigned different weights, only the one
-        on the upper triangular part of the adjacency matrix is considered.
+        of upper-triangular matrices. When ``False``, in each weighted
+        undirected graphs of the input collection, if two directed edges
+        corresponding to the same undirected edge are assigned different
+        weights, only the one on the upper triangular part of the adjacency
+        matrix is considered.
 
     filtration : string, optional, default: ``'max'``
         Algorithm determining the filtration. Warning: if an edge filtration is
@@ -877,7 +878,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_vertices) or list of \
+        X : ndarray of shape (n_samples, n_vertices, n_vertices) or list of \
             n_samples ``scipy.sparse`` matrices of shape (n_vertices, \
             n_vertices)
             Input collection. Each entry along axis 0 is the adjacency matrix
@@ -930,7 +931,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_vertices) or list of \
+        X : ndarray of shape (n_samples, n_vertices, n_vertices) or list of \
             n_samples ``scipy.sparse`` matrices of shape (n_vertices, \
             n_vertices)
             Input collection. Each entry along axis 0 is the adjacency matrix
