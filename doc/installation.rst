@@ -14,8 +14,8 @@ The latest stable version of giotto-tda requires:
 - NumPy (>= 1.17.0)
 - SciPy (>= 0.17.0)
 - joblib (>= 0.13)
-- pyflagser (>= 0.2.1)
 - scikit-learn (>= 0.22.0)
+- pyflagser (>= 0.3.1)
 - python-igraph (>= 0.7.1.post6)
 - matplotlib (>= 3.0.3)
 - plotly (>= 4.4.1)
@@ -177,6 +177,3 @@ After installation, you can launch the test suite from outside the
 source directory::
 
     pytest gtda
-
-
-
