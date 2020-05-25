@@ -3,6 +3,8 @@
 
 import logging
 import traceback
+from copy import deepcopy
+from warnings import warn
 
 import numpy as np
 import plotly.graph_objects as go
@@ -13,6 +15,7 @@ from .utils._logging import OutputWidgetHandler
 from .utils.visualization import (
     _calculate_graph_data,
     _get_column_color_buttons,
+    _get_colors_for_vals,
     PLOT_OPTIONS_LAYOUT_DEFAULTS
 )
 
@@ -147,13 +150,70 @@ def plot_static_mapper_graph(
 
     fig = go.FigureWidget(data=[edge_trace, node_trace], layout=layout_options)
 
+    _plotly_params = deepcopy(plotly_params)
+
+    # When laying out the graph in 3D, plotly does not automatically give
+    # the background hoverlabel the same color as the respective marker,
+    # so we do this by hand here.
+    # TODO: Extract logic so as to avoid repetitions in interactive version
+    colorscale_for_hoverlabel = None
+    if layout_dim == 3:
+        compute_hoverlabel_bgcolor = True
+        if _plotly_params:
+            if "node_trace" in _plotly_params:
+                if "hoverlabel_bgcolor" in _plotly_params["node_trace"]:
+                    fig.update_traces(
+                        hoverlabel_bgcolor=_plotly_params["node_trace"].pop(
+                            "hoverlabel_bgcolor"
+                        ),
+                        selector={"name": "node_trace"}
+                    )
+                    compute_hoverlabel_bgcolor = False
+                if "marker_colorscale" in _plotly_params["node_trace"]:
+                    fig.update_traces(
+                        marker_colorscale=_plotly_params["node_trace"].pop(
+                            "marker_colorscale"
+                        ),
+                        selector={"name": "node_trace"}
+                    )
+
+        if compute_hoverlabel_bgcolor:
+            colorscale_for_hoverlabel = fig.data[1].marker.colorscale
+            node_colors_color_variable = np.asarray(node_colors_color_variable)
+            min_col = np.min(node_colors_color_variable)
+            max_col = np.max(node_colors_color_variable)
+            try:
+                hoverlabel_bgcolor = _get_colors_for_vals(
+                    node_colors_color_variable, min_col, max_col,
+                    colorscale_for_hoverlabel
+                )
+            except Exception as e:
+                if e.args[0] == "This colorscale is not supported.":
+                    warn("Data-dependent background hoverlabel colors cannot "
+                         "be generated with this choice of colorscale. Please "
+                         "use a standard hex- or RGB-formatted colorscale.")
+                else:
+                    warn("Something went wrong in generating data-dependent "
+                         "background hoverlabel colors. All background "
+                         "hoverlabel colors will be set to white.")
+                hoverlabel_bgcolor = "white"
+                colorscale_for_hoverlabel = None
+            fig.update_traces(
+                hoverlabel_bgcolor=hoverlabel_bgcolor,
+                selector={"name": "node_trace"}
+            )
+
     # Compute node colors according to data columns only if necessary
     if color_by_columns_dropdown:
         hovertext_color_variable = node_trace.hovertext
         column_color_buttons = _get_column_color_buttons(
             data, is_data_dataframe, node_elements, node_colors_color_variable,
-            _node_color_statistic, hovertext_color_variable, n_sig_figs
+            _node_color_statistic, hovertext_color_variable,
+            colorscale_for_hoverlabel, n_sig_figs
         )
+        # Avoid recomputing hoverlabel bgcolor for top button
+        column_color_buttons[0]["args"][0]["hoverlabel.bgcolor"] = \
+            [None, fig.data[1].hoverlabel.bgcolor]
     else:
         column_color_buttons = None
 
@@ -186,22 +246,13 @@ def plot_static_mapper_graph(
         )
 
     # Update traces and layout according to user input
-    if plotly_params:
-        node_trace_params = plotly_params.get("node_trace", None)
-        if node_trace_params:
+    if _plotly_params:
+        for key in ["node_trace", "edge_trace"]:
             fig.update_traces(
-                node_trace_params,
-                selector={"name": "node_trace"}
+                _plotly_params.pop(key, None),
+                selector={"name": key}
             )
-        edge_trace_params = plotly_params.get("edge_trace", None)
-        if edge_trace_params:
-            fig.update_traces(
-                edge_trace_params,
-                selector={"name": "edge_trace"}
-            )
-        layout_params = plotly_params.get("layout", None)
-        if layout_params:
-            fig.update_layout(layout_params)
+        fig.update_layout(_plotly_params.pop("layout", None))
 
     return fig
 
@@ -337,24 +388,6 @@ def plot_interactive_mapper_graph(
         else:
             return None
 
-    def update_figure(figure, edge_trace, node_trace, layout_dim):
-        figure.data[0].x = edge_trace.x
-        figure.data[0].y = edge_trace.y
-        figure.data[1].x = node_trace.x
-        figure.data[1].y = node_trace.y
-
-        if layout_dim == 3:
-            figure.data[0].z = edge_trace.z
-            figure.data[1].z = node_trace.z
-
-        figure.data[1].marker.size = node_trace.marker.size
-        figure.data[1].marker.color = node_trace.marker.color
-        figure.data[1].marker.cmin = node_trace.marker.cmin
-        figure.data[1].marker.cmax = node_trace.marker.cmax
-        figure.data[1].marker.sizeref = node_trace.marker.sizeref
-        figure.data[1].hoverlabel = node_trace.hoverlabel
-        figure.data[1].hovertext = node_trace.hovertext
-
     def on_parameter_change(change):
         handler.clear_logs()
         try:
@@ -371,15 +404,45 @@ def plot_interactive_mapper_graph(
 
             logger.info("Updating figure...")
             with fig.batch_update():
-                is_data_dataframe = hasattr(data, "columns")
                 (
                     edge_trace, node_trace, node_elements,
                     node_colors_color_variable
                 ) = _calculate_graph_data(
                     _pipeline, data, is_data_dataframe, layout, layout_dim,
-                    color_variable, _node_color_statistic, n_sig_figs
+                    color_variable, _node_color_statistic, n_sig_figs,
+                    node_scale
                 )
-                update_figure(fig, edge_trace, node_trace, layout_dim)
+                if colorscale_for_hoverlabel is not None:
+                    node_colors_color_variable = np.asarray(
+                        node_colors_color_variable
+                    )
+                    min_col = np.min(node_colors_color_variable)
+                    max_col = np.max(node_colors_color_variable)
+                    hoverlabel_bgcolor = _get_colors_for_vals(
+                        node_colors_color_variable, min_col, max_col,
+                        colorscale_for_hoverlabel
+                    )
+                    fig.update_traces(
+                        hoverlabel_bgcolor=hoverlabel_bgcolor,
+                        selector={"name": "node_trace"}
+                    )
+
+                fig.update_traces(
+                    x=node_trace.x,
+                    y=node_trace.y,
+                    marker_color=node_trace.marker.color,
+                    marker_size=node_trace.marker.size,
+                    marker_sizeref=node_trace.marker.sizeref,
+                    hovertext=node_trace.hovertext,
+                    **({"z": node_trace.z} if layout_dim == 3 else dict()),
+                    selector={"name": "node_trace"}
+                )
+                fig.update_traces(
+                    x=edge_trace.x,
+                    y=edge_trace.y,
+                    **({"z": edge_trace.z} if layout_dim == 3 else dict()),
+                    selector={"name": "edge_trace"}
+                )
 
                 # Update color by column buttons
                 if color_by_columns_dropdown:
@@ -387,8 +450,13 @@ def plot_interactive_mapper_graph(
                     column_color_buttons = _get_column_color_buttons(
                         data, is_data_dataframe, node_elements,
                         node_colors_color_variable, _node_color_statistic,
-                        hovertext_color_variable, n_sig_figs
+                        hovertext_color_variable, colorscale_for_hoverlabel,
+                        n_sig_figs
                     )
+                    # Avoid recomputing hoverlabel bgcolor for top button
+                    if colorscale_for_hoverlabel is not None:
+                        column_color_buttons[0]["args"][0][
+                            "hoverlabel.bgcolor"] = [None, hoverlabel_bgcolor]
                 else:
                     column_color_buttons = None
 
@@ -490,6 +558,22 @@ def plot_interactive_mapper_graph(
         clone_pipeline=False, n_sig_figs=n_sig_figs, node_scale=node_scale,
         plotly_params=plotly_params
     )
+
+    # Store variables for later updates
+    is_data_dataframe = hasattr(data, "columns")
+
+    colorscale_for_hoverlabel = None
+    if layout_dim == 3:
+        # In plot_static_mapper_graph, hoverlabel bgcolors are set to white if
+        # something goes wrong computing them according to the colorscale.
+        is_bgcolor_not_white = fig.data[1].hoverlabel.bgcolor != "white"
+        user_hoverlabel_bgcolor = False
+        if plotly_params:
+            if "node_trace" in plotly_params:
+                if "hoverlabel_bgcolor" in plotly_params["node_trace"]:
+                    user_hoverlabel_bgcolor = True
+        if is_bgcolor_not_white and not user_hoverlabel_bgcolor:
+            colorscale_for_hoverlabel = fig.data[1].marker.colorscale
 
     observe_widgets(cover_params, cover_params_widgets)
     observe_widgets(cluster_params, cluster_params_widgets)

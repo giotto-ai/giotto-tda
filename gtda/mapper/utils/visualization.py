@@ -107,7 +107,8 @@ def _get_node_summary(data, node_elements, summary_statistic):
 
 def _get_column_color_buttons(
         data, is_data_dataframe, node_elements, node_colors_color_variable,
-        summary_statistic, hovertext_color_variable, n_sig_figs
+        summary_statistic, hovertext_color_variable,
+        colorscale_for_hoverlabel, n_sig_figs
 ):
     # TODO: Consider opting for just-in-time computation instead of computing
     # all node summary values ahead of time. Solution should preserve scroll
@@ -148,16 +149,26 @@ def _get_column_color_buttons(
             node_colors
         ))
 
-        column_color_buttons.append(
-            {
-                "args": [{
-                    "marker.color": [None, node_colors],
-                    "hovertext": [None, hovertext]
-                }],
-                "label": f"Column {column}",
-                "method": "restyle"
-            }
-        )
+        new_button = {
+            "args": [{
+                "marker.color": [None, node_colors],
+                "hovertext": [None, hovertext]
+            }],
+            "label": f"Column {column}",
+            "method": "restyle"
+        }
+
+        if colorscale_for_hoverlabel is not None:
+            node_colors = np.asarray(node_colors)
+            min_col = np.min(node_colors)
+            max_col = np.max(node_colors)
+            new_button["args"][0]["hoverlabel.bgcolor"] = [
+                None,
+                _get_colors_for_vals(node_colors, min_col, max_col,
+                                     colorscale_for_hoverlabel)
+            ]
+
+        column_color_buttons.append(new_button)
 
     return column_color_buttons
 
@@ -324,3 +335,62 @@ def _calculate_graph_data(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
     return edge_trace, node_trace, node_elements, node_colors_color_variable
+
+
+def _hex_to_rgb(value):
+    """Convert a hex-formatted color to rgb, ignoring alpha values."""
+    value = value.lstrip("#")
+    return [int(value[i:i + 2], 16) for i in range(0, 6, 2)]
+
+
+def _rbg_to_hex(c):
+    """Convert an rgb-formatted color to hex, ignoring alpha values."""
+    return f"#{c[0]:02x}{c[1]:02x}{c[2]:02x}"
+
+
+def _get_colors_for_vals(vals, vmin, vmax, colorscale, return_hex=True):
+    """Given a float array vals, interpolate based on a colorscale to obtain
+    rgb or hex colors. Inspired by
+    `user empet's answer in \
+    <community.plotly.com/t/hover-background-color-on-scatter-3d/9185/6>`_."""
+    from numbers import Number
+    from ast import literal_eval
+
+    if vmin >= vmax:
+        raise ValueError("`vmin` should be < `vmax`.")
+
+    if (len(colorscale[0]) == 2) and isinstance(colorscale[0][0], Number):
+        scale, colors = zip(*colorscale)
+    else:
+        scale = np.linspace(0, 1, num=len(colorscale))
+        colors = colorscale
+    scale = np.asarray(scale)
+
+    if colors[0][:3] == "rgb":
+        colors = np.asarray([literal_eval(color[3:]) for color in colors],
+                            dtype=np.float_)
+    elif colors[0][0] == "#":
+        colors = np.asarray(list(map(_hex_to_rgb, colors)), dtype=np.float_)
+    else:
+        raise ValueError("This colorscale is not supported.")
+
+    colorscale = np.hstack([scale.reshape(-1, 1), colors])
+    colorscale = np.vstack([colorscale, colorscale[0, :]])
+    colorscale_diffs = np.diff(colorscale, axis=0)
+    colorscale_diff_ratios = colorscale_diffs[:, 1:] / colorscale_diffs[:, [0]]
+    colorscale_diff_ratios[-1, :] = np.zeros(3)
+
+    vals_scaled = (vals - vmin) / (vmax - vmin)
+
+    left_bin_indices = np.digitize(vals_scaled, scale) - 1
+    left_endpts = colorscale[left_bin_indices]
+    vals_scaled -= left_endpts[:, 0]
+    diff_ratios = colorscale_diff_ratios[left_bin_indices]
+
+    vals_rgb = (
+            left_endpts[:, 1:] + diff_ratios * vals_scaled[:, np.newaxis] + 0.5
+    ).astype(np.uint8)
+
+    if return_hex:
+        return list(map(_rbg_to_hex, vals_rgb))
+    return [f"rgb{tuple(v)}" for v in vals_rgb]
