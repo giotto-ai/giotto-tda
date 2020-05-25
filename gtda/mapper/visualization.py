@@ -99,6 +99,18 @@ def plot_static_mapper_graph(
         Figure representing the Mapper graph with appropriate node colouring
         and size.
 
+    Examples
+    --------
+    Setting a colorscale different from the default one:
+
+    >>> import numpy as np
+    >>> from gtda.mapper import make_mapper_pipeline, plot_static_mapper_graph
+    >>> pipeline = make_mapper_pipeline()
+    >>> data = np.random.random((100, 3))
+    >>> plotly_params = {"node_trace": {"marker_colorscale": "Blues"}}
+    >>> fig = plot_static_mapper_graph(pipeline, data,
+    ...                                plotly_params=plotly_params)
+
     References
     ----------
     .. [1] `igraph.Graph.layout
