@@ -726,13 +726,13 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence diagrams <persistence diagram>` resulting from
-    :ref:`filtrations <filtered complex>` of :ref:`directed or undirected flag
-    complexes <clique or flag complexes>`.
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`filtrations <filtered_complex>` of :ref:`directed or undirected flag
+    complexes <clique_and_flag_complexes>`.
 
     Given a weighted directed or undirected graph, information about the
     appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology and cohomology>`) of various dimension
+    :ref:`homology classes <homology_and_cohomology>`) of various dimension
     and at different scales is summarised in the corresponding persistence
     diagram.
 
