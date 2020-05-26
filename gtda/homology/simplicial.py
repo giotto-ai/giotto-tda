@@ -754,12 +754,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         matrix is considered.
 
     filtration : string, optional, default: ``'max'``
-        Algorithm determining the filtration. Warning: if an edge filtration is
-        specified, it is assumed that the resulting filtration is consistent,
-        meaning that the filtration value of every simplex of dimension at
-        least two should evaluate to a value that is at least the maximal value
-        of the filtration values of its containing edges. For performance
-        reasons, this is not checked automatically.  Possible values are:
+        Algorithm determining the filtration values of higher order simplices
+        from the weights of the vertices and edges. Possible values are:
         ['dimension', 'zero', 'max', 'max3', 'max_plus_one', 'product', 'sum',
         'pmean', 'pmoment', 'remove_edges', 'vertex_degree']
 
