@@ -305,7 +305,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         the same results as :class:`VietorisRipsPersistence` but is slower.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Maximum value of the  Sparse Rips filtration parameter. Points whose
+        Maximum value of the Sparse Rips filtration parameter. Points whose
         distance is greater than this value will never be connected by an
         edge, and topological features at scales larger than this value will
         not be detected.
