@@ -328,8 +328,7 @@ def make_mapper_pipeline(scaler=None,
 
     See also
     --------
-    :class:`MapperPipeline`,
-    :meth:`~gtda.mapper.utils.decorators.method_to_transform`
+    MapperPipeline, :func:`~gtda.mapper.utils.decorators.method_to_transform`
 
     References
     ----------

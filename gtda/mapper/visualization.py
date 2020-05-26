@@ -50,30 +50,28 @@ def plot_static_mapper_graph(
         The number of dimensions for the layout. Can be 2 or 3.
 
     color_variable : object or None, optional, default: ``None``
-        Specifies which quantity is to be used for node coloring.
+        Specifies a feature of interest to be used, together with
+        `node_color_statistic`, to determine node colors.
 
-            1. If a numpy ndarray or pandas dataframe, `color_variable`
-               must have the same length as `data` and is interpreted as
-               a quantity of interest according to which node of the Mapper
-               graph is to be colored (see `node_color_statistic`).
+            1. If a numpy array or pandas dataframe, it must have the same
+               length as `data`.
             2. ``None`` is equivalent to passing `data`.
             3. If an object implementing :meth:`transform` or
-               :meth:`fit_transform`, e.g. a scikit-learn estimator or
-               pipeline, it is applied to `data` to generate the quantity
-               of interest.
+               :meth:`fit_transform`, it is applied to `data` to generate the
+               feature of interest.
             4. If an index or string, or list of indices/strings, it is
                equivalent to selecting a column or subset of columns from
                `data`.
 
     node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``None``
-        Specifies how to determine the colors of each node. If a numpy array,
-        it must have the same length as the number of nodes in the Mapper
-        graph, and its values are used directly for node coloring, ignoring
-        `color_variable`. Otherwise, it can be a callable object which is used
-        to obtain a summary statistic, within each Mapper node, of the quantity
-        specified by `color_variable`. The default value ``None`` is equivalent
-        to passing :func:`numpy.mean`.
+        If a callable, node colors will be computed as summary statistics from
+        the feature array ``Y`` determined by `color_variable` – specifically,
+        the color of a node representing the entries of `data` whose row
+        indices are in ``I`` will be ``node_color_statistic(Y[I])``. ``None``
+        is equivalent to passing :func:`numpy.mean`. If a numpy array, it must
+        have the same length as the number of nodes in the Mapper graph and its
+        values are used directly as node colors (`color_variable` is ignored).
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
@@ -119,6 +117,11 @@ def plot_static_mapper_graph(
     >>> plotly_params = {"node_trace": {"marker_colorscale": "Blues"}}
     >>> fig = plot_static_mapper_graph(pipeline, data,
     ...                                plotly_params=plotly_params)
+
+    See also
+    --------
+    :func:`~gtda.mapper.plot_interactive_mapper_graph`,
+    :func:`~gtda.mapper.make_mapper_pipeline`
 
     References
     ----------
@@ -289,30 +292,25 @@ def plot_interactive_mapper_graph(
         The number of dimensions for the layout. Can be 2 or 3.
 
     color_variable : object or None, optional, default: ``None``
-        Specifies which quantity is to be used for node coloring.
+        Specifies a feature of interest to be used, together with
+        `node_color_statistic`, to determine node colors.
 
-            1. If a numpy ndarray or pandas dataframe, `color_variable`
-               must have the same length as `data` and is interpreted as
-               a quantity of interest according to which node of the Mapper
-               graph is to be colored (see `node_color_statistic`).
+            1. If a numpy array or pandas dataframe, it must have the same
+               length as `data`.
             2. ``None`` is equivalent to passing `data`.
             3. If an object implementing :meth:`transform` or
-               :meth:`fit_transform`, e.g. a scikit-learn estimator or
-               pipeline, it is applied to `data` to generate the quantity
-               of interest.
+               :meth:`fit_transform`, it is applied to `data` to generate the
+               feature of interest.
             4. If an index or string, or list of indices/strings, it is
                equivalent to selecting a column or subset of columns from
                `data`.
 
-    node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
-        (n_nodes, 1), optional, default: ``None``
-        Specifies how to determine the colors of each node. If a
-        numpy array, it must have the same length as the number of nodes in
-        the Mapper graph, and its values are used directly for node
-        coloring, ignoring `color_variable`. Otherwise, it can be a
-        callable object which is used to obtain a summary statistic, within
-        each Mapper node, of the quantity specified by `color_variable`. The
-        default value ``None`` is equivalent to passing :func:`numpy.mean`.
+    node_color_statistic : callable or None, optional, default: ``None``
+        If a callable, node colors will be computed as summary statistics from
+        the feature array ``Y`` determined by `color_variable` – specifically,
+        the color of a node representing the entries of `data` whose row
+        indices are in ``I`` will be ``node_color_statistic(Y[I])``. ``None``
+        is equivalent to passing :func:`numpy.mean`.
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
@@ -347,6 +345,11 @@ def plot_interactive_mapper_graph(
         A box containing the following widgets: parameters of the clustering
         algorithm, parameters for the covering scheme, a Mapper graph arising
         from those parameters, a validation box, and logs.
+
+    See also
+    --------
+    :func:`~gtda.mapper.plot_static_mapper_graph`,
+    :func:`~gtda.mapper.make_mapper_pipeline`
 
     References
     ----------
