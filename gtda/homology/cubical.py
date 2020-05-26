@@ -68,7 +68,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, EuclideanCechPersistence
+    images.HeightFiltration, images.RadialFiltration, \
+    images.DilationFiltration, images.ErosionFiltration, \
+    images.SignedDistanceFiltration
 
     Notes
     -----
