@@ -64,10 +64,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`p` equals `coeff`.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris–Rips filtration
-        parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological features at scales
-        larger than this value will not be detected.
+        Maximum value of the Vietoris–Rips filtration parameter. Points whose
+        distance is greater than this value will never be connected by an
+        edge, and topological features at scales larger than this value will
+        not be detected.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
@@ -305,10 +305,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         the same results as :class:`VietorisRipsPersistence` but is slower.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris–Rips filtration
-        parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological features at scales
-        larger than this value will not be detected.
+        Maximum value of the Vietoris–Rips filtration parameter. Points whose
+        distance is greater than this value will never be connected by an
+        edge, and topological features at scales larger than this value will
+        not be detected.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
@@ -532,10 +532,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`p` equals `coeff`.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Upper bound on the maximum value of the Vietoris–Rips filtration
-        parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological features at scales
-        larger than this value will not be detected.
+        Maximum value of the Cech filtration parameter. Topological features at
+        scales larger than this value will not be detected.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
