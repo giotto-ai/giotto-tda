@@ -877,15 +877,17 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             n_vertices)
             Input collection. Each entry along axis 0 is the adjacency matrix
             of a weighted directed or undirected graph. In each of those
-            adjacency matrices, diagonal elements are vertex weights. The way
-            zero values are handled depends on the format of the matrix. If the
-            matrix is a dense ``numpy.ndarray``, zero values denote
-            zero-weighted edges. If the matrix is a sparse ``scipy.sparse``
-            matrix, explicitly stored off-diagonal zeros and all diagonal
-            zeros denote zero-weighted edges. Off-diagonal values that have not
-            been explicitely stored are treated by ``scipy.sparse`` as zeros
-            but will be understood as infinitely-valued edges, i.e., edges
-            absent from the filtration.
+            adjacency matrices, diagonal elements are vertex weights and
+            off-diagonal elements are edges weights. It is assumed that a
+            vertex weight cannot be larger than the weight of the edges it
+            forms. The way zero values are handled depends on the format of the
+            matrix. If the matrix is a dense ``numpy.ndarray``, zero values
+            denote zero-weighted edges. If the matrix is a sparse
+            ``scipy.sparse`` matrix, explicitly stored off-diagonal zeros and
+            all diagonal zeros denote zero-weighted edges. Off-diagonal values
+            that have not been explicitely stored are treated by
+            ``scipy.sparse`` as zeros but will be understood as
+            infinitely-valued edges, i.e., edges absent from the filtration.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -930,15 +932,17 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             n_vertices)
             Input collection. Each entry along axis 0 is the adjacency matrix
             of a weighted directed or undirected graph. In each of those
-            adjacency matrices, diagonal elements are vertex weights. The way
-            zero values are handled depends on the format of the matrix. If the
-            matrix is a dense ``numpy.ndarray``, zero values denote
-            zero-weighted edges. If the matrix is a sparse ``scipy.sparse``
-            matrix, explicitly stored off-diagonal zeros and all diagonal
-            zeros denote zero-weighted edges. Off-diagonal values that have not
-            been explicitely stored are treated by ``scipy.sparse`` as zeros
-            but will be understood as infinitely-valued edges, i.e., edges
-            absent from the filtration.
+            adjacency matrices, diagonal elements are vertex weights and
+            off-diagonal elements are edges weights. It is assumed that a
+            vertex weight cannot be larger than the weight of the edges it
+            forms. The way zero values are handled depends on the format of the
+            matrix. If the matrix is a dense ``numpy.ndarray``, zero values
+            denote zero-weighted edges. If the matrix is a sparse
+            ``scipy.sparse`` matrix, explicitly stored off-diagonal zeros and
+            all diagonal zeros denote zero-weighted edges. Off-diagonal values
+            that have not been explicitely stored are treated by
+            ``scipy.sparse`` as zeros but will be understood as
+            infinitely-valued edges, i.e., edges absent from the filtration.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
