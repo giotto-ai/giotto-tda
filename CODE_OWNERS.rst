@@ -1,4 +1,4 @@
-The following is the list of the code owners of the `giotto-tda` Python package:
+The following is the list of the code owners of the ``giotto-tda`` Python package:
 
 - L2F SA
 - EPFL - Ecole Polytechnique Fédérale de Lausanne
