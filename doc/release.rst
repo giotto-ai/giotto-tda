@@ -101,8 +101,7 @@ This release contains contributions from many people:
 
 Umberto Lupo, Anibal Medina-Mardones, Julian Burella Pérez, Guillaume Tauzin, and Wojciech Reise.
 
-We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of
-inspiring discussions.
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of inspiring discussions.
 
 *************
 Release 0.2.0
