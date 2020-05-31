@@ -216,14 +216,13 @@ def make_mapper_pipeline(scaler=None,
 
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
-        Used to cache the fitted transformers of the pipeline. By default, no
-        caching is performed. If a string is given, it is the path to the
-        caching directory. Enabling caching triggers a clone of the
-        transformers before fitting. Therefore, the transformer instance
-        given to the pipeline cannot be inspected directly. Use the attribute
-        ``named_steps`` or ``steps`` to inspect estimators within the
-        pipeline. Caching the transformers is advantageous when fitting is
-        time consuming.
+        Used to cache the fitted transformers which make up the pipeline. This
+        is advantageous when the fitting of early steps is time consuming and
+        only later steps in the pipeline are modified (e.g. using
+        :meth:`set_params`) before refitting on the same data. To be used
+        used exactly as for :func:`sklearn.pipeline.make_pipeline`. By default,
+        no caching is performed. If a string is given, it is the path to the
+        caching directory. See [3]_.
 
     verbose : bool, optional, default: ``False``
         If True, the time elapsed while fitting each step will be printed as it
@@ -236,7 +235,8 @@ def make_mapper_pipeline(scaler=None,
 
     Examples
     --------
-    >>> # Example of basic usage with default parameters
+    Basic usage with default parameters
+
     >>> import numpy as np
     >>> from gtda.mapper import make_mapper_pipeline
     >>> mapper = make_mapper_pipeline()
@@ -258,16 +258,17 @@ def make_mapper_pipeline(scaler=None,
     dict_keys(['node_id', 'pullback_set_label', 'partial_cluster_label',
                'node_elements'])
     >>> # Find which points belong to first node of graph
-    >>> node_id, node_elements = mapper_graph['node_metadata']['node_id'],
-    ... mapper_graph['node_metadata']['node_elements']
-    >>> print(f'Node Id: {node_id[0]}, Node elements: {node_elements[0]}, '
-              f'Data points: {X[node_elements[0]]}')
+    >>> node_id = mapper_graph['node_metadata']['node_id']
+    >>> node_elements = mapper_graph['node_metadata']['node_elements']
+    >>> print(f"Node Id: {node_id[0]}, Node elements: {node_elements[0]}, "
+    ...       f"Data points: {X[node_elements[0]]}")
     Node Id: 0,
     Node elements: [8768],
     Data points: [[0.01838998 0.76928754 0.98199244 0.0074299 ]]
-    >>> #######################################################################
-    >>> # Example using a scaler from scikit-learn, a filter function from
-    >>> # gtda.mapper.filter, and a clusterer from gtda.mapper.cluster
+
+    Using a scaler from scikit-learn, a filter function from
+    gtda.mapper.filter, and a clusterer from gtda.mapper.cluster
+
     >>> from sklearn.preprocessing import MinMaxScaler
     >>> from gtda.mapper import Projection, FirstHistogramGap
     >>> scaler = MinMaxScaler()
@@ -276,15 +277,17 @@ def make_mapper_pipeline(scaler=None,
     >>> mapper = make_mapper_pipeline(scaler=scaler,
     ...                               filter_func=filter_func,
     ...                               clusterer=clusterer)
-    >>> #######################################################################
-    >>> # Example using a callable acting on each row of X separately
+
+    Using a callable acting on each row of X separately
+
     >>> import numpy as np
     >>> from gtda.mapper import OneDimensionalCover
     >>> cover = OneDimensionalCover()
     >>> mapper.set_params(scaler=None, filter_func=np.sum, cover=cover)
-    >>> #######################################################################
-    >>> # Example setting the memory parameter to cache each step and avoid
-    >>> # recomputation of early steps
+
+    Setting the memory parameter to cache each step and avoid recomputation
+    of early steps
+
     >>> from tempfile import mkdtemp
     >>> from shutil import rmtree
     >>> cachedir = mkdtemp()
@@ -301,9 +304,10 @@ def make_mapper_pipeline(scaler=None,
     [Pipeline] ............. (step 3 of 3) Processing nerve, total=   0.0s
     >>> # Clear the cache directory when you don't need it anymore
     >>> rmtree(cachedir)
-    >>> #######################################################################
-    >>> # Example using a large dataset for which parallelism in
-    >>> # clustering across the pullback cover sets can be beneficial
+
+    Using a large dataset for which parallelism in clustering across
+    the pullback cover sets can be beneficial
+
     >>> from sklearn.cluster import DBSCAN
     >>> mapper = make_mapper_pipeline(clusterer=DBSCAN(),
     ...                               n_jobs=6,
@@ -324,8 +328,7 @@ def make_mapper_pipeline(scaler=None,
 
     See also
     --------
-    :class:`MapperPipeline`,
-    :meth:`~gtda.mapper.utils.decorators.method_to_transform`
+    MapperPipeline, :func:`~gtda.mapper.utils.decorators.method_to_transform`
 
     References
     ----------
@@ -336,6 +339,10 @@ def make_mapper_pipeline(scaler=None,
     .. [2] "Thread-based parallelism vs process-based parallelism", in
            `joblib documentation
            <https://joblib.readthedocs.io/en/latest/parallel.html>`_.
+
+    .. [3] "Caching transformers: avoid repeated computation", in
+            `scikit-learn documentation
+            <https://scikit-learn.org/stable/modules/compose.html>_`.
 
     """
 

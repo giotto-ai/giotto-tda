@@ -52,12 +52,16 @@ class TestStaticPlot(TestCaseNoTemplate):
         fig = plot_static_mapper_graph(pipe, X,
                                        color_variable=colors,
                                        clone_pipeline=False)
-        xy = np.stack([fig.get_state()['_data'][1][c]
-                       for c in ['x', 'y']]).transpose()
-        assert X.shape >= xy.shape
+        node_trace_x = fig.get_state()['_data'][1]["x"]
+        node_trace_y = fig.get_state()['_data'][1]["y"]
 
-        real_colors = fig.get_state()['_data'][1]['marker']['color']
-        assert len(real_colors) == xy.shape[0]
+        assert node_trace_x["shape"][0] == node_trace_y["shape"][0]
+
+        num_nodes = node_trace_x["shape"][0]
+        assert len(X) >= num_nodes
+
+        fig_colors = fig.get_state()['_data'][1]['marker']['color']
+        assert len(fig_colors) == num_nodes
 
 
 class TestInteractivePlot(TestCaseNoTemplate):
@@ -73,8 +77,8 @@ class TestInteractivePlot(TestCaseNoTemplate):
                 pass
 
     def _get_size_from_hovertext(self, s):
-        from re import split
-        return int(split(':|<', s)[-1])
+        size_str = s.split("<br>")[1].split(": ")[1]
+        return int(size_str)
 
     def test_cluster_sizes(self):
         """Verify that the total number of calculated clusters is equal to
