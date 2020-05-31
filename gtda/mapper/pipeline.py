@@ -342,7 +342,7 @@ def make_mapper_pipeline(scaler=None,
 
     .. [3] "Caching transformers: avoid repeated computation", in
             `scikit-learn documentation \
-            <https://scikit-learn.org/stable/modules/compose.html>_`.
+            <https://scikit-learn.org/stable/modules/compose.html>`_.
 
     """
 

@@ -121,8 +121,8 @@ def plot_static_mapper_graph(
 
     See also
     --------
-    `~gtda.mapper.plot_interactive_mapper_graph`,
-    `~gtda.mapper.make_mapper_pipeline`
+    :func:`~gtda.mapper.visualization.plot_interactive_mapper_graph`,
+    :func:`~gtda.mapper.pipeline.make_mapper_pipeline`
 
     References
     ----------
@@ -349,8 +349,8 @@ def plot_interactive_mapper_graph(
 
     See also
     --------
-    `~gtda.mapper.plot_static_mapper_graph`,
-    `~gtda.mapper.make_mapper_pipeline`
+    :func:`~gtda.mapper.visualization.plot_static_mapper_graph`,
+    :func:`~gtda.mapper.pipeline.make_mapper_pipeline`
 
     References
     ----------
