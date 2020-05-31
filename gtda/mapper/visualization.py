@@ -12,7 +12,7 @@ from ipywidgets import Layout, widgets
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
-from .utils.visualization import (
+from .utils._visualization import (
     _calculate_graph_data,
     _get_column_color_buttons,
     _get_colors_for_vals,
