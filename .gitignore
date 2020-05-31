@@ -45,6 +45,9 @@ gtda/externals/pybind11
 .pytest_cache/
 .hypothesis/
 
+# Pytest output files
+test-output.xml
+
 # Latex
 *.aux
 *.bbl
@@ -55,6 +58,3 @@ gtda/externals/pybind11
 *.synctex.gz
 *.toc
 doc/theory/glossary_backup
-
-# development
-tda/mapper/scratch/
