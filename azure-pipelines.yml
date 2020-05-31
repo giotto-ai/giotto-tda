@@ -73,7 +73,7 @@ jobs:
 
   - script: |
       set -e
-      pip install pandas openml
+      pip install pandas openml matplotlib
       pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
