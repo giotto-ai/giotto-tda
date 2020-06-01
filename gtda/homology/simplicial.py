@@ -766,9 +766,9 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     max_edge_weight : float, optional, default: ``numpy.inf``
         Maximum edge weight to be considered in the filtration. All edge
-        weights greater than that value will be considered as
-        infinitely-valued, i.e., absent from the filtration and topological
-        features at scales larger than this value will not be detected.
+        weights greater than that value will be considered as absent from the
+        filtration and topological features at scales larger than this value
+        will not be detected.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
