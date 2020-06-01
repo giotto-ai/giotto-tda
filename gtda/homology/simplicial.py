@@ -742,16 +742,16 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     directed : bool, optional, default: ``True``
         If ``True``, :meth:`transform` computes the persistence diagrams of
-        filtered directed flag complexes arising from weighted directed
-        graphs. If False, computes the persistence diagrams of undirected
-        filtered flag complexes obtained by considering all weighted edges of
-        each weighted undirected graphs of the input collection as undirected,
-        and it is therefore sufficient (but not necessary) to pass a collection
-        of upper-triangular matrices. When ``False``, in each weighted
-        undirected graphs of the input collection, if two directed edges
-        corresponding to the same undirected edge are assigned different
-        weights, only the one on the upper triangular part of the adjacency
-        matrix is considered.
+        the filtered directed flag complexes arising from the input collection
+        of weighted directed graphs. If ``False``, :meth:`transform` computes
+        the persistence diagrams of the filtered undirected flag complexes
+        obtained by regarding all input weighted graphs as undirected, and:
+
+        - if `max_edge_weight` is ``numpy.inf``, it is sufficient to pass a
+          collection of (dense or sparse) upper-triangular matrices;
+        - if `max_edge_weight` is finite, it is recommended to pass either a
+          collection of symmetric dense matrices, or a collection of sparse
+          upper-triangular matrices.
 
     filtration : string, optional, default: ``'max'``
         Algorithm determining the filtration values of higher order simplices
