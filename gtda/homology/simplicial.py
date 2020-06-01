@@ -853,7 +853,6 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                  directed=self.directed,
                                  filtration=self.filtration, coeff=self.coeff,
                                  approximation=self.max_entries)['dgms']
-
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
 

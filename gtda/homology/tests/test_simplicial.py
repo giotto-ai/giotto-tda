@@ -40,10 +40,16 @@ X_vrp_res = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
                        [0.69093919, 0.80131882, 1]]])
 
 
-def test_vrp_transform():
-    vrp = VietorisRipsPersistence()
-
-    assert_almost_equal(vrp.fit_transform(X), X_vrp_res)
+@pytest.mark.parametrize('max_edge_length', [np.inf, 0.8])
+@pytest.mark.parametrize('infinity_values', [10, 30])
+def test_vrp_transform(max_edge_length, infinity_values):
+    vrp = VietorisRipsPersistence(max_edge_length=max_edge_length,
+                                  infinity_values=infinity_values)
+    # This is not generally true, it is only a way to obtain the res array
+    # in this specific case
+    X_res = X_vrp_res.copy()
+    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_length] = infinity_values
+    assert_almost_equal(vrp.fit_transform(X), X_res)
 
 
 def test_vrp_list_of_arrays():
@@ -74,19 +80,19 @@ def test_srp_not_fitted():
         srp.transform(X)
 
 
-X_srp_res_2 = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
-                         [0., 0.60077095, 0], [0., 0.62186205, 0],
-                         [0.69093919, 0.80131882, 1]]])
+X_srp_res = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
+                       [0., 0.60077095, 0], [0., 0.62186205, 0],
+                       [0.69093919, 0.80131882, 1]]])
 
 
-@pytest.mark.parametrize("epsilon, point_clouds, expected",
+@pytest.mark.parametrize("epsilon, point_clouds, diagrams",
                          [(0.0, X, X_vrp_res),
-                          (1.0, X, X_srp_res_2)])
-def test_srp_transform(epsilon, point_clouds, expected):
+                          (1.0, X, X_srp_res)])
+def test_srp_transform(epsilon, point_clouds, diagrams):
     srp = SparseRipsPersistence(epsilon=epsilon)
 
     assert_almost_equal(np.sort(srp.fit_transform(point_clouds), axis=1),
-                        np.sort(expected, axis=1))
+                        np.sort(diagrams, axis=1))
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
@@ -144,16 +150,41 @@ def test_fp_not_fitted():
     with pytest.raises(NotFittedError):
         fp.transform(X_dist)
 
+X_dir_graph = X_dist.copy()
+X_dir_graph[0, 0, :] = X_dir_graph[0, 0, :] / 2.
+X_dir_graph[0][np.tril_indices(5, k=-1)] = np.inf
 
-X_fp_undir_res = np.array([[[0., 0.43094373, 0], [0., 0.5117411, 0],
-                            [0., 0.60077095, 0], [0., 0.62186205, 0],
-                            [0.69093919, 0.80131882, 1]]])
+X_fp_dir_res = np.array([[[0., 0.30038548, 0.], [0., 0.34546959, 0.],
+                          [0., 0.40065941, 0.], [0., 0.43094373, 0.],
+                          [0.5117411,  0.51976681, 1.]]])
 
 
-def test_fp_transform_undirected():
-    fp = FlagserPersistence(directed=False)
+@pytest.mark.parametrize('max_edge_weight', [np.inf, 0.8])
+@pytest.mark.parametrize('infinity_values', [10, 30])
+def test_fp_transform_directed(max_edge_weight, infinity_values):
+    fp = FlagserPersistence(directed=True, max_edge_weight=max_edge_weight,
+                            infinity_values=infinity_values)
+    # In the undirected case with "max" filtration, the results are always the
+    # same as the one of VietorisRipsPersistence
+    X_res = X_fp_dir_res.copy()
+    # This is not generally true, it is only a way to obtain the res array
+    # in this specific case
+    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_weight] = infinity_values
+    assert_almost_equal(fp.fit_transform(X_dir_graph), X_res)
 
-    assert_almost_equal(fp.fit_transform(X_dist), X_fp_undir_res)
+
+@pytest.mark.parametrize('max_edge_weight', [np.inf, 0.8])
+@pytest.mark.parametrize('infinity_values', [10, 30])
+def test_fp_transform_undirected(max_edge_weight, infinity_values):
+    fp = FlagserPersistence(directed=False, max_edge_weight=max_edge_weight,
+                            infinity_values=infinity_values)
+    # In the undirected case with "max" filtration, the results are always the
+    # same as the one of VietorisRipsPersistence
+    X_res = X_vrp_res.copy()
+    # This is not generally true, it is only a way to obtain the res array
+    # in this specific case
+    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_weight] = infinity_values
+    assert_almost_equal(fp.fit_transform(X_dist), X_res)
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
