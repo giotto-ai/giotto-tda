@@ -766,7 +766,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     max_edge_weight : float, optional, default: ``numpy.inf``
         Maximum edge weight to be considered in the filtration. All edge
-        weights greater than that value will be considered as absent from the
+        weights greater than this value will be considered as absent from the
         filtration and topological features at scales larger than this value
         will not be detected.
 
