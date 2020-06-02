@@ -114,5 +114,5 @@ What's new
 
 .. include::
    release.rst
-   :start-after: Release 0.2.1
-   :end-before: Release 0.2.0
+   :start-after: Release 0.2.2
+   :end-before: Release 0.2.1
