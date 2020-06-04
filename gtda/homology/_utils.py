@@ -23,7 +23,7 @@ def _pad_diagram(Xd, homology_dimensions, max_n_points, min_values):
                                             dtype=Xd[dim].dtype)])
           for dim in homology_dimensions]
 
-    Xd = np.vstack([Xd[dim] for dim in homology_dimensions])
+    Xd = np.vstack([Xd[d] for d in range(len(homology_dimensions))])
 
     return Xd
 
