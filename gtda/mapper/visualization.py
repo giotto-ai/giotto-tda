@@ -85,7 +85,7 @@ def plot_static_mapper_graph(
 
     n_sig_figs : int or None, optional, default: ``3``
        If not ``None``, number of significant figures to which to round node
-       node summary statistics. If ``None``, no rounding is performed.
+       summary statistics. If ``None``, no rounding is performed.
 
     node_scale : int or float, optional, default: ``12``
         Sets the scale factor used to determine the rendered size of the
@@ -325,7 +325,7 @@ def plot_interactive_mapper_graph(
 
     n_sig_figs : int or None, optional, default: ``3``
        If not ``None``, number of significant figures to which to round node
-       node summary statistics. If ``None``, no rounding is performed.
+       summary statistics. If ``None``, no rounding is performed.
 
     node_scale : int or float, optional, default: ``12``
         Sets the scale factor used to determine the rendered size of the
