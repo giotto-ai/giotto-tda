@@ -137,11 +137,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
 
-        # Add dimension as the third elements of each (b, d) tuple
-        Xdgms = {dim: np.hstack([Xdgms[dim],
-                                 dim * np.ones((Xdgms[dim].shape[0], 1),
-                                               dtype=Xdgms[dim].dtype)])
-                 for dim in self._homology_dimensions}
         return Xdgms
 
     def fit(self, X, y=None):
@@ -389,11 +384,6 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
 
-        # Add dimension as the third elements of each (b, d) tuple
-        Xdgms = {dim: np.hstack([Xdgms[dim],
-                                 dim * np.ones((Xdgms[dim].shape[0], 1),
-                                               dtype=Xdgms[dim].dtype)])
-                 for dim in self._homology_dimensions}
         return Xdgms
 
     def fit(self, X, y=None):
@@ -609,11 +599,6 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
 
-        # Add dimension as the third elements of each (b, d) tuple
-        Xdgms = {dim: np.hstack([Xdgms[dim],
-                                 dim * np.ones((Xdgms[dim].shape[0], 1),
-                                               dtype=Xdgms[dim].dtype)])
-                 for dim in self._homology_dimensions}
         return Xdgms
 
     def fit(self, X, y=None):
@@ -853,14 +838,10 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                  directed=self.directed,
                                  filtration=self.filtration, coeff=self.coeff,
                                  approximation=self.max_entries)['dgms']
+
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
 
-        # Add dimension as the third elements of each (b, d) tuple
-        Xdgms = {dim: np.hstack([Xdgms[dim],
-                                 dim * np.ones((Xdgms[dim].shape[0], 1),
-                                               dtype=Xdgms[dim].dtype)])
-                 for dim in self._homology_dimensions}
         return Xdgms
 
     def fit(self, X, y=None):
