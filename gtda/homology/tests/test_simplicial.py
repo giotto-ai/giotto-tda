@@ -59,6 +59,13 @@ def test_vrp_list_of_arrays():
     vrp.fit(X_list)
 
 
+def test_vrp_low_infinty_values():
+    vrp = VietorisRipsPersistence(max_edge_length=0.001,
+                                  infinity_values=-1)
+    assert_almost_equal(vrp.fit_transform(X)[:, :, :2],
+                        np.zeros((1, 2, 2)))
+
+
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
 def test_vrp_fit_transform_plot(hom_dims):
     VietorisRipsPersistence().fit_transform_plot(
@@ -149,6 +156,7 @@ def test_fp_not_fitted():
 
     with pytest.raises(NotFittedError):
         fp.transform(X_dist)
+
 
 X_dir_graph = X_dist.copy()
 X_dir_graph[0, 0, :] = X_dir_graph[0, 0, :] / 2.
