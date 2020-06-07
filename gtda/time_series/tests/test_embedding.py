@@ -111,7 +111,6 @@ def test_window_resample_any():
                             target_resampler=lambda x: sum(x))
     windows.fit(y_binary)
     y_resampled = windows.resample(y_binary)
-    print(y_resampled)
     assert_almost_equal(y_resampled, y_expected)
 
 
