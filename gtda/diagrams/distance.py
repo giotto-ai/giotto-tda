@@ -197,9 +197,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples_fit, n_samples, \
+        Xt : ndarray of shape (n_samples, n_samples_fit \
             n_homology_dimensions) if `order` is ``None``, else \
-            (n_samples_fit, n_samples)
+            (n_samples, n_samples_fit)
             Distance matrix or collection of distance matrices between
             diagrams in `X` and diagrams seen in :meth:`fit`. In the
             second case, index i along axis 2 corresponds to the i-th
@@ -221,4 +221,4 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         if self.order is not None:
             Xt = np.linalg.norm(Xt, axis=2, ord=self.order)
 
-        return Xt
+        return np.swapaxes(Xt, 1, 0)
