@@ -19,36 +19,34 @@ def _pad_diagram(Xd, homology_dimensions, max_n_points, min_values):
                 [min_values[dim], min_values[dim]]
 
     # Add dimension as the third elements of each (b, d) tuple
-    Xd = [np.hstack([Xd[dim], dim * np.ones((Xd[dim].shape[0], 1),
-                                            dtype=Xd[dim].dtype)])
+    Xd = [np.insert(Xd[dim], 2, dim, axis=1)
           for dim in homology_dimensions]
 
-    Xd = np.vstack([Xd[d] for d in range(len(homology_dimensions))])
-
+    Xd = np.vstack(Xd)
     return Xd
 
 
 def _postprocess_diagrams(Xt, homology_dimensions, infinity_values, n_jobs):
-    # Replacing np.inf with infinity_values
-    Xt = [{dim: np.nan_to_num(Xt[i][dim], posinf=infinity_values)
+    # Replacing np.inf with infinity_values and turning list of list of
+    # subdiagrams into list of dictionaries whose keys are the dimensions
+    Xt = [{dim: np.nan_to_num(diagram[dim], posinf=infinity_values)
           for dim in homology_dimensions}
-          for i in range(len(Xt))]
+          for diagram in Xt]
 
     # Removing points whose birth is higher than their death
-    Xt = [{dim: Xt[i][dim][Xt[i][dim][:, 0] < Xt[i][dim][:, 1]]
-          for dim in homology_dimensions}
-          for i in range(len(Xt))]
+    Xt = [{dim: subdiagram[subdiagram[:, 0] < subdiagram[:, 1]]
+          for dim, subdiagram in diagram.items()}
+          for diagram in Xt]
 
-    max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
-                                        for i in range(len(Xt))]))
+    max_n_points = {dim: np.max([len(diagram[dim]) for diagram in Xt] + [1])
                     for dim in homology_dimensions}
-    min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size else
-                            np.inf for i in range(len(Xt))])
+    min_values = {dim: min([np.min(diagram[dim][:, 0]) if diagram[dim].size
+                            else np.inf for diagram in Xt])
                   for dim in homology_dimensions}
-    min_values = {dim: min_values[dim] if min_values[dim] != np.inf else 0
-                  for dim in homology_dimensions}
+    min_values = {dim: min_value if min_value != np.inf else 0
+                  for dim, min_value in min_values.items()}
     Xt = Parallel(n_jobs=n_jobs)(delayed(_pad_diagram)(
-        Xt[i], homology_dimensions, max_n_points, min_values)
-                                      for i in range(len(Xt)))
+        diagram, homology_dimensions, max_n_points, min_values)
+                                 for diagram in Xt)
     Xt = np.stack(Xt)
     return Xt
