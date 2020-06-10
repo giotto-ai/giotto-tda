@@ -85,13 +85,14 @@ def plot_static_mapper_graph(
 
     n_sig_figs : int or None, optional, default: ``3``
        If not ``None``, number of significant figures to which to round node
-       node summary statistics. If ``None``, no rounding is performed.
+       summary statistics. If ``None``, no rounding is performed.
 
     node_scale : int or float, optional, default: ``12``
         Sets the scale factor used to determine the rendered size of the
         nodes. Increase for larger nodes. Implements a formula in the
         `Plotly documentation \
-        <plotly.com/python/bubble-charts/#scaling-the-size-of-bubble-charts>`_.
+        <https://plotly.com/python/bubble-charts/#scaling-the-size-of-bubble\
+        -charts>`_.
 
     plotly_params : dict or None, optional, default: ``None``
         Custom parameters to configure the plotly figure. Allowed keys are
@@ -120,8 +121,8 @@ def plot_static_mapper_graph(
 
     See also
     --------
-    :func:`~gtda.mapper.plot_interactive_mapper_graph`,
-    :func:`~gtda.mapper.make_mapper_pipeline`
+    :func:`~gtda.mapper.visualization.plot_interactive_mapper_graph`,
+    :func:`~gtda.mapper.pipeline.make_mapper_pipeline`
 
     References
     ----------
@@ -324,7 +325,7 @@ def plot_interactive_mapper_graph(
 
     n_sig_figs : int or None, optional, default: ``3``
        If not ``None``, number of significant figures to which to round node
-       node summary statistics. If ``None``, no rounding is performed.
+       summary statistics. If ``None``, no rounding is performed.
 
     node_scale : int or float, optional, default: ``12``
         Sets the scale factor used to determine the rendered size of the
@@ -348,8 +349,8 @@ def plot_interactive_mapper_graph(
 
     See also
     --------
-    :func:`~gtda.mapper.plot_static_mapper_graph`,
-    :func:`~gtda.mapper.make_mapper_pipeline`
+    :func:`~gtda.mapper.visualization.plot_static_mapper_graph`,
+    :func:`~gtda.mapper.pipeline.make_mapper_pipeline`
 
     References
     ----------

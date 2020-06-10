@@ -220,7 +220,7 @@ def make_mapper_pipeline(scaler=None,
         is advantageous when the fitting of early steps is time consuming and
         only later steps in the pipeline are modified (e.g. using
         :meth:`set_params`) before refitting on the same data. To be used
-        used exactly as for :func:`sklearn.pipeline.make_pipeline`. By default,
+        exactly as for :func:`sklearn.pipeline.make_pipeline`. By default, no
         no caching is performed. If a string is given, it is the path to the
         caching directory. See [3]_.
 
@@ -260,7 +260,7 @@ def make_mapper_pipeline(scaler=None,
     >>> # Find which points belong to first node of graph
     >>> node_id = mapper_graph['node_metadata']['node_id']
     >>> node_elements = mapper_graph['node_metadata']['node_elements']
-    >>> print(f"Node Id: {node_id[0]}, Node elements: {node_elements[0]}, "
+    >>> print(f"Node ID: {node_id[0]}, Node elements: {node_elements[0]}, "
     ...       f"Data points: {X[node_elements[0]]}")
     Node Id: 0,
     Node elements: [8768],
@@ -341,8 +341,8 @@ def make_mapper_pipeline(scaler=None,
            <https://joblib.readthedocs.io/en/latest/parallel.html>`_.
 
     .. [3] "Caching transformers: avoid repeated computation", in
-            `scikit-learn documentation
-            <https://scikit-learn.org/stable/modules/compose.html>_`.
+            `scikit-learn documentation \
+            <https://scikit-learn.org/stable/modules/compose.html>`_.
 
     """
 
