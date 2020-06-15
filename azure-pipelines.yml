@@ -2,7 +2,7 @@
 # Additional checks can be manually triggered
 variables:
 - name: nightly_release
-  value: and(eq(variables['nightly_check'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  value: and(eq(variables['nightly_check'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
 
 trigger:
 - master
