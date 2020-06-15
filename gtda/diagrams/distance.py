@@ -210,11 +210,11 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         X = check_diagrams(X, copy=True)
 
         if np.array_equal(X, self._X):
-            X2 = None
+            X1 = None
         else:
-            X2 = X
+            X1 = X
 
-        Xt = _parallel_pairwise(X2, self._X, self.metric,
+        Xt = _parallel_pairwise(X1, self._X, self.metric,
                                 self.effective_metric_params_,
                                 self.homology_dimensions_,
                                 self.n_jobs)
