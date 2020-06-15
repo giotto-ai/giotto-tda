@@ -67,7 +67,7 @@ The latest stable version of ``giotto-tda`` requires:
 - SciPy (>= 0.17.0)
 - joblib (>= 0.13)
 - scikit-learn (>= 0.22.0)
-- pyflagser (>= 0.3.1)
+- pyflagser (>= 0.4.0)
 - python-igraph (>= 0.7.1.post6)
 - plotly (>= 4.4.1)
 - ipywidgets (>= 7.5.1)
