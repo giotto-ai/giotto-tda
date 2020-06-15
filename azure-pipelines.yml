@@ -1,5 +1,9 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+variables:
+- name: nightly_release
+  value: and(eq(variables['nightly_check'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
 trigger:
 - master
 
@@ -46,7 +50,7 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
+    condition: nightly_release
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
@@ -99,7 +103,7 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
-    condition: eq(variables['nightly_check'], 'true')
+    condition: nightly_release
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -128,7 +132,7 @@ jobs:
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
-    condition: eq(variables['nightly_check'], 'true')
+    condition: nightly_release
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Cache@2
@@ -215,7 +219,7 @@ jobs:
   - bash: |
       set -e
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
+    condition: nightly_release
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -243,7 +247,7 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
+    condition: nightly_release
     displayName: 'Change name to giotto-tda-nightly'
 
   # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
@@ -306,5 +310,5 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
+    condition: nightly_release
     displayName: 'Upload nightly wheels to PyPI'
