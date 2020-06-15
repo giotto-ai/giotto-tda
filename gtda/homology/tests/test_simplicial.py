@@ -191,7 +191,7 @@ def test_fp_transform_undirected(max_edge_weight, infinity_values):
     X_res = X_vrp_res.copy()
 
     # In that case, subdiagrams of dimension 1 is empty
-    if max_edge_weight is 0.6:
+    if max_edge_weight == 0.6:
         X_res[0, -1, :] = [0., 0., 1.]
 
     # This is not generally true, it is only a way to obtain the res array
