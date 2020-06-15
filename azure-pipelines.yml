@@ -1,8 +1,7 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
 variables:
-- name: nightly_release
-  value: and(eq(variables['nightly_check'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.Reason'], 'PullRequest'))
+- nightly_release: and(eq(variables['nightly_check'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
 
 trigger:
 - master
