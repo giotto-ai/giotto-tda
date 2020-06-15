@@ -49,7 +49,7 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: variables['nightly_release']
+    condition: eq('True', variables['nightly_release'])
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
@@ -102,7 +102,7 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
-    condition: variables['nightly_release']
+    condition: eq('True', variables['nightly_release'])
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -131,7 +131,7 @@ jobs:
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
-    condition: variables['nightly_release']
+    condition: eq('True', variables['nightly_release'])
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Cache@2
@@ -218,7 +218,7 @@ jobs:
   - bash: |
       set -e
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: variables['nightly_release']
+    condition: eq('True', variables['nightly_release'])
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -246,7 +246,7 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: variables['nightly_release']
+    condition: eq('True', variables['nightly_release'])
     displayName: 'Change name to giotto-tda-nightly'
 
   # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
@@ -309,5 +309,5 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: variables['nightly_release']
+    condition: eq('True', variables['nightly_release'])
     displayName: 'Upload nightly wheels to PyPI'
