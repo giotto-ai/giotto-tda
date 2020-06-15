@@ -181,7 +181,7 @@ def test_fp_transform_directed(max_edge_weight, infinity_values):
     assert_almost_equal(fp.fit_transform(X_dir_graph), X_res)
 
 
-@pytest.mark.parametrize('max_edge_weight', [np.inf, 0.8])
+@pytest.mark.parametrize('max_edge_weight', [np.inf, 0.8, 0.6])
 @pytest.mark.parametrize('infinity_values', [10, 30])
 def test_fp_transform_undirected(max_edge_weight, infinity_values):
     fp = FlagserPersistence(directed=False, max_edge_weight=max_edge_weight,
@@ -189,6 +189,11 @@ def test_fp_transform_undirected(max_edge_weight, infinity_values):
     # In the undirected case with "max" filtration, the results are always the
     # same as the one of VietorisRipsPersistence
     X_res = X_vrp_res.copy()
+
+    # In that case, subdiagrams of dimension 1 is empty
+    if max_edge_weight is 0.6:
+        X_res[0, -1, :] = [0., 0., 1.]
+
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
     X_res[:, :, :2][X_res[:, :, :2] >= max_edge_weight] = infinity_values
