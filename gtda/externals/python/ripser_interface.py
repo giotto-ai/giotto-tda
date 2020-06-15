@@ -31,18 +31,21 @@ def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
 
 
 def dpoint2pointcloud(X, i, metric):
-    """
-    Return the distance from the ith point in a Euclidean point cloud
-    to the rest of the points
+    """Return the distance from the ith point in a Euclidean point cloud
+    to the rest of the points.
+
     Parameters
     ----------
     X: ndarray (n_samples, n_features)
         A numpy array of data
+
     i: int
         The index of the point from which to return all distances
+
     metric: string or callable
         The metric to use when calculating distance between instances in a
         feature array
+
     """
     ds = pairwise_distances(X, X[i, :][None, :], metric=metric).flatten()
     ds[i] = 0
@@ -50,26 +53,32 @@ def dpoint2pointcloud(X, i, metric):
 
 
 def get_greedy_perm(X, n_perm=None, metric="euclidean"):
-    """
-    Compute a furthest point sampling permutation of a set of points
+    """Compute a furthest point sampling permutation of a set of points
+
     Parameters
     ----------
     X: ndarray (n_samples, n_features)
         A numpy array of either data or distance matrix
+
     n_perm: int
         Number of points to take in the permutation
+
     metric: string or callable
         The metric to use when calculating distance between instances in a
         feature array
+
     Returns
     -------
     idx_perm: ndarray(n_perm)
         Indices of points in the greedy permutation
+
     lambdas: ndarray(n_perm)
         Covering radii at different points
+
     dperm2all: ndarray(n_perm, n_samples)
         Distances from points in the greedy permutation to points
         in the original point set
+
     """
     if not n_perm:
         n_perm = X.shape[0]
@@ -104,15 +113,19 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     X: ndarray (n_samples, n_features)
         A numpy array of either data or distance matrix.
         Can also be a sparse distance matrix of type scipy.sparse
+
     maxdim: int, optional, default 1
         Maximum homology dimension computed. Will compute all dimensions
         lower than and equal to this value.
         For 1, H_0 and H_1 will be computed.
+
     thresh: float, default infinity
         Maximum distances considered when constructing filtration.
         If infinity, compute the entire filtration.
+
     coeff: int prime, default 2
         Compute homology with coefficients in the prime field Z/pZ for p=coeff.
+
     metric: string or callable
         The metric to use when calculating distance between instances in a
         feature array. If metric is a string, it must be one of the options
@@ -129,26 +142,29 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         computation, at the expense of some accuracy, which can
         be bounded as a maximum bottleneck distance to all diagrams
         on the original point set
+
     Returns
     -------
     A dictionary holding all of the results of the computation
-    {'dgms': list (size maxdim) of ndarray (n_pairs, 2)
-        A list of persistence diagrams, one for each dimension less
-        than maxdim. Each diagram is an ndarray of size (n_pairs, 2)
-        with the first column representing the birth time and the
-        second column representing the death time of each pair.
-     'num_edges': int
-        The number of edges added during the computation
-     'dperm2all': ndarray(n_samples, n_samples) or ndarray (n_perm, n_samples) if n_perm
-        The distance matrix used in the computation if n_perm is none.
-        Otherwise, the distance from all points in the permutation to
-        all points in the dataset
-     'idx_perm': ndarray(n_perm) if n_perm > 0
-        Index into the original point cloud of the points used
-        as a subsample in the greedy permutation
-     'r_cover': float
-        Covering radius of the subsampled points.
-        If n_perm <= 0, then the full point cloud was used and this is 0
+    {
+        'dgms': list (size maxdim) of ndarray (n_pairs, 2)
+            A list of persistence diagrams, one for each dimension less
+            than maxdim. Each diagram is an ndarray of size (n_pairs, 2)
+            with the first column representing the birth time and the
+            second column representing the death time of each pair.
+        'num_edges': int
+            The number of edges added during the computation
+        'dperm2all': ndarray(n_samples, n_samples) or ndarray (n_perm, \
+            n_samples) if n_perm
+            The distance matrix used in the computation if n_perm is none.
+            Otherwise, the distance from all points in the permutation to
+            all points in the dataset
+        'idx_perm': ndarray(n_perm) if n_perm > 0
+            Index into the original point cloud of the points used
+            as a subsample in the greedy permutation
+        'r_cover': float
+            Covering radius of the subsampled points.
+            If n_perm <= 0, then the full point cloud was used and this is 0
     }
 
     """
@@ -159,7 +175,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     if n_perm and n_perm > X.shape[0]:
         raise Exception(
             "Number of points in greedy permutation is greater"
-            + " than number of points in the point cloud"
+            " than number of points in the point cloud"
         )
     if n_perm and n_perm < 0:
         raise Exception(

@@ -68,7 +68,9 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, EuclideanCechPersistence
+    images.HeightFiltration, images.RadialFiltration, \
+    images.DilationFiltration, images.ErosionFiltration, \
+    images.SignedDistanceFiltration
 
     Notes
     -----
@@ -118,11 +120,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                 if Xdgms[i][0] == dim]).reshape((-1, 2))
                  for dim in self.homology_dimensions}
 
-        # Add dimension as the third elements of each (b, d) tuple
-        Xdgms = {dim: np.hstack([Xdgms[dim],
-                                 dim * np.ones((Xdgms[dim].shape[0], 1),
-                                               dtype=Xdgms[dim].dtype)])
-                 for dim in self._homology_dimensions}
         return Xdgms
 
     def fit(self, X, y=None):

@@ -16,22 +16,37 @@ def _pad_diagram(Xd, homology_dimensions, max_n_points, min_values):
             padding = ((0, n_points_to_pad), (0, 0))
             Xd[dim] = np.pad(Xd[dim], padding, 'constant')
             Xd[dim][-n_points_to_pad:, :] = \
-                [min_values[dim], min_values[dim], dim]
-    Xd = np.vstack([Xd[dim] for dim in homology_dimensions])
+                [min_values[dim], min_values[dim]]
+
+    # Add dimension as the third elements of each (b, d) tuple
+    Xd = [np.insert(Xd[dim], 2, dim, axis=1)
+          for dim in homology_dimensions]
+
+    Xd = np.vstack(Xd)
     return Xd
 
 
 def _postprocess_diagrams(Xt, homology_dimensions, infinity_values, n_jobs):
-    max_n_points = {dim: max(1, np.max([Xt[i][dim].shape[0]
-                                        for i in range(len(Xt))]))
+    # Replacing np.inf with infinity_values and turning list of list of
+    # subdiagrams into list of dictionaries whose keys are the dimensions
+    Xt = [{dim: np.nan_to_num(diagram[dim], posinf=infinity_values)
+          for dim in homology_dimensions}
+          for diagram in Xt]
+
+    # Removing points whose birth is higher than their death
+    Xt = [{dim: subdiagram[subdiagram[:, 0] < subdiagram[:, 1]]
+          for dim, subdiagram in diagram.items()}
+          for diagram in Xt]
+
+    max_n_points = {dim: np.max([len(diagram[dim]) for diagram in Xt] + [1])
                     for dim in homology_dimensions}
-    min_values = {dim: min([np.min(Xt[i][dim][:, 0]) if Xt[i][dim].size else
-                            np.inf for i in range(len(Xt))])
+    min_values = {dim: min([np.min(diagram[dim][:, 0]) if diagram[dim].size
+                            else np.inf for diagram in Xt])
                   for dim in homology_dimensions}
-    min_values = {dim: min_values[dim] if min_values[dim] != np.inf else 0
-                  for dim in homology_dimensions}
+    min_values = {dim: min_value if min_value != np.inf else 0
+                  for dim, min_value in min_values.items()}
     Xt = Parallel(n_jobs=n_jobs)(delayed(_pad_diagram)(
-        Xt[i], homology_dimensions, max_n_points, min_values)
-                                      for i in range(len(Xt)))
+        diagram, homology_dimensions, max_n_points, min_values)
+                                 for diagram in Xt)
     Xt = np.stack(Xt)
-    return np.nan_to_num(Xt, posinf=infinity_values)
+    return Xt
