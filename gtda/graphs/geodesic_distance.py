@@ -3,8 +3,11 @@
 
 import numpy as np
 from joblib import Parallel, delayed
+from numpy.ma import masked_invalid
+from numpy.ma.core import MaskedArray
+from scipy.sparse import issparse
+from scipy.sparse.csgraph import shortest_path
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.graph_shortest_path import graph_shortest_path
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import PlotterMixin
@@ -22,8 +25,15 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
     path between any two of its vertices, setting it to ``numpy.inf`` when two
     vertices cannot be connected by a path.
 
-    The graphs are encoded as sparse adjacency matrices, while the outputs
-    are dense distance matrices of variable size.
+    The graphs are represented by their adjacency matrices which can be dense
+    arrays, sparse matrices or masked arrays. The following rules apply:
+
+    - In dense arrays of Boolean type, entries which are ``False`` represent
+      absent edges.
+    - In dense arrays of integer or float type, zero entries represent edges
+      of length 0. Absent edges must be indicated by ``numpy.inf``.
+    - In sparse matrices, non-stored values represent absent edges. Explicitly
+      stored zero or ``False`` edges represent edges of length 0.
 
     Parameters
     ----------
@@ -31,6 +41,21 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    directed : bool, optional, default: ``True``
+        If ``True`` (default), then find the shortest path on a directed graph.
+        If ``False``, then find the shortest path on an undirected graph.
+
+    unweighted : bool, optional, default: ``False``
+        If ``True``, then find unweighted distances. That is, rather than
+        finding the path between each point such that the sum of weights is
+        minimized, find the path such that the number of edges is minimized.
+
+    method : ``'auto'`` | ``'FW'`` | ``'D'`` | ``'BF'`` | ``'J'``, optional, \
+        default: ``'auto'``
+        Algorithm to use for shortest paths. See the `scipy documentation \
+        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.\
+        csgraph.shortest_path.html>`_.
 
     Examples
     --------
@@ -52,18 +77,26 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    TransitionGraph, KNeighborsGraph, gtda.homology.VietorisRipsPersistence
+    TransitionGraph, KNeighborsGraph
 
     """
 
-    def __init__(self, n_jobs=None):
+    def __init__(self, n_jobs=None, directed=False, unweighted=False,
+                 method='auto'):
         self.n_jobs = n_jobs
+        self.directed = directed
+        self.unweighted = unweighted
+        self.method = method
 
     def _geodesic_distance(self, X):
-        X_distance = graph_shortest_path(X)
-        X_distance[X_distance == 0] = np.inf  # graph_shortest_path returns a
-        # float64 array, so inserting np.inf does not change the type.
-        np.fill_diagonal(X_distance, 0)
+        if not issparse(X) and not isinstance(X, MaskedArray):
+            if X.dtype != bool:
+                # Convert to a masked array with mask given by positions in
+                # which infs or NaNs occur.
+                X = masked_invalid(X)
+        X_distance = shortest_path(X, directed=self.directed,
+                                   unweighted=self.unweighted,
+                                   method=self.method)
         return X_distance
 
     def fit(self, X, y=None):
@@ -74,10 +107,10 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or \
-            (n_samples, n_vertices, n_vertices)
-            Input data, i.e. a collection of adjacency matrices of graphs.
-            Each adjacency matrix may be a dense or a sparse array.
+        X : list-like of length n_samples, or ndarray of shape (n_samples, \
+            n_vertices, n_vertices)
+            Input data: a collection of adjacency matrices of graphs. Each
+            adjacency matrix may be a dense or a sparse array.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -94,27 +127,26 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         return self
 
     def transform(self, X, y=None):
-        """Use :meth:`sklearn.utils.graph_shortest_path.graph_shortest_path`
-        to compute the lengths of graph shortest paths between any two
+        """Compute the lengths of graph shortest paths between any two
         vertices.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,) or \
-            (n_samples, n_vertices, n_vertices)
-            Input data, i.e. a collection of adjacency matrices of graphs.
-            Each adjacency matrix may be a dense or sparse array.
+        X : list-like of length n_samples, or ndarray of shape (n_samples, \
+            n_vertices, n_vertices)
+            Input data: a collection of adjacency matrices of graphs. Each
+            adjacency matrix may be a dense array, a sparse matrix, or a masked
+            array.
 
         y : None
             Ignored.
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples,) or \
-             (n_samples, n_vertices, n_vertices)
-            Array of distance matrices. If the distance matrices have variable
-            size across samples, `Xt` is a one-dimensional array of dense
-            arrays.
+        Xt : list-like of length n_samples, or ndarray of shape (n_samples, \
+            n_vertices, n_vertices)
+            Output collection of dense distance matrices. If the distance
+            matrices all have the same shape, a single 3D ndarray is returned.
 
         """
         check_is_fitted(self, '_is_fitted')
@@ -123,6 +155,8 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._geodesic_distance)(x) for x in X)
         Xt = np.array(Xt)
+        if Xt.ndim == 1:
+            Xt = list(Xt)
         return Xt
 
     @staticmethod
@@ -131,7 +165,8 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, n_points)
+        Xt : list-like of length n_samples, or ndarray of shape (n_samples, \
+            n_vertices, n_vertices)
             Collection of distance matrices, such as returned by
             :meth:`transform`.
 
