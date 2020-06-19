@@ -152,9 +152,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             was not set to ``'precomputed'``, and of distance matrices or
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
-            or a list containing ``n_samples`` 2D ndarrays. If `metric` was
-            set to ``'precomputed'``, each entry of `X` must be a square
-            array and should be compatible with a filtration, i.e. the value
+            or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
+            If `metric` was set to ``'precomputed'``, each entry of `X` must be
+            square and should be compatible with a filtration, i.e. the value
             at index (i, j) should be no smaller than the values at diagonal
             indices (i, i) and (j, j).
 
@@ -170,7 +170,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         self._is_precomputed = self.metric == 'precomputed'
-        check_point_clouds(X, distance_matrices=self._is_precomputed)
+        check_point_clouds(X, accept_sparse=self._is_precomputed,
+                           distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -200,9 +201,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             was not set to ``'precomputed'``, and of distance matrices or
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
-            or a list containing ``n_samples`` 2D ndarrays. If `metric` was
-            set to ``'precomputed'``, each entry of `X` must be a square
-            array and should be compatible with a filtration, i.e. the value
+            or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
+            If `metric` was set to ``'precomputed'``, each entry of `X` must be
+            square and should be compatible with a filtration, i.e. the value
             at index (i, j) should be no smaller than the values at diagonal
             indices (i, i) and (j, j).
 
@@ -221,7 +222,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, distance_matrices=self._is_precomputed)
+        X = check_point_clouds(X, accept_sparse=self._is_precomputed,
+                               distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._ripser_diagram)(x) for x in X)
@@ -613,8 +615,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data representing a collection of point clouds. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays. The rows of
-            elements in `X` are interpreted as vectors in Euclidean space and.
-            and, when `X` is a list, warnings are issued when the number of
+            elements in `X` are interpreted as vectors in Euclidean space and,
+            when `X` is a list, warnings are issued when the number of
             columns (dimension of the Euclidean space) differs among samples.
 
         y : None
@@ -657,8 +659,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data representing a collection of point clouds. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays. The rows of
-            elements in `X` are interpreted as vectors in Euclidean space and.
-            and, when `X` is a list, warnings are issued when the number of
+            elements in `X` are interpreted as vectors in Euclidean space and,
+            when `X` is a list, warnings are issued when the number of
             columns (dimension of the Euclidean space) differs among samples.
 
         y : None
@@ -852,20 +854,20 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_vertices, n_vertices) or list of \
-            n_samples ``scipy.sparse`` matrices of shape (n_vertices, \
-            n_vertices)
-            Input collection. Each entry along axis 0 is the adjacency matrix
-            of a weighted directed or undirected graph. In each of those
-            adjacency matrices, diagonal elements are vertex weights and
-            off-diagonal elements are edges weights. It is assumed that a
-            vertex weight cannot be larger than the weight of the edges it
+        X : ndarray or list
+            Input collection of adjacency matrices of weighted directed or
+            undirected graphs. Can be either a 3D ndarray whose zeroth
+            dimension has size ``n_samples``, or a list containing
+            ``n_samples`` 2D ndarrays/sparse matrices. In each adjacency
+            matrix, diagonal elements are vertex weights and off-diagonal
+            elements are edges weights. It is assumed that a vertex weight
+            cannot be larger than the weight of the edges it
             forms. The way zero values are handled depends on the format of the
             matrix. If the matrix is a dense ``numpy.ndarray``, zero values
             denote zero-weighted edges. If the matrix is a sparse
             ``scipy.sparse`` matrix, explicitly stored off-diagonal zeros and
             all diagonal zeros denote zero-weighted edges. Off-diagonal values
-            that have not been explicitely stored are treated by
+            that have not been explicitly stored are treated by
             ``scipy.sparse`` as zeros but will be understood as
             infinitely-valued edges, i.e., edges absent from the filtration.
 
@@ -878,7 +880,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_point_clouds(X, distance_matrices=True)
+        check_point_clouds(X, allow_sparse=True, distance_matrices=True)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs',
                                                                'filtration'])
@@ -907,20 +909,20 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_vertices, n_vertices) or list of \
-            n_samples ``scipy.sparse`` matrices of shape (n_vertices, \
-            n_vertices)
-            Input collection. Each entry along axis 0 is the adjacency matrix
-            of a weighted directed or undirected graph. In each of those
-            adjacency matrices, diagonal elements are vertex weights and
-            off-diagonal elements are edges weights. It is assumed that a
-            vertex weight cannot be larger than the weight of the edges it
+        X : ndarray or list
+            Input collection of adjacency matrices of weighted directed or
+            undirected graphs. Can be either a 3D ndarray whose zeroth
+            dimension has size ``n_samples``, or a list containing
+            ``n_samples`` 2D ndarrays/sparse matrices. In each adjacency
+            matrix, diagonal elements are vertex weights and off-diagonal
+            elements are edges weights. It is assumed that a vertex weight
+            cannot be larger than the weight of the edges it
             forms. The way zero values are handled depends on the format of the
             matrix. If the matrix is a dense ``numpy.ndarray``, zero values
             denote zero-weighted edges. If the matrix is a sparse
             ``scipy.sparse`` matrix, explicitly stored off-diagonal zeros and
             all diagonal zeros denote zero-weighted edges. Off-diagonal values
-            that have not been explicitely stored are treated by
+            that have not been explicitly stored are treated by
             ``scipy.sparse`` as zeros but will be understood as
             infinitely-valued edges, i.e., edges absent from the filtration.
 
@@ -939,7 +941,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, distance_matrices=True)
+        X = check_point_clouds(X, allow_sparse=True, distance_matrices=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._flagser_diagram)(x) for x in X)
