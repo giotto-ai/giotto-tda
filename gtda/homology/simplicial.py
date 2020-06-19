@@ -153,10 +153,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
-            If `metric` was set to ``'precomputed'``, each entry of `X` must be
-            square and should be compatible with a filtration, i.e. the value
-            at index (i, j) should be no smaller than the values at diagonal
-            indices (i, i) and (j, j).
+            If `metric` was set to ``'precomputed'``, each entry of `X` should
+            be compatible with a filtration, i.e. the value at index (i, j)
+            should be no smaller than the values at diagonal indices (i, i)
+            and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -202,10 +202,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
-            If `metric` was set to ``'precomputed'``, each entry of `X` must be
-            square and should be compatible with a filtration, i.e. the value
-            at index (i, j) should be no smaller than the values at diagonal
-            indices (i, i) and (j, j).
+            If `metric` was set to ``'precomputed'``, each entry of `X` should
+            be compatible with a filtration, i.e. the value at index (i, j)
+            should be no smaller than the values at diagonal indices (i, i)
+            and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -397,14 +397,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray or list
-            Input data representing a collection of point clouds or of distance
-            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            Input data representing a collection of point clouds if `metric`
+            was not set to ``'precomputed'``, and of distance matrices
+            otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            If ``metric == 'precomputed'``, elements of `X` must be square
-            arrays representing distance matrices; otherwise, their rows are
-            interpreted as vectors in Euclidean space and, when `X` is a list,
-            warnings are issued when the number of columns (dimension of the
-            Euclidean space) differs among samples.
+            If `metric` was set to ``'precomputed'``, entries of `X` must be
+            square arrays and should be compatible with a filtration, i.e. the
+            value at index (i, j) should be no smaller than the values at
+            diagonal indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -444,14 +444,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray or list
-            Input data representing a collection of point clouds or of distance
-            matrices. Can be either a 3D ndarray whose zeroth dimension has
+            Input data representing a collection of point clouds if `metric`
+            was not set to ``'precomputed'``, and of distance matrices
+            otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            If ``metric == 'precomputed'``, elements of `X` must be square
-            arrays representing distance matrices; otherwise, their rows are
-            interpreted as vectors in Euclidean space and, when `X` is a list,
-            warnings are issued when the number of columns (dimension of the
-            Euclidean space) differs among samples.
+            If `metric` was set to ``'precomputed'``, entries of `X` must be
+            square arrays and should be compatible with a filtration, i.e. the
+            value at index (i, j) should be no smaller than the values at
+            diagonal indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -612,12 +612,9 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray or list
-            Input data representing a collection of point clouds. Can be
-            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
-            or a list containing ``n_samples`` 2D ndarrays. The rows of
-            elements in `X` are interpreted as vectors in Euclidean space and,
-            when `X` is a list, warnings are issued when the number of
-            columns (dimension of the Euclidean space) differs among samples.
+            Input data representing a collection of point clouds. Can be either
+            a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
+            list containing ``n_samples`` 2D ndarrays.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -656,12 +653,9 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_points, n_dimensions)
-            Input data representing a collection of point clouds. Can be
-            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
-            or a list containing ``n_samples`` 2D ndarrays. The rows of
-            elements in `X` are interpreted as vectors in Euclidean space and,
-            when `X` is a list, warnings are issued when the number of
-            columns (dimension of the Euclidean space) differs among samples.
+            Input data representing a collection of point clouds. Can be either
+            a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
+            list containing ``n_samples`` 2D ndarrays.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
