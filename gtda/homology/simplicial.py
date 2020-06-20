@@ -799,8 +799,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing \
-        persistent homology of directed flag complexes", Algorithms,
-        13(1), 2020.
+        persistent homology of directed flag complexes", Algorithms, 13(1), \
+        2020.
 
     """
 
