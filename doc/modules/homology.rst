@@ -15,3 +15,4 @@
    homology.SparseRipsPersistence
    homology.EuclideanCechPersistence
    homology.CubicalPersistence
+   homology.FlagserPersistence
