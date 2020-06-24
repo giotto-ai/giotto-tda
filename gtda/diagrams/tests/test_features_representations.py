@@ -109,6 +109,21 @@ def test_pi_positive(pts):
         axis=1), axis=0)
     assert np.all(pi.fit_transform(diagrams) >= 0.)
 
+def test_large_pi_null_multithreaded():
+    """Test that, if one trivial diagram (all pts on the diagonal) is provided,
+    (along with a non-trivial one), then its pi is null when the input array is at
+    least 1MB and more than 1 process is used, triggering joblib's use of memmaps"""
+    X = np.linspace(0, 100, 300000)
+    pi = PersistenceImage(sigma=1, n_bins=10, n_jobs=2)
+    X = np.append(X, 1 + X[-1])
+    diagrams = np.expand_dims(np.stack([X, X,
+                                        np.zeros((X.shape[0],),
+                                                 dtype=int)]).transpose(),
+                              axis=0)
+    diagrams = np.repeat(diagrams, 2, axis=0)
+    diagrams[1, :, 1] += 1
+
+    assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
 
 def test_silhouette_transform():
     sht = Silhouette(n_bins=31, power=1.)
@@ -234,3 +249,20 @@ def test_hk_with_diag_points(pts):
                                  for x_ in [x, x_with_diag_points]]
 
     assert_almost_equal(x_with_diag_points_t, x_t, decimal=13)
+
+def test_large_hk_shape_multithreaded():
+    """Test that HeatKernel returns something of the right shape when the input
+    array is at least 1MB and more than 1 process is used, triggering joblib's
+    use of memmaps"""
+    X = np.linspace(0, 100, 300000)
+    n_bins = 10
+    diagrams = np.expand_dims(np.stack([X, X,
+                                        np.zeros((X.shape[0],),
+                                                 dtype=int)]).transpose(),
+                              axis=0)
+
+    hk = HeatKernel(sigma=1, n_bins=n_bins, n_jobs=2)
+    num_dimensions = 1
+    x_t = hk.fit_transform(diagrams)
+
+    assert x_t.shape == (diagrams.shape[0], num_dimensions, n_bins, n_bins)

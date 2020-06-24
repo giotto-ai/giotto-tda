@@ -587,7 +587,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_diagrams(X, copy=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(
+        Xt = Parallel(n_jobs=self.n_jobs, mmap_mode='c')(delayed(
             heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
                    self._samplings[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
@@ -792,7 +792,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_diagrams(X, copy=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
+        Xt = Parallel(n_jobs=self.n_jobs, mmap_mode='c')(
             delayed(persistence_images)(_subdiagrams(X, [dim],
                                                      remove_dim=True)[s],
                                         self._samplings[dim],
