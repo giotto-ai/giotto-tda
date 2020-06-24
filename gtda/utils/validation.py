@@ -303,10 +303,4 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                     "Euclidean space.", DataDimensionalityWarning,
                     stacklevel=2)
 
-            ref_dim = X[0].shape[1]  # Embedding dimension of first sample
-            if not reduce(and_, (x.shape[1] == ref_dim for x in X[1:]), True):
-                warn(
-                    "Not all point clouds have the same embedding dimension.",
-                    DataDimensionalityWarning, stacklevel=2)
-
     return Xnew
