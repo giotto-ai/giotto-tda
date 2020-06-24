@@ -214,7 +214,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         else:
             X1 = X
 
-        Xt = _parallel_pairwise(X1, self._X, self.metric,
+        Xt = _parallel_pairwise(self._X, X1, self.metric,
                                 self.effective_metric_params_,
                                 self.homology_dimensions_,
                                 self.n_jobs)

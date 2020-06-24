@@ -259,17 +259,17 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
         X2 = X1
 
     distance_matrices = Parallel(n_jobs=n_jobs)(
-        delayed(metric_func)(_subdiagrams(X1, [dim], remove_dim=True),
-                             _subdiagrams(X2[s], [dim], remove_dim=True),
+        delayed(metric_func)(_subdiagrams(X2[s], [dim], remove_dim=True),
+                             _subdiagrams(X1, [dim], remove_dim=True),
                              sampling=samplings[dim],
                              step_size=step_sizes[dim],
                              **effective_metric_params)
         for dim in homology_dimensions
         for s in gen_even_slices(X2.shape[0], effective_n_jobs(n_jobs)))
 
-    distance_matrices = np.concatenate(distance_matrices, axis=1)
+    distance_matrices = np.concatenate(distance_matrices, axis=0)
     distance_matrices = np.stack(
-        [distance_matrices[:, i * X2.shape[0]:(i + 1) * X2.shape[0]]
+        [distance_matrices[i * X2.shape[0]:(i + 1) * X2.shape[0], :]
          for i in range(len(homology_dimensions))],
         axis=2)
     return distance_matrices
