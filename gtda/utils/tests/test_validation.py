@@ -173,11 +173,6 @@ def test_check_point_clouds_warn_finite():
     with pytest.warns(DataDimensionalityWarning):
         check_point_clouds(ex.X_list)
 
-    # Check that we throw warnings on list input when arrays have different
-    # number of columns
-    with pytest.warns(DataDimensionalityWarning):
-        check_point_clouds(ex.X_list_rectang_diff_cols)
-
 
 def test_check_point_clouds_regular_inf():
     """Cases in which part of the input is infinite and no warnings or errors
@@ -238,7 +233,7 @@ def test_check_point_clouds_regular_nan():
 
 @pytest.mark.parametrize("force_all_finite", [True, False])
 def test_check_point_clouds_value_err_nan(force_all_finite):
-    """Cases in which part of the input is nan and we throw a
+    """Cases in which part of the input is NaN and we throw a
     ValueError."""
 
     ex = CreateInputs(
