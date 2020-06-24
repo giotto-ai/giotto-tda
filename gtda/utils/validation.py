@@ -299,8 +299,12 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                 warn(
                     "All arrays/matrices are square. This is consistent with "
                     "a collection of distance/adjacency matrices, but the "
-                    "entries are being treated as collections of vectors in "
+                    "entries will be treated as collections of vectors in "
                     "Euclidean space.", DataDimensionalityWarning,
                     stacklevel=2)
+
+        ref_dim = X[0].shape  # Shape of first sample
+        if reduce(and_, (x.shape == ref_dim for x in X[1:]), True):
+            Xnew = np.asarray(Xnew)
 
     return Xnew
