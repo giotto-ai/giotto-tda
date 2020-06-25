@@ -1,6 +1,10 @@
 """Graph geodesic distance calculations."""
 # License: GNU AGPLv3
 
+from functools import reduce
+from operator import and_
+from warnings import warn
+
 import numpy as np
 from joblib import Parallel, delayed
 from numpy.ma import masked_invalid
@@ -88,15 +92,29 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         self.unweighted = unweighted
         self.method = method
 
-    def _geodesic_distance(self, X):
-        if not issparse(X) and not isinstance(X, MaskedArray):
-            if X.dtype != bool:
+    def _geodesic_distance(self, X, i=None):
+        method_ = self.method
+        if not issparse(X):
+            diag = np.eye(X.shape[0], dtype=bool)
+            if np.any(~np.logical_or(X, diag)):
+                if self.method in ['auto', 'FW']:
+                    if np.any(X < 0):
+                        method_ = 'J'
+                    else:
+                        method_ = 'D'
+                    warn(
+                        f"Methods 'auto' and 'FW' are not supported when "
+                        f"some edge weights are zero. Using '{method_}' "
+                        f"instead for graph {i}."
+                    )
+            if not isinstance(X, MaskedArray):
                 # Convert to a masked array with mask given by positions in
                 # which infs or NaNs occur.
-                X = masked_invalid(X)
+                if X.dtype != bool:
+                    X = masked_invalid(X)
         X_distance = shortest_path(X, directed=self.directed,
                                    unweighted=self.unweighted,
-                                   method=self.method)
+                                   method=method_)
         return X_distance
 
     def fit(self, X, y=None):
@@ -153,10 +171,12 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._geodesic_distance)(x) for x in X)
-        Xt = np.array(Xt)
-        if Xt.ndim == 1:
-            Xt = list(Xt)
+            delayed(self._geodesic_distance)(x, i) for i, x in enumerate(X))
+
+        x0_shape = Xt[0].shape
+        if reduce(and_, (x.shape == x0_shape for x in X), True):
+            Xt = np.array(Xt)
+
         return Xt
 
     @staticmethod

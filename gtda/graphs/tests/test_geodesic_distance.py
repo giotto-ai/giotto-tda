@@ -37,19 +37,7 @@ def test_ggd_fit_transform_plot():
 
 
 def test_ggd_transform():
-    X_ggd_res = np.array([
-        [[0., 1., 3., 7., np.inf],
-         [1., 0., 4., 8., np.inf],
-         [3., 4., 0., 4., np.inf],
-         [7., 8., 4., 0., np.inf],
-         [np.inf, np.inf, np.inf, np.inf, 0.]],
-
-        [[0., 1., 2., 6., np.inf],
-         [1., 0., 1., 5., np.inf],
-         [2., 1., 0., 4., np.inf],
-         [6., 5., 4., 0., np.inf],
-         [np.inf, np.inf, np.inf, np.inf, 0.]]
-    ])
+    X_ggd_res = np.zeros(X_ggd.shape)
     ggd = GraphGeodesicDistance()
 
     assert_almost_equal(ggd.fit_transform(X_ggd), X_ggd_res)
