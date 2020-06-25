@@ -171,7 +171,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_graph(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._geodesic_distance)(x, i) for i, x in enumerate(X))
+            delayed(self._geodesic_distance)(x, i=i) for i, x in enumerate(X))
 
         x0_shape = Xt[0].shape
         if reduce(and_, (x.shape == x0_shape for x in X), True):
