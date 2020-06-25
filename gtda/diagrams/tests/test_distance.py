@@ -8,7 +8,7 @@ from numpy.testing import assert_almost_equal
 
 from gtda.diagrams import PairwiseDistance, Amplitude
 
-X_1 = np.array([
+X1 = np.array([
     [[0., 0.36905774, 0],
      [0., 0.37293977, 0],
      [0., 0.38995215, 0],
@@ -118,7 +118,7 @@ X_1 = np.array([
      [0., 0., 2],
      [0., 0., 2]]])
 
-X_2 = np.array([
+X2 = np.array([
     [[0., 0.36905774, 0],
      [0., 0.37293977, 0],
      [0., 0.38995215, 0],
@@ -236,10 +236,10 @@ def test_not_fitted():
     da = Amplitude()
 
     with pytest.raises(NotFittedError):
-        dd.transform(X_1)
+        dd.transform(X1)
 
     with pytest.raises(NotFittedError):
-        da.transform(X_1)
+        da.transform(X1)
 
 
 parameters_distance = [
@@ -257,22 +257,22 @@ def test_dd_transform(metric, metric_params, order, n_jobs):
     # X_fit == X_transform
     dd = PairwiseDistance(metric=metric, metric_params=metric_params,
                           order=order, n_jobs=n_jobs)
-    X_res = dd.fit_transform(X_1)
-    assert (X_res.shape[0], X_res.shape[1]) == (X_1.shape[0], X_1.shape[0])
+    X_res = dd.fit_transform(X1)
+    assert (X_res.shape[0], X_res.shape[1]) == (X1.shape[0], X1.shape[0])
 
     # X_fit != X_transform
     dd = PairwiseDistance(metric=metric, metric_params=metric_params,
                           order=order, n_jobs=n_jobs)
-    X_res = dd.fit(X_1).transform(X_2)
-    assert (X_res.shape[0], X_res.shape[1]) == (X_2.shape[0], X_1.shape[0])
+    X_res = dd.fit(X1).transform(X2)
+    assert (X_res.shape[0], X_res.shape[1]) == (X2.shape[0], X1.shape[0])
 
     if order is None:
-        assert X_res.shape[2] == len(np.unique(X_2[:, :, 2]))
+        assert X_res.shape[2] == len(np.unique(X2[:, :, 2]))
 
     # X_fit != X_transform, default metric_params
     dd = PairwiseDistance(metric=metric, order=order, n_jobs=n_jobs)
-    X_res = dd.fit(X_1).transform(X_2)
-    assert (X_res.shape[0], X_res.shape[1]) == (X_2.shape[0], X_1.shape[0])
+    X_res = dd.fit(X1).transform(X2)
+    assert (X_res.shape[0], X_res.shape[1]) == (X2.shape[0], X1.shape[0])
 
 
 parameters_amplitude = [
@@ -288,14 +288,14 @@ parameters_amplitude = [
 def test_da_transform(metric, metric_params, n_jobs):
     da = Amplitude(metric=metric, metric_params=metric_params,
                    n_jobs=n_jobs)
-    X_res = da.fit_transform(X_1)
-    assert X_res.shape == (X_1.shape[0], 1)
+    X_res = da.fit_transform(X1)
+    assert X_res.shape == (X1.shape[0], 1)
 
     # X_fit != X_transform
     da = Amplitude(metric=metric, metric_params=metric_params,
                    n_jobs=n_jobs)
-    X_res = da.fit(X_1).transform(X_2)
-    assert X_res.shape == (X_2.shape[0], 1)
+    X_res = da.fit(X1).transform(X2)
+    assert X_res.shape == (X2.shape[0], 1)
 
 
 @pytest.mark.parametrize(('metric', 'metric_params', 'order'),
