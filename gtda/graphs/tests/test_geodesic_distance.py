@@ -55,18 +55,24 @@ X_ggd.append((X_ggd_int, X_ggd_int_res))
 x_ggd_float = X_ggd_bool[0].astype(np.float)
 X_ggd.append(([x_ggd_float], X_ggd_int_res))
 
-X_ggd.append(([masked_array(x_ggd_float, mask=x_ggd_float == np.inf)], X_ggd_int_res))
+X_ggd.append(
+    ([masked_array(x_ggd_float, mask=x_ggd_float == np.inf)], X_ggd_int_res)
+)
 
 X_ggd_csr_int = [csr_matrix(X_ggd_int[0])]
 X_ggd.append((X_ggd_csr_int, X_ggd_bool_res))
 
-X_ggd_csr_int_with_zeros = [csr_matrix(([1, 1, 0, 0], ([0, 1, 0, 2], [1, 0, 2, 0])))]
+X_ggd_csr_int_with_zeros = [
+    csr_matrix(([1, 1, 0, 0], ([0, 1, 0, 2], [1, 0, 2, 0])))
+]
 X_ggd_csr_int_with_zeros_res = np.array([[[0., 1., 0.],
                                           [1., 0., 1.],
                                           [0., 1., 0.]]])
 X_ggd.append((X_ggd_csr_int_with_zeros, X_ggd_csr_int_with_zeros_res))
 
-X_ggd_csr_bool_with_False = [csr_matrix(([True, True, False, False], ([0, 1, 0, 2], [1, 0, 2, 0])))]
+X_ggd_csr_bool_with_False = [
+    csr_matrix(([True, True, False, False], ([0, 1, 0, 2], [1, 0, 2, 0])))
+]
 X_ggd.append((X_ggd_csr_bool_with_False, X_ggd_csr_int_with_zeros_res))
 
 
