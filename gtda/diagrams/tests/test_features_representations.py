@@ -116,7 +116,6 @@ def test_large_pi_null_multithreaded():
     joblib's use of memmaps"""
     X = np.linspace(0, 100, 300000)
     pi = PersistenceImage(sigma=1, n_bins=10, n_jobs=2)
-    X = np.append(X, 1 + X[-1])
     diagrams = np.expand_dims(np.stack([X, X,
                                         np.zeros((X.shape[0],),
                                                  dtype=int)]).transpose(),
