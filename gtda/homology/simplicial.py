@@ -170,7 +170,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         self._is_precomputed = self.metric == 'precomputed'
-        check_point_clouds(X, accept_sparse=self._is_precomputed,
+        check_point_clouds(X, accept_sparse=True,
                            distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
@@ -222,7 +222,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, accept_sparse=self._is_precomputed,
+        X = check_point_clouds(X, accept_sparse=True,
                                distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
@@ -418,7 +418,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         self._is_precomputed = self.metric == 'precomputed'
-        check_point_clouds(X, distance_matrices=self._is_precomputed)
+        check_point_clouds(X, accept_sparse=True,
+                           distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -468,7 +469,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, distance_matrices=self._is_precomputed)
+        X = check_point_clouds(X, accept_sparse=True,
+                               distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(x) for x in X)
