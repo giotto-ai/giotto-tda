@@ -43,9 +43,9 @@ X_ggd.append((X_ggd_float_list, X_ggd_float_res))
 X_ggd_bool = [np.array([[False, True, False],
                        [True, False, False],
                        [False, False, False]])]
-X_ggd_bool_res = np.array([[[0.,  1., np.inf],
-                            [1.,  0., np.inf],
-                            [np.inf, np.inf,  0.]]])
+X_ggd_bool_res = np.array([[[0., 1., np.inf],
+                            [1., 0., np.inf],
+                            [np.inf, np.inf, 0.]]])
 X_ggd.append((X_ggd_bool, X_ggd_bool_res))
 
 X_ggd_int = [X_ggd_bool[0].astype(int)]
