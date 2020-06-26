@@ -144,9 +144,9 @@ jobs:
     displayName: ccache
 
   - script: |
-      echo $(nc)
-      echo $(br)
-      echo $(nightly_release)
+      echo $"nc"
+      echo $"br"
+      echo $"nightly_release"
       set -e
       brew update
       brew install boost ccache
