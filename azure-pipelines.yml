@@ -144,7 +144,6 @@ jobs:
     displayName: ccache
 
   - script: |
-      echo ${{ variables.nc }}
       echo ${{ variables.br }}
       echo ${{ variables.nightly_release }}
       set -e
