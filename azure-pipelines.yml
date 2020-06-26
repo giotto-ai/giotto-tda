@@ -144,7 +144,7 @@ jobs:
     displayName: ccache
 
   - script: |
-      echo $(nigtly_check)
+      echo $(nightly_check)
       set -e
       brew update
       brew install boost ccache
