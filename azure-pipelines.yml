@@ -1,9 +1,9 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
 variables:
-  nc: eq(variables['nightly_check'], 'true')
-  bsc: variables['Build.SourceBranch']
-  br: variables['Build.Reason']
+  nc: $[eq(variables['nightly_check'], true)]
+  sb: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  br: $[ne(variables['Build.Reason'], 'PullRequest')]
   nightly_release: $[and(eq(variables['nightly_check'], true), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))]
 
 trigger:
@@ -144,7 +144,10 @@ jobs:
     displayName: ccache
 
   - script: |
-      echo $(nightly_check)
+      echo $(nc)
+      echo $(sb)
+      echo $(br)
+      echo $(nightly_release)
       set -e
       brew update
       brew install boost ccache
