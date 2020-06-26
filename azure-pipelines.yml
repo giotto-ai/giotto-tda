@@ -145,7 +145,6 @@ jobs:
 
   - script: |
       echo ${{ variables.br }}
-      echo ${{ variables.nightly_release }}
       set -e
       brew update
       brew install boost ccache
