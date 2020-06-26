@@ -141,6 +141,11 @@ jobs:
     displayName: ccache
 
   - script: |
+      echo $(eq(variables['nightly_check'], 'true'))
+      echo $(variables['Build.SourceBranch'])
+      echo $(variables['Build.Reason'])
+      echo $(variables['nightly_release'])
+      echo $eq(variables['nightly_release'])
       set -e
       brew update
       brew install boost ccache
