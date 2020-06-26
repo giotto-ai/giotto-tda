@@ -144,7 +144,8 @@ jobs:
     displayName: ccache
 
   - script: |
-      echo ${{ variables.br }}
+      echo $[variables.br]
+      echo $(br)
       set -e
       brew update
       brew install boost ccache
