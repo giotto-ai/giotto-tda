@@ -145,7 +145,7 @@ jobs:
       echo $(variables['Build.SourceBranch'])
       echo $(variables['Build.Reason'])
       echo $(variables['nightly_release'])
-      echo $eq(variables['nightly_release'])
+      echo $eq(variables['nightly_release'], 'False')
       set -e
       brew update
       brew install boost ccache
