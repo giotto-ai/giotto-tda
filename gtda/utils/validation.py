@@ -6,6 +6,7 @@ from operator import and_
 from warnings import warn
 
 import numpy as np
+from scipy.sparse import issparse
 
 from sklearn.utils.validation import check_array
 from sklearn.exceptions import DataDimensionalityWarning
@@ -194,9 +195,9 @@ def _check_array_mod(X, **kwargs):
     accepted but infinity is."""
     if not kwargs['force_all_finite']:
         Xnew = check_array(X, **kwargs)
-        if np.isnan(Xnew).any():
+        if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
             raise ValueError(
-                "Input contains NaN. Only finite values and infinity are "
+                "Input contains NaNs. Only finite values and infinity are "
                 "allowed when parameter `force_all_finite` is False.")
         return Xnew
     return check_array(X, **kwargs)
@@ -257,8 +258,10 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
             else:
                 extra_2D = ""
             raise ValueError(
-                f"Input must be a single 3D array or a list of 2D arrays. "
-                f"Array of dimension {X.ndim} passed." + extra_2D)
+                f"Input must be a single 3D array or a list of 2D arrays or "
+                f"sparse matrices. Structure of dimension {X.ndim} passed."
+                + extra_2D
+            )
         if (X.shape[1] != X.shape[2]) and distance_matrices:
             raise ValueError(
                 f"Input array X must have X.shape[1] == X.shape[2]: "
@@ -269,7 +272,8 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                 "consistent with a collection of distance/adjacency "
                 "matrices, but the input is being treated as a collection "
                 "of vectors in Euclidean space.",
-                DataDimensionalityWarning, stacklevel=2)
+                DataDimensionalityWarning, stacklevel=2
+            )
         Xnew = _check_array_mod(X, **kwargs_, allow_nd=True)
     else:
         has_check_failed = False
@@ -278,11 +282,12 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
         for i, x in enumerate(X):
             try:
                 xnew = _check_array_mod(x, **kwargs_, ensure_2d=True)
-                if distance_matrices:
+                if distance_matrices and not issparse(xnew):
                     if not x.shape[0] == x.shape[1]:
                         raise ValueError(
                             f"All arrays must be square: {x.shape[0]} rows "
-                            f"and {x.shape[1]} columns found in this array.")
+                            f"and {x.shape[1]} columns found in this array."
+                        )
                 Xnew.append(xnew)
             except ValueError as e:
                 has_check_failed = True
@@ -290,20 +295,21 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
         if has_check_failed:
             raise ValueError(
                 "The following errors were raised by the inputs:\n\n" +
-                "\n\n".join(messages))
+                "\n\n".join(messages)
+            )
 
         if not distance_matrices:
             if reduce(and_, (x.shape[0] == x.shape[1] for x in X), True):
                 warn(
-                    "All arrays are square. This is consistent with a "
-                    "collection of distance/adjacency matrices, but the input "
-                    "is being treated as a collection of vectors in Euclidean "
-                    "space.", DataDimensionalityWarning, stacklevel=2)
+                    "All arrays/matrices are square. This is consistent with "
+                    "a collection of distance/adjacency matrices, but the "
+                    "entries will be treated as collections of vectors in "
+                    "Euclidean space.", DataDimensionalityWarning,
+                    stacklevel=2
+                )
 
-            ref_dim = X[0].shape[1]  # Embedding dimension of first sample
-            if not reduce(and_, (x.shape[1] == ref_dim for x in X[1:]), True):
-                warn(
-                    "Not all point clouds have the same embedding dimension.",
-                    DataDimensionalityWarning, stacklevel=2)
+        ref_dim = X[0].shape  # Shape of first sample
+        if reduce(and_, (x.shape == ref_dim for x in X[1:]), True):
+            Xnew = np.asarray(Xnew)
 
     return Xnew

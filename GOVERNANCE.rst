@@ -13,7 +13,7 @@ Authors:
 Giotto-tda Project Team:
 ------------------------
 
-- Umberto Lupo u.lupo@l2f.ch (Maintainer)
+- Umberto Lupo umberto.lupo@gmail.com (Maintainer)
 - Lewis Tunstall l.tunstall@l2f.ch (Maintainer)
 - Matteo Caorsi m.caorsi@l2f.ch (Project Leader)
 

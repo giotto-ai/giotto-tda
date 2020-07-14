@@ -85,7 +85,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     [1] P. Dlotko, "Cubical complex", 2015; `GUDHI User and Reference Manual \
-    <http://gudhi.gforge.inria.fr/doc/latest/group__cubical__complex.html>`_.
+        <http://gudhi.gforge.inria.fr/doc/latest/group__cubical__complex.\
+        html>`_.
 
     """
 
