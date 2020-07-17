@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
-from ._utils import _sort, _filter, _bin, _calculate_weights
+from ._utils import _filter, _bin, _calculate_weights
 from ..base import PlotterMixin
 from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
@@ -415,7 +415,6 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_diagrams(X)
 
-        X = _sort(X)
         Xt = _filter(X, self.homology_dimensions_, self.epsilon)
         return Xt
 

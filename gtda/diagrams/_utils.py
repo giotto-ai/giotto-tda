@@ -25,13 +25,6 @@ def _pad(X, max_diagram_sizes):
     return X_padded
 
 
-def _sort(Xs):
-    indices = np.argsort(Xs[:, :, 1] - Xs[:, :, 0], axis=1)
-    indices = np.stack([indices, indices, indices], axis=2)
-    Xs = np.flip(np.take_along_axis(Xs, indices, axis=1), axis=1)
-    return Xs
-
-
 def _sample_image(image, sampled_diag):
     # NOTE: Modifies `image` in-place
     unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
@@ -41,22 +34,16 @@ def _sample_image(image, sampled_diag):
 
 def _filter(Xs, filtered_homology_dimensions, cutoff):
     homology_dimensions = sorted(list(set(Xs[0, :, 2])))
-    unfiltered_homology_dimensions = sorted(list(
-        set(homology_dimensions) - set(filtered_homology_dimensions)))
+    Xf = np.empty((Xs.shape[0], 0, 3), dtype=Xs.dtype)
 
-    if len(unfiltered_homology_dimensions) == 0:
-        Xf = np.empty((Xs.shape[0], 0, 3), dtype=Xs.dtype)
-    else:
-        Xf = _subdiagrams(Xs, unfiltered_homology_dimensions)
-
-    for dim in filtered_homology_dimensions:
+    for dim in homology_dimensions:
         Xdim = _subdiagrams(Xs, [dim])
-        min_value = np.min(Xdim[:, :, 0])
-        mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
-        Xdim[mask, :] = [min_value, min_value, dim]
-        max_points = np.max(np.sum(Xs[:, :, 1] != 0, axis=1))
-        Xdim = Xdim[:, :max_points, :]
+        if dim in filtered_homology_dimensions:
+            min_value = np.min(Xdim[:, :, 0])
+            mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
+            Xdim[mask, :] = [min_value, min_value, dim]
         Xf = np.concatenate([Xf, Xdim], axis=1)
+
     return Xf
 
 
