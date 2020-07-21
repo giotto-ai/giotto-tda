@@ -255,13 +255,10 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
     samplings = effective_metric_params.pop("samplings", none_dict)
     step_sizes = effective_metric_params.pop("step_sizes", none_dict)
 
-    if X2 is None:
-        X2 = X1
-
     n_columns = len(X2)
     distance_matrices = Parallel(n_jobs=n_jobs)(
-        delayed(metric_func)(_subdiagrams(X2[s], [dim], remove_dim=True),
-                             _subdiagrams(X1, [dim], remove_dim=True),
+        delayed(metric_func)(_subdiagrams(X1, [dim], remove_dim=True),
+                             _subdiagrams(X2[s], [dim], remove_dim=True),
                              sampling=samplings[dim],
                              step_size=step_sizes[dim],
                              **effective_metric_params)
