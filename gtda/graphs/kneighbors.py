@@ -89,6 +89,10 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
      [1. 0. 0. 1.]
      [1. 1. 1. 0.]]
 
+    See also
+    --------
+    TransitionGraph, GraphGeodesicDistance
+
     """
 
     def __init__(self, n_neighbors=4, metric='euclidean',
