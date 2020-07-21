@@ -265,7 +265,7 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
         for dim in homology_dimensions
         for s in gen_even_slices(n_columns, effective_n_jobs(n_jobs)))
 
-    distance_matrices = np.concatenate(distance_matrices, axis=0)
+    distance_matrices = np.concatenate(distance_matrices, axis=1)
     distance_matrices = np.stack(
         [distance_matrices[:, i * n_columns:(i + 1) * n_columns]
          for i in range(len(homology_dimensions))],
