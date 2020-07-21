@@ -20,7 +20,6 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
         homology dimensions which appear in `diagram` will be plotted.
 
     """
-    from ..diagrams._utils import _subdiagrams  # To avoid circular imports
 
     # TODO: increase the marker size
     if homology_dimensions is None:
@@ -76,8 +75,7 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
 
     for dim in homology_dimensions:
         name = f'H{int(dim)}' if dim != np.inf else 'Any homology dimension'
-        subdiagram = _subdiagrams(np.asarray([diagram]), [dim],
-                                  remove_dim=True)[0]
+        subdiagram = diagram[diagram[:, 2] == dim]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
         subdiagram = subdiagram[diff]
         fig.add_trace(gobj.Scatter(x=subdiagram[:, 0], y=subdiagram[:, 1],

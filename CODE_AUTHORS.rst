@@ -13,3 +13,4 @@ Where component authors are known, add them here.
 | Anibal Medina-Mardones, anibal.medinamardones@epfl.ch
 | Wojciech Reise, reisewojciech@gmail.com
 | Roman Yurchak, roman.yurchak@symerio.com
+| Nick Sale, nicholas.j.sale@gmail.com
