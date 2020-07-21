@@ -197,7 +197,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_samples_fit \
+        Xt : ndarray of shape (n_samples, n_samples_fit, \
             n_homology_dimensions) if `order` is ``None``, else \
             (n_samples, n_samples_fit)
             Distance matrix or collection of distance matrices between
@@ -209,12 +209,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_diagrams(X, copy=True)
 
-        if np.array_equal(X, self._X):
-            X1 = None
-        else:
-            X1 = X
-
-        Xt = _parallel_pairwise(self._X, X1, self.metric,
+        Xt = _parallel_pairwise(X, self._X, self.metric,
                                 self.effective_metric_params_,
                                 self.homology_dimensions_,
                                 self.n_jobs)
