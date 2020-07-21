@@ -588,13 +588,13 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_diagrams(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs, mmap_mode='c')(delayed(
-            heats)(_subdiagrams(X, [dim], remove_dim=True)[s],
+            heats)(_subdiagrams(X[s], [dim], remove_dim=True),
                    self._samplings[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_bins, self.n_bins).\
+        Xt = np.concatenate(Xt).\
+            reshape(self._n_dimensions, X.shape[0], self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -793,18 +793,19 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_diagrams(X, copy=True)
 
         Xt = Parallel(n_jobs=self.n_jobs, mmap_mode='c')(
-            delayed(persistence_images)(_subdiagrams(X, [dim],
-                                                     remove_dim=True)[s],
-                                        self._samplings[dim],
-                                        self._step_size[dim],
-                                        self.weights_[dim],
-                                        self.sigma)
+            delayed(persistence_images)(
+                _subdiagrams(X[s], [dim], remove_dim=True),
+                self._samplings[dim],
+                self._step_size[dim],
+                self.weights_[dim],
+                self.sigma
+            )
             for dim in self.homology_dimensions_
             for s in gen_even_slices(X.shape[0],
                                      effective_n_jobs(self.n_jobs))
         )
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_bins, self.n_bins).\
+        Xt = np.concatenate(Xt).\
+            reshape(self._n_dimensions, X.shape[0], self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -975,7 +976,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_diagrams(X)
 
         Xt = (Parallel(n_jobs=self.n_jobs)
-              (delayed(silhouettes)(_subdiagrams(X, [dim], remove_dim=True)[s],
+              (delayed(silhouettes)(_subdiagrams(X[s], [dim], remove_dim=True),
                                     self._samplings[dim], power=self.power)
               for dim in self.homology_dimensions_
               for s in gen_even_slices(X.shape[0],
