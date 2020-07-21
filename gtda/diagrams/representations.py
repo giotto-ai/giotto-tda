@@ -142,13 +142,12 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_diagrams(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(betti_curves)(
-                _subdiagrams(X, [dim], remove_dim=True)[s],
+                _subdiagrams(X[s], [dim], remove_dim=True),
                 self._samplings[dim])
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).\
-            reshape(self._n_dimensions, X.shape[0], -1).\
+            reshape(self._n_dimensions, len(X), -1).\
             transpose((1, 0, 2))
         return Xt
 
@@ -354,14 +353,13 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_diagrams(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
-                _subdiagrams(X, [dim], remove_dim=True)[s],
+                _subdiagrams(X[s], [dim], remove_dim=True),
                 self._samplings[dim],
                 self.n_layers)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0],
-                                        self.n_layers, self.n_bins).\
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt).\
+            reshape(self._n_dimensions, len(X), self.n_layers, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -591,10 +589,9 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             heats)(_subdiagrams(X[s], [dim], remove_dim=True),
                    self._samplings[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt).\
-            reshape(self._n_dimensions, X.shape[0], self.n_bins, self.n_bins).\
+            reshape(self._n_dimensions, len(X), self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -801,11 +798,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
                 self.sigma
             )
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(X.shape[0],
-                                     effective_n_jobs(self.n_jobs))
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
         )
         Xt = np.concatenate(Xt).\
-            reshape(self._n_dimensions, X.shape[0], self.n_bins, self.n_bins).\
+            reshape(self._n_dimensions, len(X), self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
@@ -979,11 +975,10 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
               (delayed(silhouettes)(_subdiagrams(X[s], [dim], remove_dim=True),
                                     self._samplings[dim], power=self.power)
               for dim in self.homology_dimensions_
-              for s in gen_even_slices(X.shape[0],
-                                       effective_n_jobs(self.n_jobs))))
+              for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))))
 
-        Xt = np.concatenate(Xt). \
-            reshape(self._n_dimensions, X.shape[0], -1). \
+        Xt = np.concatenate(Xt).\
+            reshape(self._n_dimensions, len(X), -1).\
             transpose((1, 0, 2))
         return Xt
 

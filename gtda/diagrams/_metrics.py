@@ -258,6 +258,7 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
     if X2 is None:
         X2 = X1
 
+    n_columns = len(X2)
     distance_matrices = Parallel(n_jobs=n_jobs)(
         delayed(metric_func)(_subdiagrams(X1, [dim], remove_dim=True),
                              _subdiagrams(X2[s], [dim], remove_dim=True),
@@ -265,11 +266,11 @@ def _parallel_pairwise(X1, X2, metric, metric_params,
                              step_size=step_sizes[dim],
                              **effective_metric_params)
         for dim in homology_dimensions
-        for s in gen_even_slices(X2.shape[0], effective_n_jobs(n_jobs)))
+        for s in gen_even_slices(n_columns, effective_n_jobs(n_jobs)))
 
     distance_matrices = np.concatenate(distance_matrices, axis=1)
     distance_matrices = np.stack(
-        [distance_matrices[:, i * X2.shape[0]:(i + 1) * X2.shape[0]]
+        [distance_matrices[:, i * n_columns:(i + 1) * n_columns]
          for i in range(len(homology_dimensions))],
         axis=2)
     return distance_matrices
@@ -341,13 +342,13 @@ def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
 
     amplitude_arrays = Parallel(n_jobs=n_jobs)(
         delayed(amplitude_func)(
-            _subdiagrams(X, [dim], remove_dim=True)[s],
+            _subdiagrams(X[s], [dim], remove_dim=True),
             sampling=samplings[dim], step_size=step_sizes[dim],
             **effective_metric_params)
         for dim in homology_dimensions
         for s in gen_even_slices(_num_samples(X), effective_n_jobs(n_jobs)))
 
-    amplitude_arrays = (np.concatenate(amplitude_arrays).reshape(
-        len(homology_dimensions), X.shape[0]).T)
+    amplitude_arrays = np.concatenate(amplitude_arrays).\
+        reshape(len(homology_dimensions), len(X)).T
 
     return amplitude_arrays
