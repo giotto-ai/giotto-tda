@@ -314,18 +314,21 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing
-    topological features whose lifetime d - b is less than or equal to a
-    cutoff value. Technically, discarded points are replaced by points on the
-    diagonal (i.e. whose birth and death values coincide), which carry no
-    information.
+    non-trivial topological features whose lifetime d - b is less than or
+    equal to a cutoff value. Points on the diagonal (i.e. for which b and d
+    are equal) may still appear in the output for padding purposes, but carry
+    no information.
+
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
     homology_dimensions : list, tuple, or None, optional, default: ``None``
         When set to ``None``, subdiagrams corresponding to all homology
-        dimensions seen in :meth:`fit` will be filtered.
-        Otherwise, it contains the homology dimensions (as non-negative
-        integers) at which filtering should occur.
+        dimensions seen in :meth:`fit` will be filtered. Otherwise, it contains
+        the homology dimensions (as non-negative integers) at which filtering
+        should occur.
 
     epsilon : float, optional, default: ``0.01``
         The cutoff value controlling the amount of filtering.
@@ -368,6 +371,9 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -399,6 +405,9 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -406,10 +415,10 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_features, 3)
+        Xt : ndarray of shape (n_samples, n_features_filtered, 3)
             Filtered persistence diagrams. Only the subdiagrams corresponding
             to dimensions in :attr:`homology_dimensions_` are filtered.
-            Discarded points are replaced by points on the diagonal.
+            ``n_features_filtered`` is less than or equal to ``n_features`.
 
         """
         check_is_fitted(self)
