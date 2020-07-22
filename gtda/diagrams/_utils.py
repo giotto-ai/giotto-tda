@@ -1,6 +1,9 @@
 """Utility functions for diagrams."""
 # License: GNU AGPLv3
 
+from functools import reduce
+from operator import iconcat
+
 import numpy as np
 
 
@@ -32,18 +35,36 @@ def _sample_image(image, sampled_diag):
     image[unique] = counts
 
 
-def _filter(Xs, filtered_homology_dimensions, cutoff):
-    homology_dimensions = sorted(list(set(Xs[0, :, 2])))
-    Xf = np.empty((Xs.shape[0], 0, 3), dtype=Xs.dtype)
+def _filter(X, filtered_homology_dimensions, cutoff):
+    n = len(X)
+    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    unfiltered_homology_dimensions = [dim for dim in homology_dimensions if
+                                      dim not in filtered_homology_dimensions]
 
-    for dim in homology_dimensions:
-        Xdim = _subdiagrams(Xs, [dim])
-        if dim in filtered_homology_dimensions:
-            min_value = np.min(Xdim[:, :, 0])
-            mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
-            Xdim[mask, :] = [min_value, min_value, dim]
-        Xf = np.concatenate([Xf, Xdim], axis=1)
+    if len(unfiltered_homology_dimensions) == 0:
+        Xuf = np.empty((n, 0, 3), dtype=X.dtype)
+    else:
+        Xuf = _subdiagrams(X, unfiltered_homology_dimensions)
 
+    Xf = []
+    for dim in filtered_homology_dimensions:
+        Xdim = _subdiagrams(X, [dim])
+        indices = np.nonzero(Xdim[:, :, 1] - Xdim[:, :, 0] > cutoff)
+        if not indices[0].size:
+            Xdim = np.tile([0., 0., dim], (n, 1, 1))
+        else:
+            unique, counts = np.unique(indices[0], return_counts=True)
+            max_n_points = np.max(counts)
+            X_indices = Xdim[indices]
+            min_value = np.min(X_indices[:, 0])
+            Xdim = np.full((n, max_n_points, 3), min_value)
+            Xdim[:, :, 2] = dim
+            Xdim[indices[0], reduce(iconcat, map(range, counts), [])] = \
+                X_indices
+        Xf.append(Xdim)
+
+    Xf.append(Xuf)
+    Xf = np.concatenate(Xf, axis=1)
     return Xf
 
 
