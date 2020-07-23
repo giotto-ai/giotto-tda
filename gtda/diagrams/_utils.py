@@ -60,8 +60,7 @@ def _filter(X, filtered_homology_dimensions, cutoff):
             max_n_points = np.max(counts)
             X_indices = Xdim[indices]
             min_value = np.min(X_indices[:, 0])
-            Xdim = np.full((n, max_n_points, 3), min_value)
-            Xdim[:, :, 2] = dim
+            Xdim = np.tile([min_value, min_value, dim], (n, max_n_points, 1))
             Xdim[indices[0], reduce(iconcat, map(range, counts), [])] = \
                 X_indices
         Xf.append(Xdim)
