@@ -49,16 +49,17 @@ def _filter(X, filtered_homology_dimensions, cutoff):
     else:
         Xuf = _subdiagrams(X, unfiltered_homology_dimensions)
 
+    cutoff_mask = X[:, :, 1] - X[:, :, 0] > cutoff
     Xf = []
     for dim in filtered_homology_dimensions:
-        Xdim = _subdiagrams(X, [dim])
-        indices = np.nonzero(Xdim[:, :, 1] - Xdim[:, :, 0] > cutoff)
+        dim_mask = X[:, :, 2] == dim
+        indices = np.nonzero(np.logical_and(dim_mask, cutoff_mask))
         if not indices[0].size:
             Xdim = np.tile([0., 0., dim], (n, 1, 1))
         else:
             unique, counts = np.unique(indices[0], return_counts=True)
             max_n_points = np.max(counts)
-            X_indices = Xdim[indices]
+            X_indices = X[indices]
             min_value = np.min(X_indices[:, 0])
             Xdim = np.tile([min_value, min_value, dim], (n, max_n_points, 1))
             Xdim[indices[0], reduce(iconcat, map(range, counts), [])] = \
