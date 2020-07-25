@@ -38,6 +38,23 @@ def _sample_image(image, sampled_diag):
     image[unique] = counts
 
 
+def _multirange(counts):
+    """Given a 1D array of positive integers, generate an array equal to
+    np.concatenate([np.arange(c) for c in counts]), but in a faster and more
+    memory-efficient way."""
+    cumsum = np.cumsum(counts)
+    reset_index = cumsum[:-1]
+    incr = np.ones(cumsum[-1], dtype=np.int32)
+    incr[0] = 0
+
+    # For each index in reset_index, we insert the negative value necessary
+    # to offset the cumsum in the last line
+    incr[reset_index] = 1 - counts[:-1]
+    incr.cumsum(out=incr)
+
+    return incr
+
+
 def _filter(X, filtered_homology_dimensions, cutoff):
     n = len(X)
     homology_dimensions = sorted(list(set(X[0, :, 2])))
@@ -62,8 +79,7 @@ def _filter(X, filtered_homology_dimensions, cutoff):
             X_indices = X[indices]
             min_value = np.min(X_indices[:, 0])
             Xdim = np.tile([min_value, min_value, dim], (n, max_n_points, 1))
-            Xdim[indices[0], reduce(iconcat, map(range, counts), [])] = \
-                X_indices
+            Xdim[indices[0], _multirange(counts)] = X_indices
         Xf.append(Xdim)
 
     Xf.append(Xuf)
