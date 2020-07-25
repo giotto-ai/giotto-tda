@@ -1,9 +1,6 @@
 """Utility functions for diagrams."""
 # License: GNU AGPLv3
 
-from functools import reduce
-from operator import iconcat
-
 import numpy as np
 
 
