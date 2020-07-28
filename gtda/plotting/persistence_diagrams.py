@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objs as gobj
 
 
-def plot_diagram(diagram, homology_dimensions=None, **input_layout):
+def plot_diagram(diagram, homology_dimensions=None):
     """Plot a single persistence diagram.
 
     Parameters
@@ -25,50 +25,19 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
 
-    max_filt_param = np.where(np.isinf(diagram), -np.inf, diagram).max()
+    diagram_no_dims = diagram[:, :2]
+    max_birth, max_death = np.where(
+        np.isposinf(diagram_no_dims), -np.inf, diagram_no_dims
+    ).max(axis=0)
+    min_birth, min_death = np.where(
+        np.isneginf(diagram_no_dims), np.inf, diagram_no_dims
+    ).min(axis=0)
 
-    layout = dict(
-        width=500,
-        height=500,
-        xaxis1=dict(
-            title='Birth',
-            side='bottom',
-            type='linear',
-            range=[0, 1.1 * max_filt_param],
-            ticks='outside',
-            anchor='y1',
-            showline=True,
-            zeroline=True,
-            showexponent='all',
-            exponentformat='e'
-        ),
-        yaxis1=dict(
-            title='Death',
-            side='left',
-            type='linear',
-            range=[0, 1.1 * max_filt_param],
-            ticks='outside',
-            anchor='x1',
-            showline=True,
-            zeroline=True,
-            showexponent='all',
-            exponentformat='e'
-        ),
-        plot_bgcolor='white'
-    )
-
-    layout.update(input_layout)
-
-    fig = gobj.Figure(layout=layout)
-    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
-                     mirror=False)
-    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
-                     mirror=False)
-
-    fig.add_trace(gobj.Scatter(x=np.array([-100 * max_filt_param,
-                                           100 * max_filt_param]),
-                               y=np.array([-100 * max_filt_param,
-                                           100 * max_filt_param]),
+    fig = gobj.Figure()
+    fig.add_trace(gobj.Scatter(x=[100 * min(-np.abs(max_death), min_birth),
+                                  100 * max_death],
+                               y=[100 * min(-np.abs(max_death), min_birth),
+                                  100 * max_death],
                                mode='lines',
                                line=dict(dash='dash', width=1, color='black'),
                                showlegend=False, hoverinfo='none'))
@@ -80,5 +49,46 @@ def plot_diagram(diagram, homology_dimensions=None, **input_layout):
         subdiagram = subdiagram[diff]
         fig.add_trace(gobj.Scatter(x=subdiagram[:, 0], y=subdiagram[:, 1],
                                    mode='markers', name=name))
+
+    range = max_death - min_birth
+    extra_space = 0.02 * range
+
+    fig.update_layout(
+        width=500,
+        height=500,
+        xaxis1=dict(
+            title='Birth',
+            side='bottom',
+            type='linear',
+            range=[min_birth - extra_space, max_death + extra_space],
+            autorange=False,
+            ticks='outside',
+            showline=True,
+            zeroline=True,
+            linewidth=1,
+            linecolor='black',
+            mirror=False,
+            showexponent='all',
+            exponentformat='e'
+        ),
+        yaxis1=dict(
+            title='Death',
+            side='left',
+            type='linear',
+            range=[min_birth - extra_space, max_death + extra_space],
+            autorange=False,
+            scaleanchor="x",
+            scaleratio=1,
+            ticks='outside',
+            showline=True,
+            zeroline=True,
+            linewidth=1,
+            linecolor='black',
+            mirror=False,
+            showexponent='all',
+            exponentformat='e'
+        ),
+        plot_bgcolor='white'
+    )
 
     fig.show()
