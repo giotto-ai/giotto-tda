@@ -20,7 +20,6 @@ def plot_diagram(diagram, homology_dimensions=None):
         homology dimensions which appear in `diagram` will be plotted.
 
     """
-    from ..diagrams._utils import _subdiagrams  # To avoid circular imports
 
     # TODO: increase the marker size
     if homology_dimensions is None:

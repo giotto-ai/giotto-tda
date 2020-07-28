@@ -5,9 +5,13 @@ import numpy as np
 
 
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
-    for dim in homology_dimensions:
-        Xs = X[X[:, :, 2] == dim]
-        Xs = Xs.reshape(X.shape[0], -1, 3)
+    """For each diagram in a collection, extract the subdiagrams in a given
+    list of homology dimensions. It is assumed that all diagrams in X contain
+    the same number of points in each homology dimension."""
+    n = len(X)
+    Xs = np.concatenate([X[X[:, :, 2] == dim].reshape(n, -1, 3)
+                         for dim in homology_dimensions],
+                        axis=1)
     if remove_dim:
         Xs = Xs[:, :, :2]
     return Xs
@@ -29,6 +33,7 @@ def _sort(Xs):
 
 
 def _sample_image(image, sampled_diag):
+    # NOTE: Modifies `image` in-place
     unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
     unique = tuple(tuple(row) for row in unique.astype(np.int).T)
     image[unique] = counts
