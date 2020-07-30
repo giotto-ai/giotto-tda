@@ -29,7 +29,7 @@ User installation
 
 The simplest way to install giotto-tda is using ``pip``   ::
 
-    pip install -U giotto-tda
+    python -m pip install -U giotto-tda
 
 If necessary, this will also automatically install all the above dependencies. Note: we recommend
 upgrading ``pip`` to a recent version as the above may fail on very old versions.
@@ -37,7 +37,7 @@ upgrading ``pip`` to a recent version as the above may fail on very old versions
 Pre-release, experimental builds containing recently added features, and/or
 bug fixes can be installed by running   ::
 
-    pip install -U giotto-tda-nightly
+    python -m pip install -U giotto-tda-nightly
 
 The main difference between giotto-tda-nightly and the developer installation (see the section
 on contributing, below) is that the former is shipped with pre-compiled wheels (similarly to the stable
@@ -137,7 +137,7 @@ Troubleshooting
 If you need to understand where the compiler tries to look for ``boost`` headers,
 you can install ``giotto-tda`` with::
 
-   pip install -e . -v
+   python -m pip install -e . -v
 
 Then you can look at the output for lines starting with::
 
