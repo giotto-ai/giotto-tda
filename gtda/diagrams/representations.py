@@ -595,7 +595,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues'):
+    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues',
+             plotly_params=None):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of heat kernel images.
 
@@ -619,12 +620,21 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
         """
         check_is_fitted(self)
-        return plot_heatmap(Xt[sample][homology_dimension_ix],
-                            x=self.samplings_[homology_dimension_ix],
-                            y=self.samplings_[homology_dimension_ix],
-                            colorscale=colorscale)
+        plot_heatmap(
+            Xt[sample][homology_dimension_ix],
+            x=self.samplings_[homology_dimension_ix],
+            y=self.samplings_[homology_dimension_ix],
+            colorscale=colorscale, plotly_params=plotly_params
+        ).show()
 
 
 @adapt_fit_transform_docs
@@ -805,7 +815,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues'):
+    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues',
+             plotly_params=None):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of persistence images.
 
@@ -829,13 +840,20 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
         """
         check_is_fitted(self)
         samplings_x, samplings_y = self.samplings_[homology_dimension_ix]
-        return plot_heatmap(Xt[sample][homology_dimension_ix],
-                            x=samplings_x,
-                            y=samplings_y,
-                            colorscale=colorscale)
+        plot_heatmap(
+            Xt[sample][homology_dimension_ix], x=samplings_x, y=samplings_y,
+            colorscale=colorscale, plotly_params=plotly_params
+        ).show()
 
 
 @adapt_fit_transform_docs
@@ -982,7 +1000,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimensions=None):
+    def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of silhouettes arranged as in
         the output of :meth:`transform`. Include homology in multiple
         dimensions.
@@ -998,6 +1016,13 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         homology_dimensions : list, tuple or None, optional, default: ``None``
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in :attr:`homology_dimensions_`.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
 
         """
         check_is_fitted(self)
@@ -1054,5 +1079,10 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
                                        mode="lines", showlegend=True,
                                        hoverinfo="none",
                                        name=f"H{int(dim)}"))
+
+        # Update trace and layout according to user input
+        if plotly_params:
+            fig.update_traces(plotly_params.get("traces", None))
+            fig.update_layout(plotly_params.get("layout", None))
 
         fig.show()

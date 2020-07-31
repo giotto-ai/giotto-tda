@@ -130,7 +130,7 @@ class PlotterMixin:
         sample : int
             Sample to be plotted.
 
-        plot_params : dict
+        **plot_params
             Optional plotting parameters.
 
         Returns
