@@ -170,8 +170,13 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
             plotly_params=plotly_params
         )
@@ -288,11 +293,16 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -450,11 +460,16 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -581,5 +596,10 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_point_cloud(Xt[sample], plotly_params=plotly_params).show()
+        return plot_point_cloud(Xt[sample], plotly_params=plotly_params)

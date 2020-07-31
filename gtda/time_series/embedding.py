@@ -199,8 +199,13 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_point_cloud(Xt[sample], plotly_params=plotly_params).show()
+        return plot_point_cloud(Xt[sample], plotly_params=plotly_params)
 
 
 @adapt_fit_transform_docs

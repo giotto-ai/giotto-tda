@@ -168,6 +168,11 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in :attr:`homology_dimensions_`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         check_is_fitted(self)
 
@@ -224,7 +229,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
                                        mode='lines', showlegend=True,
                                        name=f"H{int(dim)}"))
 
-        fig.show()
+        return fig
 
 
 @adapt_fit_transform_docs
@@ -383,6 +388,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             ``None`` means plotting all dimensions present in
             :attr:`homology_dimensions_`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         check_is_fitted(self)
 
@@ -445,7 +455,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                                            hoverinfo='none',
                                            name=f"Layer {layer + 1}"))
 
-            fig.show()
+            return fig
 
 
 @adapt_fit_transform_docs
@@ -627,14 +637,19 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         check_is_fitted(self)
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample][homology_dimension_ix],
             x=self.samplings_[homology_dimension_ix],
             y=self.samplings_[homology_dimension_ix],
             colorscale=colorscale, plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -847,13 +862,18 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         check_is_fitted(self)
         samplings_x, samplings_y = self.samplings_[homology_dimension_ix]
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample][homology_dimension_ix], x=samplings_x, y=samplings_y,
             colorscale=colorscale, plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -1024,6 +1044,11 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         check_is_fitted(self)
 
@@ -1085,4 +1110,4 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             fig.update_traces(plotly_params.get("traces", None))
             fig.update_layout(plotly_params.get("layout", None))
 
-        fig.show()
+        return fig

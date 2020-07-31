@@ -108,11 +108,16 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=[np.inf],
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -315,16 +320,21 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         if homology_dimensions is None:
             _homology_dimensions = self.homology_dimensions_
         else:
             _homology_dimensions = homology_dimensions
 
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=_homology_dimensions,
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -461,13 +471,18 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         if homology_dimensions is None:
             _homology_dimensions = self.homology_dimensions_
         else:
             _homology_dimensions = homology_dimensions
 
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=_homology_dimensions,
             plotly_params=plotly_params
-        ).show()
+        )

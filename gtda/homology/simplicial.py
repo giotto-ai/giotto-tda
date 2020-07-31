@@ -257,11 +257,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -513,11 +518,16 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -725,11 +735,16 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -998,8 +1013,13 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_diagram(
+        return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        ).show()
+        )

@@ -215,10 +215,15 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample], colorscale=colorscale, plotly_params=plotly_params
-        ).show()
+        )
 
 
 @adapt_fit_transform_docs
@@ -403,7 +408,12 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        plot_heatmap(
+        return plot_heatmap(
             Xt[sample], colorscale=colorscale, plotly_params=plotly_params
-        ).show()
+        )
