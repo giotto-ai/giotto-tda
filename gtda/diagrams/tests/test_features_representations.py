@@ -10,7 +10,7 @@ from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, BettiCurve, \
+from gtda.diagrams import PersistenceEntropy, NumberOfPoints, BettiCurve, \
     PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
@@ -23,8 +23,8 @@ layout_params = {"title": "New title"}
 
 
 @pytest.mark.parametrize('transformer',
-                         [PersistenceEntropy(), BettiCurve(),
-                          PersistenceLandscape(), HeatKernel(),
+                         [PersistenceEntropy(), NumberOfPoints(),
+                          BettiCurve(), PersistenceLandscape(), HeatKernel(),
                           PersistenceImage(), Silhouette()])
 def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
@@ -80,6 +80,14 @@ def test_pe_transform(n_jobs):
     pe_normalize = PersistenceEntropy(normalize=True)
     diagram_res = np.array([[1., 0.355245321276]])
     assert_almost_equal(pe_normalize.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_nop_transform(n_jobs):
+    nop = NumberOfPoints(n_jobs=n_jobs)
+    diagram_res = np.array([[2, 2]])
+
+    assert_almost_equal(nop.fit_transform(X), diagram_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))

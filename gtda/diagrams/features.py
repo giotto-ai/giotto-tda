@@ -390,3 +390,113 @@ class Amplitude(BaseEstimator, TransformerMixin):
             Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
 
         return Xt
+
+
+@adapt_fit_transform_docs
+class NumberOfPoints(BaseEstimator, TransformerMixin):
+    """Number of (off-diagonal) points per homology dimension of persistence
+    diagrams.
+
+    Given a persistence diagrams consisting of birth-death-dimension triples
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately, and their respective number of off-diagonal points
+    are calculated.
+
+    **Important notes**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+        - By default, persistence subdiagrams containing only triples with zero
+          lifetime will have corresponding (normalized) entropies computed as
+          ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
+          different from ``None``.
+
+    Parameters
+    ----------
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    See also
+    --------
+    BettiCurve, PersistenceLandscape, HeatKernel, PersistenceEntropy, \
+    Amplitude, PersistenceImage, PairwiseDistance, Silhouette, \
+    gtda.homology.VietorisRipsPersistence
+
+    """
+
+    def __init__(self, n_jobs=None):
+        self.n_jobs = n_jobs
+
+    def _number_points(self, X):
+        return np.count_nonzero(X[:, :, 1] - X[:, :, 0], axis=1)
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_`. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_diagrams(X)
+
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        self._n_dimensions = len(self.homology_dimensions_)
+
+        return self
+
+    def transform(self, X, y=None):
+        """Compute the number of points of diagrams in `X`.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions)
+            Number of points: one value per sample and per homology
+            dimension seen in :meth:`fit`. Index i along axis 1 corresponds
+            to the i-th homology dimension in :attr:`homology_dimensions_`.
+
+        """
+        check_is_fitted(self)
+        X = check_diagrams(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._number_points)(_subdiagrams(X, [dim])[s])
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(
+                    X.shape[0], effective_n_jobs(self.n_jobs)))
+
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
+        return Xt
