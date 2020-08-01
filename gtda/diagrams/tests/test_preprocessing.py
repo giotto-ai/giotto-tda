@@ -277,7 +277,7 @@ epsilons_1 = np.linspace(np.min(lifetimes_1), np.max(lifetimes_1), num=3)
 def test_filt_transform(epsilon):
     filt = Filtering(epsilon=epsilon)
     X_res_1 = filt.fit_transform(X_1)
-    assert X_res_1.shape == X_1.shape
+    assert X_res_1.shape[1] <= X_1.shape[1]
 
     lifetimes_res_1 = X_res_1[:, :, 1] - X_res_1[:, :, 0]
     assert not ((lifetimes_res_1 > 0.) & (lifetimes_res_1 <= epsilon)).any()

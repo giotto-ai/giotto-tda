@@ -9,9 +9,12 @@ def _subdiagrams(X, homology_dimensions, remove_dim=False):
     list of homology dimensions. It is assumed that all diagrams in X contain
     the same number of points in each homology dimension."""
     n = len(X)
-    Xs = np.concatenate([X[X[:, :, 2] == dim].reshape(n, -1, 3)
-                         for dim in homology_dimensions],
-                        axis=1)
+    if len(homology_dimensions) == 1:
+        Xs = X[X[:, :, 2] == homology_dimensions[0]].reshape(n, -1, 3)
+    else:
+        Xs = np.concatenate([X[X[:, :, 2] == dim].reshape(n, -1, 3)
+                             for dim in homology_dimensions],
+                            axis=1)
     if remove_dim:
         Xs = Xs[:, :, :2]
     return Xs
@@ -25,13 +28,6 @@ def _pad(X, max_diagram_sizes):
     return X_padded
 
 
-def _sort(Xs):
-    indices = np.argsort(Xs[:, :, 1] - Xs[:, :, 0], axis=1)
-    indices = np.stack([indices, indices, indices], axis=2)
-    Xs = np.flip(np.take_along_axis(Xs, indices, axis=1), axis=1)
-    return Xs
-
-
 def _sample_image(image, sampled_diag):
     # NOTE: Modifies `image` in-place
     unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
@@ -39,24 +35,65 @@ def _sample_image(image, sampled_diag):
     image[unique] = counts
 
 
-def _filter(Xs, filtered_homology_dimensions, cutoff):
-    homology_dimensions = sorted(list(set(Xs[0, :, 2])))
-    unfiltered_homology_dimensions = sorted(list(
-        set(homology_dimensions) - set(filtered_homology_dimensions)))
+def _multirange(counts):
+    """Given a 1D array of positive integers, generate an array equal to
+    np.concatenate([np.arange(c) for c in counts]), but in a faster and more
+    memory-efficient way."""
+    cumsum = np.cumsum(counts)
+    reset_index = cumsum[:-1]
+    incr = np.ones(cumsum[-1], dtype=np.int32)
+    incr[0] = 0
+
+    # For each index in reset_index, we insert the negative value necessary
+    # to offset the cumsum in the last line
+    incr[reset_index] = 1 - counts[:-1]
+    incr.cumsum(out=incr)
+
+    return incr
+
+
+def _filter(X, filtered_homology_dimensions, cutoff):
+    n = len(X)
+    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    unfiltered_homology_dimensions = [dim for dim in homology_dimensions if
+                                      dim not in filtered_homology_dimensions]
 
     if len(unfiltered_homology_dimensions) == 0:
-        Xf = np.empty((Xs.shape[0], 0, 3), dtype=Xs.dtype)
+        Xuf = np.empty((n, 0, 3), dtype=X.dtype)
     else:
-        Xf = _subdiagrams(Xs, unfiltered_homology_dimensions)
+        Xuf = _subdiagrams(X, unfiltered_homology_dimensions)
 
+    # Compute a global 2D cutoff mask once
+    cutoff_mask = X[:, :, 1] - X[:, :, 0] > cutoff
+    Xf = []
     for dim in filtered_homology_dimensions:
-        Xdim = _subdiagrams(Xs, [dim])
-        min_value = np.min(Xdim[:, :, 0])
-        mask = (Xdim[:, :, 1] - Xdim[:, :, 0]) <= cutoff
-        Xdim[mask, :] = [min_value, min_value, dim]
-        max_points = np.max(np.sum(Xs[:, :, 1] != 0, axis=1))
-        Xdim = Xdim[:, :max_points, :]
-        Xf = np.concatenate([Xf, Xdim], axis=1)
+        # Compute a 2D mask for persistence pairs in dimension dim
+        dim_mask = X[:, :, 2] == dim
+        # Need the indices relative to X of persistence triples in dimension
+        # dim surviving the cutoff
+        indices = np.nonzero(np.logical_and(dim_mask, cutoff_mask))
+        if not indices[0].size:
+            Xdim = np.tile([0., 0., dim], (n, 1, 1))
+        else:
+            # A unique element k is repeated N times *consecutively* in
+            # indices[0] iff there are exactly N valid persistence triples
+            # in the k-th diagram
+            unique, counts = np.unique(indices[0], return_counts=True)
+            max_n_points = np.max(counts)
+            # Make a global 2D array of all valid triples
+            X_indices = X[indices]
+            min_value = np.min(X_indices[:, 0])  # For padding
+            # Initialise the array of filtered subdiagrams in dimension m
+            Xdim = np.tile([min_value, min_value, dim], (n, max_n_points, 1))
+            # Since repeated indices in indices[0] are consecutive and we know
+            # the counts per unique index, we can fill the top portion of
+            # each 2D array entry of Xdim with the filtered triples from the
+            # corresponding entry of X
+            Xdim[indices[0], _multirange(counts)] = X_indices
+        Xf.append(Xdim)
+
+    Xf.append(Xuf)
+    Xf = np.concatenate(Xf, axis=1)
     return Xf
 
 
