@@ -35,6 +35,9 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     considered separately, and their respective Betti curves are obtained by
     evenly sampling the :ref:`filtration parameter <filtered_complex>`.
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
     Parameters
     ----------
     n_bins : int, optional, default: ``100``
@@ -93,6 +96,9 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -124,6 +130,9 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -238,6 +247,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
     landscapes are obtained by evenly sampling the :ref:`filtration parameter
     <filtered_complex>`.
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
     Parameters
     ----------
     n_layers : int, optional, default: ``1``
@@ -302,6 +314,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -333,6 +348,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -462,6 +480,9 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a (multi-channel) raster image.
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
     Parameters
     ----------
     sigma : float, optional default ``1.``
@@ -534,6 +555,9 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -567,6 +591,9 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -641,6 +668,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     evenly sampled from appropriate ranges of the :ref:`filtration parameter
     <filtered_complex>`. The result can be thought of as a (multi-channel)
     raster image.
+
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -731,6 +761,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -771,6 +804,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -850,6 +886,9 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     spaced locations from appropriate ranges of the :ref:`filtration parameter
     <filtered_complex>`.
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
     Parameters
     ----------
     power: float, optional, default: ``1.``
@@ -923,6 +962,9 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -954,6 +996,9 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline

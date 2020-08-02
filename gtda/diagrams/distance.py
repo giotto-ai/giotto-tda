@@ -24,6 +24,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     matrices or a single distance matrix between pairs of diagrams is
     calculated according to the following steps:
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
         1. All diagrams are partitioned into subdiagrams corresponding to
            distinct homology dimensions.
         2. Pairwise distances between subdiagrams of equal homology
@@ -146,6 +149,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -190,6 +196,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
