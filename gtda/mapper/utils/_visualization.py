@@ -90,16 +90,18 @@ def _get_node_size(node_elements):
 
 
 def _get_node_text(
-        node_ids, pullback_set_ids, num_node_elements, node_summary_statistics
+        node_ids, pullback_set_labels, partial_cluster_labels,
+        num_node_elements, node_summary_statistics
 ):
     return [
-        f"Node ID: {node_id}<br>Pullback set ID: {pullback_set_id}"
-        f"<br>Node size: {num_elements}<br>Summary statistic: "
-        f"{node_summary_statistic}"
-        for node_id, pullback_set_id, num_elements, node_summary_statistic
-        in zip(node_ids, pullback_set_ids, num_node_elements,
-               node_summary_statistics)
-        ]
+        f"Node ID: {node_id}<br>Pullback set label: {pullback_set_label}<br>"
+        f"Partial cluster label: {partial_cluster_label}<br>Node size: "
+        f"{num_elements}<br>Summary statistic: {node_summary_statistic}"
+        for (node_id, pullback_set_label, partial_cluster_label, num_elements,
+             node_summary_statistic)
+        in zip(node_ids, pullback_set_labels, partial_cluster_labels,
+               num_node_elements, node_summary_statistics)
+    ]
 
 
 def _get_node_summary(data, node_elements, summary_statistic):
@@ -265,12 +267,14 @@ def _calculate_graph_data(
     # Generate hovertext
     node_ids = graph["node_metadata"]["node_id"]
     pullback_set_ids = graph["node_metadata"]["pullback_set_label"]
+    partial_cluster_labels = graph["node_metadata"]["partial_cluster_label"]
     num_node_elements = map(len, graph["node_metadata"]["node_elements"])
     node_colors_round = map(
         partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors_color_variable
     )
     plot_options["node_trace"]["hovertext"] = _get_node_text(
-        node_ids, pullback_set_ids, num_node_elements, node_colors_round
+        node_ids, pullback_set_ids, partial_cluster_labels,
+        num_node_elements, node_colors_round
     )
 
     # Compute graph layout
