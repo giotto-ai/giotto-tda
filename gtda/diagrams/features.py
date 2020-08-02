@@ -54,7 +54,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     @staticmethod
-    def _persistence_entropy(self, X):
+    def _persistence_entropy(X):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
         X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
         return - np.sum(np.nan_to_num(
