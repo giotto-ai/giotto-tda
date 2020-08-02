@@ -139,6 +139,9 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
           two-dimensional array of amplitudes (one per diagram and homology
           dimension) to obtain :attr:`scale_`.
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
@@ -210,6 +213,9 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -258,6 +264,9 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -276,13 +285,13 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xs
 
     def inverse_transform(self, X):
-        """Scale back the data to the original representation. Multiplies
-        by the scale found in :meth:`fit`.
+        """Scale back the data to the original representation. Multiplies by
+        the scale found in :meth:`fit`.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features, 3)
-            Data to apply the inverse transform to.
+            Data to apply the inverse transform to, c.f. :meth:`transform`.
 
         Returns
         -------

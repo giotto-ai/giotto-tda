@@ -27,6 +27,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     calculated as the (base e) entropies of the collections of differences
     d - b, normalized by the sum of all such differences.
 
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
+
     Parameters
     ----------
     n_jobs : int or None, optional, default: ``None``
@@ -50,7 +53,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _persistence_entropy(self, X):
+    @staticmethod
+    def _persistence_entropy(X):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
         X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
         return - np.sum(np.nan_to_num(
@@ -69,6 +73,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -95,6 +102,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -136,6 +146,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
            the :math:`q_i` range over the available homology dimensions.
         3. The final result is either :math:`\\mathbf{a}` itself or
            a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
+
+    Input collections of persistence diagrams for this transformer must
+    satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -242,6 +255,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -284,6 +300,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of X.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
