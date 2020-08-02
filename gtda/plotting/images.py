@@ -52,9 +52,7 @@ def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
         title=title
     )
     fig = gobj.Figure(layout=layout)
-    fig.add_trace(gobj.Heatmap(
-        z=data, x=x, y=y, colorscale=colorscale
-    ))
+    fig.add_trace(gobj.Heatmap(z=data * 1, x=x, y=y, colorscale=colorscale))
 
     # Update trace and layout according to user input
     if plotly_params:
