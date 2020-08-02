@@ -89,7 +89,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0):
+    def plot(Xt, sample=0, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams.
 
         Parameters
@@ -101,9 +101,23 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
         sample : int, optional, default: ``0``
             Index of the sample in `Xt` to be plotted.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_diagram(
-            Xt[sample], homology_dimensions=[np.inf])
+            Xt[sample], homology_dimensions=[np.inf],
+            plotly_params=plotly_params
+        )
 
 
 @adapt_fit_transform_docs
@@ -282,7 +296,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         Xs[:, :, :2] *= self.scale_
         return Xs
 
-    def plot(self, Xt, sample=0, homology_dimensions=None):
+    def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
@@ -299,6 +313,18 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` is
             equivalent to passing :attr:`homology_dimensions_`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         if homology_dimensions is None:
             _homology_dimensions = self.homology_dimensions_
@@ -306,7 +332,9 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
             _homology_dimensions = homology_dimensions
 
         return plot_diagram(
-            Xt[sample], homology_dimensions=_homology_dimensions)
+            Xt[sample], homology_dimensions=_homology_dimensions,
+            plotly_params=plotly_params
+        )
 
 
 @adapt_fit_transform_docs
@@ -427,7 +455,7 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = _filter(X, self.homology_dimensions_, self.epsilon)
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimensions=None):
+    def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
@@ -444,6 +472,18 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` is
             equivalent to passing :attr:`homology_dimensions_`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         if homology_dimensions is None:
             _homology_dimensions = self.homology_dimensions_
@@ -451,4 +491,6 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             _homology_dimensions = homology_dimensions
 
         return plot_diagram(
-            Xt[sample], homology_dimensions=_homology_dimensions)
+            Xt[sample], homology_dimensions=_homology_dimensions,
+            plotly_params=plotly_params
+        )

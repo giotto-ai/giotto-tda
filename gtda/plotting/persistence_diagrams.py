@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objs as gobj
 
 
-def plot_diagram(diagram, homology_dimensions=None):
+def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
     """Plot a single persistence diagram.
 
     Parameters
@@ -19,8 +19,19 @@ def plot_diagram(diagram, homology_dimensions=None):
         Homology dimensions which will appear on the plot. If ``None``, all
         homology dimensions which appear in `diagram` will be plotted.
 
-    """
+    plotly_params : dict or None, optional, default: ``None``
+        Custom parameters to configure the plotly figure. Allowed keys are
+        ``"traces"`` and ``"layout"``, and the corresponding values should be
+        dictionaries containing keyword arguments as would be fed to the
+        :meth:`update_traces` and :meth:`update_layout` methods of
+        :class:`plotly.graph_objects.Figure`.
 
+    Returns
+    -------
+    fig : :class:`plotly.graph_objects.Figure` object
+        Figure representing the persistence diagram.
+
+    """
     # TODO: increase the marker size
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
@@ -91,4 +102,9 @@ def plot_diagram(diagram, homology_dimensions=None):
         plot_bgcolor='white'
     )
 
-    fig.show()
+    # Update trace and layout according to user input
+    if plotly_params:
+        fig.update_traces(plotly_params.get("traces", None))
+        fig.update_layout(plotly_params.get("layout", None))
+
+    return fig

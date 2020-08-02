@@ -5,7 +5,8 @@ import numpy as np
 import plotly.graph_objs as gobj
 
 
-def plot_betti_curves(betti_numbers, samplings, homology_dimensions=None):
+def plot_betti_curves(betti_numbers, samplings, homology_dimensions=None,
+                      plotly_params=None):
     """Plot Betti curves by homology dimension.
 
     Parameters
@@ -22,6 +23,18 @@ def plot_betti_curves(betti_numbers, samplings, homology_dimensions=None):
     homology_dimensions : list, tuple or None, optional, default: ``None``
         Which homology dimensions to include in the plot. If ``None``,
         all available homology dimensions will be used.
+
+    plotly_params : dict or None, optional, default: ``None``
+        Custom parameters to configure the plotly figure. Allowed keys are
+        ``"traces"`` and ``"layout"``, and the corresponding values should be
+        dictionaries containing keyword arguments as would be fed to the
+        :meth:`update_traces` and :meth:`update_layout` methods of
+        :class:`plotly.graph_objects.Figure`.
+
+    Returns
+    -------
+    fig : :class:`plotly.graph_objects.Figure` object
+        Figure representing the Betti curves.
 
     """
     if homology_dimensions is None:
@@ -67,11 +80,16 @@ def plot_betti_curves(betti_numbers, samplings, homology_dimensions=None):
                                    hoverinfo='none',
                                    name=f'H{int(dim)}'))
 
-    fig.show()
+    # Update trace and layout according to user input
+    if plotly_params:
+        fig.update_traces(plotly_params.get("traces", None))
+        fig.update_layout(plotly_params.get("layout", None))
+
+    return fig
 
 
 def plot_betti_surfaces(betti_curves, samplings=None,
-                        homology_dimensions=None):
+                        homology_dimensions=None, plotly_params=None):
     """Plot Betti surfaces (Betti numbers against "time" and filtration
     parameter) by homology dimension.
 
@@ -96,6 +114,22 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         For each homology dimension, (filtration parameter) values to be used
         on the x-axis against the corresponding values in `betti_curves` on the
         y-axis.
+
+    plotly_params : dict or None, optional, default: ``None``
+        Custom parameters to configure the plotly figure. Allowed keys are
+        ``"traces"`` and ``"layout"``, and the corresponding values should be
+        dictionaries containing keyword arguments as would be fed to the
+        :meth:`update_traces` and :meth:`update_layout` methods of
+        :class:`plotly.graph_objects.Figure`.
+
+    Returns
+    -------
+    figs/fig : tuple of :class:`plotly.graph_objects.Figure`/\
+        :class:`plotly.graph_objects.Figure` object
+        If ``n_samples > 1``, a tuple of figures representing the Betti
+        surfaces, with one figure per dimension in `homology_dimensions`.
+        Otherwise, a single figure representing the Betti curve of the
+        single sample present.
 
     """
     if homology_dimensions is None:
@@ -124,8 +158,11 @@ def plot_betti_surfaces(betti_curves, samplings=None,
         }
     }
     if betti_curves.shape[0] == 1:
-        plot_betti_curves(betti_curves[0], samplings, homology_dimensions)
+        return plot_betti_curves(
+            betti_curves[0], samplings, homology_dimensions, plotly_params
+        )
     else:
+        figs = []
         for dim in _homology_dimensions:
             fig = gobj.Figure()
             fig.update_layout(scene=scene,
@@ -136,4 +173,11 @@ def plot_betti_surfaces(betti_curves, samplings=None,
                                        z=betti_curves[:, dim],
                                        connectgaps=True, hoverinfo='none'))
 
-            fig.show()
+            # Update trace and layout according to user input
+            if plotly_params:
+                fig.update_traces(plotly_params.get("traces", None))
+                fig.update_layout(plotly_params.get("layout", None))
+
+            figs.append(fig)
+
+        return tuple(figs)

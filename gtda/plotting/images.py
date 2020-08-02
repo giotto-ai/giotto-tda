@@ -5,7 +5,7 @@ import plotly.graph_objects as gobj
 
 
 def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
-                 title=None):
+                 title=None, plotly_params=None):
     """Plot a 2D single-channel image, as a heat map from 2D array data.
 
     Parameters
@@ -31,6 +31,18 @@ def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
     title : str or None, optional, default: ``None``
         Title of the resulting figure.
 
+    plotly_params : dict or None, optional, default: ``None``
+        Custom parameters to configure the plotly figure. Allowed keys are
+        ``"trace"`` and ``"layout"``, and the corresponding values should be
+        dictionaries containing keyword arguments as would be fed to the
+        :meth:`update_traces` and :meth:`update_layout` methods of
+        :class:`plotly.graph_objects.Figure`.
+
+    Returns
+    -------
+    fig : :class:`plotly.graph_objects.Figure` object
+        Figure representing the 2D single-channel image.
+
     """
     autorange = True if origin == 'lower' else 'reversed'
     layout = dict(
@@ -44,4 +56,9 @@ def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
         z=data, x=x, y=y, colorscale=colorscale
     ))
 
-    fig.show()
+    # Update trace and layout according to user input
+    if plotly_params:
+        fig.update_traces(plotly_params.get("trace", None))
+        fig.update_layout(plotly_params.get("layout", None))
+
+    return fig

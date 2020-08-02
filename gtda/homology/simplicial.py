@@ -233,7 +233,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, homology_dimensions=None):
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
@@ -250,9 +250,23 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in ``Xt[sample]``.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_diagram(
-            Xt[sample], homology_dimensions=homology_dimensions)
+            Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+        )
 
 
 @adapt_fit_transform_docs
@@ -480,7 +494,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, homology_dimensions=None):
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
@@ -497,9 +511,23 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in ``Xt[sample]``.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_diagram(
-            Xt[sample], homology_dimensions=homology_dimensions)
+            Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+        )
 
 
 @adapt_fit_transform_docs
@@ -683,7 +711,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, homology_dimensions=None):
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
@@ -700,9 +728,23 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in ``Xt[sample]``.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_diagram(
-            Xt[sample], homology_dimensions=homology_dimensions)
+            Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+        )
 
 
 @adapt_fit_transform_docs
@@ -947,7 +989,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, homology_dimensions=None):
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
@@ -964,6 +1006,20 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in ``Xt[sample]``.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_diagram(
-            Xt[sample], homology_dimensions=homology_dimensions)
+            Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+        )
