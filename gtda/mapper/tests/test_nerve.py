@@ -42,10 +42,10 @@ def test_edge_elements(X):
     # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
     # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline()
-    pipe_store_edge_elems = make_mapper_pipeline(store_edge_elements=True)
+    pipe_edge_elems = make_mapper_pipeline(store_edge_elements=True)
 
     graph = pipe.fit_transform(X)
-    graph_ee = pipe_store_edge_elems.fit_transform(X)
+    graph_edge_elems = pipe_edge_elems.fit_transform(X)
 
     # Check that when store_edge_elements=False (default) there is no
     # "edge_elements" attribute.
@@ -54,29 +54,29 @@ def test_edge_elements(X):
 
     # Check that graph and graph_ee agree otherwise
     # Vertices
-    assert graph.vs.indices == graph_ee.vs.indices
+    assert graph.vs.indices == graph_edge_elems.vs.indices
     for attr_name in ["pullback_set_label", "partial_cluster_label"]:
-        assert graph.vs[attr_name] == graph_ee.vs[attr_name]
+        assert graph.vs[attr_name] == graph_edge_elems.vs[attr_name]
     node_elements = graph.vs["node_elements"]
-    node_elements_ee = graph_ee.vs["node_elements"]
+    node_elements_ee = graph_edge_elems.vs["node_elements"]
     assert all([
         np.array_equal(node, node_ee)
         for node, node_ee in zip(node_elements, node_elements_ee)
     ])
-    assert graph.vs.indices == graph_ee.vs.indices
+    assert graph.vs.indices == graph_edge_elems.vs.indices
     # Edges
-    assert graph.es.indices == graph_ee.es.indices
-    assert graph.es["weight"] == graph_ee.es["weight"]
+    assert graph.es.indices == graph_edge_elems.es.indices
+    assert graph.es["weight"] == graph_edge_elems.es["weight"]
     assert all([
         edge.tuple == edge_ee.tuple
-        for edge, edge_ee in zip(graph.es, graph_ee.es)
+        for edge, edge_ee in zip(graph.es, graph_edge_elems.es)
     ])
 
     # Check that the arrays edge_elements contain precisely those indices which
     # are in the element sets associated to both the first and second vertex,
     # and that the edge weight equals the size of edge_elements.
     flag = True
-    for edge in graph_ee.es:
+    for edge in graph_edge_elems.es:
         v1, v2 = edge.vertex_tuple
         flag *= np.array_equal(
             edge["edge_elements"],

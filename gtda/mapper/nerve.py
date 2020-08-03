@@ -97,7 +97,7 @@ class Nerve(BaseEstimator, TransformerMixin):
             Undirected Mapper graph according to `X` and `min_intersection`.
             Each node is an :class:`igraph.Vertex` object with attributes
             ``"pullback_set_label"``, ``"partial_cluster_label"`` and
-            ``"node_element"'``. Each edge is an :class:`igraph.Edge` object
+            ``"node_elements"'``. Each edge is an :class:`igraph.Edge` object
             with a ``"weight"`` attribute which is equal to the size of the
             intersection between the data subsets associated to its two nodes.
             If `store_edge_elements` is ``True`` each edge also has an
@@ -108,10 +108,15 @@ class Nerve(BaseEstimator, TransformerMixin):
         # Graph construction -- vertices with their metadata
         nodes = reduce(iconcat, X, [])
         graph = ig.Graph(len(nodes))
-        node_attribute_lists = zip(*nodes)
-        graph.vs["pullback_set_label"] = next(node_attribute_lists)
-        graph.vs["partial_cluster_label"] = next(node_attribute_lists)
-        node_elements = next(node_attribute_lists)
+
+        # Since `nodes` is a list, say of length N, of triples of the form
+        # (pullback_set_label, partial_cluster_label, node_elements),
+        # zip(*nodes) generates three tuples of length N, each corresponding to
+        # a type of node attribute.
+        node_attributes = zip(*nodes)
+        graph.vs["pullback_set_label"] = next(node_attributes)
+        graph.vs["partial_cluster_label"] = next(node_attributes)
+        node_elements = next(node_attributes)
         graph.vs["node_elements"] = node_elements
 
         # Graph construction -- edges with weights given by intersection sizes
@@ -134,20 +139,20 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         # Boilerplate is just to avoid boolean checking at each iteration
         if not self.store_edge_elements:
-            for (node_1_ix, node_1_elements), (node_2_ix, node_2_elements) \
+            for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
                     in node_tuples:
                 intersection = np.intersect1d(node_1_elements, node_2_elements)
                 intersection_size = len(intersection)
                 if intersection_size >= self.min_intersection:
-                    node_index_pairs.append((node_1_ix, node_2_ix))
+                    node_index_pairs.append((node_1_idx, node_2_idx))
                     weights.append(intersection_size)
         else:
-            for (node_1_ix, node_1_elements), (node_2_ix, node_2_elements) \
+            for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
                     in node_tuples:
                 intersection = np.intersect1d(node_1_elements, node_2_elements)
                 intersection_size = len(intersection)
                 if intersection_size >= self.min_intersection:
-                    node_index_pairs.append((node_1_ix, node_2_ix))
+                    node_index_pairs.append((node_1_idx, node_2_idx))
                     weights.append(intersection_size)
                     intersections.append(intersection)
 

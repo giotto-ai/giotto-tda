@@ -96,7 +96,7 @@ class ParallelClustering(BaseEstimator):
             self._precomputed = precomputed[0]
         else:
             raise NotImplementedError("Behaviour when metric and affinity "
-                                      "are both set to 'precomputed' not yet"
+                                      "are both set to 'precomputed' not yet "
                                       "implemented by ParallelClustering.")
 
     def fit(self, X, y=None, sample_weight=None):

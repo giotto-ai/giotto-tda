@@ -222,11 +222,13 @@ def plot_static_mapper_graph(
                 if e.args[0] == "This colorscale is not supported.":
                     warn("Data-dependent background hoverlabel colors cannot "
                          "be generated with this choice of colorscale. Please "
-                         "use a standard hex- or RGB-formatted colorscale.")
+                         "use a standard hex- or RGB-formatted colorscale.",
+                         RuntimeWarning)
                 else:
                     warn("Something went wrong in generating data-dependent "
                          "background hoverlabel colors. All background "
-                         "hoverlabel colors will be set to white.")
+                         "hoverlabel colors will be set to white.",
+                         RuntimeWarning)
                 hoverlabel_bgcolor = "white"
                 colorscale_for_hoverlabel = None
             fig.update_traces(
