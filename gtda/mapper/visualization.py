@@ -36,8 +36,8 @@ def plot_static_mapper_graph(
     "pullback (cover) sets", which are computed by means of the `pipeline`'s
     "filter function" and "cover" and correspond to the differently-colored
     portions in `this diagram <../../../../_images/mapper_pipeline.svg>`_.
-    Two pullback cover sets can overlap, and there is an edge between two nodes
-    in the graph only if their corresponding data subsets share some elements.
+    Two clusters from different pullback cover sets can overlap; if they do, an
+    edge between the corresponding nodes in the graph may be drawn.
 
     Nodes are colored according to `color_variable` and `node_color_statistic`
     and are sized according to the number of elements they represent. The
