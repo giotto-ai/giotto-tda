@@ -120,7 +120,7 @@ def test_valid_colorscale():
         fig_3d.get_state()["_data"][1]["marker"]["colorscale"]
     assert marker_colorscale == marker_colorscale_3d
 
-    # Test that the default colorscale "viridis" and that the custom one is
+    # Test that the default colorscale is "viridis" and that the custom one is
     # different
     fig_default = plot_static_mapper_graph(pipe, X)
     marker_colorscale_default = \
