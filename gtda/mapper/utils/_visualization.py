@@ -278,20 +278,11 @@ def _calculate_graph_data(
     )
 
     # Compute graph layout
-    is_layout_ndarray = hasattr(layout, "dtype")
-    if is_layout_ndarray:
-        if layout.shape[1] not in [2, 3]:
-            raise ValueError(
-                f"If an ndarray, `layout` must be 2D with 2 or 3 columns. "
-                f"Array with {layout.shape[1]} columns passed."
-            )
-        node_pos = layout
-    else:
-        if layout_dim not in [2, 3]:
-            raise ValueError(
-                f"`layout_dim` must be either 2 or 3. {layout_dim} entered."
-            )
-        node_pos = np.asarray(graph.layout(layout, dim=layout_dim).coords)
+    if layout_dim not in [2, 3]:
+        raise ValueError(
+            f"`layout_dim` must be either 2 or 3. {layout_dim} entered."
+        )
+    node_pos = np.asarray(graph.layout(layout, dim=layout_dim).coords)
 
     # Store x and y coordinates of edge endpoints
     edge_x = list(
