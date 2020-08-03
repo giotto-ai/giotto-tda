@@ -48,7 +48,7 @@ def plot_static_mapper_graph(
           :class:`~gtda.mapper.nerve.Nerve`;
         - the label of the pullback (cover) set which the node's elements
           form a cluster in;
-        - a label identifying the cluster within that pullback set;
+        - a label identifying the node as a cluster within that pullback set;
         - the number of elements of `data` associated with the node;
         - the value of the summary statistic which determines the node's color.
 
