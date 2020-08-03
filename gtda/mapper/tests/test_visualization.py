@@ -77,7 +77,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
                 pass
 
     def _get_size_from_hovertext(self, s):
-        size_str = s.split("<br>")[1].split(": ")[1]
+        size_str = s.split("<br>")[3].split(": ")[1]
         return int(size_str)
 
     def test_cluster_sizes(self):

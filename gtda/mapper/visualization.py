@@ -26,12 +26,31 @@ def plot_static_mapper_graph(
         color_by_columns_dropdown=False, clone_pipeline=True, n_sig_figs=3,
         node_scale=12, plotly_params=None
 ):
-    """Plotting function for static Mapper graphs.
+    """Plot Mapper graphs without interactivity on pipeline parameters.
 
-    Nodes are colored according to `color_variable` and `node_color_statistic`.
-    By default, the hovertext on each node displays a globally unique ID for
-    the node, the number of data points associated with the node, and the
-    summary statistic which determines its color.
+    The output graph is a rendition of the :class:`igraph.Graph` object
+    computed by calling the :meth:`fit_transform` method of the
+    :class:`~gtda.mapper.pipeline.MapperPipeline` instance `pipeline` on the
+    input `data`. The graph's nodes correspond to subsets of elements (rows) in
+    `data`; these subsets are clusters in larger portions of `data` called
+    "pullback (cover) sets", which are computed by means of the `pipeline`'s
+    "filter function" and "cover" and correspond to the differently-colored
+    portions in `this diagram <../../../../_images/mapper_pipeline.svg>`_.
+    Two clusters from different pullback cover sets can overlap; if they do, an
+    edge between the corresponding nodes in the graph may be drawn.
+
+    Nodes are colored according to `color_variable` and `node_color_statistic`
+    and are sized according to the number of elements they represent. The
+    hovertext on each node displays, in this order:
+
+        - a globally unique ID for the node, which can be used to retrieve
+          node information from the :class:`igraph.Graph` object, see
+          :class:`~gtda.mapper.nerve.Nerve`;
+        - the label of the pullback (cover) set which the node's elements
+          form a cluster in;
+        - a label identifying the node as a cluster within that pullback set;
+        - the number of elements of `data` associated with the node;
+        - the value of the summary statistic which determines the node's color.
 
     Parameters
     ----------
@@ -267,14 +286,11 @@ def plot_interactive_mapper_graph(
         color_by_columns_dropdown=False, n_sig_figs=3, node_scale=12,
         plotly_params=None
 ):
-    """Plotting function for interactive Mapper graphs.
+    """Plot Mapper graphs with interactivity on pipeline parameters.
 
-    Provides functionality to interactively update parameters from the cover
-    and clustering steps defined in `pipeline`. Nodes are colored according to
-    `color_variable` and `node_color_statistic`. By default, the hovertext on
-    each node displays a globally unique ID for the node, the number of data
-    points associated with the node, and the summary statistic which determines
-    its color.
+    Extends `~gtda.mapper.visualization.plot_static_mapper_graph` by providing
+    functionality to interactively update parameters from the cover and
+    clustering steps defined in `pipeline`.
 
     Parameters
     ----------
