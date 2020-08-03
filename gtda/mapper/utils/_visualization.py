@@ -1,7 +1,7 @@
 """Graph layout functions and plotly layout functions."""
 # License: GNU AGPLv3
 
-import operator
+from operator import iconcat
 from copy import deepcopy
 from functools import reduce, partial
 
@@ -232,7 +232,7 @@ def _calculate_graph_data(
         node_color_statistic, n_sig_figs, node_scale
 ):
     graph = pipeline.fit_transform(data)
-    node_elements = graph["node_metadata"]["node_elements"]
+    node_elements = graph.vs["node_elements"]
 
     # Determine whether node_color_statistic is an array of node colors
     is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
@@ -265,10 +265,10 @@ def _calculate_graph_data(
     })
 
     # Generate hovertext
-    node_ids = graph["node_metadata"]["node_id"]
-    pullback_set_ids = graph["node_metadata"]["pullback_set_label"]
-    partial_cluster_labels = graph["node_metadata"]["partial_cluster_label"]
-    num_node_elements = map(len, graph["node_metadata"]["node_elements"])
+    node_ids = graph.vs.indices
+    pullback_set_ids = graph.vs["pullback_set_label"]
+    partial_cluster_labels = graph.vs["partial_cluster_label"]
+    num_node_elements = map(len, graph.vs["node_elements"])
     node_colors_round = map(
         partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors_color_variable
     )
@@ -296,7 +296,7 @@ def _calculate_graph_data(
     # Store x and y coordinates of edge endpoints
     edge_x = list(
         reduce(
-            operator.iconcat, map(
+            iconcat, map(
                 lambda e: [node_pos[e.source, 0], node_pos[e.target, 0],
                            None],
                 graph.es
@@ -305,7 +305,7 @@ def _calculate_graph_data(
     )
     edge_y = list(
         reduce(
-            operator.iconcat, map(
+            iconcat, map(
                 lambda e: [node_pos[e.source, 1], node_pos[e.target, 1],
                            None],
                 graph.es
@@ -330,7 +330,7 @@ def _calculate_graph_data(
 
         edge_z = list(
             reduce(
-                operator.iconcat, map(
+                iconcat, map(
                     lambda e: [node_pos[e.source][2], node_pos[e.target][2],
                                None],
                     graph.es

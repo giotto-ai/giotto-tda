@@ -32,6 +32,8 @@ class ParallelClustering(BaseEstimator):
     location of a portion of ``X_tot`` to cluster separately. Parallelism is
     achieved over the columns of ``masks``.
 
+    This estimator is not intended for direct use.
+
     Parameters
     ----------
     clusterer : object, optional, default: ``None``

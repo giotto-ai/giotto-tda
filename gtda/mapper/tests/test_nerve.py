@@ -22,9 +22,8 @@ def test_node_intersection(X):
     # Check if the elements of nodes defining an edge are disjoint or not:
     # If True, they are disjoint, i.e. the created edge is incorrect.
     # If all are False, all edges are correct.
-    disjoint_nodes = [set(graph['node_metadata']['node_elements'][node_1])
-                      .isdisjoint(graph['node_metadata']['node_elements']
-                                  [node_2])
+    disjoint_nodes = [set(graph.vs['node_elements'][node_1])
+                      .isdisjoint(graph.vs['node_elements'][node_2])
                       for node_1, node_2 in graph.get_edgelist()]
 
     # Check if there is a disjoint node pair given by an edge.
