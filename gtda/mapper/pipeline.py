@@ -149,6 +149,7 @@ def make_mapper_pipeline(scaler=None,
                          parallel_backend_prefer='threads',
                          graph_step=True,
                          min_intersection=1,
+                         store_edge_elements=False,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
@@ -207,12 +208,20 @@ def make_mapper_pipeline(scaler=None,
 
     graph_step : bool, optional, default: ``True``
         Whether the resulting pipeline should stop at the calculation of the
-        Mapper cover, or include the construction of the Mapper graph.
+        (refined) Mapper cover, or include the construction of the Mapper
+        graph.
 
     min_intersection : int, optional, default: ``1``
         Minimum size of the intersection between clusters required for creating
         an edge in the Mapper graph. Ignored if `graph_step` is set to
         ``False``.
+
+    store_edge_elements : bool, options, default: ``False``
+        Whether the indices of data elements associated to Mapper edges (i.e.
+        in the intersections allowed by `min_intersection`) should be stored in
+        the :class:`igraph.Graph` object output by the pipeline's
+        :meth:`fit_transform`. When ``True``, might lead to large
+        :class:`igraph.Graph` objects.
 
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
@@ -231,7 +240,12 @@ def make_mapper_pipeline(scaler=None,
     Returns
     -------
     mapper_pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
-        Output Mapper pipeline.
+        Output Mapper pipeline. The output of `mapper_pipeline`'s
+        :meth:`fit_transform` is: a) an :class:`igraph.Graph` object as per the
+        output of `~gtda.mapper.nerve.Nerve`, when `graph_step` is ``True``; b)
+        a list of lists of tuples as per the output of
+        `~gtda.mapper.clustering.ParallelClustering` (or input of
+        `~gtda.mapper.nerve.Nerve`), otherwise.
 
     Examples
     --------
@@ -253,15 +267,14 @@ def make_mapper_pipeline(scaler=None,
     >>> mapper_graph = mapper.fit_transform(X)  # Create the mapper graph
     >>> print(type(mapper_graph))
     igraph.Graph
-    >>> # Node metadata stored as dict in graph object
-    >>> print(mapper_graph['node_metadata'].keys())
-    dict_keys(['node_id', 'pullback_set_label', 'partial_cluster_label',
-               'node_elements'])
+    >>> # Node metadata stored as vertex attributes in graph object
+    >>> print(mapper_graph.vs.attributes())
+    ['pullback_set_label', 'partial_cluster_label', 'node_elements']
     >>> # Find which points belong to first node of graph
-    >>> node_id = mapper_graph['node_metadata']['node_id']
-    >>> node_elements = mapper_graph['node_metadata']['node_elements']
-    >>> print(f"Node ID: {node_id[0]}, Node elements: {node_elements[0]}, "
-    ...       f"Data points: {X[node_elements[0]]}")
+    >>> node_id = 0
+    >>> node_elements = mapper_graph.vs['node_elements']
+    >>> print(f"Node ID: {node_id}, Node elements: {node_elements[node_id]}, "
+    ...       f"Data points: {X[node_elements[node_id]")
     Node Id: 0,
     Node elements: [8768],
     Data points: [[0.01838998 0.76928754 0.98199244 0.0074299 ]]
@@ -398,7 +411,10 @@ def make_mapper_pipeline(scaler=None,
     ]
 
     if graph_step:
-        all_steps.append(('nerve', Nerve(min_intersection=min_intersection)))
+        all_steps.append(
+            ('nerve', Nerve(min_intersection=min_intersection,
+                            store_edge_elements=store_edge_elements))
+        )
 
     mapper_pipeline = MapperPipeline(
         steps=all_steps, memory=memory, verbose=verbose)

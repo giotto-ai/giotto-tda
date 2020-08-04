@@ -32,6 +32,8 @@ class ParallelClustering(BaseEstimator):
     location of a portion of ``X_tot`` to cluster separately. Parallelism is
     achieved over the columns of ``masks``.
 
+    This estimator is not intended for direct use.
+
     Parameters
     ----------
     clusterer : object, optional, default: ``None``
@@ -94,7 +96,7 @@ class ParallelClustering(BaseEstimator):
             self._precomputed = precomputed[0]
         else:
             raise NotImplementedError("Behaviour when metric and affinity "
-                                      "are both set to 'precomputed' not yet"
+                                      "are both set to 'precomputed' not yet "
                                       "implemented by ParallelClustering.")
 
     def fit(self, X, y=None, sample_weight=None):

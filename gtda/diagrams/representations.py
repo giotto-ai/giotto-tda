@@ -75,7 +75,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")}}
 
     def __init__(self, n_bins=100, n_jobs=None):
         self.n_bins = n_bins
@@ -111,11 +111,11 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_diagrams(X)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, metric='betti', n_bins=self.n_bins)
+        self._samplings, _ = _bin(X, metric="betti", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -160,7 +160,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimensions=None):
+    def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of Betti curves arranged as in
         the output of :meth:`transform`. Include homology in multiple
         dimensions.
@@ -176,6 +176,13 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         homology_dimensions : list, tuple or None, optional, default: ``None``
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in :attr:`homology_dimensions_`.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
 
         Returns
         -------
@@ -201,31 +208,32 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
                     ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
                     _homology_dimensions.append((ix, dim))
 
-        layout = dict(
-            xaxis1=dict(
-                title="Filtration parameter",
-                side="bottom",
-                type="linear",
-                ticks="outside",
-                anchor="x1",
-                showline=True,
-                zeroline=True,
-                showexponent="all",
-                exponentformat="e"
-            ),
-            yaxis1=dict(
-                title="Betti number",
-                side="left",
-                type="linear",
-                ticks="outside",
-                anchor="y1",
-                showline=True,
-                zeroline=True,
-                showexponent="all",
-                exponentformat="e"
-            ),
-            plot_bgcolor="white"
-        )
+        layout = {
+            "xaxis1": {
+                "title": "Filtration parameter",
+                "side": "bottom",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "x1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+                },
+            "yaxis1": {
+                "title": "Betti number",
+                "side": "left",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "y1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+                },
+            "plot_bgcolor": "white"
+            }
+
         fig = gobj.Figure(layout=layout)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
@@ -235,8 +243,13 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         for ix, dim in _homology_dimensions:
             fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
                                        y=Xt[sample][ix],
-                                       mode='lines', showlegend=True,
+                                       mode="lines", showlegend=True,
                                        name=f"H{int(dim)}"))
+
+        # Update traces and layout according to user input
+        if plotly_params:
+            fig.update_traces(plotly_params.get("traces", None))
+            fig.update_layout(plotly_params.get("layout", None))
 
         return fig
 
@@ -296,8 +309,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'n_layers': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
+        "n_layers": {"type": int, "in": Interval(1, np.inf, closed="left")}}
 
     def __init__(self, n_layers=1, n_bins=100, n_jobs=None):
         self.n_layers = n_layers
@@ -334,7 +347,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_diagrams(X)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -386,7 +399,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimensions=None):
+    def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence landscapes arranged
         as in the output of :meth:`transform`. Include homology in multiple
         dimensions.
@@ -405,6 +418,13 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             Homology dimensions for which the landscape should be plotted.
             ``None`` means plotting all dimensions present in
             :attr:`homology_dimensions_`.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
 
         Returns
         -------
@@ -430,34 +450,34 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                     ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
                     _homology_dimensions.append((ix, dim))
 
-        layout = dict(
-            xaxis1=dict(
-                side="bottom",
-                type="linear",
-                ticks="outside",
-                anchor="y1",
-                showline=True,
-                zeroline=True,
-                showexponent="all",
-                exponentformat="e"
-            ),
-            yaxis1=dict(
-                side="left",
-                type="linear",
-                ticks="outside",
-                anchor="x1",
-                showline=True,
-                zeroline=True,
-                showexponent="all",
-                exponentformat="e"
-            ),
-            plot_bgcolor="white"
-        )
+        layout = {
+            "xaxis1": {
+                "side": "bottom",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "y1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+                },
+            "yaxis1": {
+                "side": "left",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "x1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+                },
+            "plot_bgcolor": "white"
+            }
 
         Xt_sample = Xt[sample]
         for ix, dim in _homology_dimensions:
             layout_dim = layout.copy()
-            layout_dim['title'] = "Persistence landscape for homology " + \
+            layout_dim["title"] = "Persistence landscape for homology " + \
                                   "dimension {}".format(int(dim))
             fig = gobj.Figure(layout=layout_dim)
             fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
@@ -469,9 +489,14 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             for layer in range(n_layers):
                 fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
                                            y=Xt_sample[ix, layer],
-                                           mode='lines', showlegend=True,
-                                           hoverinfo='none',
+                                           mode="lines", showlegend=True,
+                                           hoverinfo="none",
                                            name=f"Layer {layer + 1}"))
+
+            # Update traces and layout according to user input
+            if plotly_params:
+                fig.update_traces(plotly_params.get("traces", None))
+                fig.update_layout(plotly_params.get("layout", None))
 
             return fig
 
@@ -542,8 +567,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
+        "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")}}
 
     def __init__(self, sigma=1., n_bins=100, n_jobs=None):
         self.sigma = sigma
@@ -580,12 +605,12 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_diagrams(X)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, self._step_size = _bin(
-            X, metric='heat', n_bins=self.n_bins)
+            X, metric="heat", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -622,7 +647,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_diagrams(X, copy=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs, mmap_mode='c')(delayed(
+        Xt = Parallel(n_jobs=self.n_jobs, mmap_mode="c")(delayed(
             heats)(_subdiagrams(X[s], [dim], remove_dim=True),
                    self._samplings[dim], self._step_size[dim], self.sigma)
             for dim in self.homology_dimensions_
@@ -632,7 +657,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues',
+    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale="blues",
              plotly_params=None):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of heat kernel images.
@@ -653,7 +678,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             index is i, the plot corresponds to the homology dimension given by
             the i-th entry in :attr:`homology_dimensions_`.
 
-        colorscale : str, optional, default: ``'blues'``
+        colorscale : str, optional, default: ``"blues"``
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
@@ -676,7 +701,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             x=self.samplings_[homology_dimension_ix],
             y=self.samplings_[homology_dimension_ix],
             colorscale=colorscale, plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -760,9 +785,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
-        'weight_function': {'type': (types.FunctionType, type(None))}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
+        "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")},
+        "weight_function": {"type": (types.FunctionType, type(None))}}
 
     def __init__(self, sigma=1., n_bins=100, weight_function=None,
                  n_jobs=None):
@@ -801,7 +826,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_diagrams(X)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         if self.weight_function is None:
             self.effective_weight_function_ = identity
@@ -811,7 +836,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, self._step_size = _bin(
-            X, metric='persistence_image', n_bins=self.n_bins)
+            X, metric="persistence_image", n_bins=self.n_bins)
         self.samplings_ = {dim: s.transpose()
                            for dim, s in self._samplings.items()}
         self.weights_ = _calculate_weights(X, self.effective_weight_function_,
@@ -850,23 +875,23 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_diagrams(X, copy=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs, mmap_mode='c')(
+        Xt = Parallel(n_jobs=self.n_jobs, mmap_mode="c")(
             delayed(persistence_images)(
                 _subdiagrams(X[s], [dim], remove_dim=True),
                 self._samplings[dim],
                 self._step_size[dim],
                 self.weights_[dim],
                 self.sigma
-            )
+                )
             for dim in self.homology_dimensions_
             for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
-        )
+            )
         Xt = np.concatenate(Xt).\
             reshape(self._n_dimensions, len(X), self.n_bins, self.n_bins).\
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale='blues',
+    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale="blues",
              plotly_params=None):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of persistence images.
@@ -887,7 +912,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             index is i, the plot corresponds to the homology dimension given by
             the i-th entry in :attr:`homology_dimensions_`.
 
-        colorscale : str, optional, default: ``'blues'``
+        colorscale : str, optional, default: ``"blues"``
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
@@ -909,7 +934,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_heatmap(
             Xt[sample][homology_dimension_ix], x=samplings_x, y=samplings_y,
             colorscale=colorscale, plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -977,8 +1002,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'power': {'type': Real, 'in': Interval(0, np.inf, closed='right')}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
+        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")}}
 
     def __init__(self, power=1., n_bins=100, n_jobs=None):
         self.power = power
@@ -1015,11 +1040,11 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_diagrams(X)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, metric='silhouette', n_bins=self.n_bins)
+        self._samplings, _ = _bin(X, metric="silhouette", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -1113,30 +1138,31 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
                     ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
                     _homology_dimensions.append((ix, dim))
 
-        layout = dict(
-            xaxis1=dict(
-                title="Filtration parameter",
-                side="bottom",
-                type="linear",
-                ticks="outside",
-                anchor="x1",
-                showline=True,
-                zeroline=True,
-                showexponent="all",
-                exponentformat="e"
-            ),
-            yaxis1=dict(
-                side="left",
-                type="linear",
-                ticks="outside",
-                anchor="y1",
-                showline=True,
-                zeroline=True,
-                showexponent="all",
-                exponentformat="e"
-            ),
-            plot_bgcolor="white"
-        )
+        layout = {
+            "xaxis1": {
+                "title": "Filtration parameter",
+                "side": "bottom",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "x1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+                },
+            "yaxis1": {
+                "side": "left",
+                "type": "linear",
+                "ticks": "outside",
+                "anchor": "y1",
+                "showline": True,
+                "zeroline": True,
+                "showexponent": "all",
+                "exponentformat": "e"
+                },
+            "plot_bgcolor": "white"
+            }
+
         fig = gobj.Figure(layout=layout)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
@@ -1150,7 +1176,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
                                        hoverinfo="none",
                                        name=f"H{int(dim)}"))
 
-        # Update trace and layout according to user input
+        # Update traces and layout according to user input
         if plotly_params:
             fig.update_traces(plotly_params.get("traces", None))
             fig.update_layout(plotly_params.get("layout", None))

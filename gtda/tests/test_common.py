@@ -9,23 +9,21 @@ from gtda.images.preprocessing import Binarizer, Inverter
 
 # mark checks to skip
 SKIP_TESTS = {
-  'Binarizer':  [],
-  'Inverter':  [],
-}
+    'Binarizer':  [],
+    'Inverter':  [],
+    }
 
 # mark tests as a known failure
 # TODO: these should be addressed later.
 # Note with scikit-learn 0.23 these can be moved to estimator tags
 XFAIL_TESTS = {
-  'Binarizer':  ["check_transformer_data_not_an_array",
-                 "check_transformer_general",
-                 "check_transformer_general(readonly_memmap=True)",
-                 ],
-  'Inverter':  ["check_transformer_data_not_an_array",
-                "check_transformer_general",
-                "check_transformer_general(readonly_memmap=True)",
-                ],
-}
+    'Binarizer':  ["check_transformer_data_not_an_array",
+                   "check_transformer_general",
+                   "check_transformer_general(readonly_memmap=True)", ],
+    'Inverter':  ["check_transformer_data_not_an_array",
+                  "check_transformer_general",
+                  "check_transformer_general(readonly_memmap=True)", ],
+    }
 
 
 # adapted from sklearn.utils.estimator_check v0.22
@@ -72,7 +70,7 @@ def _get_estimator_name(estimator):
 
 @parametrize_with_checks(
     [Binarizer, Inverter]
-)
+    )
 def test_sklearn_api(check, estimator, request):
     estimator_name = _get_estimator_name(estimator)
     check_name = _get_callable_name(check)

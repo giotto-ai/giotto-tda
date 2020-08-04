@@ -1,4 +1,4 @@
-"""Construct the nerve of a Mapper cover."""
+"""Construct the nerve of a refined Mapper cover."""
 # License: GNU AGPLv3
 
 from functools import reduce
@@ -11,59 +11,49 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class Nerve(BaseEstimator, TransformerMixin):
-    """One-dimensional skeleton of the nerve of a Mapper cover, i.e. the
-    Mapper graph.
+    """1-skeleton of the nerve of a refined Mapper cover, i.e. the Mapper
+    graph.
 
     This transformer is the final step in the
     :class:`gtda.mapper.pipeline.MapperPipeline` objects created
-    by :func:`gtda.mapper.make_mapper_pipeline`. It is not intended for
-    direct use.
+    by :func:`gtda.mapper.make_mapper_pipeline`. It corresponds the last two
+    arrows in `this diagram <../../../../_images/mapper_pipeline.svg>`_.
+
+    This transformer is not intended for direct use.
 
     Parameters
     ----------
     min_intersection : int, optional, default: ``1``
-        The minimum size of the intersection between Mapper cover sets
-        required to create an edge in the Mapper graph.
+        Minimum size of the intersection, between data subsets associated to
+        any two Mapper nodes, required to create an edge between the nodes in
+        the Mapper graph.
+
+    store_edge_elements : bool, options, default: ``False``
+        Whether the indices of data elements associated to Mapper edges (i.e.
+        in the intersections allowed by `min_intersection`) should be stored in
+        the :class:`igraph.Graph` object output by :meth:`fit_transform`. When
+        ``True``, might lead to a large :class:`igraph.Graph` object.
 
     Attributes
     ----------
-    X_ : list of tuple
-        Nodes of the Mapper graph obtained from the input data for
-        :meth:`fit`. It is a flattened version of the input Mapper cover,
-        with the addition of a globally unique node ID as the first entry in
-        each tuple. Created only when :meth:`fit` is called.
-
-    edges_ : list of dict
-        Edges of the Mapper graph obtained from the input data for
-        :meth:`fit`. Each edge is a dictionary with two keys:
-        ``'node_indices'`` is mapped to a pair of triples characterising the
-        two adjacent nodes; ``'intersection'`` is mapped to the array of
-        indices of points in the intersection between the two nodes. Created
-        only when :meth:`fit` is called.
+    graph_ : :class:`igraph.Graph` object
+        Mapper graph obtained from the input data. Created when :meth:`fit` is
+        called.
 
     """
 
-    def __init__(self, min_intersection=1):
+    def __init__(self, min_intersection=1, store_edge_elements=False):
         self.min_intersection = min_intersection
+        self.store_edge_elements = store_edge_elements
 
     def fit(self, X, y=None):
-        """Compute and store the nodes and edges of the Mapper graph,
-        and return the estimator.
+        """Compute the Mapper graph as in :meth:`fit_transform`, but store the
+        graph as :attr:`graph_` and return the estimator.
 
         Parameters
         ----------
         X : list of list of tuple
-            Input data structure describing an abstract Mapper cover. Each
-            sublist corresponds to a (non-empty) pullback cover set --
-            equivalently, to a cover set in the filter range which has
-            non-empty preimage -- and contains triples of the form ``( \
-            pullback_set_label, partial_cluster_label, indices)`` where
-            ``partial_cluster_label`` is a cluster label within the pullback
-            cover set identified by ``pullback_set_label``, and ``indices``
-            is the array of indices of points belonging to cluster ``( \
-            pullback_set_label, partial_cluster_label)``. In the context of a
-            :class:`gtda.mapper.MapperPipeline`, this is the output of the
-            clustering step.
+            See :meth:`fit_transform`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -74,27 +64,28 @@ class Nerve(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        # TODO: Include a validation step for X
-        self.X_, self.edges_ = self._graph_data_creation(X)
+        self.graph_ = self.fit_transform(X, y=y)
         return self
 
-    def fit_transform(self, X, y=None, **fit_params):
-        """Construct a Mapper graph from an abstract Mapper cover `X`.
+    def fit_transform(self, X, y=None):
+        """Construct a Mapper graph from a refined Mapper cover.
 
         Parameters
         ----------
         X : list of list of tuple
-            Input data structure describing an abstract Mapper cover. Each
-            sublist corresponds to a (non-empty) pullback cover set --
+            Data structure describing a cover of a dataset (e.g. as depicted in
+            `this diagram <../../../../_images/mapper_pipeline.svg>`_) produced
+            by the clustering step of a :class:`gtda.mapper.MapperPipeline`.
+            Each sublist corresponds to a (non-empty) pullback cover set --
             equivalently, to a cover set in the filter range which has
-            non-empty preimage -- and contains triples of the form ``( \
-            pullback_set_label, partial_cluster_label, indices)`` where
+            non-empty preimage. It contains triples of the form ``(\
+            pullback_set_label, partial_cluster_label, node_elements)`` where
             ``partial_cluster_label`` is a cluster label within the pullback
-            cover set identified by ``pullback_set_label``, and ``indices``
-            is the array of indices of points belonging to cluster ``( \
-            pullback_set_label, partial_cluster_label)``. In the context of a
-            :class:`gtda.mapper.MapperPipeline`, this is the output of the
-            clustering step.
+            cover set identified by ``pullback_set_label``, and
+            ``node_elements`` is an array of integer indices. To each pair
+            ``(pullback_set_label, partial_cluster_label)`` there corresponds
+            a unique node in the output Mapper graph. This node represents
+            the data subset defined by the indices in ``node_elements``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -103,47 +94,66 @@ class Nerve(BaseEstimator, TransformerMixin):
         Returns
         -------
         graph : :class:`igraph.Graph` object
-            Mapper graph. Edges exist between two Mapper cover sets if and
-            only if the size of the intersection between the two sets is no
-            less than `min_intersection`.
+            Undirected Mapper graph according to `X` and `min_intersection`.
+            Each node is an :class:`igraph.Vertex` object with attributes
+            ``"pullback_set_label"``, ``"partial_cluster_label"`` and
+            ``"node_elements"'``. Each edge is an :class:`igraph.Edge` object
+            with a ``"weight"`` attribute which is equal to the size of the
+            intersection between the data subsets associated to its two nodes.
+            If `store_edge_elements` is ``True`` each edge also has an
+            additional attribute ``"edge_elements"``.
 
         """
         # TODO: Include a validation step for X
-        _X, _edges = self._graph_data_creation(X)
+        # Graph construction -- vertices with their metadata
+        nodes = reduce(iconcat, X, [])
+        graph = ig.Graph(len(nodes))
 
-        # Graph construction
-        graph = ig.Graph()
-        graph.add_vertices([vertex[0] for vertex in _X])
-        graph.add_edges([
-            (edge['node_indices'][0][0], edge['node_indices'][1][0])
-            for edge in _edges
-        ])
-        graph['node_metadata'] = dict(
-            zip(['node_id', 'pullback_set_label', 'partial_cluster_label',
-                 'node_elements'],
-                zip(*_X)))
+        # Since `nodes` is a list, say of length N, of triples of the form
+        # (pullback_set_label, partial_cluster_label, node_elements),
+        # zip(*nodes) generates three tuples of length N, each corresponding to
+        # a type of node attribute.
+        node_attributes = zip(*nodes)
+        graph.vs["pullback_set_label"] = next(node_attributes)
+        graph.vs["partial_cluster_label"] = next(node_attributes)
+        node_elements = next(node_attributes)
+        graph.vs["node_elements"] = node_elements
+
+        # Graph construction -- edges with weights given by intersection sizes
+        node_index_pairs, weights, intersections = \
+            self._generate_edge_data(node_elements)
+        graph.es["weight"] = 1
+        graph.add_edges(node_index_pairs)
+        graph.es["weight"] = weights
+        if self.store_edge_elements:
+            graph.es["edge_elements"] = intersections
+
         return graph
 
-    def _graph_data_creation(self, X):
-        X_ = reduce(iconcat, X, [])
-        # Preprocess X by 1) flattening and 2) extending each tuple
-        X_ = [(node_info[0], *node_info[1])
-              for node_info in zip(range(len(X_)), X_)]
-        edges_ = self._generate_edges(X_)
-        return X_, edges_
+    def _generate_edge_data(self, node_elements):
+        node_tuples = combinations(enumerate(node_elements), 2)
 
-    @staticmethod
-    def _pairwise_intersections(min_intersection, node_pair):
-        data = dict()
-        node_1, node_2 = node_pair
-        data['node_indices'] = tuple((node_1[0:3], node_2[0:3]))
-        data['intersection'] = np.intersect1d(node_1[3], node_2[3])
-        if data['intersection'].size >= min_intersection:
-            yield data
+        node_index_pairs = []
+        weights = []
+        intersections = []
 
-    def _generate_edges(self, nodes):
-        node_tuples = combinations(nodes, 2)
-        for pair in node_tuples:
-            for intersection in \
-             self._pairwise_intersections(self.min_intersection, pair):
-                yield intersection
+        # Boilerplate is just to avoid boolean checking at each iteration
+        if not self.store_edge_elements:
+            for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
+                    in node_tuples:
+                intersection = np.intersect1d(node_1_elements, node_2_elements)
+                intersection_size = len(intersection)
+                if intersection_size >= self.min_intersection:
+                    node_index_pairs.append((node_1_idx, node_2_idx))
+                    weights.append(intersection_size)
+        else:
+            for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
+                    in node_tuples:
+                intersection = np.intersect1d(node_1_elements, node_2_elements)
+                intersection_size = len(intersection)
+                if intersection_size >= self.min_intersection:
+                    node_index_pairs.append((node_1_idx, node_2_idx))
+                    weights.append(intersection_size)
+                    intersections.append(intersection)
+
+        return node_index_pairs, weights, intersections

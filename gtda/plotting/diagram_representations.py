@@ -53,7 +53,7 @@ def plot_betti_curves(betti_numbers, samplings, homology_dimensions=None,
             "zeroline": True,
             "showexponent": "all",
             "exponentformat": "e"
-        },
+            },
         "yaxis1": {
             "title": "Betti number",
             "side": "left",
@@ -64,23 +64,24 @@ def plot_betti_curves(betti_numbers, samplings, homology_dimensions=None,
             "zeroline": True,
             "showexponent": "all",
             "exponentformat": "e"
-        },
+            },
         "plot_bgcolor": "white"
-    }
+        }
+
     fig = gobj.Figure(layout=layout)
-    fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+    fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                      mirror=False)
-    fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+    fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                      mirror=False)
 
     for dim in _homology_dimensions:
         fig.add_trace(gobj.Scatter(x=samplings[dim],
                                    y=betti_numbers[dim],
-                                   mode='lines', showlegend=True,
-                                   hoverinfo='none',
-                                   name=f'H{int(dim)}'))
+                                   mode="lines", showlegend=True,
+                                   hoverinfo="none",
+                                   name=f"H{int(dim)}"))
 
-    # Update trace and layout according to user input
+    # Update traces and layout according to user input
     if plotly_params:
         fig.update_traces(plotly_params.get("traces", None))
         fig.update_layout(plotly_params.get("layout", None))
@@ -143,24 +144,27 @@ def plot_betti_surfaces(betti_curves, samplings=None,
             "type": "linear",
             "showexponent": "all",
             "exponentformat": "e"
-        },
+            },
         "yaxis": {
             "title": "Time",
             "type": "linear",
             "showexponent": "all",
             "exponentformat": "e"
-        },
+            },
         "zaxis": {
             "title": "Betti number",
             "type": "linear",
             "showexponent": "all",
             "exponentformat": "e"
+            }
         }
-    }
+
     if betti_curves.shape[0] == 1:
         return plot_betti_curves(
-            betti_curves[0], samplings, homology_dimensions, plotly_params
-        )
+            betti_curves[0], samplings,
+            homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+            )
     else:
         figs = []
         for dim in _homology_dimensions:
@@ -171,9 +175,9 @@ def plot_betti_surfaces(betti_curves, samplings=None,
             fig.add_trace(gobj.Surface(x=samplings[dim],
                                        y=np.arange(betti_curves.shape[0]),
                                        z=betti_curves[:, dim],
-                                       connectgaps=True, hoverinfo='none'))
+                                       connectgaps=True, hoverinfo="none"))
 
-            # Update trace and layout according to user input
+            # Update traces and layout according to user input
             if plotly_params:
                 fig.update_traces(plotly_params.get("traces", None))
                 fig.update_layout(plotly_params.get("layout", None))
