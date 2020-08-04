@@ -37,23 +37,26 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
         homology_dimensions = np.unique(diagram[:, 2])
 
     diagram_no_dims = diagram[:, :2]
-    max_birth, max_death = np.max(
-        np.where(np.isposinf(diagram_no_dims), -np.inf, diagram_no_dims),
-        axis=0
+    max_val_display = np.max(
+        np.where(np.isposinf(diagram_no_dims), -np.inf, diagram_no_dims)
         )
-    min_birth, min_death = np.max(
-        np.where(np.isneginf(diagram_no_dims), np.inf, diagram_no_dims),
-        axis=0
+    min_val_display = np.min(
+        np.where(np.isneginf(diagram_no_dims), np.inf, diagram_no_dims)
         )
+    parameter_range = max_val_display - min_val_display
+    extra_space = 0.02 * parameter_range
+    min_val_display -= extra_space
+    max_val_display += extra_space
 
     fig = gobj.Figure()
-    fig.add_trace(gobj.Scatter(x=[100 * min(-np.abs(max_death), min_birth),
-                                  100 * max_death],
-                               y=[100 * min(-np.abs(max_death), min_birth),
-                                  100 * max_death],
-                               mode="lines",
-                               line=dict(dash="dash", width=1, color="black"),
-                               showlegend=False, hoverinfo="none"))
+    fig.add_trace(gobj.Scatter(
+        x=[min_val_display, max_val_display],
+        y=[min_val_display, max_val_display],
+        mode="lines",
+        line={"dash": "dash", "width": 1, "color": "black"},
+        showlegend=False,
+        hoverinfo="none"
+        ))
 
     for dim in homology_dimensions:
         name = f"H{int(dim)}" if dim != np.inf else "Any homology dimension"
@@ -63,9 +66,6 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
         fig.add_trace(gobj.Scatter(x=subdiagram[:, 0], y=subdiagram[:, 1],
                                    mode="markers", name=name))
 
-    parameter_range = max_death - min_birth
-    extra_space = 0.02 * parameter_range
-
     fig.update_layout(
         width=500,
         height=500,
@@ -73,7 +73,7 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
             "title": "Birth",
             "side": "bottom",
             "type": "linear",
-            "range": [min_birth - extra_space, max_death + extra_space],
+            "range": [min_val_display, max_val_display],
             "autorange": False,
             "ticks": "outside",
             "showline": True,
@@ -88,7 +88,7 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
             "title": "Death",
             "side": "left",
             "type": "linear",
-            "range": [min_birth - extra_space, max_death + extra_space],
+            "range": [min_val_display, max_val_display],
             "autorange": False, "scaleanchor": "x", "scaleratio": 1,
             "ticks": "outside",
             "showline": True,

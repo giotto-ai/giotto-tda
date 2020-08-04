@@ -8,16 +8,16 @@ from .nerve import Nerve
 from .utils._list_feature_union import ListFeatureUnion
 from .utils.pipeline import transformer_from_callable_on_rows, identity
 
-global_pipeline_params = ('memory', 'verbose')
-nodes_params = ('scaler', 'filter_func', 'cover')
-clust_prepr_params = ('clustering_preprocessing',)
-clust_params = ('clusterer', 'n_jobs',
-                'parallel_backend_prefer')
-nerve_params = ('min_intersection',)
-clust_prepr_params_prefix = 'pullback_cover__'
-nodes_params_prefix = 'pullback_cover__map_and_cover__'
-clust_params_prefix = 'clustering__'
-nerve_params_prefix = 'nerve__'
+global_pipeline_params = ("memory", "verbose")
+nodes_params = ("scaler", "filter_func", "cover")
+clust_prepr_params = ("clustering_preprocessing",)
+clust_params = ("clusterer", "n_jobs",
+                "parallel_backend_prefer")
+nerve_params = ("min_intersection", "store_edge_elements")
+clust_prepr_params_prefix = "pullback_cover__"
+nodes_params_prefix = "pullback_cover__map_and_cover__"
+clust_params_prefix = "clustering__"
+nerve_params_prefix = "nerve__"
 
 
 class MapperPipeline(Pipeline):
@@ -43,10 +43,10 @@ class MapperPipeline(Pipeline):
     >>> pipe = make_mapper_pipeline(filter_func=filter_func,
     ...                             cover=cover,
     ...                             clusterer=clusterer)
-    >>> print(pipe.get_mapper_params()['clusterer__eps'])
+    >>> print(pipe.get_mapper_params()["clusterer__eps"])
     0.5
     >>> pipe.set_params(clusterer___eps=0.1)
-    >>> print(pipe.get_mapper_params()['clusterer__eps'])
+    >>> print(pipe.get_mapper_params()["clusterer__eps"])
     0.1
 
     See also
@@ -130,14 +130,14 @@ class MapperPipeline(Pipeline):
             key[len(prefix):]: kwargs[key]
             for key in kwargs
             if (key.startswith(prefix)
-                and not key.startswith(prefix + 'steps')
-                and not key.startswith(prefix + 'memory')
-                and not key.startswith(prefix + 'verbose')
-                and not key.startswith(prefix + 'transformer_list')
-                and not key.startswith(prefix + 'n_jobs')
-                and not key.startswith(prefix + 'transformer_weights')
-                and not key.startswith(prefix + 'map_and_cover'))
-        }
+                and not key.startswith(prefix + "steps")
+                and not key.startswith(prefix + "memory")
+                and not key.startswith(prefix + "verbose")
+                and not key.startswith(prefix + "transformer_list")
+                and not key.startswith(prefix + "n_jobs")
+                and not key.startswith(prefix + "transformer_weights")
+                and not key.startswith(prefix + "map_and_cover"))
+            }
 
 
 def make_mapper_pipeline(scaler=None,
@@ -146,7 +146,7 @@ def make_mapper_pipeline(scaler=None,
                          clustering_preprocessing=None,
                          clusterer=None,
                          n_jobs=None,
-                         parallel_backend_prefer='threads',
+                         parallel_backend_prefer="threads",
                          graph_step=True,
                          min_intersection=1,
                          store_edge_elements=False,
@@ -199,12 +199,12 @@ def make_mapper_pipeline(scaler=None,
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    parallel_backend_prefer : ``'processes'`` | ``'threads'``, optional, \
-        default: ``'threads'``
+    parallel_backend_prefer : ``"processes"`` | ``"threads"``, optional, \
+        default: ``"threads"``
         Soft hint for the default joblib backend to use in a joblib-parallel
         application of the clustering step across pullback cover sets. To be
         used in conjunction with `n_jobs`. The default process-based backend is
-        'loky' and the default thread-based backend is 'threading'. See [2]_.
+        "loky" and the default thread-based backend is "threading". See [2]_.
 
     graph_step : bool, optional, default: ``True``
         Whether the resulting pipeline should stop at the calculation of the
@@ -257,11 +257,11 @@ def make_mapper_pipeline(scaler=None,
     >>> print(mapper.__class__)
     <class 'gtda.mapper.pipeline.MapperPipeline'>
     >>> mapper_params = mapper.get_mapper_params()
-    >>> print(mapper_params['filter_func'].__class__)
+    >>> print(mapper_params["filter_func"].__class__)
     <class 'sklearn.decomposition._pca.PCA'>
-    >>> print(mapper_params['cover'].__class__)
+    >>> print(mapper_params["cover"].__class__)
     <class 'gtda.mapper.cover.CubicalCover'>
-    >>> print(mapper_params['clusterer'].__class__)
+    >>> print(mapper_params["clusterer"].__class__)
     <class 'sklearn.cluster._dbscan.DBSCAN'>
     >>> X = np.random.random((10000, 4))  # 10000 points in 4-dimensional space
     >>> mapper_graph = mapper.fit_transform(X)  # Create the mapper graph
@@ -272,7 +272,7 @@ def make_mapper_pipeline(scaler=None,
     ['pullback_set_label', 'partial_cluster_label', 'node_elements']
     >>> # Find which points belong to first node of graph
     >>> node_id = 0
-    >>> node_elements = mapper_graph.vs['node_elements']
+    >>> node_elements = mapper_graph.vs["node_elements"]
     >>> print(f"Node ID: {node_id}, Node elements: {node_elements[node_id]}, "
     ...       f"Data points: {X[node_elements[node_id]")
     Node Id: 0,
@@ -372,7 +372,7 @@ def make_mapper_pipeline(scaler=None,
     if filter_func is None:
         from sklearn.decomposition import PCA
         _filter_func = PCA(n_components=2)
-    elif not hasattr(filter_func, 'fit_transform'):
+    elif not hasattr(filter_func, "fit_transform"):
         _filter_func = transformer_from_callable_on_rows(filter_func)
     else:
         _filter_func = filter_func
@@ -395,26 +395,26 @@ def make_mapper_pipeline(scaler=None,
         _clusterer = clusterer
 
     map_and_cover = Pipeline(
-        steps=[('scaler', _scaler),
-               ('filter_func', _filter_func),
-               ('cover', _cover)],
+        steps=[("scaler", _scaler),
+               ("filter_func", _filter_func),
+               ("cover", _cover)],
         verbose=verbose)
 
     all_steps = [
-        ('pullback_cover', ListFeatureUnion(
-            [('clustering_preprocessing', _clustering_preprocessing),
-             ('map_and_cover', map_and_cover)])),
-        ('clustering', ParallelClustering(
+        ("pullback_cover", ListFeatureUnion(
+            [("clustering_preprocessing", _clustering_preprocessing),
+             ("map_and_cover", map_and_cover)])),
+        ("clustering", ParallelClustering(
             clusterer=_clusterer,
             n_jobs=n_jobs,
             parallel_backend_prefer=parallel_backend_prefer))
-    ]
+        ]
 
     if graph_step:
         all_steps.append(
-            ('nerve', Nerve(min_intersection=min_intersection,
+            ("nerve", Nerve(min_intersection=min_intersection,
                             store_edge_elements=store_edge_elements))
-        )
+            )
 
     mapper_pipeline = MapperPipeline(
         steps=all_steps, memory=memory, verbose=verbose)
