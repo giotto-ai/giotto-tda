@@ -58,7 +58,7 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
                 "zeroline": True,
                 "showexponent": "all",
                 "exponentformat": "e"
-            },
+                },
             "yaxis1": {
                 "title": "1st",
                 "side": "left",
@@ -69,24 +69,28 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
                 "zeroline": True,
                 "showexponent": "all",
                 "exponentformat": "e"
-            },
+                },
             "plot_bgcolor": "white"
-        }
+            }
 
         fig = gobj.Figure(layout=layout)
-        fig.update_xaxes(zeroline=True, linewidth=1, linecolor='black',
+        fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
-        fig.update_yaxes(zeroline=True, linewidth=1, linecolor='black',
+        fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
 
-        fig.add_trace(gobj.Scatter(x=point_cloud[:, 0],
-                                   y=point_cloud[:, 1],
-                                   mode='markers',
-                                   marker=dict(size=4,
-                                               color=list(range(
-                                                   point_cloud.shape[0])),
-                                               colorscale='Viridis',
-                                               opacity=0.8)))
+        fig.add_trace(gobj.Scatter(
+            x=point_cloud[:, 0],
+            y=point_cloud[:, 1],
+            mode="markers",
+            marker={
+                "size": 4,
+                "color": list(range(point_cloud.shape[0])),
+                "colorscale": "Viridis",
+                "opacity": 0.8
+                }
+            ))
+
     elif dimension == 3:
         scene = {
             "xaxis": {
@@ -94,33 +98,36 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e"
-            },
+                },
             "yaxis": {
                 "title": "1st",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e"
-            },
+                },
             "zaxis": {
                 "title": "2nd",
                 "type": "linear",
                 "showexponent": "all",
                 "exponentformat": "e"
+                }
             }
-        }
 
         fig = gobj.Figure()
         fig.update_layout(scene=scene)
 
-        fig.add_trace(gobj.Scatter3d(x=point_cloud[:, 0],
-                                     y=point_cloud[:, 1],
-                                     z=point_cloud[:, 2],
-                                     mode='markers',
-                                     marker=dict(size=4,
-                                                 color=list(range(
-                                                     point_cloud.shape[0])),
-                                                 colorscale='Viridis',
-                                                 opacity=0.8)))
+        fig.add_trace(gobj.Scatter3d(
+            x=point_cloud[:, 0],
+            y=point_cloud[:, 1],
+            z=point_cloud[:, 2],
+            mode="markers",
+            marker={
+                "size": 4,
+                "color": list(range(point_cloud.shape[0])),
+                "colorscale": "Viridis",
+                "opacity": 0.8
+                }
+            ))
 
     # Update trace and layout according to user input
     if plotly_params:

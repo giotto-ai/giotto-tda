@@ -41,19 +41,20 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
         np.where(np.isposinf(diagram_no_dims), -np.inf, diagram_no_dims),
         axis=0
         )
-    min_birth, min_death = np.max(
+    min_birth, min_death = np.min(
         np.where(np.isneginf(diagram_no_dims), np.inf, diagram_no_dims),
         axis=0
         )
 
     fig = gobj.Figure()
-    fig.add_trace(gobj.Scatter(x=[100 * min(-np.abs(max_death), min_birth),
-                                  100 * max_death],
-                               y=[100 * min(-np.abs(max_death), min_birth),
-                                  100 * max_death],
-                               mode="lines",
-                               line=dict(dash="dash", width=1, color="black"),
-                               showlegend=False, hoverinfo="none"))
+    fig.add_trace(gobj.Scatter(
+        x=[100 * min(-np.abs(max_death), min_birth), 100 * max_death],
+        y=[100 * min(-np.abs(max_death), min_birth), 100 * max_death],
+        mode="lines",
+        line={"dash": "dash", "width": 1, "color": "black"},
+        showlegend=False,
+        hoverinfo="none"
+        ))
 
     for dim in homology_dimensions:
         name = f"H{int(dim)}" if dim != np.inf else "Any homology dimension"
