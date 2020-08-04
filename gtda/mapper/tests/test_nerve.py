@@ -1,3 +1,6 @@
+"""Testing for Nerve (Mapper graph construction)."""
+# License: GNU AGPLv3
+
 import numpy as np
 import pytest
 from hypothesis import given

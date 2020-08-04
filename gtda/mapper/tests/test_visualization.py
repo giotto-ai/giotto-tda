@@ -1,3 +1,6 @@
+"""Testing for Mapper plotting functions."""
+# License: GNU AGPLv3
+
 import warnings
 from unittest import TestCase
 

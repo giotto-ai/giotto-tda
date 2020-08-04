@@ -102,7 +102,7 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
         plot_bgcolor='white'
     )
 
-    # Update trace and layout according to user input
+    # Update traces and layout according to user input
     if plotly_params:
         fig.update_traces(plotly_params.get("traces", None))
         fig.update_layout(plotly_params.get("layout", None))

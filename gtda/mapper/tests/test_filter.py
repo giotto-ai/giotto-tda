@@ -1,3 +1,6 @@
+"""Testing for Mapper filter functions."""
+# License: GNU AGPLv3
+
 import warnings
 
 import numpy as np

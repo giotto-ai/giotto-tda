@@ -1,4 +1,4 @@
-"""Testing for images preprocessors."""
+"""Testing for image preprocessors."""
 # License: GNU AGPLv3
 
 import numpy as np
