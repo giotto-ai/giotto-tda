@@ -26,6 +26,7 @@ plotly_params_surfaces = {
 @pytest.mark.parametrize("homology_dimensions", [None, [0], [0, 1], [0, 1, 2]])
 def test_plot_betti_curves(homology_dimensions):
     fig = plot_betti_curves(X[0], samplings=samplings,
+                            homology_dimensions=homology_dimensions,
                             plotly_params=plotly_params_curves)
 
     if homology_dimensions is None:
@@ -45,6 +46,7 @@ def test_plot_betti_curves(homology_dimensions):
 @pytest.mark.parametrize("homology_dimensions", [None, [0], [0, 1], [0, 1, 2]])
 def test_plot_betti_surfaces(homology_dimensions):
     fig = plot_betti_surfaces(X, samplings=samplings,
+                              homology_dimensions=homology_dimensions,
                               plotly_params=plotly_params_surfaces)
 
     if homology_dimensions is None:
