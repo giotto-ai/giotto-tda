@@ -150,6 +150,7 @@ def make_mapper_pipeline(scaler=None,
                          graph_step=True,
                          min_intersection=1,
                          store_edge_elements=False,
+                         contract_vertices=False,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
@@ -222,6 +223,9 @@ def make_mapper_pipeline(scaler=None,
         the :class:`igraph.Graph` object output by the pipeline's
         :meth:`fit_transform`. When ``True``, might lead to large
         :class:`igraph.Graph` objects.
+
+    contract_vertices : bool, optional, default: ``False``
+        TODO write
 
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
@@ -413,7 +417,8 @@ def make_mapper_pipeline(scaler=None,
     if graph_step:
         all_steps.append(
             ("nerve", Nerve(min_intersection=min_intersection,
-                            store_edge_elements=store_edge_elements))
+                            store_edge_elements=store_edge_elements,
+                            contract_vertices=contract_vertices))
             )
 
     mapper_pipeline = MapperPipeline(

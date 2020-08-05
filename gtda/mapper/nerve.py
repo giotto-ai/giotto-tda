@@ -10,6 +10,18 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
+def _fixed_points(mapping):
+    terminal_states = []
+    for i in range(len(mapping)):
+        j = i
+        k = mapping[i]
+        while j != k:
+            j = mapping[j]
+            k = mapping[mapping[j]]
+        terminal_states.append(j)
+    return terminal_states
+
+
 class Nerve(BaseEstimator, TransformerMixin):
     """1-skeleton of the nerve of a refined Mapper cover, i.e. the Mapper
     graph.
@@ -34,6 +46,9 @@ class Nerve(BaseEstimator, TransformerMixin):
         the :class:`igraph.Graph` object output by :meth:`fit_transform`. When
         ``True``, might lead to a large :class:`igraph.Graph` object.
 
+    contract_vertices : bool, optional, default: ``False``
+        TODO write
+
     Attributes
     ----------
     graph_ : :class:`igraph.Graph` object
@@ -42,9 +57,11 @@ class Nerve(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, min_intersection=1, store_edge_elements=False):
+    def __init__(self, min_intersection=1, store_edge_elements=False,
+                 contract_vertices=False):
         self.min_intersection = min_intersection
         self.store_edge_elements = store_edge_elements
+        self.contract_vertices = contract_vertices
 
     def fit(self, X, y=None):
         """Compute the Mapper graph as in :meth:`fit_transform`, but store the
@@ -120,13 +137,21 @@ class Nerve(BaseEstimator, TransformerMixin):
         graph.vs["node_elements"] = node_elements
 
         # Graph construction -- edges with weights given by intersection sizes
-        node_index_pairs, weights, intersections = \
+        node_index_pairs, weights, intersections, mapping = \
             self._generate_edge_data(node_elements)
         graph.es["weight"] = 1
         graph.add_edges(node_index_pairs)
         graph.es["weight"] = weights
         if self.store_edge_elements:
             graph.es["edge_elements"] = intersections
+        if self.contract_vertices:
+            fixed_points_mapping = _fixed_points(mapping)
+            graph.contract_vertices(
+                fixed_points_mapping, combine_attrs="first"
+            )
+            graph.delete_vertices(
+                [i for i in graph.vs.indices if i != fixed_points_mapping[i]]
+            )
 
         return graph
 
@@ -137,13 +162,29 @@ class Nerve(BaseEstimator, TransformerMixin):
         weights = []
         intersections = []
 
+        if self.contract_vertices:
+            mapping = list(range(len(node_elements)))
+        else:
+            mapping = None
+
         # Boilerplate is just to avoid boolean checking at each iteration
         if not self.store_edge_elements:
             for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
                     in node_tuples:
                 intersection = np.intersect1d(node_1_elements, node_2_elements)
                 intersection_size = len(intersection)
-                if intersection_size >= self.min_intersection:
+
+                if self.contract_vertices:
+                    if intersection_size == len(node_2_elements):
+                        mapping[node_2_idx] = node_1_idx
+                        continue
+                    elif intersection_size == len(node_1_elements):
+                        mapping[node_1_idx] = node_2_idx
+                        continue
+                    elif intersection_size >= self.min_intersection:
+                        node_index_pairs.append((node_1_idx, node_2_idx))
+                        weights.append(intersection_size)
+                elif intersection_size >= self.min_intersection:
                     node_index_pairs.append((node_1_idx, node_2_idx))
                     weights.append(intersection_size)
         else:
@@ -151,9 +192,20 @@ class Nerve(BaseEstimator, TransformerMixin):
                     in node_tuples:
                 intersection = np.intersect1d(node_1_elements, node_2_elements)
                 intersection_size = len(intersection)
-                if intersection_size >= self.min_intersection:
+
+                if self.contract_vertices:
+                    if intersection_size == len(node_2_elements):
+                        mapping[node_2_idx] = node_1_idx
+                        continue
+                    elif intersection_size == len(node_1_elements):
+                        mapping[node_1_idx] = node_2_idx
+                        continue
+                    elif intersection_size >= self.min_intersection:
+                        node_index_pairs.append((node_1_idx, node_2_idx))
+                        weights.append(intersection_size)
+                elif intersection_size >= self.min_intersection:
                     node_index_pairs.append((node_1_idx, node_2_idx))
                     weights.append(intersection_size)
                     intersections.append(intersection)
 
-        return node_index_pairs, weights, intersections
+        return node_index_pairs, weights, intersections, mapping
