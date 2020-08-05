@@ -28,7 +28,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         any two Mapper nodes, required to create an edge between the nodes in
         the Mapper graph.
 
-    store_edge_elements : bool, options, default: ``False``
+    store_edge_elements : bool, optional, default: ``False``
         Whether the indices of data elements associated to Mapper edges (i.e.
         in the intersections allowed by `min_intersection`) should be stored in
         the :class:`igraph.Graph` object output by :meth:`fit_transform`. When
