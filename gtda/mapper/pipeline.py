@@ -216,7 +216,7 @@ def make_mapper_pipeline(scaler=None,
         an edge in the Mapper graph. Ignored if `graph_step` is set to
         ``False``.
 
-    store_edge_elements : bool, options, default: ``False``
+    store_edge_elements : bool, optional, default: ``False``
         Whether the indices of data elements associated to Mapper edges (i.e.
         in the intersections allowed by `min_intersection`) should be stored in
         the :class:`igraph.Graph` object output by the pipeline's
