@@ -10,6 +10,18 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
+def _fixed_points(mapping):
+    terminal_states = []
+    for i in range(len(mapping)):
+        j = i
+        k = mapping[i]
+        while j != k:
+            j = mapping[j]
+            k = mapping[mapping[j]]
+        terminal_states.append(j)
+    return terminal_states
+
+
 class Nerve(BaseEstimator, TransformerMixin):
     """1-skeleton of the nerve of a refined Mapper cover, i.e. the Mapper
     graph.
@@ -133,9 +145,12 @@ class Nerve(BaseEstimator, TransformerMixin):
         if self.store_edge_elements:
             graph.es["edge_elements"] = intersections
         if self.contract_nodes:
-            graph.contract_vertices(mapping, combine_attrs="first")
+            fixed_points_mapping = _fixed_points(mapping)
+            graph.contract_vertices(
+                fixed_points_mapping, combine_attrs="first"
+                )
             graph.delete_vertices(
-                [i for i in graph.vs.indices if i != mapping[i]]
+                [i for i in graph.vs.indices if i != fixed_points_mapping[i]]
                 )
 
         return graph
