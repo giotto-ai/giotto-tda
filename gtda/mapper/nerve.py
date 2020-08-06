@@ -11,14 +11,14 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def _fixed_points(mapping):
-    terminal_states = []
-    for i in range(len(mapping)):
-        j = i
-        k = mapping[i]
-        while j != k:
-            j = mapping[j]
-            k = mapping[mapping[j]]
-        terminal_states.append(j)
+    terminal_states = np.empty_like(mapping)
+    for i, initial_target_idx in enumerate(mapping):
+        temp_target_idx = i
+        next_target_idx = initial_target_idx
+        while temp_target_idx != next_target_idx:
+            temp_target_idx = mapping[temp_target_idx]
+            next_target_idx = mapping[mapping[temp_target_idx]]
+        terminal_states[i] = temp_target_idx
     return terminal_states
 
 
@@ -163,50 +163,62 @@ class Nerve(BaseEstimator, TransformerMixin):
         intersections = []
 
         if self.contract_nodes:
-            mapping = list(range(len(node_elements)))
+            mapping = np.arange(len(node_elements))
         else:
             mapping = None
 
-        # Boilerplate is just to avoid boolean checking at each iteration
-        if not self.store_edge_elements:
-            for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
-                    in node_tuples:
-                intersection = np.intersect1d(node_1_elements, node_2_elements)
-                intersection_size = len(intersection)
+        def _do_nothing(*args):
+            pass
 
-                if self.contract_nodes:
-                    if intersection_size == len(node_2_elements):
-                        mapping[node_2_idx] = node_1_idx
-                        continue
-                    elif intersection_size == len(node_1_elements):
-                        mapping[node_1_idx] = node_2_idx
-                        continue
-                    elif intersection_size >= self.min_intersection:
-                        node_index_pairs.append((node_1_idx, node_2_idx))
-                        weights.append(intersection_size)
-                elif intersection_size >= self.min_intersection:
-                    node_index_pairs.append((node_1_idx, node_2_idx))
-                    weights.append(intersection_size)
-        else:
-            for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
-                    in node_tuples:
-                intersection = np.intersect1d(node_1_elements, node_2_elements)
-                intersection_size = len(intersection)
+        def _intersections_append(_intersection):
+            return intersections.append(_intersection)
 
-                if self.contract_nodes:
-                    if intersection_size == len(node_2_elements):
-                        mapping[node_2_idx] = node_1_idx
-                        continue
-                    elif intersection_size == len(node_1_elements):
-                        mapping[node_1_idx] = node_2_idx
-                        continue
-                    elif intersection_size >= self.min_intersection:
-                        node_index_pairs.append((node_1_idx, node_2_idx))
-                        weights.append(intersection_size)
-                        intersections.append(intersection)
-                elif intersection_size >= self.min_intersection:
-                    node_index_pairs.append((node_1_idx, node_2_idx))
-                    weights.append(intersection_size)
-                    intersections.append(intersection)
+        def _choose_intersection_behavior(_store_edge_elements):
+            if _store_edge_elements:
+                return _intersections_append
+            return _do_nothing
+
+        def _subset_check_metadata_append(
+                _node_1_idx, _node_2_idx, _intersection_size, _intersection,
+                _node_1_elements, _node_2_elements
+                ):
+            if _intersection_size == len(_node_2_elements):
+                mapping[_node_2_idx] = _node_1_idx
+            elif _intersection_size == len(_node_1_elements):
+                mapping[_node_1_idx] = _node_2_idx
+            else:
+                _metadata_append(_node_1_idx, _node_2_idx, _intersection_size,
+                                 _intersection)
+
+        def _metadata_append(
+                _node_1_idx, _node_2_idx, _intersection_size, _intersection,
+                *args
+                ):
+            if _intersection_size >= self.min_intersection:
+                node_index_pairs.append((_node_1_idx, _node_2_idx))
+                weights.append(_intersection_size)
+                intersection_behavior(_intersection)
+
+        def _choose_contraction_behavior(_contract_nodes):
+            if _contract_nodes:
+                return _subset_check_metadata_append
+            return _metadata_append
+
+        intersection_behavior = _choose_intersection_behavior(
+            self.store_edge_elements
+            )
+
+        contraction_behavior = \
+            _choose_contraction_behavior(self.contract_nodes)
+
+        for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
+                in node_tuples:
+            intersection = np.intersect1d(node_1_elements, node_2_elements)
+            intersection_size = len(intersection)
+
+            contraction_behavior(
+                node_1_idx, node_2_idx, intersection_size, intersection,
+                node_1_elements, node_2_elements
+                )
 
         return node_index_pairs, weights, intersections, mapping
