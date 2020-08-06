@@ -13,7 +13,7 @@ nodes_params = ("scaler", "filter_func", "cover")
 clust_prepr_params = ("clustering_preprocessing",)
 clust_params = ("clusterer", "n_jobs",
                 "parallel_backend_prefer")
-nerve_params = ("min_intersection", "store_edge_elements")
+nerve_params = ("min_intersection", "store_edge_elements", "contract_nodes")
 clust_prepr_params_prefix = "pullback_cover__"
 nodes_params_prefix = "pullback_cover__map_and_cover__"
 clust_params_prefix = "clustering__"
@@ -150,7 +150,7 @@ def make_mapper_pipeline(scaler=None,
                          graph_step=True,
                          min_intersection=1,
                          store_edge_elements=False,
-                         contract_vertices=False,
+                         contract_nodes=False,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
@@ -224,7 +224,7 @@ def make_mapper_pipeline(scaler=None,
         :meth:`fit_transform`. When ``True``, might lead to large
         :class:`igraph.Graph` objects.
 
-    contract_vertices : bool, optional, default: ``False``
+    contract_nodes : bool, optional, default: ``False``
         TODO write
 
     memory : None, str or object with the joblib.Memory interface, \
@@ -418,7 +418,7 @@ def make_mapper_pipeline(scaler=None,
         all_steps.append(
             ("nerve", Nerve(min_intersection=min_intersection,
                             store_edge_elements=store_edge_elements,
-                            contract_vertices=contract_vertices))
+                            contract_nodes=contract_nodes))
             )
 
     mapper_pipeline = MapperPipeline(

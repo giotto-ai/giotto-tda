@@ -34,7 +34,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         the :class:`igraph.Graph` object output by :meth:`fit_transform`. When
         ``True``, might lead to a large :class:`igraph.Graph` object.
 
-    contract_vertices : bool, optional, default: ``False``
+    contract_nodes : bool, optional, default: ``False``
         TODO write
 
     Attributes
@@ -46,10 +46,10 @@ class Nerve(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, min_intersection=1, store_edge_elements=False,
-                 contract_vertices=False):
+                 contract_nodes=False):
         self.min_intersection = min_intersection
         self.store_edge_elements = store_edge_elements
-        self.contract_vertices = contract_vertices
+        self.contract_nodes = contract_nodes
 
     def fit(self, X, y=None):
         """Compute the Mapper graph as in :meth:`fit_transform`, but store the
@@ -132,7 +132,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         graph.es["weight"] = weights
         if self.store_edge_elements:
             graph.es["edge_elements"] = intersections
-        if self.contract_vertices:
+        if self.contract_nodes:
             graph.contract_vertices(mapping, combine_attrs="first")
             graph.delete_vertices(
                 [i for i in graph.vs.indices if i != mapping]
@@ -147,7 +147,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         weights = []
         intersections = []
 
-        if self.contract_vertices:
+        if self.contract_nodes:
             mapping = list(range(len(node_elements)))
         else:
             mapping = None
@@ -159,7 +159,7 @@ class Nerve(BaseEstimator, TransformerMixin):
                 intersection = np.intersect1d(node_1_elements, node_2_elements)
                 intersection_size = len(intersection)
 
-                if self.contract_vertices:
+                if self.contract_nodes:
                     if intersection_size == len(node_2_elements):
                         mapping[node_2_idx] = node_1_idx
                         continue
@@ -178,7 +178,7 @@ class Nerve(BaseEstimator, TransformerMixin):
                 intersection = np.intersect1d(node_1_elements, node_2_elements)
                 intersection_size = len(intersection)
 
-                if self.contract_vertices:
+                if self.contract_nodes:
                     if intersection_size == len(node_2_elements):
                         mapping[node_2_idx] = node_1_idx
                         continue
