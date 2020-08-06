@@ -188,6 +188,7 @@ class Nerve(BaseEstimator, TransformerMixin):
                     elif intersection_size >= self.min_intersection:
                         node_index_pairs.append((node_1_idx, node_2_idx))
                         weights.append(intersection_size)
+                        intersections.append(intersection)
                 elif intersection_size >= self.min_intersection:
                     node_index_pairs.append((node_1_idx, node_2_idx))
                     weights.append(intersection_size)
