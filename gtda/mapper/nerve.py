@@ -135,7 +135,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         if self.contract_nodes:
             graph.contract_vertices(mapping, combine_attrs="first")
             graph.delete_vertices(
-                [i for i in graph.vs.indices if i != mapping]
+                [i for i in graph.vs.indices if i != mapping[i]]
                 )
 
         return graph
