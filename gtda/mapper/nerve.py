@@ -38,7 +38,7 @@ class Nerve(BaseEstimator, TransformerMixin):
     min_intersection : int, optional, default: ``1``
         Minimum size of the intersection, between data subsets associated to
         any two Mapper nodes, required to create an edge between the nodes in
-        the Mapper graph.
+        the Mapper graph. Must be positive.
 
     store_edge_elements : bool, optional, default: ``False``
         Whether the indices of data elements associated to Mapper edges (i.e.
@@ -220,9 +220,12 @@ class Nerve(BaseEstimator, TransformerMixin):
             intersection = np.intersect1d(node_1_elements, node_2_elements)
             intersection_size = len(intersection)
 
-            contraction_behavior(
-                node_1_idx, node_2_idx, intersection_size, intersection,
-                node_1_elements, node_2_elements
-                )
+            if intersection_size:
+                contraction_behavior(
+                    node_1_idx, node_2_idx, intersection_size, intersection,
+                    node_1_elements, node_2_elements
+                    )
+            else:
+                continue
 
         return node_index_pairs, weights, intersections, mapping
