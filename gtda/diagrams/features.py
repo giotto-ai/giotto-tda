@@ -22,11 +22,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
-    Given a persistence diagram consisting of birth-death-dimension triples
+    Given a persistence diagrams consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
-    calculated as the (base 2) entropies of the collections of differences
-    d - b, normalized by the sum of all such differences.
+    calculated as the (base 2) Shannon entropies of the collections of
+    differences d - b, normalized by the sum of all such differences.
 
     Input collections of persistence diagrams for this transformer must
     satisfy certain requirements, see e.g. :meth:`fit`.
@@ -71,12 +71,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     @staticmethod
     def _persistence_entropy(X, normalize=False):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
-        res = entropy(X_lifespan, base=2, axis=1).reshape(-1, 1)
+        X_entropy = entropy(X_lifespan, base=2, axis=1).reshape(-1, 1)
         if normalize:
-            return res / np.log2(lifespan_sums)
-        else:
-            return res
+            lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
+            X_entropy /= np.log2(lifespan_sums)
+        return X_entropy
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
