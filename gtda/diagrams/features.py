@@ -32,6 +32,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
+    normalize_nb_points : bool, optional, default: ``False``
+        Normalize PersistenceEntropy by the log of the total persistence of
+        points in the diagram, if True.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -50,15 +54,21 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, n_jobs=None):
+    def __init__(self, normalize_nb_points=False, n_jobs=None):
+        self.normalize_nb_points = normalize_nb_points
         self.n_jobs = n_jobs
 
     @staticmethod
-    def _persistence_entropy(X):
+    def _persistence_entropy(X, normalize_nb_pts=False):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        X_normalized = X_lifespan / np.sum(X_lifespan, axis=1).reshape(-1, 1)
-        return - np.sum(np.nan_to_num(
+        lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
+        X_normalized = X_lifespan / lifespan_sums
+        res = - np.sum(np.nan_to_num(
             X_normalized * np.log(X_normalized)), axis=1).reshape(-1, 1)
+        if normalize_nb_pts:
+            return res / np.log(lifespan_sums)
+        else:
+            return res
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
@@ -123,9 +133,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         with np.errstate(divide='ignore', invalid='ignore'):
             Xt = Parallel(n_jobs=self.n_jobs)(
-                delayed(self._persistence_entropy)(_subdiagrams(X[s], [dim]))
+                delayed(self._persistence_entropy)(_subdiagrams(X, [dim])[s],
+                                                   self.normalize_nb_points)
                 for dim in self.homology_dimensions_
-                for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+                for s in gen_even_slices(
+                    X.shape[0], effective_n_jobs(self.n_jobs))
             )
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
         return Xt
