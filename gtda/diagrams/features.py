@@ -32,9 +32,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    normalize_nb_points : bool, optional, default: ``False``
-        Normalize PersistenceEntropy by the log of the total persistence of
-        points in the diagram, if True.
+    normalize : bool, optional, default: ``False``
+        When ``True``, the persistence entropy of each diagram is normalized by
+        the logarithm of the sum of lifetimes of all points in the diagram.
+        Can aid comparison between diagrams in an input collection when these
+        have different numbers of (non-trivial) points.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -54,8 +56,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, normalize_nb_points=False, n_jobs=None):
-        self.normalize_nb_points = normalize_nb_points
+    def __init__(self, normalize=False, n_jobs=None):
+        self.normalize = normalize
         self.n_jobs = n_jobs
 
     @staticmethod
@@ -133,11 +135,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         with np.errstate(divide='ignore', invalid='ignore'):
             Xt = Parallel(n_jobs=self.n_jobs)(
-                delayed(self._persistence_entropy)(_subdiagrams(X, [dim])[s],
-                                                   self.normalize_nb_points)
+                delayed(self._persistence_entropy)(_subdiagrams(X[s], [dim]),
+                                                   self.normalize)
                 for dim in self.homology_dimensions_
                 for s in gen_even_slices(
-                    X.shape[0], effective_n_jobs(self.n_jobs))
+                    len(X), effective_n_jobs(self.n_jobs))
             )
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
         return Xt
