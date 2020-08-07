@@ -21,10 +21,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
-    Given a persistence diagrams consisting of birth-death-dimension triples
+    Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
-    calculated as the (base e) entropies of the collections of differences
+    calculated as the (base 2) entropies of the collections of differences
     d - b, normalized by the sum of all such differences.
 
     Input collections of persistence diagrams for this transformer must
@@ -36,7 +36,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         When ``True``, the persistence entropy of each diagram is normalized by
         the logarithm of the sum of lifetimes of all points in the diagram.
         Can aid comparison between diagrams in an input collection when these
-        have different numbers of (non-trivial) points.
+        have different numbers of (non-trivial) points. [1]_.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -54,6 +54,13 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     PersistenceImage, PairwiseDistance, Silhouette, \
     gtda.homology.VietorisRipsPersistence
 
+    References
+    ----------
+    .. [1] A. Myers, E. Munch, and F. A. Khasawneh, “Persistent Homology of
+    Complex Networks for Dynamic State Detection,” Apr. 2019,; doi:
+    `10.1103/PhysRevE.100.022314
+    <https://doi.org/10.1103/PhysRevE.100.022314>`_.
+
     """
 
     def __init__(self, normalize=False, n_jobs=None):
@@ -66,9 +73,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
         X_normalized = X_lifespan / lifespan_sums
         res = - np.sum(np.nan_to_num(
-            X_normalized * np.log(X_normalized)), axis=1).reshape(-1, 1)
+            X_normalized * np.log2(X_normalized)), axis=1).reshape(-1, 1)
         if normalize_nb_pts:
-            return res / np.log(lifespan_sums)
+            return res / np.log2(lifespan_sums)
         else:
             return res
 
