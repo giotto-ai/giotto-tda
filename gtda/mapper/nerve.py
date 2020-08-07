@@ -133,7 +133,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         node_attributes = zip(*nodes)
         attribute_names = ["pullback_set_label", "partial_cluster_label",
                            "node_elements"]
-        for i, node_attribute in node_attributes:
+        for i, node_attribute in enumerate(node_attributes):
             graph.vs[attribute_names[i]] = node_attribute
 
         # Graph construction -- edges with weights given by intersection sizes
