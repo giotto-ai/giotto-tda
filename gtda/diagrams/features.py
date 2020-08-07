@@ -68,13 +68,13 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     @staticmethod
-    def _persistence_entropy(X, normalize_nb_pts=False):
+    def _persistence_entropy(X, normalize=False):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
         lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
         X_normalized = X_lifespan / lifespan_sums
         res = - np.sum(np.nan_to_num(
             X_normalized * np.log2(X_normalized)), axis=1).reshape(-1, 1)
-        if normalize_nb_pts:
+        if normalize:
             return res / np.log2(lifespan_sums)
         else:
             return res
@@ -143,7 +143,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         with np.errstate(divide='ignore', invalid='ignore'):
             Xt = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._persistence_entropy)(_subdiagrams(X[s], [dim]),
-                                                   self.normalize)
+                                                   normalize=self.normalize)
                 for dim in self.homology_dimensions_
                 for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
                 )
