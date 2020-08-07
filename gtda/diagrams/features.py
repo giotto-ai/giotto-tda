@@ -5,6 +5,7 @@ from numbers import Real
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
+from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
@@ -71,9 +72,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     def _persistence_entropy(X, normalize=False):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
         lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
-        X_normalized = X_lifespan / lifespan_sums
-        res = - np.sum(np.nan_to_num(
-            X_normalized * np.log2(X_normalized)), axis=1).reshape(-1, 1)
+        res = entropy(X_lifespan, base=2, axis=1).reshape(-1, 1)
         if normalize:
             return res / np.log2(lifespan_sums)
         else:
