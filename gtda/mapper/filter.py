@@ -5,7 +5,7 @@ import warnings
 
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
-from scipy.special import entr
+from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -111,9 +111,9 @@ class Eccentricity(BaseEstimator, TransformerMixin):
 class Entropy(BaseEstimator, TransformerMixin):
     """Entropy of rows in a two-dimensional array.
 
-    The rows of the array are interpreted as probability vectors,
-    after taking absolute values if necessary and normalizing. Then,
-    their Shannon entropies are computed and returned.
+    The rows of the array are interpreted as probability vectors, after taking
+    absolute values if necessary and normalizing. Then, their (base 2) Shannon
+    entropies are computed and returned.
 
     """
 
@@ -175,8 +175,7 @@ class Entropy(BaseEstimator, TransformerMixin):
                           "value to calculate probabilities.")
             Xt = np.abs(Xt)
 
-        Xt = Xt / Xt.sum(axis=1, keepdims=True)
-        Xt = entr(Xt).sum(axis=1, keepdims=True) / np.log(2)
+        Xt = entropy(Xt, base=2, axis=1)
         return Xt
 
 
