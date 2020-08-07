@@ -17,7 +17,7 @@ from .utils._visualization import (
     _get_column_color_buttons,
     _get_colors_for_vals,
     PLOT_OPTIONS_LAYOUT_DEFAULTS
-)
+    )
 
 
 def plot_static_mapper_graph(
@@ -25,7 +25,7 @@ def plot_static_mapper_graph(
         color_variable=None, node_color_statistic=None,
         color_by_columns_dropdown=False, clone_pipeline=True, n_sig_figs=3,
         node_scale=12, plotly_params=None
-):
+        ):
     """Plot Mapper graphs without interactivity on pipeline parameters.
 
     The output graph is a rendition of the :class:`igraph.Graph` object
@@ -171,13 +171,13 @@ def plot_static_mapper_graph(
         _calculate_graph_data(
             _pipeline, data, is_data_dataframe, layout, layout_dim,
             color_variable, _node_color_statistic, n_sig_figs, node_scale
-        )
+            )
 
     # Define layout options
     layout_options = go.Layout(
         **PLOT_OPTIONS_LAYOUT_DEFAULTS["common"],
         **PLOT_OPTIONS_LAYOUT_DEFAULTS[layout_dim]
-    )
+        )
 
     fig = go.FigureWidget(data=[edge_trace, node_trace], layout=layout_options)
 
@@ -196,17 +196,17 @@ def plot_static_mapper_graph(
                     fig.update_traces(
                         hoverlabel_bgcolor=_plotly_params["node_trace"].pop(
                             "hoverlabel_bgcolor"
-                        ),
+                            ),
                         selector={"name": "node_trace"}
-                    )
+                        )
                     compute_hoverlabel_bgcolor = False
                 if "marker_colorscale" in _plotly_params["node_trace"]:
                     fig.update_traces(
                         marker_colorscale=_plotly_params["node_trace"].pop(
                             "marker_colorscale"
-                        ),
+                            ),
                         selector={"name": "node_trace"}
-                    )
+                        )
 
         if compute_hoverlabel_bgcolor:
             colorscale_for_hoverlabel = fig.data[1].marker.colorscale
@@ -217,7 +217,7 @@ def plot_static_mapper_graph(
                 hoverlabel_bgcolor = _get_colors_for_vals(
                     node_colors_color_variable, min_col, max_col,
                     colorscale_for_hoverlabel
-                )
+                    )
             except Exception as e:
                 if e.args[0] == "This colorscale is not supported.":
                     warn("Data-dependent background hoverlabel colors cannot "
@@ -234,7 +234,7 @@ def plot_static_mapper_graph(
             fig.update_traces(
                 hoverlabel_bgcolor=hoverlabel_bgcolor,
                 selector={"name": "node_trace"}
-            )
+                )
 
     # Compute node colors according to data columns only if necessary
     if color_by_columns_dropdown:
@@ -243,7 +243,7 @@ def plot_static_mapper_graph(
             data, is_data_dataframe, node_elements, node_colors_color_variable,
             _node_color_statistic, hovertext_color_variable,
             colorscale_for_hoverlabel, n_sig_figs
-        )
+            )
         # Avoid recomputing hoverlabel bgcolor for top button
         column_color_buttons[0]["args"][0]["hoverlabel.bgcolor"] = \
             [None, fig.data[1].hoverlabel.bgcolor]
@@ -262,8 +262,8 @@ def plot_static_mapper_graph(
                 xanchor="left",
                 y=button_height,
                 yanchor="top"
-            ),
-        ])
+                ),
+            ])
 
     if color_by_columns_dropdown:
         fig.add_annotation(
@@ -275,8 +275,8 @@ def plot_static_mapper_graph(
                 yref="paper",
                 align="left",
                 showarrow=False
+                )
             )
-        )
 
     # Update traces and layout according to user input
     if _plotly_params:
@@ -284,7 +284,7 @@ def plot_static_mapper_graph(
             fig.update_traces(
                 _plotly_params.pop(key, None),
                 selector={"name": key}
-            )
+                )
         fig.update_layout(_plotly_params.pop("layout", None))
 
     return fig
@@ -295,7 +295,7 @@ def plot_interactive_mapper_graph(
         color_variable=None, node_color_statistic=None, clone_pipeline=True,
         color_by_columns_dropdown=False, n_sig_figs=3, node_scale=12,
         plotly_params=None
-):
+        ):
     """Plot Mapper graphs with interactivity on pipeline parameters.
 
     Extends `~gtda.mapper.visualization.plot_static_mapper_graph` by providing
@@ -399,7 +399,7 @@ def plot_interactive_mapper_graph(
                 description=param.split("__")[1],
                 continuous_update=False,
                 disabled=False
-            ))
+                ))
         elif isinstance(value, int):
             return (param, widgets.IntText(
                 value=value,
@@ -407,14 +407,14 @@ def plot_interactive_mapper_graph(
                 description=param.split("__")[1],
                 continuous_update=False,
                 disabled=False
-            ))
+                ))
         elif isinstance(value, str):
             return (param, widgets.Text(
                 value=value,
                 description=param.split("__")[1],
                 continuous_update=False,
                 disabled=False
-            ))
+                ))
         else:
             return None
 
@@ -425,37 +425,37 @@ def plot_interactive_mapper_graph(
                 if isinstance(value, (int, float, str)):
                     _pipeline.set_params(
                         **{param: cover_params_widgets[param].value}
-                    )
+                        )
             for param, value in cluster_params.items():
                 if isinstance(value, (int, float, str)):
                     _pipeline.set_params(
                         **{param: cluster_params_widgets[param].value}
-                    )
+                        )
 
             logger.info("Updating figure...")
             with fig.batch_update():
                 (
                     edge_trace, node_trace, node_elements,
                     node_colors_color_variable
-                ) = _calculate_graph_data(
+                    ) = _calculate_graph_data(
                     _pipeline, data, is_data_dataframe, layout, layout_dim,
                     color_variable, _node_color_statistic, n_sig_figs,
                     node_scale
-                )
+                    )
                 if colorscale_for_hoverlabel is not None:
                     node_colors_color_variable = np.asarray(
                         node_colors_color_variable
-                    )
+                        )
                     min_col = np.min(node_colors_color_variable)
                     max_col = np.max(node_colors_color_variable)
                     hoverlabel_bgcolor = _get_colors_for_vals(
                         node_colors_color_variable, min_col, max_col,
                         colorscale_for_hoverlabel
-                    )
+                        )
                     fig.update_traces(
                         hoverlabel_bgcolor=hoverlabel_bgcolor,
                         selector={"name": "node_trace"}
-                    )
+                        )
 
                 fig.update_traces(
                     x=node_trace.x,
@@ -466,13 +466,13 @@ def plot_interactive_mapper_graph(
                     hovertext=node_trace.hovertext,
                     **({"z": node_trace.z} if layout_dim == 3 else dict()),
                     selector={"name": "node_trace"}
-                )
+                    )
                 fig.update_traces(
                     x=edge_trace.x,
                     y=edge_trace.y,
                     **({"z": edge_trace.z} if layout_dim == 3 else dict()),
                     selector={"name": "edge_trace"}
-                )
+                    )
 
                 # Update color by column buttons
                 if color_by_columns_dropdown:
@@ -482,7 +482,7 @@ def plot_interactive_mapper_graph(
                         node_colors_color_variable, _node_color_statistic,
                         hovertext_color_variable, colorscale_for_hoverlabel,
                         n_sig_figs
-                    )
+                        )
                     # Avoid recomputing hoverlabel bgcolor for top button
                     if colorscale_for_hoverlabel is not None:
                         column_color_buttons[0]["args"][0][
@@ -502,8 +502,8 @@ def plot_interactive_mapper_graph(
                             xanchor="left",
                             y=button_height,
                             yanchor="top"
-                        ),
-                    ])
+                            ),
+                        ])
 
             valid.value = True
         except Exception:
@@ -540,44 +540,44 @@ def plot_interactive_mapper_graph(
         filter(
             lambda x: x[0].startswith("cover"),
             _pipeline.get_mapper_params().items()
+            )
         )
-    )
     cover_params_widgets = dict(
         filter(
             None, map(
                 lambda x: get_widgets_per_param(*x),
                 cover_params.items()
+                )
             )
         )
-    )
     cluster_params = dict(
         filter(
             lambda x: x[0].startswith("clusterer"),
             _pipeline.get_mapper_params().items()
+            )
         )
-    )
     cluster_params_widgets = dict(
         filter(
             None, map(
                 lambda x: get_widgets_per_param(*x),
                 cluster_params.items()
+                )
             )
         )
-    )
 
     # Initialise widgets for validating input parameters of pipeline
     valid = widgets.Valid(
         value=True,
         description="Valid parameters",
         style={"description_width": "100px"},
-    )
+        )
 
     # Initialise widget for showing the logs
     logs_box = widgets.Checkbox(
         description="Show logs: ",
         value=False,
         indent=False
-    )
+        )
 
     # Initialise figure with initial pipeline and config
     fig = plot_static_mapper_graph(
@@ -587,7 +587,7 @@ def plot_interactive_mapper_graph(
         color_by_columns_dropdown=color_by_columns_dropdown,
         clone_pipeline=False, n_sig_figs=n_sig_figs, node_scale=node_scale,
         plotly_params=plotly_params
-    )
+        )
 
     # Store variables for later updates
     is_data_dataframe = hasattr(data, "columns")
@@ -613,16 +613,16 @@ def plot_interactive_mapper_graph(
     # Define containers for input widgets
     container_cover = widgets.HBox(
         children=list(cover_params_widgets.values())
-    )
+        )
 
     container_cluster_layout = Layout(display="flex", flex_flow="row wrap")
 
     container_cluster = widgets.HBox(
         children=list(cluster_params_widgets.values()),
         layout=container_cluster_layout
-    )
+        )
 
     box = widgets.VBox(
         [container_cover, container_cluster, fig, valid, logs_box, out]
-    )
+        )
     return box

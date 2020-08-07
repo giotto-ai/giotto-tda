@@ -314,11 +314,11 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         left_limits = np.array([
             X[nonzero_indices[0]] if nonzero_indices.size else -np.inf
             for nonzero_indices in left_indices
-        ])
+            ])
         right_limits = np.array([
             X[nonzero_indices[0]] if nonzero_indices.size else np.inf
             for nonzero_indices in right_indices
-        ])
+            ])
         left_limits[0] = -np.inf
         right_limits[-1] = np.inf
         return left_limits, right_limits
@@ -414,7 +414,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         self._coverers = [
             partial(self._clone_and_apply_to_column, X, coverer, fitter)(i)
             for i in range(X.shape[1])
-        ]
+            ]
         self._n_features_fit = X.shape[1]
         return self
 
@@ -543,7 +543,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
             partial(self._clone_and_apply_to_column,
                     Xt, coverer, fit_transformer)(i)
             for i, coverer in enumerate(coverers)
-        ]
+            ]
         # Only store attributes if above succeeds
         self._coverers = coverers
         self._n_features_fit = Xt.shape[1]
@@ -555,7 +555,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         # Stack intervals for each cover
         intervals = (
             [cover[:, i] for i in range(cover.shape[1])] for cover in covers
-        )
+            )
 
         # Calculate masks for pullback cover
         Xt = np.array([np.logical_and.reduce(t)
