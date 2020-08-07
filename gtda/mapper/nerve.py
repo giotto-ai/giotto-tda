@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 from functools import reduce
-from itertools import combinations
+from itertools import combinations, filterfalse
 from operator import iconcat
 
 import igraph as ig
@@ -131,14 +131,14 @@ class Nerve(BaseEstimator, TransformerMixin):
         # zip(*nodes) generates three tuples of length N, each corresponding to
         # a type of node attribute.
         node_attributes = zip(*nodes)
-        graph.vs["pullback_set_label"] = next(node_attributes)
-        graph.vs["partial_cluster_label"] = next(node_attributes)
-        node_elements = next(node_attributes)
-        graph.vs["node_elements"] = node_elements
+        attribute_names = ["pullback_set_label", "partial_cluster_label",
+                           "node_elements"]
+        for i, node_attribute in node_attributes:
+            graph.vs[attribute_names[i]] = node_attribute
 
         # Graph construction -- edges with weights given by intersection sizes
         node_index_pairs, weights, intersections, mapping = \
-            self._generate_edge_data(node_elements)
+            self._generate_edge_data(nodes)
         graph.es["weight"] = 1
         graph.add_edges(node_index_pairs)
         graph.es["weight"] = weights
@@ -155,17 +155,20 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         return graph
 
-    def _generate_edge_data(self, node_elements):
-        node_tuples = combinations(enumerate(node_elements), 2)
+    def _generate_edge_data(self, nodes):
+        node_tuples = combinations(enumerate(nodes), 2)
 
         node_index_pairs = []
         weights = []
         intersections = []
 
         if self.contract_nodes:
-            mapping = np.arange(len(node_elements))
+            mapping = np.arange(len(nodes))
         else:
             mapping = None
+
+        def _in_same_pullback_set(_node_tuple):
+            return _node_tuple[0][1][0] == _node_tuple[1][1][0]
 
         def _do_nothing(*args):
             pass
@@ -211,8 +214,9 @@ class Nerve(BaseEstimator, TransformerMixin):
         contraction_behavior = \
             _choose_contraction_behavior(self.contract_nodes)
 
-        for (node_1_idx, node_1_elements), (node_2_idx, node_2_elements) \
-                in node_tuples:
+        for node_tuple in filterfalse(_in_same_pullback_set, node_tuples):
+            ((node_1_idx, (_, _, node_1_elements)),
+             (node_2_idx, (_, _, node_2_elements))) = node_tuple
             intersection = np.intersect1d(node_1_elements, node_2_elements)
             intersection_size = len(intersection)
 
