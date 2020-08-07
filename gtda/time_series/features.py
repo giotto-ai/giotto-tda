@@ -3,6 +3,7 @@
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
+from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -16,7 +17,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     Given a two-dimensional array `A`, another array `A'` of the same size is
     computed by arg-sorting each row in `A`. The permutation entropy [1]_ of
-    `A` is the Shannon entropy of the probability distribution given by
+    `A` is the Shannon entropy (base 2) of the probability distribution given by
     the relative frequencies of each arg-sorting permutation in `A'`.
 
     Parameters
@@ -44,8 +45,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     def _entropy(self, X):
         Xo = np.unique(X, axis=0, return_counts=True)[1].reshape(-1, 1)
-        Xo = Xo / np.sum(Xo, axis=0).reshape(-1, 1)
-        return -np.sum(np.nan_to_num(Xo * np.log2(Xo)), axis=0).reshape(-1, 1)
+        return entropy(Xo, base=2, axis=0)
 
     def _permutation_entropy(self, X):
         Xo = np.argsort(X, axis=2)
