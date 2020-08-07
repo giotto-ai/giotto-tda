@@ -36,7 +36,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         When ``True``, the persistence entropy of each diagram is normalized by
         the logarithm of the sum of lifetimes of all points in the diagram.
         Can aid comparison between diagrams in an input collection when these
-        have different numbers of (non-trivial) points. [1]_.
+        have different numbers of (non-trivial) points. [1]_
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -56,10 +56,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    .. [1] A. Myers, E. Munch, and F. A. Khasawneh, “Persistent Homology of
-    Complex Networks for Dynamic State Detection,” Apr. 2019,; doi:
-    `10.1103/PhysRevE.100.022314
-    <https://doi.org/10.1103/PhysRevE.100.022314>`_.
+    .. [1] A. Myers, E. Munch, and F. A. Khasawneh, "Persistent Homology of
+           Complex Networks for Dynamic State Detection"; *Phys. Rev. E*
+           **100**, 022314, 2019; doi: `10.1103/PhysRevE.100.022314
+           <https://doi.org/10.1103/PhysRevE.100.022314>`_.
 
     """
 
