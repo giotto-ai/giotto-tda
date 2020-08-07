@@ -537,7 +537,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         coverer = OneDimensionalCover(kind=self.kind,
                                       n_intervals=self.n_intervals,
                                       overlap_frac=self.overlap_frac)
-        coverers = [clone(coverer) for i in range(Xt.shape[1])]
+        coverers = [clone(coverer) for _ in range(Xt.shape[1])]
         fit_transformer = '_fit_transform_balanced'
         covers = [
             partial(self._clone_and_apply_to_column,
