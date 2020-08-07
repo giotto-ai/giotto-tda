@@ -43,14 +43,17 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _entropy(self, X):
-        Xo = np.unique(X, axis=0, return_counts=True)[1].reshape(-1, 1)
-        return entropy(Xo, base=2, axis=0)
+    @staticmethod
+    def _entropy_2d(x):
+        unique_row_counts = np.unique(x, axis=0, return_counts=True)[1]
+        return entropy(unique_row_counts, base=2)
 
     def _permutation_entropy(self, X):
-        Xo = np.argsort(X, axis=2)
-        Xo = np.stack([self._entropy(x) for x in Xo])
-        return Xo.reshape(-1, 1)
+        X_permutations = np.argsort(X, axis=2)
+        X_permutation_entropy = np.asarray(
+            [self._entropy_2d(x) for x in X_permutations]
+            )[:, None]
+        return X_permutation_entropy
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
