@@ -41,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.05.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.08.7" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -136,7 +136,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.05.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.08.7" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -152,7 +152,7 @@ jobs:
       source .azure-ci/setup_ccache.sh
       python -m pip install -e ".[dev]"
       ccache -s
-    displayName: 'Install dependencies and dev environement'
+    displayName: 'Install dependencies and dev environment'
 
   - script: |
       set -e
