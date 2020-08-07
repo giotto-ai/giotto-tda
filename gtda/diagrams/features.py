@@ -145,9 +145,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
                 delayed(self._persistence_entropy)(_subdiagrams(X[s], [dim]),
                                                    self.normalize)
                 for dim in self.homology_dimensions_
-                for s in gen_even_slices(
-                    len(X), effective_n_jobs(self.n_jobs))
-            )
+                for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+                )
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
         return Xt
 
