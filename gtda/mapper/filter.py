@@ -175,7 +175,7 @@ class Entropy(BaseEstimator, TransformerMixin):
                           "value to calculate probabilities.")
             Xt = np.abs(Xt)
 
-        Xt = entropy(Xt, base=2, axis=1)
+        Xt = entropy(Xt, base=2, axis=1)[:, None]
         return Xt
 
 
