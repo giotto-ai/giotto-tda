@@ -60,11 +60,11 @@ def test_pe_transform():
     pe = PersistenceEntropy()
     diagram_res = np.array([[1., 0.91829583405]])
 
-    assert_almost_equal(pe.fit_transform(X), diagram_res, )
+    assert_almost_equal(pe.fit_transform(X), diagram_res)
 
     pe_normalize = PersistenceEntropy(normalize=True)
     diagram_res = np.array([[1., 0.355245321276]])
-    assert_almost_equal(pe_normalize.fit_transform(X), diagram_res, )
+    assert_almost_equal(pe_normalize.fit_transform(X), diagram_res)
 
 
 @pytest.mark.parametrize('n_bins', range(10, 51, 10))
