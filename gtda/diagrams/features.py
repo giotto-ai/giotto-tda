@@ -25,9 +25,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     Given a persistence diagrams consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
-    calculated as the (base 2) Shannon entropies of the normalized collections
-    of differences d - b ("lifetimes"). Optionally, the entropies can be
-    further normalized according to a simple heuristic, see `normalize`.
+    calculated as the (base 2) Shannon entropies of the collections of
+    differences d - b ("lifetimes"), normalized by the sum of all such
+    differences. Optionally, these entropies can be normalized according to a 
+    simple heuristic, see `normalize`.
 
     Input collections of persistence diagrams for this transformer must satisfy
     certain requirements, see e.g. :meth:`fit`.

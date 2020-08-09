@@ -3,6 +3,7 @@
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
+from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -16,7 +17,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     Given a two-dimensional array `A`, another array `A'` of the same size is
     computed by arg-sorting each row in `A`. The permutation entropy [1]_ of
-    `A` is the Shannon entropy of the probability distribution given by
+    `A` is the (base 2) Shannon entropy of the probability distribution given by
     the relative frequencies of each arg-sorting permutation in `A'`.
 
     Parameters
@@ -42,15 +43,17 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _entropy(self, X):
-        Xo = np.unique(X, axis=0, return_counts=True)[1].reshape(-1, 1)
-        Xo = Xo / np.sum(Xo, axis=0).reshape(-1, 1)
-        return -np.sum(np.nan_to_num(Xo * np.log2(Xo)), axis=0).reshape(-1, 1)
+    @staticmethod
+    def _entropy_2d(x):
+        unique_row_counts = np.unique(x, axis=0, return_counts=True)[1]
+        return entropy(unique_row_counts, base=2)
 
     def _permutation_entropy(self, X):
-        Xo = np.argsort(X, axis=2)
-        Xo = np.stack([self._entropy(x) for x in Xo])
-        return Xo.reshape(-1, 1)
+        X_permutations = np.argsort(X, axis=2)
+        X_permutation_entropy = np.asarray(
+            [self._entropy_2d(x) for x in X_permutations]
+            )[:, None]
+        return X_permutation_entropy
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.

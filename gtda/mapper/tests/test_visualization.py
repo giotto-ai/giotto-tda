@@ -135,7 +135,7 @@ def test_color_by_column_dropdown_2d(layout_dim):
     fig_buttons = fig.layout.updatemenus[0].buttons
 
     assert list(fig.data[1].marker.color) == \
-           list(fig_buttons[0].args[0]["marker.color"][1])
+        list(fig_buttons[0].args[0]["marker.color"][1])
 
     for i in range(X.shape[1]):
         fig_col_i = plot_static_mapper_graph(
