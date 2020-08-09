@@ -34,9 +34,9 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     certain requirements, see e.g. :meth:`fit`.
 
     **Important note**: By default, persistence subdiagrams containing only
-    triples with zero lifetime will have corresponding entropies computed as
-    ``numpy.nan``. To avoid this, set a value of `nan_fill_value` different
-    from ``None``.
+    triples with zero lifetime will have corresponding (normalized) entropies
+    computed as ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
+    different from ``None``.
 
     Parameters
     ----------
