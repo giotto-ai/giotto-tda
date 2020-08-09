@@ -139,8 +139,8 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
           two-dimensional array of amplitudes (one per diagram and homology
           dimension) to obtain :attr:`scale_`.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -356,8 +356,8 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     are equal) may still appear in the output for padding purposes, but carry
     no information.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
