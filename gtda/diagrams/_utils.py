@@ -4,6 +4,11 @@
 import numpy as np
 
 
+def identity(x):
+    """The identity function."""
+    return x
+
+
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     """For each diagram in a collection, extract the subdiagrams in a given
     list of homology dimensions. It is assumed that all diagrams in X contain
@@ -131,18 +136,11 @@ def _bin(X, metric, n_bins=100, **kw_args):
     samplings = {}
     step_sizes = {}
     for dim in homology_dimensions:
-        samplings[dim], step_sizes[dim] = np.linspace(min_vals[dim],
-                                                      max_vals[dim],
-                                                      retstep=True,
-                                                      num=n_bins)
+        samplings[dim], step_sizes[dim] = np.linspace(
+            min_vals[dim], max_vals[dim], retstep=True, num=n_bins
+            )
     if metric in ['landscape', 'betti', 'heat', 'silhouette']:
         for dim in homology_dimensions:
             samplings[dim] = samplings[dim][:, [0], None]
             step_sizes[dim] = step_sizes[dim][0]
     return samplings, step_sizes
-
-
-def _calculate_weights(X, weight_function, samplings, **kw_args):
-    weights = {dim: weight_function(samplings[dim][:, 1])
-               for dim in samplings.keys()}
-    return weights
