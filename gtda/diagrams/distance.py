@@ -8,7 +8,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_METRICS, _parallel_pairwise
-from ._utils import _bin, _calculate_weights
+from ._utils import _bin
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagrams, validate_params
@@ -177,11 +177,14 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \
-            _bin(X, metric=self.metric, **self.effective_metric_params_)
+            _bin(X, self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistence_image':
-            self.effective_metric_params_['weights'] = \
-                _calculate_weights(X, **self.effective_metric_params_)
+            weight_function = self.effective_metric_params_['weight_function']
+            samplings = self.effective_metric_params_['samplings']
+            weights = {dim: weight_function(samplings_dim[:, 1])
+                       for dim, samplings_dim in samplings.items()}
+            self.effective_metric_params_['weights'] = weights
 
         self._X = X
         return self

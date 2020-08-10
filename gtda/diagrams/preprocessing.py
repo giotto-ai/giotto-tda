@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
-from ._utils import _filter, _bin, _calculate_weights
+from ._utils import _filter, _bin
 from ..base import PlotterMixin
 from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
@@ -241,11 +241,14 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \
-            _bin(X, metric=self.metric, **self.effective_metric_params_)
+            _bin(X, self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistence_image':
-            self.effective_metric_params_['weights'] = \
-                _calculate_weights(X, **self.effective_metric_params_)
+            weight_function = self.effective_metric_params_['weight_function']
+            samplings = self.effective_metric_params_['samplings']
+            weights = {dim: weight_function(samplings_dim[:, 1])
+                       for dim, samplings_dim in samplings.items()}
+            self.effective_metric_params_['weights'] = weights
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,

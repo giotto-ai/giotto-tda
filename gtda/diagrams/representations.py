@@ -13,17 +13,12 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, \
     persistence_images, silhouettes
-from ._utils import _subdiagrams, _bin, _calculate_weights
+from ._utils import identity, _subdiagrams, _bin
 from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagrams
-
-
-def identity(x):
-    """The identity function."""
-    return x
 
 
 @adapt_fit_transform_docs
@@ -115,7 +110,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, metric="betti", n_bins=self.n_bins)
+        self._samplings, _ = _bin(X, "betti", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -351,7 +346,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, metric="landscape", n_bins=self.n_bins)
+        self._samplings, _ = _bin(X, "landscape", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -609,8 +604,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, self._step_size = _bin(
-            X, metric="heat", n_bins=self.n_bins)
+        self._samplings, self._step_size = _bin(X, "heat", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -834,12 +828,14 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, self._step_size = _bin(
-            X, metric="persistence_image", n_bins=self.n_bins)
-        self.samplings_ = {dim: s.transpose()
-                           for dim, s in self._samplings.items()}
-        self.weights_ = _calculate_weights(X, self.effective_weight_function_,
-                                           self._samplings)
+        self._samplings, self._step_size = _bin(X, "persistence_image",
+                                                n_bins=self.n_bins)
+        self.weights_ = {
+            dim: self.effective_weight_function_(samplings_dim[:, 1])
+            for dim, samplings_dim in self._samplings.items()
+            }
+        self.samplings_ = {dim: s.T for dim, s in self._samplings.items()}
+
 
         return self
 
@@ -864,7 +860,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions, n_bins, \
-             n_bins)
+            n_bins)
             Multi-channel raster images: one image per sample and one channel
             per homology dimension seen in :meth:`fit`. Index i along axis 1
             corresponds to the i-th homology dimension in
@@ -1044,7 +1040,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, metric="silhouette", n_bins=self.n_bins)
+        self._samplings, _ = _bin(X, "silhouette", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
