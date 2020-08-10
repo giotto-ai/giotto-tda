@@ -657,7 +657,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale="blues",
+    def plot(self, Xt, sample=0, homology_dimension_idx=0, colorscale="blues",
              plotly_params=None):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of heat kernel images.
@@ -672,11 +672,11 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         sample : int, optional, default: ``0``
             Index of the sample in `Xt` to be selected.
 
-        homology_dimension_ix : int, optional, default: ``0``
-            Index of the channel in the selected sample to be plotted. If
-            `Xt` is the result of a call to :meth:`transform` and this
-            index is i, the plot corresponds to the homology dimension given by
-            the i-th entry in :attr:`homology_dimensions_`.
+        homology_dimension_idx : int, optional, default: ``0``
+            Index of the channel in the selected sample to be plotted. If `Xt`
+            is the result of a call to :meth:`transform` and this index is i,
+            the plot corresponds to the homology dimension given by the i-th
+            entry in :attr:`homology_dimensions_`.
 
         colorscale : str, optional, default: ``"blues"``
             Color scale to be used in the heat map. Can be anything allowed by
@@ -696,10 +696,9 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
+        x = self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
         return plot_heatmap(
-            Xt[sample][homology_dimension_ix],
-            x=self.samplings_[homology_dimension_ix],
-            y=self.samplings_[homology_dimension_ix],
+            Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
             colorscale=colorscale, plotly_params=plotly_params
             )
 
@@ -891,7 +890,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             transpose((1, 0, 2, 3))
         return Xt
 
-    def plot(self, Xt, sample=0, homology_dimension_ix=0, colorscale="blues",
+    def plot(self, Xt, sample=0, homology_dimension_idx=0, colorscale="blues",
              plotly_params=None):
         """Plot a single channel – corresponding to a given homology
         dimension – in a sample from a collection of persistence images.
@@ -906,11 +905,11 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         sample : int, optional, default: ``0``
             Index of the sample in `Xt` to be selected.
 
-        homology_dimension_ix : int, optional, default: ``0``
-            Index of the channel in the selected sample to be plotted. If
-            `Xt` is the result of a call to :meth:`transform` and this
-            index is i, the plot corresponds to the homology dimension given by
-            the i-th entry in :attr:`homology_dimensions_`.
+        homology_dimension_idx : int, optional, default: ``0``
+            Index of the channel in the selected sample to be plotted. If `Xt`
+            is the result of a call to :meth:`transform` and this index is i,
+            the plot corresponds to the homology dimension given by the i-th
+            entry in :attr:`homology_dimensions_`.
 
         colorscale : str, optional, default: ``"blues"``
             Color scale to be used in the heat map. Can be anything allowed by
@@ -930,9 +929,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        samplings_x, samplings_y = self.samplings_[homology_dimension_ix]
+        samplings_x, samplings_y = \
+            self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
         return plot_heatmap(
-            Xt[sample][homology_dimension_ix], x=samplings_x, y=samplings_y,
+            Xt[sample][homology_dimension_idx], x=samplings_x, y=samplings_y,
             colorscale=colorscale, plotly_params=plotly_params
             )
 
