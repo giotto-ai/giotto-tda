@@ -24,8 +24,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     matrices or a single distance matrix between pairs of diagrams is
     calculated according to the following steps:
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
         1. All diagrams are partitioned into subdiagrams corresponding to
            distinct homology dimensions.

@@ -26,10 +26,17 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
     calculated as the (base 2) Shannon entropies of the collections of
-    differences d - b, normalized by the sum of all such differences.
+    differences d - b ("lifetimes"), normalized by the sum of all such
+    differences. Optionally, these entropies can be normalized according to a 
+    simple heuristic, see `normalize`.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
+
+    **Important note**: By default, persistence subdiagrams containing only
+    triples with zero lifetime will have corresponding (normalized) entropies
+    computed as ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
+    different from ``None``.
 
     Parameters
     ----------
@@ -38,6 +45,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         the logarithm of the sum of lifetimes of all points in the diagram.
         Can aid comparison between diagrams in an input collection when these
         have different numbers of (non-trivial) points. [1]_
+
+    nan_fill_value : float or None, optional, default: ``None``
+        If a float, (normalized) persistence entropies initially computed as
+        ``numpy.nan`` are replaced with this value.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -64,17 +75,25 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, normalize=False, n_jobs=None):
+    _hyperparameters = {
+        'normalize': {'type': bool},
+        'nan_fill_value': {'type': (Real, type(None))}}
+
+    def __init__(self, normalize=False, nan_fill_value=None, n_jobs=None):
         self.normalize = normalize
+        self.nan_fill_value = nan_fill_value
         self.n_jobs = n_jobs
 
     @staticmethod
-    def _persistence_entropy(X, normalize=False):
+    def _persistence_entropy(X, normalize=False, nan_fill_value=None):
         X_lifespan = X[:, :, 1] - X[:, :, 0]
-        X_entropy = entropy(X_lifespan, base=2, axis=1).reshape(-1, 1)
+        X_entropy = entropy(X_lifespan, base=2, axis=1)
         if normalize:
-            lifespan_sums = np.sum(X_lifespan, axis=1).reshape(-1, 1)
+            lifespan_sums = np.sum(X_lifespan, axis=1)
             X_entropy /= np.log2(lifespan_sums)
+        if nan_fill_value is not None:
+            np.nan_to_num(X_entropy, nan=nan_fill_value, copy=False)
+        X_entropy = X_entropy[:, None]
         return X_entropy
 
     def fit(self, X, y=None):
@@ -104,6 +123,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagrams(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
         self._n_dimensions = len(self.homology_dimensions_)
@@ -138,13 +159,17 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         X = check_diagrams(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._persistence_entropy)(_subdiagrams(X[s], [dim]),
-                                               normalize=self.normalize)
-            for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
-            )
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
+        with np.errstate(divide='ignore', invalid='ignore'):
+            Xt = Parallel(n_jobs=self.n_jobs)(
+                delayed(self._persistence_entropy)(
+                    _subdiagrams(X[s], [dim]),
+                    normalize=self.normalize,
+                    nan_fill_value=self.nan_fill_value
+                )
+                for dim in self.homology_dimensions_
+                for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+                )
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, len(X)).T
         return Xt
 
 
@@ -164,8 +189,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
         3. The final result is either :math:`\\mathbf{a}` itself or
            a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
