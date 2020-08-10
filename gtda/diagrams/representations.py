@@ -35,8 +35,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     considered separately, and their respective Betti curves are obtained by
     evenly sampling the :ref:`filtration parameter <filtered_complex>`.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -265,8 +265,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
     landscapes are obtained by evenly sampling the :ref:`filtration parameter
     <filtered_complex>`.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -515,8 +515,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a (multi-channel) raster image.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -718,8 +718,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     <filtered_complex>`. The result can be thought of as a (multi-channel)
     raster image.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -949,8 +949,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     spaced locations from appropriate ranges of the :ref:`filtration parameter
     <filtered_complex>`.
 
-    Input collections of persistence diagrams for this transformer must
-    satisfy certain requirements, see e.g. :meth:`fit`.
+    Input collections of persistence diagrams for this transformer must satisfy
+    certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
