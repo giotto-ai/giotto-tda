@@ -1,10 +1,10 @@
 """Image-related plotting functions and classes."""
 # License: GNU AGPLv3
 
-import plotly.graph_objects as gobj
+from plotly.express import imshow
 
 
-def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
+def plot_heatmap(data, x=None, y=None, colorscale="greys", origin="upper",
                  title=None, plotly_params=None):
     """Plot a 2D single-channel image, as a heat map from 2D array data.
 
@@ -19,13 +19,13 @@ def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
     y : ndarray of shape (n_pixels_y,) or None, optional, default: ``None``
         Vertical coordinates of the pixels in `data`.
 
-    colorscale : str, optional, default: ``'greys'``
+    colorscale : str, optional, default: ``"greys"``
         Color scale to be used in the heat map. Can be anything allowed by
         :class:`plotly.graph_objects.Heatmap`.
 
-    origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+    origin : ``"upper"`` | ``"lower"``, optional, default: ``"upper"``
         Position of the [0, 0] pixel of `data`, in the upper left or lower
-        left corner. The convention ``'upper'`` is typically used for
+        left corner. The convention ``"upper"`` is typically used for
         matrices and images.
 
     title : str or None, optional, default: ``None``
@@ -44,15 +44,10 @@ def plot_heatmap(data, x=None, y=None, colorscale='greys', origin='upper',
         Figure representing the 2D single-channel image.
 
     """
-    autorange = True if origin == 'lower' else 'reversed'
-    layout = dict(
-        xaxis=dict(scaleanchor='y', constrain='domain'),
-        yaxis=dict(autorange=autorange, constrain='domain'),
-        plot_bgcolor='white',
-        title=title
-    )
-    fig = gobj.Figure(layout=layout)
-    fig.add_trace(gobj.Heatmap(z=data * 1, x=x, y=y, colorscale=colorscale))
+    fig = imshow(
+        data * 1, x=x, y=y,
+        color_continuous_scale=colorscale, origin=origin, title=title
+        )
 
     # Update trace and layout according to user input
     if plotly_params:
