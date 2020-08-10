@@ -17,8 +17,8 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     Given a two-dimensional array `A`, another array `A'` of the same size is
     computed by arg-sorting each row in `A`. The permutation entropy [1]_ of
-    `A` is the (base 2) Shannon entropy of the probability distribution given by
-    the relative frequencies of each arg-sorting permutation in `A'`.
+    `A` is the (base 2) Shannon entropy of the probability distribution given
+    by the relative frequencies of each arg-sorting permutation in `A'`.
 
     Parameters
     ----------
