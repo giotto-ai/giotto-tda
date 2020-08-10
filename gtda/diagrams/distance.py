@@ -126,7 +126,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         'metric': {'type': str, 'in': _AVAILABLE_METRICS.keys()},
         'order': {'type': (Real, type(None)),
                   'in': Interval(0, np.inf, closed='right')},
-        'metric_params': {'type': (dict, type(None))}}
+        'metric_params': {'type': (dict, type(None))}
+        }
 
     def __init__(self, metric='landscape', metric_params=None, order=2.,
                  n_jobs=None):

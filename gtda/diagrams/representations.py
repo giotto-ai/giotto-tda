@@ -75,7 +75,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")}
+        }
 
     def __init__(self, n_bins=100, n_jobs=None):
         self.n_bins = n_bins
@@ -231,7 +232,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
                 "showexponent": "all",
                 "exponentformat": "e"
                 },
-            "plot_bgcolor": "white"
+            "plot_bgcolor": "white",
+            "title": f"Betti curves from diagram {sample}"
             }
 
         fig = gobj.Figure(layout=layout)
@@ -310,7 +312,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "n_layers": {"type": int, "in": Interval(1, np.inf, closed="left")}}
+        "n_layers": {"type": int, "in": Interval(1, np.inf, closed="left")}
+        }
 
     def __init__(self, n_layers=1, n_bins=100, n_jobs=None):
         self.n_layers = n_layers
@@ -471,7 +474,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                 "showexponent": "all",
                 "exponentformat": "e"
                 },
-            "plot_bgcolor": "white"
+            "plot_bgcolor": "white",
+            "title": f"Landscape representation of diagram {sample}"
             }
 
         Xt_sample = Xt[sample]
@@ -568,7 +572,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")}}
+        "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")}
+        }
 
     def __init__(self, sigma=1., n_bins=100, n_jobs=None):
         self.sigma = sigma
@@ -696,10 +701,16 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        x = self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
+        homology_dimension = self.homology_dimensions_[homology_dimension_idx]
+        if homology_dimension != np.inf:
+            homology_dimension = int(homology_dimension)
+        x = self.samplings_[homology_dimension]
         return plot_heatmap(
-            Xt[sample][homology_dimension_idx], x=x, y=x,
-            colorscale=colorscale, plotly_params=plotly_params
+            Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
+            colorscale=colorscale, origin="lower",
+            title=f"Heat kernel representation of diagram {sample} in "
+                  f"homology dimension {homology_dimension}",
+            plotly_params=plotly_params
             )
 
 
@@ -786,7 +797,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
         "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")},
-        "weight_function": {"type": (types.FunctionType, type(None))}}
+        "weight_function": {"type": (types.FunctionType, type(None))}
+        }
 
     def __init__(self, sigma=1., n_bins=100, weight_function=None,
                  n_jobs=None):
@@ -929,11 +941,16 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        samplings_x, samplings_y = \
-            self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
+        homology_dimension = self.homology_dimensions_[homology_dimension_idx]
+        if homology_dimension != np.inf:
+            homology_dimension = int(homology_dimension)
+        samplings_x, samplings_y = self.samplings_[homology_dimension]
         return plot_heatmap(
             Xt[sample][homology_dimension_idx], x=samplings_x, y=samplings_y,
-            colorscale=colorscale, plotly_params=plotly_params
+            colorscale=colorscale,
+            title=f"Persistence image representation of diagram {sample} in "
+                  f"homology dimension {homology_dimension}",
+            plotly_params=plotly_params
             )
 
 
@@ -1003,7 +1020,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")}}
+        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")}
+        }
 
     def __init__(self, power=1., n_bins=100, n_jobs=None):
         self.power = power
@@ -1160,7 +1178,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
                 "showexponent": "all",
                 "exponentformat": "e"
                 },
-            "plot_bgcolor": "white"
+            "plot_bgcolor": "white",
+            "title": f"Silhouette representation of diagram {sample}"
             }
 
         fig = gobj.Figure(layout=layout)

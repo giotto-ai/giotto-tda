@@ -45,8 +45,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {
-        'absolute_value': {'type': bool}}
+    _hyperparameters = {'absolute_value': {'type': bool}}
 
     def __init__(self, absolute_value=False, n_jobs=None):
         self.absolute_value = absolute_value

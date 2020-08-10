@@ -112,12 +112,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
         'homology_dimensions': {
-            'type': (list, tuple), 'of': {
-                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'type': (list, tuple),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_length': {'type': Real},
         'infinity_values': {'type': (Real, type(None))}
-    }
+        }
 
     def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
                  coeff=2, max_edge_length=np.inf, infinity_values=None,
@@ -266,7 +267,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -363,13 +364,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
         'homology_dimensions': {
-            'type': (list, tuple), 'of': {
-                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'type': (list, tuple),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'epsilon': {'type': Real, 'in': Interval(0, 1, closed='both')},
         'max_edge_length': {'type': Real},
         'infinity_values': {'type': (Real, type(None))}
-    }
+        }
 
     def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
                  coeff=2, epsilon=0.1, max_edge_length=np.inf,
@@ -527,7 +529,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -598,15 +600,15 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'homology_dimensions': {
-            'type': (list, tuple), 'of': {
-                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'type': (list, tuple),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'max_edge_length': {
-            'type': Real, 'in': Interval(0, np.inf, closed='right')},
-        'infinity_values': {
-            'type': (Real, type(None)),
-            'in': Interval(0, np.inf, closed='neither')},
-    }
+        'max_edge_length': {'type': Real,
+                            'in': Interval(0, np.inf, closed='right')},
+        'infinity_values': {'type': (Real, type(None)),
+                            'in': Interval(0, np.inf, closed='neither')},
+        }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
                  max_edge_length=np.inf, infinity_values=None, n_jobs=None):
@@ -744,7 +746,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -850,14 +852,15 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'homology_dimensions': {
-            'type': (list, tuple), 'of': {
-                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'type': (list, tuple),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'directed': {'type': bool},
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_weight': {'type': Real},
         'infinity_values': {'type': (Real, type(None))},
         'max_entries': {'type': int}
-    }
+        }
 
     def __init__(self, homology_dimensions=(0, 1), directed=True,
                  filtration='max', coeff=2, max_edge_weight=np.inf,
@@ -1022,4 +1025,4 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )

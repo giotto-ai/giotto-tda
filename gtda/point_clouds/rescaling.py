@@ -94,9 +94,9 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))},
-        'neighbor_rank': {
-            'type': int, 'in': Interval(1, np.inf, closed='left')}
-    }
+        'neighbor_rank': {'type': int,
+                          'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, metric='euclidean', metric_params=None, neighbor_rank=1,
                  n_jobs=None):
@@ -222,8 +222,10 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         return plot_heatmap(
-            Xt[sample], colorscale=colorscale, plotly_params=plotly_params
-        )
+            Xt[sample], colorscale=colorscale,
+            title=f"{sample}-th distance matrix after consistent rescaling",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -293,8 +295,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))},
-        'factor': {
-            'type': Real, 'in': Interval(0, np.inf, closed='both')}
+        'factor': {'type': Real, 'in': Interval(0, np.inf, closed='both')}
     }
 
     def __init__(self, metric='euclidean', metric_params=None, factor=0.,
@@ -415,5 +416,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         return plot_heatmap(
-            Xt[sample], colorscale=colorscale, plotly_params=plotly_params
-        )
+            Xt[sample], colorscale=colorscale,
+            title=f"{sample}-th distance matrix after consecutive rescaling",
+            plotly_params=plotly_params
+            )

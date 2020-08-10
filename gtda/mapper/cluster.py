@@ -401,13 +401,13 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     """
 
     _hyperparameters = {
-        'relative_gap_size': {
-            'type': Real, 'in': Interval(0, 1, closed='right')},
-        'max_fraction': {
-            'type': (Real, type(None)), 'in': Interval(0, 1, closed='right')},
+        'relative_gap_size': {'type': Real,
+                              'in': Interval(0, 1, closed='right')},
+        'max_fraction': {'type': (Real, type(None)),
+                         'in': Interval(0, 1, closed='right')},
         'affinity': {'type': str},
         'linkage': {'type': str}
-    }
+        }
 
     def __init__(self, relative_gap_size=0.3, max_fraction=None,
                  affinity='euclidean', memory=None, linkage='single'):
@@ -554,15 +554,15 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     """
 
     _hyperparameters = {
-        'freq_threshold': {
-            'type': int, 'in': Interval(0, np.inf, closed='left')},
-        'max_fraction': {
-            'type': (Real, type(None)), 'in': Interval(0, 1, closed='right')},
-        'n_bins_start': {
-            'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'freq_threshold': {'type': int,
+                           'in': Interval(0, np.inf, closed='left')},
+        'max_fraction': {'type': (Real, type(None)),
+                         'in': Interval(0, 1, closed='right')},
+        'n_bins_start': {'type': int,
+                         'in': Interval(1, np.inf, closed='left')},
         'affinity': {'type': str},
         'linkage': {'type': str}
-    }
+        }
 
     def __init__(self, freq_threshold=0, max_fraction=None, n_bins_start=5,
                  affinity='euclidean', memory=None, linkage='single'):
