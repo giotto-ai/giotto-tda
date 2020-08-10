@@ -698,7 +698,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         x = self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
         return plot_heatmap(
-            Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
+            Xt[sample][homology_dimension_idx], x=x, y=x,
             colorscale=colorscale, plotly_params=plotly_params
             )
 
