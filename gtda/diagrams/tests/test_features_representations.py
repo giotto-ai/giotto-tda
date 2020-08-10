@@ -38,12 +38,12 @@ def test_not_fitted():
         Silhouette().transform(X)
 
 
-@pytest.mark.parametrize('hom_dim_ix', [0, 1])
-def test_fit_transform_plot_one_hom_dim(hom_dim_ix):
+@pytest.mark.parametrize('hom_dim_idx', [0, 1])
+def test_fit_transform_plot_one_hom_dim(hom_dim_idx):
     HeatKernel().fit_transform_plot(
-        X, sample=0, homology_dimension_ix=hom_dim_ix)
+        X, sample=0, homology_dimension_idx=hom_dim_idx)
     PersistenceImage().fit_transform_plot(
-        X, sample=0, homology_dimension_ix=hom_dim_ix)
+        X, sample=0, homology_dimension_idx=hom_dim_idx)
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
