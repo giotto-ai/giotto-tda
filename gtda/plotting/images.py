@@ -1,7 +1,7 @@
 """Image-related plotting functions and classes."""
 # License: GNU AGPLv3
 
-from plotly.express import imshow
+import plotly.graph_objects as gobj
 
 
 def plot_heatmap(data, x=None, y=None, colorscale="greys", origin="upper",
@@ -44,10 +44,15 @@ def plot_heatmap(data, x=None, y=None, colorscale="greys", origin="upper",
         Figure representing the 2D single-channel image.
 
     """
-    fig = imshow(
-        data * 1, x=x, y=y,
-        color_continuous_scale=colorscale, origin=origin, title=title
-        )
+    autorange = True if origin == "lower" else "reversed"
+    layout = {
+        "xaxis": {"scaleanchor": "y", "constrain": "domain"},
+        "yaxis": {"autorange": autorange, "constrain": "domain"},
+        "plot_bgcolor": "white",
+        "title": title
+        }
+    fig = gobj.Figure(layout=layout)
+    fig.add_trace(gobj.Heatmap(z=data * 1, x=x, y=y, colorscale=colorscale))
 
     # Update trace and layout according to user input
     if plotly_params:
