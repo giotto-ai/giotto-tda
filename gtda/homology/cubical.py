@@ -92,13 +92,14 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'homology_dimensions': {
-            'type': (list, tuple), 'of': {
-                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'type': (list, tuple),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'periodic_dimensions': {
-            'type': (np.ndarray, type(None)),
-            'of': {'type': np.bool_}},
-        'infinity_values': {'type': (Real, type(None))}}
+        'periodic_dimensions': {'type': (np.ndarray, type(None)),
+                                'of': {'type': np.bool_}},
+        'infinity_values': {'type': (Real, type(None))}
+        }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
                  periodic_dimensions=None, infinity_values=None, n_jobs=None):

@@ -58,7 +58,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'threshold': {'type': Real, 'in': Interval(0, 1, closed='right')}
-    }
+        }
 
     def __init__(self, threshold=0.5, n_jobs=None):
         self.threshold = threshold
@@ -343,11 +343,9 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'paddings': {
-            'type': (np.ndarray, type(None)),
-            'of': {'type': int}},
+        'paddings': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
         'activated': {'type': bool}
-    }
+        }
 
     def __init__(self, paddings=None, activated=False, n_jobs=None):
         self.paddings = paddings

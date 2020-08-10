@@ -193,7 +193,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         'metric': {'type': str, 'in': _AVAILABLE_AMPLITUDE_METRICS.keys()},
         'metric_params': {'type': (dict, type(None))},
         'function': {'type': (FunctionType, type(None))}
-    }
+        }
 
     def __init__(self, metric='bottleneck', metric_params=None,
                  function=np.max, n_jobs=None):
@@ -387,9 +387,10 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'homology_dimensions': {
             'type': (list, tuple, type(None)),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'epsilon': {'type': Real, 'in': Interval(0, np.inf, closed='left')}
-    }
+        }
 
     def __init__(self, homology_dimensions=None, epsilon=0.01):
         self.homology_dimensions = homology_dimensions

@@ -75,7 +75,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")}}
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")}
+        }
 
     def __init__(self, n_bins=100, n_jobs=None):
         self.n_bins = n_bins
@@ -311,7 +312,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "n_layers": {"type": int, "in": Interval(1, np.inf, closed="left")}}
+        "n_layers": {"type": int, "in": Interval(1, np.inf, closed="left")}
+        }
 
     def __init__(self, n_layers=1, n_bins=100, n_jobs=None):
         self.n_layers = n_layers
@@ -570,7 +572,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")}}
+        "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")}
+        }
 
     def __init__(self, sigma=1., n_bins=100, n_jobs=None):
         self.sigma = sigma
@@ -794,7 +797,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
         "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")},
-        "weight_function": {"type": (types.FunctionType, type(None))}}
+        "weight_function": {"type": (types.FunctionType, type(None))}
+        }
 
     def __init__(self, sigma=1., n_bins=100, weight_function=None,
                  n_jobs=None):
@@ -1016,7 +1020,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")}}
+        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")}
+        }
 
     def __init__(self, power=1., n_bins=100, n_jobs=None):
         self.power = power

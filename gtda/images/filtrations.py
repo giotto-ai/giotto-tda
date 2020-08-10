@@ -75,9 +75,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'direction': {
-            'type': (np.ndarray, type(None)), 'of': {'type': Real}}
-    }
+        'direction': {'type': (np.ndarray, type(None)), 'of': {'type': Real}}
+        }
 
     def __init__(self, direction=None, n_jobs=None):
         self.direction = direction
@@ -305,12 +304,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'center': {
-            'type': (np.ndarray, type(None)), 'of': {'type': int}},
+        'center': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))}
-    }
+        }
 
     def __init__(self, center=None, radius=np.inf, metric='euclidean',
                  metric_params=None, n_jobs=None):
@@ -521,10 +519,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_iterations': {
-            'type': (int, type(None)),
-            'in': Interval(1, np.inf, closed='left')}
-    }
+        'n_iterations': {'type': (int, type(None)),
+                         'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -711,10 +708,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_iterations': {
-            'type': (int, type(None)),
-            'in': Interval(1, np.inf, closed='left')}
-    }
+        'n_iterations': {'type': (int, type(None)),
+                         'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -903,10 +899,9 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_iterations': {
-            'type': (int, type(None)),
-            'in': Interval(1, np.inf, closed='left')}
-    }
+        'n_iterations': {'type': (int, type(None)),
+                         'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
