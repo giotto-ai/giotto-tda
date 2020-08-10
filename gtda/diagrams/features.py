@@ -27,7 +27,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     considered separately, and their respective persistence entropies are
     calculated as the (base 2) Shannon entropies of the collections of
     differences d - b ("lifetimes"), normalized by the sum of all such
-    differences. Optionally, these entropies can be normalized according to a 
+    differences. Optionally, these entropies can be normalized according to a
     simple heuristic, see `normalize`.
 
     Input collections of persistence diagrams for this transformer must satisfy
