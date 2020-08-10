@@ -231,7 +231,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
                 "showexponent": "all",
                 "exponentformat": "e"
                 },
-            "plot_bgcolor": "white"
+            "plot_bgcolor": "white",
+            "title": f"Betti curves from diagram {sample}"
             }
 
         fig = gobj.Figure(layout=layout)
@@ -471,7 +472,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                 "showexponent": "all",
                 "exponentformat": "e"
                 },
-            "plot_bgcolor": "white"
+            "plot_bgcolor": "white",
+            "title": f"Landscape representation of diagram {sample}"
             }
 
         Xt_sample = Xt[sample]
@@ -696,10 +698,16 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        x = self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
+        homology_dimension = self.homology_dimensions_[homology_dimension_idx]
+        if homology_dimension != np.inf:
+            homology_dimension = int(homology_dimension)
+        x = self.samplings_[homology_dimension]
         return plot_heatmap(
             Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
             colorscale=colorscale, origin="lower",
+            title=f"Heat kernel representation of diagram {sample} in "
+                  f"homology dimension {homology_dimension}",
+            plotly_params=plotly_params
             )
 
 
@@ -929,11 +937,16 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        samplings_x, samplings_y = \
-            self.samplings_[self.homology_dimensions_[homology_dimension_idx]]
+        homology_dimension = self.homology_dimensions_[homology_dimension_idx]
+        if homology_dimension != np.inf:
+            homology_dimension = int(homology_dimension)
+        samplings_x, samplings_y = self.samplings_[homology_dimension]
         return plot_heatmap(
             Xt[sample][homology_dimension_idx], x=samplings_x, y=samplings_y,
-            colorscale=colorscale, plotly_params=plotly_params
+            colorscale=colorscale,
+            title=f"Persistence image representation of diagram {sample} in "
+                  f"homology dimension {homology_dimension}",
+            plotly_params=plotly_params
             )
 
 
@@ -1160,7 +1173,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
                 "showexponent": "all",
                 "exponentformat": "e"
                 },
-            "plot_bgcolor": "white"
+            "plot_bgcolor": "white",
+            "title": f"Silhouette representation of diagram {sample}"
             }
 
         fig = gobj.Figure(layout=layout)

@@ -255,4 +255,4 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )

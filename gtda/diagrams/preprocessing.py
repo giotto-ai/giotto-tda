@@ -117,7 +117,7 @@ class ForgetDimension(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=[np.inf],
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -343,7 +343,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=_homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -502,4 +502,4 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=_homology_dimensions,
             plotly_params=plotly_params
-        )
+            )

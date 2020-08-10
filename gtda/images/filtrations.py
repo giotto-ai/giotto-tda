@@ -217,8 +217,9 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Height filtration of image {sample}",
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -459,8 +460,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Radial filtration of image {sample}",
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -648,8 +650,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Dilation filtration of image {sample}",
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -836,8 +839,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Erosion filtration of image {sample}",
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -1034,5 +1038,6 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Signed-distance filtration of image {sample}",
             plotly_params=plotly_params
-        )
+            )

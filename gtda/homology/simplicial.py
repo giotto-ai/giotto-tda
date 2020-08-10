@@ -266,7 +266,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -527,7 +527,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -744,7 +744,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
 
 
 @adapt_fit_transform_docs
@@ -1022,4 +1022,4 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
-        )
+            )
