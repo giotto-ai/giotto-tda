@@ -240,7 +240,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
           (int, default: ``100``) and `weight_function` (callable or None,
           default: ``None``).
 
-    order : float or None, optional, default: ``2.``
+    order : float or None, optional, default: ``None``
         If ``None``, :meth:`transform` returns for each diagram a vector of
         amplitudes corresponding to the dimensions in
         :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
@@ -282,7 +282,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         'metric_params': {'type': (dict, type(None))}
         }
 
-    def __init__(self, metric='landscape', metric_params=None, order=2.,
+    def __init__(self, metric='landscape', metric_params=None, order=None,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
