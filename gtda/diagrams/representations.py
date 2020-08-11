@@ -942,8 +942,11 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             homology_dimension = int(homology_dimension)
         samplings_x, samplings_y = self.samplings_[homology_dimension]
         return plot_heatmap(
-            Xt[sample][homology_dimension_idx], x=samplings_x, y=samplings_y,
+            Xt[sample][homology_dimension_idx],
+            x=samplings_x,
+            y=samplings_y[::-1],
             colorscale=colorscale,
+            origin="lower",
             title=f"Persistence image representation of diagram {sample} in "
                   f"homology dimension {homology_dimension}",
             plotly_params=plotly_params
