@@ -5,8 +5,9 @@ import types
 from numbers import Real
 
 import numpy as np
-import plotly.graph_objects as gobj
 from joblib import Parallel, delayed, effective_n_jobs
+from plotly.graph_objects import Figure, Scatter
+from plotly.subplots import make_subplots
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
@@ -231,17 +232,17 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
             "title": f"Betti curves from diagram {sample}"
             }
 
-        fig = gobj.Figure(layout=layout)
+        fig = Figure(layout=layout)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
         fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
 
         for ix, dim in _homology_dimensions:
-            fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
-                                       y=Xt[sample][ix],
-                                       mode="lines", showlegend=True,
-                                       name=f"H{int(dim)}"))
+            fig.add_trace(Scatter(x=self.samplings_[dim],
+                                  y=Xt[sample][ix],
+                                  mode="lines", showlegend=True,
+                                  name=f"H{int(dim)}"))
 
         # Update traces and layout according to user input
         if plotly_params:
@@ -445,59 +446,67 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                 else:
                     homology_dimensions_arr = np.array(
                         self.homology_dimensions_)
-                    ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
-                    _homology_dimensions.append((ix, dim))
+                    inv_idx = np.flatnonzero(homology_dimensions_arr == dim)[0]
+                    _homology_dimensions.append((inv_idx, dim))
 
+        layout_axes_comm = {
+            "type": "linear",
+            "ticks": "outside",
+            "showline": True,
+            "zeroline": True,
+            "linewidth": 1,
+            "linecolor": "black",
+            "mirror": False,
+            "showexponent": "all",
+            "exponentformat": "e"
+            }
         layout = {
             "xaxis1": {
                 "side": "bottom",
-                "type": "linear",
-                "ticks": "outside",
                 "anchor": "y1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
+                **layout_axes_comm
                 },
             "yaxis1": {
                 "side": "left",
-                "type": "linear",
-                "ticks": "outside",
                 "anchor": "x1",
-                "showline": True,
-                "zeroline": True,
-                "showexponent": "all",
-                "exponentformat": "e"
+                **layout_axes_comm
                 },
             "plot_bgcolor": "white",
-            "title": f"Landscape representation of diagram {sample}"
             }
 
         Xt_sample = Xt[sample]
-        for ix, dim in _homology_dimensions:
-            layout_dim = layout.copy()
-            layout_dim["title"] = "Persistence landscape for homology " + \
-                                  "dimension {}".format(int(dim))
-            fig = gobj.Figure(layout=layout_dim)
-            fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
-                             mirror=False)
-            fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
-                             mirror=False)
-
-            n_layers = Xt_sample.shape[1]
+        n_layers = Xt_sample.shape[1]
+        subplot_titles = [f"H{int(dim) if dim != np.inf else np.inf}"
+                          for _, dim in _homology_dimensions]
+        fig = make_subplots(rows=len(_homology_dimensions), cols=1,
+                            subplot_titles=subplot_titles)
+        many_homology_dim = len(_homology_dimensions) - 1
+        for i, (inv_idx, dim) in enumerate(_homology_dimensions):
+            hom_dim_str = \
+                f" ({subplot_titles[i]})" if many_homology_dim else ""
             for layer in range(n_layers):
-                fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
-                                           y=Xt_sample[ix, layer],
-                                           mode="lines", showlegend=True,
-                                           hoverinfo="none",
-                                           name=f"Layer {layer + 1}"))
+                fig.add_trace(
+                    Scatter(x=self.samplings_[dim],
+                            y=Xt_sample[inv_idx, layer],
+                            mode="lines",
+                            showlegend=True,
+                            hoverinfo="none",
+                            name=f"Layer {layer + 1}{hom_dim_str}"),
+                    row=i + 1,
+                    col=1
+                    )
 
-            # Update traces and layout according to user input
-            if plotly_params:
-                fig.update_traces(plotly_params.get("traces", None))
-                fig.update_layout(plotly_params.get("layout", None))
+        fig.update_layout(
+            title_text=f"Landscape representations of diagram {sample}",
+            **layout.copy()
+            )
 
-            return fig
+        # Update traces and layout according to user input
+        if plotly_params:
+            fig.update_traces(plotly_params.get("traces", None))
+            fig.update_layout(plotly_params.get("layout", None))
+
+        return fig
 
 
 @adapt_fit_transform_docs
@@ -1181,18 +1190,19 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
             "title": f"Silhouette representation of diagram {sample}"
             }
 
-        fig = gobj.Figure(layout=layout)
+        fig = Figure(layout=layout)
         fig.update_xaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
         fig.update_yaxes(zeroline=True, linewidth=1, linecolor="black",
                          mirror=False)
 
         for ix, dim in _homology_dimensions:
-            fig.add_trace(gobj.Scatter(x=self.samplings_[dim],
-                                       y=Xt[sample][ix],
-                                       mode="lines", showlegend=True,
-                                       hoverinfo="none",
-                                       name=f"H{int(dim)}"))
+            fig.add_trace(Scatter(x=self.samplings_[dim],
+                                  y=Xt[sample][ix],
+                                  mode="lines",
+                                  showlegend=True,
+                                  hoverinfo="none",
+                                  name=f"H{int(dim)}"))
 
         # Update traces and layout according to user input
         if plotly_params:
