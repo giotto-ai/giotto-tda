@@ -17,43 +17,44 @@ pio.renderers.default = 'plotly_mimetype'
 
 X = np.array([[[0., 1., 0.], [2., 3., 0.], [4., 6., 1.], [2., 6., 1.]]])
 
+line_plots_traces_params = {"mode": "lines+markers"}
+heatmap_trace_params = {"colorscale": "viridis"}
+layout_params = {"title": "New title"}
 
-def test_not_fitted():
+
+@pytest.mark.parametrize('transformer',
+                         [PersistenceEntropy(), BettiCurve(),
+                          PersistenceLandscape(), HeatKernel(),
+                          PersistenceImage(), Silhouette()])
+def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
-        PersistenceEntropy().transform(X)
-
-    with pytest.raises(NotFittedError):
-        BettiCurve().transform(X)
-
-    with pytest.raises(NotFittedError):
-        PersistenceLandscape().transform(X)
-
-    with pytest.raises(NotFittedError):
-        HeatKernel().transform(X)
-
-    with pytest.raises(NotFittedError):
-        PersistenceImage().transform(X)
-
-    with pytest.raises(NotFittedError):
-        Silhouette().transform(X)
+        transformer.transform(X)
 
 
+@pytest.mark.parametrize('transformer',
+                         [HeatKernel(), PersistenceImage()])
 @pytest.mark.parametrize('hom_dim_idx', [0, 1])
-def test_fit_transform_plot_one_hom_dim(hom_dim_idx):
-    HeatKernel().fit_transform_plot(
-        X, sample=0, homology_dimension_idx=hom_dim_idx)
-    PersistenceImage().fit_transform_plot(
-        X, sample=0, homology_dimension_idx=hom_dim_idx)
+def test_fit_transform_plot_one_hom_dim(transformer, hom_dim_idx):
+    plotly_params = \
+        {"trace": heatmap_trace_params, "layout": layout_params}
+    common_kwargs = {
+        "sample": 0, "homology_dimension_idx": hom_dim_idx,
+        "plotly_params": plotly_params
+        }
+    transformer.fit_transform_plot(X, **common_kwargs)
 
 
+@pytest.mark.parametrize('transformer',
+                         [BettiCurve(), PersistenceLandscape(), Silhouette()])
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
-def test_fit_transform_plot_many_hom_dims(hom_dims):
-    BettiCurve().fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
-    PersistenceLandscape().fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
-    Silhouette().fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
+def test_fit_transform_plot_many_hom_dims(transformer, hom_dims):
+    plotly_params = \
+        {"traces": line_plots_traces_params, "layout": layout_params}
+    common_kwargs = {
+        "sample": 0, "homology_dimensions": hom_dims,
+        "plotly_params": plotly_params
+        }
+    transformer.fit_transform_plot(X, **common_kwargs)
 
 
 def test_pe_transform():
