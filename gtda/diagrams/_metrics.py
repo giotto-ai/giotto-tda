@@ -41,7 +41,7 @@ _AVAILABLE_METRICS = {
         'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
         'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
-        'weight_function': {'type': FunctionType, 'in': None}
+        'weight_function': {'type': (FunctionType, type(None))}
         },
     'silhouette': {
         'power': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
