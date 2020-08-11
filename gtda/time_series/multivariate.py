@@ -13,15 +13,15 @@ from ..utils._docs import adapt_fit_transform_docs
 class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     """Pearson dissimilarities from collections of multivariate time series.
 
-    The sample Pearson correlation coefficients between pairs of
-    components of an :math:`N`-variate time series form an :math:`N
-    \\times N` matrix :math:`R` with entries
+    The sample Pearson correlation coefficients between pairs of components of
+    an :math:`N`-variate time series form an :math:`N \\times N` matrix
+    :math:`R` with entries
 
     .. math:: R_{ij} = \\frac{ C_{ij} }{ \\sqrt{ C_{ii} C_{jj} } },
 
     where :math:`C` is the covariance matrix. Setting :math:`D_{ij} =
-    (1 - R_{ij})/2` or :math:`D_{ij} = 1 - |R_{ij}|` we obtain a
-    dissimilarity matrix with entries between 0 and 1.
+    (1 - R_{ij})/2` or :math:`D_{ij} = 1 - |R_{ij}|` we obtain a dissimilarity
+    matrix with entries between 0 and 1.
 
     This transformer computes one dissimilarity matrix per multivariate time
     series in a collection. Examples of such collections are the outputs of
@@ -30,14 +30,14 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     absolute_value : bool, default: ``False``
-        Whether absolute values of the Pearson correlation coefficients
-        should be taken. Doing so makes pairs of strongly anti-correlated
-        variables as similar as pairs of strongly correlated ones.
+        Whether absolute values of the Pearson correlation coefficients should
+        be taken. Doing so makes pairs of strongly anti-correlated variables as
+        as similar as pairs of strongly correlated ones.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     See also
     --------
