@@ -84,7 +84,7 @@ def landscapes(diagrams, sampling, n_layers):
 
 def _heat(image, sampled_diagram, sigma):
     _sample_image(image, sampled_diagram)
-    gaussian_filter(image, sigma, mode="reflect", output=image)
+    gaussian_filter(image, sigma, mode="constant", output=image)
 
 
 def heats(diagrams, sampling, step_size, sigma):
@@ -128,7 +128,7 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
 
     # Smoothen the weighted image
     for image in persistence_images_:
-        gaussian_filter(image, sigma, mode="reflect", output=image)
+        gaussian_filter(image, sigma, mode="constant", output=image)
 
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
     return persistence_images_
