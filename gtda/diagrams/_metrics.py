@@ -93,7 +93,8 @@ def heats(diagrams, sampling, step_size, sigma):
 
     diagrams[diagrams < sampling[0, 0]] = sampling[0, 0]
     diagrams[diagrams > sampling[-1, 0]] = sampling[-1, 0]
-    diagrams = np.array((diagrams - sampling[0, 0]) / step_size, dtype=int)
+    diagrams[...] = (diagrams - sampling[0, 0]) / step_size
+    diagrams = diagrams.astype(int)
 
     [_heat(heats_[i], sampled_diagram, sigma)
      for i, sampled_diagram in enumerate(diagrams)]
@@ -109,17 +110,15 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] -= diagrams[:, :, 0]
 
-    for axis in [0, 1]:
-        # Set the values outside of the sampling range to be the sampling range
-        diagrams[:, :, axis][diagrams[:, :, axis] < sampling[0, axis]] = \
-            sampling[0, axis]
-        diagrams[:, :, axis][diagrams[:, :, axis] > sampling[-1, axis]] = \
-            sampling[-1, axis]
+    for ax in [0, 1]:
+        diagrams_ax = diagrams[:, :, ax]
+        # Set the values outside of the sampling range
+        diagrams_ax[diagrams_ax < sampling[0, ax]] = sampling[0, ax]
+        diagrams_ax[diagrams_ax > sampling[-1, ax]] = sampling[-1, ax]
         # Convert into pixel
-        diagrams[:, :, axis] = np.array(
-            (diagrams[:, :, axis] - sampling[0, axis]) / step_size[axis],
-            dtype=int
-            )
+        diagrams_ax[...] = (diagrams_ax - sampling[0, ax]) / step_size[ax]
+    diagrams = diagrams.astype(int)
+
     # Sample the image
     [_sample_image(persistence_images_[i], sampled_diagram)
      for i, sampled_diagram in enumerate(diagrams)]
@@ -127,7 +126,7 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
     # Apply the weights
     persistence_images_ *= weights
 
-    # Smoothen the weighted-image
+    # Smoothen the weighted image
     for image in persistence_images_:
         gaussian_filter(image, sigma, mode="reflect", output=image)
 
