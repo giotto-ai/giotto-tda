@@ -14,7 +14,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, \
     persistence_images, silhouettes
-from ._utils import identity, _subdiagrams, _bin
+from ._utils import _subdiagrams, _bin
 from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
@@ -752,9 +752,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         dimension, to sample during :meth:`fit`.
 
     weight_function : callable or None, default: ``None``
-        Function mapping the 1D array of persistence values of the points of an
-        input diagram to a 1D array of weights. ``None`` is equivalent to
-        passing the identity function.
+        Function mapping the 1D array of sampled persistence values (see
+        :attr:`samplings_`) to a 1D array of weights. ``None`` is equivalent to
+        passing ``numpy.ones_like``. More weight can be given to regions of
+        high persistence by passing a monotonic function, e.g. the identity.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -851,7 +852,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         if self.weight_function is None:
-            self.effective_weight_function_ = identity
+            self.effective_weight_function_ = np.ones_like
         else:
             self.effective_weight_function_ = self.weight_function
 

@@ -10,7 +10,7 @@ from scipy.spatial.distance import cdist, pdist, squareform
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import _num_samples
 
-from ._utils import identity, _subdiagrams, _sample_image
+from ._utils import _subdiagrams, _sample_image
 from ..externals.modules.gtda_bottleneck import bottleneck_distance
 from ..externals.modules.gtda_wasserstein import wasserstein_distance
 from ..utils.intervals import Interval
