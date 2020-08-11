@@ -82,22 +82,21 @@ def landscapes(diagrams, sampling, n_layers):
     return fibers
 
 
-def _heat(image, sampled_diag, sigma):
-    _sample_image(image, sampled_diag)
+def _heat(image, sampled_diagram, sigma):
+    _sample_image(image, sampled_diagram)
     gaussian_filter(image, sigma, mode="reflect", output=image)
 
 
 def heats(diagrams, sampling, step_size, sigma):
-    heats_ = np.zeros(
-        (len(diagrams), len(sampling), len(sampling)), dtype=float
-        )
+    heats_ = \
+        np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
 
     diagrams[diagrams < sampling[0, 0]] = sampling[0, 0]
     diagrams[diagrams > sampling[-1, 0]] = sampling[-1, 0]
     diagrams = np.array((diagrams - sampling[0, 0]) / step_size, dtype=int)
 
-    [_heat(heats_[i], sampled_diag, sigma)
-     for i, sampled_diag in enumerate(diagrams)]
+    [_heat(heats_[i], sampled_diagram, sigma)
+     for i, sampled_diagram in enumerate(diagrams)]
 
     heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
     heats_ = np.rot90(heats_, k=1, axes=(1, 2))
@@ -105,11 +104,10 @@ def heats(diagrams, sampling, step_size, sigma):
 
 
 def persistence_images(diagrams, sampling, step_size, weights, sigma):
-    persistence_images_ = np.zeros(
-        (len(diagrams), len(sampling), len(sampling)), dtype=float
-        )
+    persistence_images_ = \
+        np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
-    diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
+    diagrams[:, :, 1] -= diagrams[:, :, 0]
 
     for axis in [0, 1]:
         # Set the values outside of the sampling range to be the sampling range
@@ -123,8 +121,8 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
             dtype=int
             )
     # Sample the image
-    [_sample_image(persistence_images_[i], sampled_diag)
-     for i, sampled_diag in enumerate(diagrams)]
+    [_sample_image(persistence_images_[i], sampled_diagram)
+     for i, sampled_diagram in enumerate(diagrams)]
 
     # Apply the weights
     persistence_images_ *= weights
