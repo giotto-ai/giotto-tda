@@ -26,10 +26,14 @@ def _subdiagrams(X, homology_dimensions, remove_dim=False):
 
 
 def _pad(X, max_diagram_sizes):
-    X_padded = {dim: np.pad(
-        X[dim],
-        ((0, 0), (0, max_diagram_sizes[dim] - X[dim].shape[1]),
-         (0, 0)), 'constant') for dim in X.keys()}
+    X_padded = {
+        dim: np.pad(
+            Xdim,
+            ((0, 0), (0, max_diagram_sizes[dim] - Xdim.shape[1]), (0, 0)),
+            "constant"
+            )
+        for dim, Xdim in X.items()
+        }
     return X_padded
 
 

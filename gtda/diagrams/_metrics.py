@@ -84,11 +84,13 @@ def landscapes(diagrams, sampling, n_layers):
 
 def _heat(image, sampled_diag, sigma):
     _sample_image(image, sampled_diag)
-    image[:] = gaussian_filter(image, sigma, mode="reflect")
+    gaussian_filter(image, sigma, mode="reflect", output=image)
 
 
 def heats(diagrams, sampling, step_size, sigma):
-    heats_ = np.zeros((len(diagrams), len(sampling), len(sampling)))
+    heats_ = np.zeros(
+        (len(diagrams), len(sampling), len(sampling)), dtype=float
+        )
 
     diagrams[diagrams < sampling[0, 0]] = sampling[0, 0]
     diagrams[diagrams > sampling[-1, 0]] = sampling[-1, 0]
@@ -104,7 +106,7 @@ def heats(diagrams, sampling, step_size, sigma):
 
 def persistence_images(diagrams, sampling, step_size, weights, sigma):
     persistence_images_ = np.zeros(
-        (len(diagrams), len(sampling), len(sampling))
+        (len(diagrams), len(sampling), len(sampling)), dtype=float
         )
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] = diagrams[:, :, 1] - diagrams[:, :, 0]
@@ -128,8 +130,8 @@ def persistence_images(diagrams, sampling, step_size, weights, sigma):
     persistence_images_ *= weights
 
     # Smoothen the weighted-image
-    for i, image in enumerate(persistence_images_):
-        persistence_images_[i] = gaussian_filter(image, sigma, mode="reflect")
+    for image in persistence_images_:
+        gaussian_filter(image, sigma, mode="reflect", output=image)
 
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
     return persistence_images_
