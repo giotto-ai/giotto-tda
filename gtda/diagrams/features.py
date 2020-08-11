@@ -30,13 +30,14 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     differences. Optionally, these entropies can be normalized according to a
     simple heuristic, see `normalize`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important notes**:
 
-    **Important note**: By default, persistence subdiagrams containing only
-    triples with zero lifetime will have corresponding (normalized) entropies
-    computed as ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
-    different from ``None``.
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+        - By default, persistence subdiagrams containing only triples with zero
+          lifetime will have corresponding (normalized) entropies computed as
+          ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
+          different from ``None``.
 
     Parameters
     ----------
@@ -189,26 +190,30 @@ class Amplitude(BaseEstimator, TransformerMixin):
         3. The final result is either :math:`\\mathbf{a}` itself or
            a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important notes**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+        - The shape of outputs of :meth:`transform` depends on the value of the
+          `order` parameter.
 
     Parameters
     ----------
-    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'`` | ``'silhouette'`` | \
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
+        ``'landscape'`` | ``'silhouette'`` | ``'heat'`` | \
         ``'persistence_image'``, optional, default: ``'landscape'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the (trivial) diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
           perfect-matching--based notions of distance.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
-        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
-        - ``'heat'`` refers to the :math:`L^p` distance between
-          Gaussian-smoothed diagrams.
         - ``'silhouette'`` refers to the :math:`L^p` distance between
           silhouettes.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
         - ``'persistence_image'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams represented on birth-persistence axes.
 
@@ -219,21 +224,21 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (float,
           default: ``2.``).
-        - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
-          `n_layers` (int, default: ``1``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
           default: ``2.``) and `n_bins` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p` (float,
+          default: ``2.``), `n_bins` (int, default: ``100``) and `n_layers`
+          (int, default: ``1``).
+        - If ``metric == 'silhouette'`` the available arguments are `p` (float,
+          default: ``2.``), `power` (float, default: ``1.``) and `n_bins` (int,
+          default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
-          (int, default: ``100``).
-        - If ``metric == 'silhouette'`` the available arguments are `p`
-          (float, default: ``2.``), `order` (float, default: ``1.``) and
-          `n_bins` (int, default: ``100``).
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins` (int,
+          default: ``100``).
         - If ``metric == 'persistence_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_bins` (int, default: ``100``) and `weight_function`
-          (callable or None, default: ``None``).
+          (float, default: ``2.``), `sigma` (float, default: ``1.``), `n_bins`
+          (int, default: ``100``) and `weight_function` (callable or None,
+          default: ``None``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each diagram a vector of
@@ -250,7 +255,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params` as
-        well as on any relevant quantities computed in :meth:`fit`.
+        well as relevant quantities computed in :meth:`fit`.
 
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.

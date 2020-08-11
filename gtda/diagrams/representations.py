@@ -31,8 +31,10 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     considered separately, and their respective Betti curves are obtained by
     evenly sampling the :ref:`filtration parameter <filtered_complex>`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -41,9 +43,9 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         dimension, to sample during :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
@@ -158,9 +160,8 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
-        """Plot a sample from a collection of Betti curves arranged as in
-        the output of :meth:`transform`. Include homology in multiple
-        dimensions.
+        """Plot a sample from a collection of Betti curves arranged as in the
+        output of :meth:`transform`. Include homology in multiple dimensions.
 
         Parameters
         ----------
@@ -263,8 +264,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
     landscapes are obtained by evenly sampling the :ref:`filtration parameter
     <filtered_complex>`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -523,8 +526,10 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     diagonal, and the difference between the results of the two convolutions is
     computed. The result can be thought of as a (multi-channel) raster image.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -667,8 +672,8 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
     def plot(self, Xt, sample=0, homology_dimension_idx=0, colorscale="blues",
              plotly_params=None):
-        """Plot a single channel – corresponding to a given homology
-        dimension – in a sample from a collection of heat kernel images.
+        """Plot a single channel –- corresponding to a given homology
+        dimension -- in a sample from a collection of heat kernel images.
 
         Parameters
         ----------
@@ -732,8 +737,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     <filtered_complex>`. The result can be thought of as a (multi-channel)
     raster image.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -764,9 +771,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         Homology dimensions seen in :meth:`fit`.
 
     samplings_ : dict
-        For each number in `homology_dimensions_`, a discrete sampling of
-        filtration parameters, calculated during :meth:`fit` according to the
-        minimum birth and maximum death values observed across all samples.
+        For each dimension in `homology_dimensions_`, a discrete sampling of
+        birth parameters and one of persistence values, calculated during
+        :meth:`fit` according to the minimum birth and maximum death values
+        observed across all samples.
 
     weights_ : dict
         For each number in `homology_dimensions_`, an array of weights
@@ -857,7 +865,6 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             }
         self.samplings_ = {dim: s.T for dim, s in self._samplings.items()}
 
-
         return self
 
     def transform(self, X, y=None):
@@ -909,8 +916,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
     def plot(self, Xt, sample=0, homology_dimension_idx=0, colorscale="blues",
              plotly_params=None):
-        """Plot a single channel – corresponding to a given homology
-        dimension – in a sample from a collection of persistence images.
+        """Plot a single channel -– corresponding to a given homology
+        dimension -– in a sample from a collection of persistence images.
 
         Parameters
         ----------
@@ -970,12 +977,14 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     Based on ideas in [1]_. Given a persistence diagram consisting of
     birth-death-dimension triples [b, d, q], subdiagrams corresponding to
     distinct homology dimensions are considered separately, and their
-    respective silhouette by sampling the silhouette function over evenly
-    spaced locations from appropriate ranges of the :ref:`filtration parameter
-    <filtered_complex>`.
+    respective silhouettes are obtained by sampling the silhouette function
+    over evenly spaced locations from appropriate ranges of the
+    :ref:`filtration parameter <filtered_complex>`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -988,9 +997,9 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         dimension, to sample during :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
@@ -1010,10 +1019,9 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     The samplings in :attr:`samplings_` are in general different between
-    different homology dimensions. This means that the j-th entry of
-    a silhouette in homology dimension q typically arises from
-    a different parameter values to the j-th entry of a curve
-    in dimension q'.
+    different homology dimensions. This means that the j-th entry of a
+    silhouette in homology dimension q typically arises from a different
+    parameter values to the j-th entry of a curve in dimension q'.
 
     References
     ----------
@@ -1027,8 +1035,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
-        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")}
+        "power": {"type": Real, "in": Interval(0, np.inf, closed="right")},
+        "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")}
         }
 
     def __init__(self, power=1., n_bins=100, n_jobs=None):
@@ -1117,9 +1125,8 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
-        """Plot a sample from a collection of silhouettes arranged as in
-        the output of :meth:`transform`. Include homology in multiple
-        dimensions.
+        """Plot a sample from a collection of silhouettes arranged as in the
+        output of :meth:`transform`. Include homology in multiple dimensions.
 
         Parameters
         ----------

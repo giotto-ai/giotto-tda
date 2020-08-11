@@ -139,8 +139,10 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
           two-dimensional array of amplitudes (one per diagram and homology
           dimension) to obtain :attr:`scale_`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -157,15 +159,15 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         amplitude vectors in :meth:`fit`. Must map 2D arrays to scalars.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params` as
-        well as on any relevant quantities computed in :meth:`fit`.
+        well as relevant quantities computed in :meth:`fit`.
 
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
@@ -359,8 +361,10 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     are equal) may still appear in the output for padding purposes, but carry
     no information.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------

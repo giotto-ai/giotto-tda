@@ -24,9 +24,6 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     matrices or a single distance matrix between pairs of diagrams is
     calculated according to the following steps:
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
-
         1. All diagrams are partitioned into subdiagrams corresponding to
            distinct homology dimensions.
         2. Pairwise distances between subdiagrams of equal homology
@@ -37,22 +34,29 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
            three-dimensional array, or a single distance matrix constructed
            by taking norms of the vectors of distances between diagram pairs.
 
+    **Important notes**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+        - The shape of outputs of :meth:`transform` depends on the value of the
+          `order` parameter.
+
     Parameters
     ----------
-    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'`` | ``'persistence_image'``, | \
-        ``'silhouette'``, optional, default: ``'landscape'``
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
+        ``'landscape'`` | ``'silhouette'`` | ``'heat'`` | \
+        ``'persistence_image'``, optional, default: ``'landscape'``
         Distance or dissimilarity function between subdiagrams:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
           perfect-matching--based notions of distance.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
-        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
-        - ``'heat'`` refers to the :math:`L^p` distance between
-          Gaussian-smoothed diagrams.
         - ``'silhouette'`` refers to the :math:`L^p` distance between
           silhouettes.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
         - ``'persistence_image'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams represented on birth-persistence axes.
 
@@ -61,27 +65,27 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         ``None`` is equivalent to passing the defaults described below):
 
         - If ``metric == 'bottleneck'`` the only argument is `delta` (float,
-          default: ``0.01``). When equal to ``0.``, an exact algorithm is
-          used; otherwise, a faster approximate algorithm is used.
+          default: ``0.01``). When equal to ``0.``, an exact algorithm is used;
+          otherwise, a faster approximate algorithm is used.
         - If ``metric == 'wasserstein'`` the available arguments are `p`
           (float, default: ``2.``) and `delta` (float, default: ``0.01``).
-          Unlike the case of ``'bottleneck'``, `delta` cannot be set to
-          ``0.`` and an exact algorithm is not available.
+          Unlike the case of ``'bottleneck'``, `delta` cannot be set to ``0.``
+          and an exact algorithm is not available.
         - If ``metric == 'betti'`` the available arguments are `p` (float,
           default: ``2.``) and `n_bins` (int, default: ``100``).
-        - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
-          `n_layers` (int, default: ``1``).
-        - If ``metric == 'heat'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``) and
-          `n_bins` (int, default: ``100``).
-        - If ``metric == 'silhouette'`` the available arguments are `p`
-          (float, default: ``2.``), `order` (float, default: ``1.``) and
-          `n_bins` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p` (float,
+          default: ``2.``), `n_bins` (int, default: ``100``) and `n_layers`
+          (int, default: ``1``).
+        - If ``metric == 'silhouette'`` the available arguments are `p` (float,
+          default: ``2.``), `power` (float, default: ``1.``) and `n_bins` (int,
+          default: ``100``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins` (int,
+          default: ``100``).
         - If ``metric == 'persistence_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_bins` (int, default: ``100``) and `weight_function`
-          (callable or None, default: ``None``).
+          (float, default: ``2.``), `sigma` (float, default: ``1.``), `n_bins`
+          (int, default: ``100``) and `weight_function` (callable or None,
+          default: ``None``).
 
     order : float or None, optional, default: ``2.``
         If ``None``, :meth:`transform` returns for each pair of diagrams a
@@ -98,7 +102,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params` as
-        well as on any relevant quantities computed in :meth:`fit`.
+        well as relevant quantities computed in :meth:`fit`.
 
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
