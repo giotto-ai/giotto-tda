@@ -441,10 +441,7 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
                 ]
         else:
             self.homology_dimensions_ = self.homology_dimensions
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        self.homology_dimensions_ = tuple(sorted(self.homology_dimensions_))
 
         return self
 

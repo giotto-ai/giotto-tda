@@ -278,6 +278,28 @@ def test_filt_transform_zero(X):
     assert_almost_equal(X_res, X[:, [0], :])
 
 
+def total_lifetimes_in_dims(X, dims):
+    return sum([
+        np.sum(np.diff(X[X[:, :, 2] == dim], axis=1)[:, 0]) for dim in dims
+        ])
+
+
+@pytest.mark.parametrize('homology_dimensions', [None, (0, 1, 2), (0,), (1,),
+                                                 (2,), (0, 1), (0, 2), (1, 2)])
+def test_filt_transform_unfiltered_hom_dims(homology_dimensions):
+    filt = Filtering(epsilon=2., homology_dimensions=homology_dimensions)
+    X_1_res = filt.fit_transform(X_1)
+    if homology_dimensions is None:
+        unfiltered_hom_dims = []
+    else:
+        unfiltered_hom_dims = [
+            dim for dim in filt.homology_dimensions_
+            if dim not in homology_dimensions
+            ]
+    assert total_lifetimes_in_dims(X_1, unfiltered_hom_dims) == \
+           total_lifetimes_in_dims(X_1_res, unfiltered_hom_dims)
+
+
 lifetimes_1 = X_1[:, :, 1] - X_1[:, :, 0]
 epsilons_1 = np.linspace(np.min(lifetimes_1), np.max(lifetimes_1), num=3)
 
