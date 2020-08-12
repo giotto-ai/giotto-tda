@@ -68,6 +68,7 @@ def _get_estimator_name(estimator):
         return estimator.__class__.__name__
 
 
+@pytest.mark.filterwarnings("ignore:Input of `fit` contains")
 @parametrize_with_checks(
     [Binarizer, Inverter]
     )
