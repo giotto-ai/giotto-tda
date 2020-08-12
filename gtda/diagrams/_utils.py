@@ -20,18 +20,6 @@ def _subdiagrams(X, homology_dimensions, remove_dim=False):
     return Xs
 
 
-def _pad(X, max_diagram_sizes):
-    X_padded = {
-        dim: np.pad(
-            Xdim,
-            ((0, 0), (0, max_diagram_sizes[dim] - Xdim.shape[1]), (0, 0)),
-            "constant"
-            )
-        for dim, Xdim in X.items()
-        }
-    return X_padded
-
-
 def _sample_image(image, diagram_pixel_coords):
     # WARNING: Modifies `image` in-place
     unique, counts = \
