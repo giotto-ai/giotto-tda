@@ -10,6 +10,8 @@ from sklearn.exceptions import NotFittedError
 from gtda.diagrams import ForgetDimension, Scaler, Filtering
 
 pio.renderers.default = 'plotly_mimetype'
+plotly_params = {"trace": {"marker_size": 20},
+                 "layout": {"title": "New title"}}
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],
@@ -227,16 +229,22 @@ def test_not_fitted():
 
 
 def test_forg_fit_transform_plot():
-    ForgetDimension().fit_transform_plot(X_1, sample=0)
+    ForgetDimension().fit_transform_plot(
+        X_1, sample=0, plotly_params=plotly_params
+    )
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,)])
 def test_fit_transform_plot(hom_dims):
     Scaler().fit_transform_plot(
-        X_1, sample=0, homology_dimensions=hom_dims)
+        X_1, sample=0, homology_dimensions=hom_dims,
+        plotly_params=plotly_params
+    )
 
     Filtering().fit_transform_plot(
-        X_1, sample=0, homology_dimensions=hom_dims)
+        X_1, sample=0, homology_dimensions=hom_dims,
+        plotly_params=plotly_params
+    )
 
 
 @pytest.mark.parametrize('X', [X_1, X_2])
