@@ -58,7 +58,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
@@ -127,7 +127,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
         self._n_dimensions = len(self.homology_dimensions_)
 
         return self
@@ -257,7 +260,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         Dictionary containing all information present in `metric_params` as
         well as relevant quantities computed in :meth:`fit`.
 
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
@@ -327,7 +330,10 @@ class Amplitude(BaseEstimator, TransformerMixin):
         validate_params(self.effective_metric_params_,
                         _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \

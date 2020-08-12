@@ -47,7 +47,7 @@ def _multirange(counts):
 
 def _filter(X, filtered_homology_dimensions, cutoff):
     n = len(X)
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    homology_dimensions = sorted(set(X[0, :, 2]))
     unfiltered_homology_dimensions = [dim for dim in homology_dimensions if
                                       dim not in filtered_homology_dimensions]
 
@@ -91,7 +91,7 @@ def _filter(X, filtered_homology_dimensions, cutoff):
 
 
 def _bin(X, metric, n_bins=100, **kw_args):
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    homology_dimensions = sorted(set(X[0, :, 2]))
     # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
                  for dim in homology_dimensions}

@@ -104,7 +104,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         Dictionary containing all information present in `metric_params` as
         well as relevant quantities computed in :meth:`fit`.
 
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
@@ -178,7 +178,10 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         validate_params(
             self.effective_metric_params_, _AVAILABLE_METRICS[self.metric])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \

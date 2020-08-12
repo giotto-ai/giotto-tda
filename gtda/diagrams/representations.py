@@ -49,7 +49,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     samplings_ : dict
@@ -112,7 +112,10 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, _ = _bin(X, "betti", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
@@ -284,7 +287,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`.
 
     samplings_ : dict
@@ -350,7 +353,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, _ = _bin(X, "landscape", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
@@ -546,7 +552,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`.
 
     samplings_ : dict
@@ -620,7 +626,10 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, self._step_size = _bin(X, "heat", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
@@ -767,7 +776,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         Effective function corresponding to `weight_function`. Set in
         :meth:`fit`.
 
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`.
 
     samplings_ : dict
@@ -855,7 +864,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         else:
             self.effective_weight_function_ = self.weight_function
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, self._step_size = _bin(X, "persistence_image",
                                                 n_bins=self.n_bins)
@@ -1003,7 +1015,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     samplings_ : dict
@@ -1076,7 +1088,10 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = sorted(list(set(X[0, :, 2])))
+        self.homology_dimensions_ = tuple(
+            sorted([int(dim) if dim != np.inf else dim
+                    for dim in set(X[0, :, 2])])
+            )
         self._n_dimensions = len(self.homology_dimensions_)
         self._samplings, _ = _bin(X, "silhouette", n_bins=self.n_bins)
         self.samplings_ = {dim: s.flatten()
