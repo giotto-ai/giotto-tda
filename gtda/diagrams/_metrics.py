@@ -86,7 +86,7 @@ def heats(diagrams, sampling, step_size, sigma):
     # WARNING: modifies `diagrams` in place
     heats_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
-    # If the step size is zero, we return a trivial diagram
+    # If the step size is zero, we return a trivial image
     if step_size == 0:
         return heats_
 
@@ -120,7 +120,7 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
     # WARNING: modifies `diagrams` in place
     persistence_images_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
-    # If both step sizes are zero, we return a trivial diagram
+    # If both step sizes are zero, we return a trivial image
     if (step_size == 0).all():
         return persistence_images_
 
