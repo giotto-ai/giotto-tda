@@ -237,11 +237,12 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         fig = Figure(layout=layout)
 
         for ix, dim in _homology_dimensions:
+            name = f"H{int(dim) if dim != np.inf else np.inf}"
             fig.add_trace(Scatter(x=self.samplings_[dim],
                                   y=Xt[sample][ix],
                                   mode="lines",
                                   showlegend=True,
-                                  name=f"H{int(dim)}"))
+                                  name=name))
 
         # Update traces and layout according to user input
         if plotly_params:
@@ -1200,12 +1201,13 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         fig = Figure(layout=layout)
 
         for ix, dim in _homology_dimensions:
+            name = f"H{int(dim) if dim != np.inf else np.inf}"
             fig.add_trace(Scatter(x=self.samplings_[dim],
                                   y=Xt[sample][ix],
                                   mode="lines",
                                   showlegend=True,
                                   hoverinfo="none",
-                                  name=f"H{int(dim)}"))
+                                  name=name))
 
         # Update traces and layout according to user input
         if plotly_params:
