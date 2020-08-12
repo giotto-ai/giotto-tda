@@ -117,7 +117,10 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
                     for dim in set(X[0, :, 2])])
             )
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, "betti", n_bins=self.n_bins)
+        self._samplings, _ = _bin(
+            X, "betti", n_bins=self.n_bins,
+            homology_dimensions=self.homology_dimensions_
+            )
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -358,7 +361,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                     for dim in set(X[0, :, 2])])
             )
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, "landscape", n_bins=self.n_bins)
+        self._samplings, _ = _bin(
+            X, "landscape", n_bins=self.n_bins,
+            homology_dimensions=self.homology_dimensions_
+            )
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -631,7 +637,10 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
                     for dim in set(X[0, :, 2])])
             )
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, self._step_size = _bin(X, "heat", n_bins=self.n_bins)
+        self._samplings, self._step_size = _bin(
+            X, "heat", n_bins=self.n_bins,
+            homology_dimensions=self.homology_dimensions_
+            )
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 
@@ -869,8 +878,10 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
                     for dim in set(X[0, :, 2])])
             )
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, self._step_size = _bin(X, "persistence_image",
-                                                n_bins=self.n_bins)
+        self._samplings, self._step_size = _bin(
+            X, "persistence_image",  n_bins=self.n_bins,
+            homology_dimensions=self.homology_dimensions_
+            )
         self.weights_ = {
             dim: self.effective_weight_function_(samplings_dim[:, 1])
             for dim, samplings_dim in self._samplings.items()
@@ -1093,7 +1104,10 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
                     for dim in set(X[0, :, 2])])
             )
         self._n_dimensions = len(self.homology_dimensions_)
-        self._samplings, _ = _bin(X, "silhouette", n_bins=self.n_bins)
+        self._samplings, _ = _bin(
+            X, "silhouette", n_bins=self.n_bins,
+            homology_dimensions=self.homology_dimensions_
+            )
         self.samplings_ = {dim: s.flatten()
                            for dim, s in self._samplings.items()}
 

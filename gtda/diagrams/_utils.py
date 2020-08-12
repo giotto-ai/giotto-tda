@@ -90,8 +90,9 @@ def _filter(X, filtered_homology_dimensions, cutoff):
     return Xf
 
 
-def _bin(X, metric, n_bins=100, **kw_args):
-    homology_dimensions = sorted(set(X[0, :, 2]))
+def _bin(X, metric, n_bins=100, homology_dimensions=None, **kw_args):
+    if homology_dimensions is None:
+        homology_dimensions = sorted(set(X[0, :, 2]))
     # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
                  for dim in homology_dimensions}
