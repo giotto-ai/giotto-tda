@@ -215,6 +215,7 @@ def get_input(pts, dims):
     X = np.concatenate([np.sort(pts, axis=2), dims], axis=2)
     return X
 
+
 @given(pts_gen, dims_gen)
 def test_hk_shape(pts, dims):
     n_bins = 10
