@@ -103,7 +103,7 @@ def test_pi_zero_weight_function():
 
 
 @given(X=arrays(dtype=np.float, unique=True,
-                elements=integers(min_value=-1e10, max_value=1e6),
+                elements=floats(min_value=-1e3, max_value=1e3),
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
 def test_pi_null(X):
     """Test that, if one trivial diagram (all pts on the diagonal) is provided,
@@ -122,8 +122,8 @@ def test_pi_null(X):
 @given(pts=arrays(dtype=np.float, unique=True,
                   elements=floats(allow_nan=False,
                                   allow_infinity=False,
-                                  min_value=-1e10,
-                                  max_value=1e6),
+                                  min_value=-1e3,
+                                  max_value=1e3),
                   shape=(20, 2)))
 def test_pi_positive(pts):
     pi = PersistenceImage(sigma=1)
@@ -218,13 +218,14 @@ def get_input(pts, dims):
 @given(pts_gen, dims_gen)
 def test_hk_shape(pts, dims):
     n_bins = 10
-    x = get_input(pts, dims)
+    X = get_input(pts, dims)
+    sigma = (np.max(X[:, :, :2]) - np.min(X[:, :, :2])) / 2
 
-    hk = HeatKernel(sigma=1, n_bins=n_bins)
+    hk = HeatKernel(sigma=sigma, n_bins=n_bins)
     num_dimensions = len(np.unique(dims))
-    x_t = hk.fit(x).transform(x)
+    X_t = hk.fit_transform(X)
 
-    assert x_t.shape == (x.shape[0], num_dimensions, n_bins, n_bins)
+    assert X_t.shape == (X.shape[0], num_dimensions, n_bins, n_bins)
 
 
 @given(pts_gen, dims_gen)
@@ -232,12 +233,13 @@ def test_hk_positive(pts, dims):
     """We expect the points above the PD-diagonal to be non-negative (up to a
     numerical error)"""
     n_bins = 10
-    hk = HeatKernel(sigma=1, n_bins=n_bins)
+    X = get_input(pts, dims)
+    sigma = (np.max(X[:, :, :2]) - np.min(X[:, :, :2])) / 2
 
-    x = get_input(pts, dims)
-    x_t = hk.fit(x).transform(x)
+    hk = HeatKernel(sigma=sigma, n_bins=n_bins)
+    X_t = hk.fit_transform(X)
 
-    assert np.all((np.tril(x_t[:, :, ::-1, :]) + 1e-13) >= 0.)
+    assert np.all((np.tril(X_t[:, :, ::-1, :]) + 1e-13) >= 0.)
 
 
 @given(pts_gen, dims_gen)
@@ -245,12 +247,14 @@ def test_hk_big_sigma(pts, dims):
     """We expect that with a huge sigma, the diagrams are so diluted that they
     are almost 0. Effectively, verifies that the smoothing is applied."""
     n_bins = 10
-    x = get_input(pts, dims)
+    X = get_input(pts, dims)
+    sigma = 100 * (np.max(X[:, :, :2]) - np.min(X[:, :, :2]))
 
-    hk = HeatKernel(sigma=100 * np.max(np.abs(x)), n_bins=n_bins)
-    x_t = hk.fit_transform(x)
+    hk = HeatKernel(sigma=sigma, n_bins=n_bins)
+    X_t = hk.fit_transform(X)
 
-    assert np.all(np.abs(x_t) <= 1e-4)
+    max_hk_abs_value = np.max(np.abs(X_t))
+    assert max_hk_abs_value <= 1e-4
 
 
 @given(pts_gen)
@@ -260,16 +264,16 @@ def test_hk_with_diag_points(pts):
     n_bins = 10
     hk = HeatKernel(sigma=1, n_bins=n_bins)
 
-    x = get_input(pts, np.zeros((pts.shape[0], pts.shape[1], 1)))
+    X = get_input(pts, np.zeros((pts.shape[0], pts.shape[1], 1)))
     diag_points = np.array([[[2, 2, 0], [3, 3, 0], [7, 7, 0]]])
-    x_with_diag_points = np.concatenate([x, diag_points], axis=1)
+    X_with_diag_points = np.concatenate([X, diag_points], axis=1)
 
-    hk = hk.fit(x_with_diag_points)
+    hk = hk.fit(X_with_diag_points)
 
-    x_t, x_with_diag_points_t = [hk.transform(x_)
-                                 for x_ in [x, x_with_diag_points]]
+    X_t, X_with_diag_points_t = [hk.transform(X_)
+                                 for X_ in [X, X_with_diag_points]]
 
-    assert_almost_equal(x_with_diag_points_t, x_t, decimal=13)
+    assert_almost_equal(X_with_diag_points_t, X_t, decimal=13)
 
 
 def test_large_hk_shape_multithreaded():
