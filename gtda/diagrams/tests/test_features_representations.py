@@ -249,15 +249,18 @@ def test_hk_positive(pts, dims):
     assert np.all((np.tril(X_t[:, :, ::-1, :]) + 1e-13) >= 0.)
 
 
+@pytest.mark.parametrize('transformer_cls', [HeatKernel, PersistenceImage])
 @given(pts_gen, dims_gen)
-def test_hk_big_sigma(pts, dims):
+def test_hk_pi_big_sigma(transformer_cls, pts, dims):
     """We expect that with a huge sigma, the diagrams are so diluted that they
     are almost 0. Effectively, verifies that the smoothing is applied."""
     n_bins = 10
     X = get_input(pts, dims)
+    # To make the test less flaky, it helps to set al homology dimensions equal
+    X[:, :, 2] = 0.
     sigma = 100 * (np.max(X[:, :, :2]) - np.min(X[:, :, :2]))
 
-    hk = HeatKernel(sigma=sigma, n_bins=n_bins)
+    hk = transformer_cls(sigma=sigma, n_bins=n_bins)
     X_t = hk.fit_transform(X)
 
     max_hk_abs_value = np.max(np.abs(X_t))
