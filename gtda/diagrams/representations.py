@@ -482,10 +482,10 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
                           for _, dim in _homology_dimensions]
         fig = make_subplots(rows=len(_homology_dimensions), cols=1,
                             subplot_titles=subplot_titles)
-        many_homology_dim = len(_homology_dimensions) - 1
+        has_many_homology_dim = len(_homology_dimensions) - 1
         for i, (inv_idx, dim) in enumerate(_homology_dimensions):
             hom_dim_str = \
-                f" ({subplot_titles[i]})" if many_homology_dim else ""
+                f" ({subplot_titles[i]})" if has_many_homology_dim else ""
             for layer in range(n_layers):
                 fig.add_trace(
                     Scatter(x=self.samplings_[dim],
