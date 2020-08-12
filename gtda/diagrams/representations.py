@@ -1158,7 +1158,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        homology_dimensions_mapping = _make_homology_dimension_mapping(
+        homology_dimensions_mapping = _make_homology_dimensions_mapping(
             homology_dimensions, self.homology_dimensions_
             )
 
