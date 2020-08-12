@@ -243,12 +243,11 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         fig = Figure(layout=layout)
 
         for ix, dim in _homology_dimensions:
-            name = f"H{int(dim) if dim != np.inf else np.inf}"
             fig.add_trace(Scatter(x=self.samplings_[dim],
                                   y=Xt[sample][ix],
                                   mode="lines",
                                   showlegend=True,
-                                  name=name))
+                                  name=f"H{dim}"))
 
         # Update traces and layout according to user input
         if plotly_params:
@@ -490,8 +489,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Xt_sample = Xt[sample]
         n_layers = Xt_sample.shape[1]
-        subplot_titles = [f"H{int(dim) if dim != np.inf else np.inf}"
-                          for _, dim in _homology_dimensions]
+        subplot_titles = [f"H{dim} for _, dim in _homology_dimensions"]
         fig = make_subplots(rows=len(_homology_dimensions), cols=1,
                             subplot_titles=subplot_titles)
         has_many_homology_dim = len(_homology_dimensions) - 1
@@ -1230,13 +1228,12 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         fig = Figure(layout=layout)
 
         for ix, dim in _homology_dimensions:
-            name = f"H{int(dim) if dim != np.inf else np.inf}"
             fig.add_trace(Scatter(x=self.samplings_[dim],
                                   y=Xt[sample][ix],
                                   mode="lines",
                                   showlegend=True,
                                   hoverinfo="none",
-                                  name=name))
+                                  name=f"H{dim}"))
 
         # Update traces and layout according to user input
         if plotly_params:
