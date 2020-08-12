@@ -82,55 +82,76 @@ def landscapes(diagrams, sampling, n_layers):
     return fibers
 
 
-def _heat(image, sampled_diagram, sigma):
-    _sample_image(image, sampled_diagram)
-    gaussian_filter(image, sigma, mode="constant", output=image)
-
-
 def heats(diagrams, sampling, step_size, sigma):
+    # WARNING: modifies `diagrams` in place
     heats_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
 
-    diagrams[diagrams < sampling[0, 0]] = sampling[0, 0]
-    diagrams[diagrams > sampling[-1, 0]] = sampling[-1, 0]
-    diagrams[...] = (diagrams - sampling[0, 0]) / step_size
-    diagrams = diagrams.astype(int)
+    # Set the values outside of the sampling range
+    first_sampling, last_sampling = sampling[0, 0, 0], sampling[-1, 0, 0]
+    diagrams[diagrams < first_sampling] = first_sampling
+    diagrams[diagrams > last_sampling] = last_sampling
 
-    [_heat(heats_[i], sampled_diagram, sigma)
-     for i, sampled_diagram in enumerate(diagrams)]
+    # Calculate the value of `sigma` in pixel units
+    sigma_pixel = sigma / step_size
 
-    heats_ = heats_ - np.transpose(heats_, (0, 2, 1))
+    for i, diagram in enumerate(diagrams):
+        nontrivial_points_idx = np.flatnonzero(diagram[:, 1] != diagram[:, 0])
+        diagram_nontrivial_pixel_coords = np.array(
+            (diagram - first_sampling) / step_size, dtype=int
+        )[nontrivial_points_idx]
+        image = heats_[i]
+        _sample_image(image, diagram_nontrivial_pixel_coords)
+        gaussian_filter(image, sigma_pixel, mode="constant", output=image)
+
+    heats_ -= np.transpose(heats_, (0, 2, 1))
+    heats_ /= (step_size ** 2)
     heats_ = np.rot90(heats_, k=1, axes=(1, 2))
     return heats_
 
 
-def persistence_images(diagrams, sampling, step_size, weights, sigma):
+def persistence_images(diagrams, sampling, step_size, sigma, weights):
+    # For persistence images, `sampling` is a tall matrix with two columns
+    # (the first for birth and the second for persistence), and `step_size` is
+    # a 2d array
+    # WARNING: modifies `diagrams` in place
     persistence_images_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] -= diagrams[:, :, 0]
 
+    sigma_pixel = []
+    first_samplings = sampling[0]
+    last_samplings = sampling[-1]
     for ax in [0, 1]:
         diagrams_ax = diagrams[:, :, ax]
         # Set the values outside of the sampling range
-        diagrams_ax[diagrams_ax < sampling[0, ax]] = sampling[0, ax]
-        diagrams_ax[diagrams_ax > sampling[-1, ax]] = sampling[-1, ax]
-        # Convert into pixel
-        diagrams_ax[...] = (diagrams_ax - sampling[0, ax]) / step_size[ax]
-    diagrams = diagrams.astype(int)
+        diagrams_ax[diagrams_ax < first_samplings[ax]] = first_samplings[ax]
+        diagrams_ax[diagrams_ax > last_samplings[ax]] = last_samplings[ax]
+        # Calculate the value of the component of `sigma` in pixel units
+        sigma_pixel.append(sigma / step_size[ax])
 
-    # Sample the image
-    [_sample_image(persistence_images_[i], sampled_diagram)
-     for i, sampled_diagram in enumerate(diagrams)]
+    # diagrams_ax[...] = (diagrams_ax - first_sampling) / step_size[ax]
+    #
+    # diagrams = diagrams.astype(int)
 
-    # Apply the weights
-    persistence_images_ *= weights
+    # Sample the image, apply the weights, smoothen
+    for i, diagram in enumerate(diagrams):
+        nontrivial_points_idx = np.flatnonzero(diagram[:, 1])
+        diagram_nontrivial_pixel_coords = np.array(
+            (diagram - first_samplings) / step_size, dtype=int
+        )[nontrivial_points_idx]
+        image = persistence_images_[i]
+        _sample_image(image, diagram_nontrivial_pixel_coords)
+        image *= weights
+        gaussian_filter(image, sigma_pixel, mode="constant", output=image)
 
     # Smoothen the weighted image
     for image in persistence_images_:
-        gaussian_filter(image, sigma, mode="constant", output=image)
+        gaussian_filter(image, sigma_pixel, mode="constant", output=image)
 
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
+    persistence_images_ /= np.product(step_size)
     return persistence_images_
 
 
@@ -139,15 +160,17 @@ def silhouettes(diagrams, sampling, power, **kwargs):
     returned by _bin) of a one-dimensional range.
     """
     sampling = np.transpose(sampling, axes=(1, 2, 0))
-    weights = np.diff(diagrams, axis=2)[:, :, [0]]
+    weights = np.diff(diagrams, axis=2)
     if power > 8.:
-        weights = weights/np.max(weights, axis=1, keepdims=True)
-    weights = weights**power
+        weights = weights / np.max(weights, axis=1, keepdims=True)
+    weights = weights ** power
     total_weights = np.sum(weights, axis=1)
+    # Next line is a trick to avoid NaNs when computing `fibers_weighted_sum`
+    total_weights[total_weights == 0.] = np.inf
     midpoints = (diagrams[:, :, [1]] + diagrams[:, :, [0]]) / 2.
     heights = (diagrams[:, :, [1]] - diagrams[:, :, [0]]) / 2.
     fibers = np.maximum(-np.abs(sampling - midpoints) + heights, 0)
-    fibers_weighted_sum = np.sum(weights*fibers, axis=1)/total_weights
+    fibers_weighted_sum = np.sum(weights * fibers, axis=1) / total_weights
     return fibers_weighted_sum
 
 
@@ -168,8 +191,9 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
 def betti_distances(
         diagrams_1, diagrams_2, sampling, step_size, p=2., **kwargs
         ):
+    are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
     betti_curves_1 = betti_curves(diagrams_1, sampling)
-    if np.array_equal(diagrams_1, diagrams_2):
+    if are_arrays_equal:
         unnorm_dist = squareform(pdist(betti_curves_1, "minkowski", p=p))
         return (step_size ** (1 / p)) * unnorm_dist
     betti_curves_2 = betti_curves(diagrams_2, sampling)
@@ -200,48 +224,62 @@ def landscape_distances(
 
 
 def heat_distances(
-        diagrams_1, diagrams_2, sampling, step_size, sigma=1., p=2., **kwargs
+        diagrams_1, diagrams_2, sampling, step_size, sigma=0.1, p=2., **kwargs
         ):
-    heat_1 = heats(diagrams_1, sampling, step_size, sigma).\
+    # WARNING: `heats` modifies `diagrams` in place
+    step_size_factor = step_size ** (2 / p)
+    are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
+    heats_1 = heats(diagrams_1, sampling, step_size, sigma).\
         reshape(len(diagrams_1), -1)
-    if np.array_equal(diagrams_1, diagrams_2):
-        unnorm_dist = squareform(pdist(heat_1, "minkowski", p=p))
-        return (step_size ** (1 / p)) * unnorm_dist
-    heat_2 = heats(diagrams_2, sampling, step_size, sigma).\
+    if are_arrays_equal:
+        distances = pdist(heats_1, "minkowski", p=p)
+        distances *= step_size_factor
+        return squareform(distances)
+    heats_2 = heats(diagrams_2, sampling, step_size, sigma).\
         reshape(len(diagrams_2), -1)
-    unnorm_dist = cdist(heat_1, heat_2, "minkowski", p=p)
-    return (step_size ** (1 / p)) * unnorm_dist
+    distances = cdist(heats_1, heats_2, "minkowski", p=p)
+    distances *= step_size_factor
+    return distances
 
 
 def persistence_image_distances(
-        diagrams_1, diagrams_2, sampling, step_size, weight_function=identity,
-        sigma=1., p=2., **kwargs
+        diagrams_1, diagrams_2, sampling, step_size, sigma=0.1,
+        weight_function=np.ones_like, p=2., **kwargs
         ):
-    weights = weight_function(sampling)
-    persistence_image_1 = \
-        persistence_images(diagrams_1, sampling, step_size, weights, sigma).\
+    # For persistence images, `sampling` is a tall matrix with two columns
+    # (the first for birth and the second for persistence), and `step_size` is
+    # a 2d array
+    weights = weight_function(sampling[:, 1])
+    step_sizes_factor = np.product(step_size) ** (1 / p)
+    # WARNING: `persistence_images` modifies `diagrams` in place
+    are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
+    persistence_images_1 = \
+        persistence_images(diagrams_1, sampling, step_size, sigma, weights).\
         reshape(len(diagrams_1), -1)
-    if np.array_equal(diagrams_1, diagrams_2):
-        unnorm_dist = squareform(pdist(persistence_image_1, "minkowski", p=p))
-        return (step_size ** (1 / p)) * unnorm_dist
-    persistence_image_2 = persistence_images(
-        diagrams_2, sampling, step_size, weights, sigma
+    if are_arrays_equal:
+        distances = pdist(persistence_images_1, "minkowski", p=p)
+        distances *= step_sizes_factor
+        return squareform(distances)
+    persistence_images_2 = persistence_images(
+        diagrams_2, sampling, step_size, sigma, weights
         ).reshape(len(diagrams_2), -1)
-    unnorm_dist = cdist(
-        persistence_image_1, persistence_image_2, "minkowski", p=p
+    distances = cdist(
+        persistence_images_1, persistence_images_2, "minkowski", p=p
         )
-    return (step_size ** (1 / p)) * unnorm_dist
+    distances *= step_sizes_factor
+    return distances
 
 
 def silhouette_distances(
-        diagrams_1, diagrams_2, sampling, step_size, power=2., p=2., **kwargs
+        diagrams_1, diagrams_2, sampling, step_size, power=1., p=2., **kwargs
         ):
-    silhouette_1 = silhouettes(diagrams_1, sampling, power)
-    if np.array_equal(diagrams_1, diagrams_2):
-        unnorm_dist = squareform(pdist(silhouette_1, 'minkowski', p=p))
+    are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
+    silhouettes_1 = silhouettes(diagrams_1, sampling, power)
+    if are_arrays_equal:
+        unnorm_dist = squareform(pdist(silhouettes_1, 'minkowski', p=p))
     else:
-        silhouette_2 = silhouettes(diagrams_2, sampling, power)
-        unnorm_dist = cdist(silhouette_1, silhouette_2, 'minkowski', p=p)
+        silhouettes_2 = silhouettes(diagrams_2, sampling, power)
+        unnorm_dist = cdist(silhouettes_1, silhouettes_2, 'minkowski', p=p)
     return (step_size ** (1 / p)) * unnorm_dist
 
 
@@ -315,27 +353,39 @@ def landscape_amplitudes(
     return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
 
 
-def heat_amplitudes(diagrams, sampling, step_size, sigma=1., p=2., **kwargs):
-    heat = heats(diagrams, sampling, step_size, sigma)
-    return np.linalg.norm(heat, axis=(1, 2), ord=p)
+def heat_amplitudes(diagrams, sampling, step_size, sigma=0.1, p=2., **kwargs):
+    # WARNING: `heats` modifies `diagrams` in place
+    step_size_factor = step_size ** (2 / p)
+    heats_ = heats(diagrams, sampling, step_size, sigma).\
+        reshape(len(diagrams), -1)
+    amplitudes = np.linalg.norm(heats_, axis=1, ord=p)
+    amplitudes *= step_size_factor
+    return amplitudes
 
 
 def persistence_image_amplitudes(
-        diagrams, sampling, step_size, weight_function=identity, sigma=1.,
+        diagrams, sampling, step_size, sigma=0.1, weight_function=np.ones_like,
         p=2., **kwargs
         ):
-    weights = weight_function(sampling)
-    persistence_image = persistence_images(
-        diagrams, sampling, step_size, weights, sigma
-        )
-    return np.linalg.norm(persistence_image, axis=(1, 2), ord=p)
+    # For persistence images, `sampling` is a tall matrix with two columns
+    # (the first for birth and the second for persistence), and `step_size` is
+    # a 2d array
+    weights = weight_function(sampling[:, 1])
+    step_sizes_factor = np.product(step_size) ** (1 / p)
+    # WARNING: `persistence_images` modifies `diagrams` in place
+    persistence_images_ = persistence_images(
+        diagrams, sampling, step_size, sigma, weights
+        ).reshape(len(diagrams), -1)
+    amplitudes = np.linalg.norm(persistence_images_, axis=1, ord=p)
+    amplitudes *= step_sizes_factor
+    return amplitudes
 
 
 def silhouette_amplitudes(
-        diagrams, sampling, step_size, power=2., p=2., **kwargs
+        diagrams, sampling, step_size, power=1., p=2., **kwargs
         ):
-    sht = silhouettes(diagrams, sampling, power)
-    return (step_size ** (1 / p)) * np.linalg.norm(sht, axis=1, ord=p)
+    silhouettes_ = silhouettes(diagrams, sampling, power)
+    return (step_size ** (1 / p)) * np.linalg.norm(silhouettes_, axis=1, ord=p)
 
 
 implemented_amplitude_recipes = {
@@ -365,7 +415,8 @@ def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
     amplitude_arrays = Parallel(n_jobs=n_jobs)(
         delayed(amplitude_func)(
             _subdiagrams(X[s], [dim], remove_dim=True),
-            sampling=samplings[dim], step_size=step_sizes[dim],
+            sampling=samplings[dim],
+            step_size=step_sizes[dim],
             **effective_metric_params
             )
         for dim in homology_dimensions

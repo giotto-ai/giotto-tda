@@ -4,11 +4,6 @@
 import numpy as np
 
 
-def identity(x):
-    """The identity function."""
-    return x
-
-
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     """For each diagram in a collection, extract the subdiagrams in a given
     list of homology dimensions. It is assumed that all diagrams in X contain
@@ -37,9 +32,10 @@ def _pad(X, max_diagram_sizes):
     return X_padded
 
 
-def _sample_image(image, sampled_diag):
-    # NOTE: Modifies `image` in-place
-    unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
+def _sample_image(image, diagram_pixel_coords):
+    # WARNING: Modifies `image` in-place
+    unique, counts = \
+        np.unique(diagram_pixel_coords, axis=0, return_counts=True)
     unique = tuple(tuple(row) for row in unique.astype(np.int).T)
     image[unique] = counts
 

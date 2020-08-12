@@ -233,10 +233,10 @@ class Amplitude(BaseEstimator, TransformerMixin):
           default: ``2.``), `power` (float, default: ``1.``) and `n_bins` (int,
           default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins` (int,
-          default: ``100``).
+          default: ``2.``), `sigma` (float, default: ``0.1``) and `n_bins`
+          (int, default: ``100``).
         - If ``metric == 'persistence_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``), `n_bins`
+          (float, default: ``2.``), `sigma` (float, default: ``0.1``), `n_bins`
           (int, default: ``100``) and `weight_function` (callable or None,
           default: ``None``).
 
@@ -334,11 +334,11 @@ class Amplitude(BaseEstimator, TransformerMixin):
             _bin(X, self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistence_image':
-            weight_function = self.effective_metric_params_['weight_function']
-            samplings = self.effective_metric_params_['samplings']
-            weights = {dim: weight_function(samplings_dim[:, 1])
-                       for dim, samplings_dim in samplings.items()}
-            self.effective_metric_params_['weights'] = weights
+            weight_function = self.effective_metric_params_.get(
+                'weight_function', None
+                )
+            if weight_function is None:
+                self.effective_metric_params_['weight_function'] = np.ones_like
 
         return self
 

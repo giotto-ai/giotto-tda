@@ -531,7 +531,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Parameters
     ----------
-    sigma : float, optional default ``1.``
+    sigma : float, optional default ``0.1``
         Standard deviation for Gaussian kernel.
 
     n_bins : int, optional, default: ``100``
@@ -582,7 +582,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")}
         }
 
-    def __init__(self, sigma=1., n_bins=100, n_jobs=None):
+    def __init__(self, sigma=0.1, n_bins=100, n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins
         self.n_jobs = n_jobs
@@ -742,7 +742,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Parameters
     ----------
-    sigma : float, optional default ``1.``
+    sigma : float, optional default ``0.1``
         Standard deviation for Gaussian kernel.
 
     n_bins : int, optional, default: ``100``
@@ -810,7 +810,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         "weight_function": {"type": (types.FunctionType, type(None))}
         }
 
-    def __init__(self, sigma=1., n_bins=100, weight_function=None,
+    def __init__(self, sigma=0.1, n_bins=100, weight_function=None,
                  n_jobs=None):
         self.sigma = sigma
         self.n_bins = n_bins
@@ -902,8 +902,8 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
                 _subdiagrams(X[s], [dim], remove_dim=True),
                 self._samplings[dim],
                 self._step_size[dim],
-                self.weights_[dim],
-                self.sigma
+                self.sigma,
+                self.weights_[dim]
                 )
             for dim in self.homology_dimensions_
             for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
