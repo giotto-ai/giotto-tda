@@ -135,3 +135,23 @@ def _bin(X, metric, n_bins=100, homology_dimensions=None, **kw_args):
             samplings[dim] = samplings[dim][:, [0], None]
             step_sizes[dim] = step_sizes[dim][0]
     return samplings, step_sizes
+
+
+def _make_homology_dimensions_mapping(
+        homology_dimensions, homology_dimensions_ref
+    ):
+    """`homology_dimensions_ref` is assumed to be a sorted tuple as is e.g.
+    :attr:`homology_dimensions_` for several transformers."""
+    if homology_dimensions is None:
+        homology_dimensions_mapping = list(enumerate(homology_dimensions_ref))
+    else:
+        homology_dimensions_mapping = []
+        for dim in homology_dimensions:
+            if dim not in homology_dimensions_ref:
+                raise ValueError(f"All homology dimensions must be in "
+                                 f"{homology_dimensions_ref}; {dim} is not.")
+            else:
+                homology_dimensions_arr = np.array(homology_dimensions_ref)
+                inv_idx = np.flatnonzero(homology_dimensions_arr == dim)[0]
+                homology_dimensions_mapping.append((inv_idx, dim))
+    return homology_dimensions_mapping

@@ -14,7 +14,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, \
     persistence_images, silhouettes
-from ._utils import _subdiagrams, _bin
+from ._utils import _subdiagrams, _bin, _make_homology_dimensions_mapping
 from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
@@ -196,21 +196,9 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        if homology_dimensions is None:
-            _homology_dimensions = list(enumerate(self.homology_dimensions_))
-        else:
-            _homology_dimensions = []
-            for dim in homology_dimensions:
-                if dim not in self.homology_dimensions_:
-                    raise ValueError(
-                        f"All homology dimensions must be in "
-                        f"self.homology_dimensions_ which is "
-                        f"{self.homology_dimensions_}. {dim} is not.")
-                else:
-                    homology_dimensions_arr = np.array(
-                        self.homology_dimensions_)
-                    ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
-                    _homology_dimensions.append((ix, dim))
+        homology_dimensions_mapping = _make_homology_dimensions_mapping(
+            homology_dimensions, self.homology_dimensions_
+            )
 
         layout_axes_common = {
             "type": "linear",
@@ -242,7 +230,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
 
         fig = Figure(layout=layout)
 
-        for ix, dim in _homology_dimensions:
+        for ix, dim in homology_dimensions_mapping:
             fig.add_trace(Scatter(x=self.samplings_[dim],
                                   y=Xt[sample][ix],
                                   mode="lines",
@@ -446,21 +434,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        if homology_dimensions is None:
-            _homology_dimensions = list(enumerate(self.homology_dimensions_))
-        else:
-            _homology_dimensions = []
-            for dim in homology_dimensions:
-                if dim not in self.homology_dimensions_:
-                    raise ValueError(
-                        f"All homology dimensions must be in "
-                        f"self.homology_dimensions_ which is "
-                        f"{self.homology_dimensions_}. {dim} is not.")
-                else:
-                    homology_dimensions_arr = np.array(
-                        self.homology_dimensions_)
-                    inv_idx = np.flatnonzero(homology_dimensions_arr == dim)[0]
-                    _homology_dimensions.append((inv_idx, dim))
+        homology_dimensions_mapping = _make_homology_dimensions_mapping(
+            homology_dimensions, self.homology_dimensions_
+            )
 
         layout_axes_common = {
             "type": "linear",
@@ -489,11 +465,11 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Xt_sample = Xt[sample]
         n_layers = Xt_sample.shape[1]
-        subplot_titles = [f"H{dim} for _, dim in _homology_dimensions"]
-        fig = make_subplots(rows=len(_homology_dimensions), cols=1,
+        subplot_titles = [f"H{dim}" for _, dim in homology_dimensions_mapping]
+        fig = make_subplots(rows=len(homology_dimensions_mapping), cols=1,
                             subplot_titles=subplot_titles)
-        has_many_homology_dim = len(_homology_dimensions) - 1
-        for i, (inv_idx, dim) in enumerate(_homology_dimensions):
+        has_many_homology_dim = len(homology_dimensions_mapping) - 1
+        for i, (inv_idx, dim) in enumerate(homology_dimensions_mapping):
             hom_dim_str = \
                 f" ({subplot_titles[i]})" if has_many_homology_dim else ""
             for layer in range(n_layers):
@@ -1182,21 +1158,9 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        if homology_dimensions is None:
-            _homology_dimensions = list(enumerate(self.homology_dimensions_))
-        else:
-            _homology_dimensions = []
-            for dim in homology_dimensions:
-                if dim not in self.homology_dimensions_:
-                    raise ValueError(
-                        f"All homology dimensions must be in "
-                        f"self.homology_dimensions_ which is "
-                        f"{self.homology_dimensions_}. {dim} is not.")
-                else:
-                    homology_dimensions_arr = np.array(
-                        self.homology_dimensions_)
-                    ix = np.flatnonzero(homology_dimensions_arr == dim)[0]
-                    _homology_dimensions.append((ix, dim))
+        homology_dimensions_mapping = _make_homology_dimension_mapping(
+            homology_dimensions, self.homology_dimensions_
+            )
 
         layout_axes_common = {
             "type": "linear",
@@ -1227,7 +1191,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
 
         fig = Figure(layout=layout)
 
-        for ix, dim in _homology_dimensions:
+        for ix, dim in homology_dimensions_mapping:
             fig.add_trace(Scatter(x=self.samplings_[dim],
                                   y=Xt[sample][ix],
                                   mode="lines",
