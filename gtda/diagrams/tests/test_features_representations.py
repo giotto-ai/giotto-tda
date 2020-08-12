@@ -173,6 +173,13 @@ def test_silhouette_big_order():
     assert_almost_equal(sht_10.fit_transform(diagrams)[0][0], X_sht_res)
 
 
+@pytest.mark.parametrize('transformer', [HeatKernel(), PersistenceImage()])
+def test_all_pts_the_same(transformer):
+    X = np.zeros((1, 4, 3))
+    X_res = transformer.fit_transform(X)
+    assert np.array_equal(X_res, np.zeros_like(X_res))
+
+
 pts_gen = arrays(
     dtype=np.float,
     elements=floats(allow_nan=False,
@@ -207,14 +214,6 @@ def get_input(pts, dims):
             # add a distinct value, if not provided by hypothesis
     X = np.concatenate([np.sort(pts, axis=2), dims], axis=2)
     return X
-
-
-def test_all_pts_the_same():
-    X = np.zeros((1, 4, 3))
-    hk = HeatKernel(sigma=1)
-    with pytest.raises(OverflowError):
-        _ = hk.fit(X).transform(X)
-
 
 @given(pts_gen, dims_gen)
 def test_hk_shape(pts, dims):

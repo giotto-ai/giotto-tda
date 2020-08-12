@@ -86,6 +86,9 @@ def heats(diagrams, sampling, step_size, sigma):
     # WARNING: modifies `diagrams` in place
     heats_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
+    # If the step size is zero, we return a trivial diagram
+    if step_size == 0:
+        return heats_
 
     # Set the values outside of the sampling range
     first_sampling, last_sampling = sampling[0, 0, 0], sampling[-1, 0, 0]
@@ -117,6 +120,10 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
     # WARNING: modifies `diagrams` in place
     persistence_images_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
+    # If both step sizes are zero, we return a trivial diagram
+    if (step_size == 0).all():
+        return persistence_images_
+
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
     diagrams[:, :, 1] -= diagrams[:, :, 0]
 
