@@ -137,9 +137,8 @@ def _bin(X, metric, n_bins=100, homology_dimensions=None, **kw_args):
     return samplings, step_sizes
 
 
-def _make_homology_dimensions_mapping(
-        homology_dimensions, homology_dimensions_ref
-    ):
+def _make_homology_dimensions_mapping(homology_dimensions,
+                                      homology_dimensions_ref):
     """`homology_dimensions_ref` is assumed to be a sorted tuple as is e.g.
     :attr:`homology_dimensions_` for several transformers."""
     if homology_dimensions is None:
