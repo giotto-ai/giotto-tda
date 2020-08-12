@@ -67,8 +67,11 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
             subdiagram, axis=0, return_inverse=True, return_counts=True
             )
         hovertext = [
-            "<br>".join([f"{tuple(unique[unique_row_index][:2])}"]
-                        * counts[unique_row_index])
+            f"{tuple(unique[unique_row_index][:2])}" +
+            (
+                f", multiplicity: {counts[unique_row_index]}"
+                if counts[unique_row_index] > 1 else ""
+            )
             for unique_row_index in inverse
             ]
         fig.add_trace(gobj.Scatter(
