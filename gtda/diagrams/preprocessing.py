@@ -285,7 +285,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagrams(X)
+        Xs = check_diagrams(X, copy=True)
         Xs[:, :, :2] /= self.scale_
         return Xs
 
@@ -306,7 +306,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagrams(X)
+        Xs = check_diagrams(X, copy=True)
         Xs[:, :, :2] *= self.scale_
         return Xs
 
