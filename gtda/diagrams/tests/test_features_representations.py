@@ -81,15 +81,15 @@ def test_pe_transform():
     assert_almost_equal(pe_normalize.fit_transform(X), diagram_res)
 
 
-@pytest.mark.parametrize('n_bins', range(10, 51, 10))
+@pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
 def test_bc_transform_shape(n_bins):
     bc = BettiCurve(n_bins=n_bins)
     X_res = bc.fit_transform(X)
     assert X_res.shape == (1, bc._n_dimensions, n_bins)
 
 
-@pytest.mark.parametrize('n_bins', range(10, 51, 10))
-@pytest.mark.parametrize('n_layers', range(1, 10))
+@pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
+@pytest.mark.parametrize('n_layers', list(range(1, 10)))
 def test_pl_transform_shape(n_bins, n_layers):
     pl = PersistenceLandscape(n_bins=n_bins, n_layers=n_layers)
     X_res = pl.fit_transform(X)
@@ -180,18 +180,18 @@ pts_gen = arrays(
                     min_value=1.,
                     max_value=10.),
     shape=(1, 20, 2), unique=True
-)
+    )
 dims_gen = arrays(
     dtype=np.int,
     elements=integers(min_value=0,
                       max_value=3),
     shape=(1, 20, 1)
-)
+    )
 
 
 def _validate_distinct(X):
-    """Check if, in X, there is any persistence X for which all births and
-    deaths are equal."""
+    """Check if, in X, there is any persistence diagram for which all births
+    and deaths are equal."""
     unique_values = [np.unique(x[:, 0:2]) for x in X]
     if np.any([len(u) < 2 for u in unique_values]):
         raise ValueError
