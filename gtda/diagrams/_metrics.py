@@ -294,12 +294,6 @@ implemented_metric_recipes = {
     }
 
 
-def _matrix_wrapper(
-        distance_func, distance_matrices, slice_, dim, *args, **kwargs
-        ):
-    distance_matrices[:, slice_, int(dim)] = distance_func(*args, **kwargs)
-
-
 def _parallel_pairwise(
         X1, X2, metric, metric_params, homology_dimensions, n_jobs
         ):
@@ -397,12 +391,6 @@ implemented_amplitude_recipes = {
     "persistence_image": persistence_image_amplitudes,
     'silhouette': silhouette_amplitudes,
     }
-
-
-def _arrays_wrapper(
-        amplitude_func, amplitude_arrays, slice_, dim, *args, **kwargs
-        ):
-    amplitude_arrays[slice_, int(dim)] = amplitude_func(*args, **kwargs)
 
 
 def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
