@@ -210,6 +210,8 @@ X2 = np.array([
      [0., 0., 2],
      [0., 0., 2]]])
 
+n_homology_dimensions = len(np.unique(X1[:, :, 2]))
+
 X_bottleneck = np.array([
     [[0, 1, 0.],
      [0, 0, 0.],
@@ -225,77 +227,90 @@ X_bottleneck = np.array([
 ])
 
 X_bottleneck_res_exp = np.array([
- [1/2, 2],
- [1, 0],
- [1/4, 2]
-])
+    [1/2, 2],
+    [1, 0],
+    [1/4, 2]
+    ])
 
 
-def test_not_fitted():
-    dd = PairwiseDistance()
-    da = Amplitude()
-
+@pytest.mark.parametrize('transformer', [PairwiseDistance(), Amplitude()])
+def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
-        dd.transform(X1)
-
-    with pytest.raises(NotFittedError):
-        da.transform(X1)
+        transformer.transform(X1)
 
 
 parameters_distance = [
     ('bottleneck', None),
     ('wasserstein', {'p': 2, 'delta': 0.1}),
     ('betti', {'p': 2.1, 'n_bins': 10}),
-    ('landscape', {'n_bins': 10}),
-    ('heat', {'n_bins': 10})]
+    ('landscape', {'p': 2.1, 'n_bins': 10, 'n_layers': 2}),
+    ('silhouette', {'p': 2.1, 'power': 1.2, 'n_bins': 10}),
+    ('heat', {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10, 'weight_function': lambda x: x})
+    ]
 
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters_distance)
+@pytest.mark.parametrize('order', [2., None])
 @pytest.mark.parametrize('n_jobs', [1, 2, 4])
-@pytest.mark.parametrize('order', [2, None])
 def test_dd_transform(metric, metric_params, order, n_jobs):
     # X_fit == X_transform
     dd = PairwiseDistance(metric=metric, metric_params=metric_params,
                           order=order, n_jobs=n_jobs)
     X_res = dd.fit_transform(X1)
     assert (X_res.shape[0], X_res.shape[1]) == (X1.shape[0], X1.shape[0])
+    if order is None:
+        assert X_res.shape[2] == n_homology_dimensions
 
     # X_fit != X_transform
     dd = PairwiseDistance(metric=metric, metric_params=metric_params,
                           order=order, n_jobs=n_jobs)
     X_res = dd.fit(X1).transform(X2)
     assert (X_res.shape[0], X_res.shape[1]) == (X2.shape[0], X1.shape[0])
-
     if order is None:
-        assert X_res.shape[2] == len(np.unique(X2[:, :, 2]))
+        assert X_res.shape[2] == n_homology_dimensions
 
     # X_fit != X_transform, default metric_params
     dd = PairwiseDistance(metric=metric, order=order, n_jobs=n_jobs)
     X_res = dd.fit(X1).transform(X2)
     assert (X_res.shape[0], X_res.shape[1]) == (X2.shape[0], X1.shape[0])
+    if order is None:
+        assert X_res.shape[2] == n_homology_dimensions
 
 
 parameters_amplitude = [
     ('bottleneck', None),
     ('wasserstein', {'p': 2}),
     ('betti', {'p': 2.1, 'n_bins': 10}),
-    ('landscape', {'n_bins': 10}),
-    ('heat', {'n_bins': 10})]
+    ('landscape', {'p': 2.1, 'n_bins': 10, 'n_layers': 2}),
+    ('silhouette', {'p': 2.1, 'power': 1.2, 'n_bins': 10}),
+    ('heat', {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10, 'weight_function': lambda x: x})
+    ]
 
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters_amplitude)
+@pytest.mark.parametrize('order', [None, 2.])
 @pytest.mark.parametrize('n_jobs', [1, 2, 4])
-def test_da_transform(metric, metric_params, n_jobs):
-    da = Amplitude(metric=metric, metric_params=metric_params,
+def test_da_transform(metric, metric_params, order, n_jobs):
+    n_expected_columns = n_homology_dimensions if order is None else 1
+
+    da = Amplitude(metric=metric, metric_params=metric_params, order=order,
                    n_jobs=n_jobs)
     X_res = da.fit_transform(X1)
-    assert X_res.shape == (X1.shape[0], 1)
+    assert X_res.shape == (X1.shape[0], n_expected_columns)
 
     # X_fit != X_transform
-    da = Amplitude(metric=metric, metric_params=metric_params,
+    da = Amplitude(metric=metric, metric_params=metric_params, order=order,
                    n_jobs=n_jobs)
     X_res = da.fit(X1).transform(X2)
-    assert X_res.shape == (X2.shape[0], 1)
+    assert X_res.shape == (X2.shape[0], n_expected_columns)
 
 
 @pytest.mark.parametrize(('metric', 'metric_params', 'order'),
