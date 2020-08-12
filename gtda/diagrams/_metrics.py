@@ -142,10 +142,6 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
         image *= weights
         gaussian_filter(image, sigma_pixel, mode="constant", output=image)
 
-    # Smoothen the weighted image
-    for image in persistence_images_:
-        gaussian_filter(image, sigma_pixel, mode="constant", output=image)
-
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
     persistence_images_ /= np.product(step_size)
     return persistence_images_
