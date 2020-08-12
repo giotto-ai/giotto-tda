@@ -96,6 +96,12 @@ def test_pl_transform_shape(n_bins, n_layers):
     assert X_res.shape == (1, pl._n_dimensions, n_layers, n_bins)
 
 
+def test_pi_zero_weight_function():
+    pi = PersistenceImage(weight_function=lambda x: x * 0.)
+    X_res = pi.fit_transform(X)
+    assert np.array_equal(X_res, np.zeros_like(X_res))
+
+
 @given(X=arrays(dtype=np.float, unique=True,
                 elements=integers(min_value=-1e10, max_value=1e6),
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
