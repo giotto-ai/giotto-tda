@@ -131,10 +131,6 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
         # Calculate the value of the component of `sigma` in pixel units
         sigma_pixel.append(sigma / step_size[ax])
 
-    # diagrams_ax[...] = (diagrams_ax - first_sampling) / step_size[ax]
-    #
-    # diagrams = diagrams.astype(int)
-
     # Sample the image, apply the weights, smoothen
     for i, diagram in enumerate(diagrams):
         nontrivial_points_idx = np.flatnonzero(diagram[:, 1])
