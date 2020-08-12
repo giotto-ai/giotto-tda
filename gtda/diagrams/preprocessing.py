@@ -147,8 +147,8 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
-        ``'landscape'`` | ``'heat'`` | ``'persistence_image'`` | \
-        ``'silhouette'``, optional, default: ``'bottleneck'``
+        ``'landscape'`` |``'silhouette'`` |  ``'heat'`` | \
+        ``'persistence_image'``, optional, default: ``'bottleneck'``
         See the corresponding parameter in :class:`Amplitude`.
 
     metric_params : dict or None, optional, default: ``None``
@@ -246,11 +246,11 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
             _bin(X, self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistence_image':
-            weight_function = self.effective_metric_params_['weight_function']
-            samplings = self.effective_metric_params_['samplings']
-            weights = {dim: weight_function(samplings_dim[:, 1])
-                       for dim, samplings_dim in samplings.items()}
-            self.effective_metric_params_['weights'] = weights
+            weight_function = self.effective_metric_params_.get(
+                'weight_function', None
+                )
+            if weight_function is None:
+                self.effective_metric_params_['weight_function'] = np.ones_like
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,

@@ -246,9 +246,18 @@ def test_forg_transform_shape(X):
     assert X_res.shape == X.shape
 
 
-parameters_sc = [('wasserstein', {'p': 2}),
-                 ('betti', {'n_bins': 10}),
-                 ('bottleneck', None)]
+parameters_sc = [
+    ('bottleneck', None),
+    ('wasserstein', {'p': 2}),
+    ('betti', {'p': 2.1, 'n_bins': 10}),
+    ('landscape', {'p': 2.1, 'n_bins': 10, 'n_layers': 2}),
+    ('silhouette', {'p': 2.1, 'power': 1.2, 'n_bins': 10}),
+    ('heat', {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10, 'weight_function': lambda x: x})
+    ]
 
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters_sc)
