@@ -103,12 +103,12 @@ def test_pi_zero_weight_function():
 
 
 @given(X=arrays(dtype=np.float, unique=True,
-                elements=floats(min_value=-1e3, max_value=1e3),
+                elements=floats(min_value=-10, max_value=10),
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
 def test_pi_null(X):
     """Test that, if one trivial diagram (all pts on the diagonal) is provided,
     along with a non-trivial one, then its persistence image is null"""
-    pi = PersistenceImage(sigma=1, n_bins=10)
+    n_bins = 10
     X = np.append(X, 1 + X[-1])
     diagrams = np.expand_dims(
         np.stack([X, X, np.zeros(len(X))]).transpose(), axis=0
@@ -116,20 +116,26 @@ def test_pi_null(X):
     diagrams = np.repeat(diagrams, 2, axis=0)
     diagrams[1, :, 1] += 1
 
+    sigma = (np.max(diagrams[:, :, 1] - np.min(diagrams[:, :, 0]))) / 2
+    pi = PersistenceImage(sigma=sigma, n_bins=n_bins)
+
     assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
 
 
 @given(pts=arrays(dtype=np.float, unique=True,
                   elements=floats(allow_nan=False,
                                   allow_infinity=False,
-                                  min_value=-1e3,
-                                  max_value=1e3),
+                                  min_value=-10,
+                                  max_value=10),
                   shape=(20, 2)))
 def test_pi_positive(pts):
-    pi = PersistenceImage(sigma=1)
-    diagrams = np.expand_dims(np.concatenate([
-        np.sort(pts, axis=1), np.zeros((pts.shape[0], 1))],
-        axis=1), axis=0)
+    diagrams = np.expand_dims(
+        np.concatenate([np.sort(pts, axis=1), np.zeros((pts.shape[0], 1))],
+                       axis=1),
+        axis=0
+        )
+    sigma = (np.max(diagrams[:, :, 1] - np.min(diagrams[:, :, 0]))) / 2
+    pi = PersistenceImage(sigma=sigma)
     assert np.all(pi.fit_transform(diagrams) >= 0.)
 
 
