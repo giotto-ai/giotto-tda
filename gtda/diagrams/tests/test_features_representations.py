@@ -37,11 +37,10 @@ def test_not_fitted(transformer):
 def test_fit_transform_plot_one_hom_dim(transformer, hom_dim_idx):
     plotly_params = \
         {"trace": heatmap_trace_params, "layout": layout_params}
-    common_kwargs = {
-        "sample": 0, "homology_dimension_idx": hom_dim_idx,
-        "plotly_params": plotly_params
-        }
-    transformer.fit_transform_plot(X, **common_kwargs)
+    transformer.fit_transform_plot(
+        X, sample=0, homology_dimension_idx=hom_dim_idx,
+        plotly_params=plotly_params
+    )
 
 
 @pytest.mark.parametrize('transformer',
@@ -50,11 +49,25 @@ def test_fit_transform_plot_one_hom_dim(transformer, hom_dim_idx):
 def test_fit_transform_plot_many_hom_dims(transformer, hom_dims):
     plotly_params = \
         {"traces": line_plots_traces_params, "layout": layout_params}
-    common_kwargs = {
-        "sample": 0, "homology_dimensions": hom_dims,
-        "plotly_params": plotly_params
-        }
-    transformer.fit_transform_plot(X, **common_kwargs)
+    transformer.fit_transform_plot(
+        X, sample=0, homology_dimensions=hom_dims, plotly_params=plotly_params
+    )
+
+
+@pytest.mark.parametrize('transformer',
+                         [HeatKernel(), PersistenceImage(), BettiCurve(),
+                          PersistenceLandscape(), Silhouette()])
+def test_fit_transform_plot_infinite_hom_dims(transformer):
+    X_infinite_hom_dim = X.copy()
+    X_infinite_hom_dim[:, :, 2] = np.inf
+    transformer.fit_transform_plot(X_infinite_hom_dim, sample=0)
+
+
+@pytest.mark.parametrize('transformer',
+                         [BettiCurve(), PersistenceLandscape(), Silhouette()])
+def test_fit_transform_plot_wrong_hom_dims(transformer):
+    with pytest.raises(ValueError):
+        transformer.fit_transform_plot(X, sample=0, homology_dimensions=(2,))
 
 
 def test_pe_transform():
@@ -88,13 +101,12 @@ def test_pl_transform_shape(n_bins, n_layers):
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
 def test_pi_null(X):
     """Test that, if one trivial diagram (all pts on the diagonal) is provided,
-    (along with a non-trivial one), then its pi is null"""
+    along with a non-trivial one, then its persistence image is null"""
     pi = PersistenceImage(sigma=1, n_bins=10)
     X = np.append(X, 1 + X[-1])
-    diagrams = np.expand_dims(np.stack([X, X,
-                                        np.zeros((X.shape[0],),
-                                                 dtype=int)]).transpose(),
-                              axis=0)
+    diagrams = np.expand_dims(
+        np.stack([X, X, np.zeros(len(X))]).transpose(), axis=0
+        )
     diagrams = np.repeat(diagrams, 2, axis=0)
     diagrams[1, :, 1] += 1
 
@@ -116,15 +128,13 @@ def test_pi_positive(pts):
 
 
 def test_large_pi_null_multithreaded():
-    """Test that pi is computed correctly when the input array
-    is at least 1MB and more than 1 process is used, triggering
-    joblib's use of memmaps"""
+    """Test that pi is computed correctly when the input array is at least 1MB
+    and more than 1 process is used, triggering joblib's use of memmaps"""
     X = np.linspace(0, 100, 300000)
     pi = PersistenceImage(sigma=1, n_bins=10, n_jobs=2)
-    diagrams = np.expand_dims(np.stack([X, X,
-                                        np.zeros((X.shape[0],),
-                                                 dtype=int)]).transpose(),
-                              axis=0)
+    diagrams = np.expand_dims(
+        np.stack([X, X, np.zeros(len(X))]).transpose(), axis=0
+        )
     diagrams = np.repeat(diagrams, 2, axis=0)
     diagrams[1, :, 1] += 1
 
@@ -162,7 +172,7 @@ pts_gen = arrays(
     elements=floats(allow_nan=False,
                     allow_infinity=False,
                     min_value=1.,
-                    max_value=10),
+                    max_value=10.),
     shape=(1, 20, 2), unique=True
 )
 dims_gen = arrays(
@@ -174,8 +184,8 @@ dims_gen = arrays(
 
 
 def _validate_distinct(X):
-    """Check if, in X, there is any persistence X for which all births
-    and deaths are equal."""
+    """Check if, in X, there is any persistence X for which all births and
+    deaths are equal."""
     unique_values = [np.unique(x[:, 0:2]) for x in X]
     if np.any([len(u) < 2 for u in unique_values]):
         raise ValueError
@@ -196,7 +206,7 @@ def get_input(pts, dims):
 def test_all_pts_the_same():
     X = np.zeros((1, 4, 3))
     hk = HeatKernel(sigma=1)
-    with pytest.raises(IndexError):
+    with pytest.raises(OverflowError):
         _ = hk.fit(X).transform(X)
 
 
@@ -214,8 +224,8 @@ def test_hk_shape(pts, dims):
 
 @given(pts_gen, dims_gen)
 def test_hk_positive(pts, dims):
-    """ We expect the points above the PD-diagonal to be non-negative,
-    (up to a numerical error)"""
+    """We expect the points above the PD-diagonal to be non-negative (up to a
+    numerical error)"""
     n_bins = 10
     hk = HeatKernel(sigma=1, n_bins=n_bins)
 
@@ -227,12 +237,12 @@ def test_hk_positive(pts, dims):
 
 @given(pts_gen, dims_gen)
 def test_hk_big_sigma(pts, dims):
-    """We expect that with a huge sigma, the diagrams are so diluted that
-    they are almost 0. Effectively, verifies that the smoothing is applied."""
+    """We expect that with a huge sigma, the diagrams are so diluted that they
+    are almost 0. Effectively, verifies that the smoothing is applied."""
     n_bins = 10
     x = get_input(pts, dims)
 
-    hk = HeatKernel(sigma=100*np.max(np.abs(x)), n_bins=n_bins)
+    hk = HeatKernel(sigma=100 * np.max(np.abs(x)), n_bins=n_bins)
     x_t = hk.fit_transform(x)
 
     assert np.all(np.abs(x_t) <= 1e-4)
@@ -263,10 +273,9 @@ def test_large_hk_shape_multithreaded():
     use of memmaps"""
     X = np.linspace(0, 100, 300000)
     n_bins = 10
-    diagrams = np.expand_dims(np.stack([X, X,
-                                        np.zeros((X.shape[0],),
-                                                 dtype=int)]).transpose(),
-                              axis=0)
+    diagrams = np.expand_dims(
+        np.stack([X, X, np.zeros(len(X))]).transpose(), axis=0
+        )
 
     hk = HeatKernel(sigma=1, n_bins=n_bins, n_jobs=2)
     num_dimensions = 1
