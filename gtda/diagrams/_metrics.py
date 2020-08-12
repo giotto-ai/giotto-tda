@@ -190,27 +190,32 @@ def wasserstein_distances(diagrams_1, diagrams_2, p=2, delta=0.01, **kwargs):
 def betti_distances(
         diagrams_1, diagrams_2, sampling, step_size, p=2., **kwargs
         ):
+    step_size_factor = step_size ** (1 / p)
     are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
     betti_curves_1 = betti_curves(diagrams_1, sampling)
     if are_arrays_equal:
-        unnorm_dist = squareform(pdist(betti_curves_1, "minkowski", p=p))
-        return (step_size ** (1 / p)) * unnorm_dist
+        distances = pdist(betti_curves_1, "minkowski", p=p)
+        distances *= step_size_factor
+        return squareform(distances)
     betti_curves_2 = betti_curves(diagrams_2, sampling)
-    unnorm_dist = cdist(betti_curves_1, betti_curves_2, "minkowski", p=p)
-    return (step_size ** (1 / p)) * unnorm_dist
+    distances = cdist(betti_curves_1, betti_curves_2, "minkowski", p=p)
+    distances *= step_size_factor
+    return distances
 
 
 def landscape_distances(
         diagrams_1, diagrams_2, sampling, step_size, p=2., n_layers=1,
         **kwargs
         ):
+    step_size_factor = step_size ** (1 / p)
     n_samples_1, n_points_1 = diagrams_1.shape[:2]
     n_layers_1 = min(n_layers, n_points_1)
     if np.array_equal(diagrams_1, diagrams_2):
         ls_1 = landscapes(diagrams_1, sampling, n_layers_1).\
             reshape(n_samples_1, -1)
-        unnorm_dist = squareform(pdist(ls_1, "minkowski", p=p))
-        return (step_size ** (1 / p)) * unnorm_dist
+        distances = pdist(ls_1, "minkowski", p=p)
+        distances *= step_size_factor
+        return squareform(distances)
     n_samples_2, n_points_2 = diagrams_2.shape[:2]
     n_layers_2 = min(n_layers, n_points_2)
     n_layers = max(n_layers_1, n_layers_2)
@@ -218,8 +223,9 @@ def landscape_distances(
         reshape(n_samples_1, -1)
     ls_2 = landscapes(diagrams_2, sampling, n_layers).\
         reshape(n_samples_2, -1)
-    unnorm_dist = cdist(ls_1, ls_2, "minkowski", p=p)
-    return (step_size ** (1 / p)) * unnorm_dist
+    distances = cdist(ls_1, ls_2, "minkowski", p=p)
+    distances *= step_size_factor
+    return distances
 
 
 def heat_distances(
@@ -272,14 +278,17 @@ def persistence_image_distances(
 def silhouette_distances(
         diagrams_1, diagrams_2, sampling, step_size, power=1., p=2., **kwargs
         ):
+    step_size_factor = step_size ** (1 / p)
     are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
     silhouettes_1 = silhouettes(diagrams_1, sampling, power)
     if are_arrays_equal:
-        unnorm_dist = squareform(pdist(silhouettes_1, 'minkowski', p=p))
-    else:
-        silhouettes_2 = silhouettes(diagrams_2, sampling, power)
-        unnorm_dist = cdist(silhouettes_1, silhouettes_2, 'minkowski', p=p)
-    return (step_size ** (1 / p)) * unnorm_dist
+        distances = pdist(silhouettes_1, 'minkowski', p=p)
+        distances *= step_size_factor
+        return squareform(distances)
+    silhouettes_2 = silhouettes(diagrams_2, sampling, power)
+    distances = cdist(silhouettes_1, silhouettes_2, 'minkowski', p=p)
+    distances *= step_size_factor
+    return distances
 
 
 implemented_metric_recipes = {
@@ -289,7 +298,7 @@ implemented_metric_recipes = {
     "betti": betti_distances,
     "heat": heat_distances,
     "persistence_image": persistence_image_distances,
-    'silhouette': silhouette_distances,
+    'silhouette': silhouette_distances
     }
 
 
@@ -334,16 +343,22 @@ def wasserstein_amplitudes(diagrams, p=2., **kwargs):
 
 
 def betti_amplitudes(diagrams, sampling, step_size, p=2., **kwargs):
+    step_size_factor = step_size ** (1 / p)
     bcs = betti_curves(diagrams, sampling)
-    return (step_size ** (1 / p)) * np.linalg.norm(bcs, axis=1, ord=p)
+    amplitudes = np.linalg.norm(bcs, axis=1, ord=p)
+    amplitudes *= step_size_factor
+    return amplitudes
 
 
 def landscape_amplitudes(
         diagrams, sampling, step_size, p=2., n_layers=1, **kwargs
         ):
+    step_size_factor = step_size ** (1 / p)
     ls = landscapes(diagrams, sampling, n_layers).\
         reshape(len(diagrams), -1)
-    return (step_size ** (1 / p)) * np.linalg.norm(ls, axis=1, ord=p)
+    amplitudes = np.linalg.norm(ls, axis=1, ord=p)
+    amplitudes *= step_size_factor
+    return amplitudes
 
 
 def heat_amplitudes(diagrams, sampling, step_size, sigma=0.1, p=2., **kwargs):
@@ -377,8 +392,11 @@ def persistence_image_amplitudes(
 def silhouette_amplitudes(
         diagrams, sampling, step_size, power=1., p=2., **kwargs
         ):
+    step_size_factor = step_size ** (1 / p)
     silhouettes_ = silhouettes(diagrams, sampling, power)
-    return (step_size ** (1 / p)) * np.linalg.norm(silhouettes_, axis=1, ord=p)
+    amplitudes = np.linalg.norm(silhouettes_, axis=1, ord=p)
+    amplitudes *= step_size_factor
+    return amplitudes
 
 
 implemented_amplitude_recipes = {
@@ -388,7 +406,7 @@ implemented_amplitude_recipes = {
     "betti": betti_amplitudes,
     "heat": heat_amplitudes,
     "persistence_image": persistence_image_amplitudes,
-    'silhouette': silhouette_amplitudes,
+    'silhouette': silhouette_amplitudes
     }
 
 
