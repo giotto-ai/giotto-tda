@@ -1087,6 +1087,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         homology_dimensions_fit = np.unique(X[0, :, 2])
         self.homology_dimensions_ = \
             _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
+        self._n_dimensions = len(self.homology_dimensions_)
 
         self._samplings, _ = _bin(
             X, "silhouette", n_bins=self.n_bins,
