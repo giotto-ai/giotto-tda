@@ -9,6 +9,8 @@ def _homology_dimensions_to_sorted_ints(homology_dimensions):
         sorted([int(dim) if dim != np.inf else dim
                 for dim in homology_dimensions])
         )
+
+
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     """For each diagram in a collection, extract the subdiagrams in a given
     list of homology dimensions. It is assumed that all diagrams in X contain
