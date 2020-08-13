@@ -345,8 +345,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
             weight_function = self.effective_metric_params_.get(
                 'weight_function', None
                 )
-            if weight_function is None:
-                self.effective_metric_params_['weight_function'] = np.ones_like
+            weight_function = \
+                np.ones_like if weight_function is None else weight_function
+            self.effective_metric_params_['weight_function'] = weight_function
 
         return self
 

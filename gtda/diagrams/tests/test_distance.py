@@ -321,3 +321,22 @@ def test_da_transform_bottleneck(metric, metric_params, order, n_jobs):
                    order=order, n_jobs=n_jobs)
     X_bottleneck_res = da.fit_transform(X_bottleneck)
     assert_almost_equal(X_bottleneck_res, X_bottleneck_res_exp)
+
+
+@pytest.mark.parametrize('order', [None, 2.])
+@pytest.mark.parametrize('transformer_cls', [PairwiseDistance, Amplitude])
+@pytest.mark.parametrize('Xnew', [X1, X2])
+def test_pi_zero_weight_function(transformer_cls, order, Xnew):
+    """Test that, if a zero weight function is passed to `metric_params` in
+    Amplitude or PairwiseDistance when `metric` is 'persistence_image', the
+    result is zero."""
+    metric = 'persistence_image'
+    metric_params = {
+        'sigma': 0.1, 'weight_function': lambda x: x * 0., 'n_bins': 10
+        }
+    transformer = transformer_cls(
+        metric=metric, metric_params=metric_params, order=order
+        )
+    X_res = transformer.fit(X1).transform(Xnew)
+
+    assert np.array_equal(X_res, np.zeros_like(X_res))
