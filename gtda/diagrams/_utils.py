@@ -31,9 +31,9 @@ def _subdiagrams(X, homology_dimensions, remove_dim=False):
                     f"All persistence diagrams in the collection must have "
                     f"the same number of birth-death-dimension triples in any "
                     f"given homology dimension. This is not true in homology "
-                    f"dimension {dim}. Trivial triples for which birth = "
-                    f"death may be added or removed to fulfill this "
-                    f"requirement."
+                    f"dimension {homology_dimension}. Trivial triples for "
+                    f"which birth = death may be added or removed to fulfill "
+                    f"this requirement."
                 )
             else:
                 raise e
