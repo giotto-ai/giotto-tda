@@ -8,7 +8,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_METRICS, _parallel_pairwise
-from ._utils import _bin
+from ._utils import _bin, _homology_dimensions_to_sorted_ints
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import check_diagrams, validate_params
@@ -178,10 +178,11 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
         validate_params(
             self.effective_metric_params_, _AVAILABLE_METRICS[self.metric])
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \

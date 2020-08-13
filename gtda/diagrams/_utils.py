@@ -4,6 +4,11 @@
 import numpy as np
 
 
+def _homology_dimensions_to_sorted_ints(homology_dimensions):
+    return tuple(
+        sorted([int(dim) if dim != np.inf else dim
+                for dim in homology_dimensions])
+        )
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     """For each diagram in a collection, extract the subdiagrams in a given
     list of homology dimensions. It is assumed that all diagrams in X contain
@@ -49,7 +54,7 @@ def _multirange(counts):
 
 def _filter(X, filtered_homology_dimensions, cutoff):
     n = len(X)
-    homology_dimensions = sorted(set(X[0, :, 2]))
+    homology_dimensions = sorted(np.unique(X[0, :, 2]))
     unfiltered_homology_dimensions = [dim for dim in homology_dimensions if
                                       dim not in filtered_homology_dimensions]
 
@@ -94,7 +99,7 @@ def _filter(X, filtered_homology_dimensions, cutoff):
 
 def _bin(X, metric, n_bins=100, homology_dimensions=None, **kw_args):
     if homology_dimensions is None:
-        homology_dimensions = sorted(set(X[0, :, 2]))
+        homology_dimensions = sorted(np.unique(X[0, :, 2]))
     # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
                  for dim in homology_dimensions}

@@ -14,7 +14,8 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import betti_curves, landscapes, heats, \
     persistence_images, silhouettes
-from ._utils import _subdiagrams, _bin, _make_homology_dimensions_mapping
+from ._utils import _subdiagrams, _bin, _make_homology_dimensions_mapping, \
+    _homology_dimensions_to_sorted_ints
 from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
@@ -112,11 +113,13 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
+
         self._samplings, _ = _bin(
             X, "betti", n_bins=self.n_bins,
             homology_dimensions=self.homology_dimensions_
@@ -343,11 +346,13 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
+
         self._samplings, _ = _bin(
             X, "landscape", n_bins=self.n_bins,
             homology_dimensions=self.homology_dimensions_
@@ -606,11 +611,13 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
+
         self._samplings, self._step_size = _bin(
             X, "heat", n_bins=self.n_bins,
             homology_dimensions=self.homology_dimensions_
@@ -847,11 +854,13 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         else:
             self.effective_weight_function_ = self.weight_function
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
+
         self._samplings, self._step_size = _bin(
             X, "persistence_image",  n_bins=self.n_bins,
             homology_dimensions=self.homology_dimensions_
@@ -1073,11 +1082,12 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
-        self._n_dimensions = len(self.homology_dimensions_)
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
+
         self._samplings, _ = _bin(
             X, "silhouette", n_bins=self.n_bins,
             homology_dimensions=self.homology_dimensions_

@@ -47,7 +47,7 @@ def check_diagrams(X, copy=False):
             f"components, but there are {X_array.shape[2]} components.")
 
     X_array = X_array.astype(float, copy=False)
-    homology_dimensions = sorted(set(X_array[0, :, 2]))
+    homology_dimensions = sorted(np.unique(X_array[0, :, 2]))
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:

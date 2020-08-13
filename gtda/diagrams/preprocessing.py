@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
-from ._utils import _filter, _bin
+from ._utils import _filter, _bin, _homology_dimensions_to_sorted_ints
 from ..base import PlotterMixin
 from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
@@ -239,10 +239,11 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(self.effective_metric_params_,
                         _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        self.homology_dimensions_ = tuple(
-            sorted([int(dim) if dim != np.inf else dim
-                    for dim in set(X[0, :, 2])])
-            )
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \
@@ -436,12 +437,13 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             self.get_params(), self._hyperparameters)
 
         if self.homology_dimensions is None:
-            self.homology_dimensions_ = [
-                int(dim) if dim != np.inf else dim for dim in set(X[0, :, 2])
-                ]
+            # Find the unique homology dimensions in the 3D array X passed to
+            # `fit` assuming that they can all be found in its zero-th entry
+            homology_dimensions = np.unique(X[0, :, 2])
         else:
-            self.homology_dimensions_ = self.homology_dimensions
-        self.homology_dimensions_ = tuple(sorted(self.homology_dimensions_))
+            homology_dimensions = self.homology_dimensions
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions)
 
         return self
 
