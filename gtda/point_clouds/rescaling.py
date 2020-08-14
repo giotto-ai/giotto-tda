@@ -58,9 +58,9 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         to the "consistent rescaling" procedure.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
@@ -94,9 +94,9 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))},
-        'neighbor_rank': {
-            'type': int, 'in': Interval(1, np.inf, closed='left')}
-    }
+        'neighbor_rank': {'type': int,
+                          'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, metric='euclidean', metric_params=None, neighbor_rank=1,
                  n_jobs=None):
@@ -192,7 +192,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='blues'):
+    def plot(Xt, sample=0, colorscale='blues', plotly_params=None):
         """Plot a sample from a collection of distance matrices.
 
         Parameters
@@ -208,8 +208,24 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale,
+            title=f"{sample}-th distance matrix after consistent rescaling",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -250,9 +266,9 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         points.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
@@ -279,8 +295,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))},
-        'factor': {
-            'type': Real, 'in': Interval(0, np.inf, closed='both')}
+        'factor': {'type': Real, 'in': Interval(0, np.inf, closed='both')}
     }
 
     def __init__(self, metric='euclidean', metric_params=None, factor=0.,
@@ -371,7 +386,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='blues'):
+    def plot(Xt, sample=0, colorscale='blues', plotly_params=None):
         """Plot a sample from a collection of distance matrices.
 
         Parameters
@@ -387,5 +402,21 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale,
+            title=f"{sample}-th distance matrix after consecutive rescaling",
+            plotly_params=plotly_params
+            )

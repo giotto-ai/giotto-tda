@@ -142,7 +142,7 @@ def test_check_point_clouds_value_err_finite():
 
     # Check that we error on 1d array input
     with pytest.raises(ValueError):
-        check_point_clouds(np.asarray(ex.X_list_tot))
+        check_point_clouds(np.asarray(ex.X_list_tot, dtype=object))
 
     # Check that we error on 2d array input
     with pytest.raises(ValueError):
@@ -172,11 +172,6 @@ def test_check_point_clouds_warn_finite():
     # 2) List input
     with pytest.warns(DataDimensionalityWarning):
         check_point_clouds(ex.X_list)
-
-    # Check that we throw warnings on list input when arrays have different
-    # number of columns
-    with pytest.warns(DataDimensionalityWarning):
-        check_point_clouds(ex.X_list_rectang_diff_cols)
 
 
 def test_check_point_clouds_regular_inf():
@@ -238,7 +233,7 @@ def test_check_point_clouds_regular_nan():
 
 @pytest.mark.parametrize("force_all_finite", [True, False])
 def test_check_point_clouds_value_err_nan(force_all_finite):
-    """Cases in which part of the input is nan and we throw a
+    """Cases in which part of the input is NaN and we throw a
     ValueError."""
 
     ex = CreateInputs(

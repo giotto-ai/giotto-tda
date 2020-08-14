@@ -130,7 +130,7 @@ class PlotterMixin:
         sample : int
             Sample to be plotted.
 
-        plot_params : dict
+        **plot_params
             Optional plotting parameters.
 
         Returns
@@ -140,6 +140,6 @@ class PlotterMixin:
 
         """
         Xt = self.transform(X[sample:sample+1])
-        self.plot(Xt, sample=0, **plot_params)
+        self.plot(Xt, sample=0, **plot_params).show()
 
         return Xt

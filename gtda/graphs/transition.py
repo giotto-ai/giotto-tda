@@ -82,7 +82,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    GraphGeodesicDistance, gtda.time_series.TakensEmbedding
+    KNeighborsGraph, GraphGeodesicDistance,
+    :class:`~gtda.time_series.TakensEmbedding`
 
     Notes
     -----
@@ -113,7 +114,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     _hyperparameters = {
         'func': {'type': (FunctionType, type(None))},
         'func_params': {'type': (dict, type(None))}
-    }
+        }
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):
         self.func = func

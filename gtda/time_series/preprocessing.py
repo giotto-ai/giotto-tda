@@ -39,7 +39,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
     """
 
     _hyperparameters = {
-        'period': {'type': int, 'in': Interval(1, np.inf, closed='left')}}
+        'period': {'type': int, 'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, period=2):
         self.period = period
@@ -160,7 +161,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
     """
 
     _hyperparameters = {
-        'operation': {'type': str, 'in': ['return', 'log-return']}}
+        'operation': {'type': str, 'in': ['return', 'log-return']}
+        }
 
     def __init__(self, operation='return'):
         self.operation = operation

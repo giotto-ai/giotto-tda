@@ -173,7 +173,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return yr
 
     @staticmethod
-    def plot(Xt, sample=0):
+    def plot(Xt, sample=0, plotly_params=None):
         """Plot a sample from a collection of sliding windows, as a point
         cloud in 2D or 3D. If points in the window have more than three
         dimensions, only the first three are plotted.
@@ -192,8 +192,20 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         sample : int, optional, default: ``0``
             Index of the sample in `Xt` to be plotted.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_point_cloud(Xt[sample])
+        return plot_point_cloud(Xt[sample], plotly_params=plotly_params)
 
 
 @adapt_fit_transform_docs
