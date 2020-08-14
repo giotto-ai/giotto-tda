@@ -108,10 +108,10 @@ class TestInteractivePlot(TestCaseNoTemplate):
             exp_final_affin = initial_affin if clone_pipeline else new_affin
 
             pipe = make_mapper_pipeline(
-                clusterer=FirstSimpleGap(affinity=initial_affinity)
+                clusterer=FirstSimpleGap(affinity=initial_affin)
                 )
             fig = plot_interactive_mapper_graph(
-              pipe, X, clone_pipeline=clone_pipeline
+                pipe, X, clone_pipeline=clone_pipeline
                 )
 
             # Get widget and change the affinity type
