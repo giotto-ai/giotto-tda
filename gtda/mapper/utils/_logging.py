@@ -13,7 +13,7 @@ class OutputWidgetHandler(logging.Handler):
             'width': '100%',
             'height': '160px',
             'border': '1px solid black',
-            'overflow_y': 'auto'
+            'overflow': 'auto'
         }
         self.out = widgets.Output(layout=layout)
 
