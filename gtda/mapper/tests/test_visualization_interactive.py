@@ -27,7 +27,6 @@ def _get_widget_by_trait(fig, key, val=None):
 def test_pipeline_change_not_cloned():
     """Verify that the pipeline is changed on interaction if `clone_pipeline`
     is True."""
-    warnings.simplefilter("ignore")
     initial_affin = 'euclidean'
     new_affin = 'manhattan'
 

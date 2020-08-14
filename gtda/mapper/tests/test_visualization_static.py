@@ -1,7 +1,6 @@
 """Testing for Mapper plotting functions."""
 # License: GNU AGPLv3
 
-import warnings
 from unittest import TestCase
 
 import numpy as np
@@ -153,7 +152,6 @@ class TestStaticPlot(TestCaseNoTemplate):
     def test_is_data_present(self):
         """Verify that what we see in the graph corresponds to
         the number of samples in the graph."""
-        warnings.simplefilter("ignore")
         pipe = make_mapper_pipeline()
         fig = plot_static_mapper_graph(pipe, X,
                                        color_variable=colors,
@@ -173,7 +171,6 @@ class TestStaticPlot(TestCaseNoTemplate):
         """Verify that the total number of calculated clusters is equal to
         the number of displayed clusters."""
         pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
-        warnings.simplefilter("ignore")
         fig = plot_static_mapper_graph(pipe, X)
         node_trace = fig.data[1]
 
