@@ -8,17 +8,13 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, ClusterMixin, clone
 from sklearn.cluster import DBSCAN
-
-try:  # scikit-learn >= 0.22.1
-    from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
-except ImportError:
-    from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
+from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
 
+from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 
 
 class ParallelClustering(BaseEstimator):
