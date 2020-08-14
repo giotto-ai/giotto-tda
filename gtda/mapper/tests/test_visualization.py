@@ -100,23 +100,28 @@ class TestInteractivePlot(TestCaseNoTemplate):
 
     def test_is_cloned(self):
         """Verify that the pipeline is changed on interaction, if and only if
-        `in_place` is True."""
+        `clone_pipeline` is True."""
 
         def inner(clone_pipeline):
-            expected = 'euclidean' if clone_pipeline else 'manhattan'
+            initial_affin = 'euclidean'
+            new_affin = 'manhattan'
+            exp_final_affin = initial_affin if clone_pipeline else new_affin
 
-            pipe = make_mapper_pipeline(clusterer=FirstSimpleGap(
-                affinity='euclidean'))
-            warnings.simplefilter("ignore")
-            fig = plot_interactive_mapper_graph(pipe, X,
-                                                clone_pipeline=clone_pipeline)
-            # Get widget and change the cover type
+            pipe = make_mapper_pipeline(
+                clusterer=FirstSimpleGap(affinity=initial_affinity)
+                )
+
+            fig = plot_interactive_mapper_graph(
+              pipe, X, clone_pipeline=clone_pipeline
+                )
+
+            # Get widget and change the affinity type
             w_text = _get_widget_by_trait(fig, 'description', 'affinity')
-            d = w_text.get_state()
-            d.update({'value': 'manhattan'})
-            w_text.set_state(d)
-            
-            assert pipe.get_mapper_params()['clusterer__affinity'] == expected
+            w_text.set_state({'value': new_affinity})
+            w_text.send_state()
+            final_affin = pipe.get_mapper_params()['clusterer__affinity'])
+
+            assert final_affin == exp_final_affin
 
         for clone_pipeline in [False, True]:
             with self.subTest(clone_pipeline=clone_pipeline):
