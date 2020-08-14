@@ -8,10 +8,8 @@ import numpy as np
 import plotly.io as pio
 import pytest
 
-from gtda.mapper import FirstSimpleGap
-from gtda.mapper import make_mapper_pipeline
-from gtda.mapper import (plot_interactive_mapper_graph,
-                         plot_static_mapper_graph)
+from gtda.mapper import FirstSimpleGap, make_mapper_pipeline, \
+    plot_static_mapper_graph
 
 
 class TestCaseNoTemplate(TestCase):
@@ -155,8 +153,8 @@ class TestStaticPlot(TestCaseNoTemplate):
     def test_is_data_present(self):
         """Verify that what we see in the graph corresponds to
         the number of samples in the graph."""
-        pipe = make_mapper_pipeline()
         warnings.simplefilter("ignore")
+        pipe = make_mapper_pipeline()
         fig = plot_static_mapper_graph(pipe, X,
                                        color_variable=colors,
                                        clone_pipeline=False)
@@ -171,62 +169,18 @@ class TestStaticPlot(TestCaseNoTemplate):
         fig_colors = fig.data[1].marker.color
         assert len(fig_colors) == num_nodes
 
-
-def _get_widget_by_trait(fig, key, val=None):
-    for k, v in fig.widgets.items():
-        try:
-            b = getattr(v, key) == val if val is not None \
-                else getattr(v, key)
-            if b:
-                return fig.widgets[k]
-        except (AttributeError, TypeError):
-            pass
-
-
-class TestInteractivePlot(TestCaseNoTemplate):
-
     def test_cluster_sizes(self):
         """Verify that the total number of calculated clusters is equal to
         the number of displayed clusters."""
         pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
         warnings.simplefilter("ignore")
-        fig = plot_interactive_mapper_graph(pipe, X)
-        w_scatter = _get_widget_by_trait(fig, 'data')
+        fig = plot_static_mapper_graph(pipe, X)
+        node_trace = fig.data[1]
 
-        node_sizes_vis = [
-            _get_size_from_hovertext(s_)
-            for s_ in w_scatter.data[1].hovertext
-        ]
+        node_sizes_vis = [_get_size_from_hovertext(ht) for ht in
+                          node_trace.hovertext]
 
         g = pipe.fit_transform(X)
         node_size_real = [len(node) for node in g.vs['node_elements']]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
-
-    def test_is_cloned(self):
-        """Verify that the pipeline is changed on interaction, if and only if
-        `clone_pipeline` is True."""
-
-        def inner(clone_pipeline):
-            initial_affin = 'euclidean'
-            new_affin = 'manhattan'
-            exp_final_affin = initial_affin if clone_pipeline else new_affin
-
-            pipe = make_mapper_pipeline(
-                clusterer=FirstSimpleGap(affinity=initial_affin)
-                )
-            fig = plot_interactive_mapper_graph(
-                pipe, X, clone_pipeline=clone_pipeline
-                )
-
-            # Get widget and change the affinity type
-            w_text = _get_widget_by_trait(fig, 'description', 'affinity')
-            w_text.set_state({'value': new_affin})
-            w_text.send_state()
-            final_affin = pipe.get_mapper_params()['clusterer__affinity']
-
-            assert final_affin == exp_final_affin
-
-        for clone_pipeline in [False, True]:
-            with self.subTest(clone_pipeline=clone_pipeline):
-                inner(clone_pipeline)
