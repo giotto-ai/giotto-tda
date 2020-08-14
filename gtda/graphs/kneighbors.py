@@ -69,9 +69,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Examples
     --------

@@ -4,33 +4,58 @@
 import numpy as np
 
 
+def _homology_dimensions_to_sorted_ints(homology_dimensions):
+    return tuple(
+        sorted([int(dim) if dim != np.inf else dim
+                for dim in homology_dimensions])
+        )
+
+
 def _subdiagrams(X, homology_dimensions, remove_dim=False):
     """For each diagram in a collection, extract the subdiagrams in a given
     list of homology dimensions. It is assumed that all diagrams in X contain
     the same number of points in each homology dimension."""
-    n = len(X)
+    n_samples = len(X)
+    X_0 = X[0]
+
+    def _subdiagrams_single_homology_dimension(homology_dimension):
+        n_features_in_dim = np.sum(X_0[:, 2] == homology_dimension)
+        try:
+            # In this case, reshape ensures copy
+            Xs = X[X[:, :, 2] == homology_dimension].\
+                reshape(n_samples, n_features_in_dim, 3)
+            return Xs
+        except ValueError as e:
+            if e.args[0].lower().startswith("cannot reshape array"):
+                raise ValueError(
+                    f"All persistence diagrams in the collection must have "
+                    f"the same number of birth-death-dimension triples in any "
+                    f"given homology dimension. This is not true in homology "
+                    f"dimension {homology_dimension}. Trivial triples for "
+                    f"which birth = death may be added or removed to fulfill "
+                    f"this requirement."
+                )
+            else:
+                raise e
+
     if len(homology_dimensions) == 1:
-        Xs = X[X[:, :, 2] == homology_dimensions[0]].reshape(n, -1, 3)
+        Xs = _subdiagrams_single_homology_dimension(homology_dimensions[0])
     else:
-        Xs = np.concatenate([X[X[:, :, 2] == dim].reshape(n, -1, 3)
-                             for dim in homology_dimensions],
-                            axis=1)
+        # np.concatenate will also create a copy
+        Xs = np.concatenate(
+            [_subdiagrams_single_homology_dimension(dim)
+             for dim in homology_dimensions],
+            axis=1
+            )
     if remove_dim:
         Xs = Xs[:, :, :2]
     return Xs
 
 
-def _pad(X, max_diagram_sizes):
-    X_padded = {dim: np.pad(
-        X[dim],
-        ((0, 0), (0, max_diagram_sizes[dim] - X[dim].shape[1]),
-         (0, 0)), 'constant') for dim in X.keys()}
-    return X_padded
-
-
-def _sample_image(image, sampled_diag):
-    # NOTE: Modifies `image` in-place
-    unique, counts = np.unique(sampled_diag, axis=0, return_counts=True)
+def _sample_image(image, diagram_pixel_coords):
+    # WARNING: Modifies `image` in-place
+    unique, counts = \
+        np.unique(diagram_pixel_coords, axis=0, return_counts=True)
     unique = tuple(tuple(row) for row in unique.astype(np.int).T)
     image[unique] = counts
 
@@ -54,7 +79,7 @@ def _multirange(counts):
 
 def _filter(X, filtered_homology_dimensions, cutoff):
     n = len(X)
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+    homology_dimensions = sorted(np.unique(X[0, :, 2]))
     unfiltered_homology_dimensions = [dim for dim in homology_dimensions if
                                       dim not in filtered_homology_dimensions]
 
@@ -97,8 +122,9 @@ def _filter(X, filtered_homology_dimensions, cutoff):
     return Xf
 
 
-def _bin(X, metric, n_bins=100, **kw_args):
-    homology_dimensions = sorted(list(set(X[0, :, 2])))
+def _bin(X, metric, n_bins=100, homology_dimensions=None, **kw_args):
+    if homology_dimensions is None:
+        homology_dimensions = sorted(np.unique(X[0, :, 2]))
     # For some vectorizations, we force the values to be the same + widest
     sub_diags = {dim: _subdiagrams(X, [dim], remove_dim=True)
                  for dim in homology_dimensions}
@@ -131,10 +157,9 @@ def _bin(X, metric, n_bins=100, **kw_args):
     samplings = {}
     step_sizes = {}
     for dim in homology_dimensions:
-        samplings[dim], step_sizes[dim] = np.linspace(min_vals[dim],
-                                                      max_vals[dim],
-                                                      retstep=True,
-                                                      num=n_bins)
+        samplings[dim], step_sizes[dim] = np.linspace(
+            min_vals[dim], max_vals[dim], retstep=True, num=n_bins
+            )
     if metric in ['landscape', 'betti', 'heat', 'silhouette']:
         for dim in homology_dimensions:
             samplings[dim] = samplings[dim][:, [0], None]
@@ -142,7 +167,20 @@ def _bin(X, metric, n_bins=100, **kw_args):
     return samplings, step_sizes
 
 
-def _calculate_weights(X, weight_function, samplings, **kw_args):
-    weights = {dim: weight_function(samplings[dim][:, 1])
-               for dim in samplings.keys()}
-    return weights
+def _make_homology_dimensions_mapping(homology_dimensions,
+                                      homology_dimensions_ref):
+    """`homology_dimensions_ref` is assumed to be a sorted tuple as is e.g.
+    :attr:`homology_dimensions_` for several transformers."""
+    if homology_dimensions is None:
+        homology_dimensions_mapping = list(enumerate(homology_dimensions_ref))
+    else:
+        homology_dimensions_mapping = []
+        for dim in homology_dimensions:
+            if dim not in homology_dimensions_ref:
+                raise ValueError(f"All homology dimensions must be in "
+                                 f"{homology_dimensions_ref}; {dim} is not.")
+            else:
+                homology_dimensions_arr = np.array(homology_dimensions_ref)
+                inv_idx = np.flatnonzero(homology_dimensions_arr == dim)[0]
+                homology_dimensions_mapping.append((inv_idx, dim))
+    return homology_dimensions_mapping

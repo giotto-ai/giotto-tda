@@ -10,6 +10,8 @@ from sklearn.exceptions import NotFittedError
 from gtda.diagrams import ForgetDimension, Scaler, Filtering
 
 pio.renderers.default = 'plotly_mimetype'
+plotly_params = {"trace": {"marker_size": 20},
+                 "layout": {"title": "New title"}}
 
 X_1 = np.array([[[0., 0.36905774, 0],
                  [0., 0.37293977, 0],
@@ -227,16 +229,22 @@ def test_not_fitted():
 
 
 def test_forg_fit_transform_plot():
-    ForgetDimension().fit_transform_plot(X_1, sample=0)
+    ForgetDimension().fit_transform_plot(
+        X_1, sample=0, plotly_params=plotly_params
+    )
 
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,)])
 def test_fit_transform_plot(hom_dims):
     Scaler().fit_transform_plot(
-        X_1, sample=0, homology_dimensions=hom_dims)
+        X_1, sample=0, homology_dimensions=hom_dims,
+        plotly_params=plotly_params
+    )
 
     Filtering().fit_transform_plot(
-        X_1, sample=0, homology_dimensions=hom_dims)
+        X_1, sample=0, homology_dimensions=hom_dims,
+        plotly_params=plotly_params
+    )
 
 
 @pytest.mark.parametrize('X', [X_1, X_2])
@@ -246,9 +254,18 @@ def test_forg_transform_shape(X):
     assert X_res.shape == X.shape
 
 
-parameters_sc = [('wasserstein', {'p': 2}),
-                 ('betti', {'n_bins': 10}),
-                 ('bottleneck', None)]
+parameters_sc = [
+    ('bottleneck', None),
+    ('wasserstein', {'p': 2}),
+    ('betti', {'p': 2.1, 'n_bins': 10}),
+    ('landscape', {'p': 2.1, 'n_bins': 10, 'n_layers': 2}),
+    ('silhouette', {'p': 2.1, 'power': 1.2, 'n_bins': 10}),
+    ('heat', {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10}),
+    ('persistence_image',
+     {'p': 2.1, 'sigma': 0.5, 'n_bins': 10, 'weight_function': lambda x: x})
+    ]
 
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters_sc)
@@ -267,6 +284,28 @@ def test_filt_transform_zero(X):
     filt = Filtering(epsilon=0.)
     X_res = filt.fit_transform(X[:, [0], :])
     assert_almost_equal(X_res, X[:, [0], :])
+
+
+def total_lifetimes_in_dims(X, dims):
+    return sum([
+        np.sum(np.diff(X[X[:, :, 2] == dim], axis=1)[:, 0]) for dim in dims
+        ])
+
+
+@pytest.mark.parametrize('homology_dimensions', [None, (0, 1, 2), (0,), (1,),
+                                                 (2,), (0, 1), (0, 2), (1, 2)])
+def test_filt_transform_unfiltered_hom_dims(homology_dimensions):
+    filt = Filtering(epsilon=2., homology_dimensions=homology_dimensions)
+    X_1_res = filt.fit_transform(X_1)
+    if homology_dimensions is None:
+        unfiltered_hom_dims = []
+    else:
+        unfiltered_hom_dims = [
+            dim for dim in filt.homology_dimensions_
+            if dim not in homology_dimensions
+            ]
+    assert total_lifetimes_in_dims(X_1, unfiltered_hom_dims) == \
+           total_lifetimes_in_dims(X_1_res, unfiltered_hom_dims)
 
 
 lifetimes_1 = X_1[:, :, 1] - X_1[:, :, 0]

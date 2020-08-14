@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
-from ._utils import _filter, _bin, _calculate_weights
+from ._utils import _filter, _bin, _homology_dimensions_to_sorted_ints
 from ..base import PlotterMixin
 from ..plotting.persistence_diagrams import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
@@ -139,14 +139,16 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
           two-dimensional array of amplitudes (one per diagram and homology
           dimension) to obtain :attr:`scale_`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
-        ``'landscape'`` | ``'heat'`` | ``'persistence_image'`` | \
-        ``'silhouette'``, optional, default: ``'bottleneck'``
+        ``'landscape'`` |``'silhouette'`` |  ``'heat'`` | \
+        ``'persistence_image'``, optional, default: ``'bottleneck'``
         See the corresponding parameter in :class:`Amplitude`.
 
     metric_params : dict or None, optional, default: ``None``
@@ -157,17 +159,17 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         amplitude vectors in :meth:`fit`. Must map 2D arrays to scalars.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     Attributes
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params` as
-        well as on any relevant quantities computed in :meth:`fit`.
+        well as relevant quantities computed in :meth:`fit`.
 
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     scale_ : float
@@ -237,15 +239,23 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(self.effective_metric_params_,
                         _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \
-            _bin(X, metric=self.metric, **self.effective_metric_params_)
+            _bin(X, self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistence_image':
-            self.effective_metric_params_['weights'] = \
-                _calculate_weights(X, **self.effective_metric_params_)
+            weight_function = self.effective_metric_params_.get(
+                'weight_function', None
+                )
+            weight_function = \
+                np.ones_like if weight_function is None else weight_function
+            self.effective_metric_params_['weight_function'] = weight_function
 
         amplitude_array = _parallel_amplitude(X, self.metric,
                                               self.effective_metric_params_,
@@ -280,7 +290,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagrams(X)
+        Xs = check_diagrams(X, copy=True)
         Xs[:, :, :2] /= self.scale_
         return Xs
 
@@ -301,7 +311,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_is_fitted(self)
 
-        Xs = check_diagrams(X)
+        Xs = check_diagrams(X, copy=True)
         Xs[:, :, :2] *= self.scale_
         return Xs
 
@@ -351,13 +361,15 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
     """Filtering of persistence diagrams.
 
     Filtering a diagram means discarding all points [b, d, q] representing
-    non-trivial topological features whose lifetime d - b is less than or
-    equal to a cutoff value. Points on the diagonal (i.e. for which b and d
-    are equal) may still appear in the output for padding purposes, but carry
-    no information.
+    non-trivial topological features whose lifetime d - b is less than or equal
+    to a cutoff value. Points on the diagonal (i.e. for which b and d are
+    equal) may still appear in the output for padding purposes, but carry no
+    information.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -372,11 +384,10 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
-        If `homology_dimensions` is set to ``None``, then this is the list
-        of homology dimensions seen in :meth:`fit`, sorted in ascending
-        order. Otherwise, it is a similarly sorted version of
-        `homology_dimensions`.
+    homology_dimensions_ : tuple
+        If `homology_dimensions` is set to ``None``, contains the homology
+        dimensions seen in :meth:`fit`, sorted in ascending order. Otherwise,
+        it is a similarly sorted version of `homology_dimensions`.
 
     See also
     --------
@@ -427,10 +438,13 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
             self.get_params(), self._hyperparameters)
 
         if self.homology_dimensions is None:
-            self.homology_dimensions_ = [int(dim) for dim in set(X[0, :, 2])]
+            # Find the unique homology dimensions in the 3D array X passed to
+            # `fit` assuming that they can all be found in its zero-th entry
+            homology_dimensions = np.unique(X[0, :, 2])
         else:
-            self.homology_dimensions_ = self.homology_dimensions
-        self.homology_dimensions_ = sorted(self.homology_dimensions_)
+            homology_dimensions = self.homology_dimensions
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions)
 
         return self
 

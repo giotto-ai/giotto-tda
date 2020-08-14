@@ -11,7 +11,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
-from ._utils import _subdiagrams, _bin, _calculate_weights
+from ._utils import _subdiagrams, _bin, _homology_dimensions_to_sorted_ints
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagrams
@@ -30,13 +30,14 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     differences. Optionally, these entropies can be normalized according to a
     simple heuristic, see `normalize`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important notes**:
 
-    **Important note**: By default, persistence subdiagrams containing only
-    triples with zero lifetime will have corresponding (normalized) entropies
-    computed as ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
-    different from ``None``.
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+        - By default, persistence subdiagrams containing only triples with zero
+          lifetime will have corresponding (normalized) entropies computed as
+          ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
+          different from ``None``.
 
     Parameters
     ----------
@@ -57,7 +58,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
@@ -126,7 +127,11 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
 
         return self
@@ -189,26 +194,30 @@ class Amplitude(BaseEstimator, TransformerMixin):
         3. The final result is either :math:`\\mathbf{a}` itself or
            a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
 
-    Input collections of persistence diagrams for this transformer must satisfy
-    certain requirements, see e.g. :meth:`fit`.
+    **Important notes**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+        - The shape of outputs of :meth:`transform` depends on the value of the
+          `order` parameter.
 
     Parameters
     ----------
-    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'`` | ``'silhouette'`` | \
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
+        ``'landscape'`` | ``'silhouette'`` | ``'heat'`` | \
         ``'persistence_image'``, optional, default: ``'landscape'``
         Distance or dissimilarity function used to define the amplitude of
         a subdiagram as its distance from the (trivial) diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
           perfect-matching--based notions of distance.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
         - ``'landscape'`` refers to the :math:`L^p` distance between
           persistence landscapes.
-        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
-        - ``'heat'`` refers to the :math:`L^p` distance between
-          Gaussian-smoothed diagrams.
         - ``'silhouette'`` refers to the :math:`L^p` distance between
           silhouettes.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
         - ``'persistence_image'`` refers to the :math:`L^p` distance between
           Gaussian-smoothed diagrams represented on birth-persistence axes.
 
@@ -219,23 +228,23 @@ class Amplitude(BaseEstimator, TransformerMixin):
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (float,
           default: ``2.``).
-        - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_bins` (int, default: ``100``) and
-          `n_layers` (int, default: ``1``).
         - If ``metric == 'betti'`` the available arguments are `p` (float,
           default: ``2.``) and `n_bins` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p` (float,
+          default: ``2.``), `n_bins` (int, default: ``100``) and `n_layers`
+          (int, default: ``1``).
+        - If ``metric == 'silhouette'`` the available arguments are `p` (float,
+          default: ``2.``), `power` (float, default: ``1.``) and `n_bins` (int,
+          default: ``100``).
         - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_bins`
+          default: ``2.``), `sigma` (float, default: ``0.1``) and `n_bins`
           (int, default: ``100``).
-        - If ``metric == 'silhouette'`` the available arguments are `p`
-          (float, default: ``2.``), `order` (float, default: ``1.``) and
-          `n_bins` (int, default: ``100``).
         - If ``metric == 'persistence_image'`` the available arguments are `p`
-          (float, default: ``2.``), `sigma` (float, default: ``1.``),
-          `n_bins` (int, default: ``100``) and `weight_function`
-          (callable or None, default: ``None``).
+          (float, default: ``2.``), `sigma` (float, default: ``0.1``), `n_bins`
+          (int, default: ``100``) and `weight_function` (callable or None,
+          default: ``None``).
 
-    order : float or None, optional, default: ``2.``
+    order : float or None, optional, default: ``None``
         If ``None``, :meth:`transform` returns for each diagram a vector of
         amplitudes corresponding to the dimensions in
         :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
@@ -250,9 +259,9 @@ class Amplitude(BaseEstimator, TransformerMixin):
     ----------
     effective_metric_params_ : dict
         Dictionary containing all information present in `metric_params` as
-        well as on any relevant quantities computed in :meth:`fit`.
+        well as relevant quantities computed in :meth:`fit`.
 
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
@@ -277,7 +286,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
         'metric_params': {'type': (dict, type(None))}
         }
 
-    def __init__(self, metric='landscape', metric_params=None, order=2.,
+    def __init__(self, metric='landscape', metric_params=None, order=None,
                  n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -322,15 +331,23 @@ class Amplitude(BaseEstimator, TransformerMixin):
         validate_params(self.effective_metric_params_,
                         _AVAILABLE_AMPLITUDE_METRICS[self.metric])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
         self.effective_metric_params_['samplings'], \
             self.effective_metric_params_['step_sizes'] = \
-            _bin(X, metric=self.metric, **self.effective_metric_params_)
+            _bin(X, self.metric, **self.effective_metric_params_)
 
         if self.metric == 'persistence_image':
-            self.effective_metric_params_['weights'] = \
-                _calculate_weights(X, **self.effective_metric_params_)
+            weight_function = self.effective_metric_params_.get(
+                'weight_function', None
+                )
+            weight_function = \
+                np.ones_like if weight_function is None else weight_function
+            self.effective_metric_params_['weight_function'] = weight_function
 
         return self
 

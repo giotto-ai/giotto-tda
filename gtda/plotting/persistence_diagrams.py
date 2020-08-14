@@ -63,8 +63,21 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
         subdiagram = diagram[diagram[:, 2] == dim]
         diff = (subdiagram[:, 1] != subdiagram[:, 0])
         subdiagram = subdiagram[diff]
-        fig.add_trace(gobj.Scatter(x=subdiagram[:, 0], y=subdiagram[:, 1],
-                                   mode="markers", name=name))
+        unique, inverse, counts = np.unique(
+            subdiagram, axis=0, return_inverse=True, return_counts=True
+            )
+        hovertext = [
+            f"{tuple(unique[unique_row_index][:2])}" +
+            (
+                f", multiplicity: {counts[unique_row_index]}"
+                if counts[unique_row_index] > 1 else ""
+            )
+            for unique_row_index in inverse
+            ]
+        fig.add_trace(gobj.Scatter(
+            x=subdiagram[:, 0], y=subdiagram[:, 1], mode="markers",
+            hoverinfo="text", hovertext=hovertext, name=name
+        ))
 
     fig.update_layout(
         width=500,
