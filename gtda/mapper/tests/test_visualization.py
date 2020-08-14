@@ -118,7 +118,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
             w_text = _get_widget_by_trait(fig, 'description', 'affinity')
             w_text.set_state({'value': new_affinity})
             w_text.send_state()
-            final_affin = pipe.get_mapper_params()['clusterer__affinity'])
+            final_affin = pipe.get_mapper_params()['clusterer__affinity']
 
             assert final_affin == exp_final_affin
 
