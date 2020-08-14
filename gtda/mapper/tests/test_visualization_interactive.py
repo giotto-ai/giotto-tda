@@ -1,8 +1,6 @@
 """Testing for interactivity in Mapper plotting functions."""
 # License: GNU AGPLv3
 
-import warnings
-
 import numpy as np
 
 from gtda.mapper import FirstSimpleGap, make_mapper_pipeline, \
