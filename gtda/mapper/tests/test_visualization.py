@@ -110,7 +110,6 @@ class TestInteractivePlot(TestCaseNoTemplate):
             pipe = make_mapper_pipeline(
                 clusterer=FirstSimpleGap(affinity=initial_affinity)
                 )
-
             fig = plot_interactive_mapper_graph(
               pipe, X, clone_pipeline=clone_pipeline
                 )
