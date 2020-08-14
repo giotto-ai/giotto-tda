@@ -220,7 +220,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
                 )
 
             # Get widget and change the affinity type
-            w_text = self._get_widget_by_trait(fig, 'description', 'affinity')
+            w_text = _get_widget_by_trait(fig, 'description', 'affinity')
             w_text.set_state({'value': new_affin})
             w_text.send_state()
             final_affin = pipe.get_mapper_params()['clusterer__affinity']
