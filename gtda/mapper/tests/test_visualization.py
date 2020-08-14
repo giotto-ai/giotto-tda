@@ -111,7 +111,7 @@ class TestInteractivePlot(TestCaseNoTemplate):
             fig = plot_interactive_mapper_graph(pipe, X,
                                                 clone_pipeline=clone_pipeline)
             # Get widget and change the cover type
-            w_text = self._get_widget_by_trait(fig, 'description', 'affinity')
+            w_text = _get_widget_by_trait(fig, 'description', 'affinity')
             d = w_text.get_state()
             d.update({'value': 'manhattan'})
             w_text.set_state(d)
