@@ -259,7 +259,7 @@ package ``giotto-tda`` will start at v0.1.4 for project continuity.
 
 Short summary: install via ::
 
-    pip install -U giotto-tda
+    python -m pip install -U giotto-tda
 
 and ``import gtda`` in your scripts or notebooks!
 

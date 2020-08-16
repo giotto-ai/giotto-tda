@@ -88,7 +88,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         'kind': {'type': str, 'in': ['uniform', 'balanced']},
         'n_intervals': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'overlap_frac': {'type': float, 'in': Interval(0, 1, closed='neither')}
-    }
+        }
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind
@@ -384,7 +384,7 @@ class CubicalCover(BaseEstimator, TransformerMixin):
         'kind': {'type': str, 'in': ['uniform', 'balanced']},
         'n_intervals': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'overlap_frac': {'type': float, 'in': Interval(0, 1, closed='neither')}
-    }
+        }
 
     def __init__(self, kind='uniform', n_intervals=10, overlap_frac=0.1):
         self.kind = kind

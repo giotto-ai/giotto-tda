@@ -14,4 +14,5 @@
    homology.VietorisRipsPersistence
    homology.SparseRipsPersistence
    homology.EuclideanCechPersistence
+   homology.FlagserPersistence
    homology.CubicalPersistence

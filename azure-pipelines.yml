@@ -1,5 +1,8 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+variables:
+  nightlyRelease: $[and(eq(variables['nightly_check'], true), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))]
+
 trigger:
 - master
 
@@ -38,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.05.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.08.08" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -46,7 +49,7 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
@@ -99,7 +102,7 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -128,12 +131,12 @@ jobs:
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.05.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.08.08" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -149,7 +152,7 @@ jobs:
       source .azure-ci/setup_ccache.sh
       python -m pip install -e ".[dev]"
       ccache -s
-    displayName: 'Install dependencies and dev environement'
+    displayName: 'Install dependencies and dev environment'
 
   - script: |
       set -e
@@ -215,7 +218,7 @@ jobs:
   - bash: |
       set -e
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -243,7 +246,7 @@ jobs:
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
   # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
@@ -306,7 +309,7 @@ jobs:
       set -e
       pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
 - job: 'Documentation'

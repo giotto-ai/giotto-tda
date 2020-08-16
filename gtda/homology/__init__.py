@@ -4,12 +4,13 @@ to generate persistence diagrams.
 # License: GNU AGPLv3
 
 from .simplicial import VietorisRipsPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence
+    EuclideanCechPersistence, FlagserPersistence
 from .cubical import CubicalPersistence
 
 __all__ = [
     'VietorisRipsPersistence',
     'SparseRipsPersistence',
     'EuclideanCechPersistence',
+    'FlagserPersistence',
     'CubicalPersistence',
 ]

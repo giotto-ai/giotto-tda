@@ -1,4 +1,4 @@
-.. image:: https://github.com/giotto-ai/giotto-tda/blob/master/doc/images/tda_logo.svg
+.. image:: https://raw.githubusercontent.com/giotto-ai/giotto-tda/master/doc/images/tda_logo.svg
    :width: 850
 
 |Version|_ |Azure-build|_ |Azure-cov|_ |Azure-test|_ |Twitter-follow|_ |Slack-join|_
@@ -63,12 +63,13 @@ Dependencies
 The latest stable version of ``giotto-tda`` requires:
 
 - Python (>= 3.6)
-- NumPy (>= 1.17.0)
-- SciPy (>= 0.17.0)
-- joblib (>= 0.13)
-- scikit-learn (>= 0.22.0)
-- python-igraph (>= 0.7.1.post6)
-- plotly (>= 4.4.1)
+- NumPy (>= 1.19.1)
+- SciPy (>= 1.5.0)
+- joblib (>= 0.16.0)
+- scikit-learn (>= 0.23.1)
+- pyflagser (>= 0.4.0)
+- python-igraph (>= 0.8.2)
+- plotly (>= 4.8.2)
 - ipywidgets (>= 7.5.1)
 
 To run the examples, jupyter is required.
@@ -78,7 +79,7 @@ User installation
 
 The simplest way to install ``giotto-tda`` is using ``pip``   ::
 
-    pip install -U giotto-tda
+    python -m pip install -U giotto-tda
 
 If necessary, this will also automatically install all the above dependencies. Note: we recommend
 upgrading ``pip`` to a recent version as the above may fail on very old versions.
@@ -86,7 +87,7 @@ upgrading ``pip`` to a recent version as the above may fail on very old versions
 Pre-release, experimental builds containing recently added features, and/or
 bug fixes can be installed by running   ::
 
-    pip install -U giotto-tda-nightly
+    python -m pip install -U giotto-tda-nightly
 
 The main difference between ``giotto-tda-nightly`` and the developer installation (see the section
 on contributing, below) is that the former is shipped with pre-compiled wheels (similarly to the stable
