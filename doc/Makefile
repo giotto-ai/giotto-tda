@@ -6,11 +6,11 @@
 ########## Config
 
 ifndef GITDIR
-GITDIR    = ../../../projects/gtda-docs
+GITDIR    = ../../../Projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = latest
+VERSION = test
 endif
 
 ifndef RUNNOTEBOOKS
@@ -52,6 +52,9 @@ clean-gh:
 update-versions-list:
 	@cd $(GITDIR); find . -type d -depth 1 > versions
 	@mv $(GITDIR)/versions versions
+	@make update-versions
+
+update-versions:
 	@python3 update_versions.py $(GITDIR)
 
 all-gh:
