@@ -46,12 +46,13 @@ def test_pipeline_cloned(clone_pipeline, layout_dim):
         pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim
         )
 
-    # Get relevant widgets and change their states
+    # Get relevant widgets and change their states, then check final values
     for step, values in params.items():
         for param_name, initial_param_value in values["initial"].items():
             w_text = _get_widget_by_trait(fig, 'description', param_name)
-            w_text.set_state({'value': values["final"][param_name]})
+            final_param_value = values["final"][param_name]
+            w_text.set_state({'value': final_param_value})
             final_param = \
                 pipe.get_mapper_params()[f"{step}__{param_name}"]
             assert final_param == initial_param_value \
-                if clone_pipeline else values["final"][param_name]
+                if clone_pipeline else final_param_value
