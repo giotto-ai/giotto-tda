@@ -28,9 +28,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`Vietoris–Rips filtrations
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, or an abstract
-    :ref:`metric space <finite_metric_spaces_and_point_clouds>` encoded by a
+    :ref:`metric space <metric_space>` encoded by a
     distance matrix, information about the appearance and disappearance of
     topological features (technically,
     :ref:`homology classes <homology_and_cohomology>`) of various dimension
@@ -276,9 +276,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`Sparse Vietoris–Rips filtrations
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, or an abstract
-    :ref:`metric space <finite_metric_spaces_and_point_clouds>`
+    :ref:`metric space <metric_space>`
     encoded by a distance matrix, information about the appearance and
     disappearance of topological features (technically,
     :ref:`homology classes <homology_and_cohomology>`) of various dimensions
@@ -537,7 +537,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
     `Cech filtrations <TODO>`_.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, information about the appearance and disappearance of
     topological features (technically,
     :ref:`homology classes <homology_and_cohomology>`) of various dimensions

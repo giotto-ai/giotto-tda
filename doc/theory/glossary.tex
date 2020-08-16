@@ -494,7 +494,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}	
 	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}	
 	\end{equation*}	
-	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the $p$-\textit{landscape norm} of $D$ and, for $p = 2$, define the value of the \textit{landscape kernel} on two persistence diagrams $D$ and $E$ as
+	is finite. In this case we refer to (\ref{equation:persistence_landscape_norm}) as the $p$-\textit{landscape norm} of $D$ and, for $p = 2$, define the value of the \textit{landscape kernel} on two persistence diagrams $D$ and $E$ as
 	\begin{equation*}
 	\langle \lambda, \mu \rangle = \left(\sum_{i \in \mathbb N} \int_{\mathbb R} |\lambda_i(x) - \mu_i(x)|^2\, dx\right)^{1/2}
 	\end{equation*}
@@ -525,14 +525,14 @@ pdfpagelabels]{hyperref}
 	Considering the points in a persistence diagram as the support of Dirac deltas one can construct, for any $t > 0$,
 	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
 	two vectorizations of the set of persistence diagrams to the set of continuous real-valued function on the first quadrant $\mathbb{R}^2_{>0}$. The \textit{symmetry heat vectorization} is constructed for every persistence diagram $D$ by solving the heat equation
-	\begin{align} \label{equation: heat equation}
+	\begin{align} \label{equation:heat_equation}
 	\Delta_x(u) &= \partial_t u && \text{on } \Omega \times \mathbb R_{>0} \nonumber \\
 	u &= 0 && \text{on } \{x_1 = x_2\} \times \mathbb R_{\geq 0} \\
 	u &= \sum_{p \in D} \delta_p && \text{on } \Omega \times {0} \nonumber
 	\end{align}
-	where $\Omega = \{(x_1, x_2) \in \mathbb R^2\ |\ x_1 \leq x_2\}$, then solving the same equation after precomposing the data of \eqref{equation: heat equation} with the change of coordinates $(x_1, x_2) \mapsto (x_2, x_1)$, and defining the image of $D$ to be the difference between these two solutions at the chosen time $t$.
+	where $\Omega = \{(x_1, x_2) \in \mathbb R^2\ |\ x_1 \leq x_2\}$, then solving the same equation after precomposing the data of (\ref{equation:heat_equation}) with the change of coordinates $(x_1, x_2) \mapsto (x_2, x_1)$, and defining the image of $D$ to be the difference between these two solutions at the chosen time $t$.
 	
-	Similarly, the \textit{rotation heat vectorization} is defined by sending $D$ to the solution, evaluated at time $t$, of the equation obtained by precomposing the data of \eqref{equation: heat equation} with the change of coordinates $(x_1, x_2) \mapsto (x_1, x_2-x_1)$.
+	Similarly, the \textit{rotation heat vectorization} is defined by sending $D$ to the solution, evaluated at time $t$, of the equation obtained by precomposing the data of (\ref{equation:heat_equation}) with the change of coordinates $(x_1, x_2) \mapsto (x_1, x_2-x_1)$.
 	
 	We recall that the solution to the heat equation with initial condition given by a Dirac delta supported at $p \in \mathbb R^2$ is
 	\begin{equation*}
