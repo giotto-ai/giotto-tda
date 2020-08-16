@@ -1,15 +1,17 @@
 """Testing for OneDimensionalCover and CubicalCover."""
 # License: GNU AGPLv3
 
+from functools import reduce
+
 import numpy as np
+import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers, booleans, composite
 from numpy.testing import assert_almost_equal
-from functools import reduce
-import pytest
-
+from sklearn.base import clone
 from sklearn.exceptions import NotFittedError
+
 from gtda.mapper import OneDimensionalCover, CubicalCover
 
 
@@ -18,36 +20,32 @@ def get_filter_values(draw, shape=None):
     """Generate a 1d array of floats, of a given shape. If the shape is not
     given, generate a shape of at least (4,)."""
     if shape is None:
-        shape = array_shapes(min_dims=1, max_dims=1,
-                             min_side=4)
-    points = draw(arrays(dtype=np.float,
-                         elements=floats(allow_nan=False,
-                                         allow_infinity=False,
-                                         min_value=-1e10,
-                                         max_value=1e10),
-                         shape=shape, unique=True))
-    return points
+        shape = array_shapes(min_dims=1, max_dims=1,cmin_side=4)
+    return draw(arrays(dtype=np.float,
+                       elements=floats(allow_nan=False,
+                                       allow_infinity=False,
+                                       min_value=-1e10,
+                                       max_value=1e10),
+                       shape=shape, unique=True))
 
 
 @composite
 def get_nb_intervals(draw):
-    nb_intervals = draw(integers(min_value=3, max_value=20))
-    return nb_intervals
+    return draw(integers(min_value=3, max_value=20))
 
 
 @composite
 def get_overlap_fraction(draw):
-    overlap = draw(floats(allow_nan=False,
-                          allow_infinity=False,
-                          min_value=1e-8, exclude_min=True,
-                          max_value=1., exclude_max=True))
-    return overlap
+    return draw(floats(allow_nan=False,
+                       allow_infinity=False,
+                       min_value=1e-8, exclude_min=True,
+                       max_value=1., exclude_max=True))
 
 
 @composite
 def get_kind(draw):
     is_uniform = draw(booleans())
-    return 'uniform' if is_uniform else 'balanced'
+    return "uniform" if is_uniform else "balanced"
 
 
 @given(filter_values=get_filter_values(), n_intervals=get_nb_intervals())
@@ -78,8 +76,7 @@ def test_filter_values_covered_by_single_interval(filter_values):
     cover = OneDimensionalCover(n_intervals=1)
     interval_masks = cover.fit_transform(filter_values)
     # TODO: Generate filter_values with desired shape
-    assert_almost_equal(
-        filter_values[:, None][interval_masks], filter_values)
+    assert_almost_equal(filter_values[:, None][interval_masks], filter_values)
 
 
 @given(filter_values=get_filter_values(),
@@ -88,13 +85,13 @@ def test_filter_values_covered_by_single_interval(filter_values):
 def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
     """Test that all the intervals have the same length, up to an additive
     constant of 0.1."""
-    cover = OneDimensionalCover(kind='uniform',
-                                n_intervals=n_intervals,
+    cover = OneDimensionalCover(kind="uniform", n_intervals=n_intervals,
                                 overlap_frac=overlap_frac)
     cover = cover.fit(filter_values)
 
     lower_limits, upper_limits = np.array(
-        list(map(tuple, zip(*cover.get_fitted_intervals()[1:-1]))))
+        list(map(tuple, zip(*cover.get_fitted_intervals()[1:-1])))
+        )
 
     # rounding precision
     decimals = 10
@@ -128,8 +125,7 @@ def test_balanced_is_balanced(balanced_cover):
 
 
 @given(filter_values=get_filter_values(), n_intervals=get_nb_intervals())
-def test_filter_values_covered_by_interval_union(filter_values,
-                                                 n_intervals):
+def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
     """Test that each value is at least in one interval.
     (that is, the cover is a true cover)."""
     # TODO: Extend to inputs with shape (n_samples, 1)
@@ -185,20 +181,20 @@ def test_two_dimensional_tensor(pts):
     _ = cubical.fit(pts)
 
 
-@given(filter_values=get_filter_values(),
-       kind=get_kind(),
-       n_intervals=get_nb_intervals(),
-       overlap_fraction=get_overlap_fraction())
-def test_cubical_fit_transform_consistent_with_1D(
-        filter_values, kind, n_intervals, overlap_fraction
+@given(filter_values=get_filter_values(), kind=get_kind(),
+       n_intervals=get_nb_intervals(), overlap_fraction=get_overlap_fraction())
+@pytest.mark.parametrize("cover_cls", [OneDimensionalCover, CubicalCover])
+def test_fit_transform_equals_fittransform(
+        filter_values, kind, n_intervals, overlap_fraction, cover_cls
         ):
     """Check that CubicalCover gives the same results as OneDimensionalCover,
-    on one-d data """
-    one_d = OneDimensionalCover(kind, n_intervals, overlap_fraction)
-    cubical = CubicalCover(kind, n_intervals, overlap_fraction)
-    x_one_d = one_d.fit_transform(filter_values)
-    x_cubical = cubical.fit_transform(filter_values)
-    assert_almost_equal(x_one_d, x_cubical)
+    on 1D data."""
+    cover = cover_cls(kind, n_intervals, overlap_fraction)
+    cover_clone = clone(cover)
+    assert np.array_equal(
+        cover.fit_transform(filter_values),
+        cover_clone.fit(filter_values).transform(filter_values)
+        )
 
 
 @given(filter_values=get_filter_values(), kind=get_kind(),
@@ -212,4 +208,4 @@ def test_cubical_fit_transform_consistent_with_1D(
     cubical = CubicalCover(kind, n_intervals, overlap_fraction)
     x_one_d = one_d.fit(filter_values).transform(filter_values)
     x_cubical = cubical.fit(filter_values).transform(filter_values)
-    assert_almost_equal(x_one_d, x_cubical)
+    assert np.array_equal(x_one_d, x_cubical)
