@@ -20,7 +20,7 @@ def get_filter_values(draw, shape=None):
     """Generate a 1d array of floats, of a given shape. If the shape is not
     given, generate a shape of at least (4,)."""
     if shape is None:
-        shape = array_shapes(min_dims=1, max_dims=1,cmin_side=4)
+        shape = array_shapes(min_dims=1, max_dims=1, cmin_side=4)
     return draw(arrays(dtype=np.float,
                        elements=floats(allow_nan=False,
                                        allow_infinity=False,
