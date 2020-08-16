@@ -14,9 +14,9 @@ from gtda.mapper import OneDimensionalCover, CubicalCover
 
 
 @composite
-def get_filter(draw, shape=None):
-    """Generate a 1d array of floats, of a given shape.
-    If the shape is not given, generate a shape of at least (4,)."""
+def get_filter_values(draw, shape=None):
+    """Generate a 1d array of floats, of a given shape. If the shape is not
+    given, generate a shape of at least (4,)."""
     if shape is None:
         shape = array_shapes(min_dims=1, max_dims=1,
                              min_side=4)
@@ -40,8 +40,7 @@ def get_overlap_fraction(draw):
     overlap = draw(floats(allow_nan=False,
                           allow_infinity=False,
                           min_value=1e-8, exclude_min=True,
-                          max_value=1., exclude_max=True),
-                   )
+                          max_value=1., exclude_max=True))
     return overlap
 
 
@@ -51,17 +50,13 @@ def get_kind(draw):
     return 'uniform' if is_uniform else 'balanced'
 
 
-@given(
-    filter_values=get_filter(),
-    n_intervals=get_nb_intervals()
-)
+@given(filter_values=get_filter_values(), n_intervals=get_nb_intervals())
 def test_one_dimensional_cover_shape(filter_values, n_intervals):
-    """Assert that the length of the mask ``unique_interval_masks``
-    corresponds to the pre-specified ``n_samples`` and that there
-    are no more intervals in the cover than ``n_intervals``.
-    The case when the filter has only a unique value, in which
-    case the fit_transform should throw an error, is treated separately.
-    """
+    """Assert that the length of the mask ``unique_interval_masks`` corresponds
+    to the pre-specified ``n_samples`` and that there are no more intervals in
+    the cover than ``n_intervals``. The case when the filter has only a unique
+    value, in which case fit_transform should throw an error, is treated
+    separately."""
     # TODO: Extend to inputs with shape (n_samples, 1)
     cover = OneDimensionalCover(n_intervals=n_intervals)
     n_samples, n_intervals = len(filter_values), cover.n_intervals
@@ -75,9 +70,7 @@ def test_one_dimensional_cover_shape(filter_values, n_intervals):
         assert (n_intervals > 1) and (len(np.unique(filter_values)) == 1)
 
 
-@given(
-    filter_values=get_filter()
-)
+@given(filter_values=get_filter_values())
 def test_filter_values_covered_by_single_interval(filter_values):
     """Verify that a single intervals covers all the values in
     ``filter_values``"""
@@ -89,11 +82,9 @@ def test_filter_values_covered_by_single_interval(filter_values):
         filter_values[:, None][interval_masks], filter_values)
 
 
-@given(
-    filter_values=get_filter(),
-    n_intervals=get_nb_intervals(),
-    overlap_frac=get_overlap_fraction()
-)
+@given(filter_values=get_filter_values(),
+       n_intervals=get_nb_intervals(),
+       overlap_frac=get_overlap_fraction())
 def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
     """Test that all the intervals have the same length, up to an additive
     constant of 0.1."""
@@ -116,29 +107,27 @@ def get_input_tests_balanced(draw):
     """Points, nb_in_each_interval and nb_intervals"""
     nb_intervals = draw(get_nb_intervals())
     nb_in_each_interval = draw(integers(min_value=2, max_value=5))
-    points = draw(get_filter(shape=(nb_in_each_interval * nb_intervals,)))
+    points = draw(
+        get_filter_values(shape=(nb_in_each_interval * nb_intervals,))
+        )
     return [points, nb_in_each_interval, nb_intervals]
 
 
-@given(input=get_input_tests_balanced())
-def test_balanced_is_balanced(input):
+@given(balanced_cover=get_input_tests_balanced())
+def test_balanced_is_balanced(balanced_cover):
     """Test that each point is in one interval, and that each interval has
     ``nb_in_each_interval`` points."""
-    points, nb_in_each_interval, nb_intervals = input
-    oneD_cover = OneDimensionalCover(kind='balanced',
-                                     n_intervals=nb_intervals,
-                                     overlap_frac=0.01)
-    mask = oneD_cover.fit_transform(points)
+    points, nb_in_each_interval, nb_intervals = balanced_cover
+    cover = OneDimensionalCover(kind='balanced', n_intervals=nb_intervals,
+                                overlap_frac=0.01)
+    mask = cover.fit_transform(points)
     # each interval contains nb_in_each_interval points
     assert all([s == nb_in_each_interval for s in np.sum(mask, axis=0)])
     # each point is in exactly one interval
     assert all([s == 1 for s in np.sum(mask, axis=1)])
 
 
-@given(
-    filter_values=get_filter(),
-    n_intervals=get_nb_intervals()
-)
+@given(filter_values=get_filter_values(), n_intervals=get_nb_intervals())
 def test_filter_values_covered_by_interval_union(filter_values,
                                                  n_intervals):
     """Test that each value is at least in one interval.
@@ -154,14 +143,11 @@ def test_filter_values_covered_by_interval_union(filter_values,
     assert_almost_equal(filter_values_union, filter_values)
 
 
-@given(
-    pts=get_filter(),
-    n_intervals=get_nb_intervals(),
-    overlap_frac=get_overlap_fraction(),
-    kind=get_kind()
-)
-def test_fit_transform_against_fit_and_transform(pts, n_intervals,
-                                                 kind, overlap_frac):
+@given(pts=get_filter_values(), n_intervals=get_nb_intervals(),
+       overlap_frac=get_overlap_fraction(), kind=get_kind())
+def test_fit_transform_against_fit_and_transform(
+        pts, n_intervals, kind, overlap_frac
+        ):
     """Fitting and transforming should give the same result as fit_transform"""
     cover = OneDimensionalCover(n_intervals=n_intervals, kind=kind,
                                 overlap_frac=overlap_frac)
@@ -185,7 +171,9 @@ def test_fit_transform_limits_not_computed():
         _ = cover.get_fitted_intervals()
 
 
-@given(pts=get_filter(shape=array_shapes(min_dims=2, max_dims=2, min_side=2)))
+@given(pts=get_filter_values(
+    shape=array_shapes(min_dims=2, max_dims=2, min_side=2)
+    ))
 def test_two_dimensional_tensor(pts):
     """Verify that the oneDimensionalCover fails for an input
     with more than one dimension, and that the CubicalCover
@@ -197,34 +185,31 @@ def test_two_dimensional_tensor(pts):
     _ = cubical.fit(pts)
 
 
-@given(filter=get_filter(),
+@given(filter_values=get_filter_values(),
        kind=get_kind(),
        n_intervals=get_nb_intervals(),
-       overlap_fraction=get_overlap_fraction(),)
-def test_cubical_fit_transform_consistent_with_OneD(filter, kind,
-                                                    n_intervals,
-                                                    overlap_fraction):
+       overlap_fraction=get_overlap_fraction())
+def test_cubical_fit_transform_consistent_with_1D(
+        filter_values, kind, n_intervals, overlap_fraction
+        ):
     """Check that CubicalCover gives the same results as OneDimensionalCover,
     on one-d data """
     one_d = OneDimensionalCover(kind, n_intervals, overlap_fraction)
     cubical = CubicalCover(kind, n_intervals, overlap_fraction)
-    x_one_d = one_d.fit_transform(filter)
-    x_cubical = cubical.fit_transform(filter)
+    x_one_d = one_d.fit_transform(filter_values)
+    x_cubical = cubical.fit_transform(filter_values)
     assert_almost_equal(x_one_d, x_cubical)
 
 
-@given(filter=get_filter(),
-       kind=get_kind(),
-       n_intervals=get_nb_intervals(),
-       overlap_fraction=get_overlap_fraction(),
-       )
-def test_cubical_fit_A_transform_consistent_with_OneD(filter, kind,
-                                                      n_intervals,
-                                                      overlap_fraction):
+@given(filter_values=get_filter_values(), kind=get_kind(),
+       n_intervals=get_nb_intervals(), overlap_fraction=get_overlap_fraction())
+def test_cubical_fit_transform_consistent_with_1D(
+        filter_values, kind, n_intervals, overlap_fraction
+        ):
     """Check that CubicalCover gives the same results as OneDimensionalCover,
     on one-d data """
     one_d = OneDimensionalCover(kind, n_intervals, overlap_fraction)
     cubical = CubicalCover(kind, n_intervals, overlap_fraction)
-    x_one_d = one_d.fit(filter).transform(filter)
-    x_cubical = cubical.fit(filter).transform(filter)
+    x_one_d = one_d.fit(filter_values).transform(filter_values)
+    x_cubical = cubical.fit(filter_values).transform(filter_values)
     assert_almost_equal(x_one_d, x_cubical)

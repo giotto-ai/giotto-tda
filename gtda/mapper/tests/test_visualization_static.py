@@ -69,7 +69,7 @@ def test_valid_hoverlabel_bgcolor(layout_dim):
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim,
         plotly_params={"node_trace": {"hoverlabel_bgcolor": "white"}}
-    )
+        )
     assert fig.data[1]["hoverlabel"]["bgcolor"] == "white"
 
 
@@ -79,7 +79,7 @@ def test_unsuitable_colorscale_for_hoverlabel_3d():
         _ = plot_static_mapper_graph(
             pipe, X, layout_dim=3,
             plotly_params={"node_trace": {"marker_colorscale": hsl_colorscale}}
-        )
+            )
 
 
 def test_valid_colorscale():
@@ -88,11 +88,11 @@ def test_valid_colorscale():
     fig_2d = plot_static_mapper_graph(
         pipe, X, layout_dim=2,
         plotly_params={"node_trace": {"marker_colorscale": "blues"}}
-    )
+        )
     fig_3d = plot_static_mapper_graph(
         pipe, X, layout_dim=3,
         plotly_params={"node_trace": {"marker_colorscale": "blues"}}
-    )
+        )
 
     # Test that the custom colorscale is correctly applied both in 2d and in 3d
     marker_colorscale = fig_2d.data[1]["marker"]["colorscale"]
@@ -115,11 +115,11 @@ def test_colors_same_2d_3d(color_variable, node_color_statistic):
     fig_2d = plot_static_mapper_graph(
         pipe, X, layout_dim=2, color_variable=color_variable,
         node_color_statistic=node_color_statistic
-    )
+        )
     fig_3d = plot_static_mapper_graph(
         pipe, X, layout_dim=3, color_variable=color_variable,
         node_color_statistic=node_color_statistic
-    )
+        )
     assert fig_2d.data[1].marker.color == fig_3d.data[1].marker.color
 
 
@@ -128,7 +128,7 @@ def test_color_by_column_dropdown_2d(layout_dim):
     pipe = make_mapper_pipeline()
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim, color_by_columns_dropdown=True
-    )
+        )
     fig_buttons = fig.layout.updatemenus[0].buttons
 
     assert list(fig.data[1].marker.color) == \
@@ -137,7 +137,7 @@ def test_color_by_column_dropdown_2d(layout_dim):
     for i in range(X.shape[1]):
         fig_col_i = plot_static_mapper_graph(
             pipe, X, layout_dim=layout_dim, color_variable=i
-        )
+            )
         assert list(fig_col_i.data[1].marker.color) == \
             list(fig_buttons[i + 1].args[0]["marker.color"][1])
 
