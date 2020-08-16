@@ -3,7 +3,7 @@
 
 import numpy as np
 import pytest
-from gtda.mapper import FirstSimpleGap, make_mapper_pipeline, \
+from gtda.mapper import CubicalCover, FirstSimpleGap, make_mapper_pipeline, \
     plot_interactive_mapper_graph
 
 N = 50
@@ -22,20 +22,36 @@ def _get_widget_by_trait(fig, key, val=None):
             pass
 
 
-@pytest.mark.parametrize('clone_pipeline', [True, False])
-def test_pipeline_cloned(clone_pipeline):
+@pytest.mark.parametrize("clone_pipeline", [True, False])
+@pytest.mark.parametrize("layout_dim", [2, 3])
+def test_pipeline_cloned(clone_pipeline, layout_dim):
     """Verify that the pipeline is not changed on interaction if and only if
     `clone_pipeline` is True."""
-    initial_affin = 'euclidean'
-    new_affin = 'manhattan'
+    params = {
+        "cover": {
+            "initial": {"n_intervals": 10, "kind": "uniform",
+                        "overlap_frac": 0.1},
+            "final": {"n_intervals": 15, "kind": "balanced",
+                      "overlap_frac": 0.2}
+            },
+        "clusterer": {"initial": {"affinity": "euclidean"},
+                      "final": {"affinity": "manhattan"}}
+        }
 
     pipe = make_mapper_pipeline(
-        clusterer=FirstSimpleGap(affinity=initial_affin)
+        cover=CubicalCover(**params["cover"]["initial"]),
+        clusterer=FirstSimpleGap(**params["clusterer"]["initial"])
         )
-    fig = plot_interactive_mapper_graph(pipe, X, clone_pipeline=clone_pipeline)
+    fig = plot_interactive_mapper_graph(
+        pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim
+        )
 
-    # Get widget and change the affinity type
-    w_text = _get_widget_by_trait(fig, 'description', 'affinity')
-    w_text.set_state({'value': new_affin})
-    final_affin = pipe.get_mapper_params()['clusterer__affinity']
-    assert final_affin == initial_affin if clone_pipeline else new_affin
+    # Get relevant widgets and change their states
+    for step, values in params.items():
+        for param_name, initial_param_value in values["initial"].items():
+            w_text = _get_widget_by_trait(fig, 'description', param_name)
+            w_text.set_state({'value': values["final"][param_name]})
+            final_param = \
+                pipe.get_mapper_params()[f"{step}__{param_name}"]
+            assert final_param == initial_param_value \
+                if clone_pipeline else values["final"][param_name]
