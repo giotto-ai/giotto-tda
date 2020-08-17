@@ -77,7 +77,7 @@ def test_firstsimplegap(inp):
     has the correct number of points ``n_points_per_cluster``."""
     n_points_per_cluster, n_clusters, _, pts = inp
     fs = FirstSimpleGap(relative_gap_size=0.5,
-                        max_fraction=None,
+                        max_fraction=1.,
                         affinity='euclidean', memory=None, linkage='single')
     preds = fs.fit_predict(pts).astype(int)
     unique, counts = np.unique(preds, return_counts=True)
@@ -93,7 +93,7 @@ def test_firsthistogramgap(inp):
     appropriate parameters finds the right number of clusters, and that each
     has the correct number of points ``n_points_per_cluster``."""
     n_points_per_cluster, n_clusters, _, pts = inp
-    fh = FirstHistogramGap(freq_threshold=0, max_fraction=None, n_bins_start=5,
+    fh = FirstHistogramGap(freq_threshold=0, max_fraction=1., n_bins_start=5,
                            affinity='euclidean', memory=None, linkage='single')
     preds = fh.fit_predict(pts)
     unique, counts = np.unique(preds, return_counts=True)
@@ -104,20 +104,20 @@ def test_firsthistogramgap(inp):
 
 
 @given(inp=get_input(), max_frac=floats(min_value=0., exclude_min=True,
-                                        max_value=1., exclude_max=True))
+                                        max_value=1., exclude_max=False))
 def test_max_fraction_clusters(inp, max_frac):
     """ Check that ``FirstSimpleGap`` and ``FirstHistogramGap`` respect the
     ``max_num_clusters`` constraint, if it is set."""
     n_points_per_cluster, n_clusters, _, pts = inp
-    max_num_clusters = max_frac * (n_points_per_cluster * n_clusters - 1)
+    max_num_clusters = max_frac * n_points_per_cluster * n_clusters
 
     fs = FirstSimpleGap(max_fraction=max_frac)
     _ = fs.fit_predict(pts)
-    assert fs.n_clusters_ <= np.ceil(max_num_clusters*n_clusters)
+    assert fs.n_clusters_ <= np.floor(max_num_clusters)
 
     fh = FirstHistogramGap(max_fraction=max_frac)
     _ = fh.fit_predict(pts)
-    assert fh.n_clusters_ <= np.ceil(max_num_clusters*n_clusters)
+    assert fh.n_clusters_ <= np.floor(max_num_clusters)
 
 
 @given(inp=get_input())
@@ -127,12 +127,12 @@ def test_precomputed_distances(inp):
     n_points_per_cluster, n_clusters, _, pts = inp
 
     dist_matrix = distance_matrix(pts, pts, p=2)
-    fh_matrix = FirstHistogramGap(freq_threshold=0, max_fraction=None,
+    fh_matrix = FirstHistogramGap(freq_threshold=0, max_fraction=1.,
                                   n_bins_start=5, affinity='precomputed',
                                   memory=None, linkage='single')
     preds_mat = fh_matrix.fit_predict(dist_matrix)
 
-    fh = FirstHistogramGap(freq_threshold=0, max_fraction=None,
+    fh = FirstHistogramGap(freq_threshold=0, max_fraction=1.,
                            n_bins_start=5, affinity='euclidean',
                            memory=None, linkage='single')
     preds = fh.fit_predict(pts)
