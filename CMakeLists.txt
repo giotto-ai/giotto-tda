@@ -17,7 +17,7 @@ set(HERA_DIR "gtda/externals/hera")
 #                               Ripser                                #
 #######################################################################
 
-pybind11_add_module(gtda_ripser "${BINDINGS_DIR}/ripser_bindings.cpp")
+pybind11_add_module(gtda_ripser MODULE "${BINDINGS_DIR}/ripser_bindings.cpp")
 set_property(TARGET gtda_ripser PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -39,7 +39,7 @@ endif()
 #                     Ripser - Coefficient enable                     #
 #######################################################################
 
-pybind11_add_module(gtda_ripser_coeff "${BINDINGS_DIR}/ripser_bindings.cpp")
+pybind11_add_module(gtda_ripser_coeff MODULE "${BINDINGS_DIR}/ripser_bindings.cpp")
 set_property(TARGET gtda_ripser_coeff PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -61,7 +61,7 @@ endif()
 #                             Wasserstein                             #
 #######################################################################
 
-pybind11_add_module(gtda_wasserstein ${BINDINGS_DIR}/wasserstein_bindings.cpp)
+pybind11_add_module(gtda_wasserstein MODULE ${BINDINGS_DIR}/wasserstein_bindings.cpp)
 set_property(TARGET gtda_wasserstein PROPERTY CXX_STANDARD 14)
 
 target_link_libraries(gtda_wasserstein LINK_PUBLIC ${Boost_LIBRARIES})
@@ -82,7 +82,7 @@ endif()
 #                             Bottleneck                              #
 #######################################################################
 
-pybind11_add_module(gtda_bottleneck "${BINDINGS_DIR}/bottleneck_bindings.cpp")
+pybind11_add_module(gtda_bottleneck MODULE "${BINDINGS_DIR}/bottleneck_bindings.cpp")
 set_property(TARGET gtda_bottleneck PROPERTY CXX_STANDARD 14)
 
 target_link_libraries(gtda_bottleneck LINK_PUBLIC ${Boost_LIBRARIES})
@@ -103,7 +103,7 @@ endif()
 #                           Cubical Complex                           #
 #######################################################################
 
-pybind11_add_module(gtda_cubical_complex "${BINDINGS_DIR}/cubical_complex_bindings.cpp")
+pybind11_add_module(gtda_cubical_complex MODULE "${BINDINGS_DIR}/cubical_complex_bindings.cpp")
 set_property(TARGET gtda_cubical_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -128,7 +128,7 @@ endif()
 #                        Persistent Cohomology                        #
 #######################################################################
 
-pybind11_add_module(gtda_persistent_cohomology "${BINDINGS_DIR}/persistent_cohomology_bindings.cpp")
+pybind11_add_module(gtda_persistent_cohomology MODULE "${BINDINGS_DIR}/persistent_cohomology_bindings.cpp")
 set_property(TARGET gtda_persistent_cohomology PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -155,7 +155,7 @@ endif()
 #                            Simplex Tree                             #
 #######################################################################
 
-pybind11_add_module(gtda_simplex_tree "${BINDINGS_DIR}/simplex_tree_bindings.cpp")
+pybind11_add_module(gtda_simplex_tree MODULE "${BINDINGS_DIR}/simplex_tree_bindings.cpp")
 set_property(TARGET gtda_simplex_tree PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -184,7 +184,7 @@ endif()
 #                      Periodic Cubical Complex                       #
 #######################################################################
 
-pybind11_add_module(gtda_periodic_cubical_complex "${BINDINGS_DIR}/periodic_cubical_complex_bindings.cpp")
+pybind11_add_module(gtda_periodic_cubical_complex MODULE "${BINDINGS_DIR}/periodic_cubical_complex_bindings.cpp")
 set_property(TARGET gtda_periodic_cubical_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -211,7 +211,7 @@ endif()
 #                           Witness Complex                           #
 #######################################################################
 
-pybind11_add_module(gtda_witness_complex "${BINDINGS_DIR}/witness_complex_bindings.cpp")
+pybind11_add_module(gtda_witness_complex MODULE "${BINDINGS_DIR}/witness_complex_bindings.cpp")
 set_property(TARGET gtda_witness_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -240,7 +240,7 @@ endif()
 #                       Strong Witness Complex                        #
 #######################################################################
 
-pybind11_add_module(gtda_strong_witness_complex "${BINDINGS_DIR}/strong_witness_complex_bindings.cpp")
+pybind11_add_module(gtda_strong_witness_complex MODULE "${BINDINGS_DIR}/strong_witness_complex_bindings.cpp")
 set_property(TARGET gtda_strong_witness_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -269,7 +269,7 @@ endif()
 #                             RipsComplex                             #
 #######################################################################
 
-pybind11_add_module(gtda_sparse_rips_complex "${BINDINGS_DIR}/rips_complex_bindings.cpp")
+pybind11_add_module(gtda_sparse_rips_complex MODULE "${BINDINGS_DIR}/rips_complex_bindings.cpp")
 set_property(TARGET gtda_sparse_rips_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
@@ -299,7 +299,7 @@ endif()
 #                            Cech Complex                             #
 #######################################################################
 
-pybind11_add_module(gtda_cech_complex "${BINDINGS_DIR}/cech_complex_bindings.cpp")
+pybind11_add_module(gtda_cech_complex MODULE "${BINDINGS_DIR}/cech_complex_bindings.cpp")
 set_property(TARGET gtda_cech_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
