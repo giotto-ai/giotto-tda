@@ -2,7 +2,6 @@
 # License: GNU AGPLv3
 
 import numpy as np
-import pytest
 from gtda.mapper import CubicalCover, FirstSimpleGap, make_mapper_pipeline, \
     plot_interactive_mapper_graph
 
