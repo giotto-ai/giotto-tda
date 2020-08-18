@@ -607,7 +607,6 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self)
         yr = column_or_1d(y)
 
-        yr = np.flip(yr)
-        final_index = -self.time_delay_ * (self.dimension_ - 1)
-        yr = np.flip(yr[:final_index:self.stride])
+        final_index = self.time_delay_ * (self.dimension_ - 1)
+        yr = yr[:final_index - 1:-self.stride][::-1]
         return yr
