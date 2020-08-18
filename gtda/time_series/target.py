@@ -20,8 +20,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     """Target creation from sliding windows over a time series.
 
     Useful to define a time series forecasting task in which labels are
-    obtained from future values of the input time series, via the
-    application of a function to time windows.
+    obtained from future values of the input time series, via the application
+    of a function to time windows.
 
     Parameters
     ----------
@@ -37,8 +37,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     percentiles : list of real numbers between 0 and 100 inclusive, or \
         None, optional, default: ``None``
-        If ``None``, creates a target for a regression task. Otherwise,
-        creates a target for an n-class classification task where
+        If ``None``, creates a target for a regression task. Otherwise, creates
+        a target for an n-class classification task where
         ``n = len(percentiles) + 1``.
 
     n_steps_future : int, optional, default: ``1``
@@ -55,8 +55,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     >>> import numpy as np
     >>> from gtda.time_series import Labeller
     >>> # Create a time series
-    >>> X = np.arange(10).reshape(-1, 1)
-    >>> labeller = Labeller(width=2)
+    >>> X = np.arange(10)
+    >>> labeller = Labeller(width=2, func=np.max)
     >>> # Fit and transform X
     >>> X, y = labeller.fit_transform_resample(X, X)
     >>> print(X)
@@ -69,8 +69,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
      [7]
      [8]]
     >>> print(y)
-    [0.81649658 0.81649658 0.81649658 0.81649658 0.81649658 0.81649658
-     0.81649658 0.81649658]
+    [0 1 2 3 4 5 6 7]
 
     """
 
@@ -193,7 +192,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                 [1 * (yr >= self.thresholds_[-1])], axis=1)
             yr = np.nonzero(yr)[1].reshape(yr.shape[0], 1)
 
-        if self.n_steps_future >= self.width:
-            yr = yr[self.n_steps_future - self.width + 1:]
+        if self.n_steps_future > self.width:
+            yr = yr[self.n_steps_future - self.width:]
 
         return yr.reshape(-1)

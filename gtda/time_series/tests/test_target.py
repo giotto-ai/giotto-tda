@@ -16,7 +16,7 @@ def test_labeller_shape():
     labeller = Labeller(width=width, func=np.std, func_params={},
                         percentiles=None, n_steps_future=1)
     signal_transformed = labeller.fit_transform(signal)
-    assert signal_transformed.shape == (20-(width+1)+1, 1)
+    assert signal_transformed.shape == (20 - (width + 1) + 1, 1)
 
 
 def test_labeller_transformed():
@@ -25,17 +25,32 @@ def test_labeller_transformed():
     labeller = Labeller(width=width, func=np.max, func_params={},
                         percentiles=None, n_steps_future=n_steps_future)
     x, y = labeller.fit_transform_resample(X, X)
-    assert_almost_equal(x, X[(width-1):-n_steps_future])
+    assert_almost_equal(x, X[(width - 1):-n_steps_future])
+    assert len(x) == len(y)
 
 
 def test_labeller_resampled():
     width = 5
-    n_steps_future = 1
     labeller = Labeller(width=width, func=np.max, func_params={},
-                        percentiles=None, n_steps_future=n_steps_future)
+                        percentiles=None, n_steps_future=1)
     x, y = labeller.fit_transform_resample(X, X)
     assert_almost_equal(y, np.array([5, 6, 7, 8, 9, 9, 9,
                                      9, 9, 9, 5, 6, 7, 8, 9]))
+    assert len(x) == len(y)
+
+    # Test behaviour when n_steps_future = width
+    labeller.set_params(n_steps_future=width)
+    x, y = labeller.fit_transform_resample(X, X)
+    assert_almost_equal(y, np.array([5, 6, 7, 8, 9, 9, 9,
+                                     9, 9, 9, 5, 6, 7, 8, 9]))
+    assert len(x) == len(y)
+
+    # Test behaviour when n_steps_future > width
+    labeller.set_params(n_steps_future=width + 1)
+    x, y = labeller.fit_transform_resample(X, X)
+    assert_almost_equal(y, np.array([6, 7, 8, 9, 9, 9, 9,
+                                     9, 9, 5, 6, 7, 8, 9]))
+    assert len(x) == len(y)
 
 
 def test_labeller_with_percentage():
