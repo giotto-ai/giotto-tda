@@ -215,14 +215,14 @@ def time_delay_embedding(
     """Time-delay embeddings of arrays of time-series data.
 
     On a 1D array `X` representing a single time series, the time-delay
-    embedding algorithm is the one described in
-    :class:`~gtda.time_series.TakensEmbedding` and yields a 2D array
-    representing a point cloud in Euclidean space. 2D array inputs are
-    interpreted as collections of time series (one per entry along axis 0), and
-    the algorithm is applied to each time series separately to produce a 3D
-    array of point clouds. More generally, N-dimensional array inputs are
-    interpreted as containing one time series per entry along the first N - 1
-    axes, and a (N + 1)-dimensional array of point clouds is returned.
+    embedding algorithm is the one described in :class:`TakensEmbedding` and
+    yields a 2D array representing a point cloud in Euclidean space. 2D array
+    inputs are interpreted as collections of time series (one per entry along
+    axis 0), and the algorithm is applied to each time series separately to
+    produce a 3D array of point clouds. More generally, N-dimensional array
+    inputs are interpreted as containing one time series per entry along the
+    first N - 1 axes, and a (N + 1)-dimensional array of point clouds is
+    returned.
 
     Parameters
     ----------
