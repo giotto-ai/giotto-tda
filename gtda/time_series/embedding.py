@@ -264,6 +264,16 @@ def time_delay_embedding(
     --------
     TakensEmbedding, SlidingWindow
 
+    Notes
+    -----
+    When `X` is 1D and `ensure_last_value` is ``True``, this function gives
+    identical outputs as the :meth:`fit_transform` method of a
+    :class:`TakensEmbedding` object instantiated with
+    ``parameters_type='fixed'`` (and its other parameters set appropriately).
+    However, :class:`TakensEmbedding` only accepts 2D array input when it is a
+    column vector, in which case it is flattened to 1D and interpreted as a
+    single time series.
+
     """
     if validate:
         expected_params = {
@@ -319,6 +329,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     If :math:`d` and :math:`\\tau` are not explicitly set, suitable values are
     searched for during :meth:`fit`. [2]_ [3]_
+
+    To compute time-delay embeddings of several time series simultaneously, use
+    :func:`time_delay_embedding` instead.
 
     Parameters
     ----------
