@@ -249,8 +249,8 @@ def time_delay_embedding(
     -------
     X_embedded : ndarray of shape (n_points, dimension) or \
         (n_time_series, ..., n_points, dimension)
-        The result of the time-delay embedding of `X` with the given
-        parameters. If `X` is 1D, `X_embedded` is a single point cloud in
+        The result (a view on `X`) of the time-delay embedding of `X` with the
+        given parameters. If `X` is 1D, `X_embedded` is a single point cloud in
         Euclidean space of dimension given by `dimension`. If `X` is
         N-dimensional, `X_embedded` contains one such point cloud per entry of
         `X` along its first N - 1 axes. In both cases, ``n_points`` is equal to
