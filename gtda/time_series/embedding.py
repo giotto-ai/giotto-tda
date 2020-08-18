@@ -258,7 +258,7 @@ def time_delay_embedding(
         Euclidean space of dimension given by `dimension`. If `X` is
         N-dimensional, `X_embedded` contains one such point cloud per entry of
         `X` along its first N - 1 axes. In both cases, ``n_points`` is equal to
-        ``(n_samples - time_delay * (dimension - 1) - 1) // stride + 1``.
+        ``(n_timestamps - time_delay * (dimension - 1) - 1) // stride + 1``.
 
     See also
     --------
