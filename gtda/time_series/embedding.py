@@ -233,7 +233,7 @@ def time_delay_embedding(
         Time delay between two consecutive values for constructing one embedded
         point.
 
-    dimension : int, optional, default: ``5``
+    dimension : int, optional, default: ``2``
         Dimension of the embedding space.
 
     stride : int, optional, default: ``1``
