@@ -156,8 +156,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
             Target.
 
         X : None
-            There is no need for input data, yet the pipeline API requires
-            this parameter.
+            There is no need for input data, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -517,8 +517,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
             Input data.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -593,8 +593,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
             Target.
 
         X : None
-            There is no need for input data, yet the pipeline API requires
-            this parameter.
+            There is no need for input data, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------

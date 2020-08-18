@@ -103,8 +103,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Time series to build a target for.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -140,8 +140,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Time series to build a target for.
 
         y : None
-            There is no need for a target, yet the pipeline API
-            requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
