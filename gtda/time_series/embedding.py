@@ -445,8 +445,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
         """Calculate the mutual information given the time delay."""
-        contingency = np.histogram2d(X.reshape((-1,))[:-time_delay],
-                                     X.reshape((-1,))[time_delay:],
+        contingency = np.histogram2d(X[:-time_delay], X[time_delay:],
                                      bins=n_bins)[0]
         mutual_information = mutual_info_score(None, None,
                                                contingency=contingency)
@@ -457,11 +456,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """Calculate the number of false nearest neighbours in a certain
         embedding dimension, based on heuristics."""
         X_embedded = time_delay_embedding(
-            X.flatten(), time_delay, dimension, stride, validate=False
+            X, time_delay=time_delay, dimension=dimension, stride=stride,
+            validate=False
             )
 
-        neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
-            X_embedded)
+        neighbor = \
+            NearestNeighbors(n_neighbors=2, algorithm='auto').fit(X_embedded)
         distances, indices = neighbor.kneighbors(X_embedded)
         distance = distances[:, 1]
         X_first_nbhrs = X[indices[:, 1]]
@@ -472,22 +472,23 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         neg_dim_delay = - dimension * time_delay
         distance_slice = distance[:neg_dim_delay]
         X_rolled = np.roll(X, neg_dim_delay)
-        X_rolled_slice = slice(X.shape[0] - X_embedded.shape[0], neg_dim_delay)
+        X_rolled_slice = slice(len(X) - len(X_embedded), neg_dim_delay)
         X_first_nbhrs_rolled = np.roll(X_first_nbhrs, neg_dim_delay)
 
         neighbor_abs_diff = np.abs(
-            X_rolled[X_rolled_slice] - X_first_nbhrs_rolled[:neg_dim_delay]).\
-            flatten()
+            X_rolled[X_rolled_slice] - X_first_nbhrs_rolled[:neg_dim_delay]
+            )
 
         false_neighbor_ratio = np.divide(
             neighbor_abs_diff, distance_slice,
-            out=np.zeros_like(neighbor_abs_diff), where=(distance_slice != 0))
+            out=np.zeros_like(neighbor_abs_diff), where=(distance_slice != 0)
+            )
         false_neighbor_criteria = false_neighbor_ratio > tolerance
 
         limited_dataset_criteria = distance_slice < epsilon
 
-        n_false_neighbors = np.sum(
-            false_neighbor_criteria * limited_dataset_criteria)
+        n_false_neighbors = \
+            np.sum(false_neighbor_criteria * limited_dataset_criteria)
         return n_false_neighbors
 
     def fit(self, X, y=None):
@@ -511,12 +512,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         self : object
 
         """
-        X = check_array(X, ensure_2d=False)
+        X = column_or_1d(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-
-        if X.ndim == 1:
-            X = X[:, None]
 
         if self.parameters_type == 'search':
             mutual_information_list = Parallel(n_jobs=self.n_jobs)(
@@ -562,12 +560,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, ensure_2d=False)
+        Xt = column_or_1d(X).copy()
 
-        if Xt.ndim == 1:
-            Xt = Xt[:, None]
-        Xt = time_delay_embedding(Xt, self.time_delay_, self.dimension_,
-                                  self.stride, validate=False)
+        Xt = time_delay_embedding(
+            Xt, time_delay=self.time_delay_, dimension=self.dimension_,
+            stride=self.stride, validate=False
+            )
 
         return Xt
 
