@@ -210,7 +210,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 def time_delay_embedding(
-        X, time_delay=1, dimension=2, stride=1, ensure_last_value=True
+        X, time_delay=1, dimension=2, stride=1, ensure_last_value=True,
+        validate=True
         ):
     """Time-delay embeddings of arrays of time-series data.
 
@@ -245,6 +246,9 @@ def time_delay_embedding(
         embedding vector(s). If ``False``, the first measurement(s) is (are)
         present as the 0-th coordinate(s) of the 0-th vector(s) instead.
 
+    validate : bool, optional, default: ``True``
+        Whether keyword arguments should be validated.
+
     Returns
     -------
     X_embedded : ndarray of shape (n_points, dimension) or \
@@ -261,10 +265,31 @@ def time_delay_embedding(
     TakensEmbedding, SlidingWindow
 
     """
+    if validate:
+        expected_params = {
+            'time_delay': {'type': int,
+                           'in': Interval(1, np.inf, closed='left')},
+            'dimension': {'type': int,
+                          'in': Interval(1, np.inf, closed='left')},
+            'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+            'ensure_last_value': {'type': bool}
+            }
+        input_params = {
+            'time_delay': time_delay, 'dimension': dimension,
+            'stride': stride, 'ensure_last_value': ensure_last_value
+            }
+        validate_params(input_params, expected_params)
+
     n_timestamps = X.shape[-1]
     n_points, offset = \
         divmod(n_timestamps - time_delay * (dimension - 1) - 1, stride)
     n_points += 1
+    if n_points <= 0:
+        raise ValueError(
+            f"Not enough time stamps ({n_timestamps}) to produce at least "
+            f"one {dimension}-dimensional vector under the current choices "
+            f"of time delay ({time_delay}) and stride ({stride})."
+            )
     indices = np.tile(np.arange(0, time_delay * dimension, time_delay),
                       (n_points, 1))
     indices += np.arange(n_points)[:, None] * stride
@@ -431,8 +456,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     def _false_nearest_neighbors(X, time_delay, dimension, stride=1):
         """Calculate the number of false nearest neighbours in a certain
         embedding dimension, based on heuristics."""
-        X_embedded = \
-            time_delay_embedding(X.flatten(), time_delay, dimension, stride)
+        X_embedded = time_delay_embedding(
+            X.flatten(), time_delay, dimension, stride, validate=False
+            )
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
             X_embedded)
@@ -541,7 +567,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         if Xt.ndim == 1:
             Xt = Xt[:, None]
         Xt = time_delay_embedding(Xt, self.time_delay_, self.dimension_,
-                                  self.stride)
+                                  self.stride, validate=False)
 
         return Xt
 
