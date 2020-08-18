@@ -169,8 +169,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, '_is_fitted')
         yr = column_or_1d(y)
 
-        yr = np.flip(yr)
-        yr = np.flip(yr[:-self.width:self.stride])
+        yr = yr[:self.width - 1:-self.stride][::-1]
         return yr
 
     @staticmethod
