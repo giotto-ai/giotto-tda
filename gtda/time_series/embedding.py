@@ -212,7 +212,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 def time_delay_embedding(
         X, time_delay=1, dimension=2, stride=1, ensure_last_value=True
         ):
-    """Time-delay embeddings of arrays of time series data.
+    """Time-delay embeddings of arrays of time-series data.
 
     On a 1D array `X` representing a single time series, the time-delay
     embedding algorithm is the one described in
