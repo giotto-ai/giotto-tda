@@ -494,7 +494,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         false_neighbor_ratio = np.divide(
             neighbor_abs_diff, distance_slice,
-            out=np.zeros_like(neighbor_abs_diff), where=(distance_slice != 0)
+            out=np.zeros_like(neighbor_abs_diff, dtype=float),
+            where=(distance_slice != 0)
             )
         false_neighbor_criteria = false_neighbor_ratio > tolerance
 
