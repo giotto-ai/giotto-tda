@@ -61,22 +61,23 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    TakensEmbedding
+    TakensEmbedding, time_delay_embedding, \
+    gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
-    The current implementation favours the last entry over the first one,
-    in the sense that the last entry of the last window always equals the last
+    The current implementation favours the last entry over the first one, in
+    the sense that the last entry of the last window always equals the last
     entry in the original time series. Hence, a number of initial entries
-    (depending on the remainder of the division between :math:`n_\\mathrm{
-    samples} - \\mathrm{width} - 1` and the stride) may be lost.
+    (depending on the remainder of the division between
+    ``n_samples - width - 1`` and ``stride``) may be lost.
 
     """
 
     _hyperparameters = {
         'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
-    }
+        }
 
     def __init__(self, width=10, stride=1):
         self.width = width
@@ -208,43 +209,108 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return plot_point_cloud(Xt[sample], plotly_params=plotly_params)
 
 
+def time_delay_embedding(
+        X, time_delay=1, dimension=2, stride=1, ensure_last_value=True
+        ):
+    """Time-delay embeddings of arrays of time series data.
+
+    On a 1D array `X` representing a single time series, the time-delay
+    embedding algorithm is the one described in
+    :class:`~gtda.time_series.TakensEmbedding` and yields a 2D array
+    representing a point cloud in Euclidean space. 2D array inputs are
+    interpreted as collections of time series (one per entry along axis 0), and
+    the algorithm is applied to each time series separately to produce a 3D
+    array of point clouds. More generally, N-dimensional array inputs are
+    interpreted as containing one time series per entry along the first N - 1
+    axes, and a (N + 1)-dimensional array of point clouds is returned.
+
+    Parameters
+    ----------
+    X : ndarray of shape (n_timestamps,) or (n_time_series, ..., n_timestamps)
+        Input time series or collection of time series.
+
+    time_delay : int, optional, default: ``1``
+        Time delay between two consecutive values for constructing one embedded
+        point.
+
+    dimension : int, optional, default: ``5``
+        Dimension of the embedding space.
+
+    stride : int, optional, default: ``1``
+        Stride duration between two consecutive embedded points.
+
+    ensure_last_value : bool, optional, default: ``True``
+        Whether the value(s) of `X` representing the last measurement(s) must
+        be present in the output as the last coordinate(s) of the last
+        embedding vector(s). If ``False``, the first measurement(s) is (are)
+        present as the 0-th coordinate(s) of the 0-th vector(s) instead.
+
+    Returns
+    -------
+    X_embedded : ndarray of shape (n_points, dimension) or \
+        (n_time_series, ..., n_points, dimension)
+        The result of the time-delay embedding of `X` with the given
+        parameters. If `X` is 1D, `X_embedded` is a single point cloud in
+        Euclidean space of dimension given by `dimension`. If `X` is
+        N-dimensional, `X_embedded` contains one such point cloud per entry of
+        `X` along its first N - 1 axes. In both cases, ``n_points`` is equal to
+        ``(n_samples - time_delay * (dimension - 1) - 1) // stride + 1``.
+
+    See also
+    --------
+    TakensEmbedding, SlidingWindow
+
+    """
+    n_timestamps = X.shape[-1]
+    n_points, offset = \
+        divmod(n_timestamps - time_delay * (dimension - 1) - 1, stride)
+    n_points += 1
+    indices = np.tile(np.arange(0, time_delay * dimension, time_delay),
+                      (n_points, 1))
+    indices += np.arange(n_points)[:, None] * stride
+    if ensure_last_value:
+        indices += offset
+
+    X_embedded = X[..., indices]
+    return X_embedded
+
+
 @adapt_fit_transform_docs
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    """Representation of a univariate time series as a time series of
-    point clouds.
+    """Representation of a univariate time series as a time series of point
+    clouds.
 
-    Based on a time-delay embedding technique named after F. Takens [1]_.
-    Given a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence
-    of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
-    of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
-    \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
-    This set is called the :ref:`Takens embedding <takens_embedding>`
-    of the time series and can be interpreted as a point cloud.
+    Based on a time-delay embedding technique named after F. Takens [1]_. Given
+    a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of evenly
+    sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
+    :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i + \\tau},
+    \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`. This set is
+    called the :ref:`Takens embedding <takens_embedding>` of the time series
+    and can be interpreted as a point cloud.
 
     The difference between :math:`t_{i+1}` and :math:`t_i` is called the
-    stride, :math:`\\tau` is called the time delay, and :math:`d` is called
-    the (embedding) dimension.
+    stride, :math:`\\tau` is called the time delay, and :math:`d` is called the
+    (embedding) dimension.
 
-    If :math:`d` and :math:`\\tau` are not explicitly set, suitable values
-    are searched for during :meth:`fit`. [2]_ [3]_
+    If :math:`d` and :math:`\\tau` are not explicitly set, suitable values are
+    searched for during :meth:`fit`. [2]_ [3]_
 
     Parameters
     ----------
     parameters_type : ``'search'`` | ``'fixed'``, optional, default: \
         ``'search'``
-        If set to ``'fixed'``, the values of `time_delay` and `dimension`
-        are used directly in :meth:`transform`. If set to ``'search'``,
-        those values are only used as upper bounds in a search as follows:
-        first, an optimal time delay is found by minimising the time delayed
-        mutual information; then, a heuristic based on an algorithm in [2]_ is
-        used to select an embedding dimension which, when increased, does not
-        reveal a large proportion of "false nearest neighbors".
+        If set to ``'fixed'``, the values of `time_delay` and `dimension` are
+        used directly in :meth:`transform`. If set to ``'search'``, those
+        values are only used as upper bounds in a search as follows: first, an
+        optimal time delay is found by minimising the time delayed mutual
+        information; then, a heuristic based on an algorithm in [2]_ is used to
+        select an embedding dimension which, when increased, does not reveal a
+        large proportion of "false nearest neighbors".
 
     time_delay : int, optional, default: ``1``
-        Time delay between two consecutive values for constructing one
-        embedded point. If `parameters_type` is ``'search'``,
-        it corresponds to the maximal embedding time delay that will be
-        considered.
+        Time delay between two consecutive values for constructing one embedded
+        point. If `parameters_type` is ``'search'``, it corresponds to the
+        maximal embedding time delay that will be considered.
 
     dimension : int, optional, default: ``5``
         Dimension of the embedding space. If `parameters_type` is ``'search'``,
@@ -252,8 +318,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         considered.
 
     stride : int, optional, default: ``1``
-        Stride duration between two consecutive embedded points. It defaults
-        to 1 as this is the usual value in the statement of Takens's embedding
+        Stride duration between two consecutive embedded points. It defaults to
+        1 as this is the usual value in the statement of Takens's embedding
         theorem.
 
     n_jobs : int or None, optional, default: ``None``
@@ -271,8 +337,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
-        ``'search'``, it is the calculated optimal embedding dimension and
-        is less than or equal to `dimension`. Otherwise it is equal to
+        ``'search'``, it is the calculated optimal embedding dimension and is
+        less than or equal to `dimension`. Otherwise it is equal to
         `dimension`.
 
     Examples
@@ -299,16 +365,16 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    SlidingWindow, gtda.homology.VietorisRipsPersistence
+    time_delay_embedding, SlidingWindow, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
-    The current implementation favours the last value over the first one,
-    in the sense that the last coordinate of the last vector in a Takens
-    embedded time series always equals the last value in the original time
-    series. Hence, a number of initial values (depending on the remainder of
-    the division between :math:`n_\\mathrm{samples} - d(\\tau - 1) - 1` and
-    the stride) may be lost.
+    The current implementation favours the last value over the first one, in
+    the sense that the last coordinate of the last vector in a Takens embedded
+    time series always equals the last value in the original time series.
+    Hence, a number of initial values (depending on the remainder of the
+    division between ``n_samples - dimension * (time_delay - 1) - 1`` and the
+    stride) may be lost.
 
     References
     ----------
@@ -341,7 +407,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         'time_delay': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'dimension': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
-    }
+        }
 
     def __init__(self, parameters_type='search', time_delay=1, dimension=5,
                  stride=1, n_jobs=None):
@@ -350,18 +416,6 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         self.dimension = dimension
         self.stride = stride
         self.n_jobs = n_jobs
-
-    @staticmethod
-    def _embed(X, time_delay, dimension, stride):
-        n_points = (X.shape[0] - time_delay * (dimension - 1) - 1)\
-                   // stride + 1
-
-        X = np.flip(X)
-        points_ = [X[j * stride:j * stride + time_delay * dimension:time_delay]
-                   .flatten() for j in range(n_points)]
-        X_embedded = np.stack(points_)
-
-        return np.flip(X_embedded).reshape(n_points, dimension)
 
     @staticmethod
     def _mutual_information(X, time_delay, n_bins):
@@ -377,7 +431,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     def _false_nearest_neighbors(X, time_delay, dimension, stride=1):
         """Calculate the number of false nearest neighbours in a certain
         embedding dimension, based on heuristics."""
-        X_embedded = TakensEmbedding._embed(X, time_delay, dimension, stride)
+        X_embedded = \
+            time_delay_embedding(X.flatten(), time_delay, dimension, stride)
 
         neighbor = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(
             X_embedded)
@@ -485,7 +540,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
         if Xt.ndim == 1:
             Xt = Xt[:, None]
-        Xt = self._embed(Xt, self.time_delay_, self.dimension_, self.stride)
+        Xt = time_delay_embedding(Xt, self.time_delay_, self.dimension_,
+                                  self.stride)
 
         return Xt
 

@@ -27,6 +27,12 @@ Time-delay embedding
 
    time_series.TakensEmbedding
 
+.. autosummary::
+   :toctree: generated/time_series/embedding/
+   :template: function.rst
+
+   time_series.time_delay_embedding
+
 Target preparation
 ------------------
 .. currentmodule:: gtda
