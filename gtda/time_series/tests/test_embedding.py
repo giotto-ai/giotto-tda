@@ -1,13 +1,16 @@
 """Testing for time series embedding."""
 # License: GNU AGPLv3
 
+from functools import partial
+
 import numpy as np
 import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.time_series import SlidingWindow, TakensEmbedding
+from gtda.time_series import SlidingWindow, TakensEmbedding, \
+    time_delay_embedding
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -107,3 +110,46 @@ def test_window_plot():
     windows = SlidingWindow(width=3, stride=2)
     X_windows = windows.fit_transform(signal_embedded_search)
     windows.plot(X_windows, sample=0)
+
+
+@pytest.mark.parametrize('X', [signal, signal[:, None]])
+@pytest.mark.parametrize('time_delay', list(range(1, 5)))
+@pytest.mark.parametrize('dimension', list(range(1, 5)))
+@pytest.mark.parametrize('stride', list(range(1, 5)))
+def test_time_delay_embedding_consistent_with_takensembedding(
+        X, time_delay, dimension, stride
+        ):
+    """Test that time_delay_embedding and TakensEmbedding give identical
+    outputs on 1D arrays."""
+    n_points = (len(signal) - time_delay * (dimension - 1) - 1) // stride + 1
+    embedder = TakensEmbedding(parameters_type='fixed', time_delay=time_delay,
+                               dimension=dimension, stride=stride)
+    func = partial(time_delay_embedding, time_delay=time_delay,
+                   dimension=dimension, stride=stride)
+    if n_points <= 0:
+        with pytest.raises(ValueError):
+            embedder.fit_transform(X)
+        with pytest.raises(ValueError):
+            func(X.ravel())
+    else:
+        assert np.array_equal(embedder.fit_transform(X), func(X.ravel()))
+
+
+@pytest.mark.parametrize('params',
+                         [{'time_delay': 0}, {'time_delay': -1},
+                          {'dimension': 0}, {'dimension': -1},
+                          {'stride': 0}, {'stride': -1}])
+def test_time_delay_embedding_validation(params):
+    with pytest.raises(ValueError):
+        time_delay_embedding(signal, **params)
+
+
+def test_time_delay_embedding_2D():
+    """Testing the return values of time_delay_embedding on 2D input, assuming
+    correctness of TakensEmbedding on 1D input."""
+    params = {"time_delay": 2, "dimension": 3, "stride": 3}
+    signals = np.tile(signal, (3, 1)) * np.arange(3)[:, None]
+    signals_emb = time_delay_embedding(signals, **params)
+    for i, X in enumerate(signals):
+        embedder = TakensEmbedding(parameters_type='fixed', **params)
+        assert np.array_equal(embedder.fit_transform(X), signals_emb[i])
