@@ -111,13 +111,14 @@ def test_stationarizer_errors():
         stationarizer.fit(signal)
 
 
+@pytest.mark.parametrize('X', [signal, signal.ravel()])
 @pytest.mark.parametrize("operation, expected",
                          [('return', signal_stationarized_return),
                           ('log-return', signal_stationarized_log_return)])
-def test_stationarizer_transform(operation, expected):
+def test_stationarizer_transform(X, operation, expected):
     stationarizer = Stationarizer(operation=operation)
 
-    assert_almost_equal(stationarizer.fit_transform(signal), expected)
+    assert_almost_equal(stationarizer.fit_transform(X), expected)
 
 
 @pytest.mark.parametrize("operation, expected",
