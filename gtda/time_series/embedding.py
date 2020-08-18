@@ -19,8 +19,8 @@ from..plotting import plot_point_cloud
 class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """Sliding windows onto the data.
 
-    Useful in time series analysis to convert a sequence of objects (scalar
-    or array-like) into a sequence of windows on the original sequence. Each
+    Useful in time series analysis to convert a sequence of objects (scalar or
+    array-like) into a sequence of windows on the original sequence. Each
     window stacks together consecutive objects, and consecutive windows are
     separated by a constant stride.
 
