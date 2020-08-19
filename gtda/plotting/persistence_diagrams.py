@@ -47,8 +47,6 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
     if has_posinfinite_death:
         posinfinity_val = max_val + 0.1 * parameter_range
         extra_space_factor += 0.1
-    else:
-        extra_space_infinity = 0.
     extra_space = extra_space_factor * parameter_range
     min_val_display = min_val - extra_space
     max_val_display = max_val + extra_space
