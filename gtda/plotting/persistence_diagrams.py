@@ -78,7 +78,8 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
             for unique_row_index in inverse
             ]
         y = subdiagram[:, 1]
-        y[np.isposinf(y)] = posinfinity_val
+        if has_posinfinite_death:
+            y[np.isposinf(y)] = posinfinity_val
         fig.add_trace(gobj.Scatter(
             x=subdiagram[:, 0], y=y, mode="markers",
             hoverinfo="text", hovertext=hovertext, name=name
