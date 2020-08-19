@@ -56,7 +56,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     >>> from gtda.time_series import Labeller
     >>> # Create a time series
     >>> X = np.arange(10)
-    >>> labeller = Labeller(width=2, func=np.max)
+    >>> labeller = Labeller(width=2, func=np.min)
     >>> # Fit and transform X
     >>> X, y = labeller.fit_transform_resample(X, X)
     >>> print(X)
@@ -119,8 +119,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             self._effective_func_params = {}
         else:
             self._effective_func_params = self.func_params
-        _X = self.func(
-            _X, axis=1, **self._effective_func_params).reshape(-1, 1)
+        _X = self.func(_X, axis=1, **self._effective_func_params)[:, None]
 
         if self.percentiles is None:
             self.thresholds_ = None
@@ -179,8 +178,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         y = column_or_1d(y)
 
         yr = self._sliding_window.transform(y)
-        yr = self.func(
-            yr, axis=1, **self._effective_func_params).reshape(-1, 1)
+        yr = self.func(yr, axis=1, **self._effective_func_params)[:, None]
 
         if self.thresholds_ is not None:
             yr = np.abs(yr)
