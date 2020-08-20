@@ -37,6 +37,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     and at different scales is summarised in the corresponding persistence
     diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
@@ -71,8 +79,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this
-        death value is declared to be equal to `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -96,10 +104,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for computing Vietoris–Rips persistent homology. Python bindings were
     modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
-
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
 
     References
     ----------
@@ -136,7 +140,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                        metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -285,6 +289,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     and at different scales is summarised in the corresponding persistence
     diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
@@ -324,8 +336,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this
-        death value is declared to be equal to `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -348,10 +360,6 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
     for computing sparse Vietoris–Rips persistent homology. Python bindings
     were modified for performance.
-
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
 
     References
     ----------
@@ -400,7 +408,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -544,6 +552,14 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     and at different scales is summarised in the corresponding persistence
     diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
@@ -586,10 +602,6 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for computing Cech persistent homology. Python bindings were modified
     for performance.
 
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
-
     References
     ----------
     [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
@@ -631,7 +643,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -761,6 +773,14 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     and at different scales is summarised in the corresponding persistence
     diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
@@ -799,16 +819,16 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_weight`. ``None`` means that this
-        death value is declared to be equal to `max_edge_weight`.
+        filtration value `max_edge_weight`. ``None`` means that this death
+        value is declared to be equal to `max_edge_weight`.
 
     max_entries : int, optional, default: ``-1``
-        Number controlling the degree of precision in the matrix
-        reductions performed by the the backend. Corresponds to the parameter
-        ``approximation`` in :func:`pyflagser.flagser`. Increase for higher
-        precision, decrease for faster computation. A good value is often
-        ``100000`` in hard problems.  A negative value computes highest
-        possible precision.
+        Number controlling the degree of precision in the matrix reductions
+        performed by the the backend. Corresponds to the parameter
+        ``approximation`` in :func:`pyflagser.flagser_weighted` and
+        :func:`pyflagser.flagser_unweighted`. Increase for higher precision,
+        decrease for faster computation. A good value is often ``100000`` in
+        hard problems. A negative value computes highest possible precision.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -831,16 +851,9 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     The `pyflagser <https://github.com/giotto-ai/pyflagser>`_ Python package
     is used for binding `Flagser <https://github.com/luetge/flagser>`_, a C++
     backend for computing the (persistent) homology of (filtered) directed
-    flag complexes.
-
-    For more details, please refer to the `flagser documentation \
-    <https://github.com/luetge/flagser/blob/master/docs/\
+    flag complexes. For more details, please refer to the `flagser \
+    documentation <https://github.com/luetge/flagser/blob/master/docs/\
     documentation_flagser.pdf>`_.
-
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
-
 
     References
     ----------
