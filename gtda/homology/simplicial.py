@@ -875,15 +875,19 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _flagser_diagram(self, X):
-        Xdgms = flagser_weighted(X, max_edge_weight=self.max_edge_weight,
-                                 min_dimension=self._min_homology_dimension,
-                                 max_dimension=self._max_homology_dimension,
-                                 directed=self.directed,
-                                 filtration=self.filtration, coeff=self.coeff,
-                                 approximation=self.max_entries)['dgms']
+        Xdgms = [np.empty((0, 2), dtype=float)] * self._min_homology_dimension
+        Xdgms += flagser_weighted(X, max_edge_weight=self.max_edge_weight,
+                                  min_dimension=self._min_homology_dimension,
+                                  max_dimension=self._max_homology_dimension,
+                                  directed=self.directed,
+                                  filtration=self.filtration, coeff=self.coeff,
+                                  approximation=self.max_entries)['dgms']
+        n_missing_dims = self._max_homology_dimension + 1 - len(Xdgms)
+        if n_missing_dims:
+            Xdgms += [np.empty((0, 2), dtype=float)] * n_missing_dims
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
