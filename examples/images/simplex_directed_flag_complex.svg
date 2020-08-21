@@ -20,8 +20,18 @@ width="400px" height="400px"> <defs id="defs3">
 <g inkscape:groupmode="layer" id="layer2" inkscape:label="Lines" sodipodi:insensitive="true">
 <path
     style="fill:none;stroke:black;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend0)"
-    d="M 10.0,303.90431877827444 380.24718741416774,387.7903288331446"
+    d="M 390.0,10.0 18.95279530285902,194.6387860408176"
     id="path0"
+    inkscape:connector-type="polyline"
+    inkscape:connector-curvature="0"
+    inkscape:connection-start="#g1"
+    inkscape:connection-start-point="d4"
+    inkscape:connection-end="#g2"
+    inkscape:connection-end-point="d4" />
+<path
+    style="fill:none;stroke:black;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend0)"
+    d="M 388.79246067893564,390.0 389.9682228098883,19.99994951038197"
+    id="path1"
     inkscape:connector-type="polyline"
     inkscape:connector-curvature="0"
     inkscape:connection-start="#g0"
@@ -30,39 +40,29 @@ width="400px" height="400px"> <defs id="defs3">
     inkscape:connection-end-point="d4" />
 <path
     style="fill:none;stroke:black;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend0)"
-    d="M 272.8098004313471,10.0 16.66573361229139,296.4499244091812"
-    id="path1"
-    inkscape:connector-type="polyline"
-    inkscape:connector-curvature="0"
-    inkscape:connection-start="#g2"
-    inkscape:connection-start-point="d4"
-    inkscape:connection-end="#g0"
-    inkscape:connection-end-point="d4" />
-<path
-    style="fill:none;stroke:black;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend0)"
-    d="M 272.8098004313471,10.0 387.0530057174353,380.44410000583247"
+    d="M 388.79246067893564,390.0 18.929987957769566,203.59442496796458"
     id="path2"
     inkscape:connector-type="polyline"
     inkscape:connector-curvature="0"
-    inkscape:connection-start="#g2"
+    inkscape:connection-start="#g0"
     inkscape:connection-start-point="d4"
-    inkscape:connection-end="#g1"
+    inkscape:connection-end="#g2"
     inkscape:connection-end-point="d4" />
   </g>
 
   <g inkscape:label="Nodes"                     inkscape:groupmode="layer" id="layer1">
   <!-- Vertices -->
-    <g id="g0" transform="translate(10.0,303.90431877827444)">
+    <g id="g0" transform="translate(388.79246067893564,390.0)">
      <circle cx="0" cy="0" r="10" fill="red"/>
       <text sodipodi:linespacing="125%" y="5.0" x="0" id="text0" style="font-size:16px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">
 <tspan y="5.0" x="0" id="tspan0" sodipodi:role="line">1</tspan></text>
     </g>
-    <g id="g1" transform="translate(390.0,390.0)">
+    <g id="g1" transform="translate(390.0,10.0)">
      <circle cx="0" cy="0" r="10" fill="red"/>
       <text sodipodi:linespacing="125%" y="5.0" x="0" id="text1" style="font-size:16px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">
 <tspan y="5.0" x="0" id="tspan1" sodipodi:role="line">2</tspan></text>
     </g>
-    <g id="g2" transform="translate(272.8098004313471,10.0)">
+    <g id="g2" transform="translate(10.0,199.0938344429234)">
      <circle cx="0" cy="0" r="10" fill="red"/>
       <text sodipodi:linespacing="125%" y="5.0" x="0" id="text2" style="font-size:16px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">
 <tspan y="5.0" x="0" id="tspan2" sodipodi:role="line">3</tspan></text>
