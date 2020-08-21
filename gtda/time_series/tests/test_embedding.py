@@ -116,7 +116,7 @@ def test_window_plot():
 @pytest.mark.parametrize('time_delay', list(range(1, 5)))
 @pytest.mark.parametrize('dimension', list(range(1, 5)))
 @pytest.mark.parametrize('stride', list(range(1, 5)))
-def test_time_delay_embedding_consistent_with_takensembedding(
+def test_time_delay_embedding_consistent_with_takens_embedding(
         X, time_delay, dimension, stride
         ):
     """Test that time_delay_embedding and TakensEmbedding give identical
