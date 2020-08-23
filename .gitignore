@@ -1,5 +1,7 @@
 # Compiled python modules.
 *.pyc
+*.pyo
+*.pyd
 
 # Setuptools distribution folder.
 /dist/
@@ -43,6 +45,9 @@ gtda/externals/pybind11
 .hypothesis/
 test-output.xml
 
+# Pytest output files
+test-output.xml
+
 # Latex
 *.aux
 *.bbl
@@ -51,7 +56,5 @@ test-output.xml
 *.log
 *.pdf
 *.synctex.gz
+*.toc
 doc/theory/glossary_backup
-
-# development
-tda/mapper/scratch/

@@ -75,9 +75,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'direction': {
-            'type': (np.ndarray, type(None)), 'of': {'type': Real}}
-    }
+        'direction': {'type': (np.ndarray, type(None)), 'of': {'type': Real}}
+        }
 
     def __init__(self, direction=None, n_jobs=None):
         self.direction = direction
@@ -180,7 +179,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -201,8 +201,24 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Height filtration of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -288,12 +304,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'center': {
-            'type': (np.ndarray, type(None)), 'of': {'type': int}},
+        'center': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))}
-    }
+        }
 
     def __init__(self, center=None, radius=np.inf, metric='euclidean',
                  metric_params=None, n_jobs=None):
@@ -406,7 +421,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -427,8 +443,24 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Radial filtration of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -487,10 +519,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_iterations': {
-            'type': (int, type(None)),
-            'in': Interval(1, np.inf, closed='left')}
-    }
+        'n_iterations': {'type': (int, type(None)),
+                         'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -579,7 +610,8 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -600,8 +632,24 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Dilation filtration of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -660,10 +708,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_iterations': {
-            'type': (int, type(None)),
-            'in': Interval(1, np.inf, closed='left')}
-    }
+        'n_iterations': {'type': (int, type(None)),
+                         'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -751,7 +798,8 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -772,8 +820,24 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Erosion filtration of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -835,10 +899,9 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'n_iterations': {
-            'type': (int, type(None)),
-            'in': Interval(1, np.inf, closed='left')}
-    }
+        'n_iterations': {'type': (int, type(None)),
+                         'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, n_iterations=None, n_jobs=None):
         self.n_iterations = n_iterations
@@ -933,7 +996,8 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -954,5 +1018,21 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale, origin=origin)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Signed-distance filtration of image {sample}",
+            plotly_params=plotly_params
+            )

@@ -5,7 +5,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gtda/externals/pybind11)
 set(BINDINGS_DIR "gtda/externals/bindings")
 
 include(cmake/HelperBoost.cmake)
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(OpenMP)
 
@@ -18,11 +18,13 @@ set(HERA_DIR "gtda/externals/hera")
 #######################################################################
 
 pybind11_add_module(gtda_ripser "${BINDINGS_DIR}/ripser_bindings.cpp")
+set_property(TARGET gtda_ripser PROPERTY CXX_STANDARD 14)
+
 if(OpenMP_FOUND)
   target_link_libraries(gtda_ripser PRIVATE OpenMP::OpenMP_CXX)
 endif()
-target_compile_definitions(gtda_ripser PRIVATE ASSEMBLE_REDUCTION_MATRIX=1)
 
+target_compile_definitions(gtda_ripser PRIVATE ASSEMBLE_REDUCTION_MATRIX=1)
 target_include_directories(gtda_ripser PRIVATE "${RIPSER_SRC_DIR}/ripser")
 
 if(MSVC)
@@ -38,11 +40,13 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_ripser_coeff "${BINDINGS_DIR}/ripser_bindings.cpp")
+set_property(TARGET gtda_ripser_coeff PROPERTY CXX_STANDARD 14)
+
 if(OpenMP_FOUND)
   target_link_libraries(gtda_ripser_coeff PRIVATE OpenMP::OpenMP_CXX)
 endif()
-target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
 
+target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
 target_include_directories(gtda_ripser_coeff PRIVATE "${RIPSER_SRC_DIR}/ripser")
 
 if(MSVC)
@@ -58,6 +62,8 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_wasserstein ${BINDINGS_DIR}/wasserstein_bindings.cpp)
+set_property(TARGET gtda_wasserstein PROPERTY CXX_STANDARD 14)
+
 target_link_libraries(gtda_wasserstein LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_wasserstein PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
@@ -77,6 +83,8 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_bottleneck "${BINDINGS_DIR}/bottleneck_bindings.cpp")
+set_property(TARGET gtda_bottleneck PROPERTY CXX_STANDARD 14)
+
 target_link_libraries(gtda_bottleneck LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_bottleneck PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
@@ -96,6 +104,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_cubical_complex "${BINDINGS_DIR}/cubical_complex_bindings.cpp")
+set_property(TARGET gtda_cubical_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
   target_link_libraries(gtda_cubical_complex PRIVATE OpenMP::OpenMP_CXX)
@@ -120,6 +129,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_persistent_cohomology "${BINDINGS_DIR}/persistent_cohomology_bindings.cpp")
+set_property(TARGET gtda_persistent_cohomology PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
   target_link_libraries(gtda_persistent_cohomology PRIVATE OpenMP::OpenMP_CXX)
@@ -146,6 +156,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_simplex_tree "${BINDINGS_DIR}/simplex_tree_bindings.cpp")
+set_property(TARGET gtda_simplex_tree PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_simplex_tree PRIVATE OpenMP::OpenMP_CXX)
@@ -174,6 +185,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_periodic_cubical_complex "${BINDINGS_DIR}/periodic_cubical_complex_bindings.cpp")
+set_property(TARGET gtda_periodic_cubical_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_periodic_cubical_complex PRIVATE OpenMP::OpenMP_CXX)
@@ -200,6 +212,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_witness_complex "${BINDINGS_DIR}/witness_complex_bindings.cpp")
+set_property(TARGET gtda_witness_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_witness_complex PRIVATE OpenMP::OpenMP_CXX)
@@ -228,6 +241,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_strong_witness_complex "${BINDINGS_DIR}/strong_witness_complex_bindings.cpp")
+set_property(TARGET gtda_strong_witness_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_strong_witness_complex PRIVATE OpenMP::OpenMP_CXX)
@@ -256,6 +270,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_sparse_rips_complex "${BINDINGS_DIR}/rips_complex_bindings.cpp")
+set_property(TARGET gtda_sparse_rips_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_sparse_rips_complex PRIVATE OpenMP::OpenMP_CXX)
@@ -285,6 +300,7 @@ endif()
 #######################################################################
 
 pybind11_add_module(gtda_cech_complex "${BINDINGS_DIR}/cech_complex_bindings.cpp")
+set_property(TARGET gtda_cech_complex PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_cech_complex PRIVATE OpenMP::OpenMP_CXX)

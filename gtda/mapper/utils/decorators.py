@@ -8,9 +8,12 @@ def method_to_transform(cls, method_name):
     """Wrap a class to add a :meth:`transform` method as an alias to an
     existing method.
 
-    An example of use is for classes possessing a :meth:`score` method such
-    as kernel density estimators and anomaly/novelty detection estimators,
-    to allow for these estimators are to be used as steps in a pipeline.
+    An example of use is for classes possessing a :meth:`score` method such as
+    kernel density estimators and anomaly/novelty detection estimators, to
+    allow for these estimators are to be used as steps in a pipeline.
+
+    Note that 1D array outputs are reshaped into 2D column vectors before
+    being returned by the new :meth:`transform`.
 
     Parameters
     ----------
@@ -20,20 +23,19 @@ def method_to_transform(cls, method_name):
 
     method_name : str
         Name of the method in `cls` to which :meth:`transform` will be
-        an alias. The fist argument of this method becomes the `X`
-        input for :meth:`transform`.
+        an alias. The fist argument of this method (after ``self``) becomes
+        the ``X`` input for :meth:`transform`.
 
     Returns
     -------
     wrapped_cls : object
-        New class inheriting from :class:`sklearn.base.TransformerMixin`,
-        so that a :meth:`fit_transform` is also available. Its name is the
-        name of `cls` prepended with ``'Extended'``.
+        New class inheriting from :class:`sklearn.base.TransformerMixin`, so
+        that both :meth:`transform` and :meth:`fit_transform` are available.
+        Its name is the name of `cls` prepended with ``'Extended'``.
 
     Examples
     --------
     >>> import numpy as np
-    >>> from numpy.testing import assert_almost_equal
     >>> from sklearn.neighbors import KernelDensity
     >>> from gtda.mapper import method_to_transform
     >>> X = np.random.random((100, 2))
@@ -41,8 +43,12 @@ def method_to_transform(cls, method_name):
     >>> kde_extended = method_to_transform(
     ...     KernelDensity, 'score_samples')()
     >>> Xt = kde.fit(X).score_samples(X)
+    >>> print(Xt.shape)
+    (100,)
     >>> Xt_extended = kde_extended.fit_transform(X)
-    >>> assert_almost_equal(Xt, Xt_extended)
+    >>> print(Xt_extended.shape)
+    (100, 1)
+    >>> np.array_equal(Xt, Xt_extended.flatten())
     True
 
     """

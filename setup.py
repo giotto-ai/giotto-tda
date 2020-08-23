@@ -29,8 +29,8 @@ MAINTAINER = 'Umberto Lupo, Lewis Tunstall'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-tda'
 LICENSE = 'GNU AGPLv3'
-DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.2.0'
-VERSION = __version__ # noqa
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-tda/tarball/v0.2.2'
+VERSION = __version__  # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
@@ -67,7 +67,8 @@ EXTRAS_REQUIRE = {
     'examples': [
         'jupyter',
         'pandas',
-        'openml']
+        'openml',
+        'matplotlib']
 }
 
 
@@ -113,7 +114,7 @@ class CMakeBuild(build_ext):
         if os.path.exists(dir_pybind11):
             return 0
         os.mkdir(dir_pybind11)
-        subprocess.check_call(['git', 'clone',
+        subprocess.check_call(['git', 'clone', '--branch', 'v2.5.0',
                                'https://github.com/pybind/pybind11.git',
                                dir_pybind11])
 
