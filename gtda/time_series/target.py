@@ -25,9 +25,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    width : int, optional, default: ``10``
-        Width of each sliding window. Each window contains ``width + 1``
-        objects from the original time series.
+    size : int, optional, default: ``10``
+        Size of each sliding window.
 
     func : callable, optional, default: ``numpy.std``
         Function to be applied to each window.
@@ -56,7 +55,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     >>> from gtda.time_series import Labeller
     >>> # Create a time series
     >>> X = np.arange(10)
-    >>> labeller = Labeller(width=2, func=np.min)
+    >>> labeller = Labeller(size=3, func=np.min)
     >>> # Fit and transform X
     >>> X, y = labeller.fit_transform_resample(X, X)
     >>> print(X)
@@ -74,7 +73,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     """
 
     _hyperparameters = {
-        'width': {'type': int, 'in': Interval(0, np.inf, closed='left')},
+        'size': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'func': {'type': FunctionType},
         'func_params': {'type': (dict, type(None))},
         'percentiles': {
@@ -85,9 +84,9 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                            'in': Interval(1, np.inf, closed='left')}
         }
 
-    def __init__(self, width=10, func=np.std,
+    def __init__(self, size=10, func=np.std,
                  func_params=None, percentiles=None, n_steps_future=1):
-        self.width = width
+        self.size = size
         self.func = func
         self.func_params = func_params
         self.percentiles = percentiles
@@ -113,7 +112,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         X = column_or_1d(X)
         validate_params(self.get_params(), self._hyperparameters)
 
-        self._sliding_window = SlidingWindow(width=self.width, stride=1).fit(X)
+        self._sliding_window = SlidingWindow(width=self.size + 1,
+                                             stride=1).fit(X)
         _X = self._sliding_window.transform(X)
         if self.func_params is None:
             self._effective_func_params = {}
@@ -150,11 +150,11 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self)
         Xt = column_or_1d(X)
 
-        Xt = Xt[:-self.n_steps_future]
+        Xt = Xt[:-self.n_steps_future, None]
 
-        if self.n_steps_future < self.width:
-            Xt = Xt[self.width - self.n_steps_future:]
-        return Xt.reshape(-1, 1)
+        if self.n_steps_future < self.size - 1:
+            Xt = Xt[self.size - 1 - self.n_steps_future:]
+        return Xt
 
     def resample(self, y, X=None):
         """Resample `y`.
@@ -190,7 +190,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                 [1 * (yr >= self.thresholds_[-1])], axis=1)
             yr = np.nonzero(yr)[1].reshape(yr.shape[0], 1)
 
-        if self.n_steps_future > self.width:
-            yr = yr[self.n_steps_future - self.width:]
+        if self.n_steps_future > self.size - 1:
+            yr = yr[self.n_steps_future - self.size + 1:]
 
         return yr.reshape(-1)
