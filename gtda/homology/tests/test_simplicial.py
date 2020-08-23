@@ -10,7 +10,7 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence, FlagserPersistence
+    EuclideanCechPersistence, WitnessPersistence, FlagserPersistence
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -199,6 +199,37 @@ def test_cp_fit_transform_plot(X, hom_dims):
         X, sample=0, homology_dimensions=hom_dims)
 
 
+def test_wit_params():
+    coeff = 'not_defined'
+    wit = WitnessPersistence(coeff=coeff)
+
+    with pytest.raises(TypeError):
+        wit.fit_transform(X)
+
+
+def test_wit_not_fitted():
+    wit = WitnessPersistence()
+
+    with pytest.raises(NotFittedError):
+        wit.transform(X)
+
+
+X_wit_res = np.array([[[0., 2.98935825, 0],
+                       [0., 0., 1]]])
+
+
+def test_wit_transform():
+    wit = WitnessPersistence()
+
+    assert_almost_equal(wit.fit_transform(X), X_wit_res)
+
+
+@pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
+def test_wit_fit_transform_plot(hom_dims):
+    WitnessPersistence().fit_transform_plot(
+        X, sample=0, homology_dimensions=hom_dims)
+
+    
 def test_fp_params():
     coeff = 'not_defined'
     fp = FlagserPersistence(coeff=coeff)

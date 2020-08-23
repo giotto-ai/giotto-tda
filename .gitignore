@@ -43,6 +43,7 @@ gtda/externals/pybind11
 # Unit test
 .pytest_cache/
 .hypothesis/
+test-output.xml
 
 # Pytest output files
 test-output.xml
