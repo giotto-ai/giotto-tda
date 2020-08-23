@@ -97,7 +97,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         indices += np.arange(n_windows)[:, None] * self.stride + offset
         return indices
 
-    def _slice_windows(self, X):
+    def slice_windows(self, X):
         indices = self._window_indices(X)
         return indices[:, [0, -1]] + np.array([0, 1])
 

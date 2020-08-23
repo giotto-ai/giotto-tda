@@ -106,6 +106,16 @@ def test_window_resample():
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])
 
 
+def test_window_slice_windows():
+    windows = SlidingWindow(width=3, stride=2)
+    X = signal_embedded_search
+    X_windows = windows.fit_transform(X)
+    slice_idx = windows.slice_windows(X)
+    assert_almost_equal(
+        np.stack(X[begin:end] for begin, end in slice_idx), X_windows
+        )
+
+
 def test_window_plot():
     windows = SlidingWindow(width=3, stride=2)
     X_windows = windows.fit_transform(signal_embedded_search)
