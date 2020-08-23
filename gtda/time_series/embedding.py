@@ -296,8 +296,8 @@ def time_delay_embedding(
     if n_points <= 0:
         raise ValueError(
             f"Not enough time stamps ({n_timestamps}) to produce at least "
-            f"one {dimension}-dimensional vector under the current choices "
-            f"of time delay ({time_delay}) and stride ({stride})."
+            f"one {dimension}-dimensional vector under the current choice "
+            f"of time delay ({time_delay})."
             )
     indices = np.tile(np.arange(0, time_delay * dimension, time_delay),
                       (n_points, 1))
