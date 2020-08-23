@@ -112,8 +112,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         X = column_or_1d(X)
         validate_params(self.get_params(), self._hyperparameters)
 
-        self._sliding_window = SlidingWindow(width=self.size + 1,
-                                             stride=1).fit(X)
+        self._sliding_window = SlidingWindow(size=self.size, stride=1).fit(X)
         _X = self._sliding_window.transform(X)
         if self.func_params is None:
             self._effective_func_params = {}

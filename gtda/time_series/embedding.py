@@ -26,9 +26,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     Parameters
     ----------
-    width : int, optional, default: ``10``
-        Width of each sliding window. Each window contains ``width + 1``
-        objects from the original time series.
+    size : int, optional, default: ``10``
+        Size of each sliding window.
 
     stride : int, optional, default: ``1``
         Stride between consecutive windows.
@@ -41,7 +40,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     >>> # time series of scalars
     >>> X = np.arange(20).reshape(-1, 2)
     >>> y = np.arange(10)
-    >>> windows = SlidingWindow(width=2, stride=3)
+    >>> windows = SlidingWindow(size=3, stride=3)
     >>> # Fit and transform X
     >>> X_windows = windows.fit_transform(X)
     >>> print(X_windows)
@@ -69,31 +68,30 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     The current implementation favours the last entry over the first one, in
     the sense that the last entry of the last window always equals the last
     entry in the original time series. Hence, a number of initial entries
-    (depending on the remainder of the division between
-    ``n_samples - width - 1`` and ``stride``) may be lost.
+    (depending on the remainder of the division between ``n_samples - size``
+    and ``stride``) may be lost.
 
     """
 
     _hyperparameters = {
-        'width': {'type': int, 'in': Interval(0, np.inf, closed='left')},
+        'size': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
         }
 
-    def __init__(self, width=10, stride=1):
-        self.width = width
+    def __init__(self, size=10, stride=1):
+        self.size = size
         self.stride = stride
 
     def _window_indices(self, X):
         n_samples = X.shape[0]
-        n_windows, offset = \
-            divmod(n_samples - self.width - 1, self.stride)
+        n_windows, offset = divmod(n_samples - self.size, self.stride)
         n_windows += 1
         if n_windows <= 0:
             raise ValueError(
-                f"Number of samples ({n_samples}) must be strictly greater "
-                f"than window width ({self.width})."
+                f"Number of samples ({n_samples}) cannot be less than window "
+                f"size ({self.size})."
                 )
-        indices = np.tile(np.arange(0, self.width + 1), (n_windows, 1))
+        indices = np.tile(np.arange(self.size), (n_windows, 1))
         indices += np.arange(n_windows)[:, None] * self.stride + offset
         return indices
 
@@ -139,10 +137,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_windows, n_samples_window, ...)
+        Xt : ndarray of shape (n_windows, size, ...)
             Windows of consecutive entries of the original time series.
-            ``n_windows = (n_samples - width - 1) // stride  + 1``, and
-            ``n_samples_window = width + 1``.
+            ``n_windows = (n_samples - size) // stride  + 1``.
 
         """
         check_is_fitted(self, '_is_fitted')
@@ -170,14 +167,14 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         Returns
         -------
         yr : ndarray of shape (n_samples_new,)
-            The resampled target. ``n_samples_new = (n_samples - time_delay *
-            (dimension - 1) - 1) // stride + 1``.
+            The resampled target. ``n_samples_new = (n_samples - size)
+            // stride + 1``.
 
         """
         check_is_fitted(self, '_is_fitted')
         yr = column_or_1d(y)
 
-        yr = yr[:self.width - 1:-self.stride][::-1]
+        yr = yr[:self.size - 2:-self.stride][::-1]
         return yr
 
     @staticmethod

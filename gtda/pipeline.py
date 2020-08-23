@@ -79,7 +79,7 @@ class Pipeline(pipeline.Pipeline):
     (395, 1) (395,)
     >>> steps = [
     >>>     ('embedding', ts.TakensEmbedding()),
-    >>>     ('window', ts.SlidingWindow(width=5, stride=1)),
+    >>>     ('window', ts.SlidingWindow(size=6, stride=1)),
     >>>     ('diagram', hl.VietorisRipsPersistence()),
     >>>     ('rescaler', diag.Scaler()),
     >>>     ('filter', diag.Filtering(epsilon=0.1)),

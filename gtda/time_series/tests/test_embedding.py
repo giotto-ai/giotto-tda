@@ -87,27 +87,28 @@ def test_embedder_resample():
     assert_almost_equal(y_resampled, y[np.arange(4, 20, 3)])
 
 
-def test_window_params():
-    windows = SlidingWindow(width=-1)
+@pytest.mark.parametrize("size", [0, -1])
+def test_window_params(size):
+    windows = SlidingWindow(size=size)
     with pytest.raises(ValueError):
         windows.fit(signal)
 
 
 def test_window_transform():
-    windows = SlidingWindow(width=3, stride=2)
+    windows = SlidingWindow(size=4, stride=2)
     X_windows = windows.fit_transform(signal_embedded_search)
     assert (X_windows.shape == (8, 4, 2))
 
 
 def test_window_resample():
-    windows = SlidingWindow(width=3, stride=2)
+    windows = SlidingWindow(size=4, stride=2)
     windows.fit(y)
     y_resampled = windows.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])
 
 
 def test_window_slice_windows():
-    windows = SlidingWindow(width=3, stride=2)
+    windows = SlidingWindow(size=4, stride=2)
     X = signal_embedded_search
     X_windows = windows.fit_transform(X)
     slice_idx = windows.slice_windows(X)
@@ -117,7 +118,7 @@ def test_window_slice_windows():
 
 
 def test_window_plot():
-    windows = SlidingWindow(width=3, stride=2)
+    windows = SlidingWindow(size=4, stride=2)
     X_windows = windows.fit_transform(signal_embedded_search)
     windows.plot(X_windows, sample=0)
 
