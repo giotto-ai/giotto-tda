@@ -11,6 +11,12 @@ signal = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
 X = np.tile(np.arange(10), reps=2).reshape(-1, 1)
 
 
+def test_labeller_params():
+    labeller = Labeller(width=-1)
+    with pytest.raises(ValueError):
+        labeller.fit(signal)
+
+
 def test_labeller_shape():
     width = 3
     labeller = Labeller(width=width, func=np.std, func_params={},
