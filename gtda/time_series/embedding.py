@@ -65,11 +65,11 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     Notes
     -----
-    The current implementation favours the last entry over the first one,
-    in the sense that the last entry of the last window always equals the last
+    The current implementation favours the last entry over the first one, in
+    the sense that the last entry of the last window always equals the last
     entry in the original time series. Hence, a number of initial entries
-    (depending on the remainder of the division between :math:`n_\\mathrm{
-    samples} - \\mathrm{width} - 1` and the stride) may be lost.
+    (depending on the remainder of the division between
+    ``n_samples - width - 1`` and ``stride``) may be lost.
 
     """
 
@@ -210,41 +210,40 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 @adapt_fit_transform_docs
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    """Representation of a univariate time series as a time series of
-    point clouds.
+    """Representation of a univariate time series as a time series of point
+    clouds.
 
-    Based on a time-delay embedding technique named after F. Takens [1]_.
-    Given a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence
-    of evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set
-    of :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i +
-    \\tau}, \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`.
-    This set is called the :ref:`Takens embedding <takens_embedding>`
-    of the time series and can be interpreted as a point cloud.
+    Based on a time-delay embedding technique named after F. Takens [1]_. Given
+    a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of evenly
+    sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
+    :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i + \\tau},
+    \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`. This set is
+    called the :ref:`Takens embedding <takens_embedding>` of the time series
+    and can be interpreted as a point cloud.
 
     The difference between :math:`t_{i+1}` and :math:`t_i` is called the
-    stride, :math:`\\tau` is called the time delay, and :math:`d` is called
-    the (embedding) dimension.
+    stride, :math:`\\tau` is called the time delay, and :math:`d` is called the
+    (embedding) dimension.
 
-    If :math:`d` and :math:`\\tau` are not explicitly set, suitable values
-    are searched for during :meth:`fit`. [2]_ [3]_
+    If :math:`d` and :math:`\\tau` are not explicitly set, suitable values are
+    searched for during :meth:`fit`. [2]_ [3]_
 
     Parameters
     ----------
     parameters_type : ``'search'`` | ``'fixed'``, optional, default: \
         ``'search'``
-        If set to ``'fixed'``, the values of `time_delay` and `dimension`
-        are used directly in :meth:`transform`. If set to ``'search'``,
-        those values are only used as upper bounds in a search as follows:
-        first, an optimal time delay is found by minimising the time delayed
-        mutual information; then, a heuristic based on an algorithm in [2]_ is
-        used to select an embedding dimension which, when increased, does not
-        reveal a large proportion of "false nearest neighbors".
+        If set to ``'fixed'``, the values of `time_delay` and `dimension` are
+        used directly in :meth:`transform`. If set to ``'search'``, those
+        values are only used as upper bounds in a search as follows: first, an
+        optimal time delay is found by minimising the time delayed mutual
+        information; then, a heuristic based on an algorithm in [2]_ is used to
+        select an embedding dimension which, when increased, does not reveal a
+        large proportion of "false nearest neighbors".
 
     time_delay : int, optional, default: ``1``
-        Time delay between two consecutive values for constructing one
-        embedded point. If `parameters_type` is ``'search'``,
-        it corresponds to the maximal embedding time delay that will be
-        considered.
+        Time delay between two consecutive values for constructing one embedded
+        point. If `parameters_type` is ``'search'``, it corresponds to the
+        maximal embedding time delay that will be considered.
 
     dimension : int, optional, default: ``5``
         Dimension of the embedding space. If `parameters_type` is ``'search'``,
@@ -252,8 +251,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         considered.
 
     stride : int, optional, default: ``1``
-        Stride duration between two consecutive embedded points. It defaults
-        to 1 as this is the usual value in the statement of Takens's embedding
+        Stride duration between two consecutive embedded points. It defaults to
+        1 as this is the usual value in the statement of Takens's embedding
         theorem.
 
     n_jobs : int or None, optional, default: ``None``
@@ -271,8 +270,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
-        ``'search'``, it is the calculated optimal embedding dimension and
-        is less than or equal to `dimension`. Otherwise it is equal to
+        ``'search'``, it is the calculated optimal embedding dimension and is
+        less than or equal to `dimension`. Otherwise it is equal to
         `dimension`.
 
     Examples
@@ -303,12 +302,12 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     Notes
     -----
-    The current implementation favours the last value over the first one,
-    in the sense that the last coordinate of the last vector in a Takens
-    embedded time series always equals the last value in the original time
-    series. Hence, a number of initial values (depending on the remainder of
-    the division between :math:`n_\\mathrm{samples} - d(\\tau - 1) - 1` and
-    the stride) may be lost.
+    The current implementation favours the last value over the first one, in
+    the sense that the last coordinate of the last vector in a Takens embedded
+    time series always equals the last value in the original time series.
+    Hence, a number of initial values (depending on the remainder of the
+    division between ``n_samples - dimension * (time_delay - 1) - 1`` and the
+    stride) may be lost.
 
     References
     ----------
