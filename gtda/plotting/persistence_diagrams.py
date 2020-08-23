@@ -37,16 +37,19 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
         homology_dimensions = np.unique(diagram[:, 2])
 
     diagram_no_dims = diagram[:, :2]
-    max_val_display = np.max(
-        np.where(np.isposinf(diagram_no_dims), -np.inf, diagram_no_dims)
-        )
-    min_val_display = np.min(
-        np.where(np.isneginf(diagram_no_dims), np.inf, diagram_no_dims)
-        )
-    parameter_range = max_val_display - min_val_display
-    extra_space = 0.02 * parameter_range
-    min_val_display -= extra_space
-    max_val_display += extra_space
+    posinfinite_mask = np.isposinf(diagram_no_dims)
+    neginfinite_mask = np.isneginf(diagram_no_dims)
+    max_val = np.max(np.where(posinfinite_mask, -np.inf, diagram_no_dims))
+    min_val = np.min(np.where(neginfinite_mask, np.inf, diagram_no_dims))
+    parameter_range = max_val - min_val
+    extra_space_factor = 0.02
+    has_posinfinite_death = np.any(posinfinite_mask[:, 1])
+    if has_posinfinite_death:
+        posinfinity_val = max_val + 0.1 * parameter_range
+        extra_space_factor += 0.1
+    extra_space = extra_space_factor * parameter_range
+    min_val_display = min_val - extra_space
+    max_val_display = max_val + extra_space
 
     fig = gobj.Figure()
     fig.add_trace(gobj.Scatter(
@@ -74,8 +77,11 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
             )
             for unique_row_index in inverse
             ]
+        y = subdiagram[:, 1]
+        if has_posinfinite_death:
+            y[np.isposinf(y)] = posinfinity_val
         fig.add_trace(gobj.Scatter(
-            x=subdiagram[:, 0], y=subdiagram[:, 1], mode="markers",
+            x=subdiagram[:, 0], y=y, mode="markers",
             hoverinfo="text", hovertext=hovertext, name=name
         ))
 
@@ -114,6 +120,18 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
             },
         plot_bgcolor="white"
         )
+
+    # Add a horizontal dashed line for points with infinite death
+    if has_posinfinite_death:
+        fig.add_trace(gobj.Scatter(
+            x=[min_val_display, max_val_display],
+            y=[posinfinity_val, posinfinity_val],
+            mode="lines",
+            line={"dash": "dash", "width": 0.5, "color": "black"},
+            showlegend=True,
+            name=u"\u221E",
+            hoverinfo="none"
+        ))
 
     # Update traces and layout according to user input
     if plotly_params:
