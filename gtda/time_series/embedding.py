@@ -75,7 +75,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     """
 
     _hyperparameters = {
-        'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'width': {'type': int, 'in': Interval(0, np.inf, closed='left')},
         'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
         }
 

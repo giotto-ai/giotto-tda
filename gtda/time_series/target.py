@@ -74,7 +74,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     """
 
     _hyperparameters = {
-        'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'width': {'type': int, 'in': Interval(0, np.inf, closed='left')},
         'func': {'type': FunctionType},
         'func_params': {'type': (dict, type(None))},
         'percentiles': {
