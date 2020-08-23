@@ -88,7 +88,7 @@ def test_embedder_resample():
 
 
 def test_window_params():
-    windows = SlidingWindow(width=0)
+    windows = SlidingWindow(width=-1)
     with pytest.raises(ValueError):
         windows.fit(signal)
 
