@@ -85,13 +85,19 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     def _slice_windows(self, X):
         n_samples = X.shape[0]
-        n_windows = (n_samples - self.width - 1) // self.stride + 1
+        n_windows, offset = \
+            divmod(n_samples - self.width - 1, self.stride)
+        n_windows += 1
+        if n_windows <= 0:
+            raise ValueError(
+                f"Number of samples ({n_samples}) must be strictly greater "
+                f"than window width ({self.width})."
+                )
+        indices = np.tile(np.array([0, self.width + 1]), (n_windows, 1))
+        indices += np.arange(n_windows)[:, None] * self.stride
+        indices += offset
 
-        window_slices = [(n_samples - i * self.stride - self.width - 1,
-                          n_samples - i * self.stride)
-                         for i in reversed(range(n_windows))]
-
-        return window_slices
+        return indices
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
