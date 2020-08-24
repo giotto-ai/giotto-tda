@@ -1116,8 +1116,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     def _weak_alpha_diagram(self, X):
         N = len(X)
-        d = Delaunay(X)
-        indptr, indices = d.vertex_neighbor_vertices
+        indptr, indices = Delaunay(X).vertex_neighbor_vertices
 
         row = np.zeros_like(indices)
         row[indptr[1:-1]] = 1
