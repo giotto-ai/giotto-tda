@@ -7,6 +7,7 @@ import pytest
 from numpy.testing import assert_almost_equal
 from scipy.sparse import csr_matrix
 from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.qhull import QhullError
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
@@ -171,13 +172,9 @@ def test_wap_not_fitted():
         wap.transform(X_pc)
 
 
-X_vrp_res = np.array([
-    [[0., 0.43094373, 0.],
-     [0., 0.5117411, 0.],
-     [0., 0.60077095, 0.],
-     [0., 0.62186205, 0.],
-     [0.69093919, 0.80131882, 1.]]
-    ])
+# On this particular X_pc, WeakAlpha and VietorisRips should give the exact
+# same result
+X_wap_res = X_vrp_res
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
@@ -188,21 +185,29 @@ def test_wap_transform(X, max_edge_length, infinity_values):
                                infinity_values=infinity_values)
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
-    X_res = X_vrp_res.copy()
+    X_res = X_wap_res.copy()
     X_res[:, :, :2][X_res[:, :, :2] >= max_edge_length] = infinity_values
     assert_almost_equal(wap.fit_transform(X), X_res)
 
 
-def test_wap_list_of_arrays_different_size():
-    X_2 = np.array([[0., 1.], [1., 2.]])
+def test_wap_qhullerror():
+    """"Test that SciPy raises a QhullError when there are too few points (at
+    least 4 are needed)"""
+    X_pc_2 = np.array([[[0., 1.], [1., 2.], [2., 3.]]])
     wap = WeakAlphaPersistence()
-    assert_almost_equal(wap.fit_transform([X_pc[0], X_2])[0], X_vrp_res[0])
+    with pytest.raises(QhullError):
+        wap.fit_transform(X_pc_2)
+
+
+def test_wap_list_of_arrays_different_size():
+    X = [X_pc[0], X_pc[0][:-1]]
+    wap = WeakAlphaPersistence()
+    assert_almost_equal(wap.fit_transform(X)[0], X_wap_res[0])
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
 def test_wap_low_infinity_values(X):
-    wap = WeakAlphaPersistence(max_edge_length=0.001,
-                               infinity_values=-1)
+    wap = WeakAlphaPersistence(max_edge_length=0.001, infinity_values=-1)
     assert_almost_equal(wap.fit_transform(X)[:, :, :2],
                         np.zeros((1, 2, 2)))
 
