@@ -1115,7 +1115,6 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _weak_alpha_diagram(self, X):
-        N = len(X)
         indptr, indices = Delaunay(X).vertex_neighbor_vertices
 
         row = np.zeros_like(indices)
@@ -1125,7 +1124,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         mask = indices > row
         row, col = row[mask], indices[mask]
         dists = np.linalg.norm(X[row] - X[col], axis=1)
-        dm = coo_matrix((dists, (row, col)), shape=(N, N))
+        dm = coo_matrix((dists, (row, col)))
 
         Xdgms = ripser(dm, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
