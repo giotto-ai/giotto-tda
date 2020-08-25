@@ -6,6 +6,7 @@ set(BINDINGS_DIR "gtda/externals/bindings")
 
 include(cmake/HelperBoost.cmake)
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Eigen_INCLUDE_DIRS})
 
 find_package(OpenMP)
 find_package(Eigen REQUIRED)
