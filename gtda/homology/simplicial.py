@@ -86,8 +86,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    FlagserPersistence, SparseRipsPersistence, EuclideanCechPersistence, \
-    ConsistentRescaling, ConsecutiveRescaling
+    FlagserPersistence, SparseRipsPersistence, WeakAlphaPersistence, \
+    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
@@ -337,8 +337,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, FlagserPersistence, EuclideanCechPersistence, \
-    ConsistentRescaling, ConsecutiveRescaling
+    VietorisRipsPersistence, FlagserPersistence, WeakAlphaPersistence, \
+    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
@@ -573,8 +573,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, FlagserPersistence, SparseRipsPersistence, \
-    ConsistentRescaling, ConsecutiveRescaling
+    VietorisRipsPersistence, FlagserPersistence, SparseRipsPersistence,
+    WeakAlphaPersistence
 
     Notes
     -----
@@ -818,8 +818,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, EuclideanCechPersistence, \
-    ConsistentRescaling, ConsecutiveRescaling
+    VietorisRipsPersistence, SparseRipsPersistence, WeakAlphaPersistence,
+    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
 
     Notes
     -----
@@ -1078,11 +1078,12 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     See also
     --------
     VietorisRipsPersistence, FlagserPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
+    EuclideanCechPersistence
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
+    Delaunay triangulation are computed by :class:`scipy.spatial.Delaunay`.
+    Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
     computing Vietoris–Rips persistent homology. Python bindings were modified
     for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
