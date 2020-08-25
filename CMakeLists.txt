@@ -8,6 +8,7 @@ include(cmake/HelperBoost.cmake)
 include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(OpenMP)
+find_package(Eigen REQUIRED)
 
 set(RIPSER_SRC_DIR "gtda/externals/ripser")
 set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
