@@ -634,7 +634,10 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         mask = indices > row
         row, col = row[mask], indices[mask]
         dists = np.linalg.norm(X[row] - X[col], axis=1)
-        dm = coo_matrix((dists, (row, col)))
+        # Note: passing the shape explicitly should not be needed in more
+        # recent versions of C++ ripser
+        n_points = len(X)
+        dm = coo_matrix((dists, (row, col)), shape=(n_points, n_points))
 
         Xdgms = ripser(dm, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
