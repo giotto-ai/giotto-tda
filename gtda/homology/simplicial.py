@@ -29,13 +29,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
     Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Euclidean space, or an abstract
-    :ref:`metric space <finite_metric_spaces_and_point_clouds>` encoded by a
-    distance matrix, information about the appearance and disappearance of
-    topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimension
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    Euclidean space, or an abstract :ref:`metric space
+    <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     Parameters
     ----------
@@ -45,9 +44,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         undirected graphs. Otherwise, input data is to be interpreted as a
         collection of point clouds (i.e. feature arrays), and `metric`
         determines a rule with which to calculate distances between pairs of
-        points (i.e. row vectors). If `metric` is a string, it must be one
-        of the options allowed by :func:`scipy.spatial.distance.pdist` for
-        its metric parameter, or a metric listed in
+        points (i.e. row vectors). If `metric` is a string, it must be one of
+        the options allowed by :func:`scipy.spatial.distance.pdist` for its
+        metric parameter, or a metric listed in
         :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
         ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If `metric` is a
         callable, it should take pairs of vectors (1D arrays) as input and, for
@@ -65,14 +64,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
-        distance is greater than this value will never be connected by an
-        edge, and topological features at scales larger than this value will
-        not be detected.
+        distance is greater than this value will never be connected by an edge,
+        and topological features at scales larger than this value will not be
+        detected.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this
-        death value is declared to be equal to `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -92,14 +91,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris–Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
+    computing Vietoris–Rips persistent homology. Python bindings were modified
+    for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
+    Persistence diagrams produced by this class must be interpreted with care
+    due to the presence of padding triples which carry no information. See
+    :meth:`transform` for additional information.
 
     References
     ----------
@@ -277,30 +276,28 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
     Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Euclidean space, or an abstract
-    :ref:`metric space <finite_metric_spaces_and_point_clouds>`
-    encoded by a distance matrix, information about the appearance and
-    disappearance of topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    Euclidean space, or an abstract :ref:`metric space
+    <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
         If set to ``'precomputed'``, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and `metric` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
-        If `metric` is a string, it must be one of the options allowed by
+        interpreted as a collection of point clouds (i.e. feature arrays), and
+        `metric` determines a rule with which to calculate distances between
+        pairs of instances (i.e. rows) in these arrays. If `metric` is a
+        string, it must be one of the options allowed by
         :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
         metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
-        including "euclidean", "manhattan", or "cosine".
-        If `metric` is a callable function, it is called on each pair of
-        instances and the resulting value recorded. The callable should take
-        two arrays from the entry in `X` as input, and return a value
-        indicating the distance between them.
+        including "euclidean", "manhattan", or "cosine". If `metric` is a
+        callable, it is called on each pair of instances and the resulting
+        value recorded. The callable should take two arrays from the entry in
+        `X` as input, and return a value indicating the distance between them.
 
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
@@ -313,19 +310,19 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     epsilon : float between 0. and 1., optional, default: ``0.1``
         Parameter controlling the approximation to the exact Vietoris–Rips
-        filtration. If set to `0.`, :class:`SparseRipsPersistence` leads to
-        the same results as :class:`VietorisRipsPersistence` but is slower.
+        filtration. If set to `0.`, :class:`SparseRipsPersistence` leads to the
+        same results as :class:`VietorisRipsPersistence` but is slower.
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Sparse Rips filtration parameter. Points whose
-        distance is greater than this value will never be connected by an
-        edge, and topological features at scales larger than this value will
-        not be detected.
+        distance is greater than this value will never be connected by an edge,
+        and topological features at scales larger than this value will not be
+        detected.
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this
-        death value is declared to be equal to `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -349,9 +346,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for computing sparse Vietoris–Rips persistent homology. Python bindings
     were modified for performance.
 
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
+    Persistence diagrams produced by this class must be interpreted with care
+    due to the presence of padding triples which carry no information. See
+    :meth:`transform` for additional information.
 
     References
     ----------
@@ -539,10 +536,9 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
     Euclidean space, information about the appearance and disappearance of
-    topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    topological features (technically, :ref:`homology classes
+    <homology_and_cohomology>`) of various dimensions and at different scales
+    is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
@@ -583,12 +579,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cech persistent homology. Python bindings were modified
-    for performance.
+    for computing Cech persistent homology. Python bindings were modified for
+    performance.
 
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
+    Persistence diagrams produced by this class must be interpreted with care
+    due to the presence of padding triples which carry no information. See
+    :meth:`transform` for additional information.
 
     References
     ----------
@@ -757,9 +753,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Given a weighted directed or undirected graph, information about the
     appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimension
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    :ref:`homology classes <homology_and_cohomology>`) of various dimension and
+    at different scales is summarised in the corresponding persistence diagram.
 
     Parameters
     ----------
@@ -768,11 +763,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         detected.
 
     directed : bool, optional, default: ``True``
-        If ``True``, :meth:`transform` computes the persistence diagrams of
-        the filtered directed flag complexes arising from the input collection
-        of weighted directed graphs. If ``False``, :meth:`transform` computes
-        the persistence diagrams of the filtered undirected flag complexes
-        obtained by regarding all input weighted graphs as undirected, and:
+        If ``True``, :meth:`transform` computes the persistence diagrams of the
+        filtered directed flag complexes arising from the input collection of
+        weighted directed graphs. If ``False``, :meth:`transform` computes the
+        persistence diagrams of the filtered undirected flag complexes obtained
+        by regarding all input weighted graphs as undirected, and:
 
         - if `max_edge_weight` is ``numpy.inf``, it is sufficient to pass a
           collection of (dense or sparse) upper-triangular matrices;
@@ -799,8 +794,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_weight`. ``None`` means that this
-        death value is declared to be equal to `max_edge_weight`.
+        filtration value `max_edge_weight`. ``None`` means that this death
+        value is declared to be equal to `max_edge_weight`.
 
     max_entries : int, optional, default: ``-1``
         Number controlling the degree of precision in the matrix
@@ -830,16 +825,16 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     -----
     The `pyflagser <https://github.com/giotto-ai/pyflagser>`_ Python package
     is used for binding `Flagser <https://github.com/luetge/flagser>`_, a C++
-    backend for computing the (persistent) homology of (filtered) directed
-    flag complexes.
+    backend for computing the (persistent) homology of (filtered) directed flag
+    complexes.
 
     For more details, please refer to the `flagser documentation \
     <https://github.com/luetge/flagser/blob/master/docs/\
     documentation_flagser.pdf>`_.
 
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
+    Persistence diagrams produced by this class must be interpreted with care
+    due to the presence of padding triples which carry no information. See
+    :meth:`transform` for additional information.
 
 
     References
@@ -1031,13 +1026,21 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
-    :ref:`weak Alpha filtrations <TODO>`.
+    :ref:`weak alpha filtrations <TODO>`.
 
     Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
     Euclidean space, information about the appearance and disappearance of
     topological features (technically, :ref:`homology classes
     <homology_and_cohomology>`) of various dimension and at different scales is
     summarised in the corresponding persistence diagram.
+
+    The weak alpha filtration of a point cloud is defined to be the
+    :ref:`Vietoris–Rips filtration
+    <vietoris-rips_complex_and_vietoris-rips_persistence>` of the sparse matrix
+    of Euclidean distances between neighbouring vertices in the Delaunay
+    triangulation of the point cloud. In low dimensions, computing the
+    persistent homology of this filtration can be much faster than computing
+    Vietoris-Rips persistent homology via :class:`VietorisRipsPersistence`.
 
     Parameters
     ----------
@@ -1052,14 +1055,14 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
-        distance is greater than this value will never be connected by an
-        edge, and topological features at scales larger than this value will
-        not be detected.
+        distance is greater than this value will never be connected by an edge,
+        and topological features at scales larger than this value will not be
+        detected.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this
-        death value is declared to be equal to `max_edge_length`.
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -1079,9 +1082,9 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris–Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
+    computing Vietoris–Rips persistent homology. Python bindings were modified
+    for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     Persistence diagrams produced by this class must be interpreted with
