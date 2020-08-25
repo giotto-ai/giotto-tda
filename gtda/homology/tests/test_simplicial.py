@@ -38,7 +38,7 @@ X_circle = np.array([
      [0.70821787, 0.68571714],
      [-0.73369765, -0.71298056],
      [0.01110395, -1.03739883],
-     [-0.64968271, 0.7011624 ],
+     [-0.64968271, 0.7011624],
      [0.03895963, 0.94494511],
      [0.76291108, -0.68774373],
      [-1.01932365, -0.05793851]]
@@ -243,7 +243,7 @@ def test_wap_low_infinity_values(X):
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
-def test_vrp_fit_transform_plot(X, hom_dims):
+def test_wap_fit_transform_plot(X, hom_dims):
     WeakAlphaPersistence().fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims)
 
