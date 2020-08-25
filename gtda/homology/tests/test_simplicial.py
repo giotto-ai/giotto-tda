@@ -10,7 +10,7 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence, FlagserPersistence
+    EuclideanCechPersistence, FlagserPersistence, WeakAlphaPersistence
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -20,12 +20,12 @@ X_pc = np.array([
      [2.98935825, 2.79848711],
      [2.79848711, 2.41211849],
      [2.41211849, 1.92484888]]
-])
+    ])
 X_pc_list = list(X_pc)
 
 X_dist = np.array([
     squareform(pdist(x)) for x in X_pc
-])
+    ])
 X_dist_list = list(X_dist)
 
 X_pc_sparse = [csr_matrix(x) for x in X_pc]
@@ -53,7 +53,7 @@ X_vrp_res = np.array([
      [0., 0.60077095, 0.],
      [0., 0.62186205, 0.],
      [0.69093919, 0.80131882, 1.]]
-])
+    ])
 
 
 @pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
@@ -128,7 +128,7 @@ X_srp_res = np.array([
      [0., 0.60077095, 0.],
      [0., 0.62186205, 0.],
      [0.69093919, 0.80131882, 1.]]
-])
+    ])
 
 
 @pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
@@ -182,7 +182,7 @@ X_cp_res = np.array([
      [0.52355742, 0.52358794, 1.],
      [0.40065941, 0.40067135, 1.],
      [0.45954496, 0.45954497, 1.]]
-])
+    ])
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
@@ -228,7 +228,7 @@ X_fp_dir_res = np.array([
      [0., 0.40065941, 0.],
      [0., 0.43094373, 0.],
      [0.5117411,  0.51976681, 1.]]
-])
+    ])
 
 
 @pytest.mark.parametrize('X',
@@ -272,3 +272,61 @@ def test_fp_transform_undirected(X, max_edge_weight, infinity_values):
 def test_fp_fit_transform_plot(X, hom_dims):
     FlagserPersistence(directed=False).fit_transform_plot(
         X_dist, sample=0, homology_dimensions=hom_dims)
+
+
+def test_wap_params():
+    coeff = 'not_defined'
+    wap = WeakAlphaPersistence(coeff=coeff)
+
+    with pytest.raises(ValueError):
+        wap.fit_transform(X_pc)
+
+
+def test_wap_not_fitted():
+    wap = WeakAlphaPersistence()
+
+    with pytest.raises(NotFittedError):
+        wap.transform(X_pc)
+
+
+X_vrp_res = np.array([
+    [[0., 0.43094373, 0.],
+     [0., 0.5117411, 0.],
+     [0., 0.60077095, 0.],
+     [0., 0.62186205, 0.],
+     [0.69093919, 0.80131882, 1.]]
+    ])
+
+
+@pytest.mark.parametrize('X', [X_pc, X_pc_list])
+@pytest.mark.parametrize('max_edge_length', [np.inf, 0.8])
+@pytest.mark.parametrize('infinity_values', [10, 30])
+def test_wap_transform(X, max_edge_length, infinity_values):
+    wap = WeakAlphaPersistence(max_edge_length=max_edge_length,
+                               infinity_values=infinity_values)
+    # This is not generally true, it is only a way to obtain the res array
+    # in this specific case
+    X_res = X_vrp_res.copy()
+    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_length] = infinity_values
+    assert_almost_equal(wap.fit_transform(X), X_res)
+
+
+def test_wap_list_of_arrays_different_size():
+    X_2 = np.array([[0., 1.], [1., 2.]])
+    wap = WeakAlphaPersistence()
+    assert_almost_equal(wap.fit_transform([X_pc[0], X_2])[0], X_vrp_res[0])
+
+
+@pytest.mark.parametrize('X', [X_pc, X_pc_list])
+def test_wap_low_infinity_values(X):
+    wap = WeakAlphaPersistence(max_edge_length=0.001,
+                               infinity_values=-1)
+    assert_almost_equal(wap.fit_transform(X)[:, :, :2],
+                        np.zeros((1, 2, 2)))
+
+
+@pytest.mark.parametrize('X', [X_pc, X_pc_list])
+@pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
+def test_vrp_fit_transform_plot(X, hom_dims):
+    WeakAlphaPersistence().fit_transform_plot(
+        X, sample=0, homology_dimensions=hom_dims)
