@@ -625,12 +625,15 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _weak_alpha_diagram(self, X):
+        # `indices` will serve as the array of column indices
         indptr, indices = Delaunay(X).vertex_neighbor_vertices
 
+        # Compute the array of row indices
         row = np.zeros_like(indices)
         row[indptr[1:-1]] = 1
         np.cumsum(row, out=row)
 
+        # We only need the upper diagonal
         mask = indices > row
         row, col = row[mask], indices[mask]
         dists = np.linalg.norm(X[row] - X[col], axis=1)
