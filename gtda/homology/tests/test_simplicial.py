@@ -32,6 +32,18 @@ X_dist_list = list(X_dist)
 X_pc_sparse = [csr_matrix(x) for x in X_pc]
 X_dist_sparse = [csr_matrix(x) for x in X_dist]
 
+# 8-point sampling of a noisy circle
+X_circle = np.array([
+    [[1.00399159, -0.00797583],
+     [0.70821787, 0.68571714],
+     [-0.73369765, -0.71298056],
+     [0.01110395, -1.03739883],
+     [-0.64968271, 0.7011624 ],
+     [0.03895963, 0.94494511],
+     [0.76291108, -0.68774373],
+     [-1.01932365, -0.05793851]]
+    ])
+
 
 def test_vrp_params():
     metric = 'not_defined'
@@ -48,7 +60,7 @@ def test_vrp_not_fitted():
         vrp.transform(X_pc)
 
 
-X_vrp_res = np.array([
+X_vrp_exp = np.array([
     [[0., 0.43094373, 0.],
      [0., 0.5117411, 0.],
      [0., 0.60077095, 0.],
@@ -71,15 +83,15 @@ def test_vrp_transform(X, metric, max_edge_length, infinity_values):
                                   infinity_values=infinity_values)
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
-    X_res = X_vrp_res.copy()
-    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_length] = infinity_values
-    assert_almost_equal(vrp.fit_transform(X), X_res)
+    X_exp = X_vrp_exp.copy()
+    X_exp[:, :, :2][X_exp[:, :, :2] >= max_edge_length] = infinity_values
+    assert_almost_equal(vrp.fit_transform(X), X_exp)
 
 
 def test_vrp_list_of_arrays_different_size():
     X_2 = np.array([[0., 1.], [1., 2.]])
     vrp = VietorisRipsPersistence()
-    assert_almost_equal(vrp.fit_transform([X_pc[0], X_2])[0], X_vrp_res[0])
+    assert_almost_equal(vrp.fit_transform([X_pc[0], X_2])[0], X_vrp_exp[0])
 
 
 @pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
@@ -123,7 +135,7 @@ def test_srp_not_fitted():
         srp.transform(X_pc)
 
 
-X_srp_res = np.array([
+X_srp_exp = np.array([
     [[0., 0.43094373, 0.],
      [0., 0.5117411, 0.],
      [0., 0.60077095, 0.],
@@ -138,7 +150,7 @@ X_srp_res = np.array([
                                        (X_dist, 'precomputed'),
                                        (X_dist_list, 'precomputed')])
 @pytest.mark.parametrize("epsilon, diagrams",
-                         [(0.0, X_vrp_res), (1.0, X_srp_res)])
+                         [(0.0, X_vrp_exp), (1.0, X_srp_exp)])
 def test_srp_transform(X, metric, epsilon, diagrams):
     srp = SparseRipsPersistence(metric=metric, epsilon=epsilon)
 
@@ -174,7 +186,7 @@ def test_wap_not_fitted():
 
 # On this particular X_pc, WeakAlpha and VietorisRips should give the exact
 # same result
-X_wap_res = X_vrp_res
+X_wap_exp = X_vrp_exp
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
@@ -185,9 +197,26 @@ def test_wap_transform(X, max_edge_length, infinity_values):
                                infinity_values=infinity_values)
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
-    X_res = X_wap_res.copy()
-    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_length] = infinity_values
-    assert_almost_equal(wap.fit_transform(X), X_res)
+    X_exp = X_wap_exp.copy()
+    X_exp[:, :, :2][X_exp[:, :, :2] >= max_edge_length] = infinity_values
+    assert_almost_equal(wap.fit_transform(X), X_exp)
+
+
+@pytest.mark.parametrize("transformer_cls", [VietorisRipsPersistence,
+                                             WeakAlphaPersistence])
+def test_vrp_wap_transform_circle(transformer_cls):
+    """Test that, on a sampled noisy circle, both VietorisRipsPersistence and
+    WeakAlphaPersistence lead to reasonable barcodes"""
+    transformer = transformer_cls()
+    X_res = transformer.fit_transform(X_circle)
+    subdiagram_0 = X_res[X_res[:, :, 2] == 0]
+    subdiagram_1 = X_res[X_res[:, :, 2] == 1]
+    length_reg_pol = 2 * np.sin(np.pi / X_circle.shape[1])
+    last_conn_comp_param = np.max(subdiagram_0[:, 1])
+    assert last_conn_comp_param < length_reg_pol + 0.1
+    assert len(subdiagram_1) == 1
+    assert subdiagram_1[0, 0] > last_conn_comp_param
+    assert subdiagram_1[0, 1] > np.sqrt(3)
 
 
 def test_wap_qhullerror():
@@ -202,7 +231,7 @@ def test_wap_qhullerror():
 def test_wap_list_of_arrays_different_size():
     X = [X_pc[0], X_pc[0][:-1]]
     wap = WeakAlphaPersistence()
-    assert_almost_equal(wap.fit_transform(X)[0], X_wap_res[0])
+    assert_almost_equal(wap.fit_transform(X)[0], X_wap_exp[0])
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
@@ -234,7 +263,7 @@ def test_cp_not_fitted():
         cp.transform(X_pc)
 
 
-X_cp_res = np.array([
+X_cp_exp = np.array([
     [[0., 0.31093103, 0.],
      [0., 0.30038548, 0.],
      [0., 0.25587055, 0.],
@@ -252,7 +281,7 @@ X_cp_res = np.array([
 def test_cp_transform(X):
     cp = EuclideanCechPersistence()
 
-    assert_almost_equal(cp.fit_transform(X), X_cp_res)
+    assert_almost_equal(cp.fit_transform(X), X_cp_exp)
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
@@ -285,7 +314,7 @@ X_dir_graph_list = [x for x in X_dir_graph]
 
 X_dir_graph_sparse = [csr_matrix(x) for x in X_dir_graph]
 
-X_fp_dir_res = np.array([
+X_fp_dir_exp = np.array([
     [[0., 0.30038548, 0.],
      [0., 0.34546959, 0.],
      [0., 0.40065941, 0.],
@@ -303,11 +332,11 @@ def test_fp_transform_directed(X, max_edge_weight, infinity_values):
                             infinity_values=infinity_values)
     # In the undirected case with "max" filtration, the results are always the
     # same as the one of VietorisRipsPersistence
-    X_res = X_fp_dir_res.copy()
+    X_exp = X_fp_dir_exp.copy()
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
-    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_weight] = infinity_values
-    assert_almost_equal(fp.fit_transform(X), X_res)
+    X_exp[:, :, :2][X_exp[:, :, :2] >= max_edge_weight] = infinity_values
+    assert_almost_equal(fp.fit_transform(X), X_exp)
 
 
 @pytest.mark.parametrize('X', [X_dist, X_dist_list, X_dist_sparse])
@@ -318,16 +347,16 @@ def test_fp_transform_undirected(X, max_edge_weight, infinity_values):
                             infinity_values=infinity_values)
     # In the undirected case with "max" filtration, the results are always the
     # same as the one of VietorisRipsPersistence
-    X_res = X_vrp_res.copy()
+    X_exp = X_vrp_exp.copy()
 
     # In that case, subdiagrams of dimension 1 is empty
     if max_edge_weight == 0.6:
-        X_res[0, -1, :] = [0., 0., 1.]
+        X_exp[0, -1, :] = [0., 0., 1.]
 
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
-    X_res[:, :, :2][X_res[:, :, :2] >= max_edge_weight] = infinity_values
-    assert_almost_equal(fp.fit_transform(X), X_res)
+    X_exp[:, :, :2][X_exp[:, :, :2] >= max_edge_weight] = infinity_values
+    assert_almost_equal(fp.fit_transform(X), X_exp)
 
 
 @pytest.mark.parametrize('X', [X_dist, X_dist_list, X_dist_sparse])
