@@ -546,7 +546,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     of Euclidean distances between neighbouring vertices in the Delaunay
     triangulation of the point cloud. In low dimensions, computing the
     persistent homology of this filtration can be much faster than computing
-    Vietoris-Rips persistent homology via :class:`VietorisRipsPersistence`.
+    Vietoris–Rips persistent homology via :class:`VietorisRipsPersistence`.
 
     Parameters
     ----------
