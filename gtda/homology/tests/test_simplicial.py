@@ -173,7 +173,7 @@ def test_wap_params():
     coeff = 'not_defined'
     wap = WeakAlphaPersistence(coeff=coeff)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         wap.fit_transform(X_pc)
 
 
