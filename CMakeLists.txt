@@ -310,6 +310,7 @@ endif()
 target_link_libraries(gtda_cech_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_cech_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
+target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/Simplex_tree/include")
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/Cech_complex/include")
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")

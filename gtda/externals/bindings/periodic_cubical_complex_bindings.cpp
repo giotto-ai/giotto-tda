@@ -56,6 +56,5 @@ PYBIND11_MODULE(gtda_periodic_cubical_complex, m) {
            &Persistent_cohomology_interface_inst::persistent_betti_numbers)
       .def("intervals_in_dimension",
            &Persistent_cohomology_interface_inst::intervals_in_dimension);
-  m.doc() = "GUDHI periocal cubical complex function interfacing";
+  m.doc() = "GUDHI periodic cubical complex function interfacing";
 }
-
