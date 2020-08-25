@@ -149,6 +149,7 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip setuptools
+      python -m pip install wheel
       source .azure-ci/setup_ccache.sh
       python -m pip install -e ".[dev]"
       ccache -s
@@ -172,7 +173,6 @@ jobs:
 
   - script: |
       set -e
-      pip install wheel
       python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
@@ -257,6 +257,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
+      python -m pip install wheel
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
@@ -265,18 +266,17 @@ jobs:
     displayName: 'Test dev install with pytest'
 
   - script: |
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
+      python -m pip uninstall -y giotto-tda
+      python -m pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       set -e
       sed -i $'s/\r$//' README.rst
-      pip install wheel
       python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
-  - bash: pip install dist/*.whl
+  - bash: python -m pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -287,7 +287,7 @@ jobs:
 
   - script: |
       python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
+      python -m pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
@@ -307,7 +307,7 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
+      python -m pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
