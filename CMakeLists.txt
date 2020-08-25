@@ -155,7 +155,7 @@ endif()
 #                   Flag complex edge collapser                       #
 #######################################################################
 
-pybind11_add_module(gtda_flag_complex_edge_collapser "${BINDINGS_DIR}/flag_complex_edge_collapser_bindings.cpp")
+# pybind11_add_module(gtda_flag_complex_edge_collapser "${BINDINGS_DIR}/flag_complex_edge_collapser_bindings.cpp")
 set_property(TARGET gtda_flag_complex_edge_collapser PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
