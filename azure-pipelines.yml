@@ -143,7 +143,7 @@ jobs:
   - script: |
       set -e
       brew update
-      brew install boost ccache
+      brew install boost eigen ccache
     displayName: 'Install system dependencies'
 
   - script: |
