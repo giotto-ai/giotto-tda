@@ -6,11 +6,9 @@ set(BINDINGS_DIR "gtda/externals/bindings")
 
 include(cmake/HelperBoost.cmake)
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${Eigen_INCLUDE_DIRS})
-include_directories(${Eigen_INCLUDE_DIR})
 
 find_package(OpenMP)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 3.3 REQUIRED)
 
 set(RIPSER_SRC_DIR "gtda/externals/ripser")
 set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
@@ -165,6 +163,7 @@ if(OpenMP_FOUND)
     target_link_libraries(gtda_simplex_tree PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
+target_link_libraries(gtda_simplex_tree Eigen3::Eigen)
 target_link_libraries(gtda_simplex_tree LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_simplex_tree PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
@@ -310,6 +309,7 @@ if(OpenMP_FOUND)
     target_link_libraries(gtda_cech_complex PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
+target_link_libraries(gtda_cech_complex Eigen3::Eigen)
 target_link_libraries(gtda_cech_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_cech_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
