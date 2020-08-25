@@ -7,7 +7,7 @@ from types import FunctionType
 import numpy as np
 from joblib import Parallel, delayed
 from pyflagser import flagser_weighted
-from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix
 from scipy.spatial import Delaunay
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import pairwise_distances
