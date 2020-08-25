@@ -1125,7 +1125,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         mask = indices > row
         row, col = row[mask], indices[mask]
         dists = np.linalg.norm(X[row] - X[col], axis=1)
-        dm = csr_matrix((dists, (row, col)), shape=(N, N))
+        dm = coo_matrix((dists, (row, col)), shape=(N, N))
 
         Xdgms = ripser(dm, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
