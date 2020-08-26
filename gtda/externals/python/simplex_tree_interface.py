@@ -171,21 +171,6 @@ class SimplexTree:
             ct.append((v, filtered_complex[1]))
         return ct
 
-    def get_skeleton(self, dimension):
-        """This function returns the (simplices of the) skeleton of a maximum
-        given dimension.
-        :param dimension: The skeleton dimension value.
-        :type dimension: int.
-        :returns:  The (simplices of the) skeleton of a maximum dimension.
-        :rtype:  list of tuples(simplex, filtration)
-        """
-        skeleton = self.thisptr.get_skeleton(dimension)
-        ct = []
-        for filtered_simplex in skeleton:
-            v = [vertex for vertex in filtered_simplex[0]]
-            ct.append((v, filtered_simplex[1]))
-        return ct
-
     def get_star(self, simplex):
         """This function returns the star of a given N-simplex.
         :param simplex: The N-simplex, represented by a list of vertex.
@@ -321,10 +306,12 @@ class SimplexTree:
             del self.pcohptr
         self.pcohptr = Simplex_tree_persistence_interface(self.thisptr,
                                                           persistence_dim_max)
+        persistence_result = []
         if self.pcohptr is not None:
             self.pcohptr.compute_persistence(homology_coeff_field,
                                              min_persistence)
-        return self.pcohptr.get_persistence()
+            persistence_result = self.pcohptr.get_persistence()
+        return persistence_result
 
     def betti_numbers(self):
         """This function returns the Betti numbers of the simplicial complex.
@@ -377,6 +364,7 @@ class SimplexTree:
             :func:`persistence()<gudhi.SimplexTree.persistence>`
             function to be launched first.
         """
+        intervals_result = []
         if self.pcohptr is not None:
             intervals_result = self.pcohptr.intervals_in_dimension(dimension)
         else:
@@ -393,6 +381,7 @@ class SimplexTree:
             :func:`persistence()<gudhi.SimplexTree.persistence>`
             function to be launched first.
         """
+        persistence_pairs_result = []
         if self.pcohptr is not None:
             persistence_pairs_result = self.pcohptr.persistence_pairs()
         else:

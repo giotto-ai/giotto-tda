@@ -97,12 +97,13 @@ class CubicalComplex:
         if self.thisptr is not None:
             self.pcohptr = Cubical_complex_persistence_interface(self.thisptr,
                                                                  True)
-
+        persistence_result = []
         if self.pcohptr is not None:
             self.pcohptr.compute_persistence(homology_coeff_field,
                                              min_persistence)
+            persistence_result = self.pcohptr.get_persistence()
 
-        return self.pcohptr.get_persistence()
+        return persistence_result
 
     def betti_numbers(self):
         """This function returns the Betti numbers of the complex.
