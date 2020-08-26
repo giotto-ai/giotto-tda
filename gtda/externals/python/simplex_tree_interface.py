@@ -69,7 +69,7 @@ class SimplexTree:
             :func:`persistence()<gudhi.SimplexTree.persistence>`,
             :func:`betti_numbers()<gudhi.SimplexTree.betti_numbers>`,
             :func:`persistent_betti_numbers()<gudhi.SimplexTree.persistent_betti_numbers>`,
-            or :func:`get_filtration()<gudhi.SimplexTree.get_filtration>`
+            or :func:`get_simplex_and_filtration()<gudhi.SimplexTree.get_simplex_and_filtration>`
             after :func:`inserting<gudhi.SimplexTree.insert>` or
             :func:`removing<gudhi.SimplexTree.remove_maximal_simplex>`
             simplices.
@@ -158,13 +158,13 @@ class SimplexTree:
         return self.thisptr.insert_simplex_and_subfaces(csimplex,
                                                         filtration)
 
-    def get_filtration(self):
-        """This function returns a list of all simplices with their given
+    def get_simplex_and_filtration(self):
+        """This function returns an iterator of all simplices with their given
         filtration values.
         :returns:  The simplices sorted by increasing filtration values.
         :rtype:  list of tuples(simplex, filtration)
         """
-        filtration = self.thisptr.get_filtration()
+        filtration = self.thisptr.get_simplex_and_filtration()
         ct = []
         for filtered_complex in filtration:
             v = [vertex for vertex in filtered_complex[0]]

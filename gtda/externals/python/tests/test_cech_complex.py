@@ -47,4 +47,4 @@ def test_example_from_points():
     assert stree.dimension() == 2
     assert stree.num_simplices() == 30
     assert stree.num_vertices() == 11
-    assert stree.get_filtration() == verification_filtration
+    assert stree.get_simplex_and_filtration() == verification_filtration

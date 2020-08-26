@@ -41,8 +41,7 @@ PYBIND11_MODULE(gtda_simplex_tree, m) {
                const std::vector<simplex_tree_interface_inst::Vertex_handle>&,
                double>(
                &simplex_tree_interface_inst::insert_simplex_and_subfaces))
-      .def("get_filtration", &simplex_tree_interface_inst::get_filtration)
-      .def("get_skeleton", &simplex_tree_interface_inst::get_skeleton)
+      .def("get_simplex_and_filtration", &simplex_tree_interface_inst::get_simplex_and_filtration)
       .def("get_star", &simplex_tree_interface_inst::get_star)
       .def("get_cofaces", &simplex_tree_interface_inst::get_cofaces)
       .def("expansion", &simplex_tree_interface_inst::expansion)
