@@ -98,12 +98,10 @@ class PeriodicCubicalComplex:
             self.pcohptr = \
                 Periodic_cubical_complex_persistence_interface(self.thisptr,
                                                                True)
-        persistence_result = []
         if self.pcohptr is not None:
-            persistence_result = \
-                self.pcohptr.get_persistence(homology_coeff_field,
+            self.pcohptr.compute_persistence(homology_coeff_field,
                                              min_persistence)
-        return persistence_result
+        return self.pcohptr.get_persistence()
 
     def betti_numbers(self):
         """This function returns the Betti numbers of the complex.
@@ -147,7 +145,6 @@ class PeriodicCubicalComplex:
         :note: intervals_in_dim function requires persistence function to be
             launched first.
         """
-        intervals_result = []
         if self.pcohptr is not None:
             intervals_result = self.pcohptr.intervals_in_dimension(dimension)
         else:

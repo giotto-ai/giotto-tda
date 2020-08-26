@@ -300,7 +300,7 @@ class SimplexTree:
         return self.thisptr.make_filtration_non_decreasing()
 
     def persistence(self, homology_coeff_field=11, min_persistence=0,
-                    persistence_dim_max = False):
+                    persistence_dim_max=False):
         """This function returns the persistence of the simplicial complex.
         :param homology_coeff_field: The homology coefficient field. Must be a
             prime number. Default value is 11.
@@ -321,12 +321,10 @@ class SimplexTree:
             del self.pcohptr
         self.pcohptr = Simplex_tree_persistence_interface(self.thisptr,
                                                           persistence_dim_max)
-        persistence_result = []
         if self.pcohptr is not None:
-            persistence_result = \
-                self.pcohptr.get_persistence(homology_coeff_field,
+            self.pcohptr.compute_persistence(homology_coeff_field,
                                              min_persistence)
-        return persistence_result
+        return self.pcohptr.get_persistence()
 
     def betti_numbers(self):
         """This function returns the Betti numbers of the simplicial complex.
@@ -379,7 +377,6 @@ class SimplexTree:
             :func:`persistence()<gudhi.SimplexTree.persistence>`
             function to be launched first.
         """
-        intervals_result = []
         if self.pcohptr is not None:
             intervals_result = self.pcohptr.intervals_in_dimension(dimension)
         else:
@@ -388,14 +385,14 @@ class SimplexTree:
         return np.array(intervals_result)
 
     def persistence_pairs(self):
-        """This function returns a list of persistence birth and death simplices pairs.
+        """This function returns a list of persistence birth and death simplex
+        pairs.
         :returns: A list of persistence simplices intervals.
         :rtype:  list of pair of list of int
         :note: persistence_pairs function requires
             :func:`persistence()<gudhi.SimplexTree.persistence>`
             function to be launched first.
         """
-        persistence_pairs_result = []
         if self.pcohptr is not None:
             persistence_pairs_result = self.pcohptr.persistence_pairs()
         else:
