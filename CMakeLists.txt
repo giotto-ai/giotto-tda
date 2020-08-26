@@ -221,9 +221,11 @@ if(OpenMP_FOUND)
     target_link_libraries(gtda_witness_complex PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
+target_link_libraries(gtda_witness_complex LINK_PUBLIC Eigen3::Eigen)
 target_link_libraries(gtda_witness_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_witness_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
+target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Witness_complex/include")
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Simplex_tree/include")
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Cech_complex/include")
@@ -250,9 +252,11 @@ if(OpenMP_FOUND)
     target_link_libraries(gtda_strong_witness_complex PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
+target_link_libraries(gtda_strong_witness_complex LINK_PUBLIC Eigen3::Eigen)
 target_link_libraries(gtda_strong_witness_complex LINK_PUBLIC ${Boost_LIBRARIES})
 target_compile_definitions(gtda_strong_witness_complex PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
 
+target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Witness_complex/include")
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Simplex_tree/include")
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Cech_complex/include")
