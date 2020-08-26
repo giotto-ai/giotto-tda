@@ -158,17 +158,19 @@ class SimplexTree:
         return self.thisptr.insert_simplex_and_subfaces(csimplex,
                                                         filtration)
 
-    def get_simplex_and_filtration(self):
+    def get_filtration(self):
         """This function returns an iterator of all simplices with their given
-        filtration values.
+        filtration values sorted by increasing filtration values.
         :returns:  The simplices sorted by increasing filtration values.
         :rtype:  list of tuples(simplex, filtration)
         """
-        filtration = self.thisptr.get_simplex_and_filtration()
+        it = self.thisptr.get_filtration_iterator_begin()
+        end = self.thisptr.get_filtration_iterator_end()
+        simplex_and_filtration = self.thisptr.get_simplex_and_filtration
         ct = []
-        for filtered_complex in filtration:
-            v = [vertex for vertex in filtered_complex[0]]
-            ct.append((v, filtered_complex[1]))
+        while it != end:
+            ct.append(simplex_and_filtration(it))
+            it += 1
         return ct
 
     def get_star(self, simplex):
