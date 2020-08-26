@@ -20,6 +20,8 @@ PYBIND11_MODULE(gtda_persistent_cohomology, m) {
       .def(py::init<Gudhi::cubical_complex::Cubical_complex_interface<>*>())
       .def(py::init<Gudhi::cubical_complex::Cubical_complex_interface<>*,
                     bool>())
+      .def("compute_persistence",
+           &Persistent_cohomology_interface_inst::compute_persistence)
       .def("get_persistence",
            &Persistent_cohomology_interface_inst::get_persistence)
       .def("betti_numbers",
@@ -28,5 +30,5 @@ PYBIND11_MODULE(gtda_persistent_cohomology, m) {
            &Persistent_cohomology_interface_inst::persistent_betti_numbers)
       .def("intervals_in_dimension",
            &Persistent_cohomology_interface_inst::intervals_in_dimension);
-  m.doc() = "GUDHI persistant homology interfacing";
+  m.doc() = "GUDHI persistent homology interfacing";
 }
