@@ -18,19 +18,26 @@ source /io/.azure-ci/setup_ccache.sh
 
 ccache -s
 
-# Install boost
+# Install boost and Eigen3
 yum install -y wget tar
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install -j3 || echo "Parts of boost failed to build. Continuing.."
+./b2 install -j3 || echo "Parts of boost failed to build. Continuing..."
 cd ..
+wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
+tar -zxvf /eigen-3.3.7.tar.gz
+cd /eigen-3.3.7
+mkdir build
+cd build
+cmake ..
+make install
 
 ccache -s
 
-# Help CMake find boost
+# Help CMake find boost and Eigen3
 export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
