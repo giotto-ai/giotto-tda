@@ -36,6 +36,7 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # Install dev environment
 cd /io
+pip install wheel
 pip install -e ".[dev]"
 
 # Test dev install with pytest
@@ -46,10 +47,10 @@ pip uninstall -y giotto-tda
 pip uninstall -y giotto-tda-nightly
 
 # Build wheels
-pip install wheel==0.34.1 auditwheel==3.1.0
 python setup.py bdist_wheel
 
 # Repair wheels with auditwheel
+pip install auditwheel
 auditwheel repair dist/*whl -w dist/
 # remove wheels that are not manylinux2010
 rm -rf dist/*-linux*.whl
