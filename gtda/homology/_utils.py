@@ -43,8 +43,9 @@ def _postprocess_diagrams(Xt, format, homology_dimensions, infinity_values,
             ) for dim in homology_dimensions} for diagram in Xt]
     elif format == "gudhi":  # Input is list of list of [dim, (birth, death)]
         Xt = [{dim: _replace_infinity_values(
-            np.array([birth_death for d, birth_death in diagram if d == dim])\
-            [slice() if dim else slice(1, -1)],  # In H0, remove 1 infinite bar
+            np.array([pers_info[1] for pers_info in diagram
+                      if pers_info[0] == dim]).reshape(-1, 2)
+            [slice(None if dim else 1, -1)],  # In H0,  remove 1 infinite bar
             infinity_values
             )
             for dim in homology_dimensions} for diagram in Xt]
