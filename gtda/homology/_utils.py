@@ -45,7 +45,7 @@ def _postprocess_diagrams(Xt, format, homology_dimensions, infinity_values,
         Xt = [{dim: _replace_infinity_values(
             np.array([pers_info[1] for pers_info in diagram
                       if pers_info[0] == dim]).reshape(-1, 2)
-            [slice(None if dim else 1, -1)],  # In H0,  remove 1 infinite bar
+            [slice(None if dim else 1, None)],  # In H0,  remove 1 infinite bar
             infinity_values
             )
             for dim in homology_dimensions} for diagram in Xt]
