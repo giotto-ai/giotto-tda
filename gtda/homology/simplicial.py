@@ -135,9 +135,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                        thresh=self.max_edge_length, coeff=self.coeff,
                        metric=self.metric)['dgms']
 
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
-
         return Xdgms
 
     def fit(self, X, y=None):
@@ -229,7 +226,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._ripser_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+        Xt = _postprocess_diagrams(Xt, "ripser", self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
@@ -385,24 +382,19 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        Xdgms = pairwise_distances(X, metric=self.metric)
+        Xdgm = pairwise_distances(X, metric=self.metric)
         sparse_rips_complex = SparseRipsComplex(
-            distance_matrix=Xdgms, max_edge_length=self.max_edge_length,
-            sparse=self.epsilon)
+            distance_matrix=Xdgm, max_edge_length=self.max_edge_length,
+            sparse=self.epsilon
+            )
         simplex_tree = sparse_rips_complex.create_simplex_tree(
-            max_dimension=max(self._homology_dimensions) + 1)
-        Xdgms = simplex_tree.persistence(
-            homology_coeff_field=self.coeff, min_persistence=0)
+            max_dimension=max(self._homology_dimensions) + 1
+            )
+        Xdgm = simplex_tree.persistence(
+            homology_coeff_field=self.coeff, min_persistence=0
+            )
 
-        # Separate diagrams by homology dimensions
-        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
-                                if Xdgms[i][0] == dim]).reshape((-1, 2))
-                 for dim in self.homology_dimensions}
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
-
-        return Xdgms
+        return Xdgm
 
     def fit(self, X, y=None):
         """Calculate :attr:`infinity_values_`. Then, return the estimator.
@@ -491,7 +483,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+        Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
@@ -621,19 +613,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     def _gudhi_diagram(self, X):
         cech_complex = CechComplex(points=X, max_radius=self.max_edge_length)
         simplex_tree = cech_complex.create_simplex_tree(
-            max_dimension=max(self._homology_dimensions) + 1)
-        Xdgms = simplex_tree.persistence(
-            homology_coeff_field=self.coeff, min_persistence=0)
+            max_dimension=max(self._homology_dimensions) + 1
+            )
+        Xdgm = simplex_tree.persistence(homology_coeff_field=self.coeff,
+                                        min_persistence=0)
 
-        # Separate diagrams by homology dimensions
-        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
-                                if Xdgms[i][0] == dim]).reshape((-1, 2))
-                 for dim in self.homology_dimensions}
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
-
-        return Xdgms
+        return Xdgm
 
     def fit(self, X, y=None):
         """Calculate :attr:`infinity_values_`. Then, return the estimator.
@@ -705,10 +690,10 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_point_clouds(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
+                                          for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+        Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 
@@ -882,9 +867,6 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                  filtration=self.filtration, coeff=self.coeff,
                                  approximation=self.max_entries)['dgms']
 
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
-
         return Xdgms
 
     def fit(self, X, y=None):
@@ -934,6 +916,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._min_homology_dimension = self._homology_dimensions[0]
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -987,7 +970,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._flagser_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
+        Xt = _postprocess_diagrams(Xt, "flagser", self._homology_dimensions,
                                    self.infinity_values_, self.n_jobs)
         return Xt
 

@@ -26,17 +26,32 @@ def _pad_diagram(Xd, homology_dimensions, max_n_points, min_values):
     return Xd
 
 
-def _postprocess_diagrams(Xt, homology_dimensions, infinity_values, n_jobs):
-    # Replacing np.inf with infinity_values and turning list of list of
-    # subdiagrams into list of dictionaries whose keys are the dimensions
-    Xt = [{dim: np.nan_to_num(diagram[dim], posinf=infinity_values)
-          for dim in homology_dimensions}
-          for diagram in Xt]
+def _replace_infinity_values(subdiagram, infinity_values):
+    np.nan_to_num(subdiagram, posinf=infinity_values, copy=False)
+    return subdiagram[subdiagram[:, 0] < subdiagram[:, 1]]
 
-    # Removing points whose birth is higher than their death
-    Xt = [{dim: subdiagram[subdiagram[:, 0] < subdiagram[:, 1]]
-          for dim, subdiagram in diagram.items()}
-          for diagram in Xt]
+
+def _postprocess_diagrams(Xt, format, homology_dimensions, infinity_values,
+                          n_jobs):
+    # Replace np.inf with infinity_values and turn into list of dictionaries
+    # whose keys are the dimensions
+    if format in ["ripser", "flagser"]:  # Input is list of list of subdiagrams
+        Xt = [{dim: _replace_infinity_values(
+            # In H0, remove 1 infinite bar
+            (diagram[dim] if dim else diagram[dim][:-1]),
+            infinity_values
+            ) for dim in homology_dimensions} for diagram in Xt]
+    elif format == "gudhi":  # Input is list of list of [dim, (birth, death)]
+        Xt = [{dim: _replace_infinity_values(
+            np.array([birth_death for d, birth_death in diagram if d == dim])\
+            [slice() if dim else slice(1, -1)],  # In H0, remove 1 infinite bar
+            infinity_values
+            )
+            for dim in homology_dimensions} for diagram in Xt]
+    else:
+        raise ValueError(
+            f"Unknown input format {format} for collection of diagrams."
+            )
 
     max_n_points = {dim: np.max([len(diagram[dim]) for diagram in Xt] + [1])
                     for dim in homology_dimensions}

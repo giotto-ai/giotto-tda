@@ -113,16 +113,12 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         cubical_complex = self._filtration(
             dimensions=X.shape,
             top_dimensional_cells=X.flatten(order="F"),
-            **self._filtration_kwargs)
-        Xdgms = cubical_complex.persistence(homology_coeff_field=self.coeff,
-                                            min_persistence=0)
+            **self._filtration_kwargs
+            )
+        Xdgm = cubical_complex.persistence(homology_coeff_field=self.coeff,
+                                           min_persistence=0)
 
-        # Separate diagrams by homology dimensions
-        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
-                                if Xdgms[i][0] == dim]).reshape((-1, 2))
-                 for dim in self.homology_dimensions}
-
-        return Xdgms
+        return Xdgm
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -167,6 +163,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -203,23 +200,12 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(x) for x in Xt)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
+                                          for x in Xt)
 
-        max_n_points = {
-            dim: max(1, np.max([x[dim].shape[0] for x in Xt])) for dim in
-            self.homology_dimensions}
-        min_values = {
-            dim: min([np.min(x[dim][:, 0]) if x[dim].size else np.inf for x
-                      in Xt]) for dim in self.homology_dimensions}
-        min_values = {
-            dim: min_values[dim] if min_values[dim] != np.inf else 0 for dim
-            in self.homology_dimensions}
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(_pad_diagram)(
-            x, self._homology_dimensions, max_n_points, min_values)
-            for x in Xt)
-        Xt = np.stack(Xt)
-        Xt = np.nan_to_num(Xt, posinf=self.infinity_values_)
+        Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
+                                   self.infinity_values_, self.n_jobs)
+
         return Xt
 
     @staticmethod
