@@ -26,6 +26,13 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
+    **Important notes**:
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
@@ -34,8 +41,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
-        :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
-        :math:`p` equals `coeff`.
+        :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where :math:`p`
+        equals `coeff`.
 
     periodic_dimensions : boolean ndarray of shape (n_dimensions,) or None, \
         optional, default: ``None``
@@ -48,8 +55,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `np.inf`. ``None`` assigns the maximum pixel
-        values within all images passed to :meth:`fit`.
+        filtration value `np.inf`. ``None`` assigns the maximum pixel values
+        within all images passed to :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -59,8 +66,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Attributes
     ----------
     periodic_dimensions_ : boolean ndarray of shape (n_dimensions,)
-       Effective periodicity of the boundaries along each of the axis.
-       Set in :meth:`fit`.
+       Effective periodicity of the boundaries along each of the axis. Set in
+       :meth:`fit`.
 
     infinity_values_ : float
        Effective death value to assign to features which have infinite
@@ -77,10 +84,6 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
     for computing cubical persistent homology. Python bindings were modified
     for performance.
-
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
 
     References
     ----------
@@ -167,8 +170,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each image in `X`, compute the relevant persistence diagram
-        as an array of triples [b, d, q]. Each triple represents a persistent
+        """For each image in `X`, compute the relevant persistence diagram as
+        an array of triples [b, d, q]. Each triple represents a persistent
         topological feature in dimension q (belonging to `homology_dimensions`)
         which is born at b and dies at d. Only triples in which b < d are
         meaningful. Triples in which b and d are equal ("diagonal elements")
