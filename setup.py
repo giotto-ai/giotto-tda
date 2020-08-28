@@ -20,7 +20,7 @@ with open(version_file) as f:
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
-DISTNAME = "giotto-tda"
+DISTNAME = 'giotto-tda'
 DESCRIPTION = "Toolbox for Machine Learning using Topological Data Analysis."
 with codecs.open("README.rst", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
