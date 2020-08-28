@@ -60,4 +60,3 @@ PYBIND11_MODULE(gtda_periodic_cubical_complex, m) {
            &Persistent_cohomology_interface_inst::intervals_in_dimension);
   m.doc() = "GUDHI periocal cubical complex function interfacing";
 }
-
