@@ -1,4 +1,4 @@
-""" Utilities function for persistent homology."""
+"""Utility functions for persistent homology."""
 # License: GNU AGPLv3
 
 import numpy as np
