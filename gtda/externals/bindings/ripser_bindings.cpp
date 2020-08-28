@@ -52,4 +52,3 @@ PYBIND11_MODULE(gtda_ripser, m) {
         "I"_a, "J"_a, "V"_a, "NEdges"_a, "N"_a, "modulus"_a, "dim_max"_a,
         "threshold"_a, "do_cocycles"_a, "ripser sparse distance matrix");
 }
-
