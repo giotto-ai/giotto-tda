@@ -207,7 +207,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                           for x in Xt)
 
         Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+                                   self.infinity_values_)
 
         return Xt
 

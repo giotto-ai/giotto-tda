@@ -227,7 +227,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             delayed(self._ripser_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, "ripser", self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+                                   self.infinity_values_)
         return Xt
 
     @staticmethod
@@ -484,7 +484,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             delayed(self._gudhi_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+                                   self.infinity_values_)
         return Xt
 
     @staticmethod
@@ -695,7 +695,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                           for x in X)
 
         Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+                                   self.infinity_values_)
         return Xt
 
     @staticmethod
@@ -972,7 +972,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             delayed(self._flagser_diagram)(x) for x in X)
 
         Xt = _postprocess_diagrams(Xt, "flagser", self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+                                   self.infinity_values_)
         return Xt
 
     @staticmethod
