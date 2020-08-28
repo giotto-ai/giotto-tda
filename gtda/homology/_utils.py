@@ -36,16 +36,19 @@ def _postprocess_diagrams(Xt, format, homology_dimensions, infinity_values,
     # Replace np.inf with infinity_values and turn into list of dictionaries
     # whose keys are the dimensions
     if format in ["ripser", "flagser"]:  # Input is list of list of subdiagrams
-        Xt = [{dim: _replace_infinity_values(
-            # In H0, remove 1 infinite bar
-            (diagram[dim] if dim else diagram[dim][:-1]),
-            infinity_values
-            ) for dim in homology_dimensions} for diagram in Xt]
+        # In H0, remove one infinite bar placed at the end by ripser
+        slices = {dim: slice(None) if dim else slice(None, -1)
+                  for dim in homology_dimensions}
+        Xt = [{dim: _replace_infinity_values(diagram[dim][slices[dim]],
+                                             infinity_values)
+               for dim in homology_dimensions} for diagram in Xt]
     elif format == "gudhi":  # Input is list of list of [dim, (birth, death)]
+        # In H0, remove one infinite bar placed at the beginning by gudhi
+        slices = {dim: slice(None) if dim else slice(1, None)
+                  for dim in homology_dimensions}
         Xt = [{dim: _replace_infinity_values(
             np.array([pers_info[1] for pers_info in diagram
-                      if pers_info[0] == dim]).reshape(-1, 2)
-            [slice(None if dim else 1, None)],  # In H0,  remove 1 infinite bar
+                      if pers_info[0] == dim]).reshape(-1, 2)[slices[dim]],
             infinity_values
             )
             for dim in homology_dimensions} for diagram in Xt]
