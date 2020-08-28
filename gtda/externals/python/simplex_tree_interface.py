@@ -49,7 +49,8 @@ class SimplexTree:
         return self.thisptr.simplex_filtration(simplex)
 
     def assign_filtration(self, simplex, filtration):
-        """Assign the simplicial complex filtration value for a given N-simplex.
+        """Assign the simplicial complex filtration value for a given
+        N-simplex.
         :param simplex: The N-simplex, represented by a list of vertex.
         :type simplex: list of int.
         :param filtration:  The simplicial complex filtration value.
@@ -132,9 +133,10 @@ class SimplexTree:
         return self.thisptr.find_simplex(csimplex)
 
     def insert(self, simplex, filtration=0.0):
-        """Insert the given N-simplex and its subfaces with the given filtration
-        value (default value is '0.0'). If some of those simplices are already
-        present with a higher filtration value, their filtration value is lowered.
+        """Insert the given N-simplex and its subfaces with the given
+        filtration value (default value is '0.0'). If some of those simplices
+        are already present with a higher filtration value, their filtration
+        value is lowered.
         :param simplex: The N-simplex to insert, represented by a list of
             vertex.
         :type simplex: list of int.
@@ -213,7 +215,8 @@ class SimplexTree:
         :type simplex: list of int.
         .. note::
             Be aware that removing is shifting data in a flat_map
-            (:func:`initialize_filtration()<gudhi.SimplexTree.initialize_filtration>` to be done).
+            (:func:`initialize_filtration()<gudhi.SimplexTree.initialize_filtration>`
+            to be done).
         .. note::
             The dimension of the simplicial complex may be lower after calling
             remove_maximal_simplex than it was before. However,
@@ -253,7 +256,7 @@ class SimplexTree:
         return self.thisptr.prune_above_filtration(filtration)
 
     def expansion(self, max_dim):
-        """Expand the Simplex_tree containing only its one skeleton until 
+        """Expand the Simplex_tree containing only its one skeleton until
         dimension max_dim.
         The expanded simplicial complex until dimension :math:`d`
         attached to a graph :math:`G` is the maximal simplicial complex of
@@ -269,8 +272,8 @@ class SimplexTree:
         self.thisptr.expansion(max_dim)
 
     def make_filtration_non_decreasing(self):
-        """Ensure that each simplex has a higher filtration value than its faces
-        by increasing the filtration values.
+        """Ensure that each simplex has a higher filtration value than its
+        faces by increasing the filtration values.
         :returns: True if any filtration value was modified,
         False if the filtration was already non-decreasing.
         :rtype: bool
@@ -326,8 +329,8 @@ class SimplexTree:
         if self.pcohptr is not None:
             bn_result = self.pcohptr.betti_numbers()
         else:
-            print("betti_numbers function requires persistence function"
-                  " to be launched first.")
+            print("`betti_numbers` requires persistence function to be "
+                  "launched first.")
         return bn_result
 
     def persistent_betti_numbers(self, from_value, to_value):
@@ -349,13 +352,13 @@ class SimplexTree:
             pbn_result = self.pcohptr.persistent_betti_numbers(from_value,
                                                                to_value)
         else:
-            print("persistent_betti_numbers function requires persistence function"
-                  " to be launched first.")
+            print("`persistent_betti_numbers` requires persistence function "
+                  "to be launched first.")
         return pbn_result
 
     def persistence_intervals_in_dimension(self, dimension):
-        """Return the persistence intervals of the simplicial complex in a specific
-        dimension.
+        """Return the persistence intervals of the simplicial complex in a
+        specific dimension.
         :param dimension: The specific dimension.
         :type dimension: int.
         :returns: The persistence intervals.
@@ -368,8 +371,8 @@ class SimplexTree:
         if self.pcohptr is not None:
             intervals_result = self.pcohptr.intervals_in_dimension(dimension)
         else:
-            print("intervals_in_dim function requires persistence function"
-                  " to be launched first.")
+            print("`intervals_in_dim` requires persistence function to be "
+                  "launched first.")
         return np.array(intervals_result)
 
     def persistence_pairs(self):
@@ -384,8 +387,8 @@ class SimplexTree:
         if self.pcohptr is not None:
             persistence_pairs_result = self.pcohptr.persistence_pairs()
         else:
-            print("persistence_pairs function requires persistence function"
-                  " to be launched first.")
+            print("`persistence_pairs` requires persistence function to be "
+                  "launched first.")
         return persistence_pairs_result
 
     def write_persistence_diagram(self, persistence_file=''):
@@ -401,7 +404,7 @@ class SimplexTree:
             if persistence_file != '':
                 self.pcohptr.write_output_diagram(str.encode(persistence_file))
             else:
-                print("persistence_file must be specified")
+                print("`persistence_file` must be specified")
         else:
-            print("intervals_in_dim function requires persistence function"
-                  " to be launched first.")
+            print("`intervals_in_dim` requires persistence function to be "
+                  "launched first.")
