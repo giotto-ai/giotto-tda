@@ -77,6 +77,8 @@ PYBIND11_MODULE(gtda_simplex_tree, m) {
   py::class_<Persistent_cohomology_interface_inst>(
       m, "Simplex_tree_persistence_interface")
       .def(py::init<simplex_tree_interface_inst*, bool>())
+      .def("compute_persistence",
+           &Persistent_cohomology_interface_inst::compute_persistence)
       .def("get_persistence",
            &Persistent_cohomology_interface_inst::get_persistence)
       .def("betti_numbers",
