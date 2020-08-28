@@ -8,3 +8,6 @@
 [submodule "gtda/externals/hera"]
 	path = gtda/externals/hera
 	url = https://github.com/grey-narn/hera
+[submodule "gtda/externals/eigen"]
+	path = gtda/externals/eigen
+	url = https://gitlab.com/libeigen/eigen
