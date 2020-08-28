@@ -3,8 +3,8 @@
  * License:          Apache 2.0
  *****************************************************************************/
 
-
 #include <iostream>
+
 #include <Persistent_cohomology_interface.h>
 #include <Simplex_tree_interface.h>
 
@@ -41,8 +41,26 @@ PYBIND11_MODULE(gtda_simplex_tree, m) {
                const std::vector<simplex_tree_interface_inst::Vertex_handle>&,
                double>(
                &simplex_tree_interface_inst::insert_simplex_and_subfaces))
-      .def("get_filtration", &simplex_tree_interface_inst::get_filtration)
-      .def("get_skeleton", &simplex_tree_interface_inst::get_skeleton)
+      .def("get_filtration",
+           [](simplex_tree_interface_inst& self)
+               -> std::vector<simplex_tree_interface_inst::Simplex_and_filtration> {
+             std::vector<simplex_tree_interface_inst::Simplex_and_filtration> tmp;
+             for (auto elem = self.get_filtration_iterator_begin();
+                  elem != self.get_filtration_iterator_end(); elem++)
+               tmp.push_back(self.get_simplex_and_filtration(*elem));
+             return tmp;
+           })
+      .def("get_skeleton",
+           [](simplex_tree_interface_inst& self, size_t dim)
+               -> std::vector<
+                   simplex_tree_interface_inst::Simplex_and_filtration> {
+             std::vector<simplex_tree_interface_inst::Simplex_and_filtration>
+                 tmp;
+             for (auto elem = self.get_skeleton_iterator_begin(dim);
+                  elem != self.get_skeleton_iterator_end(dim); elem++)
+               tmp.push_back(self.get_simplex_and_filtration(*elem));
+             return tmp;
+           })
       .def("get_star", &simplex_tree_interface_inst::get_star)
       .def("get_cofaces", &simplex_tree_interface_inst::get_cofaces)
       .def("expansion", &simplex_tree_interface_inst::expansion)
@@ -59,6 +77,8 @@ PYBIND11_MODULE(gtda_simplex_tree, m) {
   py::class_<Persistent_cohomology_interface_inst>(
       m, "Simplex_tree_persistence_interface")
       .def(py::init<simplex_tree_interface_inst*, bool>())
+      .def("compute_persistence",
+           &Persistent_cohomology_interface_inst::compute_persistence)
       .def("get_persistence",
            &Persistent_cohomology_interface_inst::get_persistence)
       .def("betti_numbers",
