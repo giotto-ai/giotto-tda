@@ -43,11 +43,11 @@ PYBIND11_MODULE(gtda_simplex_tree, m) {
                &simplex_tree_interface_inst::insert_simplex_and_subfaces))
       .def("get_filtration",
            [](simplex_tree_interface_inst& self)
-               -> std::vector<simplex_tree_interface_inst::Simplex_handle> {
-             std::vector<simplex_tree_interface_inst::Simplex_handle> tmp;
+               -> std::vector<simplex_tree_interface_inst::Simplex_and_filtration> {
+             std::vector<simplex_tree_interface_inst::Simplex_and_filtration> tmp;
              for (auto elem = self.get_filtration_iterator_begin();
                   elem != self.get_filtration_iterator_end(); elem++)
-               tmp.push_back(*elem);
+               tmp.push_back(self.get_simplex_and_filtration(*elem));
              return tmp;
            })
       .def("get_skeleton",
