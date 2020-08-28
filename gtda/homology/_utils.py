@@ -2,7 +2,6 @@
 # License: GNU AGPLv3
 
 import numpy as np
-from joblib import Parallel, delayed
 
 
 def _postprocess_diagrams(
