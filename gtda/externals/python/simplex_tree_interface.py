@@ -16,8 +16,7 @@ class SimplexTree:
 
     # Fake constructor that does nothing but documenting the constructor
     def __init__(self):
-        """SimplexTree constructor.
-        """
+        "SimplexTree constructor."
         self.thisptr = Simplex_tree_interface_full_featured()
         self.pcohptr = None
 
@@ -28,22 +27,20 @@ class SimplexTree:
             del self.pcohptr
 
     def __is_defined(self):
-        """Returns true if SimplexTree pointer is not NULL.
-         """
+        "Return True if SimplexTree pointer is not NULL."
         if self.thisptr is not None:
             return True
         return False
 
     def __is_persistence_defined(self):
-        """Returns true if Persistence pointer is not NULL.
-         """
+        """Return True if Persistence pointer is not NULL."""
         if self.pcohptr is not None:
             return True
         return False
 
     def filtration(self, simplex):
-        """This function returns the filtration value for a given N-simplex in
-        this simplicial complex, or +infinity if it is not in the complex.
+        """Return the filtration value for a given N-simplex in this simplicial
+        complex, or +infinity if it is not in the complex.
         :param simplex: The N-simplex, represented by a list of vertex.
         :type simplex: list of int.
         :returns:  The simplicial complex filtration value.
@@ -52,8 +49,8 @@ class SimplexTree:
         return self.thisptr.simplex_filtration(simplex)
 
     def assign_filtration(self, simplex, filtration):
-        """This function assigns the simplicial complex filtration value for a
-        given N-simplex.
+        """Assign the simplicial complex filtration value for a given
+        N-simplex.
         :param simplex: The N-simplex, represented by a list of vertex.
         :type simplex: list of int.
         :param filtration:  The simplicial complex filtration value.
@@ -62,8 +59,7 @@ class SimplexTree:
         self.thisptr.assign_simplex_filtration(simplex, filtration)
 
     def initialize_filtration(self):
-        """This function initializes and sorts the simplicial complex
-        filtration vector.
+        """Initialize and sort the simplicial complex filtration vector.
         .. note::
             This function must be launched before
             :func:`persistence()<gudhi.SimplexTree.persistence>`,
@@ -77,23 +73,21 @@ class SimplexTree:
         self.thisptr.initialize_filtration()
 
     def num_vertices(self):
-        """This function returns the number of vertices of the simplicial
-        complex.
+        """Return the number of vertices of the simplicial complex.
         :returns:  The simplicial complex number of vertices.
         :rtype:  int
         """
         return self.thisptr.num_vertices()
 
     def num_simplices(self):
-        """This function returns the number of simplices of the simplicial
-        complex.
+        """Return the number of simplices of the simplicial complex.
         :returns:  the simplicial complex number of simplices.
         :rtype:  int
         """
         return self.thisptr.num_simplices()
 
     def dimension(self):
-        """This function returns the dimension of the simplicial complex.
+        """Return the dimension of the simplicial complex.
         :returns:  the simplicial complex dimension.
         :rtype:  int
         .. note::
@@ -107,15 +101,14 @@ class SimplexTree:
         return self.thisptr.dimension()
 
     def upper_bound_dimension(self):
-        """This function returns a valid dimension upper bound of the
-        simplicial complex.
+        """Return a valid dimension upper bound of the simplicial complex.
         :returns:  an upper bound on the dimension of the simplicial complex.
         :rtype:  int
         """
         return self.thisptr.upper_bound_dimension()
 
     def set_dimension(self, dimension):
-        """This function sets the dimension of the simplicial complex.
+        """Set the dimension of the simplicial complex.
         :param dimension: The new dimension value.
         :type dimension: int.
         .. note::
@@ -130,8 +123,7 @@ class SimplexTree:
         self.thisptr.set_dimension(dimension)
 
     def find(self, simplex):
-        """This function returns if the N-simplex was found in the simplicial
-        complex or not.
+        """Return if the N-simplex was found in the simplicial complex or not.
         :param simplex: The N-simplex to find, represented by a list of vertex.
         :type simplex: list of int.
         :returns:  true if the simplex was found, false otherwise.
@@ -141,10 +133,10 @@ class SimplexTree:
         return self.thisptr.find_simplex(csimplex)
 
     def insert(self, simplex, filtration=0.0):
-        """This function inserts the given N-simplex and its subfaces with the
-        given filtration value (default value is '0.0'). If some of those
-        simplices are already present with a higher filtration value, their
-        filtration value is lowered.
+        """Insert the given N-simplex and its subfaces with the given
+        filtration value (default value is '0.0'). If some of those simplices
+        are already present with a higher filtration value, their filtration
+        value is lowered.
         :param simplex: The N-simplex to insert, represented by a list of
             vertex.
         :type simplex: list of int.
@@ -159,8 +151,7 @@ class SimplexTree:
                                                         filtration)
 
     def get_filtration(self):
-        """This function returns a list of all simplices with their given
-        filtration values.
+        """Return a list of all simplices with their given filtration values.
         :returns:  The simplices sorted by increasing filtration values.
         :rtype:  list of tuples(simplex, filtration)
         """
@@ -172,8 +163,7 @@ class SimplexTree:
         return ct
 
     def get_skeleton(self, dimension):
-        """This function returns the (simplices of the) skeleton of a maximum
-        given dimension.
+        """Return the (simplices of the) skeleton of a maximum given dimension.
         :param dimension: The skeleton dimension value.
         :type dimension: int.
         :returns:  The (simplices of the) skeleton of a maximum dimension.
@@ -187,7 +177,7 @@ class SimplexTree:
         return ct
 
     def get_star(self, simplex):
-        """This function returns the star of a given N-simplex.
+        """Return the star of a given N-simplex.
         :param simplex: The N-simplex, represented by a list of vertex.
         :type simplex: list of int.
         :returns:  The (simplices of the) star of a simplex.
@@ -202,8 +192,7 @@ class SimplexTree:
         return ct
 
     def get_cofaces(self, simplex, codimension):
-        """This function returns the cofaces of a given N-simplex with a
-        given codimension.
+        """Return the cofaces of a given N-simplex with a given codimension.
         :param simplex: The N-simplex, represented by a list of vertex.
         :type simplex: list of int.
         :param codimension: The codimension. If codimension = 0, all cofaces
@@ -221,13 +210,13 @@ class SimplexTree:
         return ct
 
     def remove_maximal_simplex(self, simplex):
-        """This function removes a given maximal N-simplex from the simplicial
-        complex.
+        """Remove a given maximal N-simplex from the simplicial complex.
         :param simplex: The N-simplex, represented by a list of vertex.
         :type simplex: list of int.
         .. note::
             Be aware that removing is shifting data in a flat_map
-            (:func:`initialize_filtration()<gudhi.SimplexTree.initialize_filtration>` to be done).
+            (:func:`initialize_filtration()<gudhi.SimplexTree.initialize_filtration>`
+            to be done).
         .. note::
             The dimension of the simplicial complex may be lower after calling
             remove_maximal_simplex than it was before. However,
@@ -267,8 +256,8 @@ class SimplexTree:
         return self.thisptr.prune_above_filtration(filtration)
 
     def expansion(self, max_dim):
-        """Expands the Simplex_tree containing only its one skeleton
-        until dimension max_dim.
+        """Expand the Simplex_tree containing only its one skeleton until
+        dimension max_dim.
         The expanded simplicial complex until dimension :math:`d`
         attached to a graph :math:`G` is the maximal simplicial complex of
         dimension at most :math:`d` admitting the graph :math:`G` as
@@ -283,8 +272,8 @@ class SimplexTree:
         self.thisptr.expansion(max_dim)
 
     def make_filtration_non_decreasing(self):
-        """This function ensures that each simplex has a higher filtration
-        value than its faces by increasing the filtration values.
+        """Ensure that each simplex has a higher filtration value than its
+        faces by increasing the filtration values.
         :returns: True if any filtration value was modified,
         False if the filtration was already non-decreasing.
         :rtype: bool
@@ -300,8 +289,8 @@ class SimplexTree:
         return self.thisptr.make_filtration_non_decreasing()
 
     def persistence(self, homology_coeff_field=11, min_persistence=0,
-                    persistence_dim_max = False):
-        """This function returns the persistence of the simplicial complex.
+                    persistence_dim_max=False):
+        """Return the persistence of the simplicial complex.
         :param homology_coeff_field: The homology coefficient field. Must be a
             prime number. Default value is 11.
         :type homology_coeff_field: int.
@@ -323,13 +312,13 @@ class SimplexTree:
                                                           persistence_dim_max)
         persistence_result = []
         if self.pcohptr is not None:
-            persistence_result = \
-                self.pcohptr.get_persistence(homology_coeff_field,
+            self.pcohptr.compute_persistence(homology_coeff_field,
                                              min_persistence)
+            persistence_result = self.pcohptr.get_persistence()
         return persistence_result
 
     def betti_numbers(self):
-        """This function returns the Betti numbers of the simplicial complex.
+        """Return the Betti numbers of the simplicial complex.
         :returns: The Betti numbers ([B0, B1, ..., Bn]).
         :rtype:  list of int
         :note: betti_numbers function requires
@@ -340,13 +329,12 @@ class SimplexTree:
         if self.pcohptr is not None:
             bn_result = self.pcohptr.betti_numbers()
         else:
-            print("betti_numbers function requires persistence function"
-                  " to be launched first.")
+            print("`betti_numbers` requires persistence function to be "
+                  "launched first.")
         return bn_result
 
     def persistent_betti_numbers(self, from_value, to_value):
-        """This function returns the persistent Betti numbers of the
-        simplicial complex.
+        """Return the persistent Betti numbers of the simplicial complex.
         :param from_value: The persistence birth limit to be added in the
             numbers (persistent birth <= from_value).
         :type from_value: float.
@@ -364,13 +352,13 @@ class SimplexTree:
             pbn_result = self.pcohptr.persistent_betti_numbers(from_value,
                                                                to_value)
         else:
-            print("persistent_betti_numbers function requires persistence function"
-                  " to be launched first.")
+            print("`persistent_betti_numbers` requires persistence function "
+                  "to be launched first.")
         return pbn_result
 
     def persistence_intervals_in_dimension(self, dimension):
-        """This function returns the persistence intervals of the simplicial
-        complex in a specific dimension.
+        """Return the persistence intervals of the simplicial complex in a
+        specific dimension.
         :param dimension: The specific dimension.
         :type dimension: int.
         :returns: The persistence intervals.
@@ -383,12 +371,12 @@ class SimplexTree:
         if self.pcohptr is not None:
             intervals_result = self.pcohptr.intervals_in_dimension(dimension)
         else:
-            print("intervals_in_dim function requires persistence function"
-                  " to be launched first.")
+            print("`intervals_in_dim` requires persistence function to be "
+                  "launched first.")
         return np.array(intervals_result)
 
     def persistence_pairs(self):
-        """This function returns a list of persistence birth and death simplices pairs.
+        """Return a list of persistence birth and death simplex pairs.
         :returns: A list of persistence simplices intervals.
         :rtype:  list of pair of list of int
         :note: persistence_pairs function requires
@@ -399,13 +387,13 @@ class SimplexTree:
         if self.pcohptr is not None:
             persistence_pairs_result = self.pcohptr.persistence_pairs()
         else:
-            print("persistence_pairs function requires persistence function"
-                  " to be launched first.")
+            print("`persistence_pairs` requires persistence function to be "
+                  "launched first.")
         return persistence_pairs_result
 
     def write_persistence_diagram(self, persistence_file=''):
-        """This function writes the persistence intervals of the simplicial
-        complex in a user given file name.
+        """Write the persistence intervals of the simplicial complex in a
+        user-given file name.
         :param persistence_file: The specific dimension.
         :type persistence_file: string.
         :note: intervals_in_dim function requires
@@ -416,7 +404,7 @@ class SimplexTree:
             if persistence_file != '':
                 self.pcohptr.write_output_diagram(str.encode(persistence_file))
             else:
-                print("persistence_file must be specified")
+                print("`persistence_file` must be specified")
         else:
-            print("intervals_in_dim function requires persistence function"
-                  " to be launched first.")
+            print("`intervals_in_dim` requires persistence function to be "
+                  "launched first.")
