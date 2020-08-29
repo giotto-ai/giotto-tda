@@ -147,16 +147,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
             was not set to ``'precomputed'``, and of distance matrices or
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
-            or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
-            If `metric` was set to ``'precomputed'``, each entry of `X` should
-            be compatible with a filtration, i.e. the value at index (i, j)
-            should be no smaller than the values at diagonal indices (i, i)
-            and (j, j).
+            or a list containing ``n_samples`` 2D ndarrays/sparse matrices. In
+            the case of a list of point clouds, each point cloud can have a
+            different number of points and be in a different dimension. If
+            `metric` was set to ``'precomputed'``, each entry of `X` should be
+            compatible with a filtration, i.e. the value at index (i, j) should
+            be no smaller than the values at diagonal indices (i, i) and
+            (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -196,16 +198,18 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
             was not set to ``'precomputed'``, and of distance matrices or
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
-            or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
-            If `metric` was set to ``'precomputed'``, each entry of `X` should
-            be compatible with a filtration, i.e. the value at index (i, j)
-            should be no smaller than the values at diagonal indices (i, i)
-            and (j, j).
+            or a list containing ``n_samples`` 2D ndarrays/sparse matrices. In
+            the case of a list of point clouds, each point cloud can have a
+            different number of points and be in a different dimension. If
+            `metric` was set to ``'precomputed'``, each entry of `X` should be
+            compatible with a filtration, i.e. the value at index (i, j) should
+            be no smaller than the values at diagonal indices (i, i) and
+            (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -409,12 +413,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
             was not set to ``'precomputed'``, and of distance matrices
             otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            If `metric` was set to ``'precomputed'``, entries of `X` must be
+            In the case of a list of point clouds, each point cloud can have a
+            different number of points and be in a different dimension. If
+            `metric` was set to ``'precomputed'``, entries of `X` must be
             square arrays and should be compatible with a filtration, i.e. the
             value at index (i, j) should be no smaller than the values at
             diagonal indices (i, i) and (j, j).
@@ -457,12 +463,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
             was not set to ``'precomputed'``, and of distance matrices
             otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            If `metric` was set to ``'precomputed'``, entries of `X` must be
+            In the case of a list of point clouds, each point cloud can have a
+            different number of points and be in a different dimension. If
+            `metric` was set to ``'precomputed'``, entries of `X` must be
             square arrays and should be compatible with a filtration, i.e. the
             value at index (i, j) should be no smaller than the values at
             diagonal indices (i, i) and (j, j).
@@ -659,10 +667,12 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
-            list containing ``n_samples`` 2D ndarrays.
+            list containing ``n_samples`` 2D ndarrays. If a list of point
+            clouds, each point cloud can have a different number of points and
+            be in a different dimension.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -687,23 +697,25 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return self
 
     def transform(self, X, y=None):
-        """For each point cloud or distance matrix in `X`, compute the
-        relevant persistence diagram as an array of triples [b, d, q]. Each
-        triple represents a persistent topological feature in dimension q
-        (belonging to `homology_dimensions`) which is born at b and dies at d.
-        Only triples in which b < d are meaningful. Triples in which b and d
-        are equal ("diagonal elements") may be artificially introduced during
-        the computation for padding purposes, since the number of non-trivial
+        """For each point cloud in `X`, compute the relevant persistence
+        diagram as an array of triples [b, d, q]. Each triple represents a
+        persistent topological feature in dimension q (belonging to
+        `homology_dimensions`) which is born at b and dies at d. Only triples
+        in which b < d are meaningful. Triples in which b and d are equal
+        ("diagonal elements") may be artificially introduced during the
+        computation for padding purposes, since the number of non-trivial
         persistent topological features is typically not constant across
         samples. They carry no information and hence should be effectively
         ignored by any further computation.
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
-            list containing ``n_samples`` 2D ndarrays.
+            list containing ``n_samples`` 2D ndarrays. If a list of point
+            clouds, each point cloud can have a different number of points and
+            be in a different dimension.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -876,10 +888,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
-            list containing ``n_samples`` 2D ndarrays.
+            list containing ``n_samples`` 2D ndarrays. If a list of point
+            clouds, each point cloud can have a different number of points and
+            be in a different dimension.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -917,10 +931,12 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_points, n_dimensions)
+        X : ndarray or list of length n_samples
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
-            list containing ``n_samples`` 2D ndarrays.
+            list containing ``n_samples`` 2D ndarrays. If a list of point
+            clouds, each point cloud can have a different number of points and
+            be in a different dimension.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -1127,7 +1143,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input collection of adjacency matrices of weighted directed or
             undirected graphs. Can be either a 3D ndarray whose zeroth
             dimension has size ``n_samples``, or a list containing
@@ -1182,7 +1198,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input collection of adjacency matrices of weighted directed or
             undirected graphs. Can be either a 3D ndarray whose zeroth
             dimension has size ``n_samples``, or a list containing
