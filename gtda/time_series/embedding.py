@@ -214,8 +214,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 def time_delay_embedding(
-        X, time_delay=1, dimension=2, stride=1, ensure_last_value=True,
-        validate=True
+        X, time_delay=1, dimension=2, stride=1, flatten=False,
+        ensure_last_value=True, validate=True
         ):
     """Time-delay embeddings of arrays of time-series data.
 
@@ -243,6 +243,13 @@ def time_delay_embedding(
 
     stride : int, optional, default: ``1``
         Stride duration between two consecutive embedded points.
+
+    flatten : bool, optional, default: ``False``
+        If ``True``, and if ``X.ndim > 2``, ensures that the output is a 3D
+        ndarray of shape
+        ``(n_time_series, n_points, dimension * np.prod(X.shape[1:-1]))``,
+        where ``n_points`` is equal to
+        ``(n_timestamps - time_delay * (dimension - 1) - 1) // stride + 1``.
 
     ensure_last_value : bool, optional, default: ``True``
         Whether the value(s) of `X` representing the last measurement(s) must
@@ -286,11 +293,13 @@ def time_delay_embedding(
             'dimension': {'type': int,
                           'in': Interval(1, np.inf, closed='left')},
             'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+            'flatten': {'type': bool},
             'ensure_last_value': {'type': bool}
             }
         input_params = {
             'time_delay': time_delay, 'dimension': dimension,
-            'stride': stride, 'ensure_last_value': ensure_last_value
+            'stride': stride, 'flatten': flatten,
+            'ensure_last_value': ensure_last_value
             }
         validate_params(input_params, expected_params)
 
@@ -311,6 +320,11 @@ def time_delay_embedding(
         indices += offset
 
     X_embedded = X[..., indices]
+    if flatten:
+        transpose_axes = (0, *range(1, X.ndim)[::-1], X.ndim)
+        X_embedded = np.transpose(X_embedded, axes=transpose_axes).\
+            reshape(len(X), -1, dimension * np.prod(X.shape[1:-1]))
+
     return X_embedded
 
 
