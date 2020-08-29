@@ -153,9 +153,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
-            Point cloud arrays have shape (n_points, n_dimensions), and if `X`
-            is a list these shapes can vary between point clouds. If `metric`
-            was set to ``'precomputed'``, each entry of `X` should be
+            Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
+            `X` is a list these shapes can vary between point clouds. If
+            `metric` was set to ``'precomputed'``, each entry of `X` should be
             compatible with a filtration, i.e. the value at index (i, j) should
             be no smaller than the values at diagonal indices (i, i) and
             (j, j).
@@ -204,9 +204,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
-            Point cloud arrays have shape (n_points, n_dimensions), and if `X`
-            is a list these shapes can vary between point clouds. If `metric`
-            was set to ``'precomputed'``, each entry of `X` should be
+            Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
+            `X` is a list these shapes can vary between point clouds. If
+            `metric` was set to ``'precomputed'``, each entry of `X` should be
             compatible with a filtration, i.e. the value at index (i, j) should
             be no smaller than the values at diagonal indices (i, i) and
             (j, j).
@@ -243,7 +243,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
@@ -418,9 +418,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             was not set to ``'precomputed'``, and of distance matrices
             otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            Point cloud arrays have shape (n_points, n_dimensions), and if `X`
-            is a list these shapes can vary between point clouds. If `metric`
-            was set to ``'precomputed'``, each entry of `X` should be
+            Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
+            `X` is a list these shapes can vary between point clouds. If
+            `metric` was set to ``'precomputed'``, each entry of `X` should be
             compatible with a filtration, i.e. the value at index (i, j) should
             be no smaller than the values at diagonal indices (i, i) and
             (j, j).
@@ -468,9 +468,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             was not set to ``'precomputed'``, and of distance matrices
             otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
-            Point cloud arrays have shape (n_points, n_dimensions), and if `X`
-            is a list these shapes can vary between point clouds. If `metric`
-            was set to ``'precomputed'``, each entry of `X` should be
+            Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
+            `X` is a list these shapes can vary between point clouds. If
+            `metric` was set to ``'precomputed'``, each entry of `X` should be
             compatible with a filtration, i.e. the value at index (i, j) should
             be no smaller than the values at diagonal indices (i, i) and
             (j, j).
@@ -507,7 +507,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
@@ -671,8 +671,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
             list containing ``n_samples`` 2D ndarrays. Point cloud arrays have
-            shape (n_points, n_dimensions), and if `X` is a list these shapes
-            can vary between point clouds.
+            shape ``(n_points, n_dimensions)``, and if `X` is a list these
+            shapes can vary between point clouds.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -714,8 +714,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
             list containing ``n_samples`` 2D ndarrays. Point cloud arrays have
-            shape (n_points, n_dimensions), and if `X` is a list these shapes
-            can vary between point clouds.
+            shape ``(n_points, n_dimensions)``, and if `X` is a list these
+            shapes can vary between point clouds.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -748,7 +748,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
@@ -892,8 +892,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
             list containing ``n_samples`` 2D ndarrays. Point cloud arrays have
-            shape (n_points, n_dimensions), and if `X` is a list these shapes
-            can vary between point clouds.
+            shape ``(n_points, n_dimensions)``, and if `X` is a list these
+            shapes can vary between point clouds.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -935,8 +935,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Input data representing a collection of point clouds. Can be either
             a 3D ndarray whose zeroth dimension has size ``n_samples``, or a
             list containing ``n_samples`` 2D ndarrays. Point cloud arrays have
-            shape (n_points, n_dimensions), and if `X` is a list these shapes
-            can vary between point clouds.
+            shape ``(n_points, n_dimensions)``, and if `X` is a list these
+            shapes can vary between point clouds.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -968,7 +968,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
@@ -1246,7 +1246,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
