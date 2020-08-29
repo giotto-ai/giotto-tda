@@ -48,6 +48,7 @@ jobs:
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
@@ -128,6 +129,7 @@ jobs:
   - bash: |
       set -e
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
@@ -245,6 +247,7 @@ jobs:
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
