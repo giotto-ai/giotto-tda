@@ -1,4 +1,4 @@
-"""Testing for TransitionGraph"""
+"""Testing for TransitionGraph."""
 
 import numpy as np
 import pytest

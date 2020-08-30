@@ -8,17 +8,13 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, ClusterMixin, clone
 from sklearn.cluster import DBSCAN
-
-try:  # scikit-learn >= 0.22.1
-    from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
-except ImportError:
-    from sklearn.cluster._hierarchical import _TREE_BUILDERS, _hc_cut
+from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
 
+from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-from .utils._cluster import _num_clusters_histogram, _num_clusters_simple
 
 
 class ParallelClustering(BaseEstimator):
@@ -32,6 +28,8 @@ class ParallelClustering(BaseEstimator):
     location of a portion of ``X_tot`` to cluster separately. Parallelism is
     achieved over the columns of ``masks``.
 
+    This estimator is not intended for direct use.
+
     Parameters
     ----------
     clusterer : object, optional, default: ``None``
@@ -40,9 +38,9 @@ class ParallelClustering(BaseEstimator):
         :class:`sklearn.cluster.DBSCAN` is used.
 
     n_jobs : int or None, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     parallel_backend_prefer : ``'processes'`` | ``'threads'``, optional, \
         default: ``'threads'``
@@ -94,7 +92,7 @@ class ParallelClustering(BaseEstimator):
             self._precomputed = precomputed[0]
         else:
             raise NotImplementedError("Behaviour when metric and affinity "
-                                      "are both set to 'precomputed' not yet"
+                                      "are both set to 'precomputed' not yet "
                                       "implemented by ParallelClustering.")
 
     def fit(self, X, y=None, sample_weight=None):
@@ -399,13 +397,13 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     """
 
     _hyperparameters = {
-        'relative_gap_size': {
-            'type': Real, 'in': Interval(0, 1, closed='right')},
-        'max_fraction': {
-            'type': (Real, type(None)), 'in': Interval(0, 1, closed='right')},
+        'relative_gap_size': {'type': Real,
+                              'in': Interval(0, 1, closed='right')},
+        'max_fraction': {'type': (Real, type(None)),
+                         'in': Interval(0, 1, closed='right')},
         'affinity': {'type': str},
         'linkage': {'type': str}
-    }
+        }
 
     def __init__(self, relative_gap_size=0.3, max_fraction=None,
                  affinity='euclidean', memory=None, linkage='single'):
@@ -552,15 +550,15 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     """
 
     _hyperparameters = {
-        'freq_threshold': {
-            'type': int, 'in': Interval(0, np.inf, closed='left')},
-        'max_fraction': {
-            'type': (Real, type(None)), 'in': Interval(0, 1, closed='right')},
-        'n_bins_start': {
-            'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'freq_threshold': {'type': int,
+                           'in': Interval(0, np.inf, closed='left')},
+        'max_fraction': {'type': (Real, type(None)),
+                         'in': Interval(0, 1, closed='right')},
+        'n_bins_start': {'type': int,
+                         'in': Interval(1, np.inf, closed='left')},
         'affinity': {'type': str},
         'linkage': {'type': str}
-    }
+        }
 
     def __init__(self, freq_threshold=0, max_fraction=None, n_bins_start=5,
                  affinity='euclidean', memory=None, linkage='single'):

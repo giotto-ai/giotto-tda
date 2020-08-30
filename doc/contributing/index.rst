@@ -104,7 +104,7 @@ changes. To install ``flake8`` just do
 
 .. code-block:: python
 
-    pip install flake8
+    python -m pip install flake8
 
 You can use ``flake8`` on your python code via the following instructions:
 
@@ -131,7 +131,7 @@ There are two ways to run unit tests for ``giotto-tda``.
 
 .. code-block:: python
 
-    pip install pytest
+    python -m pip install pytest
 
 You can use ``pytest`` on your python code via the following instructions:
 

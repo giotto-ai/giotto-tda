@@ -3,7 +3,7 @@
 Usage: python ipynb_to_gallery.py <notebook.ipynb>
 
 Dependencies:
-pypandoc: install using `pip install pypandoc`
+pypandoc: install using `python -m pip install pypandoc`
 """
 import pypandoc as pdoc
 import json

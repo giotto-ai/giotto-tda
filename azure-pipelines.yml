@@ -1,5 +1,8 @@
 # These jobs are triggered automatically and they test code, examples, and wheels.
 # Additional checks can be manually triggered
+variables:
+  nightlyRelease: $[and(eq(variables['nightly_check'], true), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))]
+
 trigger:
 - master
 
@@ -38,15 +41,16 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.03.18" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.08.28" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Bash@3
@@ -60,12 +64,12 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip
-      pip install dist/*manylinux2010*.whl
+      python -m pip install dist/*manylinux2010*.whl
     displayName: 'Install the wheels'
 
   - script: |
       set -e
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
+      python -m pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
@@ -73,8 +77,8 @@ jobs:
 
   - script: |
       set -e
-      pip install pandas openml
-      pip install "papermill==1.2.1"
+      python -m pip install pandas openml matplotlib
+      python -m pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -97,9 +101,9 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
+      python -m pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -125,15 +129,16 @@ jobs:
   - bash: |
       set -e
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i.bak 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.03.18" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.08.28" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -146,15 +151,16 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip setuptools
+      python -m pip install wheel
       source .azure-ci/setup_ccache.sh
       python -m pip install -e ".[dev]"
       ccache -s
-    displayName: 'Install dependencies and dev environement'
+    displayName: 'Install dependencies and dev environment'
 
   - script: |
       set -e
       pytest gtda --cov --cov-report xml
-    displayName: 'Test dev install with pytest'
+    displayName: 'Test dev install with pytest, upload coverage report'
 
   - script: |
       set -e
@@ -169,11 +175,10 @@ jobs:
 
   - script: |
       set -e
-      pip install wheel
       python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
-  - script: pip install dist/*.whl
+  - script: python -m pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -186,7 +191,7 @@ jobs:
   - script: |
       set -e
       python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
+      python -m pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -200,6 +205,12 @@ jobs:
       contents: 'dist/*'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
 
+  - script: |
+      set -e
+      python -m pip install twine
+      twine check dist/*
+    displayName: 'Check distribution with twine'
+
   - task: PublishBuildArtifacts@1
     displayName: 'Create download link'
     inputs:
@@ -208,9 +219,8 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
 
@@ -237,32 +247,39 @@ jobs:
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
+
+  # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
+  # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
+  - script: |
+      echo "##vso[task.setvariable variable=BOOST_ROOT_PIPELINE]%BOOST_ROOT_1_72_0%"
+    displayName: 'Set env variable for boost version'
 
   - script: |
       python -m pip install --upgrade pip setuptools
+      python -m pip install wheel
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
   - script: |
-      pytest gtda --cov --cov-report xml || exit /b
+      pytest gtda --no-cov --no-coverage-upload || exit /b
     displayName: 'Test dev install with pytest'
 
   - script: |
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
+      python -m pip uninstall -y giotto-tda
+      python -m pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       set -e
       sed -i $'s/\r$//' README.rst
-      pip install wheel
       python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
-  - bash: pip install dist/*.whl
+  - bash: python -m pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -273,7 +290,7 @@ jobs:
 
   - script: |
       python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
+      python -m pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
@@ -293,7 +310,8 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
+      python -m pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
-    condition: eq(variables['nightly_check'], 'true')
+    condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
+

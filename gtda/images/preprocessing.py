@@ -58,7 +58,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'threshold': {'type': Real, 'in': Interval(0, 1, closed='right')}
-    }
+        }
 
     def __init__(self, threshold=0.5, n_jobs=None):
         self.threshold = threshold
@@ -141,7 +141,8 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D binary images.
 
         Parameters
@@ -162,9 +163,24 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_heatmap(
-            Xt[sample] * 1, colorscale=colorscale, origin=origin)
+            Xt[sample] * 1, colorscale=colorscale, origin=origin,
+            title=f"Binarization of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -249,7 +265,8 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D binary images.
 
         Parameters
@@ -270,9 +287,24 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_heatmap(
-            Xt[sample] * 1, colorscale=colorscale, origin=origin)
+            Xt[sample] * 1, colorscale=colorscale, origin=origin,
+            title=f"Inversion of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -311,11 +343,9 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'paddings': {
-            'type': (np.ndarray, type(None)),
-            'of': {'type': int}},
+        'paddings': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
         'activated': {'type': bool}
-    }
+        }
 
     def __init__(self, paddings=None, activated=False, n_jobs=None):
         self.paddings = paddings
@@ -401,7 +431,8 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='greys', origin='upper'):
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
         """Plot a sample from a collection of 2D binary images.
 
         Parameters
@@ -422,9 +453,24 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
             left corner. The convention ``'upper'`` is typically used for
             matrices and images.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_heatmap(
-            Xt[sample] * 1, colorscale=colorscale, origin=origin)
+            Xt[sample] * 1, colorscale=colorscale, origin=origin,
+            title=f"Padded version of image {sample}",
+            plotly_params=plotly_params
+            )
 
 
 @adapt_fit_transform_docs
@@ -531,7 +577,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0):
+    def plot(Xt, sample=0, plotly_params=None):
         """Plot a sample from a collection of point clouds. If the point cloud
         is in more than three dimensions, only the first three are plotted.
 
@@ -544,5 +590,17 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         sample : int, optional, default: ``0``
             Index of the sample in `Xt` to be plotted.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_point_cloud(Xt[sample])
+        return plot_point_cloud(Xt[sample], plotly_params=plotly_params)

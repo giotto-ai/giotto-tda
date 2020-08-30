@@ -7,7 +7,7 @@ echo "Start manylinux2010 docker build"
 PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
 export PATH="${PYTHON_PATH}/bin:${PATH}"
 pip config set global.progress_bar off
-pip install --upgrade pip==19.3.1 setuptools
+pip install --upgrade pip setuptools
 
 # Install CMake
 pip install cmake
@@ -25,7 +25,7 @@ tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
 ./bootstrap.sh --prefix=/boost
-./b2 install -j3 || echo "Parts of boost failed to build. Continuing.."
+./b2 install -j3 || echo "Parts of boost failed to build. Continuing..."
 cd ..
 
 ccache -s
@@ -36,20 +36,21 @@ export Boost_INCLUDE_DIR=/boost/include
 
 # Install dev environment
 cd /io
+pip install wheel
 pip install -e ".[dev]"
 
 # Test dev install with pytest
-pytest gtda --cov --cov-report xml
+pytest gtda --no-cov --no-coverage-upload
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
 pip uninstall -y giotto-tda
 pip uninstall -y giotto-tda-nightly
 
 # Build wheels
-pip install wheel==0.34.1 auditwheel==3.1.0
 python setup.py bdist_wheel
 
 # Repair wheels with auditwheel
+pip install auditwheel
 auditwheel repair dist/*whl -w dist/
 # remove wheels that are not manylinux2010
 rm -rf dist/*-linux*.whl
