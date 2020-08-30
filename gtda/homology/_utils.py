@@ -44,9 +44,8 @@ def _postprocess_diagrams(
                   for dim in homology_dimensions]
     min_values = [min_value if min_value != np.inf else 0
                   for min_value in min_values]
-    dtype = next(iter(Xt[0].values())).dtype
     n_features = start_idx_per_dim[-1]
-    Xt_padded = np.empty((len(Xt), n_features, 3), dtype=dtype)
+    Xt_padded = np.empty((len(Xt), n_features, 3), dtype=float)
 
     for i, dim in enumerate(homology_dimensions):
         start_idx, end_idx = start_idx_per_dim[i:i + 2]
