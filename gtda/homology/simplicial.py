@@ -646,9 +646,6 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                        thresh=self.max_edge_length, coeff=self.coeff,
                        metric='precomputed')['dgms']
 
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
-
         return Xdgms
 
     def fit(self, X, y=None):
@@ -686,6 +683,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -729,8 +727,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._weak_alpha_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+        Xt = _postprocess_diagrams(Xt, "ripser", self._homology_dimensions,
+                                   self.infinity_values_)
         return Xt
 
     @staticmethod
