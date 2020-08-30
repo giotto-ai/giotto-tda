@@ -69,9 +69,7 @@ def _get_estimator_name(estimator):
 
 
 @pytest.mark.filterwarnings("ignore:Input of `fit` contains")
-@parametrize_with_checks(
-    [Binarizer, Inverter]
-    )
+@parametrize_with_checks([Binarizer(), Inverter()])
 def test_sklearn_api(check, estimator, request):
     estimator_name = _get_estimator_name(estimator)
     check_name = _get_callable_name(check)
