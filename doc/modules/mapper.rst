@@ -43,6 +43,19 @@ Clustering
 
    mapper.FirstSimpleGap
    mapper.FirstHistogramGap
+   mapper.ParallelClustering
+
+Nerve (graph construction)
+--------------------------
+
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/mapper/nerve/
+   :template: class.rst
+
+   mapper.Nerve
+
 
 Pipeline
 --------

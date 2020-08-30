@@ -92,13 +92,14 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'homology_dimensions': {
-            'type': (list, tuple), 'of': {
-                'type': int, 'in': Interval(0, np.inf, closed='left')}},
+            'type': (list, tuple),
+            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+            },
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'periodic_dimensions': {
-            'type': (np.ndarray, type(None)),
-            'of': {'type': np.bool_}},
-        'infinity_values': {'type': (Real, type(None))}}
+        'periodic_dimensions': {'type': (np.ndarray, type(None)),
+                                'of': {'type': np.bool_}},
+        'infinity_values': {'type': (Real, type(None))}
+        }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
                  periodic_dimensions=None, infinity_values=None, n_jobs=None):
@@ -197,6 +198,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
             topological features in dimension :math:`q` across all samples in
             `X`.
+
         """
         check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
@@ -221,13 +223,13 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, homology_dimensions=None):
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
         """Plot a sample from a collection of persistence diagrams, with
         homology in multiple dimensions.
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
@@ -238,6 +240,20 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             Which homology dimensions to include in the plot. ``None`` means
             plotting all dimensions present in ``Xt[sample]``.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
         return plot_diagram(
-            Xt[sample], homology_dimensions=homology_dimensions)
+            Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+            )

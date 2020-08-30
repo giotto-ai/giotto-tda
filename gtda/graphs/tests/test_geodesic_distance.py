@@ -1,5 +1,7 @@
 """Testing for GraphGeodesicDistance."""
 
+import warnings
+
 import numpy as np
 import plotly.io as pio
 import pytest
@@ -85,15 +87,20 @@ def test_ggd_not_fitted():
 
 def test_ggd_fit_transform_plot():
     X = X_ggd[0][0]
-    GraphGeodesicDistance().fit_transform_plot(X, sample=0)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Methods .*")
+        GraphGeodesicDistance().fit_transform_plot(X, sample=0)
 
 
 @pytest.mark.parametrize("X, X_res", X_ggd)
 @pytest.mark.parametrize("method", ["auto", "FW", "D", "J", "BF"])
 def test_ggd_transform(X, X_res, method):
-    ggd = GraphGeodesicDistance(directed=False, method=method)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Methods .*")
+        ggd = GraphGeodesicDistance(directed=False, method=method)
+        X_ft = ggd.fit_transform(X)
 
-    assert_almost_equal(ggd.fit_transform(X), X_res)
+    assert_almost_equal(X_ft, X_res)
 
 
 def test_parallel_ggd_transform():
@@ -101,4 +108,7 @@ def test_parallel_ggd_transform():
     ggd = GraphGeodesicDistance(n_jobs=1)
     ggd_parallel = GraphGeodesicDistance(n_jobs=2)
 
-    assert_almost_equal(ggd.fit_transform(X), ggd_parallel.fit_transform(X))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Methods .*")
+        assert_almost_equal(ggd.fit_transform(X),
+                            ggd_parallel.fit_transform(X))
