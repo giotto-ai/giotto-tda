@@ -111,17 +111,16 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     Parameters
     ----------
     X: ndarray (n_samples, n_features)
-        A numpy array of either data or distance matrix.
-        Can also be a sparse distance matrix of type scipy.sparse
+        A numpy array of either data or distance matrix. Can also be a sparse
+        distance matrix of type scipy.sparse
 
     maxdim: int, optional, default 1
-        Maximum homology dimension computed. Will compute all dimensions
-        lower than and equal to this value.
-        For 1, H_0 and H_1 will be computed.
+        Maximum homology dimension computed. Will compute all dimensions lower
+        than and equal to this value. For 1, H_0 and H_1 will be computed.
 
-    thresh: float, default infinity
-        Maximum distances considered when constructing filtration.
-        If infinity, compute the entire filtration.
+    thresh: float, default ``numpy.inf``
+        Maximum distances considered when constructing filtration. If
+        ``numpy.inf``, compute the entire filtration.
 
     coeff: int prime, default 2
         Compute homology with coefficients in the prime field Z/pZ for p=coeff.
@@ -129,19 +128,18 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     metric: string or callable
         The metric to use when calculating distance between instances in a
         feature array. If metric is a string, it must be one of the options
-        specified in pairwise_distances, including "euclidean", "manhattan",
-        or "cosine". Alternatively, if metric is a callable function, it is
-        called on each pair of instances (rows) and the resulting value
-        recorded. The callable should take two arrays from X as input and
-        return a value indicating the distance between them.
+        specified in pairwise_distances, including "euclidean", "manhattan", or
+        "cosine". Alternatively, if metric is a callable function, it is called
+        on each pair of instances (rows) and the resulting value recorded. The
+        callable should take two arrays from X as input and return a value
+        indicating the distance between them.
 
     n_perm: int
-        The number of points to subsample in a "greedy permutation,"
-        or a furthest point sampling of the points.  These points
-        will be used in lieu of the full point cloud for a faster
-        computation, at the expense of some accuracy, which can
-        be bounded as a maximum bottleneck distance to all diagrams
-        on the original point set
+        The number of points to subsample in a "greedy permutation", or a
+        furthest point sampling of the points. These points will be used in
+        lieu of the full point cloud for a faster computation, at the expense
+        of some accuracy, which can be bounded as a maximum bottleneck distance
+        to all diagrams on the original point set.
 
     Returns
     -------
