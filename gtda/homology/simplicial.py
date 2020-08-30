@@ -179,6 +179,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
