@@ -1,3 +1,6 @@
+"""Testing for OneDimensionalCover and CubicalCover."""
+# License: GNU AGPLv3
+
 import numpy as np
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes

@@ -180,7 +180,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='blues'):
+    def plot(Xt, sample=0, colorscale='blues', plotly_params=None):
         """Plot a sample from a collection of distance matrices.
 
         Parameters
@@ -197,5 +197,21 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
             Color scale to be used in the heat map. Can be anything allowed by
             :class:`plotly.graph_objects.Heatmap`.
 
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
         """
-        return plot_heatmap(Xt[sample], colorscale=colorscale)
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale,
+            title=f"{sample}-th geodesic distance matrix",
+            plotly_params=plotly_params
+            )

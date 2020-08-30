@@ -80,10 +80,11 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         'func_params': {'type': (dict, type(None))},
         'percentiles': {
             'type': (list, type(None)),
-            'of': {'type': Real, 'in': Interval(0, 100, closed='both')}},
-        'n_steps_future': {
-            'type': int, 'in': Interval(1, np.inf, closed='left')}
-    }
+            'of': {'type': Real, 'in': Interval(0, 100, closed='both')}
+            },
+        'n_steps_future': {'type': int,
+                           'in': Interval(1, np.inf, closed='left')}
+        }
 
     def __init__(self, width=10, func=np.std,
                  func_params=None, percentiles=None, n_steps_future=1):

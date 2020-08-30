@@ -142,7 +142,7 @@ def test_check_point_clouds_value_err_finite():
 
     # Check that we error on 1d array input
     with pytest.raises(ValueError):
-        check_point_clouds(np.asarray(ex.X_list_tot))
+        check_point_clouds(np.asarray(ex.X_list_tot, dtype=object))
 
     # Check that we error on 2d array input
     with pytest.raises(ValueError):
