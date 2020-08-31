@@ -3,18 +3,20 @@
 
 from .modules.gtda_bottleneck import bottleneck_distance
 from .modules.gtda_wasserstein import wasserstein_distance
+from .modules.gtda_collapser import flag_complex_collapse_edges
 from .python import ripser, SparseRipsComplex, CechComplex, CubicalComplex, \
-    PeriodicCubicalComplex, SimplexTree, WitnessComplex, StrongWitnessComplex
+    PeriodicCubicalComplex, SimplexTree, WitnessComplex, StrongWitnessComplex \
 
 __all__ = [
     'bottleneck_distance',
     'wasserstein_distance',
     'ripser',
     'SparseRipsComplex',
-    'CechComplex', 
+    'CechComplex',
     'CubicalComplex',
     'PeriodicCubicalComplex',
     'SimplexTree',
     'WitnessComplex',
-    'StrongWitnessComplex'
+    'StrongWitnessComplex',
+    'flag_complex_collapse_edges'
     ]
