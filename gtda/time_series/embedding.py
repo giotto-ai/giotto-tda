@@ -213,10 +213,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return plot_point_cloud(Xt[sample], plotly_params=plotly_params)
 
 
-def time_delay_embedding(
-        X, time_delay=1, dimension=2, stride=1, flatten=False,
-        ensure_last_value=True, validate=True
-        ):
+def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
+                         ensure_last_value=True, validate=True):
     """Time-delay embeddings of arrays of time-series data.
 
     On a 1D array `X` representing a single time series, the time-delay
