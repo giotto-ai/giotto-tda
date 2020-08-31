@@ -1,6 +1,8 @@
 """Time series embedding."""
 # License: GNU AGPLv3
 
+from copy import deepcopy
+
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator
@@ -9,10 +11,10 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 
 from ..base import TransformerResamplerMixin
+from ..plotting import plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params
-from..plotting import plot_point_cloud
 
 
 @adapt_fit_transform_docs
@@ -284,21 +286,15 @@ def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
     single time series.
 
     """
+    validate_params({'validate': validate}, {'validate':  {'type': bool}})
     if validate:
-        expected_params = {
-            'time_delay': {'type': int,
-                           'in': Interval(1, np.inf, closed='left')},
-            'dimension': {'type': int,
-                          'in': Interval(1, np.inf, closed='left')},
-            'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-            'flatten': {'type': bool},
-            'ensure_last_value': {'type': bool}
-            }
-        input_params = {
-            'time_delay': time_delay, 'dimension': dimension,
-            'stride': stride, 'flatten': flatten,
-            'ensure_last_value': ensure_last_value
-            }
+        expected_params = deepcopy(TakensEmbedding._hyperparameters)
+        expected_params.pop('parameters_type')
+        expected_params.update({'flatten': {'type': bool},
+                                'ensure_last_value': {'type': bool}})
+        input_params = {'time_delay': time_delay, 'dimension': dimension,
+                        'stride': stride, 'flatten': flatten,
+                        'ensure_last_value': ensure_last_value}
         validate_params(input_params, expected_params)
 
     n_timestamps = X.shape[-1]
