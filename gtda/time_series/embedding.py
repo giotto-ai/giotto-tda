@@ -1,8 +1,6 @@
 """Time series embedding."""
 # License: GNU AGPLv3
 
-from copy import deepcopy
-
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator
@@ -288,7 +286,7 @@ def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
     """
     validate_params({'validate': validate}, {'validate':  {'type': bool}})
     if validate:
-        expected_params = deepcopy(TakensEmbedding._hyperparameters)
+        expected_params = TakensEmbedding._hyperparameters.copy()
         expected_params.pop('parameters_type')
         expected_params.update({'flatten': {'type': bool},
                                 'ensure_last_value': {'type': bool}})
