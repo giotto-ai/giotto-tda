@@ -229,7 +229,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 
