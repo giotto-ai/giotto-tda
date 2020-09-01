@@ -315,6 +315,24 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
 
 
 def check_multi_time_series(X, copy=False):
+    """Input validation on arrays or lists representing collections of
+    univariate, multivariate or tensor-valued time series.
+
+    Parameters
+    ----------
+    X : object
+        Input object to check / convert.
+
+    copy : bool, optional, default: ``False``
+        Whether a forced copy will be triggered. If ``False``, a copy might
+        be triggered by a conversion.
+
+    Returns
+    -------
+    Xnew : ndarray or list
+        The converted and validated object.
+
+    """
     if hasattr(X, 'shape') and hasattr(X, 'ndim'):
         Xnew = check_array(X, ensure_2d=True, allow_nd=True, copy=copy)
     else:
