@@ -217,21 +217,24 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
                          ensure_last_value=True, validate=True):
-    """Time-delay embeddings of arrays of time-series data.
+    """Time-delay embeddings of time-series data.
 
-    On a 1D array `X` representing a single time series, the time-delay
-    embedding algorithm is the one described in :class:`TakensEmbedding` and
-    yields a 2D array representing a point cloud in Euclidean space. 2D array
-    inputs are interpreted as collections of time series (one per entry along
-    axis 0), and the algorithm is applied to each time series separately to
-    produce a 3D array of point clouds. More generally, N-dimensional array
-    inputs are interpreted as containing one time series per entry along the
-    first N - 1 axes, and a (N + 1)-dimensional array of point clouds is
-    returned.
+    On a 1D array `X` representing a single univariate time series, the
+    time-delay embedding algorithm is the one described in
+    :class:`TakensEmbedding` and yields a 2D array representing a point cloud
+    in Euclidean space. A 2D array or list of 1D arrays is interpreted as a
+    collection of univariate time series, to which the algorithm is applied
+    separately to produce a 3D array or list of 2D arrays (respectively). A 3D
+    array or list of 2D arrays is interpreted as a collection of multivariate
+    time series, each with shape ``(n_variables, n_timestamps)``. More
+    generally, :math`N`-dimensional arrays or lists of (:math`N-1`)-dimensional
+    arrays when :math:`N \\geq 3` are interpreted as collections of
+    tensor-valued time series, each with time indexed by the last axis. The
+    output shape in this case depends on the `flatten` parameter.
 
     Parameters
     ----------
-    X : ndarray of shape (n_timestamps,) or (n_time_series, ..., n_timestamps)
+    X : ndarray or list
         Input time series or collection of time series.
 
     time_delay : int, optional, default: ``1``
@@ -245,14 +248,17 @@ def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
         Stride duration between two consecutive embedded points.
 
     flatten : bool, optional, default: ``False``
-        If ``True``, and if ``X.ndim > 2``, ensures that the output is a 3D
-        ndarray of shape
-        ``(n_time_series, n_points, dimension * np.prod(X.shape[1:-1]))``,
-        where ``n_points`` is equal to
-        ``(n_timestamps - time_delay * (dimension - 1) - 1) // stride + 1``.
+        Only relevant when `X` represents a collection of multivariate or
+        tensor-valued time series. If ``True``, ensures that the output is a
+        3D ndarray or list of 2D arrays, each entry of which has shape
+        ``(n_points, dimension * n_variables)``, where ``n_points`` is equal to
+        ``(n_timestamps - time_delay * (dimension - 1) - 1) // stride + 1``,
+        and ``n_variables`` is the product of the sizes of all axes in said
+        entry except the last. If ``False``, each entry of `X` leads to an
+        array of dimension one higher than the entry's dimension.
 
     ensure_last_value : bool, optional, default: ``True``
-        Whether the value(s) of `X` representing the last measurement(s) must
+        Whether the value(s) representing the last measurement(s) must be
         be present in the output as the last coordinate(s) of the last
         embedding vector(s). If ``False``, the first measurement(s) is (are)
         present as the 0-th coordinate(s) of the 0-th vector(s) instead.
@@ -262,14 +268,12 @@ def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
 
     Returns
     -------
-    X_embedded : ndarray of shape (n_points, dimension) or \
-        (n_time_series, ..., n_points, dimension)
-        The result (a view on `X`) of the time-delay embedding of `X` with the
-        given parameters. If `X` is 1D, `X_embedded` is a single point cloud in
-        Euclidean space of dimension given by `dimension`. If `X` is
-        N-dimensional, `X_embedded` contains one such point cloud per entry of
-        `X` along its first N - 1 axes. In both cases, ``n_points`` is equal to
-        ``(n_timestamps - time_delay * (dimension - 1) - 1) // stride + 1``.
+    X_embedded : ndarray or list
+        The result of the time-delay embedding of `X` with the given
+        parameters. If `X` is 1D, `X_embedded` is a single point cloud in
+        Euclidean space of dimension given by `dimension`. Otherwise,
+        `X_embedded` is a collection of point clouds or higher-dimensional
+        tensorial objects (depending also on `flatten`).
 
     See also
     --------
