@@ -8,7 +8,10 @@ https://github.com/GUDHI/gudhi-devel/blob/master/src/Collapse/example/edge_colla
 import numpy as np
 import scipy
 from scipy.sparse import coo_matrix, csr_matrix
-from gtda.externals.modules.gtda_collapser import flag_complex_collapse_edges
+from gtda.externals.modules.gtda_collapser import \
+    flag_complex_collapse_edges_dense, \
+    flag_complex_collapse_edges_sparse, \
+    flag_complex_collapse_edges_coo
 
 
 X = np.array([[0, 1, 1.],
@@ -33,14 +36,14 @@ def check_collapse(collapsed, removed):
 
 def test_simple_csr_example():
     X = csr_matrix((tX[2], (tX[0], tX[1])))
-    coo_ = flag_complex_collapse_edges(X)
+    coo_ = flag_complex_collapse_edges_sparse(X)
     coo = coo_matrix((coo_[2], (coo_[0], coo_[1])))
     assert check_collapse(coo,
                           [[1, 3, 2]])
 
 
 def test_simple_coo_example():
-    coo_ = flag_complex_collapse_edges(
+    coo_ = flag_complex_collapse_edges_coo(
         tX[0], tX[1], tX[2])
     coo = coo_matrix((coo_[2], (coo_[0], coo_[1])))
     assert check_collapse(coo,
@@ -48,8 +51,8 @@ def test_simple_coo_example():
 
 
 def test_simple_dense_example():
-    data = csr_matrix((tX[2], (tX[0], tX[1]))).tocoo()
-    coo_ = flag_complex_collapse_edges(data)
+    data = csr_matrix((tX[2], (tX[0], tX[1]))).toarray()
+    coo_ = flag_complex_collapse_edges_dense(data)
     coo = coo_matrix((coo_[2], (coo_[0], coo_[1])))
     assert check_collapse(coo,
                           [[1, 3, 2]])
