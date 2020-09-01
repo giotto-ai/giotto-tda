@@ -1,4 +1,4 @@
-"""Utility function for time series processing."""
+"""Utility functions for time series processing."""
 # License: GNU AGPLv3
 
 from functools import partial
