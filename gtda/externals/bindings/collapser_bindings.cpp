@@ -34,27 +34,6 @@ using Distance_matrix = std::vector<std::vector<Filtration_value>>;
 /* constants */
 const Filtration_value filtration_max =
     std::numeric_limits<Filtration_value>::infinity();
-/* Generates a sparse matrix from a filtered edge list
- * This function is called after computing edge collapse
- * At the moment this function is unused because Eigen only manages
- * CSR sparse format, but in the case of giotto-tda we need COO format
- */
-static Sparse_matrix generate_sparse_matrix(Filtered_edge_list& collapsed_edges,
-                                            size_t size) {
-  std::vector<triplet_vec> triplets;
-  /* Create triplets to efficiently create a return matrix */
-  for (auto& t : collapsed_edges) {
-    triplets.push_back(
-        triplet_vec(std::get<0>(t), std::get<1>(t), std::get<2>(t)));
-    std::cout << std::get<0>(t) << ", " << std::get<1>(t) << " : "
-              << std::get<2>(t) << "\n";
-  }
-
-  Sparse_matrix mat(size, size);
-  mat.setFromTriplets(triplets.begin(), triplets.end());
-
-  return mat;
-}
 
 /* Generates COO sparse matrix data from a filtered edge list
  * This function is called after computing edge collapse
