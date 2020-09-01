@@ -159,10 +159,17 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, each entry of `X` should be
-            compatible with a filtration, i.e. the value at index (i, j) should
-            be no smaller than the values at diagonal indices (i, i) and
-            (j, j).
+            `metric` was set to ``'precomputed'``, then:
+
+                - if entries of `X` are dense, only their upper diagonal
+                  portions (including the diagonal) are considered;
+                - if entries of `X` are sparse, they do not need to be upper
+                  diagonal or symmetric, but correct results can only be
+                  guaranteed when only one between entry (i, j) and entry
+                  (j, i) is stored, or both are stored but they are equal.
+                - entries of `X` should be compatible with a filtration, i.e.
+                  the value at index (i, j) should be no smaller than the
+                  values at diagonal indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -210,10 +217,17 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, each entry of `X` should be
-            compatible with a filtration, i.e. the value at index (i, j) should
-            be no smaller than the values at diagonal indices (i, i) and
-            (j, j).
+            `metric` was set to ``'precomputed'``, then:
+
+                - if entries of `X` are dense, only their upper diagonal
+                  portions (including the diagonal) are considered;
+                - if entries of `X` are sparse, they do not need to be upper
+                  diagonal or symmetric, but correct results can only be
+                  guaranteed when only one between entry (i, j) and entry
+                  (j, i) is stored, or both are stored but they are equal.
+                - entries of `X` should be compatible with a filtration, i.e.
+                  the value at index (i, j) should be no smaller than the
+                  values at diagonal indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
