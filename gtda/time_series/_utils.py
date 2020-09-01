@@ -2,7 +2,6 @@
 # License: GNU AGPLv3
 
 from functools import partial
-from math import prod
 
 import numpy as np
 
@@ -30,7 +29,7 @@ def _time_delay_embedding(X, time_delay=1, dimension=2, stride=1,
         if flatten and (X.ndim > 2):
             transpose_axes = (0, *range(1, X.ndim)[::-1], X.ndim)
             X_embedded = np.transpose(X_embedded, axes=transpose_axes).\
-                reshape(len(X), -1, dimension * prod(X.shape[1:-1]))
+                reshape(len(X), -1, dimension * np.prod(X.shape[1:-1]))
     else:  # list of ndarray input
         func = partial(_time_delay_embedding, time_delay=time_delay,
                        dimension=dimension, stride=stride, flatten=flatten,
