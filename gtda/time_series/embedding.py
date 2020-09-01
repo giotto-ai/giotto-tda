@@ -325,7 +325,7 @@ def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
                        ensure_last_value=ensure_last_value, validate=False)
         X_embedded = []
         for x in X:
-            x_embedded = func(x.reshape(1, *x.shape))[0]
+            x_embedded = func(x[None, ...])[0]
             X_embedded.append(x_embedded)
 
     return X_embedded
