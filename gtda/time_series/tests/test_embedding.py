@@ -123,27 +123,29 @@ def test_window_plot():
     windows.plot(X_windows, sample=0)
 
 
-@pytest.mark.parametrize('X', [signal, signal[:, None]])
 @pytest.mark.parametrize('time_delay', list(range(1, 5)))
 @pytest.mark.parametrize('dimension', list(range(1, 5)))
 @pytest.mark.parametrize('stride', list(range(1, 5)))
-def test_time_delay_embedding_consistent_with_takens_embedding(
-        X, time_delay, dimension, stride
+def test_multi_takens_embedding_consistent_with_takens_embedding(
+        time_delay, dimension, stride
         ):
-    """Test that time_delay_embedding and TakensEmbedding give identical
-    outputs on 1D arrays."""
+    """Test that MultiTakensEmbedding and TakensEmbedding give identical
+    outputs (up to shape) on arrays representing single univariate time
+    series."""
     n_points = (len(signal) - time_delay * (dimension - 1) - 1) // stride + 1
     embedder = TakensEmbedding(parameters_type='fixed', time_delay=time_delay,
                                dimension=dimension, stride=stride)
-    func = partial(time_delay_embedding, time_delay=time_delay,
-                   dimension=dimension, stride=stride)
+    multi_embedder = MultiTakensEmbedding(time_delay=time_delay,
+                                          dimension=dimension, stride=stride)
     if n_points <= 0:
         with pytest.raises(ValueError):
-            embedder.fit_transform(X)
+            embedder.fit_transform(signal)
         with pytest.raises(ValueError):
-            func(X.ravel())
+            multi_embedder.fit_transform(signal[None, :])
     else:
-        assert np.array_equal(embedder.fit_transform(X), func(X.ravel()))
+        embedder_res = embedder.fit_transform(signal)
+        multi_embedder_res = multi_embedder.fit_transform(signal[None, :])[0]
+        assert np.array_equal(embedder_res, multi_embedder_res)
 
 
 @pytest.mark.parametrize("params",
@@ -151,20 +153,23 @@ def test_time_delay_embedding_consistent_with_takens_embedding(
                           {"dimension": 0}, {"dimension": -1},
                           {"stride": 0}, {"stride": -1},
                           {"flatten": "foo"}, {"ensure_last_value": "bar"}])
-def test_time_delay_embedding_validation(params):
+def test_multi_takens_embedding_validation(params):
     if "flatten" not in params and "ensure_last_value" not in params:
         exception_type = ValueError
     else:
         exception_type = TypeError
     with pytest.raises(exception_type):
-        time_delay_embedding(signal, **params)
+        MTE = MultiTakensEmbedding(**params)
+        MTE.fit(signal[None, :])
 
 
-def test_time_delay_embedding_2D():
-    """Test the return values of time_delay_embedding on 2D input with
-    default parameters."""
+def test_multi_takens_embedding_2D():
+    """Test the return values of MultiTakensEmbedding on 2D input or list of 1D
+     input, with default parameters."""
     signals = np.arange(10).reshape(2, 5)
-    signals_emb = time_delay_embedding(signals)
+    MTE = MultiTakensEmbedding()
+    signals_emb = MTE.fit_transform(signals)
+    signals_emb_list = MTE.fit_transform(list(signals))
     signals_emb_exp = np.array([[[0, 1],
                                  [1, 2],
                                  [2, 3],
@@ -174,13 +179,35 @@ def test_time_delay_embedding_2D():
                                  [7, 8],
                                  [8, 9]]])
     assert np.array_equal(signals_emb, signals_emb_exp)
+    assert np.array_equal(np.asarray(signals_emb_list), signals_emb_exp)
 
 
-def test_time_delay_embedding_3D():
-    """Test the return values of time_delay_embedding on 3D input with
-    default parameters."""
+def test_multi_takens_embedding_3D_default():
+    """Test the return values of MultiTakensEmbedding on 3D input or list
+    of 2D input, with default parameters."""
     signals = np.arange(20).reshape(2, 2, 5)
-    signals_emb = time_delay_embedding(signals)
+    MTE = MultiTakensEmbedding()
+    signals_emb = MTE.fit_transform(signals)
+    signals_emb_list = MTE.fit_transform(list(signals))
+    signals_emb_exp = np.array([[[0, 1, 5, 6],
+                                 [1, 2, 6, 7],
+                                 [2, 3, 7, 8],
+                                 [3, 4, 8, 9]],
+                                [[10, 11, 15, 16],
+                                 [11, 12, 16, 17],
+                                 [12, 13, 17, 18],
+                                 [13, 14, 18, 19]]])
+    assert np.array_equal(signals_emb, signals_emb_exp)
+    assert np.array_equal(np.asarray(signals_emb_list), signals_emb_exp)
+
+
+def test_multi_takens_embedding_3D_no_flatten():
+    """Test the return values of MultiTakensEmbedding on 3D input or list of
+    2D input, with `flatten` set to ``False``."""
+    signals = np.arange(20).reshape(2, 2, 5)
+    MTE = MultiTakensEmbedding(flatten=False)
+    signals_emb = MTE.fit_transform(signals)
+    signals_emb_list = MTE.fit_transform(list(signals))
     signals_emb_exp = np.array([[[[0, 1],
                                   [1, 2],
                                   [2, 3],
@@ -198,19 +225,4 @@ def test_time_delay_embedding_3D():
                                   [17, 18],
                                   [18, 19]]]])
     assert np.array_equal(signals_emb, signals_emb_exp)
-
-
-def test_time_delay_embedding_3D_flatten():
-    """Test the return values of time_delay_embedding on 3D input when
-    `flatten` is True."""
-    signals = np.arange(20).reshape(2, 2, 5)
-    signals_emb = time_delay_embedding(signals, flatten=True)
-    signals_emb_exp = np.array([[[0, 1, 5, 6],
-                                 [1, 2, 6, 7],
-                                 [2, 3, 7, 8],
-                                 [3, 4, 8, 9]],
-                                [[10, 11, 15, 16],
-                                 [11, 12, 16, 17],
-                                 [12, 13, 17, 18],
-                                 [13, 14, 18, 19]]])
-    assert np.array_equal(signals_emb, signals_emb_exp)
+    assert np.array_equal(np.asarray(signals_emb_list), signals_emb_exp)
