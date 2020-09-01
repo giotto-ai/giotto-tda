@@ -34,6 +34,9 @@ signal_embedded_search = np.array([[2., 2.47942554],
                                    [2.41211849, 1.92484888]])
 
 y = np.arange(signal.shape[0])
+y_binary = np.array([0, 1, 0, 1, 1, 1, 0, 0, 0])
+
+y_expected = np.array([1, 2, 2, 0])
 
 signal_embedded_fixed = \
     np.array([[2., 2.47942554, 2.84147098, 2.99749499, 2.90929743],
@@ -101,6 +104,14 @@ def test_window_resample():
     windows.fit(y)
     y_resampled = windows.resample(y)
     assert_almost_equal(y_resampled, y[np.arange(3, 20, 2)])
+
+
+def test_window_resample_any():
+    windows = SlidingWindow(width=2, stride=2,
+                            target_resampler=lambda x: sum(x))
+    windows.fit(y_binary)
+    y_resampled = windows.resample(y_binary)
+    assert_almost_equal(y_resampled, y_expected)
 
 
 def test_window_plot():

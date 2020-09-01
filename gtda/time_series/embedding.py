@@ -1,5 +1,6 @@
 """Time series embedding."""
 # License: GNU AGPLv3
+from typing import Callable
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -32,6 +33,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     stride : int, optional, default: ``1``
         Stride between consecutive windows.
+
+    target_resampler: callable, optional, default: ``None``
+        Function that defines the target from a collection of targets.
 
     Examples
     --------
@@ -75,12 +79,18 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     _hyperparameters = {
         'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
+        'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'target_resampler': {'type': Callable}
     }
 
-    def __init__(self, width=10, stride=1):
+    def __init__(self, width=10, stride=1, target_resampler=None):
         self.width = width
         self.stride = stride
+
+        if target_resampler is None:
+            self.target_resampler = lambda x: x[-1]
+        else:
+            self.target_resampler = target_resampler
 
     def _slice_windows(self, X):
         n_samples = X.shape[0]
@@ -145,9 +155,11 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return Xt
 
     def resample(self, y, X=None):
-        """Resample `y` so that, for any i > 0, the minus i-th entry of the
-        resampled vector corresponds in time to the last entry of the minus
-        i-th window produced by :meth:`transform`.
+        """Resample `y` so that, for any i > 0, the i-th entry is the target
+        for the i-th window, obtained by applying `self.target_resampler` to
+        sliding window embedding of `y`. The default behavior is that the minus
+        i-th entry of the resampled vector corresponds in time to the last
+        entry of the minus i-th window produced by :meth:`transform`.
 
         Parameters
         ----------
@@ -168,8 +180,8 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self, '_is_fitted')
         yr = column_or_1d(y)
 
-        yr = np.flip(yr)
-        yr = np.flip(yr[:-self.width:self.stride])
+        yr = self.transform(yr[:, None])[:, :, 0]
+        yr = np.apply_along_axis(self.target_resampler, 1, yr)
         return yr
 
     @staticmethod
