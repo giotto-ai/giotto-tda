@@ -213,29 +213,30 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         # births
         dm = sparse.coo_matrix(dm)
 
-    if sparse.issparse(dm):
-        if sparse.isspmatrix_coo(dm) and not collapse_edges:
-            # If the matrix is already COO, we need to order the row and column
-            # indices lexicographically to avoid errors. See
-            # https://github.com/scikit-tda/ripser.py/issues/103
-            row, col, data = _lexsort_coo_data(dm.row, dm.col, dm.data)
-        else:
-            # Lexicographic sorting is performed by scipy upon conversion
-            coo = dm.tocoo()
-            row, col, data = coo.row, coo.col, coo.data
+    if sparse.issparse(dm) or collapse_edges:
         if collapse_edges:
-            # Threshold first. Ideally, this would be implemented as a
-            # modification of the C++ code
-            if thresh < np.inf:
-                thresholded_idx = np.flatnonzero(data <= thresh)
-                data = data[thresholded_idx]
-                row = row[thresholded_idx]
-                col = col[thresholded_idx]
-            row, col, data = \
-                gtda_collapser.flag_complex_collapse_edges_from_coo_data_to_coo_data(row, col, data)
-            row, col, data = _lexsort_coo_data(
-                np.asarray(row), np.asarray(col), np.asarray(data)
-                )
+            if not sparse.issparse(dm):
+                row, col, data = \
+                    gtda_collapser.flag_complex_collapse_edges_dense(dm)
+            else:
+                coo = dm.tocoo()
+                row, col, data = \
+                    gtda_collapser.flag_complex_collapse_edges_coo(coo.row,
+                                                                   coo.col,
+                                                                   coo.data)
+        else:
+            if sparse.isspmatrix_coo(dm):
+                # If the matrix is already COO, we need to order the row and
+                # column indices lexicographically to avoid errors. See
+                # https://github.com/scikit-tda/ripser.py/issues/103
+                row, col, data = _lexsort_coo_data(dm.row, dm.col, dm.data)
+            else:
+                coo = dm.tocoo()
+                row, col, data = coo.row, coo.col, coo.data
+
+        row, col, data = _lexsort_coo_data(np.asarray(row),
+                                           np.asarray(col),
+                                           np.asarray(data))
 
         res = DRFDMSparse(
             row.astype(dtype=np.int32, order="C"),
@@ -247,30 +248,11 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             coeff
             )
     else:
-        if collapse_edges:
-            # Threshold first. Ideally, this would be implemented as a
-            # modification of the C++ code
-            if thresh < np.inf:
-                dm = np.where(dm <= thresh, dm, np.inf)
-            row, col, data = \
-                gtda_collapser.flag_complex_collapse_edges_from_dense_to_coo_data(dm)
-            row, col, data = \
-                _lexsort_coo_data(np.asarray(row), np.asarray(col),
-                                  np.asarray(data))
-            res = DRFDMSparse(
-                row.astype(dtype=np.int32, order="C"),
-                col.astype(dtype=np.int32, order="C"),
-                np.array(data, dtype=np.float32, order="C"),
-                n_points,
-                maxdim,
-                thresh,
-                coeff
-                )
-        else:
-            # Only consider upper diagonal
-            I, J = np.meshgrid(np.arange(n_points), np.arange(n_points))
-            DParam = np.array(dm[I > J], dtype=np.float32)
-            res = DRFDM(DParam, maxdim, thresh, coeff)
+        # Only consider upper diagonal
+        I, J = np.meshgrid(np.arange(n_points), np.arange(n_points))
+        DParam = np.array(dm[I > J], dtype=np.float32)
+        print(DParam)
+        res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
     dgms = res["births_and_deaths_by_dim"]
