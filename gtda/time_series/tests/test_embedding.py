@@ -1,8 +1,6 @@
 """Testing for time series embedding."""
 # License: GNU AGPLv3
 
-from functools import partial
-
 import numpy as np
 import plotly.io as pio
 import pytest

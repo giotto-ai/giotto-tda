@@ -373,7 +373,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         """Calculate the number of false nearest neighbours in a certain
         embedding dimension, based on heuristics."""
         X_embedded = _time_delay_embedding(X, time_delay=time_delay,
-                                          dimension=dimension, stride=stride)
+                                           dimension=dimension, stride=stride)
 
         neighbor = \
             NearestNeighbors(n_neighbors=2, algorithm='auto').fit(X_embedded)
