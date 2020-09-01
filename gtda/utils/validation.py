@@ -7,9 +7,8 @@ from warnings import warn
 
 import numpy as np
 from scipy.sparse import issparse
-
-from sklearn.utils.validation import check_array
 from sklearn.exceptions import DataDimensionalityWarning
+from sklearn.utils.validation import check_array
 
 
 def check_diagrams(X, copy=False):
@@ -261,7 +260,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                 f"Input must be a single 3D array or a list of 2D arrays or "
                 f"sparse matrices. Structure of dimension {X.ndim} passed."
                 + extra_2D
-            )
+                )
         if (X.shape[1] != X.shape[2]) and distance_matrices:
             raise ValueError(
                 f"Input array X must have X.shape[1] == X.shape[2]: "
@@ -273,7 +272,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                 "matrices, but the input is being treated as a collection "
                 "of vectors in Euclidean space.",
                 DataDimensionalityWarning, stacklevel=2
-            )
+                )
         Xnew = _check_array_mod(X, **kwargs_, allow_nd=True)
     else:
         has_check_failed = False
@@ -287,7 +286,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                         raise ValueError(
                             f"All arrays must be square: {x.shape[0]} rows "
                             f"and {x.shape[1]} columns found in this array."
-                        )
+                            )
                 Xnew.append(xnew)
             except ValueError as e:
                 has_check_failed = True
@@ -296,7 +295,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
             raise ValueError(
                 "The following errors were raised by the inputs:\n\n" +
                 "\n\n".join(messages)
-            )
+                )
 
         if not distance_matrices:
             if reduce(and_, (x.shape[0] == x.shape[1] for x in X), True):
@@ -306,10 +305,34 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                     "entries will be treated as collections of vectors in "
                     "Euclidean space.", DataDimensionalityWarning,
                     stacklevel=2
-                )
+                    )
 
         ref_dim = X[0].shape  # Shape of first sample
         if reduce(and_, (x.shape == ref_dim for x in X[1:]), True):
             Xnew = np.asarray(Xnew)
+
+    return Xnew
+
+
+def check_multi_time_series(X, copy=False):
+    if hasattr(X, 'shape') and hasattr(X, 'ndim'):
+        Xnew = check_array(X, ensure_2d=True, allow_nd=True, copy=copy)
+    else:
+        has_check_failed = False
+        messages = []
+        Xnew = []
+        for i, x in enumerate(X):
+            try:
+                xnew = check_array(x, ensure_2d=False, allow_nd=True,
+                                   copy=copy)
+                Xnew.append(xnew)
+            except ValueError as e:
+                has_check_failed = True
+                messages.append(f"Entry {i}:\n{e}")
+        if has_check_failed:
+            raise ValueError(
+                "The following errors were raised by the inputs:\n\n" +
+                "\n\n".join(messages)
+                )
 
     return Xnew

@@ -29,9 +29,9 @@ Time-delay embedding
 
 .. autosummary::
    :toctree: generated/time_series/embedding/
-   :template: function.rst
+   :template: class.rst
 
-   time_series.time_delay_embedding
+   time_series.MultiTakensEmbedding
 
 Target preparation
 ------------------

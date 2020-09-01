@@ -10,7 +10,7 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.time_series import SlidingWindow, TakensEmbedding, \
-    time_delay_embedding
+    MultiTakensEmbedding
 
 pio.renderers.default = 'plotly_mimetype'
 

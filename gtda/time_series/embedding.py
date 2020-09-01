@@ -1,20 +1,20 @@
 """Time series embedding."""
 # License: GNU AGPLv3
 
-from functools import partial
-
 import numpy as np
 from joblib import Parallel, delayed
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import mutual_info_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
+
+from ._utils import _time_delay_embedding
 
 from ..base import TransformerResamplerMixin
 from ..plotting import plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params
+from ..utils.validation import validate_params, check_multi_time_series
 
 
 @adapt_fit_transform_docs
@@ -62,8 +62,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    TakensEmbedding, time_delay_embedding, \
-    gtda.homology.VietorisRipsPersistence
+    TakensEmbedding, MultiTakensEmbedding
 
     Notes
     -----
@@ -215,126 +214,6 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
         return plot_point_cloud(Xt[sample], plotly_params=plotly_params)
 
 
-def time_delay_embedding(X, time_delay=1, dimension=2, stride=1, flatten=False,
-                         ensure_last_value=True, validate=True):
-    """Time-delay embeddings of time-series data.
-
-    On a 1D array `X` representing a single univariate time series, the
-    time-delay embedding algorithm is the one described in
-    :class:`TakensEmbedding` and yields a 2D array representing a point cloud
-    in Euclidean space. A 2D array or list of 1D arrays is interpreted as a
-    collection of univariate time series, to which the algorithm is applied
-    separately to produce a 3D array or list of 2D arrays (respectively). A 3D
-    array or list of 2D arrays is interpreted as a collection of multivariate
-    time series, each with shape ``(n_variables, n_timestamps)``. More
-    generally, :math`N`-dimensional arrays or lists of (:math`N-1`)-dimensional
-    arrays when :math:`N \\geq 3` are interpreted as collections of
-    tensor-valued time series, each with time indexed by the last axis. The
-    output shape in this case depends on the `flatten` parameter.
-
-    Parameters
-    ----------
-    X : ndarray or list
-        Input time series or collection of time series.
-
-    time_delay : int, optional, default: ``1``
-        Time delay between two consecutive values for constructing one embedded
-        point.
-
-    dimension : int, optional, default: ``2``
-        Dimension of the embedding space.
-
-    stride : int, optional, default: ``1``
-        Stride duration between two consecutive embedded points.
-
-    flatten : bool, optional, default: ``False``
-        Only relevant when `X` represents a collection of multivariate or
-        tensor-valued time series. If ``True``, ensures that the output is a
-        3D ndarray or list of 2D arrays, each entry of which has shape
-        ``(n_points, dimension * n_variables)``, where ``n_points`` is equal to
-        ``(n_timestamps - time_delay * (dimension - 1) - 1) // stride + 1``,
-        and ``n_variables`` is the product of the sizes of all axes in said
-        entry except the last. If ``False``, each entry of `X` leads to an
-        array of dimension one higher than the entry's dimension.
-
-    ensure_last_value : bool, optional, default: ``True``
-        Whether the value(s) representing the last measurement(s) must be
-        be present in the output as the last coordinate(s) of the last
-        embedding vector(s). If ``False``, the first measurement(s) is (are)
-        present as the 0-th coordinate(s) of the 0-th vector(s) instead.
-
-    validate : bool, optional, default: ``True``
-        Whether keyword arguments should be validated.
-
-    Returns
-    -------
-    X_embedded : ndarray or list
-        The result of the time-delay embedding of `X` with the given
-        parameters. If `X` is 1D, `X_embedded` is a single point cloud in
-        Euclidean space of dimension given by `dimension`. Otherwise,
-        `X_embedded` is a collection of point clouds or higher-dimensional
-        tensorial objects (depending also on `flatten`).
-
-    See also
-    --------
-    TakensEmbedding, SlidingWindow
-
-    Notes
-    -----
-    When `X` is 1D and `ensure_last_value` is ``True``, this function gives
-    identical outputs as the :meth:`fit_transform` method of a
-    :class:`TakensEmbedding` object instantiated with
-    ``parameters_type='fixed'`` (and its other parameters set appropriately).
-    However, :class:`TakensEmbedding` only accepts 2D array input when it is a
-    column vector, in which case it is flattened to 1D and interpreted as a
-    single time series.
-
-    """
-    validate_params({'validate': validate}, {'validate':  {'type': bool}})
-    if validate:
-        expected_params = TakensEmbedding._hyperparameters.copy()
-        expected_params.pop('parameters_type')
-        expected_params.update({'flatten': {'type': bool},
-                                'ensure_last_value': {'type': bool}})
-        input_params = {'time_delay': time_delay, 'dimension': dimension,
-                        'stride': stride, 'flatten': flatten,
-                        'ensure_last_value': ensure_last_value}
-        validate_params(input_params, expected_params)
-
-    if hasattr(X, 'shape'):  # ndarray input
-        n_timestamps = X.shape[-1]
-        n_points, offset = \
-            divmod(n_timestamps - time_delay * (dimension - 1) - 1, stride)
-        n_points += 1
-        if n_points <= 0:
-            raise ValueError(
-                f"Not enough time stamps ({n_timestamps}) to produce at least "
-                f"one {dimension}-dimensional vector under the current choice "
-                f"of time delay ({time_delay})."
-                )
-        indices = np.tile(np.arange(0, time_delay * dimension, time_delay),
-                          (n_points, 1))
-        indices += np.arange(n_points)[:, None] * stride
-        if ensure_last_value:
-            indices += offset
-
-        X_embedded = X[..., indices]
-        if flatten:
-            transpose_axes = (0, *range(1, X.ndim)[::-1], X.ndim)
-            X_embedded = np.transpose(X_embedded, axes=transpose_axes).\
-                reshape(len(X), -1, dimension * np.prod(X.shape[1:-1]))
-    else:  # list of ndarray input
-        func = partial(time_delay_embedding, time_delay=time_delay,
-                       dimension=dimension, stride=stride, flatten=flatten,
-                       ensure_last_value=ensure_last_value, validate=False)
-        X_embedded = []
-        for x in X:
-            x_embedded = func(x[None, ...])[0]
-            X_embedded.append(x_embedded)
-
-    return X_embedded
-
-
 @adapt_fit_transform_docs
 class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a univariate time series as a time series of point
@@ -356,7 +235,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     searched for during :meth:`fit`. [2]_ [3]_
 
     To compute time-delay embeddings of several time series simultaneously, use
-    :func:`time_delay_embedding` instead.
+    :class:`MultiTakensEmbedding` instead.
 
     Parameters
     ----------
@@ -428,7 +307,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    time_delay_embedding, SlidingWindow, gtda.homology.VietorisRipsPersistence
+    MultiTakensEmbedding, SlidingWindow
 
     Notes
     -----
@@ -493,10 +372,8 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     def _false_nearest_neighbors(X, time_delay, dimension, stride=1):
         """Calculate the number of false nearest neighbours in a certain
         embedding dimension, based on heuristics."""
-        X_embedded = time_delay_embedding(
-            X, time_delay=time_delay, dimension=dimension, stride=stride,
-            validate=False
-            )
+        X_embedded = _time_delay_embedding(X, time_delay=time_delay,
+                                          dimension=dimension, stride=stride)
 
         neighbor = \
             NearestNeighbors(n_neighbors=2, algorithm='auto').fit(X_embedded)
@@ -601,9 +478,9 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self)
         Xt = column_or_1d(X).copy()
 
-        Xt = time_delay_embedding(
+        Xt = _time_delay_embedding(
             Xt, time_delay=self.time_delay_, dimension=self.dimension_,
-            stride=self.stride, validate=False
+            stride=self.stride
             )
 
         return Xt
@@ -635,3 +512,208 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         final_index = self.time_delay_ * (self.dimension_ - 1)
         yr = yr[:final_index - 1:-self.stride][::-1]
         return yr
+
+
+@adapt_fit_transform_docs
+class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
+    """Point clouds from collections of time series via independent Takens
+    embeddings.
+
+    On a 1D array representing a single univariate time series, the Takens
+    embedding algorithm is the one described in :class:`TakensEmbedding` and
+    yields a 2D array representing a point cloud in Euclidean space. This
+    transformer takes collections of (possibly multivariate) time series as
+    input, applies the algorithm to each independently, and returns a
+    corresponding collection of point clouds (or possibly higher-dimensional
+    structures, see `flatten`).
+
+    Parameters
+    ----------
+    time_delay : int, optional, default: ``1``
+        Time delay between two consecutive values for constructing one embedded
+        point.
+
+    dimension : int, optional, default: ``2``
+        Dimension of the embedding space (per variable, in the multivariate
+        case).
+
+    stride : int, optional, default: ``1``
+        Stride duration between two consecutive embedded points.
+
+    flatten : bool, optional, default: ``True``
+        Only relevant when the input of :meth:`transform` represents a
+        collection of multivariate or tensor-valued time series. If ``True``,
+        ensures that the output is a 3D ndarray or list of 2D arrays. If
+        ``False``, each entry of the input collection leads to an array of
+        dimension one higher than the entry's dimension.
+
+    ensure_last_value : bool, optional, default: ``True``
+        Whether the value(s) representing the last measurement(s) must be
+        be present in the output as the last coordinate(s) of the last
+        embedding vector(s). If ``False``, the first measurement(s) is (are)
+        present as the 0-th coordinate(s) of the 0-th vector(s) instead.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from gtda.time_series import MultiTakensEmbedding
+    # Two univariate time series of duration 4
+    >>> X = np.arange(8).reshape(2, 4)
+    >>> print(X)
+    [[0 1 2 3]
+     [4 5 6 7]]
+    >>> MTE = MultiTakensEmbedding(time_delay=1, dimension=2)
+    >>> print(embedder.fit_transform(X))
+    [[[0 1]
+      [1 2]
+      [2 3]]
+
+     [[5 6]
+      [6 7]
+      [7 8]]]
+    # Two multivariate time series of duration 4, with 2 variables
+    >>> x = np.arange(8).reshape(2, 1, 4)
+    >>> X = np.concatenate([x, -x], axis=1)
+    >>> print(X)
+    [[[ 0  1  2  3]
+      [ 0 -1 -2 -3]]
+
+     [[ 4  5  6  7]
+      [-4 -5 -6 -7]]]
+    # Pass `flatten` as `True` (default)
+    >>> MTE = MultiTakensEmbedding(time_delay=1, dimension=2, flatten=True)
+    >>> print(MTE.fit_transform(X))
+    [[[ 0  1  0 -1]
+      [ 1  2 -1 -2]
+      [ 2  3 -2 -3]]
+
+     [[ 4  5 -4 -5]
+      [ 5  6 -5 -6]
+      [ 6  7 -6 -7]]]
+    # Pass `flatten` as `False`
+    >>> MTE = MultiTakensEmbedding(time_delay=1, dimension=2, flatten=False)
+    >>> print(MTE.fit_transform(X))
+    [[[[ 0  1]
+       [ 1  2]
+       [ 2  3]]
+
+      [[ 0 -1]
+       [-1 -2]
+       [-2 -3]]]
+
+
+     [[[ 4  5]
+       [ 5  6]
+       [ 6  7]]
+
+      [[-4 -5]
+       [-5 -6]
+       [-6 -7]]]]
+
+    See also
+    --------
+    TakensEmbedding, SlidingWindow
+
+    Notes
+    -----
+    To compute the Takens embedding of a single univariate time series in the
+    form of a 1D array or column vector, use :class:`TakensEmbedding` instead.
+
+    """
+
+    _hyperparameters = TakensEmbedding._hyperparameters.copy()
+    _hyperparameters.pop('parameters_type')
+    _hyperparameters.update({'flatten': {'type': bool},
+                             'ensure_last_value': {'type': bool}})
+
+    def __init__(self, time_delay=1, dimension=2, stride=1, flatten=True,
+                 ensure_last_value=True):
+        self.time_delay = time_delay
+        self.dimension = dimension
+        self.stride = stride
+        self.flatten = flatten
+        self.ensure_last_value = ensure_last_value
+
+    def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray or list
+            Input collection of time series. A 2D array or list of 1D arrays is
+            interpreted as a collection of univariate time series. A 3D array
+            or list of 2D arrays is interpreted as a collection of multivariate
+            time series, each with shape ``(n_variables, n_timestamps)``. More
+            generally, :math`N`-dimensional arrays or lists of
+            (:math`N-1`)-dimensional arrays (:math:`N \\geq 3`) are interpreted
+            as collections of tensor-valued time series, each with time indexed
+            by the last axis.
+
+        y : None
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        check_multi_time_series(X, copy=False)
+        validate_params(self.get_params(), self._hyperparameters)
+        self._is_fitted = True
+
+        return self
+
+    def transform(self, X, y=None):
+        """Compute the Takens embedding of each entry in `X`.
+
+        Parameters
+        ----------
+        X : ndarray or list
+            Input collection of time series. A 2D array or list of 1D arrays is
+            interpreted as a collection of univariate time series. A 3D array
+            or list of 2D arrays is interpreted as a collection of multivariate
+            time series, each with shape ``(n_variables, n_timestamps)``. More
+            generally, :math`N`-dimensional arrays or lists of
+            (:math`N-1`)-dimensional arrays (:math:`N \\geq 3`) are interpreted
+            as collections of tensor-valued time series, each with time indexed
+            by the last axis.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        Xt : ndarray or list
+            The result of performing a Takens embedding of each entry in `X`
+            with the given parameters. If `X` is a 2D array or a list of 1D
+            arrays, `Xt` is a 3D array or a list of 2D arrays (respectively),
+            each entry of which has shape ``(n_points, dimension)`` where
+            ``n_points = (n_timestamps - time_delay * (dimension - 1) - 1) // \
+            stride + 1``. If `X` is an :math`N`-dimensional array or a list of
+            (:math`N-1`)-dimensional arrays (:math:`N \\geq 3`), the output
+            shapes depend on the `flatten` parameter:
+
+                - if `flatten` is ``True``, `Xt` is still a 3D array or a
+                  list of 2D arrays (respectively), each entry of which has
+                  shape ``(n_points, dimension * n_variables)`` where
+                  ``n_points`` is as above and ``n_variables`` is the product
+                  of the sizes of all axes in said entry except the last.
+                - if `flatten` is ``False``, `Xt` is an
+                  (:math`N+1`)-dimensional array or list of
+                  :math`N`-dimensional arrays.
+
+        """
+        check_is_fitted(self, '_is_fitted')
+        Xt = check_multi_time_series(X, copy=True)
+
+        Xt = _time_delay_embedding(
+            Xt, time_delay=self.time_delay, dimension=self.dimension,
+            stride=self.stride, flatten=self.flatten,
+            ensure_last_value=self.ensure_last_value
+            )
+
+        return Xt
