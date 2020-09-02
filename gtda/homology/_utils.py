@@ -5,7 +5,7 @@ import numpy as np
 
 
 def _postprocess_diagrams(
-        Xt, format, homology_dimensions, infinity_values
+        Xt, format, homology_dimensions, infinity_values, reduced
         ):
     # NOTE: `homology_dimensions` must be sorted in ascending order
     def replace_infinity_values(subdiagram):
@@ -15,14 +15,16 @@ def _postprocess_diagrams(
     # Replace np.inf with infinity_values and turn into list of dictionaries
     # whose keys are the dimensions
     if format in ["ripser", "flagser"]:  # Input is list of list of subdiagrams
-        # In H0, remove one infinite bar placed at the end by ripser
-        slices = {dim: slice(None) if dim else slice(None, -1)
+        # In H0, remove one infinite bar placed at the end by ripser or flagser
+        # only if `reduce` is True
+        slices = {dim: slice(None) if (dim or not reduced) else slice(None, -1)
                   for dim in homology_dimensions}
         Xt = [{dim: replace_infinity_values(diagram[dim][slices[dim]])
                for dim in homology_dimensions} for diagram in Xt]
     elif format == "gudhi":  # Input is list of list of [dim, (birth, death)]
-        # In H0, remove one infinite bar placed at the beginning by GUDHI
-        slices = {dim: slice(None) if dim else slice(1, None)
+        # In H0, remove one infinite bar placed at the beginning by GUDHI only
+        # if `reduce` is True
+        slices = {dim: slice(None) if (dim or not reduced) else slice(1, None)
                   for dim in homology_dimensions}
         Xt = [{dim: replace_infinity_values(
             np.array([pers_info[1] for pers_info in diagram

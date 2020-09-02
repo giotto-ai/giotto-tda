@@ -58,6 +58,10 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         filtration value ``numpy.inf``. ``None`` assigns the maximum pixel
         values within all images passed to :meth:`fit`.
 
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, one feature in homology dimension 0 with infinite death is
+       discarded.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -101,15 +105,18 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'periodic_dimensions': {'type': (np.ndarray, type(None)),
                                 'of': {'type': np.bool_}},
-        'infinity_values': {'type': (Real, type(None))}
+        'infinity_values': {'type': (Real, type(None))},
+        'reduced_homology': {'type': bool}
         }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
-                 periodic_dimensions=None, infinity_values=None, n_jobs=None):
+                 periodic_dimensions=None, infinity_values=None,
+                 reduced_homology=True, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.periodic_dimensions = periodic_dimensions
         self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
@@ -206,8 +213,10 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
                                           for x in Xt)
 
-        Xt = _postprocess_diagrams(Xt, "gudhi", self._homology_dimensions,
-                                   self.infinity_values_)
+        Xt = _postprocess_diagrams(
+            Xt, "gudhi", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
 
         return Xt
 
