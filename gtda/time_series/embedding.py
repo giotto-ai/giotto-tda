@@ -519,13 +519,11 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
     """Point clouds from collections of time series via independent Takens
     embeddings.
 
-    On a 1D array representing a single univariate time series, the Takens
-    embedding algorithm is the one described in :class:`TakensEmbedding` and
-    yields a 2D array representing a point cloud in Euclidean space. This
-    transformer takes collections of (possibly multivariate) time series as
-    input, applies the algorithm to each independently, and returns a
-    corresponding collection of point clouds (or possibly higher-dimensional
-    structures, see `flatten`).
+    This transformer takes collections of (possibly multivariate) time series
+    as input, applies the Takens embedding algorithm described in
+    :class:`TakensEmbedding` to each independently, and returns a corresponding
+    collection of point clouds in Euclidean space (or possibly
+    higher-dimensional structures, see `flatten`).
 
     Parameters
     ----------
