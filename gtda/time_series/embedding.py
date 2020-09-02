@@ -14,7 +14,7 @@ from ..base import TransformerResamplerMixin
 from ..plotting import plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_multi_time_series
+from ..utils.validation import validate_params, check_time_series
 
 
 @adapt_fit_transform_docs
@@ -661,7 +661,7 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_multi_time_series(X, copy=False)
+        check_time_series(X, copy=False)
         validate_params(self.get_params(), self._hyperparameters)
         self._is_fitted = True
 
@@ -708,7 +708,7 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        Xt = check_multi_time_series(X, copy=True)
+        Xt = check_time_series(X, copy=True)
 
         Xt = _time_delay_embedding(
             Xt, time_delay=self.time_delay, dimension=self.dimension,
