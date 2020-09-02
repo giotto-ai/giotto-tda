@@ -314,7 +314,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
     return Xnew
 
 
-def check_multi_time_series(X, copy=False):
+def check_time_series(X, copy=False):
     """Input validation on arrays or lists representing collections of
     univariate, multivariate or tensor-valued time series.
 
