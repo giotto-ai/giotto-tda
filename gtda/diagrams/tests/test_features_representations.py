@@ -40,7 +40,7 @@ def test_fit_transform_plot_one_hom_dim(transformer, hom_dim_idx):
     transformer.fit_transform_plot(
         X, sample=0, homology_dimension_idx=hom_dim_idx,
         plotly_params=plotly_params
-    )
+        )
 
 
 @pytest.mark.parametrize('transformer',
@@ -51,7 +51,7 @@ def test_fit_transform_plot_many_hom_dims(transformer, hom_dims):
         {"traces": line_plots_traces_params, "layout": layout_params}
     transformer.fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims, plotly_params=plotly_params
-    )
+        )
 
 
 @pytest.mark.parametrize('transformer',
