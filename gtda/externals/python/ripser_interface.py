@@ -248,10 +248,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             coeff
             )
     else:
-        # Only consider upper diagonal
-        I, J = np.meshgrid(np.arange(n_points), np.arange(n_points))
-        DParam = np.array(dm[I > J], dtype=np.float32)
-        print(DParam)
+        # Only consider strict upper diagonal
+        idx = np.triu_indices(n_points, 1)
+        DParam = dm[idx].astype(np.float32)
         res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
