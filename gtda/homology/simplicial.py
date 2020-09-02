@@ -36,6 +36,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
@@ -96,10 +104,6 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
-    Persistence diagrams produced by this class must be interpreted with care
-    due to the presence of padding triples which carry no information. See
-    :meth:`transform` for additional information.
-
     References
     ----------
     [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
@@ -135,7 +139,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                        metric=self.metric)['dgms']
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -155,10 +159,17 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, each entry of `X` should be
-            compatible with a filtration, i.e. the value at index (i, j) should
-            be no smaller than the values at diagonal indices (i, i) and
-            (j, j).
+            `metric` was set to ``'precomputed'``, then:
+
+                - if entries of `X` are dense, only their upper diagonal
+                  portions (including the diagonal) are considered;
+                - if entries of `X` are sparse, they do not need to be upper
+                  diagonal or symmetric, but correct results can only be
+                  guaranteed when only one between entry (i, j) and entry
+                  (j, i) is stored, or both are stored but they are equal.
+                - entries of `X` should be compatible with a filtration, i.e.
+                  the value at index (i, j) should be no smaller than the
+                  values at diagonal indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -206,10 +217,17 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, each entry of `X` should be
-            compatible with a filtration, i.e. the value at index (i, j) should
-            be no smaller than the values at diagonal indices (i, i) and
-            (j, j).
+            `metric` was set to ``'precomputed'``, then:
+
+                - if entries of `X` are dense, only their upper diagonal
+                  portions (including the diagonal) are considered;
+                - if entries of `X` are sparse, they do not need to be upper
+                  diagonal or symmetric, but correct results can only be
+                  guaranteed when only one between entry (i, j) and entry
+                  (j, i) is stored, or both are stored but they are equal.
+                - entries of `X` should be compatible with a filtration, i.e.
+                  the value at index (i, j) should be no smaller than the
+                  values at diagonal indices (i, i) and (j, j).
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -287,6 +305,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     metric : string or callable, optional, default: ``'euclidean'``
@@ -350,10 +376,6 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for computing sparse Vietoris–Rips persistent homology. Python bindings
     were modified for performance.
 
-    Persistence diagrams produced by this class must be interpreted with care
-    due to the presence of padding triples which carry no information. See
-    :meth:`transform` for additional information.
-
     References
     ----------
     [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
@@ -401,7 +423,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -556,6 +578,15 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     persistent homology of this filtration can be much faster than computing
     Vietoris–Rips persistent homology via :class:`VietorisRipsPersistence`.
 
+
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
@@ -601,10 +632,6 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     computing Vietoris–Rips persistent homology. Python bindings were modified
     for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
-
-    Persistence diagrams produced by this class must be interpreted with
-    care due to the presence of padding triples which carry no information.
-    See :meth:`transform` for additional information.
 
     References
     ----------
@@ -789,6 +816,14 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <homology_and_cohomology>`) of various dimensions and at different scales
     is summarised in the corresponding persistence diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
@@ -831,10 +866,6 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for computing Cech persistent homology. Python bindings were modified for
     performance.
 
-    Persistence diagrams produced by this class must be interpreted with care
-    due to the presence of padding triples which carry no information. See
-    :meth:`transform` for additional information.
-
     References
     ----------
     [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
@@ -876,7 +907,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  for dim in self.homology_dimensions}
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar
+            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -1009,6 +1040,14 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`homology classes <homology_and_cohomology>`) of various dimension and
     at different scales is summarised in the corresponding persistence diagram.
 
+    **Important notes**:
+
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+        - In homology dimension 0, :meth:`transform` automatically removes one
+          birth-death pair whose death equals ``numpy.inf``.
+
     Parameters
     ----------
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
@@ -1051,12 +1090,12 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         value is declared to be equal to `max_edge_weight`.
 
     max_entries : int, optional, default: ``-1``
-        Number controlling the degree of precision in the matrix
-        reductions performed by the the backend. Corresponds to the parameter
-        ``approximation`` in :func:`pyflagser.flagser`. Increase for higher
-        precision, decrease for faster computation. A good value is often
-        ``100000`` in hard problems.  A negative value computes highest
-        possible precision.
+        Number controlling the degree of precision in the matrix reductions
+        performed by the the backend. Corresponds to the parameter
+        ``approximation`` in :func:`pyflagser.flagser_weighted` and
+        :func:`pyflagser.flagser_unweighted`. Increase for higher precision,
+        decrease for faster computation. A good value is often ``100000`` in
+        hard problems. A negative value computes highest possible precision.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -1078,17 +1117,10 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     -----
     The `pyflagser <https://github.com/giotto-ai/pyflagser>`_ Python package
     is used for binding `Flagser <https://github.com/luetge/flagser>`_, a C++
-    backend for computing the (persistent) homology of (filtered) directed flag
-    complexes.
-
-    For more details, please refer to the `flagser documentation \
-    <https://github.com/luetge/flagser/blob/master/docs/\
+    backend for computing the (persistent) homology of (filtered) directed
+    flag complexes. For more details, please refer to the `flagser \
+    documentation <https://github.com/luetge/flagser/blob/master/docs/\
     documentation_flagser.pdf>`_.
-
-    Persistence diagrams produced by this class must be interpreted with care
-    due to the presence of padding triples which carry no information. See
-    :meth:`transform` for additional information.
-
 
     References
     ----------
@@ -1123,15 +1155,19 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _flagser_diagram(self, X):
-        Xdgms = flagser_weighted(X, max_edge_weight=self.max_edge_weight,
-                                 min_dimension=self._min_homology_dimension,
-                                 max_dimension=self._max_homology_dimension,
-                                 directed=self.directed,
-                                 filtration=self.filtration, coeff=self.coeff,
-                                 approximation=self.max_entries)['dgms']
+        Xdgms = [np.empty((0, 2), dtype=float)] * self._min_homology_dimension
+        Xdgms += flagser_weighted(X, max_edge_weight=self.max_edge_weight,
+                                  min_dimension=self._min_homology_dimension,
+                                  max_dimension=self._max_homology_dimension,
+                                  directed=self.directed,
+                                  filtration=self.filtration, coeff=self.coeff,
+                                  approximation=self.max_entries)['dgms']
+        n_missing_dims = self._max_homology_dimension + 1 - len(Xdgms)
+        if n_missing_dims:
+            Xdgms += [np.empty((0, 2), dtype=float)] * n_missing_dims
 
         if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove final death at np.inf
+            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 

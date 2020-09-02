@@ -102,7 +102,7 @@ def heats(diagrams, sampling, step_size, sigma):
         nontrivial_points_idx = np.flatnonzero(diagram[:, 1] != diagram[:, 0])
         diagram_nontrivial_pixel_coords = np.array(
             (diagram - first_sampling) / step_size, dtype=int
-        )[nontrivial_points_idx]
+            )[nontrivial_points_idx]
         image = heats_[i]
         _sample_image(image, diagram_nontrivial_pixel_coords)
         gaussian_filter(image, sigma_pixel, mode="constant", output=image)
@@ -143,7 +143,7 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
         nontrivial_points_idx = np.flatnonzero(diagram[:, 1])
         diagram_nontrivial_pixel_coords = np.array(
             (diagram - first_samplings) / step_size, dtype=int
-        )[nontrivial_points_idx]
+            )[nontrivial_points_idx]
         image = persistence_images_[i]
         _sample_image(image, diagram_nontrivial_pixel_coords)
         image *= weights

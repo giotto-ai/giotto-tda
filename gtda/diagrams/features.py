@@ -47,9 +47,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         Can aid comparison between diagrams in an input collection when these
         have different numbers of (non-trivial) points. [1]_
 
-    nan_fill_value : float or None, optional, default: ``None``
+    nan_fill_value : float or None, optional, default: ``-1.``
         If a float, (normalized) persistence entropies initially computed as
-        ``numpy.nan`` are replaced with this value.
+        ``numpy.nan`` are replaced with this value. If ``None``, these values
+        are left as ``numpy.nan``.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -78,9 +79,10 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     _hyperparameters = {
         'normalize': {'type': bool},
-        'nan_fill_value': {'type': (Real, type(None))}}
+        'nan_fill_value': {'type': (Real, type(None))}
+        }
 
-    def __init__(self, normalize=False, nan_fill_value=None, n_jobs=None):
+    def __init__(self, normalize=False, nan_fill_value=-1., n_jobs=None):
         self.normalize = normalize
         self.nan_fill_value = nan_fill_value
         self.n_jobs = n_jobs
