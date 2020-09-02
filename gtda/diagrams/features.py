@@ -81,7 +81,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         'normalize': {'type': bool},
         'nan_fill_value': {'type': (Real, type(None))}}
 
-    def __init__(self, normalize=False, nan_fill_value=-1, n_jobs=None):
+    def __init__(self, normalize=False, nan_fill_value=-1., n_jobs=None):
         self.normalize = normalize
         self.nan_fill_value = nan_fill_value
         self.n_jobs = n_jobs
