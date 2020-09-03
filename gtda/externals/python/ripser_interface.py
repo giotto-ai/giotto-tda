@@ -221,13 +221,15 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             sort_coo = True
             if not sparse.issparse(dm):
                 row, col, data = \
-                    gtda_collapser.flag_complex_collapse_edges_dense(dm)
+                    gtda_collapser.flag_complex_collapse_edges_dense(dm,
+                                                                     thresh)
             else:
                 coo = dm.tocoo()
                 row, col, data = \
                     gtda_collapser.flag_complex_collapse_edges_coo(coo.row,
                                                                    coo.col,
-                                                                   coo.data)
+                                                                   coo.data,
+                                                                   thresh)
         else:
             if sparse.isspmatrix_coo(dm):
                 # If the matrix is already COO, we need to order the row and
