@@ -214,7 +214,11 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         dm = sparse.coo_matrix(dm)
 
     if sparse.issparse(dm) or collapse_edges:
+        # It's not necessary to apply sort in all cases
+        sort_coo = False
+
         if collapse_edges:
+            sort_coo = True
             if not sparse.issparse(dm):
                 row, col, data = \
                     gtda_collapser.flag_complex_collapse_edges_dense(dm)
@@ -229,14 +233,17 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                 # If the matrix is already COO, we need to order the row and
                 # column indices lexicographically to avoid errors. See
                 # https://github.com/scikit-tda/ripser.py/issues/103
-                row, col, data = _lexsort_coo_data(dm.row, dm.col, dm.data)
+                sort_coo = True
+                row, col, data = dm.row, dm.col, dm.data
             else:
+                sort_coo = False
                 coo = dm.tocoo()
                 row, col, data = coo.row, coo.col, coo.data
 
-        row, col, data = _lexsort_coo_data(np.asarray(row),
-                                           np.asarray(col),
-                                           np.asarray(data))
+        if sort_coo:
+            row, col, data = _lexsort_coo_data(np.asarray(row),
+                                               np.asarray(col),
+                                               np.asarray(data))
 
         res = DRFDMSparse(
             row.astype(dtype=np.int32, order="C"),
