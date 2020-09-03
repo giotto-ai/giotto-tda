@@ -43,13 +43,14 @@ def test_with_collapser_with_tresh():
 
 
 def test_with_collapser_coo():
+    X_tri = np.triu(X, 1)
     diags_collapsed = ripser(
-        sp.sparse.coo_matrix(X),
+        sp.sparse.coo_matrix(X_tri),
         metric='precomputed',
         maxdim=maxdim,
         collapse_edges=True)['dgms']
     diags_not_collapsed = ripser(
-        sp.sparse.coo_matrix(X),
+        sp.sparse.coo_matrix(X_tri),
         metric='precomputed',
         maxdim=maxdim,
         collapse_edges=False)['dgms']
@@ -60,14 +61,15 @@ def test_with_collapser_coo():
 
 def test_with_collapser_coo_thresh():
     thresh = 0.1
+    X_tri = np.triu(X, 1)
     diags_collapsed = ripser(
-        sp.sparse.coo_matrix(X),
+        sp.sparse.coo_matrix(X_tri),
         metric='precomputed',
         maxdim=maxdim,
         thresh=thresh,
         collapse_edges=True)['dgms']
     diags_not_collapsed = ripser(
-        sp.sparse.coo_matrix(X),
+        sp.sparse.coo_matrix(X_tri),
         metric='precomputed',
         maxdim=maxdim,
         thresh=thresh,
