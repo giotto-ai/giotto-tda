@@ -150,19 +150,17 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : list-like of length n_samples, or ndarray of shape (n_samples, \
-            n_vertices, n_vertices)
-            Input data: a collection of adjacency matrices of graphs. Each
-            adjacency matrix may be a dense array, a sparse matrix, or a masked
-            array.
+        X : list or ndarray of shape (n_samples, n_vertices, n_vertices)
+            Input data: a collection of ``n_samples`` adjacency matrices of
+            graphs. Each adjacency matrix may be a dense array, a sparse
+            matrix, or a masked array.
 
         y : None
             Ignored.
 
         Returns
         -------
-        Xt : list-like of length n_samples, or ndarray of shape (n_samples, \
-            n_vertices, n_vertices)
+        Xt : list or ndarray of shape (n_samples, n_vertices, n_vertices)
             Output collection of dense distance matrices. If the distance
             matrices all have the same shape, a single 3D ndarray is returned.
 
@@ -175,7 +173,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         x0_shape = Xt[0].shape
         if reduce(and_, (x.shape == x0_shape for x in X), True):
-            Xt = np.array(Xt)
+            Xt = np.asarray(Xt)
 
         return Xt
 
@@ -185,8 +183,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : list-like of length n_samples, or ndarray of shape (n_samples, \
-            n_vertices, n_vertices)
+        Xt : list or ndarray of shape (n_samples, n_vertices, n_vertices)
             Collection of distance matrices, such as returned by
             :meth:`transform`.
 

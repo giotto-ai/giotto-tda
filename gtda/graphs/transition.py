@@ -1,18 +1,18 @@
 """Construct transition graphs from dynamical systems."""
 # License: GNU AGPLv3
 
-from types import FunctionType
 import warnings
+from types import FunctionType
 
 import numpy as np
 from joblib import Parallel, delayed
 from scipy import sparse as sp
 from scipy.sparse import SparseEfficiencyWarning
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.validation import validate_params
+from ..utils.validation import validate_params, check_point_clouds
 
 
 def identity(x):
@@ -144,7 +144,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_time_steps, n_features)
+        X : list of 2D ndarray, or ndarray of shape (n_samples, n_timestamps, \
+            n_features)
             Input data.
 
         y : None
@@ -156,7 +157,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
+        check_point_clouds(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -180,8 +181,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_time_steps, n_features)
-            Input data.
+        X : list of 2D ndarray, or ndarray of shape (n_samples, n_timestamps, \
+            n_features)
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -189,15 +190,14 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : array of sparse boolean matrices, shape (n_samples,)
-            The collection of ``n_samples`` transition graphs. Each transition
+        Xt : list
+            Collection of ``n_samples`` transition graphs. Each transition
             graph is encoded by a sparse matrix of boolean type.
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True)
+        Xt = check_point_clouds(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._make_adjacency_matrix)(x) for x in Xt)
-        Xt = np.asarray(Xt)
         return Xt
