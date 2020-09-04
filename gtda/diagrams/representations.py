@@ -381,13 +381,13 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-            n_layers, n_bins)
+        Xt : ndarray of shape (n_samples, n_homology_dimensions * n_layers, \
+            n_bins)
             Persistence lanscapes: one landscape (represented as a
-            two-dimensional array) per sample and per homology dimension seen
-            in :meth:`fit`. Each landscape contains a number `n_layers` of
-            layers. Index i along axis 1 corresponds to the i-th homology
-            dimension in :attr:`homology_dimensions_`.
+            stacked one-dimensional array) per sample and per homology
+            dimension seen in :meth:`fit`. Each landscape contains a number
+            `n_layers` of layers. Index i along axis 1 corresponds to the i-th
+            homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
