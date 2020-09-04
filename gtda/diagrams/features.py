@@ -438,7 +438,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         'polynomial_type': {'type': str,
                             'in': _AVAILABLE_POLYNOMIALS.keys()},
         'n_coefficients': {'type': (int, type(None)),
-                      'in': Interval(1, np.inf, closed='left')},
+                           'in': Interval(1, np.inf, closed='left')},
     }
 
     def __init__(self, polynomial_type='R', n_coefficients=10, n_jobs=None):
@@ -495,7 +495,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     def _complex_polynomial(self, X):
         Xt = np.zeros(2 * self.n_coefficients_, )
         X = X[X[:, 0] != X[:, 1]]
-        #breakpoint()
+
         roots = self._polynomial_function(X)
         coefficients = np.poly(roots)
 
@@ -506,7 +506,6 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
             coefficients[:dimension].imag
 
         return Xt
-
 
     def transform(self, X, y=None):
         """Compute the real and imaginary parts of the complex vector of
@@ -542,6 +541,5 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
                 _subdiagrams(Xt, [dim], remove_dim=True)[s])
             for dim in self.homology_dimensions_ for s in range(X.shape[0]))
         Xt = np.stack(Xt).reshape((X.shape[0], -1))
-
 
         return Xt

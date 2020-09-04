@@ -84,7 +84,7 @@ def test_pe_transform():
 
 def test_cp_transform():
     cp = ComplexPolynomial(n_coefficients=2, polynomial_type='R')
-    diagram_res = np.array([[ -2., 1., -4., 0., -6., 1., -12., 0.]])
+    diagram_res = np.array([[-2., 1., -4., 0., -6., 1., -12., 0.]])
 
     assert_almost_equal(cp.fit_transform(X), diagram_res)
 
