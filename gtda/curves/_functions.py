@@ -1,11 +1,6 @@
-from numbers import Real
-from types import FunctionType
-
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils import gen_even_slices
-
-from gtda.utils.intervals import Interval
 
 
 _AVAILABLE_FUNCTIONS = {

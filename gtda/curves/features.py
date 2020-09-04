@@ -1,21 +1,18 @@
 """Feature extraction from curves."""
 
-from numbers import Real
 from types import FunctionType
 
-import numpy as np
-from gtda.base import BaseEstimator,
+from gtda.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_is_fitted, check_array
 
 from ._functions import _AVAILABLE_FUNCTIONS, _parallel_featurization
 from ..utils._docs import adapt_fit_transform_docs
-from ..utils.intervals import Interval
-from ..utils.validation import check_diagrams, validate_params
+from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class StandardFeature(BaseEstimator, TransformerMixin, BaseIO):
+class StandardFeature(BaseEstimator, TransformerMixin):
     """Computes standard features of multi-channels curves.
 
     Given a multi curve applies any function to extract features from it.
@@ -86,7 +83,8 @@ class StandardFeature(BaseEstimator, TransformerMixin, BaseIO):
         else:
             self.effective_function_params_ = self.function_params.copy()
         validate_params(
-            self.effective_function_params_, _AVAILABLE_FUNCTIONS[self.function])
+            self.effective_function_params_,
+            _AVAILABLE_FUNCTIONS[self.function])
 
         return self
 
@@ -112,7 +110,7 @@ class StandardFeature(BaseEstimator, TransformerMixin, BaseIO):
         Xt = check_array(X, allow_nd=True)
 
         Xt = _parallel_featurization(Xt, self.function,
-                                    self.effective_function_params_,
+                                     self.effective_function_params_,
                                      self.n_jobs)
 
         return Xt
