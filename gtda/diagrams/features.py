@@ -11,6 +11,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
+from ._features import _AVAILABLE_POLYNOMIALS, _implemented_polynomial_recipes
 from ._utils import _subdiagrams, _bin, _homology_dimensions_to_sorted_ints
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
@@ -387,4 +388,160 @@ class Amplitude(BaseEstimator, TransformerMixin):
         if self.order is None:
             return Xt
         Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
+        return Xt
+
+
+@adapt_fit_transform_docs
+class ComplexPolynomial(BaseEstimator, TransformerMixin):
+    """Computes complex polynomials coefficients that have diagrams point as
+    their roots.
+
+    Given a persistence diagrams consisting of birth-death-dimension triples
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately, and their respective complex polynomial are computed
+    using the persitence points as roots. The :attr:`n_coefficients`
+    coefficients of those polynomial are returned as a vector of their real
+    part concatenated with a vector of their imaginary parts.
+
+    **Important notes**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+
+    Parameters
+    ----------
+    polynomial_type : ``'R'`` | ``'S'`` | ``'T'``, optional, default: \
+        ``'R'``
+        Type of complex polynomial to compute.
+
+    n_coefficients : int or None, optional, default: ``10``
+        Number of coefficients. This is the dimension of the complex vector of
+        coefficients, i.e., the number of coefficients corresponding to the
+        largest degree terms of the polynomial. If ``None``, this number is
+        computed from the list of persistence diagrams by considering the one
+        with the largest number of points and using the dimension of its
+        corresponding complex vector of coefficients as the number of
+        coefficients.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    """
+    _hyperparameters = {
+        'polynomial_type': {'type': str,
+                            'in': _AVAILABLE_POLYNOMIALS.keys()},
+        'n_coefficients': {'type': (int, type(None)),
+                      'in': Interval(1, np.inf, closed='left')},
+    }
+
+    def __init__(self, polynomial_type='R', n_coefficients=10, n_jobs=None):
+        self.n_coefficients = n_coefficients
+        self.polynomial_type = polynomial_type
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute :attr:`n_coefficients_`. Then,
+        return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        X = check_diagrams(X)
+
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+
+        if self.n_coefficients is None:
+            self.n_coefficients_ = \
+                np.array([X[i].shape[0] for i in range(len(X))]).max()
+        else:
+            self.n_coefficients_ = self.n_coefficients
+
+        self._polynomial_function = \
+            _implemented_polynomial_recipes[self.polynomial_type]
+
+        return self
+
+    def _complex_polynomial(self, X):
+        Xt = np.zeros(2 * self.n_coefficients_, )
+        X = X[X[:, 0] != X[:, 1]]
+        #breakpoint()
+        roots = self._polynomial_function(X)
+        coefficients = np.poly(roots)
+
+        coefficients = np.array(coefficients[::-1])[1:]
+        dimension = min(self.n_coefficients_, coefficients.shape[0])
+        Xt[:dimension] = coefficients[:dimension].real
+        Xt[self.n_coefficients_:self.n_coefficients_ + dimension] = \
+            coefficients[:dimension].imag
+
+        return Xt
+
+
+    def transform(self, X, y=None):
+        """Compute the real and imaginary parts of the complex vector of
+        coefficients for each diagram individually and concatenate the results.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions * 2 \
+            * n_coefficients)
+            Polynomial coefficients: Real and imaginary parts of the complex
+            polynomial for each homology dimension of each diagrams in `X`.
+
+        """
+        check_is_fitted(self)
+        Xt = check_diagrams(X, copy=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._complex_polynomial)(
+                _subdiagrams(Xt, [dim], remove_dim=True)[s])
+            for dim in self.homology_dimensions_ for s in range(X.shape[0]))
+        Xt = np.stack(Xt).reshape((X.shape[0], -1))
+
+
         return Xt

@@ -10,12 +10,13 @@ from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, BettiCurve, \
+from gtda.diagrams import PersistenceEntropy, ComplexPolynomial, BettiCurve, \
     PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
 
-X = np.array([[[0., 1., 0.], [2., 3., 0.], [4., 6., 1.], [2., 6., 1.]]])
+X = np.array([[[0., 0., 0.], [0., 1., 0.], [2., 3., 0.],
+               [4., 6., 1.], [2., 6., 1.]]])
 
 line_plots_traces_params = {"mode": "lines+markers"}
 heatmap_trace_params = {"colorscale": "viridis"}
@@ -23,8 +24,8 @@ layout_params = {"title": "New title"}
 
 
 @pytest.mark.parametrize('transformer',
-                         [PersistenceEntropy(), BettiCurve(),
-                          PersistenceLandscape(), HeatKernel(),
+                         [PersistenceEntropy(), ComplexPolynomial(),
+                          BettiCurve(), PersistenceLandscape(), HeatKernel(),
                           PersistenceImage(), Silhouette()])
 def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
@@ -79,6 +80,13 @@ def test_pe_transform():
     pe_normalize = PersistenceEntropy(normalize=True)
     diagram_res = np.array([[1., 0.355245321276]])
     assert_almost_equal(pe_normalize.fit_transform(X), diagram_res)
+
+
+def test_cp_transform():
+    cp = ComplexPolynomial(n_coefficients=2, polynomial_type='R')
+    diagram_res = np.array([[ -2., 1., -4., 0., -6., 1., -12., 0.]])
+
+    assert_almost_equal(cp.fit_transform(X), diagram_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
