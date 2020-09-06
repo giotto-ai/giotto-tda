@@ -139,7 +139,7 @@ def test_pi_positive(pts):
     assert np.all(pi.fit_transform(diagrams) >= 0.)
 
 
-def test_large_pi_null_multithreaded():
+def test_large_pi_null_parallel():
     """Test that pi is computed correctly when the input array is at least 1MB
     and more than 1 process is used, triggering joblib's use of memmaps"""
     X = np.linspace(0, 100, 300000)
@@ -286,7 +286,7 @@ def test_hk_with_diag_points(pts):
     assert_almost_equal(X_with_diag_points_t, X_t, decimal=13)
 
 
-def test_large_hk_shape_multithreaded():
+def test_large_hk_shape_parallel():
     """Test that HeatKernel returns something of the right shape when the input
     array is at least 1MB and more than 1 process is used, triggering joblib's
     use of memmaps"""
