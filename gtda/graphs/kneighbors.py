@@ -115,7 +115,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             include_self=False
             )
         if self.mode == "connectivity":
-            return lambda x: _kneighbors_graph.astype(bool)
+            return lambda x: _kneighbors_graph(x).astype(bool)
         elif self.mode == "distance":
             return _kneighbors_graph
 
