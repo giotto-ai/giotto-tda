@@ -269,7 +269,6 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                 sort_coo = True
                 row, col, data = dm.row, dm.col, dm.data
             else:
-                sort_coo = False
                 coo = dm.tocoo()
                 row, col, data = coo.row, coo.col, coo.data
 
