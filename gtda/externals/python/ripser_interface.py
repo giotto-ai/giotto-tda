@@ -136,7 +136,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
     metric : string or callable, optional, default: ``'euclidean'``
         The metric to use when calculating distance between instances in a
-        feature array. If set to ``"precomputed"``, input data is interpreted
+        feature array. If set to ``'precomputed'``, input data is interpreted
         as a distance matrix or of adjacency matrices of a weighted undirected
         graph. If a string, it must be one of the options allowed by
         :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
@@ -236,7 +236,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             dm = pairwise_distances(X, metric=metric)
         dperm2all = dm
 
-    n_points = dm.shape[0]
+    n_points = max(dm.shape)
     if not sparse.issparse(dm) and np.sum(np.abs(dm.diagonal()) > 0) > 0:
         # If any of the diagonal elements are nonzero,
         # convert to sparse format, because currently
