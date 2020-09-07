@@ -4,7 +4,7 @@
 import numpy as np
 import plotly.io as pio
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
@@ -230,6 +230,7 @@ def get_input(pts, dims):
 
 
 @pytest.mark.parametrize('n_jobs', [1, 2])
+@settings(deadline=None)
 @given(pts_gen, dims_gen)
 def test_hk_shape(n_jobs, pts, dims):
     n_bins = 10
