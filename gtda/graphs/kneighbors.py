@@ -6,6 +6,7 @@ from functools import partial
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors import kneighbors_graph
+from sklearn.utils.validation import check_is_fitted
 
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.validation import check_point_clouds
@@ -118,7 +119,34 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         elif self.mode == "distance":
             return _kneighbors_graph
 
-    def fit_transform(self, X, y=None):
+    def fit(self, X, y=None):
+        """Do nothing and return the estimator unchanged.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : list of 2D ndarray, or ndarray of shape (n_samples, n_points, \
+            n_dimensions)
+            Input data representing a collection of point clouds. Each entry
+            in `X` is a 2D array of shape ``(n_points, n_dimensions)``.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        check_point_clouds(X)
+
+        self._is_fitted = True
+        return self
+
+    def transform(self, X, y=None):
         """Compute kNN graphs and return their adjacency matrices as sparse
         matrices whose type depends on `mode`.
 
@@ -141,6 +169,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             ``'distance'``.
 
         """
+        check_is_fitted(self, 'is_fitted')
         Xt = check_point_clouds(X)
 
         _adjacency_matrix_func = self._adjacency_matrix_func
