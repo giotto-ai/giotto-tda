@@ -1,6 +1,9 @@
-from scipy import sparse
+from warnings import warn
+
 import numpy as np
+from scipy import sparse
 from sklearn.metrics.pairwise import pairwise_distances
+
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
 
 
@@ -237,17 +240,21 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         dperm2all = dm
 
     n_points = max(dm.shape)
-    if not sparse.issparse(dm) and np.sum(np.abs(dm.diagonal()) > 0) > 0:
-        # If any of the diagonal elements are nonzero,
-        # convert to sparse format, because currently
-        # that's the only format that handles nonzero
-        # births
-        dm = sparse.coo_matrix(dm)
+    sort_coo = True
+    if (dm.diagonal() != 0).any():
+        if collapse_edges:
+            warn("Edge collapses are not supported when any of the diagonal "
+                 "entries are non-zero. Computing persistent homology without "
+                 "using edge collapse.")
+            collapse_edges = False
+        if not sparse.issparse(dm):
+            # If any of the diagonal elements are nonzero, convert to sparse
+            # format, because currently that's the only format that handles
+            # nonzero births
+            dm = sparse.coo_matrix(dm)
+            sort_coo = False
 
     if sparse.issparse(dm) or collapse_edges:
-        # It's not necessary to apply sort in all cases
-        sort_coo = False
-
         if collapse_edges:
             sort_coo = True
             if not sparse.issparse(dm):
@@ -266,11 +273,11 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                 # If the matrix is already COO, we need to order the row and
                 # column indices lexicographically to avoid errors. See
                 # https://github.com/scikit-tda/ripser.py/issues/103
-                sort_coo = True
                 row, col, data = dm.row, dm.col, dm.data
             else:
                 coo = dm.tocoo()
                 row, col, data = coo.row, coo.col, coo.data
+                sort_coo = False
 
         if sort_coo:
             row, col, data = _lexsort_coo_data(np.asarray(row),
