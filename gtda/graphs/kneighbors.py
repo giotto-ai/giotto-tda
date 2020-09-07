@@ -169,7 +169,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             ``'distance'``.
 
         """
-        check_is_fitted(self, 'is_fitted')
+        check_is_fitted(self, '_is_fitted')
         Xt = check_point_clouds(X)
 
         _adjacency_matrix_func = self._adjacency_matrix_func
