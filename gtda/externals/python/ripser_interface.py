@@ -112,43 +112,51 @@ def get_greedy_perm(X, n_perm=None, metric="euclidean"):
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
            n_perm=None, collapse_edges=False):
-    """Compute persistence diagrams for X data array. If X is not a distance
-    matrix, it will be converted to a distance matrix using the chosen metric.
+    """Compute persistence diagrams for X data array using Ripser [1]_.
+
+    If X is not a distance matrix, it will be converted to a distance matrix
+    using the chosen metric.
 
     Parameters
     ----------
-    X: ndarray (n_samples, n_features)
+    X : ndarray of shape (n_samples, n_features)
         A numpy array of either data or distance matrix. Can also be a sparse
         distance matrix of type scipy.sparse
 
-    maxdim: int, optional, default 1
+    maxdim : int, optional, default: ``1``
         Maximum homology dimension computed. Will compute all dimensions lower
         than and equal to this value. For 1, H_0 and H_1 will be computed.
 
-    thresh: float, default ``numpy.inf``
+    thresh : float, optional, default: ``numpy.inf``
         Maximum distances considered when constructing filtration. If
         ``numpy.inf``, compute the entire filtration.
 
-    coeff: int prime, default 2
+    coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field Z/pZ for p=coeff.
 
-    metric: string or callable
+    metric : string or callable, optional, default: ``'euclidean'``
         The metric to use when calculating distance between instances in a
-        feature array. If metric is a string, it must be one of the options
-        specified in pairwise_distances, including "euclidean", "manhattan", or
-        "cosine". Alternatively, if metric is a callable function, it is called
-        on each pair of instances (rows) and the resulting value recorded. The
-        callable should take two arrays from X as input and return a value
-        indicating the distance between them.
+        feature array. If set to ``"precomputed"``, input data is interpreted
+        as a distance matrix or of adjacency matrices of a weighted undirected
+        graph. If a string, it must be one of the options allowed by
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        or a metric listed in
+        :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
+        ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If a callable, it
+        should take pairs of vectors (1D arrays) as input and, for each two
+        vectors in a pair, it should return a scalar indicating the
+        distance/dissimilarity between them.
 
-    n_perm: int
+    n_perm : int or None, optional, default: ``None``
         The number of points to subsample in a "greedy permutation", or a
         furthest point sampling of the points. These points will be used in
         lieu of the full point cloud for a faster computation, at the expense
         of some accuracy, which can be bounded as a maximum bottleneck distance
         to all diagrams on the original point set.
 
-    collapse_edges : TODO
+    collapse_edges : bool, optional, default: ``False``
+        Whether to use the edge collapse algorithm as described in [2]_ prior
+        to calling ``ripser``.
 
     Returns
     -------
@@ -173,6 +181,29 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             Covering radius of the subsampled points.
             If n_perm <= 0, then the full point cloud was used and this is 0
     }
+
+    References
+    ----------
+    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
+        barcodes", 2019; `arXiv:1908.02518 \
+        <https://arxiv.org/abs/1908.02518>`_.
+
+    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
+        Flag Complexes"; in *36th International Symposium on Computational \
+        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
+        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
+        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+
+    Notes
+    -----
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
+    <https://github.com/scikit-tda/ripser.py>`_ package.
+
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for the edge collapse algorithm described in [2]_.
 
     """
     if n_perm and sparse.issparse(X):
