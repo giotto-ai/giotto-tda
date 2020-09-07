@@ -386,7 +386,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
                                  self.effective_metric_params_,
                                  self.homology_dimensions_,
                                  self.n_jobs)
-        if self.order is None:
-            return Xt
-        Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
+        if self.order is not None:
+            Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
+
         return Xt
