@@ -172,7 +172,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         check_is_fitted(self, '_is_fitted')
         Xt = check_point_clouds(X)
 
-        _adjacency_matrix_func = self._adjacency_matrix_func
+        _adjacency_matrix_func = self._adjacency_matrix_func()
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_adjacency_matrix_func)(x)
                                           for x in Xt)
         return Xt
