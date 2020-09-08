@@ -14,7 +14,7 @@ def _lexsort_coo_data(row, col, data):
     return row, col, data
 
 
-def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
+def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     if coeff == 2:
         ret = gtda_ripser.rips_dm(DParam, DParam.shape[0], coeff, maxHomDim,
                                   thresh, do_cocycles)
@@ -27,7 +27,7 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
     return ret_rips
 
 
-def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
+def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     if coeff == 2:
         ret = gtda_ripser.rips_dm_sparse(I, J, V, I.size, N, coeff, maxHomDim,
                                          thresh, do_cocycles)
