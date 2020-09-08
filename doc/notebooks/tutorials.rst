@@ -10,6 +10,7 @@ by Lewis Tunstall provides a friendly introduction to the philosophy of ``giotto
 
    vietoris_rips_quickstart
    plotting_api
+   persistent_homology_graphs
    mapper_quickstart
    time_series_forecasting
 
