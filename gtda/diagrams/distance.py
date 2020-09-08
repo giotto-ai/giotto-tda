@@ -229,9 +229,9 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        X = check_diagrams(X, copy=True)
+        Xt = check_diagrams(X, copy=True)
 
-        Xt = _parallel_pairwise(X, self._X, self.metric,
+        Xt = _parallel_pairwise(Xt, self._X, self.metric,
                                 self.effective_metric_params_,
                                 self.homology_dimensions_,
                                 self.n_jobs)

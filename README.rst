@@ -49,11 +49,6 @@ Documentation
 
 Please visit `https://giotto-ai.github.io/gtda-docs <https://giotto-ai.github.io/gtda-docs>`_ and navigate to the version you are interested in.
 
-Use cases
-=========
-
-For a wide selection of use cases and application domains, you can visit `this page <https://giotto.ai/learn/course-content>`_.
-
 Installation
 ============
 
