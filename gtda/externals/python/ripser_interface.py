@@ -1,10 +1,20 @@
-from scipy import sparse
+from warnings import warn
+
 import numpy as np
+from scipy import sparse
 from sklearn.metrics.pairwise import pairwise_distances
-from ..modules import gtda_ripser, gtda_ripser_coeff
+
+from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
 
 
-def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
+def _lexsort_coo_data(row, col, data):
+    lex_sort_idx = np.lexsort((col, row))
+    row, col, data = \
+        row[lex_sort_idx], col[lex_sort_idx], data[lex_sort_idx]
+    return row, col, data
+
+
+def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     if coeff == 2:
         ret = gtda_ripser.rips_dm(DParam, DParam.shape[0], coeff, maxHomDim,
                                   thresh, do_cocycles)
@@ -17,7 +27,7 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
     return ret_rips
 
 
-def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=1):
+def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     if coeff == 2:
         ret = gtda_ripser.rips_dm_sparse(I, J, V, I.size, N, coeff, maxHomDim,
                                          thresh, do_cocycles)
@@ -100,48 +110,56 @@ def get_greedy_perm(X, n_perm=None, metric="euclidean"):
         ds = np.minimum(ds, dperm2all[-1])
     lambdas[-1] = np.max(ds)
     dperm2all = np.array(dperm2all)
-    return (idx_perm, lambdas, dperm2all)
+    return idx_perm, lambdas, dperm2all
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           n_perm=None):
-    """Compute persistence diagrams for X data array. If X is not a distance
-    matrix, it will be converted to a distance matrix using the chosen metric.
+           n_perm=None, collapse_edges=False):
+    """Compute persistence diagrams for X data array using Ripser [1]_.
+
+    If X is not a distance matrix, it will be converted to a distance matrix
+    using the chosen metric.
 
     Parameters
     ----------
-    X: ndarray (n_samples, n_features)
-        A numpy array of either data or distance matrix.
-        Can also be a sparse distance matrix of type scipy.sparse
+    X : ndarray of shape (n_samples, n_features)
+        A numpy array of either data or distance matrix. Can also be a sparse
+        distance matrix of type scipy.sparse
 
-    maxdim: int, optional, default 1
-        Maximum homology dimension computed. Will compute all dimensions
-        lower than and equal to this value.
-        For 1, H_0 and H_1 will be computed.
+    maxdim : int, optional, default: ``1``
+        Maximum homology dimension computed. Will compute all dimensions lower
+        than and equal to this value. For 1, H_0 and H_1 will be computed.
 
-    thresh: float, default infinity
-        Maximum distances considered when constructing filtration.
-        If infinity, compute the entire filtration.
+    thresh : float, optional, default: ``numpy.inf``
+        Maximum distances considered when constructing filtration. If
+        ``numpy.inf``, compute the entire filtration.
 
-    coeff: int prime, default 2
+    coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field Z/pZ for p=coeff.
 
-    metric: string or callable
+    metric : string or callable, optional, default: ``'euclidean'``
         The metric to use when calculating distance between instances in a
-        feature array. If metric is a string, it must be one of the options
-        specified in pairwise_distances, including "euclidean", "manhattan",
-        or "cosine". Alternatively, if metric is a callable function, it is
-        called on each pair of instances (rows) and the resulting value
-        recorded. The callable should take two arrays from X as input and
-        return a value indicating the distance between them.
+        feature array. If set to ``'precomputed'``, input data is interpreted
+        as a distance matrix or of adjacency matrices of a weighted undirected
+        graph. If a string, it must be one of the options allowed by
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        or a metric listed in
+        :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
+        ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If a callable, it
+        should take pairs of vectors (1D arrays) as input and, for each two
+        vectors in a pair, it should return a scalar indicating the
+        distance/dissimilarity between them.
 
-    n_perm: int
-        The number of points to subsample in a "greedy permutation,"
-        or a furthest point sampling of the points.  These points
-        will be used in lieu of the full point cloud for a faster
-        computation, at the expense of some accuracy, which can
-        be bounded as a maximum bottleneck distance to all diagrams
-        on the original point set
+    n_perm : int or None, optional, default: ``None``
+        The number of points to subsample in a "greedy permutation", or a
+        furthest point sampling of the points. These points will be used in
+        lieu of the full point cloud for a faster computation, at the expense
+        of some accuracy, which can be bounded as a maximum bottleneck distance
+        to all diagrams on the original point set.
+
+    collapse_edges : bool, optional, default: ``False``
+        Whether to use the edge collapse algorithm as described in [2]_ prior
+        to calling ``ripser``.
 
     Returns
     -------
@@ -166,6 +184,29 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             Covering radius of the subsampled points.
             If n_perm <= 0, then the full point cloud was used and this is 0
     }
+
+    References
+    ----------
+    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
+        barcodes", 2019; `arXiv:1908.02518 \
+        <https://arxiv.org/abs/1908.02518>`_.
+
+    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
+        Flag Complexes"; in *36th International Symposium on Computational \
+        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
+        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
+        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+
+    Notes
+    -----
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
+    <https://github.com/scikit-tda/ripser.py>`_ package.
+
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for the edge collapse algorithm described in [2]_.
 
     """
     if n_perm and sparse.issparse(X):
@@ -198,27 +239,51 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             dm = pairwise_distances(X, metric=metric)
         dperm2all = dm
 
-    n_points = dm.shape[0]
-    if not sparse.issparse(dm) and np.sum(np.abs(dm.diagonal()) > 0) > 0:
-        # If any of the diagonal elements are nonzero,
-        # convert to sparse format, because currently
-        # that's the only format that handles nonzero
-        # births
-        dm = sparse.coo_matrix(dm)
+    n_points = max(dm.shape)
+    sort_coo = True
+    if (dm.diagonal() != 0).any():
+        if collapse_edges:
+            warn("Edge collapses are not supported when any of the diagonal "
+                 "entries are non-zero. Computing persistent homology without "
+                 "using edge collapse.")
+            collapse_edges = False
+        if not sparse.issparse(dm):
+            # If any of the diagonal elements are nonzero, convert to sparse
+            # format, because currently that's the only format that handles
+            # nonzero births
+            dm = sparse.coo_matrix(dm)
+            sort_coo = False
 
-    if sparse.issparse(dm):
-        if sparse.isspmatrix_coo(dm):
-            # If the matrix is already COO, we need to order the row and column
-            # indices lexicographically to avoid errors. See
-            # https://github.com/scikit-tda/ripser.py/issues/103
-            row, col, data = dm.row, dm.col, dm.data
-            lex_sort_idx = np.lexsort((col, row))
-            row, col, data = \
-                row[lex_sort_idx], col[lex_sort_idx], data[lex_sort_idx]
+    if sparse.issparse(dm) or collapse_edges:
+        if collapse_edges:
+            sort_coo = True
+            if not sparse.issparse(dm):
+                row, col, data = \
+                    gtda_collapser.flag_complex_collapse_edges_dense(dm,
+                                                                     thresh)
+            else:
+                coo = dm.tocoo()
+                row, col, data = \
+                    gtda_collapser.flag_complex_collapse_edges_coo(coo.row,
+                                                                   coo.col,
+                                                                   coo.data,
+                                                                   thresh)
         else:
-            # Lexicographic sorting is performed by scipy upon conversion
-            coo = dm.tocoo()
-            row, col, data = coo.row, coo.col, coo.data
+            if sparse.isspmatrix_coo(dm):
+                # If the matrix is already COO, we need to order the row and
+                # column indices lexicographically to avoid errors. See
+                # https://github.com/scikit-tda/ripser.py/issues/103
+                row, col, data = dm.row, dm.col, dm.data
+            else:
+                coo = dm.tocoo()
+                row, col, data = coo.row, coo.col, coo.data
+                sort_coo = False
+
+        if sort_coo:
+            row, col, data = _lexsort_coo_data(np.asarray(row),
+                                               np.asarray(col),
+                                               np.asarray(data))
+
         res = DRFDMSparse(
             row.astype(dtype=np.int32, order="C"),
             col.astype(dtype=np.int32, order="C"),
@@ -226,11 +291,12 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             n_points,
             maxdim,
             thresh,
-            coeff,
+            coeff
             )
     else:
-        I, J = np.meshgrid(np.arange(n_points), np.arange(n_points))
-        DParam = np.array(dm[I > J], dtype=np.float32)
+        # Only consider strict upper diagonal
+        idx = np.triu_indices(n_points, 1)
+        DParam = dm[idx].astype(np.float32)
         res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
