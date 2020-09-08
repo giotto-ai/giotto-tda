@@ -91,7 +91,7 @@ def test_coo_results_independent_of_order():
                           [0., 2.],
                           [0., 5.],
                           [0., np.inf]]),
-                np.array([], shape=(0, 2), dtype=np.float64)]
+                np.array([], dtype=np.float64).reshape(0, 2)]
     for i in range(2):
         assert np.array_equal(diagrams[i], expected[i])
         assert np.array_equal(diagrams_csr[i], expected[i])
