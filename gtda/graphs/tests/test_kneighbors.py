@@ -13,8 +13,7 @@ X_kng = np.array([[[0, 0],
                    [6, 2]]])
 
 X_kng_res = [csr_matrix((np.array([1] * 4),
-                         (np.array([0, 1, 2, 3]), np.array([1, 0, 3, 2]))),
-                        shape=(4, 4))]
+                         (np.array([0, 1, 2, 3]), np.array([1, 0, 3, 2]))))]
 
 X_kng_res_k2 = [csr_matrix(np.array([[0, 1, 1, 0],
                                      [1, 0, 1, 0],

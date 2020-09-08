@@ -68,11 +68,11 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
     >>> X = np.arange(4).reshape(1, -1, 1)
     >>> tg = TransitionGraph(func=None).fit_transform(X)
     >>> print(tg[0].toarray())
-    [[False  True False False]
-     [ True False  True False]
-     [False  True False  True]
-     [False False  True False]]
-    >>> ggd = GraphGeodesicDistance().fit_transform(tg)
+    [[0 1 0 0]
+     [0 0 1 0]
+     [0 0 0 1]
+     [0 0 0 0]]
+    >>> ggd = GraphGeodesicDistance(directed=False).fit_transform(tg)
     >>> print(ggd[0])
     [[0. 1. 2. 3.]
      [1. 0. 1. 2.]
