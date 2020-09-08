@@ -70,6 +70,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where :math:`p`
         equals `coeff`.
 
+    collapse_edges : bool, optional, default: ``False``
+        Whether to run the edge collapse algorithm in [2]_ prior to the
+        persistent homology computation (see the Notes). Can reduce the runtime
+        dramatically when the data or the maximum homology dimension are large.
+
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
         distance is greater than this value will never be connected by an edge,
@@ -104,11 +109,21 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for the edge collapse algorithm described in [2]_.
+
     References
     ----------
     [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
         barcodes", 2019; `arXiv:1908.02518 \
         <https://arxiv.org/abs/1908.02518>`_.
+
+    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
+        Flag Complexes"; in *36th International Symposium on Computational \
+        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
+        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
+        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """
 
@@ -118,25 +133,29 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             'type': (list, tuple),
             'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
             },
+        'collapse_edges': {'type': bool},
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_length': {'type': Real},
         'infinity_values': {'type': (Real, type(None))}
         }
 
     def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
-                 coeff=2, max_edge_length=np.inf, infinity_values=None,
-                 n_jobs=None):
+                 collapse_edges=False, coeff=2, max_edge_length=np.inf,
+                 infinity_values=None, n_jobs=None):
         self.metric = metric
         self.homology_dimensions = homology_dimensions
+        self.collapse_edges = collapse_edges
         self.coeff = coeff
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xdgms = ripser(X, maxdim=self._max_homology_dimension,
-                       thresh=self.max_edge_length, coeff=self.coeff,
-                       metric=self.metric)['dgms']
+        Xdgms = ripser(
+            X, maxdim=self._max_homology_dimension,
+            thresh=self.max_edge_length, coeff=self.coeff,
+            metric=self.metric, collapse_edges=self.collapse_edges
+            )['dgms']
 
         if 0 in self._homology_dimensions:
             Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
