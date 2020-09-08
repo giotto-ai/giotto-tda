@@ -26,7 +26,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     axis) of one-dimensional arrays encoding the "state" of a system. The
     corresponding *undirected transition graph* (or *network*) has as vertex
     set the set of all unique states (rows) in A, and there is an edge
-    between vertex i and vertex j if and only if the state corresponding to
+    between vertex i and vertex j≠i if and only if the state corresponding to
     vertex j immediately follows the one corresponding to vertex i, somewhere
     somewhere in A.
 
