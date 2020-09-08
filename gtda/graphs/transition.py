@@ -69,13 +69,12 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     >>> import numpy as np
     >>> from gtda.graphs import TransitionGraph
     >>> X = np.array([[[1, 0], [2, 3], [5, 4]],
-    ...               [[5, 4], [5, 4], [5, 4]])
-    >>> tg = TransitionGraph()
-    >>> tg = tg.fit(X)
-    >>> print(tg.transform(X)[0].toarray())
+    ...               [[5, 4], [5, 4], [5, 4]]])
+    >>> X_tg = TransitionGraph().fit_transform(X)
+    >>> print(X_tg[0].toarray())
     [[0 1]
      [1 0]]
-    >>> print(tg.transform(X)[1].toarray())
+    >>> print(X_tg[1].toarray())
     [[0]]
 
     See also

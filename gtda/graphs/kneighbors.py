@@ -33,7 +33,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     mode : ``'connectivity'`` | ``'distance'``, optional, \
         default: ``'connectivity'``
-        Type of returned matrices: ``'connectivity'`` will return the boolean
+        Type of returned matrices: ``'connectivity'`` will return the 0-1
         connectivity matrices, and ``'distance'`` will return the distances
         between neighbors according to the given metric.
 
@@ -88,10 +88,10 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     >>> kng = KNeighborsGraph(n_neighbors=2)
     >>> Xg = kng.fit_transform(X)
     >>> print(Xg[0].toarray())
-    [[0. 1. 1. 1.]
-     [1. 0. 0. 1.]
-     [1. 0. 0. 1.]
-     [1. 1. 1. 0.]]
+    [[0 1 0 1]
+     [1 0 0 1]
+     [1 0 0 1]
+     [1 1 0 0]]
 
     See also
     --------
@@ -107,17 +107,6 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self.p = p
         self.metric_params = metric_params
         self.n_jobs = n_jobs
-
-    def _adjacency_matrix_func(self):
-        _kneighbors_graph = partial(
-            kneighbors_graph, n_neighbors=self.n_neighbors, metric=self.metric,
-            p=self.p, metric_params=self.metric_params, mode=self.mode,
-            include_self=False
-            )
-        if self.mode == "connectivity":
-            return lambda x: _kneighbors_graph(x).astype(bool)
-        elif self.mode == "distance":
-            return _kneighbors_graph
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -164,15 +153,19 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : list of sparse matrices in CSR format, shape (n_samples,)
-            Adjacency matrices of kNN graphs. The matrices are of boolean type
-            if `mode` is ``'connectivity'``, and of float type if `mode` is
-            ``'distance'``.
+            Adjacency matrices of kNN graphs. The matrices contains ones and
+            zeros if `mode` is ``'connectivity'``, and floats representing
+            distances according to `metric` if `mode` is ``'distance'``.
 
         """
         check_is_fitted(self, '_is_fitted')
         Xt = check_point_clouds(X)
 
-        _adjacency_matrix_func = self._adjacency_matrix_func()
+        _adjacency_matrix_func = partial(
+            kneighbors_graph, n_neighbors=self.n_neighbors, metric=self.metric,
+            p=self.p, metric_params=self.metric_params, mode=self.mode,
+            include_self=False
+            )
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_adjacency_matrix_func)(x)
                                           for x in Xt)
         return Xt

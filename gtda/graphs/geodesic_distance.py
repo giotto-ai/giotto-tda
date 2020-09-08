@@ -66,14 +66,14 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
     >>> import numpy as np
     >>> from gtda.graphs import TransitionGraph, GraphGeodesicDistance
     >>> X = np.arange(4).reshape(1, -1, 1)
-    >>> tg = TransitionGraph(func=None).fit_transform(X)
-    >>> print(tg[0].toarray())
+    >>> X_tg = TransitionGraph(func=None).fit_transform(X)
+    >>> print(X_tg[0].toarray())
     [[0 1 0 0]
      [0 0 1 0]
      [0 0 0 1]
      [0 0 0 0]]
-    >>> ggd = GraphGeodesicDistance(directed=False).fit_transform(tg)
-    >>> print(ggd[0])
+    >>> X_ggd = GraphGeodesicDistance(directed=False).fit_transform(X_tg)
+    >>> print(X_ggd[0])
     [[0. 1. 2. 3.]
      [1. 0. 1. 2.]
      [2. 1. 0. 1.]
