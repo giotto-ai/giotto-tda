@@ -148,8 +148,8 @@ def plot_static_mapper_graph(
 
     See also
     --------
-    :func:`~gtda.mapper.visualization.plot_interactive_mapper_graph`,
-    :func:`~gtda.mapper.pipeline.make_mapper_pipeline`
+    gtda.mapper.visualization.plot_interactive_mapper_graph, \
+    gtda.mapper.pipeline.make_mapper_pipeline
 
     References
     ----------
@@ -298,9 +298,9 @@ def plot_interactive_mapper_graph(
 ):
     """Plot Mapper graphs with interactivity on pipeline parameters.
 
-    Extends `~gtda.mapper.visualization.plot_static_mapper_graph` by providing
-    functionality to interactively update parameters from the cover and
-    clustering steps defined in `pipeline`.
+    Extends :func:`~gtda.mapper.visualization.plot_static_mapper_graph` by
+    providing functionality to interactively update parameters from the cover
+    and clustering steps defined in `pipeline`.
 
     Parameters
     ----------
@@ -375,8 +375,8 @@ def plot_interactive_mapper_graph(
 
     See also
     --------
-    :func:`~gtda.mapper.visualization.plot_static_mapper_graph`,
-    :func:`~gtda.mapper.pipeline.make_mapper_pipeline`
+    gtda.mapper.visualization.plot_static_mapper_graph, \
+    gtda.mapper.pipeline.make_mapper_pipeline
 
     References
     ----------

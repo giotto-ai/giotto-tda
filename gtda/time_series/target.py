@@ -20,14 +20,13 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     """Target creation from sliding windows over a time series.
 
     Useful to define a time series forecasting task in which labels are
-    obtained from future values of the input time series, via the
-    application of a function to time windows.
+    obtained from future values of the input time series, via the application
+    of a function to time windows.
 
     Parameters
     ----------
-    width : int, optional, default: ``10``
-        Width of each sliding window. Each window contains ``width + 1``
-        objects from the original time series.
+    size : int, optional, default: ``10``
+        Size of each sliding window.
 
     func : callable, optional, default: ``numpy.std``
         Function to be applied to each window.
@@ -37,8 +36,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     percentiles : list of real numbers between 0 and 100 inclusive, or \
         None, optional, default: ``None``
-        If ``None``, creates a target for a regression task. Otherwise,
-        creates a target for an n-class classification task where
+        If ``None``, creates a target for a regression task. Otherwise, creates
+        a target for an n-class classification task where
         ``n = len(percentiles) + 1``.
 
     n_steps_future : int, optional, default: ``1``
@@ -55,8 +54,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     >>> import numpy as np
     >>> from gtda.time_series import Labeller
     >>> # Create a time series
-    >>> X = np.arange(10).reshape(-1, 1)
-    >>> labeller = Labeller(width=2)
+    >>> X = np.arange(10)
+    >>> labeller = Labeller(size=3, func=np.min)
     >>> # Fit and transform X
     >>> X, y = labeller.fit_transform_resample(X, X)
     >>> print(X)
@@ -69,13 +68,12 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
      [7]
      [8]]
     >>> print(y)
-    [0.81649658 0.81649658 0.81649658 0.81649658 0.81649658 0.81649658
-     0.81649658 0.81649658]
+    [0 1 2 3 4 5 6 7]
 
     """
 
     _hyperparameters = {
-        'width': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'size': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'func': {'type': FunctionType},
         'func_params': {'type': (dict, type(None))},
         'percentiles': {
@@ -86,9 +84,9 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                            'in': Interval(1, np.inf, closed='left')}
         }
 
-    def __init__(self, width=10, func=np.std,
+    def __init__(self, size=10, func=np.std,
                  func_params=None, percentiles=None, n_steps_future=1):
-        self.width = width
+        self.size = size
         self.func = func
         self.func_params = func_params
         self.percentiles = percentiles
@@ -103,8 +101,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Time series to build a target for.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -114,14 +112,13 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         X = column_or_1d(X)
         validate_params(self.get_params(), self._hyperparameters)
 
-        self._sliding_window = SlidingWindow(width=self.width, stride=1).fit(X)
+        self._sliding_window = SlidingWindow(size=self.size, stride=1).fit(X)
         _X = self._sliding_window.transform(X)
         if self.func_params is None:
             self._effective_func_params = {}
         else:
             self._effective_func_params = self.func_params
-        _X = self.func(
-            _X, axis=1, **self._effective_func_params).reshape(-1, 1)
+        _X = self.func(_X, axis=1, **self._effective_func_params)[:, None]
 
         if self.percentiles is None:
             self.thresholds_ = None
@@ -140,8 +137,8 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
             Time series to build a target for.
 
         y : None
-            There is no need for a target, yet the pipeline API
-            requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -152,11 +149,11 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self)
         Xt = column_or_1d(X)
 
-        Xt = Xt[:-self.n_steps_future]
+        Xt = Xt[:-self.n_steps_future, None]
 
-        if self.n_steps_future < self.width:
-            Xt = Xt[self.width - self.n_steps_future:]
-        return Xt.reshape(-1, 1)
+        if self.n_steps_future < self.size - 1:
+            Xt = Xt[self.size - 1 - self.n_steps_future:]
+        return Xt
 
     def resample(self, y, X=None):
         """Resample `y`.
@@ -180,8 +177,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         y = column_or_1d(y)
 
         yr = self._sliding_window.transform(y)
-        yr = self.func(
-            yr, axis=1, **self._effective_func_params).reshape(-1, 1)
+        yr = self.func(yr, axis=1, **self._effective_func_params)[:, None]
 
         if self.thresholds_ is not None:
             yr = np.abs(yr)
@@ -193,7 +189,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
                 [1 * (yr >= self.thresholds_[-1])], axis=1)
             yr = np.nonzero(yr)[1].reshape(yr.shape[0], 1)
 
-        if self.n_steps_future >= self.width:
-            yr = yr[self.n_steps_future - self.width + 1:]
+        if self.n_steps_future > self.size - 1:
+            yr = yr[self.n_steps_future - self.size + 1:]
 
         return yr.reshape(-1)

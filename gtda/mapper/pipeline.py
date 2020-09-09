@@ -242,10 +242,10 @@ def make_mapper_pipeline(scaler=None,
     mapper_pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
         Output Mapper pipeline. The output of `mapper_pipeline`'s
         :meth:`fit_transform` is: a) an :class:`igraph.Graph` object as per the
-        output of `~gtda.mapper.nerve.Nerve`, when `graph_step` is ``True``; b)
-        a list of lists of tuples as per the output of
-        `~gtda.mapper.clustering.ParallelClustering` (or input of
-        `~gtda.mapper.nerve.Nerve`), otherwise.
+        output of :class:`~gtda.mapper.nerve.Nerve`, when `graph_step` is
+        ``True``; b) a list of lists of tuples as per the output of
+        :class:`~gtda.mapper.clustering.ParallelClustering` (or input of
+        :class:`~gtda.mapper.nerve.Nerve`), otherwise.
 
     Examples
     --------
@@ -341,7 +341,7 @@ def make_mapper_pipeline(scaler=None,
 
     See also
     --------
-    MapperPipeline, :func:`~gtda.mapper.utils.decorators.method_to_transform`
+    MapperPipeline, gtda.mapper.utils.decorators.method_to_transform
 
     References
     ----------

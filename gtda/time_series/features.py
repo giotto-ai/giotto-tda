@@ -29,7 +29,8 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    TakensEmbedding, gtda.diagrams.PersistenceEntropy
+    SlidingWindow, TakensEmbedding, \
+    SingleTakensEmbedding, gtda.diagrams.PersistenceEntropy
 
     References
     ----------

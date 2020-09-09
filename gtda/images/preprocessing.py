@@ -533,7 +533,8 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _embed(self, X):
+    @staticmethod
+    def _embed(X):
         return [np.argwhere(x) for x in X]
 
     def fit(self, X, y=None):

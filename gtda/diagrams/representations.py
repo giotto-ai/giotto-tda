@@ -61,7 +61,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     See also
     --------
     PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage,\
+    PairwiseDistance, Silhouette, PersistenceImage, \
     gtda.homology.VietorisRipsPersistence
 
     Notes
