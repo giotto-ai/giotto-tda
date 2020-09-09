@@ -304,7 +304,7 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    TakensEmbedding, SlidingWindow
+    TakensEmbedding, SlidingWindow, takens_embedding_optimal_parameters
 
     Notes
     -----
@@ -544,7 +544,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    SingleTakensEmbedding, SlidingWindow
+    SingleTakensEmbedding, SlidingWindow, takens_embedding_optimal_parameters
 
     Notes
     -----
