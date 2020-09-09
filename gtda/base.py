@@ -2,6 +2,8 @@
 method and TransformerPlotterMixin for transformers that have a plot method."""
 # License: GNU AGPLv3
 
+from inspect import signature
+
 
 class TransformerResamplerMixin:
     """Mixin class for all transformers-resamplers in giotto-tda."""
@@ -139,7 +141,10 @@ class PlotterMixin:
             Transformed one-sample slice from the input.
 
         """
-        Xt = self.transform(X[sample:sample+1])
+        Xt = self.transform(X[sample:sample + 1])
+        if "sample_orig" not in plot_params:
+            if "sample_orig" in signature(self.plot).parameters:
+                plot_params["sample_orig"] = sample
         self.plot(Xt, sample=0, **plot_params).show()
 
         return Xt

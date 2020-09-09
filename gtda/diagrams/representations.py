@@ -669,7 +669,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimension_idx=0, colorscale="blues",
-             plotly_params=None):
+             plotly_params=None, sample_orig=None):
         """Plot a single channel –- corresponding to a given homology
         dimension -- in a sample from a collection of heat kernel images.
 
@@ -700,6 +700,11 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        sample_orig : int or None, optional, default: ``None``
+            Needed when this method is called as part of a call to
+            :meth:`transform_plot`, to keep track of the original sample
+            index when generating the figure title. Do not use.
+
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
@@ -711,10 +716,13 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         if homology_dimension != np.inf:
             homology_dimension = int(homology_dimension)
         x = self.samplings_[homology_dimension]
+        if sample_orig is None:
+            sample_orig = sample
+
         return plot_heatmap(
             Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
             colorscale=colorscale, origin="lower",
-            title=f"Heat kernel representation of diagram {sample} in "
+            title=f"Heat kernel representation of diagram {sample_orig} in "
                   f"homology dimension {homology_dimension}",
             plotly_params=plotly_params
             )
@@ -921,7 +929,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimension_idx=0, colorscale="blues",
-             plotly_params=None):
+             plotly_params=None, sample_orig=None):
         """Plot a single channel -– corresponding to a given homology
         dimension -– in a sample from a collection of persistence images.
 
@@ -952,6 +960,11 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        sample_orig : int or None, optional, default: ``None``
+            Needed when this method is called as part of a call to
+            :meth:`transform_plot`, to keep track of the original sample
+            index when generating the figure title. Do not use.
+
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
@@ -963,6 +976,9 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         if homology_dimension != np.inf:
             homology_dimension = int(homology_dimension)
         samplings_x, samplings_y = self.samplings_[homology_dimension]
+        if sample_orig is None:
+            sample_orig = sample
+
         return plot_heatmap(
             Xt[sample][homology_dimension_idx],
             x=samplings_x,

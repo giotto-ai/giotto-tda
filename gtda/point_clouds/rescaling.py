@@ -192,7 +192,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='blues', plotly_params=None):
+    def plot(Xt, sample=0, colorscale='blues', plotly_params=None,
+             sample_orig=None):
         """Plot a sample from a collection of distance matrices.
 
         Parameters
@@ -215,15 +216,23 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        sample_orig : int or None, optional, default: ``None``
+            Needed when this method is called as part of a call to
+            :meth:`transform_plot`, to keep track of the original sample
+            index when generating the figure title. Do not use.
+
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
+        if sample_orig is None:
+            sample_orig = sample
+
         return plot_heatmap(
             Xt[sample], colorscale=colorscale,
-            title=f"{sample}-th distance matrix after consistent rescaling",
+            title=f"{sample_orig}-th distance matrix after consistent rescaling",
             plotly_params=plotly_params
             )
 
@@ -386,7 +395,8 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xt
 
     @staticmethod
-    def plot(Xt, sample=0, colorscale='blues', plotly_params=None):
+    def plot(Xt, sample=0, colorscale='blues', plotly_params=None,
+             sample_orig=None):
         """Plot a sample from a collection of distance matrices.
 
         Parameters
@@ -409,14 +419,23 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
+        sample_orig : int or None, optional, default: ``None``
+            Needed when this method is called as part of a call to
+            :meth:`transform_plot`, to keep track of the original sample
+            index when generating the figure title. Do not use.
+
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
+        if sample_orig is None:
+            sample_orig = sample
+
         return plot_heatmap(
             Xt[sample], colorscale=colorscale,
-            title=f"{sample}-th distance matrix after consecutive rescaling",
+            title=f"{sample_orig}-th distance matrix after "
+                  f"consecutive rescaling",
             plotly_params=plotly_params
             )
