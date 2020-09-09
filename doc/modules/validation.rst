@@ -13,4 +13,5 @@
 
    utils.check_diagrams
    utils.check_point_clouds
+   utils.check_collection
    utils.validate_params

@@ -32,7 +32,7 @@ class PearsonDissimilarity(BaseEstimator, TransformerMixin):
     absolute_value : bool, default: ``False``
         Whether absolute values of the Pearson correlation coefficients should
         be taken. Doing so makes pairs of strongly anti-correlated variables as
-        as similar as pairs of strongly correlated ones.
+        similar as pairs of strongly correlated ones.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
