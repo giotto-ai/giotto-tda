@@ -214,10 +214,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 @adapt_fit_transform_docs
 class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
-    """Representation of a univariate time series as a time series of point
-    clouds.
+    """Representation of a single univariate time series as a point cloud.
 
-    Based on a time-delay embedding technique named after F. Takens [1]_. Given
+    Based on a time-delay embedding technique named after F. Takens.[1]_ Given
     a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of evenly
     sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
     :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i + \\tau},
