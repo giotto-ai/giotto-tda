@@ -33,8 +33,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     Given a collection of two-dimensional arrays, this transformer performs two
     tasks:
 
-        1. Optionally, it preprocesses the arrays by applying a function row
-           by row to them. This can be used e.g. as a "compression" step to reduce
+        1. Optionally, it preprocesses the arrays by applying a function row by
+           row to them. This can be used e.g. as a "compression" step to reduce
            the size of the state space.
         2. It computes the transition graph of each array as a sparse matrix of
            zeos and ones.
