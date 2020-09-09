@@ -20,8 +20,8 @@ class TransformerResamplerMixin:
             Input data.
 
         y : None
-            There is no need for a target in a transformer, yet the pipeline
-            API requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
