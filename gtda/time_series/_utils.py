@@ -4,6 +4,8 @@
 from functools import partial
 
 import numpy as np
+from sklearn.metrics import mutual_info_score
+from sklearn.neighbors import NearestNeighbors
 
 
 def _time_delay_embedding(X, time_delay=1, dimension=2, stride=1,
@@ -40,3 +42,51 @@ def _time_delay_embedding(X, time_delay=1, dimension=2, stride=1,
             X_embedded.append(x_embedded)
 
     return X_embedded
+
+
+def _mutual_information(X, time_delay, n_bins):
+    """Calculate the mutual information given the time delay."""
+    contingency = np.histogram2d(X[:-time_delay], X[time_delay:],
+                                 bins=n_bins)[0]
+    mutual_information = mutual_info_score(None, None,
+                                           contingency=contingency)
+    return mutual_information
+
+
+def _false_nearest_neighbors(X, time_delay, dimension, stride=1):
+    """Calculate the number of false nearest neighbours in a certain
+    embedding dimension, based on heuristics."""
+    X_embedded = _time_delay_embedding(X, time_delay=time_delay,
+                                       dimension=dimension, stride=stride)
+
+    neighbor = \
+        NearestNeighbors(n_neighbors=2, algorithm='auto').fit(X_embedded)
+    distances, indices = neighbor.kneighbors(X_embedded)
+    distance = distances[:, 1]
+    X_first_nbhrs = X[indices[:, 1]]
+
+    epsilon = 2. * np.std(X)
+    tolerance = 10
+
+    neg_dim_delay = - dimension * time_delay
+    distance_slice = distance[:neg_dim_delay]
+    X_rolled = np.roll(X, neg_dim_delay)
+    X_rolled_slice = slice(len(X) - len(X_embedded), neg_dim_delay)
+    X_first_nbhrs_rolled = np.roll(X_first_nbhrs, neg_dim_delay)
+
+    neighbor_abs_diff = np.abs(
+        X_rolled[X_rolled_slice] - X_first_nbhrs_rolled[:neg_dim_delay]
+        )
+
+    false_neighbor_ratio = np.divide(
+        neighbor_abs_diff, distance_slice,
+        out=np.zeros_like(neighbor_abs_diff, dtype=float),
+        where=(distance_slice != 0)
+        )
+    false_neighbor_criteria = false_neighbor_ratio > tolerance
+
+    limited_dataset_criteria = distance_slice < epsilon
+
+    n_false_neighbors = \
+        np.sum(false_neighbor_criteria * limited_dataset_criteria)
+    return n_false_neighbors

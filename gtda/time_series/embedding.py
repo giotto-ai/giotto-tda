@@ -4,17 +4,50 @@
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import mutual_info_score
-from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 
-from ._utils import _time_delay_embedding
-
+from ._utils import _time_delay_embedding, _mutual_information, \
+    _false_nearest_neighbors
 from ..base import TransformerResamplerMixin
 from ..plotting import plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_time_series
+
+_TAKENS_EMBEDDING_HYPERPARAMETERS = {
+        'time_delay': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'dimension': {'type': int, 'in': Interval(1, np.inf, closed='left')},
+        'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
+        }
+
+
+def takens_embedding_optimal_parameters(X, max_time_delay, max_dimension,
+                                        stride, n_jobs=None, validate=True):
+    if validate:
+        _hyperparameters = _TAKENS_EMBEDDING_HYPERPARAMETERS.copy()
+        validate_params({'validate': validate}, {'validate': {'type': bool}})
+        validate_params({'time_delay': max_time_delay,
+                         'dimension': max_dimension, 'stride': stride},
+                        _hyperparameters)
+        X = column_or_1d(X)
+
+    mutual_information_list = Parallel(n_jobs=n_jobs)(
+        delayed(_mutual_information)(X, time_delay, n_bins=100)
+        for time_delay in range(1, max_time_delay + 1))
+    time_delay = \
+        mutual_information_list.index(min(mutual_information_list)) + 1
+
+    n_false_nbhrs_list = Parallel(n_jobs=n_jobs)(
+        delayed(_false_nearest_neighbors)(X, time_delay, dim, stride=stride)
+        for dim in range(1, max_dimension + 3))
+    variation_list = [np.abs(n_false_nbhrs_list[dim - 1]
+                             - 2 * n_false_nbhrs_list[dim] +
+                             n_false_nbhrs_list[dim + 1])
+                      / (n_false_nbhrs_list[dim] + 1) / dim
+                      for dim in range(2, max_dimension + 1)]
+    dimension = variation_list.index(min(variation_list)) + 2
+
+    return time_delay, dimension
 
 
 @adapt_fit_transform_docs
@@ -344,12 +377,9 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     """
 
-    _hyperparameters = {
-        'parameters_type': {'type': str, 'in': ['fixed', 'search']},
-        'time_delay': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'dimension': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'stride': {'type': int, 'in': Interval(1, np.inf, closed='left')}
-        }
+    _hyperparameters = _TAKENS_EMBEDDING_HYPERPARAMETERS.copy()
+    _hyperparameters['parameters_type'] = \
+        {'type': str, 'in': ['fixed', 'search']}
 
     def __init__(self, parameters_type='search', time_delay=1, dimension=5,
                  stride=1, n_jobs=None):
@@ -358,54 +388,6 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         self.dimension = dimension
         self.stride = stride
         self.n_jobs = n_jobs
-
-    @staticmethod
-    def _mutual_information(X, time_delay, n_bins):
-        """Calculate the mutual information given the time delay."""
-        contingency = np.histogram2d(X[:-time_delay], X[time_delay:],
-                                     bins=n_bins)[0]
-        mutual_information = mutual_info_score(None, None,
-                                               contingency=contingency)
-        return mutual_information
-
-    @staticmethod
-    def _false_nearest_neighbors(X, time_delay, dimension, stride=1):
-        """Calculate the number of false nearest neighbours in a certain
-        embedding dimension, based on heuristics."""
-        X_embedded = _time_delay_embedding(X, time_delay=time_delay,
-                                           dimension=dimension, stride=stride)
-
-        neighbor = \
-            NearestNeighbors(n_neighbors=2, algorithm='auto').fit(X_embedded)
-        distances, indices = neighbor.kneighbors(X_embedded)
-        distance = distances[:, 1]
-        X_first_nbhrs = X[indices[:, 1]]
-
-        epsilon = 2. * np.std(X)
-        tolerance = 10
-
-        neg_dim_delay = - dimension * time_delay
-        distance_slice = distance[:neg_dim_delay]
-        X_rolled = np.roll(X, neg_dim_delay)
-        X_rolled_slice = slice(len(X) - len(X_embedded), neg_dim_delay)
-        X_first_nbhrs_rolled = np.roll(X_first_nbhrs, neg_dim_delay)
-
-        neighbor_abs_diff = np.abs(
-            X_rolled[X_rolled_slice] - X_first_nbhrs_rolled[:neg_dim_delay]
-            )
-
-        false_neighbor_ratio = np.divide(
-            neighbor_abs_diff, distance_slice,
-            out=np.zeros_like(neighbor_abs_diff, dtype=float),
-            where=(distance_slice != 0)
-            )
-        false_neighbor_criteria = false_neighbor_ratio > tolerance
-
-        limited_dataset_criteria = distance_slice < epsilon
-
-        n_false_neighbors = \
-            np.sum(false_neighbor_criteria * limited_dataset_criteria)
-        return n_false_neighbors
 
     def fit(self, X, y=None):
         """If necessary, compute the optimal time delay and embedding
@@ -433,23 +415,11 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.parameters_type == 'search':
-            mutual_information_list = Parallel(n_jobs=self.n_jobs)(
-                delayed(self._mutual_information)(X, time_delay, n_bins=100)
-                for time_delay in range(1, self.time_delay + 1))
-            self.time_delay_ = mutual_information_list.index(
-                min(mutual_information_list)) + 1
-
-            n_false_nbhrs_list = Parallel(n_jobs=self.n_jobs)(
-                delayed(self._false_nearest_neighbors)(
-                    X, self.time_delay_, dim, stride=self.stride)
-                for dim in range(1, self.dimension + 3))
-            variation_list = [np.abs(n_false_nbhrs_list[dim - 1]
-                                     - 2 * n_false_nbhrs_list[dim] +
-                                     n_false_nbhrs_list[dim + 1])
-                              / (n_false_nbhrs_list[dim] + 1) / dim
-                              for dim in range(2, self.dimension + 1)]
-            self.dimension_ = variation_list.index(min(variation_list)) + 2
-
+            self.time_delay_, self.dimension_ = \
+                takens_embedding_optimal_parameters(
+                    X, self.time_delay, self.dimension, self.stride,
+                    n_jobs=self.n_jobs, validate=False
+                    )
         else:
             self.time_delay_ = self.time_delay
             self.dimension_ = self.dimension
@@ -620,8 +590,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = SingleTakensEmbedding._hyperparameters.copy()
-    _hyperparameters.pop('parameters_type')
+    _hyperparameters = _TAKENS_EMBEDDING_HYPERPARAMETERS.copy()
     _hyperparameters.update({'flatten': {'type': bool},
                              'ensure_last_value': {'type': bool}})
 
