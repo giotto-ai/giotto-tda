@@ -225,7 +225,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
         concrete point clouds in Euclidean space. In the first case, entries
         are allowed to be infinite unless otherwise specified in `kwargs`.
 
-    kwargs
+    **kwargs
         Keyword arguments accepted by
         :func:`~sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) if not passed
@@ -273,14 +273,14 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
                 "of vectors in Euclidean space.",
                 DataDimensionalityWarning, stacklevel=2
                 )
-        Xnew = _check_array_mod(X, **kwargs_, allow_nd=True)
+        Xnew = _check_array_mod(X, allow_nd=True, **kwargs_)
     else:
         has_check_failed = False
         messages = []
         Xnew = []
         for i, x in enumerate(X):
             try:
-                xnew = _check_array_mod(x, **kwargs_, ensure_2d=True)
+                xnew = _check_array_mod(x, ensure_2d=True, **kwargs_)
                 if distance_matrices and not issparse(xnew):
                     if not x.shape[0] == x.shape[1]:
                         raise ValueError(
@@ -314,7 +314,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
     return Xnew
 
 
-def check_collection(X, copy=False):
+def check_collection(X, **kwargs):
     """Generic input validation on arrays or lists of arrays.
 
     Parameters
@@ -322,9 +322,11 @@ def check_collection(X, copy=False):
     X : object
         Input object to check / convert.
 
-    copy : bool, optional, default: ``False``
-        Whether a forced copy will be triggered. If ``False``, a copy might
-        be triggered by a conversion.
+    **kwargs
+        Keyword arguments accepted by
+        :func:`~sklearn.utils.validation.check_array`, with the following
+        caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) when
+        `force_all_finite` is set to ``False``, NaN inputs are not allowed.
 
     Returns
     -------
@@ -332,16 +334,19 @@ def check_collection(X, copy=False):
         The converted and validated object.
 
     """
+    kwargs_ = kwargs.copy()
+    kwargs_.pop('allow_nd', None)
+    kwargs_.pop('ensure_2d', None)
     if hasattr(X, 'shape') and hasattr(X, 'ndim'):
-        Xnew = check_array(X, ensure_2d=True, allow_nd=True, copy=copy)
+        Xnew = _check_array_mod(X, ensure_2d=True, allow_nd=True, **kwargs_)
     else:
         has_check_failed = False
         messages = []
         Xnew = []
         for i, x in enumerate(X):
             try:
-                xnew = check_array(x, ensure_2d=False, allow_nd=True,
-                                   copy=copy)
+                xnew = _check_array_mod(x, ensure_2d=False, allow_nd=True,
+                                        **kwargs_)
                 Xnew.append(xnew)
             except ValueError as e:
                 has_check_failed = True
