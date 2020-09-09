@@ -62,7 +62,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    TakensEmbedding, MultiTakensEmbedding
+    SingleTakensEmbedding, TakensEmbedding
 
     Notes
     -----
@@ -215,7 +215,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
 
 @adapt_fit_transform_docs
-class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
+class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a univariate time series as a time series of point
     clouds.
 
@@ -235,7 +235,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     searched for during :meth:`fit`. [2]_ [3]_
 
     To compute time-delay embeddings of several time series simultaneously, use
-    :class:`MultiTakensEmbedding` instead.
+    :class:`TakensEmbedding` instead.
 
     Parameters
     ----------
@@ -286,13 +286,13 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.time_series import TakensEmbedding
+    >>> from gtda.time_series import SingleTakensEmbedding
     >>> # Create a noisy signal
     >>> n_samples = 10000
     >>> signal_noise = np.asarray([np.sin(x / 50) + 0.5 * np.random.random()
     ...     for x in range(n_samples)])
     >>> # Set up the transformer
-    >>> embedder = TakensEmbedding(parameters_type='search', dimension=5,
+    >>> embedder = SingleTakensEmbedding(parameters_type='search', dimension=5,
     ...                            time_delay=5, n_jobs=-1)
     >>> # Fit and transform
     >>> embedded_noise = embedder.fit_transform(signal_noise)
@@ -307,7 +307,7 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
     See also
     --------
-    MultiTakensEmbedding, SlidingWindow
+    TakensEmbedding, SlidingWindow
 
     Notes
     -----
@@ -515,14 +515,14 @@ class TakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
 
 @adapt_fit_transform_docs
-class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
+class TakensEmbedding(BaseEstimator, TransformerMixin):
     """Point clouds from collections of time series via independent Takens
     embeddings.
 
     This transformer takes collections of (possibly multivariate) time series
     as input, applies the Takens embedding algorithm described in
-    :class:`TakensEmbedding` to each independently, and returns a corresponding
-    collection of point clouds in Euclidean space (or possibly
+    :class:`SingleTakensEmbedding` to each independently, and returns a
+    corresponding collection of point clouds in Euclidean space (or possibly
     higher-dimensional structures, see `flatten`).
 
     Parameters
@@ -554,13 +554,13 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtda.time_series import MultiTakensEmbedding
+    >>> from gtda.time_series import TakensEmbedding
     # Two univariate time series of duration 4
     >>> X = np.arange(8).reshape(2, 4)
     >>> print(X)
     [[0 1 2 3]
      [4 5 6 7]]
-    >>> MTE = MultiTakensEmbedding(time_delay=1, dimension=2)
+    >>> MTE = TakensEmbedding(time_delay=1, dimension=2)
     >>> print(embedder.fit_transform(X))
     [[[0 1]
       [1 2]
@@ -579,7 +579,7 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
      [[ 4  5  6  7]
       [-4 -5 -6 -7]]]
     # Pass `flatten` as `True` (default)
-    >>> MTE = MultiTakensEmbedding(time_delay=1, dimension=2, flatten=True)
+    >>> MTE = TakensEmbedding(time_delay=1, dimension=2, flatten=True)
     >>> print(MTE.fit_transform(X))
     [[[ 0  1  0 -1]
       [ 1  2 -1 -2]
@@ -589,7 +589,7 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
       [ 5  6 -5 -6]
       [ 6  7 -6 -7]]]
     # Pass `flatten` as `False`
-    >>> MTE = MultiTakensEmbedding(time_delay=1, dimension=2, flatten=False)
+    >>> MTE = TakensEmbedding(time_delay=1, dimension=2, flatten=False)
     >>> print(MTE.fit_transform(X))
     [[[[ 0  1]
        [ 1  2]
@@ -610,16 +610,17 @@ class MultiTakensEmbedding(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    TakensEmbedding, SlidingWindow
+    SingleTakensEmbedding, SlidingWindow
 
     Notes
     -----
     To compute the Takens embedding of a single univariate time series in the
-    form of a 1D array or column vector, use :class:`TakensEmbedding` instead.
+    form of a 1D array or column vector, use :class:`SingleTakensEmbedding`
+    instead.
 
     """
 
-    _hyperparameters = TakensEmbedding._hyperparameters.copy()
+    _hyperparameters = SingleTakensEmbedding._hyperparameters.copy()
     _hyperparameters.pop('parameters_type')
     _hyperparameters.update({'flatten': {'type': bool},
                              'ensure_last_value': {'type': bool}})

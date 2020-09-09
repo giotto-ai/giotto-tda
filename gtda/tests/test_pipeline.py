@@ -33,7 +33,7 @@ def split_train_test(data):
 
 def get_steps():
     steps = [
-        ('embedding', ts.TakensEmbedding()),
+        ('embedding', ts.SingleTakensEmbedding()),
         ('window', ts.SlidingWindow(size=6, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.Scaler()),

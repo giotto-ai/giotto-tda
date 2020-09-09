@@ -25,13 +25,13 @@ Time-delay embedding
    :toctree: generated/time_series/embedding/
    :template: class.rst
 
-   time_series.TakensEmbedding
+   time_series.SingleTakensEmbedding
 
 .. autosummary::
    :toctree: generated/time_series/embedding/
    :template: class.rst
 
-   time_series.MultiTakensEmbedding
+   time_series.TakensEmbedding
 
 Target preparation
 ------------------

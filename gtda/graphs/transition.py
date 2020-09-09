@@ -82,7 +82,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    KNeighborsGraph, GraphGeodesicDistance, gtda.time_series.TakensEmbedding
+    KNeighborsGraph, GraphGeodesicDistance, \
+    gtda.time_series.SingleTakensEmbedding
 
     Notes
     -----

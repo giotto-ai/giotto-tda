@@ -78,7 +78,7 @@ class Pipeline(pipeline.Pipeline):
     >>> print(X_train.shape, y_train.shape)
     (395, 1) (395,)
     >>> steps = [
-    >>>     ('embedding', ts.TakensEmbedding()),
+    >>>     ('embedding', ts.SingleTakensEmbedding()),
     >>>     ('window', ts.SlidingWindow(size=6, stride=1)),
     >>>     ('diagram', hl.VietorisRipsPersistence()),
     >>>     ('rescaler', diag.Scaler()),

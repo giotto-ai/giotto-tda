@@ -2,7 +2,7 @@
 time series or embed them in a higher dimensional space for persistent
 homology."""
 
-from .embedding import SlidingWindow, TakensEmbedding, MultiTakensEmbedding
+from .embedding import SlidingWindow, SingleTakensEmbedding, TakensEmbedding
 from .features import PermutationEntropy
 from .preprocessing import Resampler, Stationarizer
 from .multivariate import PearsonDissimilarity
@@ -12,8 +12,8 @@ __all__ = [
     'Resampler',
     'Stationarizer',
     'PermutationEntropy',
+    'SingleTakensEmbedding',
     'TakensEmbedding',
-    'MultiTakensEmbedding',
     'SlidingWindow',
     'Labeller',
     'PearsonDissimilarity'
