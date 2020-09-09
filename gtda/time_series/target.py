@@ -149,7 +149,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         check_is_fitted(self)
         Xt = column_or_1d(X)
 
-        Xt = Xt[:-self.n_steps_future, None]
+        Xt = Xt[:-self.n_steps_future]
 
         if self.n_steps_future < self.size - 1:
             Xt = Xt[self.size - 1 - self.n_steps_future:]
