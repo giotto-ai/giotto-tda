@@ -12,6 +12,7 @@ by Lewis Tunstall provides a friendly introduction to the philosophy of ``giotto
    plotting_api
    persistent_homology_graphs
    mapper_quickstart
+   time_series_forecasting
 
 ..
    include:: vietoris_rips_quickstart.rst
@@ -20,7 +21,7 @@ by Lewis Tunstall provides a friendly introduction to the philosophy of ``giotto
     Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/vietoris_rips_quickstart.ipynb>`__ for full interactivity,
     or check `the static version <vietoris_rips_quickstart.html>`__.
 
-    .. include:: mapper_quickstart.rst
+    .. include:: time_series_forecasting.rst
        :end-before: Import libraries
 
     Try it on `github <https://github.com/giotto-ai/giotto-tda/blob/master/examples/mapper_quickstart.ipynb>`__ for full interactivity,
