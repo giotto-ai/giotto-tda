@@ -232,7 +232,8 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
 
         return plot_heatmap(
             Xt[sample], colorscale=colorscale,
-            title=f"{sample_orig}-th distance matrix after consistent rescaling",
+            title=f"{sample_orig}-th distance matrix "
+                  f"after consistent rescaling",
             plotly_params=plotly_params
             )
 
