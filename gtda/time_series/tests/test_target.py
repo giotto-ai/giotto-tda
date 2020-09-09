@@ -8,7 +8,7 @@ import pytest
 from gtda.time_series.target import Labeller
 
 signal = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
-X = np.tile(np.arange(10), reps=2).reshape(-1, 1)
+X = np.tile(np.arange(10), reps=2)
 
 
 @pytest.mark.parametrize("size", [0, -1])
