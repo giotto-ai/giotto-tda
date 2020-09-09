@@ -32,8 +32,6 @@ def test_kng_not_fitted():
                          [(1, X_kng_res), (2, X_kng_res_k2)])
 def test_kng_transform(n_neighbors, expected):
     kn_graph = KNeighborsGraph(n_neighbors=n_neighbors)
-    print(kn_graph.fit_transform(X_kng)[0].toarray())
-    print(expected[0])
     assert (kn_graph.fit_transform(X_kng)[0] != expected[0]).nnz == 0
 
 

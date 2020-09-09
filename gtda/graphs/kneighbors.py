@@ -88,10 +88,10 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     >>> kng = KNeighborsGraph(n_neighbors=2)
     >>> Xg = kng.fit_transform(X)
     >>> print(Xg[0].toarray())
-    [[0 1 0 1]
-     [1 0 0 1]
-     [1 0 0 1]
-     [1 1 0 0]]
+    [[0. 1. 0. 1.]
+     [1. 0. 0. 1.]
+     [1. 0. 0. 1.]
+     [1. 1. 0. 0.]]
 
     See also
     --------
