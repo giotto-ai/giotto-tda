@@ -192,7 +192,7 @@ def _check_array_mod(X, **kwargs):
     """Modified version of :func:`~sklearn.utils.validation.check_array. When
     keyword parameter `force_all_finite` is set to False, NaNs are not
     accepted but infinity is."""
-    if not kwargs['force_all_finite']:
+    if not kwargs.get('force_all_finite', True):
         Xnew = check_array(X, **kwargs)
         if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
             raise ValueError(
