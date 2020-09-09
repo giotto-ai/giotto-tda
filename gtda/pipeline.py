@@ -69,7 +69,7 @@ class Pipeline(pipeline.Pipeline):
     >>> X = np.random.rand(600, 1)
     >>> n_train, n_test = 400, 200
     >>>
-    >>> labeller = ts.Labeller(width=5, percentiles=[80],
+    >>> labeller = ts.Labeller(size=6, percentiles=[80],
     >>>                        n_steps_future=1)
     >>> X_train = X[:n_train]
     >>> y_train = X_train
@@ -78,8 +78,8 @@ class Pipeline(pipeline.Pipeline):
     >>> print(X_train.shape, y_train.shape)
     (395, 1) (395,)
     >>> steps = [
-    >>>     ('embedding', ts.TakensEmbedding()),
-    >>>     ('window', ts.SlidingWindow(width=5, stride=1)),
+    >>>     ('embedding', ts.SingleTakensEmbedding()),
+    >>>     ('window', ts.SlidingWindow(size=6, stride=1)),
     >>>     ('diagram', hl.VietorisRipsPersistence()),
     >>>     ('rescaler', diag.Scaler()),
     >>>     ('filter', diag.Filtering(epsilon=0.1)),
