@@ -48,7 +48,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default : ``None``
         Which death value to assign to features which are still alive at
-        filtration value `np.inf`. ``None`` assigns the maximum pixel
+        filtration value ``numpy.inf``. ``None`` assigns the maximum pixel
         values within all images passed to :meth:`fit`.
 
     n_jobs : int or None, optional, default: ``None``
@@ -229,7 +229,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray of shape (n_samples, n_points, 3)
+        Xt : ndarray of shape (n_samples, n_features, 3)
             Collection of persistence diagrams, such as returned by
             :meth:`transform`.
 

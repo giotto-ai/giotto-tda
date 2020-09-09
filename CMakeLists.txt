@@ -12,6 +12,7 @@ find_package(OpenMP)
 set(RIPSER_SRC_DIR "gtda/externals/ripser")
 set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
 set(HERA_DIR "gtda/externals/hera")
+set(EIGEN_DIR "gtda/externals/eigen")
 
 #######################################################################
 #                               Ripser                                #
@@ -171,6 +172,8 @@ target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Cech_comp
 target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Subsampling/include")
 target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/python/include")
+target_include_directories(gtda_simplex_tree PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_simplex_tree PRIVATE "${EIGEN_DIR}")
 
 if(MSVC)
     target_compile_options(gtda_simplex_tree PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
@@ -227,6 +230,8 @@ target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Cech_c
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
+target_include_directories(gtda_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_witness_complex PRIVATE "${EIGEN_DIR}")
 
 if(MSVC)
     target_compile_options(gtda_witness_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
@@ -256,6 +261,8 @@ target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
+target_include_directories(gtda_strong_witness_complex PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_strong_witness_complex PRIVATE "${EIGEN_DIR}")
 
 if(MSVC)
     target_compile_options(gtda_strong_witness_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
@@ -286,6 +293,8 @@ target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/Pe
 target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/Rips_complex/include")
 target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/Subsampling/include")
 target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
+target_include_directories(gtda_sparse_rips_complex PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_sparse_rips_complex PRIVATE "${EIGEN_DIR}")
 
 if(MSVC)
     target_compile_options(gtda_sparse_rips_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
@@ -314,6 +323,8 @@ target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/Cech_comp
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/Persistent_cohomology/include")
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/python/include")
 target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/common/include")
+target_include_directories(gtda_cech_complex PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_cech_complex PRIVATE "${EIGEN_DIR}")
 
 if(MSVC)
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
@@ -323,3 +334,27 @@ else()
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 endif()
 
+#######################################################################
+#                              Collapser                              #
+#######################################################################
+
+pybind11_add_module(gtda_collapser "${BINDINGS_DIR}/collapser_bindings.cpp")
+
+if(OpenMP_FOUND)
+    target_link_libraries(gtda_collapser PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
+target_link_libraries(gtda_collapser LINK_PUBLIC ${Boost_LIBRARIES})
+target_compile_definitions(gtda_collapser PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+
+target_include_directories(gtda_collapser PRIVATE "${GUDHI_SRC_DIR}/common/include")
+target_include_directories(gtda_collapser PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_collapser PRIVATE "${EIGEN_DIR}")
+
+if(MSVC)
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
+else()
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math>)
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
+endif()

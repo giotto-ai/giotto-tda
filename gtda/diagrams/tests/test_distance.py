@@ -255,7 +255,7 @@ parameters_distance = [
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters_distance)
 @pytest.mark.parametrize('order', [2., None])
-@pytest.mark.parametrize('n_jobs', [1, 2, 4])
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
 def test_dd_transform(metric, metric_params, order, n_jobs):
     # X_fit == X_transform
     dd = PairwiseDistance(metric=metric, metric_params=metric_params,
@@ -297,7 +297,7 @@ parameters_amplitude = [
 
 @pytest.mark.parametrize(('metric', 'metric_params'), parameters_amplitude)
 @pytest.mark.parametrize('order', [None, 2.])
-@pytest.mark.parametrize('n_jobs', [1, 2, 4])
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
 def test_da_transform(metric, metric_params, order, n_jobs):
     n_expected_columns = n_homology_dimensions if order is None else 1
 
@@ -315,7 +315,7 @@ def test_da_transform(metric, metric_params, order, n_jobs):
 
 @pytest.mark.parametrize(('metric', 'metric_params', 'order'),
                          [('bottleneck', None, None)])
-@pytest.mark.parametrize('n_jobs', [1, 2, 4])
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
 def test_da_transform_bottleneck(metric, metric_params, order, n_jobs):
     da = Amplitude(metric=metric, metric_params=metric_params,
                    order=order, n_jobs=n_jobs)
@@ -340,3 +340,24 @@ def test_pi_zero_weight_function(transformer_cls, order, Xnew):
     X_res = transformer.fit(X1).transform(Xnew)
 
     assert np.array_equal(X_res, np.zeros_like(X_res))
+
+
+@pytest.mark.parametrize('metric', ['heat', 'persistence_image'])
+@pytest.mark.parametrize('transformer_cls', [Amplitude, PairwiseDistance])
+def test_large_hk_pi_parallel(metric, transformer_cls):
+    """Test that Amplitude and PairwiseDistance do not break with a read-only
+    error when the input array is at least 1MB, the metric is either 'heat'
+    or 'persistence_image', and more than 1 process is used (triggering
+    joblib's use of memmaps)."""
+    X = np.linspace(0, 100, 300000)
+    n_bins = 10
+    diagrams = np.expand_dims(
+        np.stack([X, X, np.zeros(len(X))]).transpose(), axis=0
+        )
+
+    transformer = transformer_cls(
+        metric=metric, metric_params={'sigma': 1, 'n_bins': n_bins}, n_jobs=2
+        )
+    Xt = transformer.fit_transform(diagrams)
+
+    assert_almost_equal(Xt, np.zeros_like(Xt))

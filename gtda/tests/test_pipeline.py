@@ -18,7 +18,7 @@ data = np.random.rand(600, 1)
 def split_train_test(data):
     n_train = int(0.7 * data.shape[0])
     n_test = data.shape[0] - n_train
-    labeller = ts.Labeller(width=5, percentiles=[80],
+    labeller = ts.Labeller(size=6, percentiles=[80],
                            n_steps_future=1)
     X_train = data[:n_train]
     y_train = X_train
@@ -33,8 +33,8 @@ def split_train_test(data):
 
 def get_steps():
     steps = [
-        ('embedding', ts.TakensEmbedding()),
-        ('window', ts.SlidingWindow(width=5, stride=1)),
+        ('embedding', ts.SingleTakensEmbedding()),
+        ('window', ts.SlidingWindow(size=6, stride=1)),
         ('diagram', hl.VietorisRipsPersistence()),
         ('rescaler', diag.Scaler()),
         ('filter', diag.Filtering(epsilon=0.1)),
@@ -50,7 +50,7 @@ def get_param_grid():
     diagram_param = {}
     classification_param = {}
 
-    window_param['width'] = [2, 3]
+    window_param['size'] = [3, 4]
     diagram_param['homology_dimensions'] = [[0, 1]]
     classification_param['n_estimators'] = [10, 100]
 

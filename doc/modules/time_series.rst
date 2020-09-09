@@ -26,6 +26,13 @@ Time-delay embedding
    :template: class.rst
 
    time_series.TakensEmbedding
+   time_series.SingleTakensEmbedding
+
+.. autosummary::
+   :toctree: generated/time_series/embedding/
+   :template: function.rst
+
+   time_series.takens_embedding_optimal_parameters
 
 Target preparation
 ------------------

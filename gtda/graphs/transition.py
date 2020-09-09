@@ -27,16 +27,16 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     Let A be a two-dimensional array viewed as a time series (along the row
     axis) of one-dimensional arrays encoding the "state" of a system. The
     corresponding *undirected transition graph* (or *network*) has as vertex
-    set the set of all unique states (rows) in A, and there is an edge
-    between two vertices if and only if one of the corresponding states
-    immediately follows the other in A.
+    set the set of all unique states (rows) in A, and there is an edge between
+    two vertices if and only if one of the corresponding states immediately
+    follows the other in A.
 
-    Given a collection of two-dimensional arrays, this transformer performs
-    two tasks:
+    Given a collection of two-dimensional arrays, this transformer performs two
+    tasks:
 
-        1. Optionally, it preprocesses the arrays by applying a function row
-           by row to them. This can be used e.g. as a "compression" step
-           to reduce the size of the state space.
+        1. Optionally, it preprocesses the arrays by applying a function row by
+           row to them. This can be used e.g. as a "compression" step to reduce
+           the size of the state space.
         2. It computes the undirected transition graph of each array as a
            sparse matrix.
 
@@ -44,12 +44,12 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     ----------
     func : None or callable, optional, default: ``numpy.argsort``
         If a callable, it is the function to be applied to each row of each
-        array as a preprocessing steps. Allowed callables are functions
-        mapping 1-D arrays to 1-D arrays of constant length, and must be
-        compatible with :mod:`numpy.apply_along_axis`. If ``None``, this
-        function is the identity (no preprocessing). The default is
-        ``numpy.argsort``, which makes the final transition graphs
-        *ordinal partition networks* [1]_ [2]_ [3]_.
+        array as a preprocessing steps. Allowed callables are functions mapping
+        1D arrays to 1D arrays of constant length, and must be compatible with
+        :mod:`numpy.apply_along_axis`. If ``None``, this function is the
+        identity (no preprocessing). The default is ``numpy.argsort``, which
+        makes the final transition graphs *ordinal partition networks*
+        [1]_ [2]_ [3]_.
 
     func_params : None or dict, optional, default: ``None``
         Additional keyword arguments for `func`.
@@ -82,8 +82,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    KNeighborsGraph, GraphGeodesicDistance,
-    :class:`~gtda.time_series.TakensEmbedding`
+    KNeighborsGraph, GraphGeodesicDistance, \
+    gtda.time_series.SingleTakensEmbedding
 
     Notes
     -----
@@ -100,9 +100,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     .. [2] M. McCullough, M. Small, T. Stemler, and H. Ho-Ching Iu, "Time
            lagged ordinal partition networks for capturing dynamics of
-           continuous dynamical systems"; *Chaos: An Interdisciplinary
-           Journal of Nonlinear Science* **25** (5), p. 053101, 2015;
-           doi: `10.1063/1.4919075 <http://dx.doi.org/10.1063/1.4919075>`_.
+           continuous dynamical systems"; *Chaos: An Interdisciplinary Journal
+           of Nonlinear Science* **25** (5), p. 053101, 2015; doi:
+           `10.1063/1.4919075 <http://dx.doi.org/10.1063/1.4919075>`_.
 
     .. [3] A. Myers, E. Munch, and F. A. Khasawneh, "Persistent homology of
            complex networks for dynamic state detection"; *Phys. Rev. E*
@@ -174,9 +174,8 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Create transition graphs from the input data and return their
-        adjacency matrices. The graphs are simple, undirected and
-        unweighted, and the adjacency matrices are sparse matrices of type
-        bool.
+        adjacency matrices. The graphs are simple, undirected and unweighted,
+        and the adjacency matrices are sparse boolean matrices.
 
         Parameters
         ----------

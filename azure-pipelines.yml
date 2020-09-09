@@ -41,13 +41,14 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.08.08" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.08.31" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
@@ -63,12 +64,12 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip
-      pip install dist/*manylinux2010*.whl
+      python -m pip install dist/*manylinux2010*.whl
     displayName: 'Install the wheels'
 
   - script: |
       set -e
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
+      python -m pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
@@ -76,8 +77,8 @@ jobs:
 
   - script: |
       set -e
-      pip install pandas openml matplotlib
-      pip install "papermill==1.2.1"
+      python -m pip install pandas openml matplotlib
+      python -m pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -100,7 +101,7 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
+      python -m pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
@@ -128,6 +129,7 @@ jobs:
   - bash: |
       set -e
       sed -i.bak "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i.bak 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       rm setup.py.bak
       sed -i.bak "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
       rm gtda/_version.py.bak
@@ -136,7 +138,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.08.08" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.08.31" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -149,6 +151,7 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip setuptools
+      python -m pip install wheel
       source .azure-ci/setup_ccache.sh
       python -m pip install -e ".[dev]"
       ccache -s
@@ -172,11 +175,10 @@ jobs:
 
   - script: |
       set -e
-      pip install wheel
       python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
-  - script: pip install dist/*.whl
+  - script: python -m pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -189,7 +191,7 @@ jobs:
   - script: |
       set -e
       python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
+      python -m pip install "papermill==1.2.1"
       cd examples
       for n in *.ipynb
       do
@@ -205,7 +207,7 @@ jobs:
 
   - script: |
       set -e
-      pip install twine
+      python -m pip install twine
       twine check dist/*
     displayName: 'Check distribution with twine'
 
@@ -245,6 +247,7 @@ jobs:
   - bash: |
       set -e
       sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
+      sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
       sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
@@ -257,6 +260,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
+      python -m pip install wheel
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 
@@ -265,18 +269,17 @@ jobs:
     displayName: 'Test dev install with pytest'
 
   - script: |
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
+      python -m pip uninstall -y giotto-tda
+      python -m pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
 
   - bash: |
       set -e
       sed -i $'s/\r$//' README.rst
-      pip install wheel
       python setup.py bdist_wheel
     displayName: 'Build the wheels'
 
-  - bash: pip install dist/*.whl
+  - bash: python -m pip install dist/*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -287,7 +290,7 @@ jobs:
 
   - script: |
       python -m pip install -e ".[examples]"
-      pip install "papermill==1.2.1"
+      python -m pip install "papermill==1.2.1"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
@@ -307,7 +310,8 @@ jobs:
 
   - bash: |
       set -e
-      pip install twine
+      python -m pip install twine
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
+
