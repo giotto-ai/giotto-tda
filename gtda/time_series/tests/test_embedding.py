@@ -57,8 +57,9 @@ signal_embedded_fixed = \
 
 def test_takens_embedding_optimal_parameters_validate():
     time_delay = -1
+    dimension = 2
     with pytest.raises(ValueError):
-        takens_embedding_optimal_parameters(signal, time_delay, 2, 1,
+        takens_embedding_optimal_parameters(signal, time_delay, dimension,
                                             validate=True)
 
 

@@ -22,7 +22,71 @@ _TAKENS_EMBEDDING_HYPERPARAMETERS = {
 
 
 def takens_embedding_optimal_parameters(X, max_time_delay, max_dimension,
-                                        stride, n_jobs=None, validate=True):
+                                        stride=1, n_jobs=None, validate=True):
+    """Compute the "optimal" parameters for a Takens (time-delay) embedding
+    [1]_ of a univariate time series.
+
+    First, an optimal time delay is found by minimising the time-delayed mutual
+    information among values no greater than `max_time_delay`. Then, a
+    heuristic based on an algorithm in [2]_ is used to select an embedding
+    dimension which, when increased, does not reveal a large proportion of
+    "false nearest neighbors".
+
+    Parameters
+    ----------
+    X : ndarray of shape (n_samples,) or (n_samples, 1)
+        Input data representing a single univariate time series.
+
+    max_time_delay : int, required
+        Maximum time delay between two consecutive values for constructing one
+        embedded point.
+
+    max_dimension : int, required
+        Maximum embedding dimension that will be considered in the
+        optimization.
+
+    stride : int, optional, default: ``1``
+        Stride duration between two consecutive embedded points. It defaults to
+        1 as this is the usual value in the statement of Takens's embedding
+        theorem.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    validate : bool, optional, default: ``True``
+        Whether the input and hyperparameters should be validated.
+
+    Returns
+    -------
+    time_delay : int
+        The "optimal" time delay less than or equal to `max_dimension`, as
+        determined by minimizing the time-delayed mutual information.
+
+    dimension : int
+        The "optimal" embedding dimension less than or equal to
+        `max_dimension`, as determined by a false nearest neighbors heuristic
+        once `time_delay` is computed.
+
+    See also
+    --------
+    SingleTakensEmbedding, TakensEmbedding, SlidingWindow
+
+    References
+    ----------
+    .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
+           D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
+           1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
+           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
+
+    .. [2] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
+           embedding dimension for phase-space reconstruction using a
+           geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
+           1992; doi: `10.1103/PhysRevA.45.3403
+           <https://doi.org/10.1103/PhysRevA.45.3403>`_.
+
+    """
     if validate:
         _hyperparameters = _TAKENS_EMBEDDING_HYPERPARAMETERS.copy()
         validate_params({'validate': validate}, {'validate': {'type': bool}})
@@ -239,17 +303,15 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     parameters_type : ``'search'`` | ``'fixed'``, optional, default: \
         ``'search'``
         If set to ``'fixed'``, the values of `time_delay` and `dimension` are
-        used directly in :meth:`transform`. If set to ``'search'``, those
-        values are only used as upper bounds in a search as follows: first, an
-        optimal time delay is found by minimising the time delayed mutual
-        information; then, a heuristic based on an algorithm in [2]_ is used to
-        select an embedding dimension which, when increased, does not reveal a
-        large proportion of "false nearest neighbors".
+        used directly in :meth:`transform`. If set to ``'search'``,
+        :func:`takens_embedding_optimal_parameter` is run in :meth:`fit` to
+        estimate optimal values for these quantities and store them as
+        :attr:`time_delay_` and :attr:`dimension_`.
 
     time_delay : int, optional, default: ``1``
         Time delay between two consecutive values for constructing one embedded
         point. If `parameters_type` is ``'search'``, it corresponds to the
-        maximal embedding time delay that will be considered.
+        maximum time delay that will be considered.
 
     dimension : int, optional, default: ``5``
         Dimension of the embedding space. If `parameters_type` is ``'search'``,
@@ -269,10 +331,10 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     Attributes
     ----------
     time_delay_ : int
-        Actual embedding time delay used to embed. If
-        `parameters_type` is ``'search'``, it is the calculated optimal
-        embedding time delay and is less than or equal to `time_delay`.
-        Otherwise it is equal to `time_delay`.
+        Actual time delay used to embed. If
+        `parameters_type` is ``'search'``, it is the calculated optimal time
+        delay and is less than or equal to `time_delay`. Otherwise it is equal
+        to `time_delay`.
 
     dimension_ : int
         Actual embedding dimension used to embed. If `parameters_type` is
@@ -293,9 +355,9 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     ...                            time_delay=5, n_jobs=-1)
     >>> # Fit and transform
     >>> embedded_noise = embedder.fit_transform(signal_noise)
-    >>> print('Optimal embedding time delay based on mutual information:',
+    >>> print('Optimal time delay based on mutual information:',
     ...       embedder.time_delay_)
-    Optimal embedding time delay based on mutual information: 5
+    Optimal time delay based on mutual information: 5
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
     ...       embedder.dimension_)
     Optimal embedding dimension based on false nearest neighbors: 2
@@ -381,7 +443,7 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
         if self.parameters_type == 'search':
             self.time_delay_, self.dimension_ = \
                 takens_embedding_optimal_parameters(
-                    X, self.time_delay, self.dimension, self.stride,
+                    X, self.time_delay, self.dimension, stride=self.stride,
                     n_jobs=self.n_jobs, validate=False
                     )
         else:
@@ -477,7 +539,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
         collection of multivariate or tensor-valued time series. If ``True``,
         ensures that the output is a 3D ndarray or list of 2D arrays. If
         ``False``, each entry of the input collection leads to an array of
-        dimension one higher than the entry's dimension.
+        dimension one higher than the entry's dimension. See Examples.
 
     ensure_last_value : bool, optional, default: ``True``
         Whether the value(s) representing the last measurement(s) must be
@@ -551,6 +613,16 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     To compute the Takens embedding of a single univariate time series in the
     form of a 1D array or column vector, use :class:`SingleTakensEmbedding`
     instead.
+
+    Unlike :class:`SingleTakensEmbedding`, this transformer does not include
+    heuristics to optimize the choice of time delay and embedding dimension.
+    The function :func:`takens_embedding_optimal_parameters` is specifically
+    dedicated to this task, but only on a single univariate time series.
+
+    If dealing with a forecasting problem on a single time series, this
+    transformer can be used after an instance of :class:`SlidingWindow` and
+    before an instance of a homology transformer, to produce topological
+    features from sliding windows over the time series.
 
     """
 
