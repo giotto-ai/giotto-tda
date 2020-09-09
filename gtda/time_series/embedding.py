@@ -8,7 +8,7 @@ from sklearn.utils.validation import check_is_fitted, check_array, column_or_1d
 
 from ._utils import _time_delay_embedding, _mutual_information, \
     _false_nearest_neighbors
-from ..base import TransformerResamplerMixin
+from ..base import TransformerResamplerMixin, PlotterMixin
 from ..plotting import plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
@@ -210,41 +210,6 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 
         yr = yr[:self.size - 2:-self.stride][::-1]
         return yr
-
-    @staticmethod
-    def plot(Xt, sample=0, plotly_params=None):
-        """Plot a sample from a collection of sliding windows, as a point
-        cloud in 2D or 3D. If points in the window have more than three
-        dimensions, only the first three are plotted.
-
-        Important: when using on the result `Xt` of calling :meth:`transform`
-        on ``X``, ensure that each sample in ``X`` is a point in
-        ``n_dimensions``-dimensional space with ``n_dimensions > 1``.
-
-        Parameters
-        ----------
-        Xt : ndarray of shape (n_samples, n_points, n_dimensions)
-            Collection of sliding windows, each containing ``n_points``
-            points in ``n_dimensions``-dimensional space, such as returned by
-            :meth:`transform`.
-
-        sample : int, optional, default: ``0``
-            Index of the sample in `Xt` to be plotted.
-
-        plotly_params : dict or None, optional, default: ``None``
-            Custom parameters to configure the plotly figure. Allowed keys are
-            ``"trace"`` and ``"layout"``, and the corresponding values should
-            be dictionaries containing keyword arguments as would be fed to the
-            :meth:`update_traces` and :meth:`update_layout` methods of
-            :class:`plotly.graph_objects.Figure`.
-
-        Returns
-        -------
-        fig : :class:`plotly.graph_objects.Figure` object
-            Plotly figure.
-
-        """
-        return plot_point_cloud(Xt[sample], plotly_params=plotly_params)
 
 
 @adapt_fit_transform_docs
@@ -485,7 +450,7 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
 
 
 @adapt_fit_transform_docs
-class TakensEmbedding(BaseEstimator, TransformerMixin):
+class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     """Point clouds from collections of time series via independent Takens
     embeddings.
 
@@ -685,3 +650,32 @@ class TakensEmbedding(BaseEstimator, TransformerMixin):
             )
 
         return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, plotly_params=None):
+        """Plot a sample from a collection of Takens embeddings of time series,
+        as a point cloud in 2D or 3D. If points in the window have more than
+        three dimensions, only the first three are plotted.
+
+        Parameters
+        ----------
+        Xt : ndarray or list
+            Collection of point clouds, such as returned by :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
+        """
+        return plot_point_cloud(Xt[sample], plotly_params=plotly_params)

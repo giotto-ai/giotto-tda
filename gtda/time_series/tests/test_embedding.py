@@ -7,8 +7,8 @@ import pytest
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.time_series import SlidingWindow, SingleTakensEmbedding, \
-    TakensEmbedding
+from gtda.time_series import SlidingWindow, \
+    takens_embedding_optimal_parameters, SingleTakensEmbedding, TakensEmbedding
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -53,6 +53,13 @@ signal_embedded_fixed = \
               [2.21511999, 2.6569866, 2.93799998, 2.98935825, 2.79848711],
               [2.6569866, 2.93799998, 2.98935825, 2.79848711, 2.41211849],
               [2.93799998, 2.98935825, 2.79848711, 2.41211849, 1.92484888]])
+
+
+def test_takens_embedding_optimal_parameters_validate():
+    time_delay = -1
+    with pytest.raises(ValueError):
+        takens_embedding_optimal_parameters(signal, time_delay, 2, 1,
+                                            validate=True)
 
 
 def test_embedder_params():
@@ -113,12 +120,6 @@ def test_window_slice_windows():
     assert_almost_equal(
         np.stack(X[begin:end] for begin, end in slice_idx), X_windows
         )
-
-
-def test_window_plot():
-    windows = SlidingWindow(size=4, stride=2)
-    X_windows = windows.fit_transform(signal_embedded_search)
-    windows.plot(X_windows, sample=0)
 
 
 @pytest.mark.parametrize('time_delay', list(range(1, 5)))
@@ -225,3 +226,9 @@ def test_takens_embedding_3D_no_flatten():
                                   [18, 19]]]])
     assert np.array_equal(signals_emb, signals_emb_exp)
     assert np.array_equal(np.asarray(signals_emb_list), signals_emb_exp)
+
+
+def test_takens_embedding_plot():
+    TE = TakensEmbedding()
+    X_embedded = TE.fit_transform([np.arange(20)])
+    TE.plot(X_embedded, sample=0)
