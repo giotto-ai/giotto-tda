@@ -6,14 +6,14 @@ from numbers import Real
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 from ._utils import _postprocess_diagrams
 from ..base import PlotterMixin
 from ..externals.python import CubicalComplex, PeriodicCubicalComplex
 from ..plotting import plot_diagram
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params
+from ..utils.validation import validate_params, check_collection
 
 
 class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
@@ -150,7 +150,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
+        X = check_collection(X, force_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -208,7 +208,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True)
+        Xt = check_collection(X, force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
                                           for x in Xt)
