@@ -197,7 +197,8 @@ def _check_array_mod(X, **kwargs):
         if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
             raise ValueError(
                 "Input contains NaNs. Only finite values and infinity are "
-                "allowed when parameter `force_all_finite` is False.")
+                "allowed when parameter `force_all_finite` is False."
+                )
         return Xnew
     return check_array(X, **kwargs)
 
