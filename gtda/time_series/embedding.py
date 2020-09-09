@@ -12,7 +12,7 @@ from ..base import TransformerResamplerMixin, PlotterMixin
 from ..plotting import plot_point_cloud
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
-from ..utils.validation import validate_params, check_time_series
+from ..utils.validation import validate_params, check_collection
 
 _TAKENS_EMBEDDING_HYPERPARAMETERS = {
         'time_delay': {'type': int, 'in': Interval(1, np.inf, closed='left')},
@@ -593,7 +593,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        check_time_series(X, copy=False)
+        check_collection(X, copy=False)
         validate_params(self.get_params(), self._hyperparameters)
         self._is_fitted = True
 
@@ -640,7 +640,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        Xt = check_time_series(X, copy=True)
+        Xt = check_collection(X, copy=True)
 
         Xt = _time_delay_embedding(
             Xt, time_delay=self.time_delay, dimension=self.dimension,
