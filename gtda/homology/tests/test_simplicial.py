@@ -75,11 +75,14 @@ X_vrp_exp = np.array([
                                        (X_dist, 'precomputed'),
                                        (X_dist_list, 'precomputed'),
                                        (X_dist_sparse, 'precomputed')])
+@pytest.mark.parametrize('collapse_edges', [True, False])
 @pytest.mark.parametrize('max_edge_length', [np.inf, 0.8])
 @pytest.mark.parametrize('infinity_values', [10, 30])
-def test_vrp_transform(X, metric, max_edge_length, infinity_values):
-    vrp = VietorisRipsPersistence(max_edge_length=max_edge_length,
-                                  metric=metric,
+def test_vrp_transform(X, metric, collapse_edges, max_edge_length,
+                       infinity_values):
+    vrp = VietorisRipsPersistence(metric=metric,
+                                  collapse_edges=collapse_edges,
+                                  max_edge_length=max_edge_length,
                                   infinity_values=infinity_values)
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case

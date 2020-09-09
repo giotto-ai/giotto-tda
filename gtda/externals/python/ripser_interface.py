@@ -185,6 +185,16 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             If n_perm <= 0, then the full point cloud was used and this is 0
     }
 
+    Notes
+    -----
+    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
+    <https://github.com/scikit-tda/ripser.py>`_ package.
+
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for the edge collapse algorithm described in [2]_.
+
     References
     ----------
     [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
@@ -197,16 +207,6 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
         `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
         <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
-
-    Notes
-    -----
-    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend
-    for computing Vietoris–Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
-    <https://github.com/scikit-tda/ripser.py>`_ package.
-
-    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in [2]_.
 
     """
     if n_perm and sparse.issparse(X):

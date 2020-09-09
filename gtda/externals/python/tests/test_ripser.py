@@ -46,14 +46,18 @@ def get_sparse_distance_matrices(draw):
 
 
 @pytest.mark.parametrize('thresh', [False, True])
+@pytest.mark.parametrize('coeff', [2, 7])
 @given(distance_matrix=get_dense_distance_matrices())
-def test_collapse_consistent_with_no_collapse_dense(thresh, distance_matrix):
+def test_collapse_consistent_with_no_collapse_dense(thresh,
+                                                    coeff, distance_matrix):
     thresh = np.max(distance_matrix) / 2 if thresh else np.inf
     maxdim = 3
     pd_collapse = ripser(distance_matrix, thresh=thresh, maxdim=maxdim,
-                         metric='precomputed', collapse_edges=True)['dgms']
+                         coeff=coeff, metric='precomputed',
+                         collapse_edges=True)['dgms']
     pd_no_collapse = ripser(distance_matrix, thresh=thresh, maxdim=maxdim,
-                            metric='precomputed', collapse_edges=False)['dgms']
+                            coeff=coeff, metric='precomputed',
+                            collapse_edges=False)['dgms']
     for i in range(maxdim + 1):
         pd_collapse[i] = np.sort(pd_collapse[i], axis=0)
         pd_no_collapse[i] = np.sort(pd_no_collapse[i], axis=0)
@@ -61,17 +65,21 @@ def test_collapse_consistent_with_no_collapse_dense(thresh, distance_matrix):
 
 
 @pytest.mark.parametrize('thresh', [False, True])
+@pytest.mark.parametrize('coeff', [2, 7])
 @given(distance_matrix=get_sparse_distance_matrices())
-def test_collapse_consistent_with_no_collapse_coo(thresh, distance_matrix):
+def test_collapse_consistent_with_no_collapse_coo(thresh,
+                                                  coeff, distance_matrix):
     if thresh and distance_matrix.nnz:
         thresh = np.max(distance_matrix) / 2
     else:
         thresh = np.inf
     maxdim = 3
     pd_collapse = ripser(distance_matrix, thresh=thresh, maxdim=maxdim,
-                         metric='precomputed', collapse_edges=True)['dgms']
+                         coeff=coeff, metric='precomputed',
+                         collapse_edges=True)['dgms']
     pd_no_collapse = ripser(distance_matrix, thresh=thresh, maxdim=maxdim,
-                            metric='precomputed', collapse_edges=False)['dgms']
+                            coeff=coeff, metric='precomputed',
+                            collapse_edges=False)['dgms']
     for i in range(maxdim + 1):
         pd_collapse[i] = np.sort(pd_collapse[i], axis=0)
         pd_no_collapse[i] = np.sort(pd_no_collapse[i], axis=0)
