@@ -495,7 +495,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     >>> print(X)
     [[0 1 2 3]
      [4 5 6 7]]
-    >>> MTE = TakensEmbedding(time_delay=1, dimension=2)
+    >>> TE = TakensEmbedding(time_delay=1, dimension=2)
     >>> print(embedder.fit_transform(X))
     [[[0 1]
       [1 2]
@@ -514,8 +514,8 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
      [[ 4  5  6  7]
       [-4 -5 -6 -7]]]
     # Pass `flatten` as `True` (default)
-    >>> MTE = TakensEmbedding(time_delay=1, dimension=2, flatten=True)
-    >>> print(MTE.fit_transform(X))
+    >>> TE = TakensEmbedding(time_delay=1, dimension=2, flatten=True)
+    >>> print(TE.fit_transform(X))
     [[[ 0  1  0 -1]
       [ 1  2 -1 -2]
       [ 2  3 -2 -3]]
@@ -524,8 +524,8 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
       [ 5  6 -5 -6]
       [ 6  7 -6 -7]]]
     # Pass `flatten` as `False`
-    >>> MTE = TakensEmbedding(time_delay=1, dimension=2, flatten=False)
-    >>> print(MTE.fit_transform(X))
+    >>> TE = TakensEmbedding(time_delay=1, dimension=2, flatten=False)
+    >>> print(TE.fit_transform(X))
     [[[[ 0  1]
        [ 1  2]
        [ 2  3]]
