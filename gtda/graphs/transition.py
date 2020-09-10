@@ -37,7 +37,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
            row to them. This can be used e.g. as a "compression" step to reduce
            the size of the state space.
         2. It computes the transition graph of each array as a sparse matrix of
-           zeos and ones.
+           zeros and ones.
 
     Parameters
     ----------
