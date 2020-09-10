@@ -231,5 +231,4 @@ def test_takens_embedding_3D_no_flatten():
 
 def test_takens_embedding_plot():
     TE = TakensEmbedding()
-    X_embedded = TE.fit_transform([np.arange(20)])
-    TE.plot(X_embedded, sample=0)
+    _ = TE.fit_transform_plot([np.arange(20)], sample=0)
