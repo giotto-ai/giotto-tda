@@ -17,7 +17,7 @@ from ..utils.validation import validate_params
 
 @adapt_fit_transform_docs
 class Labeller(BaseEstimator, TransformerResamplerMixin):
-    """Target creation from sliding windows over a time series.
+    """Target creation from sliding windows over a univariate time series.
 
     Useful to define a time series forecasting task in which labels are
     obtained from future values of the input time series, via the application
@@ -59,14 +59,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
     >>> # Fit and transform X
     >>> X, y = labeller.fit_transform_resample(X, X)
     >>> print(X)
-    [[1]
-     [2]
-     [3]
-     [4]
-     [5]
-     [6]
-     [7]
-     [8]]
+    [1 2 3 4 5 6 7 8]
     >>> print(y)
     [0 1 2 3 4 5 6 7]
 
@@ -98,7 +91,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         Parameters
         ----------
         X : ndarray of shape (n_samples,) or (n_samples, 1)
-            Time series to build a target for.
+            Univariate time series to build a target for.
 
         y : None
             There is no need for a target, yet the pipeline API requires this
@@ -134,7 +127,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
         Parameters
         ----------
         X : ndarray of shape (n_samples,) or (n_samples, 1)
-            Time series to build a target for.
+            Univariate time series to build a target for.
 
         y : None
             There is no need for a target, yet the pipeline API requires this
@@ -142,7 +135,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples_new, 1)
+        Xt : ndarray of shape (n_samples_new,)
             The cut input time series.
 
         """
