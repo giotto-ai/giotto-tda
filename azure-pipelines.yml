@@ -78,7 +78,7 @@ jobs:
   - script: |
       set -e
       python -m pip install pandas openml matplotlib
-      python -m pip install "papermill==1.2.1"
+      python -m pip install "papermill"
       cd examples
       for n in *.ipynb
       do
@@ -191,7 +191,7 @@ jobs:
   - script: |
       set -e
       python -m pip install -e ".[examples]"
-      python -m pip install "papermill==1.2.1"
+      python -m pip install "papermill"
       cd examples
       for n in *.ipynb
       do
@@ -290,7 +290,7 @@ jobs:
 
   - script: |
       python -m pip install -e ".[examples]"
-      python -m pip install "papermill==1.2.1"
+      python -m pip install "papermill"
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
     condition: eq(variables['notebooks_check'], 'true')
