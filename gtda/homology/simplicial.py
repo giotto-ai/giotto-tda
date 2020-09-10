@@ -71,9 +71,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         equals `coeff`.
 
     collapse_edges : bool, optional, default: ``False``
-        Whether to run the edge collapse algorithm in [2]_ prior to the
-        persistent homology computation (see the Notes). Can reduce the runtime
-        dramatically when the data or the maximum homology dimension are large.
+        Whether to run the edge collapse algorithm in Boissonnat & Pitram [2]_
+        prior to the persistent homology computation (see the Notes). Can
+        reduce the runtime dramatically when the data or the maximum homology
+        dimensions are large.
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
@@ -110,20 +111,20 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in [2]_.
+    for the edge collapse algorithm described in Boissonnat and Pitram [2]_ .
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
-        barcodes", 2019; `arXiv:1908.02518 \
-        <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips \
+           persistence barcodes", 2019; `arXiv:1908.02518 \
+           <https://arxiv.org/abs/1908.02518>`_.
 
-    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
-        Flag Complexes"; in *36th International Symposium on Computational \
-        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
-        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
-        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
-        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+    .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
+           Flag Complexes"; in 36th International Symposium on Computational \
+           Geometry (SoCG 2020), pp. 19:1–19:15, \
+           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020; \
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
+           <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """
 

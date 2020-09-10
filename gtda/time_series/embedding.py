@@ -282,7 +282,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a single univariate time series as a point cloud.
 
-    Based on a time-delay embedding technique named after F. Takens.[1]_ Given
+    Based on a time-delay embedding technique named after F. Takens. [1]_ Given
     a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of evenly
     sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
     :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i + \\tau},
@@ -397,11 +397,11 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
            Boulder, 2018; `https://scholar.colorado.edu/math_gradetds/67
            <https://scholar.colorado.edu/math_gradetds/67>`_.
 
-    [4] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
-        Application of Topological Methods to Signal Analysis"; \
-        *Foundations of Computational Mathematics*, **15**, \
-        pp. 799--838; `doi:10.1007/s10208-014-9206-z \
-        <https://doi.org/10.1007/s10208-014-9206-z>`_.
+    .. [4] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
+           Application of Topological Methods to Signal Analysis"; \
+           *Foundations of Computational Mathematics*, **15**, \
+            pp. 799--838; `doi:10.1007/s10208-014-9206-z \
+           <https://doi.org/10.1007/s10208-014-9206-z>`_.
 
     """
 
