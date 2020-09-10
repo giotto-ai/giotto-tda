@@ -210,7 +210,6 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
             Plotly figure.
 
         """
-
         return plot_heatmap(
             Xt[sample], colorscale=colorscale,
             title=f"{sample}-th geodesic distance matrix",

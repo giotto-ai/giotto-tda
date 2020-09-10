@@ -176,7 +176,6 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
             Plotly figure.
 
         """
-
         return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
             title=f"Binarization of image {sample}",
@@ -301,7 +300,6 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             Plotly figure.
 
         """
-
         return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
             title=f"Inversion of image {sample}",
@@ -468,7 +466,6 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
             Plotly figure.
 
         """
-
         return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
             title=f"Padded version of image {sample}",
