@@ -136,8 +136,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute kNN graphs and return their adjacency matrices as sparse
-        matrices whose type depends on `mode`.
+        """Compute kNN graphs and return their adjacency matrices in sparse
+        format.
 
         Parameters
         ----------
