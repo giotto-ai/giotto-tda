@@ -180,7 +180,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -208,23 +208,16 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
-            title=f"Height filtration of image {sample_orig}",
+            title=f"Height filtration of image {sample}",
             plotly_params=plotly_params
             )
 
@@ -430,7 +423,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -458,23 +451,16 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
-            title=f"Radial filtration of image {sample_orig}",
+            title=f"Radial filtration of image {sample}",
             plotly_params=plotly_params
             )
 
@@ -627,7 +613,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -655,23 +641,16 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
-            title=f"Dilation filtration of image {sample_orig}",
+            title=f"Dilation filtration of image {sample}",
             plotly_params=plotly_params
             )
 
@@ -823,7 +802,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -851,23 +830,16 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
-            title=f"Erosion filtration of image {sample_orig}",
+            title=f"Erosion filtration of image {sample}",
             plotly_params=plotly_params
             )
 
@@ -1029,7 +1001,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D greyscale images.
 
         Parameters
@@ -1057,22 +1029,15 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
-            title=f"Signed-distance filtration of image {sample_orig}",
+            title=f"Signed-distance filtration of image {sample}",
             plotly_params=plotly_params
             )

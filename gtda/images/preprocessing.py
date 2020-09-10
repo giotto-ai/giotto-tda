@@ -142,7 +142,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D binary images.
 
         Parameters
@@ -170,23 +170,16 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
-            title=f"Binarization of image {sample_orig}",
+            title=f"Binarization of image {sample}",
             plotly_params=plotly_params
             )
 
@@ -274,7 +267,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D binary images.
 
         Parameters
@@ -302,23 +295,16 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
-            title=f"Inversion of image {sample_orig}",
+            title=f"Inversion of image {sample}",
             plotly_params=plotly_params
             )
 
@@ -448,7 +434,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     @staticmethod
     def plot(Xt, sample=0, colorscale='greys', origin='upper',
-             plotly_params=None, sample_orig=None):
+             plotly_params=None):
         """Plot a sample from a collection of 2D binary images.
 
         Parameters
@@ -476,23 +462,16 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
             :meth:`update_traces` and :meth:`update_layout` methods of
             :class:`plotly.graph_objects.Figure`.
 
-        sample_orig : int or None, optional, default: ``None``
-            Needed when this method is called as part of a call to
-            :meth:`transform_plot`, to keep track of the original sample
-            index when generating the figure title. Do not use.
-
         Returns
         -------
         fig : :class:`plotly.graph_objects.Figure` object
             Plotly figure.
 
         """
-        if sample_orig is None:
-            sample_orig = sample
 
         return plot_heatmap(
             Xt[sample] * 1, colorscale=colorscale, origin=origin,
-            title=f"Padded version of image {sample_orig}",
+            title=f"Padded version of image {sample}",
             plotly_params=plotly_params
             )
 
