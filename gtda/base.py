@@ -140,6 +140,5 @@ class PlotterMixin:
 
         """
         Xt = self.transform(X[sample:sample+1])
-        self.plot(Xt, sample=0, **plot_params).show()
-
+        self.plot({sample: Xt[0]}, sample=sample, **plot_params).show()
         return Xt
