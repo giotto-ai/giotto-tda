@@ -48,6 +48,8 @@ PYBIND11_MODULE(gtda_periodic_cubical_complex, m) {
                    Bitmap_cubical_complex_periodic_boundary_conditions_base<
                        double>>*,
            bool>())
+      .def("compute_persistence",
+           &Persistent_cohomology_interface_inst::compute_persistence)
       .def("get_persistence",
            &Persistent_cohomology_interface_inst::get_persistence)
       .def("betti_numbers",
@@ -58,4 +60,3 @@ PYBIND11_MODULE(gtda_periodic_cubical_complex, m) {
            &Persistent_cohomology_interface_inst::intervals_in_dimension);
   m.doc() = "GUDHI periocal cubical complex function interfacing";
 }
-
