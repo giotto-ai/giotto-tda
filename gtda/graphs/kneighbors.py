@@ -116,8 +116,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : list of 2D ndarray, or ndarray of shape (n_samples, n_points, \
-            n_dimensions)
+        X : list of length n_samples, or ndarray of shape (n_samples, \
+            n_points, n_dimensions)
             Input data representing a collection of point clouds. Each entry
             in `X` is a 2D array of shape ``(n_points, n_dimensions)``.
 
@@ -141,8 +141,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : list of 2D ndarray, or ndarray of shape (n_samples, n_points, \
-            n_dimensions)
+        X : list of length n_samples, or ndarray of shape (n_samples, \
+            n_points, n_dimensions)
             Input data representing a collection of point clouds. Each entry
             in `X` is a 2D array of shape ``(n_points, n_dimensions)``.
 
@@ -152,10 +152,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : list of sparse matrices in CSR format, shape (n_samples,)
-            Adjacency matrices of kNN graphs. The matrices contains ones and
-            zeros if `mode` is ``'connectivity'``, and floats representing
-            distances according to `metric` if `mode` is ``'distance'``.
+        Xt : list of length n_samples
+            Adjacency matrices of kNN graphs, in sparse CSR format. The
+            matrices contain ones and zeros if `mode` is ``'connectivity'``,
+            and floats representing distances according to `metric` if `mode`
+            is ``'distance'``.
 
         """
         check_is_fitted(self, '_is_fitted')

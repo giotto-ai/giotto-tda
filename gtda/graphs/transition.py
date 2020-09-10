@@ -25,10 +25,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     Let A be a two-dimensional array viewed as a time series (along the row
     axis) of one-dimensional arrays encoding the "state" of a system. The
     corresponding *undirected transition graph* (or *network*) has as vertex
-    set the set of all unique states (rows) in A, and there is an edge
-    between vertex i and vertex j≠i if and only if the state corresponding to
-    vertex j immediately follows the one corresponding to vertex i, somewhere
-    in A.
+    set the set of all unique states (rows) in A, and there is an edge between
+    vertex i and vertex j≠i if and only if the state corresponding to vertex
+    j immediately follows the one corresponding to vertex i, somewhere in A.
 
     Given a collection of two-dimensional arrays, this transformer performs two
     tasks:
@@ -137,9 +136,10 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : list of 2D ndarray, or ndarray of shape (n_samples, n_timestamps, \
-            n_features)
-            Input data.
+        X : list of length n_samples, or ndarray of shape (n_samples, \
+            n_timestamps, n_features)
+            Input data: a collection of 2D arrays of shape
+            ``(n_timestamps, n_features)``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -168,14 +168,14 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         """Create transition graphs from the input data and return their
-        adjacency matrices. The graphs are simple, undirected and unweighted,
-        and the adjacency matrices are sparse matrices of ones and zeros.
+        adjacency matrices. The graphs are simple and unweighted.
 
         Parameters
         ----------
-        X : list of 2D ndarray, or ndarray of shape (n_samples, n_timestamps, \
-            n_features)
-            Input data.
+        X : list of length n_samples, or ndarray of shape (n_samples, \
+            n_timestamps, n_features)
+            Input data: a collection of 2D arrays of shape
+            ``(n_timestamps, n_features)``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -183,9 +183,9 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : list
+        Xt : list of length n_samples
             Collection of ``n_samples`` transition graphs. Each transition
-            graph is encoded by a sparse matrix of ones and zeros.
+            graph is encoded by a sparse CSR matrix of ones and zeros.
 
         """
         check_is_fitted(self)
