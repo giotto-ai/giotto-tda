@@ -13,7 +13,7 @@ by Lewis Tunstall provides a friendly introduction to the philosophy of ``giotto
    persistent_homology_graphs
    mapper_quickstart
    time_series_forecasting
-   topological_timeseries
+   time_series_classification
 
 ..
    include:: vietoris_rips_quickstart.rst
