@@ -145,5 +145,3 @@ def test_contract_nodes():
     pipe.set_params(contract_nodes=False)
     graph = pipe.fit_transform(X_f)
     assert len(graph.es)
-
-
