@@ -6,8 +6,10 @@ import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_circles
 
-from gtda.mapper.pipeline import make_mapper_pipeline
+from gtda.mapper import Projection, OneDimensionalCover, make_mapper_pipeline
 
 
 @given(X=arrays(dtype=np.float, unique=True,
@@ -65,7 +67,7 @@ def test_edge_elements(X):
     assert all([
         np.array_equal(node, node_ee)
         for node, node_ee in zip(node_elements, node_elements_ee)
-    ])
+        ])
     assert graph.vs.indices == graph_edge_elems.vs.indices
     # Edges
     assert graph.es.indices == graph_edge_elems.es.indices
@@ -73,7 +75,7 @@ def test_edge_elements(X):
     assert all([
         edge.tuple == edge_ee.tuple
         for edge, edge_ee in zip(graph.es, graph_edge_elems.es)
-    ])
+        ])
 
     # Check that the arrays edge_elements contain precisely those indices which
     # are in the element sets associated to both the first and second vertex,
@@ -84,7 +86,7 @@ def test_edge_elements(X):
         flag *= np.array_equal(
             edge["edge_elements"],
             np.intersect1d(v1["node_elements"], v2["node_elements"]),
-        )
+            )
         flag *= len(edge["edge_elements"]) == edge["weight"]
     assert flag
 
@@ -105,3 +107,43 @@ def test_min_intersection(X, min_intersection):
 
     # Check that there are no edges with weight less than min_intersection
     assert all([x >= min_intersection for x in graph.es["weight"]])
+
+
+def test_contract_nodes():
+    """Test that, on a pathological dataset, we generate a graph without edges
+    when `contract_nodes` is set to False and with edges when it is set to
+    True."""
+    X = make_circles(n_samples=2000)[0]
+
+    filter_func = Projection()
+    cover = OneDimensionalCover(n_intervals=5, overlap_frac=0.4)
+    p = filter_func.fit_transform(X)
+    m = cover.fit_transform(p)
+
+    gap = 0.1
+    idx_to_remove = []
+    for i in range(m.shape[1] - 1):
+        inters = np.logical_and(m[:, i], m[:, i + 1])
+        inters_idx = np.flatnonzero(inters)
+        p_inters = p[inters_idx]
+        min_p, max_p = np.min(p_inters), np.max(p_inters)
+        idx_to_remove += list(
+            np.flatnonzero((min_p <= p) & (p <= min_p + gap)))
+        idx_to_remove += list(
+            np.flatnonzero((max_p - gap <= p) & (p <= max_p)))
+
+    X_f = X[[x for x in range(len(X)) if x not in idx_to_remove]]
+
+    clusterer = DBSCAN(eps=0.05)
+    pipe = make_mapper_pipeline(filter_func=filter_func,
+                                cover=cover,
+                                clusterer=clusterer,
+                                contract_nodes=True)
+    graph = pipe.fit_transform(X_f)
+    assert not len(graph.es)
+
+    pipe.set_params(contract_nodes=False)
+    graph = pipe.fit_transform(X_f)
+    assert len(graph.es)
+
+
