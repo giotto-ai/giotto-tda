@@ -58,7 +58,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     reduced_homology : bool, optional, default: ``True``
        If ``True``, the earliest-born triple in homology dimension 0 which has
-       infinite death is discarded in :meth:`transform`.
+       infinite death is discarded from each diagram computed in
+       :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
