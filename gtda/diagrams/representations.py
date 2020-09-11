@@ -722,7 +722,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence images <persistence_image>` of persistence
+    """:ref:`Persistence images <TODO>` of persistence
     diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of

@@ -182,7 +182,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class Amplitude(BaseEstimator, TransformerMixin):
-    """:ref:`Amplitudes <amplitude>` of persistence diagrams.
+    """:ref:`Amplitudes <TODO>` of persistence diagrams.
 
     For each persistence diagram in a collection, a vector of amplitudes or a
     single scalar amplitude is calculated according to the following steps:
