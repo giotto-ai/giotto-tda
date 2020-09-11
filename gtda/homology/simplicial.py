@@ -582,7 +582,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
-    :ref:`weak alpha filtrations <weak_alpha_filtration>`.
+    :ref:`weak alpha filtrations <TODO>`.
 
     Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, or an abstract :ref:`metric space
