@@ -105,9 +105,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
-    computing Vietoris–Rips persistent homology. Python bindings were modified
-    for performance from the `ripser.py
+    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
