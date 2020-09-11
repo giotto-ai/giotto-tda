@@ -253,29 +253,26 @@ def plot_static_mapper_graph(
     button_height = 1.1
     fig.update_layout(
         updatemenus=[
-            go.layout.Updatemenu(
-                buttons=column_color_buttons,
-                direction="down",
-                pad={"r": 10, "t": 10},
-                showactive=True,
-                x=0.11,
-                xanchor="left",
-                y=button_height,
-                yanchor="top"
-                ),
-            ])
+            go.layout.Updatemenu(buttons=column_color_buttons,
+                                 direction="down",
+                                 pad={"r": 10, "t": 10},
+                                 showactive=True,
+                                 x=0.11,
+                                 xanchor="left",
+                                 y=button_height,
+                                 yanchor="top")
+            ]
+        )
 
     if color_by_columns_dropdown:
         fig.add_annotation(
-            go.layout.Annotation(
-                text="Color by:",
-                x=0,
-                xref="paper",
-                y=button_height - 0.045,
-                yref="paper",
-                align="left",
-                showarrow=False
-                )
+            go.layout.Annotation(text="Color by:",
+                                 x=0,
+                                 xref="paper",
+                                 y=button_height - 0.045,
+                                 yref="paper",
+                                 align="left",
+                                 showarrow=False)
             )
 
     # Update traces and layout according to user input
