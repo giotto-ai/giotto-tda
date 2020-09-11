@@ -602,7 +602,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     persistent homology of this filtration can be much faster than computing
     Vietoris–Rips persistent homology via :class:`VietorisRipsPersistence`.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
