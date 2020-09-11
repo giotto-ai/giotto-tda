@@ -118,9 +118,12 @@ html_theme_options = {
 # List versions
 current_version = os.environ['VERSION']
 html_theme_options.update({'current_version': current_version})
-with open('versions', 'r') as f:
-    _versions = [c[2:] for c in f.read().splitlines()]
-_versions = list(filter(lambda c: not(c.startswith('.')), _versions))
+try:
+    with open('versions', 'r') as f:
+        _versions = [c[2:] for c in f.read().splitlines()]
+    _versions = list(filter(lambda c: not(c.startswith('.')), _versions))
+except FileNotFoundError:
+    _versions = ['test1', 'test2', current_version]
 html_theme_options.update({
     'versions': [
         (c, f'../{c}/index.html')
@@ -129,7 +132,7 @@ html_theme_options.update({
 })
 
 # Get logo
-html_logo = "images/tda_logo.svg"
+html_logo = "images/tda_logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
