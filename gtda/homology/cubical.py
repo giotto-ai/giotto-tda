@@ -26,12 +26,10 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
-    **Important notes**:
+    **Important note**:
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -59,8 +57,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         values within all images passed to :meth:`fit`.
 
     reduced_homology : bool, optional, default: ``True``
-       If ``True``, one feature in homology dimension 0 with infinite death is
-       discarded.
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless

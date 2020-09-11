@@ -36,13 +36,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -87,8 +85,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         value is declared to be equal to `max_edge_length`.
 
     reduced_homology : bool, optional, default: ``True``
-       If ``True``, one feature in homology dimension 0 with infinite death is
-       discarded.
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -330,13 +328,11 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -380,8 +376,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         value is declared to be equal to `max_edge_length`.
 
     reduced_homology : bool, optional, default: ``True``
-       If ``True``, one feature in homology dimension 0 with infinite death is
-       discarded.
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -611,8 +607,6 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -637,8 +631,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         value is declared to be equal to `max_edge_length`.
 
     reduced_homology : bool, optional, default: ``True``
-       If ``True``, one feature in homology dimension 0 with infinite death is
-       discarded.
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -850,13 +844,11 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <homology_and_cohomology>`) of various dimensions and at different scales
     is summarised in the corresponding persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -879,8 +871,8 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         value is declared to be equal to `max_edge_length`.
 
     reduced_homology : bool, optional, default: ``True``
-       If ``True``, one feature in homology dimension 0 with infinite death is
-       discarded.
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -1077,13 +1069,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`homology classes <homology_and_cohomology>`) of various dimension and
     at different scales is summarised in the corresponding persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -1127,8 +1117,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         value is declared to be equal to `max_edge_weight`.
 
     reduced_homology : bool, optional, default: ``True``
-       If ``True``, one feature in homology dimension 0 with infinite death is
-       discarded.
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     max_entries : int, optional, default: ``-1``
         Number controlling the degree of precision in the matrix reductions
