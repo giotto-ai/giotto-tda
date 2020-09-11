@@ -455,28 +455,23 @@ def plot_interactive_mapper_graph(
 
             logger.info("Updating figure...")
             with fig.batch_update():
-                (
-                    edge_trace, node_trace, node_elements,
-                    node_colors_color_variable
-                    ) = _calculate_graph_data(
+                (edge_trace, node_trace, node_elements,
+                 node_colors_color_variable) = _calculate_graph_data(
                     _pipeline, data, is_data_dataframe, layout, layout_dim,
                     color_variable, _node_color_statistic, n_sig_figs,
                     node_scale
                     )
                 if colorscale_for_hoverlabel is not None:
-                    node_colors_color_variable = np.asarray(
-                        node_colors_color_variable
-                        )
+                    node_colors_color_variable = \
+                        np.asarray(node_colors_color_variable)
                     min_col = np.min(node_colors_color_variable)
                     max_col = np.max(node_colors_color_variable)
                     hoverlabel_bgcolor = _get_colors_for_vals(
                         node_colors_color_variable, min_col, max_col,
                         colorscale_for_hoverlabel
                         )
-                    fig.update_traces(
-                        hoverlabel_bgcolor=hoverlabel_bgcolor,
-                        selector={"name": "node_trace"}
-                        )
+                    fig.update_traces(hoverlabel_bgcolor=hoverlabel_bgcolor,
+                                      selector={"name": "node_trace"})
 
                 fig.update_traces(
                     x=node_trace.x,
