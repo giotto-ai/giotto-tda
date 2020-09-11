@@ -28,12 +28,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`Vietoris–Rips filtrations
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <TODO>` in Euclidean space, or an abstract
-    :ref:`metric space <TODO>` encoded by a distance matrix, information about
-    the appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     **Important notes**:
 
@@ -316,12 +317,13 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`Sparse Vietoris–Rips filtrations
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <TODO>` in Euclidean space, or an abstract
-    :ref:`metric space <TODO>` encoded by a distance matrix, information about
-    the appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     **Important notes**:
 
@@ -582,11 +584,13 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
     :ref:`weak alpha filtrations <weak_alpha_filtration>`.
 
-    Given a :ref:`point cloud <TODO>` in
-    Euclidean space, information about the appearance and disappearance of
-    topological features (technically, :ref:`homology classes
-    <homology_and_cohomology>`) of various dimension and at different scales is
-    summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     The weak alpha filtration of a point cloud is defined to be the
     :ref:`Vietoris–Rips filtration
@@ -826,14 +830,15 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
-    `Cech filtrations <TODO>`_.
+    `Cech filtrations <cech_complex_and_cech_persistence>`_.
 
-    Given a :ref:`point cloud <TODO>` in Euclidean space, or an abstract
-    :ref:`metric space <TODO>` encoded by a distance matrix, information about
-    the appearance and disappearance of topological features (technically,
-    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
-    and at different scales is summarised in the corresponding persistence
-    diagram.
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     **Important notes**:
 

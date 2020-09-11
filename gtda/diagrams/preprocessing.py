@@ -132,9 +132,10 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
     The value of :attr:`scale_` depends on two things:
 
         - A way of computing, for each homology dimension, the :ref:`amplitude
-          <TODO>` in that dimension of a persistence diagram consisting
-          of birth-death-dimension triples [b, d, q]. Together, `metric` and
-          `metric_params` define this in the same way as in :class:`Amplitude`.
+          <vectorization_amplitude_and_kernel>` in that dimension of a
+          persistence diagram consisting of birth-death-dimension triples
+          [b, d, q]. Together, `metric` and `metric_params` define this in the
+          same way as in :class:`Amplitude`.
         - A scalar-valued function which is applied to the resulting
           two-dimensional array of amplitudes (one per diagram and homology
           dimension) to obtain :attr:`scale_`.
