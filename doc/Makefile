@@ -41,20 +41,19 @@ check_installs:
 		fi;\
 	done;
 
-togit:
+copy-to-docs-location:
 	@mkdir -p "$(CURRENTDOCFOLDER)"
 	@cp -a build/html/ "$(CURRENTDOCFOLDER)"
 
-github:
-	@make update-versions-list
+test-notebooks:
+	@make run-notebooks
+	@make html-docs
+
+html-docs:
 	@export VERSION=$(VERSION); make html
-	@make togit
 
 theory-gl:
 	@pandoc theory/glossary.tex -f latex -t rst --toc -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
-
-convert-notebooks:
-	@jupyter nbconvert notebooks/*.ipynb --execute --to rst
 
 clean-gh:
 	@make clean
@@ -66,15 +65,22 @@ update-versions-list:
 	@mv $(GITDIR)/versions versions
 	@python3 update_versions.py $(GITDIR)
 
+run-notebooks:
+	@cp ../examples/*.ipynb notebooks/
+	@cp ../examples/*.py notebooks/
+	@jupyter nbconvert notebooks/*.ipynb --execute --to rst --ExecutePreprocessor.timeout=1200
+
 all-gh:
 	@make clean-gh
 	@make theory-gl
 	@if ($(RUNNOTEBOOKS)); then\
-	   cp ../examples/*.ipynb notebooks/;\
-	   cp ../examples/*.py notebooks/;\
-	   make convert-notebooks;\
+	   make run-notebooks;\
 	fi
-	@make github
+	@if ($(UPDATE_VERSIONS)); then\
+	    make update-versions-list;\
+	fi
+	@make html-docs
+	@make copy-to-docs-location
 
 gh-remove:
 	@cd $(GITDIR); rm -rfv $(VERSION) && mkdir $(VERSION)
