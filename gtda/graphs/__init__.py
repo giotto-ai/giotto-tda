@@ -10,4 +10,4 @@ __all__ = [
     'TransitionGraph',
     'KNeighborsGraph',
     'GraphGeodesicDistance'
-]
+    ]
