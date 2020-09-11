@@ -36,14 +36,17 @@ def check_diagrams(X, copy=False):
     X_array = np.asarray(X)
     if X_array.ndim == 0:
         raise ValueError(
-            f"Expected 3D array, got scalar array instead:\narray={X_array}.")
+            f"Expected 3D array, got scalar array instead:\narray={X_array}."
+            )
     if X_array.ndim != 3:
         raise ValueError(
-            f"Input should be a 3D ndarray, the shape is {X_array.shape}.")
+            f"Input should be a 3D ndarray, the shape is {X_array.shape}."
+            )
     if X_array.shape[2] != 3:
         raise ValueError(
             f"Input should be a 3D ndarray with a 3rd dimension of 3 "
-            f"components, but there are {X_array.shape[2]} components.")
+            f"components, but there are {X_array.shape[2]} components."
+            )
 
     X_array = X_array.astype(float, copy=False)
     homology_dimensions = sorted(np.unique(X_array[0, :, 2]))
@@ -53,25 +56,27 @@ def check_diagrams(X, copy=False):
                 raise ValueError(
                     f"np.inf is a valid homology dimension for a stacked "
                     f"diagram but it should be the only one: "
-                    f"homology_dimensions = {homology_dimensions}.")
+                    f"homology_dimensions = {homology_dimensions}."
+                    )
         else:
             if dim != int(dim):
                 raise ValueError(
                     f"All homology dimensions should be integer valued: "
-                    f"{dim} can't be cast to an int of the same value.")
+                    f"{dim} can't be cast to an int of the same value."
+                    )
             if dim != np.abs(dim):
                 raise ValueError(
                     f"All homology dimensions should be integer valued: "
-                    f"{dim} can't be cast to an int of the same value.")
+                    f"{dim} can't be cast to an int of the same value."
+                    )
 
-    n_points_above_diag = np.sum(X_array[:, :, 1] >= X_array[:, :, 0])
-    n_points_global = X_array.shape[0] * X_array.shape[1]
-    if n_points_above_diag != n_points_global:
+    n_points_below_diag = np.sum(X_array[:, :, 1] < X_array[:, :, 0])
+    if n_points_below_diag:
         raise ValueError(
             f"All points of all persistence diagrams should be above the "
-            f"diagonal, i.e. X[:,:,1] >= X[:,:,0]. "
-            f"{n_points_global - n_points_above_diag} points are under the "
-            f"diagonal.")
+            f"diagonal, i.e. X[:, :, 1] >= X[:, :, 0]. {n_points_below_diag} "
+            f"points are below the diagonal."
+            )
     if copy:
         X_array = np.copy(X_array)
 

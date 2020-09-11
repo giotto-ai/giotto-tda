@@ -146,9 +146,11 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     [[[ 2  3]
       [ 4  5]
       [ 6  7]]
+
      [[ 8  9]
       [10 11]
       [12 13]]
+
      [[14 15]
       [16 17]
       [18 19]]]
@@ -646,7 +648,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input collection of time series. A 2D array or list of 1D arrays is
             interpreted as a collection of univariate time series. A 3D array
             or list of 2D arrays is interpreted as a collection of multivariate
@@ -676,7 +678,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : ndarray or list
+        X : ndarray or list of length n_samples
             Input collection of time series. A 2D array or list of 1D arrays is
             interpreted as a collection of univariate time series. A 3D array
             or list of 2D arrays is interpreted as a collection of multivariate
@@ -691,7 +693,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray or list
+        Xt : ndarray or list of length n_samples
             The result of performing a Takens embedding of each entry in `X`
             with the given parameters. If `X` is a 2D array or a list of 1D
             arrays, `Xt` is a 3D array or a list of 2D arrays (respectively),
@@ -730,7 +732,7 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : ndarray or list
+        Xt : ndarray or list of length n_samples
             Collection of point clouds, such as returned by :meth:`transform`.
 
         sample : int, optional, default: ``0``

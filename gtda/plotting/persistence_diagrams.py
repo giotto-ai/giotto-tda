@@ -36,6 +36,7 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
 
+    diagram = diagram[diagram[:, 0] != diagram[:, 1]]
     diagram_no_dims = diagram[:, :2]
     posinfinite_mask = np.isposinf(diagram_no_dims)
     neginfinite_mask = np.isneginf(diagram_no_dims)
@@ -64,8 +65,6 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
     for dim in homology_dimensions:
         name = f"H{int(dim)}" if dim != np.inf else "Any homology dimension"
         subdiagram = diagram[diagram[:, 2] == dim]
-        diff = (subdiagram[:, 1] != subdiagram[:, 0])
-        subdiagram = subdiagram[diff]
         unique, inverse, counts = np.unique(
             subdiagram, axis=0, return_inverse=True, return_counts=True
             )
