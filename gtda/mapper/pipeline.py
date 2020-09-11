@@ -225,7 +225,9 @@ def make_mapper_pipeline(scaler=None,
         :class:`igraph.Graph` objects.
 
     contract_nodes : bool, optional, default: ``False``
-        TODO write
+        If ``True``, any node representing a cluster which is a strict subset
+        of the cluster corresponding to another node is eliminated, and only
+        one maximal node is kept.
 
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``

@@ -47,7 +47,9 @@ class Nerve(BaseEstimator, TransformerMixin):
         ``True``, might lead to a large :class:`igraph.Graph` object.
 
     contract_nodes : bool, optional, default: ``False``
-        TODO write
+        If ``True``, any node representing a cluster which is a strict subset
+        of the cluster corresponding to another node is eliminated, and only
+        one maximal node is kept.
 
     Attributes
     ----------
@@ -95,10 +97,10 @@ class Nerve(BaseEstimator, TransformerMixin):
             by the clustering step of a :class:`gtda.mapper.MapperPipeline`.
             Each sublist corresponds to a (non-empty) pullback cover set --
             equivalently, to a cover set in the filter range which has
-            non-empty preimage. It contains triples of the form ``(\
-            pullback_set_label, partial_cluster_label, node_elements)`` where
-            ``partial_cluster_label`` is a cluster label within the pullback
-            cover set identified by ``pullback_set_label``, and
+            non-empty preimage. It contains triples of the form
+            ``(pullback_set_label, partial_cluster_label, node_elements)``
+            where ``partial_cluster_label`` is a cluster label within the
+            pullback cover set identified by ``pullback_set_label``, and
             ``node_elements`` is an array of integer indices. To each pair
             ``(pullback_set_label, partial_cluster_label)`` there corresponds
             a unique node in the output Mapper graph. This node represents
