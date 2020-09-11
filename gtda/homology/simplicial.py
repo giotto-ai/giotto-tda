@@ -393,14 +393,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing sparse Vietoris–Rips persistent homology. Python bindings
-    were modified for performance.
+    for computing sparse Vietoris–Rips persistent homology [1]_ . Python
+    bindings were modified for performance.
 
     References
     ----------
-    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
-        Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
-        cohomology.html>`_.
+    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
+           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+           cohomology.html>`_.
 
     """
 
@@ -650,16 +650,16 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     Delaunay triangulation are computed by :class:`scipy.spatial.Delaunay`.
-    Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
+    Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend for
     computing Vietoris–Rips persistent homology. Python bindings were modified
     for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
-        barcodes", 2019; `arXiv:1908.02518 \
-        <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips \
+           persistence barcodes", 2019; `arXiv:1908.02518 \
+           <https://arxiv.org/abs/1908.02518>`_.
 
     """
 
@@ -887,14 +887,14 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cech persistent homology. Python bindings were modified for
-    performance.
+    for computing Cech persistent homology [1]_ . Python bindings were modified
+    for performance.
 
     References
     ----------
-    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
-        Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
-        cohomology.html>`_.
+    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
+           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+           cohomology.html>`_.
 
     """
 
@@ -1057,7 +1057,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
     :ref:`filtrations <filtered_complex>` of :ref:`directed or undirected flag
-    complexes <clique_and_flag_complexes>`.
+    complexes <clique_and_flag_complexes>` [1]_ .
 
     Given a weighted directed or undirected graph, information about the
     appearance and disappearance of topological features (technically,
@@ -1148,9 +1148,9 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing \
-        persistent homology of directed flag complexes", Algorithms, 13(1), \
-        2020.
+    .. [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing \
+           persistent homology of directed flag complexes", Algorithms, \
+           13(1), 2020.
 
     """
 
