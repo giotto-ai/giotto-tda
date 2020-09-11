@@ -8,7 +8,7 @@ from warnings import warn
 
 import numpy as np
 import plotly.graph_objects as go
-from ipywidgets import Layout, widgets
+from ipywidgets import widgets, Layout, HTML
 from sklearn.base import clone
 
 from .utils._logging import OutputWidgetHandler
@@ -391,32 +391,48 @@ def plot_interactive_mapper_graph(
 
     _node_color_statistic = node_color_statistic or np.mean
 
-    def get_widgets_per_param(param, value):
-        if isinstance(value, float):
-            return (param, widgets.FloatText(
-                value=value,
-                step=0.05,
-                description=param.split("__")[1],
-                continuous_update=False,
-                disabled=False
-                ))
-        elif isinstance(value, int):
-            return (param, widgets.IntText(
-                value=value,
-                step=1,
-                description=param.split("__")[1],
-                continuous_update=False,
-                disabled=False
-                ))
-        elif isinstance(value, str):
-            return (param, widgets.Text(
-                value=value,
-                description=param.split("__")[1],
-                continuous_update=False,
-                disabled=False
-                ))
-        else:
-            return None
+    def get_widgets_per_param(params):
+        for key, value in params.items():
+            style = {'description_width': 'initial'}
+            description = key.split("__")[1] if "__" in key else key
+            if isinstance(value, float):
+                yield (key, widgets.FloatText(
+                    value=value,
+                    step=0.05,
+                    description=description,
+                    continuous_update=False,
+                    disabled=False,
+                    layout=Layout(width="90%"),
+                    style=style
+                    ))
+            elif isinstance(value, bool):
+                yield (key, widgets.ToggleButton(
+                    value=value,
+                    description=description,
+                    continuous_update=False,
+                    disabled=False,
+                    layout=Layout(width="90%"),
+                    style=style
+                    ))
+            elif isinstance(value, int):
+                yield (key, widgets.IntText(
+                    value=value,
+                    step=1,
+                    description=description,
+                    continuous_update=False,
+                    disabled=False,
+                    layout=Layout(width="90%"),
+                    style=style
+                    ))
+            elif isinstance(value, str):
+                yield (key, widgets.Text(
+                    value=value,
+                    description=description,
+                    continuous_update=False,
+                    disabled=False,
+                    layout=Layout(width="90%"),
+                    style=style
+                    ))
 
     def on_parameter_change(change):
         handler.clear_logs()
@@ -430,6 +446,11 @@ def plot_interactive_mapper_graph(
                 if isinstance(value, (int, float, str)):
                     _pipeline.set_params(
                         **{param: cluster_params_widgets[param].value}
+                        )
+            for param, value in nerve_params.items():
+                if isinstance(value, (int, bool)):
+                    _pipeline.set_params(
+                        **{param: nerve_params_widgets[param].value}
                         )
 
             logger.info("Updating figure...")
@@ -502,7 +523,7 @@ def plot_interactive_mapper_graph(
                             xanchor="left",
                             y=button_height,
                             yanchor="top"
-                            ),
+                            )
                         ])
 
             valid.value = True
@@ -535,35 +556,18 @@ def plot_interactive_mapper_graph(
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
-    # Initialise cover and cluster dictionaries of parameters and widgets
-    cover_params = dict(
-        filter(
-            lambda x: x[0].startswith("cover"),
-            _pipeline.get_mapper_params().items()
-            )
-        )
-    cover_params_widgets = dict(
-        filter(
-            None, map(
-                lambda x: get_widgets_per_param(*x),
-                cover_params.items()
-                )
-            )
-        )
-    cluster_params = dict(
-        filter(
-            lambda x: x[0].startswith("clusterer"),
-            _pipeline.get_mapper_params().items()
-            )
-        )
-    cluster_params_widgets = dict(
-        filter(
-            None, map(
-                lambda x: get_widgets_per_param(*x),
-                cluster_params.items()
-                )
-            )
-        )
+    # Initialise cover, cluster and nerve dictionaries of parameters and
+    # widgets
+    mapper_params_items = _pipeline.get_mapper_params().items()
+    cover_params = {key: value for key, value in mapper_params_items
+                    if key.startswith("cover__")}
+    cover_params_widgets = dict(get_widgets_per_param(cover_params))
+    cluster_params = {key: value for key, value in mapper_params_items
+                      if key.startswith("clusterer__")}
+    cluster_params_widgets = dict(get_widgets_per_param(cluster_params))
+    nerve_params = {key: value for key, value in mapper_params_items
+                    if key in ["min_intersection", "contract_nodes"]}
+    nerve_params_widgets = dict(get_widgets_per_param(nerve_params))
 
     # Initialise widgets for validating input parameters of pipeline
     valid = widgets.Valid(
@@ -607,22 +611,32 @@ def plot_interactive_mapper_graph(
 
     observe_widgets(cover_params, cover_params_widgets)
     observe_widgets(cluster_params, cluster_params_widgets)
+    observe_widgets(nerve_params, nerve_params_widgets)
 
     logs_box.observe(click_box, names="value")
 
     # Define containers for input widgets
-    container_cover = widgets.HBox(
-        children=list(cover_params_widgets.values())
+    cover_title = HTML(value="<b>Cover parameters</b>")
+    container_cover = widgets.VBox(
+        children=[cover_title] + list(cover_params_widgets.values())
+        )
+    container_cover.layout.align_items = 'center'
+
+    cluster_title = HTML(value="<b>Clusterer parameters</b>")
+    container_cluster = widgets.VBox(
+        children=[cluster_title] + list(cluster_params_widgets.values()),
+        )
+    container_cluster.layout.align_items = 'center'
+
+    nerve_title = HTML(value="<b>Nerve parameters</b>")
+    container_nerve = widgets.VBox(
+        children=[nerve_title] + list(nerve_params_widgets.values()),
+        )
+    container_nerve.layout.align_items = 'center'
+
+    container_parameters = widgets.HBox(
+        children=[container_cover, container_cluster, container_nerve]
         )
 
-    container_cluster_layout = Layout(display="flex", flex_flow="row wrap")
-
-    container_cluster = widgets.HBox(
-        children=list(cluster_params_widgets.values()),
-        layout=container_cluster_layout
-        )
-
-    box = widgets.VBox(
-        [container_cover, container_cluster, fig, valid, logs_box, out]
-        )
+    box = widgets.VBox([container_parameters, fig, valid, logs_box, out])
     return box
