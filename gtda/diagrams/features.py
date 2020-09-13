@@ -414,14 +414,16 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         ``'R'``
         Type of complex polynomial to compute.
 
-    n_coefficients : int or None, optional, default: ``10``
-        Number of coefficients. This is the dimension of the complex vector of
-        coefficients, i.e., the number of coefficients corresponding to the
-        largest degree terms of the polynomial. If ``None``, this number is
-        computed from the list of persistence diagrams by considering the one
-        with the largest number of points and using the dimension of its
-        corresponding complex vector of coefficients as the number of
-        coefficients.
+    n_coefficients : int or list of int or None, optional, default: ``10``
+        Number of coefficients per homology dimension. This is the dimension of
+        the complex vector of coefficients, i.e., the number of coefficients
+        corresponding to the largest degree terms of the polynomial. It it is
+        an int, then the number of coefficients will be equal to that value for
+        each homology dimensions. If ``None``, those numbers are computed for
+        each homology dimension from the list of persistence diagrams by
+        considering the ones with the largest number of points and using the
+        dimension of its corresponding complex vector of coefficients as the
+        number of coefficients.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -432,6 +434,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     ----------
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    n_coefficients_ : list of int
+        Effective number of coefficients per homology dimension. Set in
+        :meth:`fit`.
 
     See also
     --------
@@ -493,26 +499,36 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         if self.n_coefficients is None:
             self.n_coefficients_ = \
-                np.array([X[i].shape[0] for i in range(len(X))]).max()
-        else:
+                [ _subdiagrams(X, [dim]).shape[1]
+                  for dim in self.homology_dimensions_ ]
+        elif type(self.n_coefficients) == list:
+            if len(self.n_coefficients) != len(self.homology_dimensions_):
+                raise ValueError(f'n_coefficients has been passed as a list '
+                                 f'of length {len(self.n_coefficients)} while '
+                                 f'diagrams in `X` have '
+                                 f'{len(self.homology_dimensions_)} homology '
+                                 f'dimensions.')
             self.n_coefficients_ = self.n_coefficients
+        else:
+            self.n_coefficients_ = \
+                [self.n_coefficients] * len(self.homology_dimensions_)
 
         self._polynomial_function = \
             _implemented_polynomial_recipes[self.polynomial_type]
 
         return self
 
-    def _complex_polynomial(self, X):
-        Xt = np.zeros(2 * self.n_coefficients_, )
+    def _complex_polynomial(self, X, n_coefficients):
+        Xt = np.zeros(2 * n_coefficients, )
         X = X[X[:, 0] != X[:, 1]]
 
         roots = self._polynomial_function(X)
         coefficients = np.poly(roots)
 
-        coefficients = np.array(coefficients[::-1])[1:]
-        dimension = min(self.n_coefficients_, coefficients.shape[0])
+        coefficients = np.array(coefficients[::-1])
+        dimension = min(n_coefficients, coefficients.shape[0])
         Xt[:dimension] = coefficients[:dimension].real
-        Xt[self.n_coefficients_:self.n_coefficients_ + dimension] = \
+        Xt[n_coefficients:n_coefficients + dimension] = \
             coefficients[:dimension].imag
 
         return Xt
@@ -548,8 +564,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
-                _subdiagrams(Xt, [dim], remove_dim=True)[s])
-            for dim in self.homology_dimensions_ for s in range(X.shape[0]))
+                _subdiagrams(Xt, [dim], remove_dim=True)[s],
+                self.n_coefficients_[d])
+            for d, dim in enumerate(self.homology_dimensions_)
+            for s in range(X.shape[0]))
         Xt = np.stack(Xt).reshape((X.shape[0], -1))
 
         return Xt
