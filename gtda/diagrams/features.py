@@ -501,8 +501,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         if self.n_coefficients is None:
             self.n_coefficients_ = \
-                [ _subdiagrams(X, [dim]).shape[1]
-                  for dim in self.homology_dimensions_ ]
+                [_subdiagrams(X, [dim]).shape[1]
+                 for dim in self.homology_dimensions_]
         elif type(self.n_coefficients) == list:
             if len(self.n_coefficients) != len(self.homology_dimensions_):
                 raise ValueError(f'n_coefficients has been passed as a list '
