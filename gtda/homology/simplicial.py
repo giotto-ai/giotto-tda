@@ -36,13 +36,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -70,6 +68,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where :math:`p`
         equals `coeff`.
 
+    collapse_edges : bool, optional, default: ``False``
+        Whether to run the edge collapse algorithm in [2]_ prior to the
+        persistent homology computation (see the Notes). Can reduce the runtime
+        dramatically when the data or the maximum homology dimension are large.
+
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
         distance is greater than this value will never be connected by an edge,
@@ -80,6 +83,11 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
+
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded from each diagram computed in
+       :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -104,11 +112,21 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for the edge collapse algorithm described in [2]_.
+
     References
     ----------
     [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
         barcodes", 2019; `arXiv:1908.02518 \
         <https://arxiv.org/abs/1908.02518>`_.
+
+    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
+        Flag Complexes"; in *36th International Symposium on Computational \
+        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
+        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
+        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """
 
@@ -118,28 +136,31 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             'type': (list, tuple),
             'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
             },
+        'collapse_edges': {'type': bool},
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))}
+        'infinity_values': {'type': (Real, type(None))},
+        'reduced_homology': {'type': bool}
         }
 
     def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
-                 coeff=2, max_edge_length=np.inf, infinity_values=None,
-                 n_jobs=None):
+                 collapse_edges=False, coeff=2, max_edge_length=np.inf,
+                 infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
         self.homology_dimensions = homology_dimensions
+        self.collapse_edges = collapse_edges
         self.coeff = coeff
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        Xdgms = ripser(X, maxdim=self._max_homology_dimension,
-                       thresh=self.max_edge_length, coeff=self.coeff,
-                       metric=self.metric)['dgms']
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
+        Xdgms = ripser(
+            X, maxdim=self._max_homology_dimension,
+            thresh=self.max_edge_length, coeff=self.coeff,
+            metric=self.metric, collapse_edges=self.collapse_edges
+            )['dgms']
 
         return Xdgms
 
@@ -193,6 +214,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -250,8 +272,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._ripser_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+        Xt = _postprocess_diagrams(
+            Xt, "ripser", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
         return Xt
 
     @staticmethod
@@ -305,13 +329,11 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     dimensions and at different scales is summarised in the corresponding
     persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -354,6 +376,11 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
 
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded from each diagram computed in
+       :meth:`transform`.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
@@ -393,39 +420,36 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'epsilon': {'type': Real, 'in': Interval(0, 1, closed='both')},
         'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))}
+        'infinity_values': {'type': (Real, type(None))},
+        'reduced_homology': {'type': bool}
         }
 
     def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
                  coeff=2, epsilon=0.1, max_edge_length=np.inf,
-                 infinity_values=None, n_jobs=None):
+                 infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.epsilon = epsilon
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
-        Xdgms = pairwise_distances(X, metric=self.metric)
+        Xdgm = pairwise_distances(X, metric=self.metric)
         sparse_rips_complex = SparseRipsComplex(
-            distance_matrix=Xdgms, max_edge_length=self.max_edge_length,
-            sparse=self.epsilon)
+            distance_matrix=Xdgm, max_edge_length=self.max_edge_length,
+            sparse=self.epsilon
+            )
         simplex_tree = sparse_rips_complex.create_simplex_tree(
-            max_dimension=max(self._homology_dimensions) + 1)
-        Xdgms = simplex_tree.persistence(
-            homology_coeff_field=self.coeff, min_persistence=0)
+            max_dimension=max(self._homology_dimensions) + 1
+            )
+        Xdgm = simplex_tree.persistence(
+            homology_coeff_field=self.coeff, min_persistence=0
+            )
 
-        # Separate diagrams by homology dimensions
-        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
-                                if Xdgms[i][0] == dim]).reshape((-1, 2))
-                 for dim in self.homology_dimensions}
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar in degree 0
-
-        return Xdgms
+        return Xdgm
 
     def fit(self, X, y=None):
         """Calculate :attr:`infinity_values_`. Then, return the estimator.
@@ -518,8 +542,10 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._gudhi_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+        Xt = _postprocess_diagrams(
+            Xt, "gudhi", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
         return Xt
 
     @staticmethod
@@ -578,14 +604,11 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     persistent homology of this filtration can be much faster than computing
     Vietoris–Rips persistent homology via :class:`VietorisRipsPersistence`.
 
-
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -608,6 +631,11 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
+
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded from each diagram computed in
+       :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -648,15 +676,18 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             },
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))}
+        'infinity_values': {'type': (Real, type(None))},
+        'reduced_homology': {'type': bool}
         }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
-                 max_edge_length=np.inf, infinity_values=None, n_jobs=None):
+                 max_edge_length=np.inf, infinity_values=None,
+                 reduced_homology=True, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
         self.n_jobs = n_jobs
 
     def _weak_alpha_diagram(self, X):
@@ -680,9 +711,6 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xdgms = ripser(dm, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
                        metric='precomputed')['dgms']
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar
 
         return Xdgms
 
@@ -721,6 +749,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -764,8 +793,10 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._weak_alpha_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+        Xt = _postprocess_diagrams(
+            Xt, "ripser", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
         return Xt
 
     @staticmethod
@@ -816,13 +847,11 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <homology_and_cohomology>`) of various dimensions and at different scales
     is summarised in the corresponding persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -843,6 +872,10 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
+
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded in :meth:`transform`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -884,32 +917,28 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                             'in': Interval(0, np.inf, closed='right')},
         'infinity_values': {'type': (Real, type(None)),
                             'in': Interval(0, np.inf, closed='neither')},
+        'reduced_homology': {'type': bool}
         }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
-                 max_edge_length=np.inf, infinity_values=None, n_jobs=None):
+                 max_edge_length=np.inf, infinity_values=None,
+                 reduced_homology=True, n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.coeff = coeff
         self.max_edge_length = max_edge_length
         self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
         self.n_jobs = n_jobs
 
     def _gudhi_diagram(self, X):
         cech_complex = CechComplex(points=X, max_radius=self.max_edge_length)
         simplex_tree = cech_complex.create_simplex_tree(
-            max_dimension=max(self._homology_dimensions) + 1)
-        Xdgms = simplex_tree.persistence(
-            homology_coeff_field=self.coeff, min_persistence=0)
+            max_dimension=max(self._homology_dimensions) + 1
+            )
+        Xdgm = simplex_tree.persistence(homology_coeff_field=self.coeff,
+                                        min_persistence=0)
 
-        # Separate diagrams by homology dimensions
-        Xdgms = {dim: np.array([Xdgms[i][1] for i in range(len(Xdgms))
-                                if Xdgms[i][0] == dim]).reshape((-1, 2))
-                 for dim in self.homology_dimensions}
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][1:, :]  # Remove one infinite bar in degree 0
-
-        return Xdgms
+        return Xdgm
 
     def fit(self, X, y=None):
         """Calculate :attr:`infinity_values_`. Then, return the estimator.
@@ -946,6 +975,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -985,11 +1015,13 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_point_clouds(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
+                                          for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+        Xt = _postprocess_diagrams(
+            Xt, "gudhi", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
         return Xt
 
     @staticmethod
@@ -1040,13 +1072,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`homology classes <homology_and_cohomology>`) of various dimension and
     at different scales is summarised in the corresponding persistence diagram.
 
-    **Important notes**:
+    **Important note**:
 
         - Persistence diagrams produced by this class must be interpreted with
           care due to the presence of padding triples which carry no
           information. See :meth:`transform` for additional information.
-        - In homology dimension 0, :meth:`transform` automatically removes one
-          birth-death pair whose death equals ``numpy.inf``.
 
     Parameters
     ----------
@@ -1088,6 +1118,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Which death value to assign to features which are still alive at
         filtration value `max_edge_weight`. ``None`` means that this death
         value is declared to be equal to `max_edge_weight`.
+
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded from each diagram computed in
+       :meth:`transform`.
 
     max_entries : int, optional, default: ``-1``
         Number controlling the degree of precision in the matrix reductions
@@ -1139,18 +1174,21 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_weight': {'type': Real},
         'infinity_values': {'type': (Real, type(None))},
+        'reduced_homology': {'type': bool},
         'max_entries': {'type': int}
         }
 
     def __init__(self, homology_dimensions=(0, 1), directed=True,
                  filtration='max', coeff=2, max_edge_weight=np.inf,
-                 infinity_values=None, max_entries=-1, n_jobs=None):
+                 infinity_values=None, reduced_homology=True, max_entries=-1,
+                 n_jobs=None):
         self.homology_dimensions = homology_dimensions
         self.directed = directed
         self.filtration = filtration
         self.coeff = coeff
         self.max_edge_weight = max_edge_weight
         self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
         self.max_entries = max_entries
         self.n_jobs = n_jobs
 
@@ -1165,9 +1203,6 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         n_missing_dims = self._max_homology_dimension + 1 - len(Xdgms)
         if n_missing_dims:
             Xdgms += [np.empty((0, 2), dtype=float)] * n_missing_dims
-
-        if 0 in self._homology_dimensions:
-            Xdgms[0] = Xdgms[0][:-1, :]  # Remove one infinite bar in degree 0
 
         return Xdgms
 
@@ -1218,6 +1253,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self._homology_dimensions = sorted(self.homology_dimensions)
         self._min_homology_dimension = self._homology_dimensions[0]
         self._max_homology_dimension = self._homology_dimensions[-1]
+
         return self
 
     def transform(self, X, y=None):
@@ -1271,8 +1307,10 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._flagser_diagram)(x) for x in X)
 
-        Xt = _postprocess_diagrams(Xt, self._homology_dimensions,
-                                   self.infinity_values_, self.n_jobs)
+        Xt = _postprocess_diagrams(
+            Xt, "flagser", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
         return Xt
 
     @staticmethod

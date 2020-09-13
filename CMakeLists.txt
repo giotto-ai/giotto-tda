@@ -334,3 +334,27 @@ else()
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 endif()
 
+#######################################################################
+#                              Collapser                              #
+#######################################################################
+
+pybind11_add_module(gtda_collapser "${BINDINGS_DIR}/collapser_bindings.cpp")
+
+if(OpenMP_FOUND)
+    target_link_libraries(gtda_collapser PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
+target_link_libraries(gtda_collapser LINK_PUBLIC ${Boost_LIBRARIES})
+target_compile_definitions(gtda_collapser PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
+
+target_include_directories(gtda_collapser PRIVATE "${GUDHI_SRC_DIR}/common/include")
+target_include_directories(gtda_collapser PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
+target_include_directories(gtda_collapser PRIVATE "${EIGEN_DIR}")
+
+if(MSVC)
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
+else()
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math>)
+    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
+endif()
