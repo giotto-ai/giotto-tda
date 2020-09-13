@@ -263,7 +263,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict or None, optional, default: ``None``
+    metric_params : dict or None, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
@@ -278,11 +278,6 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     center_ : ndarray of shape (:attr:`n_dimensions_`,)
         Effective center of the radial filtration. Set in :meth:`fit`.
-
-    effective_metric_params_ : dict
-        Dictionary containing all information present in
-        `metric_params`. If `metric_params` is ``None``, it is set to
-        the empty dictionary.
 
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
         greyscale image corresponding to the radial filtration of a binary
@@ -309,11 +304,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         'center': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
-        'metric_params': {'type': (dict, type(None))}
+        'metric_params': {'type': dict}
         }
 
     def __init__(self, center=None, radius=np.inf, metric='euclidean',
-                 metric_params=None, n_jobs=None):
+                 metric_params={}, n_jobs=None):
         self.center = center
         self.radius = radius
         self.metric = metric
@@ -330,9 +325,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xr
 
     def fit(self, X, y=None):
-        """Calculate :attr:`center_`, :attr:`effective_metric_params_`,
-        :attr:`n_dimensions_`, :attr:`mesh_` and :attr:`max_value_` from a
-        collection of binary images. Then, return the estimator.
+        """Calculate :attr:`center_`, :attr:`n_dimensions_`, :attr:`mesh_` and
+        :attr:`max_value_` from a collection of binary images. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -366,11 +361,6 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             self.center_ = np.copy(self.center)
         self.center_ = self.center_.reshape((1, -1))
 
-        if self.metric_params is None:
-            self.effective_metric_params_ = {}
-        else:
-            self.effective_metric_params_ = self.metric_params.copy()
-
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
                            for i in axis_order[:self.n_dimensions_]]
@@ -380,7 +370,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             axis=self.n_dimensions_).reshape((-1, self.n_dimensions_))
         self.mesh_ = pairwise_distances(
             self.center_, self.mesh_, metric=self.metric,
-            n_jobs=1, **self.effective_metric_params_).reshape(X.shape[1:])
+            n_jobs=1, **self.metric_params).reshape(X.shape[1:])
         self.mesh_[self.mesh_ > self.radius] = np.inf
 
         self.max_value_ = 0.
@@ -1098,7 +1088,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
-        'metric_params': {'type': (dict, type(None))},
+        'metric_params': {'type': dict},
     }
 
     def __init__(self, radius=3, metric='euclidean', metric_params={},
