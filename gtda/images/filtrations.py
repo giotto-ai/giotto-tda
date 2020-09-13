@@ -1046,16 +1046,17 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     activated pixels.
 
     The density filtration assigns to each pixel of a binary image a greyscale
-    value equal to the number of activated pixels with a ball centered around
-    it.
+    value equal to the weighted number of activated pixels within a ball
+    centered around it. The weights are calculated based on the distance of the
+    activated pixels to the center of the ball.
 
     Parameters
     ----------
-    radius : float, default: ``1``
+    radius : float, optional, default: ``1.``
         The radius of the ball within which the number of activated pixels is
         considered.
 
-    metric : string, or callable, optional, default: ``'euclidean'``
+    metric : string or callable, optional, default: ``'euclidean'``
         Determines a rule with which to calculate distances between
         pairs of pixels.
         If ``metric`` is a string, it must be one of the options allowed by
@@ -1077,10 +1078,9 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    mask_ : ndarray of shape
-        The mask applied around each pixel to calculate the number of its
-        activated neighbors. It is obtained from the choice of the ``radius``
-        and ``metric``. Set in :meth:`fit`.
+    mask_ : ndarray of shape (radius, radius, [, radius])
+        The mask applied around each pixel to calculate the weighted number of
+        its activated neighbors. Set in :meth:`fit`.
 
     See also
     --------
