@@ -282,7 +282,7 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a single univariate time series as a point cloud.
 
-    Based on a time-delay embedding technique named after F. Takens [1]_ .
+    Based on a time-delay embedding technique named after F. Takens [1]_ [2]_.
     Given a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of
     evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
     :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i + \\tau},
@@ -295,7 +295,7 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     (embedding) dimension.
 
     If :math:`d` and :math:`\\tau` are not explicitly set, suitable values are
-    searched for during :meth:`fit` [2]_ [3]_ .
+    searched for during :meth:`fit` [3]_ [4]_.
 
     To compute time-delay embeddings of several time series simultaneously, use
     :class:`TakensEmbedding` instead.
@@ -386,22 +386,22 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
            1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
            doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
-    .. [2] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
+    .. [2] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
+           Application of Topological Methods to Signal Analysis"; \
+           *Foundations of Computational Mathematics*, **15**, \
+            pp. 799--838; `doi:10.1007/s10208-014-9206-z \
+           <https://doi.org/10.1007/s10208-014-9206-z>`_.
+
+    .. [3] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
            embedding dimension for phase-space reconstruction using a
            geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
            1992; doi: `10.1103/PhysRevA.45.3403
            <https://doi.org/10.1103/PhysRevA.45.3403>`_.
 
-    .. [3] N. Sanderson, "Topological Data Analysis of Time Series using
+    .. [4] N. Sanderson, "Topological Data Analysis of Time Series using
            Witness Complexes"; PhD thesis, University of Colorado at
            Boulder, 2018; `https://scholar.colorado.edu/math_gradetds/67
            <https://scholar.colorado.edu/math_gradetds/67>`_.
-
-    .. [4] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
-           Application of Topological Methods to Signal Analysis"; \
-           *Foundations of Computational Mathematics*, **15**, \
-            pp. 799--838; `doi:10.1007/s10208-014-9206-z \
-           <https://doi.org/10.1007/s10208-014-9206-z>`_.
 
     """
 

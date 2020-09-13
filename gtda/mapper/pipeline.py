@@ -153,7 +153,7 @@ def make_mapper_pipeline(scaler=None,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
-    steps [1]_ .
+    steps [1]_.
 
     The role of this function's main parameters is illustrated in `this diagram
     <../../../../_images/mapper_pipeline.svg>`_. All computational steps may
@@ -204,7 +204,7 @@ def make_mapper_pipeline(scaler=None,
         Soft hint for the default joblib backend to use in a joblib-parallel
         application of the clustering step across pullback cover sets. To be
         used in conjunction with `n_jobs`. The default process-based backend is
-        "loky" and the default thread-based backend is "threading". See [2]_ .
+        "loky" and the default thread-based backend is "threading". See [2]_.
 
     graph_step : bool, optional, default: ``True``
         Whether the resulting pipeline should stop at the calculation of the
@@ -231,7 +231,7 @@ def make_mapper_pipeline(scaler=None,
         :meth:`set_params`) before refitting on the same data. To be used
         exactly as for :func:`sklearn.pipeline.make_pipeline`. By default, no
         no caching is performed. If a string is given, it is the path to the
-        caching directory. See [3]_ .
+        caching directory. See [3]_.
 
     verbose : bool, optional, default: ``False``
         If True, the time elapsed while fitting each step will be printed as it
