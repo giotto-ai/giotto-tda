@@ -309,19 +309,19 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
-    """Pad all 2D/3D binary images in a collection.
+    """Pad all 2D/3D images in a collection.
 
     Parameters
     ----------
-    paddings : int ndarray of shape (padding_x, padding_y [, padding_z]) or \
+    padding : int ndarray of shape (padding_x, padding_y [, padding_z]) or \
         None, optional, default: ``None``
         Number of pixels to pad the images along each axis and on both side of
         the images. By default, a frame of a single pixel width is added
         around the image (``1 = padding_x = padding_y [= padding_z]``).
 
-    activated : bool, optional, default: ``False``
-        If ``True``, the padded pixels are activated. If ``False``, they are
-        deactivated.
+    value : bool, int, or float, optional, default: ``0``
+        Value given to the padded pixels. It should be a boolean if the input
+        images are binary and an int or float if they are greyscale.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -330,7 +330,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    paddings_ : int ndarray of shape (padding_x, padding_y [, padding_z])
+    padding_ : int ndarray of shape (padding_x, padding_y [, padding_z])
        Effective padding along each of the axis. Set in :meth:`fit`.
 
     References
@@ -343,18 +343,20 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'paddings': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
-        'activated': {'type': bool}
-        }
+        'padding': {
+            'type': (np.ndarray, type(None)),
+            'of': {'type': int}},
+        'value': {'type': (bool, Real)}
+    }
 
-    def __init__(self, paddings=None, activated=False, n_jobs=None):
-        self.paddings = paddings
-        self.activated = activated
+    def __init__(self, padding=None, value=False, n_jobs=None):
+        self.padding = padding
+        self.value = value
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Calculate :attr:`paddings_` from a collection of binary images.
-        Then, return the estimator.
+        """Calculate :attr:`padding_` from a collection of images. Then,
+        return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -363,7 +365,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            binary image.
+            image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -379,20 +381,21 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         if n_dimensions < 2 or n_dimensions > 3:
             warn(f"Input of `fit` contains arrays of dimension "
                  f"{self.n_dimensions_}.")
-        validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        if self.paddings is None:
-            self.paddings_ = np.ones((n_dimensions,), dtype=np.int)
-        elif len(self.paddings) != n_dimensions:
+        validate_params(self.get_params(), self._hyperparameters,
+                        exclude=['value', 'n_jobs'])
+
+        if self.padding is None:
+            self.padding_ = np.ones((n_dimensions,), dtype=np.int)
+        elif len(self.padding) != n_dimensions:
             raise ValueError(
-                f"`paddings` has length {self.paddings} while the input "
+                f"`padding` has length {self.padding} while the input "
                 f"data requires it to have length equal to {n_dimensions}.")
         else:
-            self.paddings_ = self.paddings
+            self.padding_ = self.padding
 
         self._pad_width = ((0, 0),
-                           *[(self.paddings_[axis], self.paddings_[axis])
+                           *[(self.padding_[axis], self.padding_[axis])
                              for axis in range(n_dimensions)])
 
         return self
@@ -405,7 +408,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            binary image.
+            image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -424,7 +427,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(Xt[s], pad_width=self._pad_width,
-                    constant_values=self.activated)
+                    constant_values=self.value)
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
