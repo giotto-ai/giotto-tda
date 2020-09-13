@@ -393,15 +393,15 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ComplexPolynomial(BaseEstimator, TransformerMixin):
-    """Computes complex polynomials coefficients that have diagrams point as
-    their roots.
+    """Computes oefficients of the complex polynomials whose roots are points
+    from the diagrams.
 
-    Given a persistence diagrams consisting of birth-death-dimension triples
+    Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective complex polynomial are computed
-    using the persitence points as roots. The :attr:`n_coefficients`
+    using the persistence points as roots. The :attr:`n_coefficients`
     coefficients of those polynomial are returned as a vector of their real
-    part concatenated with a vector of their imaginary parts.
+    parts concatenated with a vector of their imaginary parts. [1]_
 
     **Important notes**:
 
@@ -432,6 +432,16 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     ----------
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    See also
+    --------
+    Amplitude, PersistenceEntropy
+
+    References
+    ----------
+    .. [1] B. Di Fabio and M. Ferri, “Comparing Persistence Diagrams Through
+           Complex Vectors”; Image Analysis and Processing (ICIAP 2015), 2015,
+           doi: 10.1007/978-3-319-23231-7_27.
 
     """
     _hyperparameters = {
