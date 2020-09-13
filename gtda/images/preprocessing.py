@@ -185,14 +185,25 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
-    """Invert all 2D/3D binary images in a collection.
+    """Invert all 2D/3D images in a collection.
 
     Parameters
     ----------
+    max_value : bool, int, float or None, optional, default: ``None``
+        Maximum possible pixel value in the images. It should be a boolean if
+        input images are binary and an int or a float if they are greyscale.
+        If ``None``, it is calculated from the collection of images passed in
+        :meth:`fit`.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    Attributes
+    ----------
+    max_value_ : int ndarray of shape (padding_x, padding_y [, padding_z])
+       Effective maximum value of the images' pixels. Set in :meth:`fit`.
 
     References
     ----------
@@ -203,8 +214,19 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     """
 
-    def __init__(self, n_jobs=None):
+    _hyperparameters = {
+        'max_value': {'type': (Real, type(None))}
+    }
+
+    def __init__(self, max_value=None, n_jobs=None):
+        self.max_value = max_value
         self.n_jobs = n_jobs
+
+    def _invert(self, X):
+        if self.max_value_ is True:
+            return np.logical_not(X)
+        else:
+            return self.max_value_ - X
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -216,7 +238,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            binary image.
+            image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -229,7 +251,17 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_array(X, allow_nd=True)
 
-        self._is_fitted = True
+        validate_params(self.get_params(), self._hyperparameters,
+                        exclude=['n_jobs'])
+
+        if self.max_value is None:
+            if X.dtype == np.bool:
+                self.max_value_ = True
+            else:
+                self.max_value_ = np.max(X)
+        else:
+            self.max_value_ = self.max_value
+
         return self
 
     def transform(self, X, y=None):
@@ -254,11 +286,11 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             2D or 3D binary image.
 
         """
-        check_is_fitted(self, ['_is_fitted'])
+        check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            np.logical_not)(Xt[s])
+            self._invert)(Xt[s])
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
