@@ -11,6 +11,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def _fixed_points(mapping):
+    """Given a 1D array interpreted as a function
+    :math:`f : \\{0, \\ldots, n - 1\\}} \to \\{0, \\ldots, n - 1\\}}`, such
+    that :math:`f^{(k)} = f^{(k + 1)}` for some :math:`k`, find the 1D array
+    corresponding to :math:`f^{(k)}`."""
     terminal_states = np.empty_like(mapping)
     for i, initial_target_idx in enumerate(mapping):
         temp_target_idx = i
@@ -149,13 +153,19 @@ class Nerve(BaseEstimator, TransformerMixin):
         if self.store_edge_elements:
             graph.es["edge_elements"] = intersections
         if self.contract_nodes:
+            # Due to the order in which itertools.combinations produces pairs,
+            # and to the preference given to node 1 in the if-elif-else clause
+            # in `_subset_check_metadata_append`, `mapping` is guaranteed to
+            # send everything to one of its fixed points after sufficiently
+            # many repeated applications and, by construction, no two pairs of
+            # indices in `_fixed_points(mapping)` can correspond to data
+            # subsets which are in a subset relation. Thus the nodes are
+            # correctly contracted by `_fixed_points(mapping)`.
             fixed_points_mapping = _fixed_points(mapping)
-            graph.contract_vertices(
-                fixed_points_mapping, combine_attrs="first"
-                )
-            graph.delete_vertices(
-                [i for i in graph.vs.indices if i != fixed_points_mapping[i]]
-                )
+            graph.contract_vertices(fixed_points_mapping,
+                                    combine_attrs="first")
+            graph.delete_vertices([i for i in graph.vs.indices
+                                   if i != fixed_points_mapping[i]])
 
         return graph
 
@@ -169,36 +179,32 @@ class Nerve(BaseEstimator, TransformerMixin):
         def _intersections_append(_intersection):
             return intersections.append(_intersection)
 
-        def _choose_intersection_behavior(_store_edge_elements):
-            if _store_edge_elements:
-                return _intersections_append
-            return _do_nothing
+        def _metadata_append(
+                _node_1_idx, _node_2_idx, _intersection_size, _intersection,
+                *args
+                ):
+            if _intersection_size >= self.min_intersection:
+                # Add edge (as a node tuple) to list of node index pairs
+                node_index_pairs.append((_node_1_idx, _node_2_idx))
+                weights.append(_intersection_size)
+                intersection_behavior(_intersection)
 
         def _subset_check_metadata_append(
                 _node_1_idx, _node_2_idx, _intersection_size, _intersection,
                 _node_1_elements, _node_2_elements
                 ):
             if _intersection_size == len(_node_2_elements):
+                # Node 2 is contained in node 1 and we remove it in favour of
+                # node 1.
                 mapping[_node_2_idx] = _node_1_idx
             elif _intersection_size == len(_node_1_elements):
+                # Node 1 is strictly contained in node 2 and we remove it in
+                # favour of node 2.
                 mapping[_node_1_idx] = _node_2_idx
             else:
+                # Edge exists provided `_intersection_size` is large enough
                 _metadata_append(_node_1_idx, _node_2_idx, _intersection_size,
                                  _intersection)
-
-        def _metadata_append(
-                _node_1_idx, _node_2_idx, _intersection_size, _intersection,
-                *args
-                ):
-            if _intersection_size >= self.min_intersection:
-                node_index_pairs.append((_node_1_idx, _node_2_idx))
-                weights.append(_intersection_size)
-                intersection_behavior(_intersection)
-
-        def _choose_contraction_behavior(_contract_nodes):
-            if _contract_nodes:
-                return _subset_check_metadata_append
-            return _metadata_append
 
         node_tuples = combinations(enumerate(nodes), 2)
 
@@ -206,16 +212,20 @@ class Nerve(BaseEstimator, TransformerMixin):
         weights = []
         intersections = []
 
+        # Choose whether intersections are stored or not.
+        # `intersection_behavior` is in scope for `_metadata_append` and
+        # `_subset_check_metadata_append`.
+        if self.store_edge_elements:
+            intersection_behavior = _intersections_append
+        else:
+            intersection_behavior = _do_nothing
+
         if self.contract_nodes:
             mapping = np.arange(len(nodes))
+            behavior = _subset_check_metadata_append
         else:
             mapping = None
-
-        intersection_behavior = \
-            _choose_intersection_behavior(self.store_edge_elements)
-
-        contraction_behavior = \
-            _choose_contraction_behavior(self.contract_nodes)
+            behavior = _metadata_append
 
         # No need to check for intersections within each pullback set as the
         # input is assumed to be a refined Mapper cover
@@ -226,10 +236,8 @@ class Nerve(BaseEstimator, TransformerMixin):
             intersection_size = len(intersection)
 
             if intersection_size:
-                contraction_behavior(
-                    node_1_idx, node_2_idx, intersection_size, intersection,
-                    node_1_elements, node_2_elements
-                    )
+                behavior(node_1_idx, node_2_idx, intersection_size,
+                         intersection, node_1_elements, node_2_elements)
             else:
                 continue
 
