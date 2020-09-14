@@ -188,9 +188,11 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
     """Invert all 2D/3D images in a collection.
 
     Applies an inversion function to the value of all pixels of all images in
-    the input collection. The inversion function is defined as
-    :math:`f(x) = M - x`, where `x` is a pixel value and `M` is :attr:`max_value,
-    the maximum possible pixel value in the images of the collection.
+    the input collection. If the images are binary, the inversion function is
+    defined as the logical NOT function. Otherwise, it is a function
+    :math:`f(x) = M - x`, where `x` is a pixel value and `M` is
+    :attr:`max_value`, the maximum possible pixel value in the images of the
+    collection.
 
     Parameters
     ----------
