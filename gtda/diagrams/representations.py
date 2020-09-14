@@ -166,6 +166,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = np.concatenate(Xt).\
             reshape(self._n_dimensions, len(X), -1).\
             transpose((1, 0, 2))
+
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
@@ -385,9 +386,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             n_bins)
             Persistence lanscapes: one landscape (represented as a
             stacked one-dimensional array) per sample and per homology
-            dimension seen in :meth:`fit`. Each landscape contains a number
-            `n_layers` of layers. Index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            dimension seen in :meth:`fit` and layer. Index i along axis 1
+            corresponds to the :math:`i / n_layers`-th homology dimension in
+            :attr:`homology_dimensions_` and to the :math:`i% n_layers` layer.
 
         """
         check_is_fitted(self)
@@ -402,6 +403,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = np.concatenate(Xt).\
             reshape(self._n_dimensions, len(X), self.n_layers, self.n_bins).\
             transpose((1, 0, 2, 3))
+        Xt = Xt.reshape((Xt.shape[0], -1, Xt.shape[-1]))
+
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
