@@ -390,3 +390,208 @@ class Amplitude(BaseEstimator, TransformerMixin):
             Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
 
         return Xt
+
+@adapt_fit_transform_docs
+class ATOL(BaseEstimator, TransformerMixin):
+    """Implementation of Automatic Topologically-Oriented Learning. Vectorizes
+    persistence diagrams after a quantisation step.
+
+    Parameters
+    ----------
+    quantiser : ``'KMeans'`` or ``'MiniBatchKMeans'``, optional, default: \
+        ``'KMeans'``
+        Clustering algorithm used in the quantisation step.
+
+    quantiser_params : dict or list of n_dimensions dicts, optional, \
+        default: ``{'n_clusters': 10}``
+        Keyword argument for the quantiser. If it is a list, the each
+        dictionnary corresponds to the keyword argument for the quantiser
+        applied to its corresponding homology dimension.
+
+    weight_function : ``'uniform'`` or None, optional, default: ``None``
+        Constant generic function for weighting the measure points. If
+        ``None``, all weights are set to 1.
+
+    contrast_function : ``'gaussian'`` | ``'laplacian'`` | ``'indicator'``, \
+        optional, default: ``'gaussian'``
+        Constant function for evaluating proximity of a measure with respect
+        to centers.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    effective_quantiser_params_ : list of n_dimensions dict
+        List of dictionary containing all information present in
+        `quantiser_params` for each homology dimensions.
+
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    centers_ : ndarray of shape (1, n_clusters, 3)
+        Diagram made of cluster centers for each homology dimensions.
+
+    """
+    _hyperparameters = {
+        'quantiser': {'type': str, 'in': _AVAILABLE_QUANTISERS.keys()},
+        'quantiser_params': {'type': dict},
+        'contrast_function': {'type': str,
+                              'in': _AVAILABLE_CONTRAST_FUNCTIONS.keys()},
+        'weight_function': {'type': (str, type(None)),
+                            'in': _AVAILABLE_WEIGHT_FUNCTIONS.keys()},
+    }
+
+    def __init__(self, quantiser='KMeans', quantiser_params={'n_clusters': 10},
+                 contrast_function='gaussian', weight_function='one',
+                 n_jobs=None):
+        self.quantiser = quantiser
+        self.quantiser_params = quantiser_params
+        self.weight_function = weight_function
+        self.contrast_function = contrast_function
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute :attr:`pdfs_` and
+        :attr:`classes_`. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_diagrams(X)
+        validate_params(self.get_params(), _hyperparameters,
+                        exclude=['quantiser_params', 'n_jobs'])
+
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        n_dimensions = len(self.homology_dimensions_)
+
+        quantiser_estimator = implemented_quantiser_recipes[self.quantiser]
+        self._weight_function = \
+            implemented_weight_recipes[self.weight_function]
+        self._contrast_function = \
+            implemented_contrast_recipes[self.contrast_function]
+
+        if isinstance(self.quantiser_params, list):
+            effective_quantiser_params_ = self.quantiser_params
+        else:
+            effective_quantiser_params_ = \
+                [self.quantiser_params] * n_dimensions
+
+        # Validation of quantiser_params
+        _hyperparameters = self._hyperparameters.copy()
+        _hyperparameters['quantiser_params']['of'] = \
+            _AVAILABLE_QUANTISERS[self.quantiser]
+        _hyperparameters = {
+            'quantiser_params': _hyperparameters['quantiser_params']
+        }
+
+        for quantiser_params in effective_quantiser_params_:
+            params = {'quantiser_params': effective_quantiser_params_}
+            validate_params(params, _hyperparameters)
+
+        n_clusters = [
+            effective_quantiser_params_[i]['n_clusters']
+            if 'n_clusters' in effective_quantiser_params_[i].keys()
+            else quantiser_estimator().n_clusters
+            for i in range(n_dimensions)
+        ]
+
+        self._cluster_centers = {}
+        self._inertias = {}
+        self.centers_ = np.empty(shape=(1, np.sum(n_clusters), 3))
+        n_points_start, n_points_end = 0, n_clusters[0]
+
+        for i, dim in enumerate(self.homology_dimensions_):
+            Xd_sub = _subdiagrams(X, [dim], remove_dim=True).reshape(-1, 2)
+            # Remove diagonal points
+            Xd_sub = Xd_sub[Xd_sub[:, 1] != Xd_sub[:, 0]].reshape(-1, 2)
+
+            sample_weight = self._weight_function(Xd_sub)
+            quantiser = quantiser_estimator(**effective_quantiser_params_[i])
+            quantiser.fit(X=Xd_sub, sample_weight=sample_weight)
+            self._cluster_centers[dim] = quantiser.cluster_centers_
+
+            if quantiser.n_clusters == 1:
+                dist_centers = pairwise_distances(Xd_sub)
+                np.fill_diagonal(dist_centers, 0)
+                self._inertias[dim] = np.array([np.max(dist_centers) / 2.])
+            else:
+                dist_centers = pairwise_distances(self._cluster_centers[dim])
+                dist_centers[dist_centers == 0] = np.inf
+                self._inertias[dim] = np.min(dist_centers, axis=0) / 2.
+
+            self.centers_[0, n_points_start : n_points_end] = \
+                np.hstack([self._cluster_centers[dim],
+                           dim * np.ones((n_points_end-n_points_start, 1))])
+
+            n_points_start += n_clusters[i]
+            if i < n_dimensions - 1:
+                n_points_end += n_clusters[i+1]
+
+        return self
+
+    def _vectorize(self, Xd_sub, dimension):
+        # Remove diagonal points
+        Xd_sub = Xd_sub[Xd_sub[:, :, 1] != Xd_sub[:, :, 0]].reshape(-1, 2)
+
+        if Xd_sub.size:
+            Xd_sub = self._contrast_function(Xd_sub,
+                                             self._cluster_centers[dimension],
+                                             self._inertias[dimension].T).T
+        else :
+            Xd_sub = np.zeros((self._cluster_centers[dimension].shape[0], 1))
+
+        sample_weight = self._weight_function(Xd_sub).reshape(-1, 1)
+        return np.sum(sample_weight * Xd_sub, axis=1)
+
+    def transform(self, X):
+        """Apply measure vectorisation to diagrams in `X`.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_clusters * n_homology_dimensions)
+            ATOL vectorizations of the diagrams in `X`.
+
+        """
+        check_is_fitted(self)
+        Xt = check_diagrams(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._vectorize)(_subdiagrams(x.reshape((1, *x.shape)),
+                                                  [dim], remove_dim=True),
+                                     dim)
+            for dim in self.homology_dimensions_ for x in Xt
+        )
+        Xt = np.concatenate(Xt).reshape(X.shape[0], -1)
+
+        return Xt

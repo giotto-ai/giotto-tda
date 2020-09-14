@@ -10,7 +10,7 @@ from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, BettiCurve, \
+from gtda.diagrams import PersistenceEntropy, BettiCurve, ATOL \
     PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
@@ -23,7 +23,7 @@ layout_params = {"title": "New title"}
 
 
 @pytest.mark.parametrize('transformer',
-                         [PersistenceEntropy(), BettiCurve(),
+                         [PersistenceEntropy(), ATOL(), BettiCurve(),
                           PersistenceLandscape(), HeatKernel(),
                           PersistenceImage(), Silhouette()])
 def test_not_fitted(transformer):
@@ -80,6 +80,17 @@ def test_pe_transform(n_jobs):
     pe_normalize = PersistenceEntropy(normalize=True)
     diagram_res = np.array([[1., 0.355245321276]])
     assert_almost_equal(pe_normalize.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_atol_transform(n_jobs):
+    atol = ATOL(quantiser_params={'n_clusters': 2, 'random_state':0},
+                n_jobs=n_jobs)
+    dist_res = np.array([[0.9944026, 0.9003059, 0.821102, 0.9477455],
+                         [0.9501663, 0.008954 , 1.0016616, 0.4676446],
+                         [1.0407622, 0.4676446, 0., 0.]])
+
+    assert_almost_equal(atol.fit_transform(X_label, y_label), dist_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
