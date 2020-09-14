@@ -116,8 +116,10 @@ class StandardFeature(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_features)
-            Output collection of curves features
+        Xt : ndarray of shape (n_samples, n_channels * n_features)
+            Output collection of curves features. ``n_features`` denotes the
+            number of features output byt :attr:`function_` for each channel of
+            the multi-channel curve.
 
         """
         check_is_fitted(self)
