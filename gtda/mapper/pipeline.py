@@ -154,7 +154,7 @@ def make_mapper_pipeline(scaler=None,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
-    steps. [1]_
+    steps [1]_.
 
     The role of this function's main parameters is illustrated in `this diagram
     <../../../../_images/mapper_pipeline.svg>`_. All computational steps may
