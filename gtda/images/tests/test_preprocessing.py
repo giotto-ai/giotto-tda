@@ -86,17 +86,17 @@ def test_padder_not_fitted():
         padder.transform(images_2D)
 
 
-@pytest.mark.parametrize("images, paddings",
+@pytest.mark.parametrize("images, padding",
                          [(images_2D, np.array([1, 1], dtype=np.int)),
                           (images_2D, None),
                           (images_3D, np.array([2, 2, 2], dtype=np.int))])
-def test_padder_transform(images, paddings):
-    padder = Padder(paddings=paddings)
+def test_padder_transform(images, padding):
+    padder = Padder(padding=padding)
 
-    if paddings is None:
+    if padding is None:
         expected_shape = np.asarray(images.shape[1:]) + 2
     else:
-        expected_shape = images.shape[1:] + 2 * paddings
+        expected_shape = images.shape[1:] + 2 * padding
 
     assert_equal(padder.fit_transform(images).shape[1:],
                  expected_shape)
