@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
-def _fixed_points(mapping):
+def _limit_mapping(mapping):
     """Given a 1D array interpreted as a function
     :math:`f : \\{0, \\ldots, n - 1\\}} \to \\{0, \\ldots, n - 1\\}}`, such
     that :math:`f^{(k)} = f^{(k + 1)}` for some :math:`k`, find the 1D array
@@ -159,14 +159,14 @@ class Nerve(BaseEstimator, TransformerMixin):
             # in `_subset_check_metadata_append`, `mapping` is guaranteed to
             # send everything to one of its fixed points after sufficiently
             # many repeated applications and, by construction, no two pairs of
-            # indices in `_fixed_points(mapping)` can correspond to data
+            # indices in `_limit_mapping(mapping)` can correspond to data
             # subsets which are in a subset relation. Thus the nodes are
-            # correctly contracted by `_fixed_points(mapping)`.
-            fixed_points_mapping = _fixed_points(mapping)
-            graph.contract_vertices(fixed_points_mapping,
+            # correctly contracted by `_limit_mapping(mapping)`.
+            limit_mapping = _limit_mapping(mapping)
+            graph.contract_vertices(limit_mapping,
                                     combine_attrs="first")
             graph.delete_vertices([i for i in graph.vs.indices
-                                   if i != fixed_points_mapping[i]])
+                                   if i != limit_mapping[i]])
 
         return graph
 
