@@ -23,6 +23,7 @@ def _fixed_points(mapping):
             temp_target_idx = mapping[temp_target_idx]
             next_target_idx = mapping[mapping[temp_target_idx]]
         terminal_states[i] = temp_target_idx
+
     return terminal_states
 
 
