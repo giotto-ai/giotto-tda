@@ -16,7 +16,7 @@ _AVAILABLE_FUNCTIONS = {
 }
 
 _implemented_function_recipes = {
-    'flatten': lambda X, axis : np.reshape(X, (X.shape[0], -1)),
+    'flatten': lambda X, axis: np.reshape(X, (X.shape[0], -1)),
     'argmax': np.argmax,
     'argmin': np.argmin,
     'min': np.min,
