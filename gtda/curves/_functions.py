@@ -4,6 +4,7 @@ from sklearn.utils import gen_even_slices
 
 
 _AVAILABLE_FUNCTIONS = {
+    'flatten': {},
     'argmax': {},
     'argmin': {},
     'min': {},
@@ -14,7 +15,8 @@ _AVAILABLE_FUNCTIONS = {
     'average': {'weights': {'type': np.ndarray}},
 }
 
-implemented_function_recipes = {
+_implemented_function_recipes = {
+    'flatten': lambda X, axis : np.reshape(X, (X.shape[0], -1)),
     'argmax': np.argmax,
     'argmin': np.argmin,
     'min': np.min,
@@ -27,10 +29,8 @@ implemented_function_recipes = {
 
 
 def _parallel_featurization(Xt, function, function_params, n_jobs):
-    function_func = implemented_function_recipes[function]
-
     Xt = Parallel(n_jobs=n_jobs)(
-        delayed(function_func)(Xt[s], axis=-1, **function_params)
+        delayed(function)(Xt[s], axis=-1, **function_params)
         for s in gen_even_slices(
                 Xt.shape[0], effective_n_jobs(n_jobs))
     )
