@@ -189,8 +189,8 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Applies an inversion function to the value of all pixels of all images in
     the input collection. The inversion function is defined as
-    :math:`f(x) = M - x`, where `x` is a pixel value and `M` is the maximum value
-    of all pixels in all the images of the collection.
+    :math:`f(x) = M - x`, where `x` is a pixel value and `M` is :attr:`max_value,
+    the maximum possible pixel value in the images of the collection.
 
     Parameters
     ----------
