@@ -159,8 +159,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions)
             Persistence entropies: one value per sample and per homology
-            dimension seen in :meth:`fit`. Index i along axis 1 corresponds
-            to the i-th homology dimension in :attr:`homology_dimensions_`.
+            dimension seen in :meth:`fit`. Index i along axis 1 corresponds to
+            the i-th homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
@@ -193,8 +193,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
            parameters `metric` and `metric_params`. This gives a vector of
            amplitudes, :math:`\\mathbf{a} = (a_{q_1}, \\ldots, a_{q_n})` where
            the :math:`q_i` range over the available homology dimensions.
-        3. The final result is either :math:`\\mathbf{a}` itself or
-           a norm of :math:`\\mathbf{a}`, specified by the parameter `order`.
+        3. The final result is either :math:`\\mathbf{a}` itself or a norm of
+           :math:`\\mathbf{a}`, specified by the parameter `order`.
 
     **Important notes**:
 
@@ -208,8 +208,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'betti'`` | \
         ``'landscape'`` | ``'silhouette'`` | ``'heat'`` | \
         ``'persistence_image'``, optional, default: ``'landscape'``
-        Distance or dissimilarity function used to define the amplitude of
-        a subdiagram as its distance from the (trivial) diagonal diagram:
+        Distance or dissimilarity function used to define the amplitude of a
+        subdiagram as its distance from the (trivial) diagonal diagram:
 
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
           perfect-matching--based notions of distance.
@@ -224,8 +224,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
           Gaussian-smoothed diagrams represented on birth-persistence axes.
 
     metric_params : dict or None, optional, default: ``None``
-        Additional keyword arguments for the metric function (passing
-        ``None`` is equivalent to passing the defaults described below):
+        Additional keyword arguments for the metric function (passing ``None``
+        is equivalent to passing the defaults described below):
 
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (float,
@@ -249,8 +249,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
     order : float or None, optional, default: ``None``
         If ``None``, :meth:`transform` returns for each diagram a vector of
         amplitudes corresponding to the dimensions in
-        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
-        these vectors with :math:`p` equal to `order` is taken.
+        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of these
+        vectors with :math:`p` equal to `order` is taken.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -375,8 +375,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_homology_dimensions) if `order` \
             is ``None``, else (n_samples, 1)
             Amplitudes or amplitude vectors of the diagrams in `X`. In the
-            second case, index i along axis 1 corresponds to the i-th
-            homology dimension in :attr:`homology_dimensions_`.
+            second case, index i along axis 1 corresponds to the i-th homology
+            dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
@@ -386,7 +386,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
                                  self.effective_metric_params_,
                                  self.homology_dimensions_,
                                  self.n_jobs)
-        if self.order is None:
-            return Xt
-        Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
+        if self.order is not None:
+            Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
+
         return Xt

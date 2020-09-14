@@ -79,8 +79,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
             Input data.
 
         y : None
-            There is no need for a target, yet the pipeline API
-            requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -106,8 +106,8 @@ class Resampler(BaseEstimator, TransformerResamplerMixin):
             Target.
 
         X : None
-            There is no need for input data,
-            yet the pipeline API requires this parameter.
+            There is no need for input data, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -201,8 +201,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
             Input data.
 
         y : None
-            There is no need for a target, yet the pipeline API
-            requires this parameter.
+            There is no need for a target, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------
@@ -230,8 +230,8 @@ class Stationarizer(BaseEstimator, TransformerResamplerMixin):
             Target.
 
         X : None
-            There is no need for input data,
-            yet the pipeline API requires this parameter.
+            There is no need for input data, yet the pipeline API requires this
+            parameter.
 
         Returns
         -------

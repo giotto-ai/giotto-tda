@@ -61,7 +61,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     See also
     --------
     PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage,\
+    PairwiseDistance, Silhouette, PersistenceImage, \
     gtda.homology.VietorisRipsPersistence
 
     Notes
@@ -711,6 +711,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         if homology_dimension != np.inf:
             homology_dimension = int(homology_dimension)
         x = self.samplings_[homology_dimension]
+
         return plot_heatmap(
             Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
             colorscale=colorscale, origin="lower",
@@ -963,6 +964,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         if homology_dimension != np.inf:
             homology_dimension = int(homology_dimension)
         samplings_x, samplings_y = self.samplings_[homology_dimension]
+
         return plot_heatmap(
             Xt[sample][homology_dimension_idx],
             x=samplings_x,
