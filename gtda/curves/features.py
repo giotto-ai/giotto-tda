@@ -93,12 +93,12 @@ class StandardFeature(BaseEstimator, TransformerMixin):
                 self.effective_function_params_ = {}
             else:
                 self.effective_function_params_ = self.function_params.copy()
+            validate_params(
+                self.effective_function_params_,
+                _AVAILABLE_FUNCTIONS[self.function])
         else:
             self.function_ = self.function
             self.effective_function_params_ = self.function_params.copy()
-        validate_params(
-            self.effective_function_params_,
-            _AVAILABLE_FUNCTIONS[self.function])
 
         return self
 
