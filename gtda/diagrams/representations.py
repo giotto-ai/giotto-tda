@@ -472,7 +472,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             }
 
         Xt_sample = Xt[sample]
-        n_layers = Xt_sample.shape[1]
+        n_dims = len(self.homology_dimensions_)
+        n_layers = Xt_sample.shape[0] // n_dims
         subplot_titles = [f"H{dim}" for _, dim in homology_dimensions_mapping]
         fig = make_subplots(rows=len(homology_dimensions_mapping), cols=1,
                             subplot_titles=subplot_titles)
@@ -483,7 +484,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             for layer in range(n_layers):
                 fig.add_trace(
                     Scatter(x=self.samplings_[dim],
-                            y=Xt_sample[inv_idx, layer],
+                            y=Xt_sample[inv_idx * n_layers + layer],
                             mode="lines",
                             showlegend=True,
                             hoverinfo="none",
