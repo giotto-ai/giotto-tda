@@ -138,7 +138,9 @@ class Nerve(BaseEstimator, TransformerMixin):
         for i, node_attribute in enumerate(node_attributes):
             graph.vs[attribute_names[i]] = node_attribute
 
-        # Graph construction -- edges with weights given by intersection sizes
+        # Graph construction -- edges with weights given by intersection sizes.
+        # In general, we need all information in `nodes` to narrow down the set
+        # of combinations to check when `contract_nodes` is True
         node_index_pairs, weights, intersections, mapping = \
             self._generate_edge_data(nodes)
         graph.es["weight"] = 1
@@ -158,17 +160,6 @@ class Nerve(BaseEstimator, TransformerMixin):
         return graph
 
     def _generate_edge_data(self, nodes):
-        node_tuples = combinations(enumerate(nodes), 2)
-
-        node_index_pairs = []
-        weights = []
-        intersections = []
-
-        if self.contract_nodes:
-            mapping = np.arange(len(nodes))
-        else:
-            mapping = None
-
         def _in_same_pullback_set(_node_tuple):
             return _node_tuple[0][1][0] == _node_tuple[1][1][0]
 
@@ -208,6 +199,17 @@ class Nerve(BaseEstimator, TransformerMixin):
             if _contract_nodes:
                 return _subset_check_metadata_append
             return _metadata_append
+
+        node_tuples = combinations(enumerate(nodes), 2)
+
+        node_index_pairs = []
+        weights = []
+        intersections = []
+
+        if self.contract_nodes:
+            mapping = np.arange(len(nodes))
+        else:
+            mapping = None
 
         intersection_behavior = _choose_intersection_behavior(
             self.store_edge_elements
