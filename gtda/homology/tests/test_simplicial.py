@@ -75,11 +75,14 @@ X_vrp_exp = np.array([
                                        (X_dist, 'precomputed'),
                                        (X_dist_list, 'precomputed'),
                                        (X_dist_sparse, 'precomputed')])
+@pytest.mark.parametrize('collapse_edges', [True, False])
 @pytest.mark.parametrize('max_edge_length', [np.inf, 0.8])
 @pytest.mark.parametrize('infinity_values', [10, 30])
-def test_vrp_transform(X, metric, max_edge_length, infinity_values):
-    vrp = VietorisRipsPersistence(max_edge_length=max_edge_length,
-                                  metric=metric,
+def test_vrp_transform(X, metric, collapse_edges, max_edge_length,
+                       infinity_values):
+    vrp = VietorisRipsPersistence(metric=metric,
+                                  collapse_edges=collapse_edges,
+                                  max_edge_length=max_edge_length,
                                   infinity_values=infinity_values)
     # This is not generally true, it is only a way to obtain the res array
     # in this specific case
@@ -349,7 +352,7 @@ def test_fp_transform_undirected(X, max_edge_weight, infinity_values):
     # same as the one of VietorisRipsPersistence
     X_exp = X_vrp_exp.copy()
 
-    # In that case, subdiagrams of dimension 1 is empty
+    # In that case, the subdiagram of dimension 1 is empty
     if max_edge_weight == 0.6:
         X_exp[0, -1, :] = [0., 0., 1.]
 
@@ -357,6 +360,17 @@ def test_fp_transform_undirected(X, max_edge_weight, infinity_values):
     # in this specific case
     X_exp[:, :, :2][X_exp[:, :, :2] >= max_edge_weight] = infinity_values
     assert_almost_equal(fp.fit_transform(X), X_exp)
+
+
+@pytest.mark.parametrize('delta', range(1, 4))
+def test_fp_transform_high_hom_dim(delta):
+    """Test that if the maximum homology dimension is greater than or equal to
+    the number of points, we do not produce errors."""
+    n_points = 3
+    X = X_dist[:, :n_points, :n_points]
+    fp = FlagserPersistence(homology_dimensions=list(range(n_points + delta)))
+    assert_almost_equal(fp.fit_transform(X)[0, -1],
+                        np.array([0., 0., n_points + delta - 1], dtype=float))
 
 
 @pytest.mark.parametrize('X', [X_dist, X_dist_list, X_dist_sparse])

@@ -3,7 +3,7 @@
 
 import numpy as np
 from numpy.testing import assert_almost_equal
-from gtda.time_series.features import PermutationEntropy
+from gtda.time_series import PermutationEntropy
 from itertools import product
 
 X = np.ones((10, 200, 3))  # 10 samples, of 200 points embedded in a 3d space

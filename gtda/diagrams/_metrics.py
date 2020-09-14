@@ -102,7 +102,7 @@ def heats(diagrams, sampling, step_size, sigma):
         nontrivial_points_idx = np.flatnonzero(diagram[:, 1] != diagram[:, 0])
         diagram_nontrivial_pixel_coords = np.array(
             (diagram - first_sampling) / step_size, dtype=int
-        )[nontrivial_points_idx]
+            )[nontrivial_points_idx]
         image = heats_[i]
         _sample_image(image, diagram_nontrivial_pixel_coords)
         gaussian_filter(image, sigma_pixel, mode="constant", output=image)
@@ -120,8 +120,8 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
     # WARNING: modifies `diagrams` in place
     persistence_images_ = \
         np.zeros((len(diagrams), len(sampling), len(sampling)), dtype=float)
-    # If both step sizes are zero, we return a trivial image
-    if (step_size == 0).all():
+    # If either step size is zero, we return a trivial image
+    if (step_size == 0).any():
         return persistence_images_
 
     # Transform diagrams from (birth, death, dim) to (birth, persistence, dim)
@@ -143,7 +143,7 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
         nontrivial_points_idx = np.flatnonzero(diagram[:, 1])
         diagram_nontrivial_pixel_coords = np.array(
             (diagram - first_samplings) / step_size, dtype=int
-        )[nontrivial_points_idx]
+            )[nontrivial_points_idx]
         image = persistence_images_[i]
         _sample_image(image, diagram_nontrivial_pixel_coords)
         image *= weights
@@ -310,9 +310,13 @@ def _parallel_pairwise(
     none_dict = {dim: None for dim in homology_dimensions}
     samplings = effective_metric_params.pop("samplings", none_dict)
     step_sizes = effective_metric_params.pop("step_sizes", none_dict)
+    if metric in ["heat", "persistence_image"]:
+        parallel_kwargs = {"mmap_mode": "c"}
+    else:
+        parallel_kwargs = {}
 
     n_columns = len(X2)
-    distance_matrices = Parallel(n_jobs=n_jobs)(
+    distance_matrices = Parallel(n_jobs=n_jobs, **parallel_kwargs)(
         delayed(metric_func)(
             _subdiagrams(X1, [dim], remove_dim=True),
             _subdiagrams(X2[s], [dim], remove_dim=True),
@@ -416,8 +420,12 @@ def _parallel_amplitude(X, metric, metric_params, homology_dimensions, n_jobs):
     none_dict = {dim: None for dim in homology_dimensions}
     samplings = effective_metric_params.pop("samplings", none_dict)
     step_sizes = effective_metric_params.pop("step_sizes", none_dict)
+    if metric in ["heat", "persistence_image"]:
+        parallel_kwargs = {"mmap_mode": "c"}
+    else:
+        parallel_kwargs = {}
 
-    amplitude_arrays = Parallel(n_jobs=n_jobs)(
+    amplitude_arrays = Parallel(n_jobs=n_jobs, **parallel_kwargs)(
         delayed(amplitude_func)(
             _subdiagrams(X[s], [dim], remove_dim=True),
             sampling=samplings[dim],
