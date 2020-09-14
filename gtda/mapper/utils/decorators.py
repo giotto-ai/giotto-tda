@@ -44,6 +44,7 @@ def method_to_transform(cls, method_name):
     Extend ``KernelDensity`` to give it a ``transform`` method as an alias
     of ``score_samples`` (up to output shape). The new class is instantiated
     with the same parameters as the original one.
+
     >>> ExtendedKDE = method_to_transform(KernelDensity, 'score_samples')
     >>> extended_kde = ExtendedKDE()
     >>> Xt = kde.fit(X).score_samples(X)
