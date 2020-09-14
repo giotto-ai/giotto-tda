@@ -187,6 +187,11 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
     """Invert all 2D/3D images in a collection.
 
+    Applies an inversion function to the value of all pixels of all images in
+    the input collection. The inversion function is defined as
+    :math:`f(x) = M - x`, where `x` is a pixel value and `M` is the maximum value
+    of all pixels in all the images of the collection.
+
     Parameters
     ----------
     max_value : bool, int, float or None, optional, default: ``None``
@@ -215,7 +220,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'max_value': {'type': (Real, type(None))}
+        'max_value': {'type': (bool, Real, type(None))}
     }
 
     def __init__(self, max_value=None, n_jobs=None):
