@@ -23,16 +23,16 @@ PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
         "colorbar": {
             "thickness": 15, "title": "", "xanchor": "left",
             "titleside": "right"
+            }
         }
     }
-}
 
 PLOT_OPTIONS_EDGE_TRACE_DEFAULTS = {
     "name": "edge_trace",
     "mode": "lines",
     "line": {"width": 1, "color": "#888"},
     "hoverinfo": "none"
-}
+    }
 
 PLOT_OPTIONS_LAYOUT_COMMON_DEFAULTS = {
     "showlegend": False,
@@ -41,17 +41,17 @@ PLOT_OPTIONS_LAYOUT_COMMON_DEFAULTS = {
     "margin": {"b": 20, "l": 5, "r": 5, "t": 40},
     "autosize": False,
     "annotations": []
-}
+    }
 
 PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_2D = {
     "title": "", "showgrid": False, "zeroline": False, "showticklabels": False,
     "ticks": "", "showline": False
-}
+    }
 
 PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_3D = {
     "title": "", "showbackground": False, "showline": False, "zeroline": False,
     "showgrid": False, "showticklabels": False,
-}
+    }
 
 PLOT_OPTIONS_LAYOUT_DEFAULTS = {
     "common": PLOT_OPTIONS_LAYOUT_COMMON_DEFAULTS,
@@ -59,15 +59,15 @@ PLOT_OPTIONS_LAYOUT_DEFAULTS = {
         "template": "simple_white",
         "xaxis": PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_2D,
         "yaxis": PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_2D
-    },
+        },
     3: {
         "scene": {
             "xaxis": PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_3D,
             "yaxis": PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_3D,
             "zaxis": PLOT_OPTIONS_LAYOUT_AXES_DEFAULTS_3D
+            }
         }
     }
-}
 
 
 def _set_node_sizeref(node_sizes, node_scale=12):
@@ -92,7 +92,7 @@ def _get_node_size(node_elements):
 def _get_node_text(
         node_ids, pullback_set_labels, partial_cluster_labels,
         num_node_elements, node_summary_statistics
-):
+        ):
     return [
         f"Node ID: {node_id}<br>Pullback set label: {pullback_set_label}<br>"
         f"Partial cluster label: {partial_cluster_label}<br>Node size: "
@@ -101,7 +101,7 @@ def _get_node_text(
              node_summary_statistic)
         in zip(node_ids, pullback_set_labels, partial_cluster_labels,
                num_node_elements, node_summary_statistics)
-    ]
+        ]
 
 
 def _get_node_summary(data, node_elements, summary_statistic):
@@ -112,7 +112,7 @@ def _get_column_color_buttons(
         data, is_data_dataframe, node_elements, node_colors_color_variable,
         summary_statistic, hovertext_color_variable,
         colorscale_for_hoverlabel, n_sig_figs
-):
+        ):
     # TODO: Consider opting for just-in-time computation instead of computing
     # all node summary values ahead of time. Solution should preserve scroll
     # zoom functionality of 2D static visualisation.
@@ -132,11 +132,11 @@ def _get_column_color_buttons(
             "args": [{
                 "marker.color": [None, node_colors_color_variable],
                 "hovertext": [None, hovertext_color_variable]
-            }],
+                }],
             "label": "color_variable",
             "method": "restyle"
-        }
-    ]
+            }
+        ]
 
     for column in columns_to_color:
         if is_data_dataframe:
@@ -146,20 +146,20 @@ def _get_column_color_buttons(
 
         node_colors = _get_node_summary(
             column_values, node_elements, summary_statistic
-        )
+            )
         hovertext = list(map(
             replace_summary_statistic, hovertext_color_variable,
             node_colors
-        ))
+            ))
 
         new_button = {
             "args": [{
                 "marker.color": [None, node_colors],
                 "hovertext": [None, hovertext]
-            }],
+                }],
             "label": f"Column {column}",
             "method": "restyle"
-        }
+            }
 
         if colorscale_for_hoverlabel is not None:
             node_colors = np.asarray(node_colors)
@@ -169,7 +169,7 @@ def _get_column_color_buttons(
                 None,
                 _get_colors_for_vals(node_colors, min_col, max_col,
                                      colorscale_for_hoverlabel)
-            ]
+                ]
 
         column_color_buttons.append(new_button)
 
@@ -201,7 +201,7 @@ def _infer_color_variable_kind(color_variable, data):
 def _get_node_summary_statistics(
         data, is_data_dataframe, node_elements, summary_statistic,
         color_variable
-):
+        ):
     """Calculate values of node summary statistics."""
     color_variable_kind = _infer_color_variable_kind(color_variable, data)
 
@@ -230,7 +230,7 @@ def _get_node_summary_statistics(
 def _calculate_graph_data(
         pipeline, data, is_data_dataframe, layout, layout_dim, color_variable,
         node_color_statistic, n_sig_figs, node_scale
-):
+        ):
     graph = pipeline.fit_transform(data)
     node_elements = graph.vs["node_elements"]
 
@@ -239,7 +239,7 @@ def _calculate_graph_data(
     if not (is_node_color_statistic_ndarray or callable(node_color_statistic)):
         raise ValueError(
             "`node_color_statistic` must be a callable or ndarray."
-        )
+            )
 
     # Compute the raw values of node summary statistics
     if is_node_color_statistic_ndarray:
@@ -248,13 +248,13 @@ def _calculate_graph_data(
         node_colors_color_variable = _get_node_summary_statistics(
             data, is_data_dataframe, node_elements, node_color_statistic,
             color_variable
-        )
+            )
 
     # Load defaults for node and edge traces
     plot_options = {
         "node_trace": deepcopy(PLOT_OPTIONS_NODE_TRACE_DEFAULTS),
         "edge_trace": deepcopy(PLOT_OPTIONS_EDGE_TRACE_DEFAULTS)
-    }
+        }
 
     # Update size and color of nodes
     node_sizes = _get_node_size(node_elements)
@@ -262,7 +262,7 @@ def _calculate_graph_data(
         "size": node_sizes,
         "sizeref": _set_node_sizeref(node_sizes, node_scale=node_scale),
         "color": node_colors_color_variable
-    })
+        })
 
     # Generate hovertext
     node_ids = graph.vs.indices
@@ -271,17 +271,17 @@ def _calculate_graph_data(
     num_node_elements = map(len, graph.vs["node_elements"])
     node_colors_round = map(
         partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors_color_variable
-    )
+        )
     plot_options["node_trace"]["hovertext"] = _get_node_text(
         node_ids, pullback_set_ids, partial_cluster_labels,
         num_node_elements, node_colors_round
-    )
+        )
 
     # Compute graph layout
     if layout_dim not in [2, 3]:
         raise ValueError(
             f"`layout_dim` must be either 2 or 3. {layout_dim} entered."
-        )
+            )
     node_pos = np.asarray(graph.layout(layout, dim=layout_dim).coords)
 
     # Store x and y coordinates of edge endpoints
@@ -291,33 +291,33 @@ def _calculate_graph_data(
                 lambda e: [node_pos[e.source, 0], node_pos[e.target, 0],
                            None],
                 graph.es
-            ), []
+                ), []
+            )
         )
-    )
     edge_y = list(
         reduce(
             iconcat, map(
                 lambda e: [node_pos[e.source, 1], node_pos[e.target, 1],
                            None],
                 graph.es
-            ), []
+                ), []
+            )
         )
-    )
 
     if layout_dim == 2:
         node_trace = go.Scatter(
             x=node_pos[:, 0], y=node_pos[:, 1], **plot_options["node_trace"]
-        )
+            )
 
         edge_trace = go.Scatter(
             x=edge_x, y=edge_y, **plot_options["edge_trace"]
-        )
+            )
 
     else:
         node_trace = go.Scatter3d(
             x=node_pos[:, 0], y=node_pos[:, 1], z=node_pos[:, 2],
             **plot_options["node_trace"]
-        )
+            )
 
         edge_z = list(
             reduce(
@@ -325,9 +325,9 @@ def _calculate_graph_data(
                     lambda e: [node_pos[e.source][2], node_pos[e.target][2],
                                None],
                     graph.es
-                ), []
+                    ), []
+                )
             )
-        )
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
@@ -386,7 +386,7 @@ def _get_colors_for_vals(vals, vmin, vmax, colorscale, return_hex=True):
 
     vals_rgb = (
             left_endpts[:, 1:] + diff_ratios * vals_scaled[:, np.newaxis] + 0.5
-    ).astype(np.uint8)
+        ).astype(np.uint8)
 
     if return_hex:
         return list(map(_rbg_to_hex, vals_rgb))

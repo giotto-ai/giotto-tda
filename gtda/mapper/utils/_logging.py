@@ -14,7 +14,7 @@ class OutputWidgetHandler(logging.Handler):
             'height': '160px',
             'border': '1px solid black',
             'overflow_y': 'auto'
-        }
+            }
         self.out = widgets.Output(layout=layout)
 
     def emit(self, record):
@@ -24,7 +24,7 @@ class OutputWidgetHandler(logging.Handler):
             'name': 'stdout',
             'output_type': 'stream',
             'text': formatted_record+'\n'
-        }
+            }
         self.out.outputs = (new_output,) + self.out.outputs
 
     def show_logs(self):
