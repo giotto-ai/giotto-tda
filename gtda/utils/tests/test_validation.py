@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 from sklearn.exceptions import DataDimensionalityWarning
 
-from gtda.utils.validation import check_diagrams, validate_params, \
-    check_point_clouds, check_collection
+from gtda.utils import check_collection, check_point_clouds, check_diagrams, \
+    validate_params
 
 
 # Testing for validate_params
