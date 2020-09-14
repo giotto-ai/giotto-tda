@@ -390,3 +390,153 @@ class Amplitude(BaseEstimator, TransformerMixin):
             Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
 
         return Xt
+
+
+class TopologicalVector(BaseEstimator, TransformerMixin):
+    """Computes topological vectors from persistence diagrams.
+
+    The topological vector associated to a persistence diagram is the sorted
+    vector of a slight modification of the pairwise distances between the
+    persistence diagram points.
+
+    Parameters
+    ----------
+    n_distances : int or None, optional, default: ``10``
+        Number of distances to keep. This is the dimension of the topological
+        vector. If ``None``, this number is computed from persistence diagrams
+        in :meth:`fit` by considering the one with the largest number of points
+        and using the dimension of its corresponding topological vector as
+        the number of distances.
+
+    metric : string or callable, optional, default: ``'euclidean'``
+        If set to ``'precomputed'``, each entry in `X` along axis 0 is
+        interpreted to be a distance matrix. Otherwise, entries are
+        interpreted as feature arrays, and `metric` determines a rule with
+        which to calculate distances between pairs of instances (i.e. rows)
+        in these arrays.
+        If `metric` is a string, it must be one of the options allowed by
+        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
+        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
+        including "euclidean", "manhattan" or "cosine".
+        If `metric` is a callable function, it is called on each pair of
+        instances and the resulting value recorded. The callable should take
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    metric_params : dict or None, optional, default: ``{}``
+        Additional keyword arguments for the metric function.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
+
+    Attributes
+    ----------
+    n_distances_ : int
+        Effective number of distances calculated in :meth:`fit`.
+
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    """
+    _hyperparameters = {
+        'n_distances': {'type': (int, type(None)),
+                      'in': Interval(1, np.inf, closed='left')},
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict},
+    }
+
+    def __init__(self, n_distances=10, metric='chebyshev', metric_params={},
+                 n_jobs=None):
+        self.n_distances = n_distances
+        self.metric = metric
+        self.metric_params = metric_params
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute :attr:`n_distances_` and
+        :attr:`effective_metric_params`. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_diagrams(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+
+        if self.n_distances is None:
+            self.n_distances_ = \
+                np.array([X[i].shape[0] for i in range(len(X))]).max()
+        else:
+            self.n_distances_ = self.n_distances
+
+        self._distance_function = DistanceMetric.get_metric(
+            self.metric, **self.metric_params)
+
+        return self
+
+    def _topological_vector(self, Xd):
+        Xv = np.zeros((self.n_distances_, ))
+        distances = self._distance_function.pairwise(Xd)
+
+        Xd[:, 1] = Xd[:, 1] - Xd[:, 0]
+        min_persistence = 0.5 * np.minimum(Xd[:, 1], Xd[:, 1].T)
+        vector = np.flip(np.sort(
+            np.triu(np.minimum(distances, min_persistence)), axis=None), 0
+        )
+
+        dimension = min(len(vector), self.n_distances_)
+        Xv[:dimension] = vector[:dimension]
+
+        return Xv
+
+    def transform(self, X, y=None):
+        """Compute the topological vectors of diagrams in `X`.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions * n_distances)
+            Output data. Topological vectors of the diagrams in `X`.
+
+        """
+        check_is_fitted(self)
+        Xt = check_diagrams(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._topological_vector)(
+                _subdiagrams(Xt, [dim], remove_dim=True)[s])
+            for dim in self.homology_dimensions_ for s in range(X.shape[0]))
+        Xt = np.stack(Xt).reshape((X.shape[0], -1))
+
+        return Xt

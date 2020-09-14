@@ -51,3 +51,4 @@ Features
 
    diagrams.Amplitude
    diagrams.PersistenceEntropy
+   diagrams.TopologicalVector
