@@ -1140,15 +1140,15 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._range = int(np.ceil(self.radius))
 
-        iterator_range_list = [range(-self._range, self._range + 1)
+        iterator_range_list = [range(-self._range, self._range + 1)] * self._n_dimensions \
                                for _ in range(self._n_dimensions)] \
-            + [[0] for _ in range(3 - self._n_dimensions)]
+            + [[0] * (3 - self._n_dimensions)]
         self._iterator = tuple(itertools.product(*iterator_range_list))
 
         # The mask is always 3D but not the iterator.
-        self.mask_ = np.ones(tuple(2 * self._range + 1 for _ in range(3)),
+        self.mask_ = np.ones(tuple([2 * self._range + 1] * 3,
                              dtype=np.bool)
-        mesh_range_list = [np.arange(0, 2 * self._range + 1) for _ in range(3)]
+        mesh_range_list = [np.arange(0, 2 * self._range + 1)] * 3
         self.mesh_ = np.stack(
             np.meshgrid(*mesh_range_list), axis=3).reshape((-1, 3))
 
@@ -1159,7 +1159,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.mask_ = self.mask_ <= self.radius
 
-        padding = np.asarray(
+        padding = np.asarray([self._range] * self._n_dimensions + [0] * (3 - self._n_dimensions))
             [*[self._range for _ in range(self._n_dimensions)],
              *[0 for _ in range(3 - self._n_dimensions)]])
         self._padder = Padder(paddings=padding)
