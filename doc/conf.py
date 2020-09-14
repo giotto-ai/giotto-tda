@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import sphinx_rtd_theme
+import warnings
 
 from gtda import __version__
 
@@ -123,7 +123,8 @@ try:
         _versions = [c[2:] for c in f.read().splitlines()]
     _versions = list(filter(lambda c: not(c.startswith('.')), _versions))
 except FileNotFoundError:
-    _versions = ['test1', 'test2', current_version]
+    warnings.warn("Versions not found. Test mode.")
+    _versions = ['test', current_version]
 html_theme_options.update({
     'versions': [
         (c, f'../{c}/index.html')
