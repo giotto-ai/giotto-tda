@@ -211,13 +211,14 @@ class Nerve(BaseEstimator, TransformerMixin):
         else:
             mapping = None
 
-        intersection_behavior = _choose_intersection_behavior(
-            self.store_edge_elements
-            )
+        intersection_behavior = \
+            _choose_intersection_behavior(self.store_edge_elements)
 
         contraction_behavior = \
             _choose_contraction_behavior(self.contract_nodes)
 
+        # No need to check for intersections within each pullback set as the
+        # input is assumed to be a refined Mapper cover
         for node_tuple in filterfalse(_in_same_pullback_set, node_tuples):
             ((node_1_idx, (_, _, node_1_elements)),
              (node_2_idx, (_, _, node_2_elements))) = node_tuple
