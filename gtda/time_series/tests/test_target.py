@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import pytest
 
-from gtda.time_series.target import Labeller
+from gtda.time_series import Labeller
 
 signal = np.asarray([np.sin(x / 2) + 2 for x in range(0, 20)])
 X = np.tile(np.arange(10), reps=2)
