@@ -274,7 +274,7 @@ def test_hk_pi_big_sigma(transformer_cls, pts, dims):
     X_t = hk.fit_transform(X)
 
     max_hk_abs_value = np.max(np.abs(X_t))
-    assert max_hk_abs_value <= 0.01*max_difference
+    assert max_hk_abs_value <= 1e-3
 
 
 @given(pts_gen)
