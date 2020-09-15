@@ -13,9 +13,10 @@ def _make_func_apply_along_axis_1(func):
 
 
 def _reshape_after_apply(func, arr):
-    if func(arr).ndim == 1:
-        return func(arr).reshape(-1, 1)
-    return func(arr)
+    res = func(arr)
+    if res.ndim == 1:
+        res = res[:, None]
+    return res
 
 
 def transformer_from_callable_on_rows(func, validate=True):
@@ -28,8 +29,8 @@ def transformer_from_callable_on_rows(func, validate=True):
 
     Parameters
     ----------
-    func : callable
-        A callable object.
+    func : callable or None
+        A callable object, or ``None`` which returns the identity transformer.
 
     validate : bool, optional, default: ``True``
         Whether the output transformer should implement input validation.
@@ -58,7 +59,10 @@ def transformer_from_callable_on_rows(func, validate=True):
         else:
             func_along_axis = partial(_reshape_after_apply,
                                       _make_func_apply_along_axis_1(func))
-        return FunctionTransformer(func=func_along_axis, validate=validate)
+    else:
+        func_along_axis = None
+
+    return FunctionTransformer(func=func_along_axis, validate=validate)
 
 
 def identity(validate=False):

@@ -66,14 +66,14 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
     >>> import numpy as np
     >>> from gtda.graphs import TransitionGraph, GraphGeodesicDistance
     >>> X = np.arange(4).reshape(1, -1, 1)
-    >>> tg = TransitionGraph(func=None).fit_transform(X)
-    >>> print(tg[0].toarray())
-    [[False  True False False]
-     [ True False  True False]
-     [False  True False  True]
-     [False False  True False]]
-    >>> ggd = GraphGeodesicDistance().fit_transform(tg)
-    >>> print(ggd[0])
+    >>> X_tg = TransitionGraph(func=None).fit_transform(X)
+    >>> print(X_tg[0].toarray())
+    [[0 1 0 0]
+     [0 0 1 0]
+     [0 0 0 1]
+     [0 0 0 0]]
+    >>> X_ggd = GraphGeodesicDistance(directed=False).fit_transform(X_tg)
+    >>> print(X_ggd[0])
     [[0. 1. 2. 3.]
      [1. 0. 1. 2.]
      [2. 1. 0. 1.]
@@ -125,7 +125,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : list-like of length n_samples, or ndarray of shape (n_samples, \
+        X : list of length n_samples, or ndarray of shape (n_samples, \
             n_vertices, n_vertices)
             Input data: a collection of adjacency matrices of graphs. Each
             adjacency matrix may be a dense or a sparse array.
@@ -150,18 +150,18 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        X : list-like of length n_samples, or ndarray of shape (n_samples, \
+        X : list of length n_samples, or ndarray of shape (n_samples, \
             n_vertices, n_vertices)
-            Input data: a collection of adjacency matrices of graphs. Each
-            adjacency matrix may be a dense array, a sparse matrix, or a masked
-            array.
+            Input data: a collection of ``n_samples`` adjacency matrices of
+            graphs. Each adjacency matrix may be a dense array, a sparse
+            matrix, or a masked array.
 
         y : None
             Ignored.
 
         Returns
         -------
-        Xt : list-like of length n_samples, or ndarray of shape (n_samples, \
+        Xt : list of length n_samples, or ndarray of shape (n_samples, \
             n_vertices, n_vertices)
             Output collection of dense distance matrices. If the distance
             matrices all have the same shape, a single 3D ndarray is returned.
@@ -175,7 +175,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         x0_shape = Xt[0].shape
         if reduce(and_, (x.shape == x0_shape for x in X), True):
-            Xt = np.array(Xt)
+            Xt = np.asarray(Xt)
 
         return Xt
 
@@ -185,7 +185,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Parameters
         ----------
-        Xt : list-like of length n_samples, or ndarray of shape (n_samples, \
+        Xt : list of length n_samples, or ndarray of shape (n_samples, \
             n_vertices, n_vertices)
             Collection of distance matrices, such as returned by
             :meth:`transform`.

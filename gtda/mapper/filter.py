@@ -33,12 +33,12 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         already a distance matrix. If not ``'precomputed'``, it may be
         anything allowed by :func:`scipy.spatial.distance.pdist`.
 
-    metric_params : dict or None, optional, default: ``None``
+    metric_params : dict, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
     """
 
-    def __init__(self, exponent=2, metric='euclidean', metric_params=None):
+    def __init__(self, exponent=2, metric='euclidean', metric_params={}):
         self.exponent = exponent
         self.metric = metric
         self.metric_params = metric_params
@@ -70,11 +70,7 @@ class Eccentricity(BaseEstimator, TransformerMixin):
         #  Evaluate performance impact of doing this.
         check_array(X)
 
-        if self.metric_params is None:
-            self.effective_metric_params_ = dict()
-        else:
-            self.effective_metric_params_ = self.metric_params.copy()
-
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -96,12 +92,13 @@ class Eccentricity(BaseEstimator, TransformerMixin):
             Column vector of eccentricities of points in `X`.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, '_is_fitted')
         Xt = check_array(X)
 
         if self.metric != 'precomputed':
             Xt = squareform(
-                pdist(Xt, metric=self.metric, **self.effective_metric_params_))
+                pdist(Xt, metric=self.metric, **self.metric_params)
+                )
 
         Xt = np.linalg.norm(Xt, axis=1, ord=self.exponent, keepdims=True)
         return Xt
