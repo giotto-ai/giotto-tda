@@ -1,11 +1,17 @@
-:mod:`gtda.utils`: Validation
-=============================
+:mod:`gtda.utils`: Utilities
+============================
 
 .. automodule:: gtda.utils
    :no-members:
    :no-inherited-members:
 
 .. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/utils
+   :template: class.rst
+
+   utils.ForEachInput
 
 .. autosummary::
    :toctree: generated/utils
