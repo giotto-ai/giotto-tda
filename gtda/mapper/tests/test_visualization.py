@@ -209,16 +209,20 @@ def test_pipeline_cloned(clone_pipeline, layout_dim):
             "initial": {"n_intervals": 10, "kind": "uniform",
                         "overlap_frac": 0.1},
             "new": {"n_intervals": 15, "kind": "balanced", "overlap_frac": 0.2}
-        },
+            },
         "clusterer": {
             "initial": {"affinity": "euclidean"},
             "new": {"affinity": "manhattan"}
+            },
+        "contract_nodes": {"initial": True, "new": False},
+        "min_intersection": {"initial": 4, "new": 1},
         }
-    }
 
     pipe = make_mapper_pipeline(
         cover=CubicalCover(**params["cover"]["initial"]),
-        clusterer=FirstSimpleGap(**params["clusterer"]["initial"])
+        clusterer=FirstSimpleGap(**params["clusterer"]["initial"]),
+        contract_nodes=params["contract_nodes"]["initial"],
+        min_intersection=params["min_intersection"]["initial"]
         )
     fig = plot_interactive_mapper_graph(
         pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim
@@ -226,13 +230,25 @@ def test_pipeline_cloned(clone_pipeline, layout_dim):
 
     # Get relevant widgets and change their states, then check final values
     for step, values in params.items():
-        for param_name, initial_param_value in values["initial"].items():
-            new_param_value = values["new"][param_name]
-            widgets = _get_widgets_by_trait(fig, "description", param_name)
+        if step in ["cover", "clusterer"]:
+            for param_name, initial_param_value in values["initial"].items():
+                new_param_value = values["new"][param_name]
+                widgets = _get_widgets_by_trait(fig, "description", param_name)
+                for w in widgets:
+                    w.set_state({'value': new_param_value})
+                final_param_value_actual = \
+                    pipe.get_mapper_params()[f"{step}__{param_name}"]
+                final_param_value_expected = \
+                    initial_param_value if clone_pipeline else new_param_value
+                assert final_param_value_actual == final_param_value_expected
+        else:
+            initial_param_value = values["initial"]
+            new_param_value = values["new"]
+            widgets = _get_widgets_by_trait(fig, "description", step)
             for w in widgets:
                 w.set_state({'value': new_param_value})
             final_param_value_actual = \
-                pipe.get_mapper_params()[f"{step}__{param_name}"]
+                pipe.get_mapper_params()[f"{step}"]
             final_param_value_expected = \
                 initial_param_value if clone_pipeline else new_param_value
             assert final_param_value_actual == final_param_value_expected
