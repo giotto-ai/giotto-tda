@@ -40,7 +40,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.imgconverter',
+    #'sphinx.ext.imgconverter',
     'sphinx_issues',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
@@ -133,7 +133,7 @@ html_theme_options.update({
 })
 
 # Get logo
-html_logo = "images/tda_logo.png"
+html_logo = "images/tda_logo.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -147,3 +147,9 @@ rst_epilog = """
 """.format(
     versionnum=release,
 )
+
+supported_image_types = [
+    'image/svg+xml',
+    'image/gif',
+    'image/jpeg'
+]
