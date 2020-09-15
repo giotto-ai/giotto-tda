@@ -68,6 +68,7 @@ update-versions-list:
 run-notebooks:
 	@cp ../examples/*.ipynb notebooks/
 	@cp ../examples/*.py notebooks/
+	@cp -r ../examples/images notebooks/
 	@jupyter nbconvert notebooks/*.ipynb --execute --to rst --ExecutePreprocessor.timeout=1200
 
 all-gh:
