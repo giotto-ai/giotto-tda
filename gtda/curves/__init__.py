@@ -1,4 +1,4 @@
-"""The module :mod:`gtda.features` implements transformers to postprocess
+"""The module :mod:`gtda.curves` implements transformers to postprocess
 curves."""
 
 from .features import StandardFeature
