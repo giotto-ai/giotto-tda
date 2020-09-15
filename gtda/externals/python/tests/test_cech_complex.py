@@ -1,9 +1,5 @@
 from .. import CechComplex
 
-""" Test comes from
-
-"""
-
 
 def test_minimal_cech():
     points = [[1, 2]]

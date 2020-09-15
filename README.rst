@@ -49,11 +49,6 @@ Documentation
 
 Please visit `https://giotto-ai.github.io/gtda-docs <https://giotto-ai.github.io/gtda-docs>`_ and navigate to the version you are interested in.
 
-Use cases
-=========
-
-For a wide selection of use cases and application domains, you can visit `this page <https://giotto.ai/learn/course-content>`_.
-
 Installation
 ============
 
@@ -63,13 +58,13 @@ Dependencies
 The latest stable version of ``giotto-tda`` requires:
 
 - Python (>= 3.6)
-- NumPy (>= 1.17.0)
-- SciPy (>= 0.17.0)
-- joblib (>= 0.13)
-- scikit-learn (>= 0.22.0)
-- pyflagser (>= 0.4.0)
-- python-igraph (>= 0.7.1.post6)
-- plotly (>= 4.4.1)
+- NumPy (>= 1.19.1)
+- SciPy (>= 1.5.0)
+- joblib (>= 0.16.0)
+- scikit-learn (>= 0.23.1)
+- pyflagser (>= 0.4.1)
+- python-igraph (>= 0.8.2)
+- plotly (>= 4.8.2)
 - ipywidgets (>= 7.5.1)
 
 To run the examples, jupyter is required.

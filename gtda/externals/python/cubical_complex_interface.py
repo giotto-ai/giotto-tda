@@ -100,9 +100,9 @@ class CubicalComplex:
                                                                  True)
         persistence_result = []
         if self.pcohptr is not None:
-            persistence_result = self.pcohptr.get_persistence(
-                homology_coeff_field, min_persistence)
-
+            self.pcohptr.compute_persistence(homology_coeff_field,
+                                             min_persistence)
+            persistence_result = self.pcohptr.get_persistence()
         return persistence_result
 
     def betti_numbers(self):

@@ -1,6 +1,5 @@
-
 # Add to BOOST_ROOT variable a custom path to 
-# ease installation of giotto-tda on Windows platform
+# ease installation of giotto-tda on Windows platforms
 # The custom path will be at `C:\\local\`
 if(WIN32)
     list(APPEND BOOST_ROOT "C:/local")
