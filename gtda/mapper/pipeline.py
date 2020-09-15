@@ -200,8 +200,8 @@ def make_mapper_pipeline(scaler=None,
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    parallel_backend_prefer : ``"processes"`` | ``"threads"``, optional, \
-        default: ``"threads"``
+    parallel_backend_prefer : ``"processes"`` | ``"threads"`` | ``None``, \
+        optional, default: ``"threads"``
         Soft hint for the default joblib backend to use in a joblib-parallel
         application of the clustering step across pullback cover sets. To be
         used in conjunction with `n_jobs`. The default process-based backend is
