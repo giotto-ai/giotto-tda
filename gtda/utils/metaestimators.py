@@ -48,7 +48,7 @@ class ForEachInput(BaseEstimator, TransformerMixin):
     >>> from gtda.utils import ForEachInput
     >>> rng = np.random.default_rng()
 
-    Create a collection of 1000 2D inputs for a PCA, as a single 3D ndarray (we
+    Create a collection of 1000 2D inputs for PCA, as a single 3D ndarray (we
     could also create a list of 2D inputs instead).
 
     >>> X = rng.random((1000, 100, 50))
