@@ -13,7 +13,7 @@ nodes_params = ("scaler", "filter_func", "cover")
 clust_prepr_params = ("clustering_preprocessing",)
 clust_params = ("clusterer", "n_jobs",
                 "parallel_backend_prefer")
-nerve_params = ("min_intersection", "store_edge_elements")
+nerve_params = ("min_intersection", "store_edge_elements", "contract_nodes")
 clust_prepr_params_prefix = "pullback_cover__"
 nodes_params_prefix = "pullback_cover__map_and_cover__"
 clust_params_prefix = "clustering__"
@@ -150,10 +150,11 @@ def make_mapper_pipeline(scaler=None,
                          graph_step=True,
                          min_intersection=1,
                          store_edge_elements=False,
+                         contract_nodes=False,
                          memory=None,
                          verbose=False):
     """Construct a MapperPipeline object according to the specified Mapper
-    steps. [1]_
+    steps [1]_.
 
     The role of this function's main parameters is illustrated in `this diagram
     <../../../../_images/mapper_pipeline.svg>`_. All computational steps may
@@ -223,6 +224,11 @@ def make_mapper_pipeline(scaler=None,
         :meth:`fit_transform`. When ``True``, might lead to large
         :class:`igraph.Graph` objects.
 
+    contract_nodes : bool, optional, default: ``False``
+        If ``True``, any node representing a cluster which is a strict subset
+        of the cluster corresponding to another node is eliminated, and only
+        one maximal node is kept.
+
     memory : None, str or object with the joblib.Memory interface, \
         optional, default: ``None``
         Used to cache the fitted transformers which make up the pipeline. This
@@ -242,10 +248,10 @@ def make_mapper_pipeline(scaler=None,
     mapper_pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
         Output Mapper pipeline. The output of `mapper_pipeline`'s
         :meth:`fit_transform` is: a) an :class:`igraph.Graph` object as per the
-        output of `~gtda.mapper.nerve.Nerve`, when `graph_step` is ``True``; b)
-        a list of lists of tuples as per the output of
-        `~gtda.mapper.clustering.ParallelClustering` (or input of
-        `~gtda.mapper.nerve.Nerve`), otherwise.
+        output of :class:`~gtda.mapper.nerve.Nerve`, when `graph_step` is
+        ``True``; b) a list of lists of tuples as per the output of
+        :class:`~gtda.mapper.clustering.ParallelClustering` (or input of
+        :class:`~gtda.mapper.nerve.Nerve`), otherwise.
 
     Examples
     --------
@@ -341,7 +347,7 @@ def make_mapper_pipeline(scaler=None,
 
     See also
     --------
-    MapperPipeline, :func:`~gtda.mapper.utils.decorators.method_to_transform`
+    MapperPipeline, gtda.mapper.utils.decorators.method_to_transform
 
     References
     ----------
@@ -413,7 +419,8 @@ def make_mapper_pipeline(scaler=None,
     if graph_step:
         all_steps.append(
             ("nerve", Nerve(min_intersection=min_intersection,
-                            store_edge_elements=store_edge_elements))
+                            store_edge_elements=store_edge_elements,
+                            contract_nodes=contract_nodes))
             )
 
     mapper_pipeline = MapperPipeline(
