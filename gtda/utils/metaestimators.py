@@ -100,7 +100,8 @@ class ForEachInput(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_collection(X)
+        check_collection(X, accept_sparse=True, accept_large_sparse=True,
+                         force_all_finite=False)
 
         return self
 
@@ -124,7 +125,8 @@ class ForEachInput(BaseEstimator, TransformerMixin):
             same shape, in which case it is converted to an ndarray.
 
         """
-        Xt = check_collection(X)
+        Xt = check_collection(X, accept_sparse=True, accept_large_sparse=True,
+                              force_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer)(
             delayed(clone(self.transformer).fit_transform)(x) for x in Xt
