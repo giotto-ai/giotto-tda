@@ -272,3 +272,10 @@ def test_check_time_series_list_of_list():
     X = [list(range(2)), list(range(3))]
     Xnew = check_collection(X)
     assert np.array_equal(np.array(X[0]), Xnew[0])
+
+
+def test_check_not_numeric():
+    X = [np.arange(3), np.arange(2).reshape(1, 2),
+         np.array([["notNumeric", "bla"]], dtype=str)]
+    with pytest.raises(ValueError):
+        check_collection(X, dtype="numeric", ensure_min_features=3)
