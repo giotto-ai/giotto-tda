@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 
+
 def generate_point_clouds(n_samples, n_points, eps):
     sphere_point_clouds = [
         np.asarray(
@@ -14,7 +15,7 @@ def generate_point_clouds(n_samples, n_points, eps):
                 for s in range(n_points)
             ]
         )
-        for kk in range(n_samples)
+        for _ in range(n_samples)
     ]
     # label spheres with 0
     sphere_labels = np.zeros(n_samples)
@@ -25,13 +26,13 @@ def generate_point_clouds(n_samples, n_points, eps):
                 [
                     (2 + np.cos(s)) * np.cos(t) + eps * (np.random.rand(1)[0] - 0.5),
                     (2 + np.cos(s)) * np.sin(t) + eps * (np.random.rand(1)[0] - 0.5),
-                    np.sin(s) + eps * (np.random.rand(1)[0] - 0.5),
+                    np.sin(s) + eps * (np.random.rand(1)[0] - 0.5)
                 ]
                 for t in range(n_points)
                 for s in range(n_points)
             ]
         )
-        for kk in range(n_samples)
+        for _ in range(n_samples)
     ]
     # label tori with 1
     torus_labels = np.ones(n_samples)
@@ -41,6 +42,7 @@ def generate_point_clouds(n_samples, n_points, eps):
 
     return point_clouds, labels
 
+
 def make_gravitational_waves(
     path_to_data: Path,
     n_signals: int = 30,
@@ -48,7 +50,7 @@ def make_gravitational_waves(
     r_min: float = 0.075,
     r_max: float = 0.65,
     n_snr_values: int = 10,
-):
+        ):
     def padrand(V, n, kr):
         cut = np.random.randint(n)
         rand1 = np.random.randn(cut)
@@ -58,11 +60,9 @@ def make_gravitational_waves(
 
     Rcoef = np.linspace(r_min, r_max, n_snr_values)
     Npad = 500  # number of padding points on either side of the vector
-    gw = np.load(path_to_data / "gravitational-wave-signals.npy")
+    gw = np.load(path_to_data / "gravitational_wave_signals.npy")
     Norig = len(gw["data"][0])
     Ndat = len(gw["signal_present"])
-    ri = []
-    k = 0
     N = int(Norig / downsample_factor)
 
     ncoeff = []
@@ -72,12 +72,8 @@ def make_gravitational_waves(
         ncoeff.append(10 ** (-19) * (1 / Rcoef[j % n_snr_values]))
         Rcoeflist.append(Rcoef[j % n_snr_values])
 
-    x = []
     noisy_signals = []
     gw_signals = []
-    y = []
-    pcloud = []
-    maxs = 0.0
     k = 0
     labels = np.zeros(n_signals)
 
