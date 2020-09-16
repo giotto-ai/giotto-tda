@@ -167,7 +167,7 @@ def make_mapper_pipeline(scaler=None,
         object with a ``fit_transform`` method.
 
     filter_func : object, callable or None, optional, default: ``None``
-        If `None``, PCA (:class:`sklearn.decomposition.PCA`) with 2
+        If ``None``, PCA (:class:`sklearn.decomposition.PCA`) with 2
         components and default parameters is used as a default filter
         function. Otherwise, it may be an object with a ``fit_transform``
         method, or a callable acting on one-dimensional arrays -- in which
@@ -250,8 +250,8 @@ def make_mapper_pipeline(scaler=None,
         :meth:`fit_transform` is: a) an :class:`igraph.Graph` object as per the
         output of :class:`~gtda.mapper.nerve.Nerve`, when `graph_step` is
         ``True``; b) a list of lists of tuples as per the output of
-        :class:`~gtda.mapper.clustering.ParallelClustering` (or input of
-        :class:`~gtda.mapper.nerve.Nerve`), otherwise.
+        :class:`~gtda.mapper.ParallelClustering` (or input of
+        :class:`~gtda.mapper.Nerve`), otherwise.
 
     Examples
     --------
@@ -286,7 +286,7 @@ def make_mapper_pipeline(scaler=None,
     Data points: [[0.01838998 0.76928754 0.98199244 0.0074299 ]]
 
     Using a scaler from scikit-learn, a filter function from
-    gtda.mapper.filter, and a clusterer from gtda.mapper.cluster
+    ``gtda.mapper.filter``, and a clusterer from ``gtda.mapper.cluster``
 
     >>> from sklearn.preprocessing import MinMaxScaler
     >>> from gtda.mapper import Projection, FirstHistogramGap
