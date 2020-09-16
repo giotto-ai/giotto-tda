@@ -146,11 +146,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     [[[ 2  3]
       [ 4  5]
       [ 6  7]]
-
      [[ 8  9]
       [10 11]
       [12 13]]
-
      [[14 15]
       [16 17]
       [18 19]]]
@@ -563,7 +561,6 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     [[[0 1]
       [1 2]
       [2 3]]
-
      [[5 6]
       [6 7]
       [7 8]]]
@@ -573,7 +570,6 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     >>> print(X)
     [[[ 0  1  2  3]
       [ 0 -1 -2 -3]]
-
      [[ 4  5  6  7]
       [-4 -5 -6 -7]]]
     # Pass `flatten` as `True` (default)
@@ -582,7 +578,6 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     [[[ 0  1  0 -1]
       [ 1  2 -1 -2]
       [ 2  3 -2 -3]]
-
      [[ 4  5 -4 -5]
       [ 5  6 -5 -6]
       [ 6  7 -6 -7]]]
@@ -592,16 +587,12 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     [[[[ 0  1]
        [ 1  2]
        [ 2  3]]
-
       [[ 0 -1]
        [-1 -2]
        [-2 -3]]]
-
-
      [[[ 4  5]
        [ 5  6]
        [ 6  7]]
-
       [[-4 -5]
        [-5 -6]
        [-6 -7]]]]
