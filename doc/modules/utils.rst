@@ -9,12 +9,6 @@
 
 .. autosummary::
    :toctree: generated/utils
-   :template: class.rst
-
-   utils.ForEachInput
-
-.. autosummary::
-   :toctree: generated/utils
    :template: function.rst
 
    utils.check_collection

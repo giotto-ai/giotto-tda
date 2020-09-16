@@ -13,14 +13,15 @@ from sklearn.utils.metaestimators import if_delegate_has_method
 from gtda.utils import check_collection
 
 
-class ForEachInput(BaseEstimator, TransformerMixin):
+class CollectionTransformer(BaseEstimator, TransformerMixin):
     """Meta-transformer for applying a fit-transformer to each input in a
     collection.
 
     If `transformer` possesses a ``fit_transform`` method,
-    ``ForEachInput(transformer)`` also possesses a :meth:`fit_transform` method
-    which, on each entry in its input ``X``, fit-transforms a clone of
-    `transformer`. A collection (list or ndarray) of outputs is returned.
+    ``CollectionTransformer(transformer)`` also possesses a
+    :meth:`fit_transform` method which, on each entry in its input ``X``,
+    fit-transforms a clone of `transformer`. A collection (list or ndarray) of
+    outputs is returned.
 
     Parameters
     ----------
@@ -45,7 +46,7 @@ class ForEachInput(BaseEstimator, TransformerMixin):
     --------
     >>> import numpy as np
     >>> from sklearn.decomposition import PCA
-    >>> from gtda.utils import ForEachInput
+    >>> from gtda.metaestimators import CollectionTransformer
     >>> rng = np.random.default_rng()
 
     Create a collection of 1000 2D inputs for PCA, as a single 3D ndarray (we
@@ -55,7 +56,7 @@ class ForEachInput(BaseEstimator, TransformerMixin):
 
     In the case of PCA, joblib parallelism can be very beneficial!
 
-    >>> multi_pca = ForEachInput(PCA(n_components=3), n_jobs=-1)
+    >>> multi_pca = CollectionTransformer(PCA(n_components=3), n_jobs=-1)
     >>> Xt = multi_pca.fit_transform(X)
 
     Since all PCA outputs have the same shape, ``Xt`` is an  ndarray.
