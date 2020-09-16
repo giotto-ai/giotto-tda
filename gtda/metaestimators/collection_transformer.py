@@ -1,4 +1,4 @@
-"""Meta-estimators."""
+"""CollectionTransformer meta-estimator."""
 # License: GNU AGPLv3
 
 from functools import reduce
