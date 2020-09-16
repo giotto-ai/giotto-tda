@@ -126,7 +126,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
            Flag Complexes"; in *36th International Symposium on Computational \
            Geometry (SoCG 2020)*, pp. 19:1–19:15, \
            Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020; \
-           `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """

@@ -78,12 +78,12 @@ def takens_embedding_optimal_parameters(X, max_time_delay, max_dimension,
     .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
            D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
            1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
-           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
+           `DOI: 10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
     .. [2] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
            embedding dimension for phase-space reconstruction using a
            geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
-           1992; doi: `10.1103/PhysRevA.45.3403
+           1992; `DOI: 10.1103/PhysRevA.45.3403
            <https://doi.org/10.1103/PhysRevA.45.3403>`_.
 
     """
@@ -382,18 +382,18 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
            D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
            1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
-           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
+           `DOI: 10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
     .. [2] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
            Application of Topological Methods to Signal Analysis"; \
            *Foundations of Computational Mathematics*, **15**, \
-            pp. 799--838; `doi:10.1007/s10208-014-9206-z \
+            pp. 799--838; `DOI: 10.1007/s10208-014-9206-z
            <https://doi.org/10.1007/s10208-014-9206-z>`_.
 
     .. [3] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
            embedding dimension for phase-space reconstruction using a
            geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
-           1992; doi: `10.1103/PhysRevA.45.3403
+           1992; `DOI: 10.1103/PhysRevA.45.3403
            <https://doi.org/10.1103/PhysRevA.45.3403>`_.
 
     .. [4] N. Sanderson, "Topological Data Analysis of Time Series using

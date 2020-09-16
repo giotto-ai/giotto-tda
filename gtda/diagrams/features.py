@@ -72,7 +72,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     ----------
     .. [1] A. Myers, E. Munch, and F. A. Khasawneh, "Persistent Homology of
            Complex Networks for Dynamic State Detection"; *Phys. Rev. E*
-           **100**, 022314, 2019; doi: `10.1103/PhysRevE.100.022314
+           **100**, 022314, 2019; `DOI: 10.1103/PhysRevE.100.022314
            <https://doi.org/10.1103/PhysRevE.100.022314>`_.
 
     """
