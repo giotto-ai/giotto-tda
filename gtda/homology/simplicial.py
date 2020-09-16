@@ -69,10 +69,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         equals `coeff`.
 
     collapse_edges : bool, optional, default: ``False``
-        Whether to run the edge collapse algorithm in Boissonnat & Pitram [2]_
-        prior to the persistent homology computation (see the Notes). Can
-        reduce the runtime dramatically when the data or the maximum homology
-        dimensions are large.
+        Whether to run the edge collapse algorithm in [2]_ prior to the
+        persistent homology computation (see the Notes). Can reduce the runtime
+        dramatically when the data or the maximum homology dimensions are
+        large.
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
@@ -114,7 +114,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in Boissonnat and Pitram [2]_.
+    for the edge collapse algorithm described in [2]_.
 
     References
     ----------
