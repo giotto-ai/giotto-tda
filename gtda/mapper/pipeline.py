@@ -347,7 +347,7 @@ def make_mapper_pipeline(scaler=None,
 
     See also
     --------
-    MapperPipeline, gtda.mapper.utils.decorators.method_to_transform
+    MapperPipeline, gtda.mapper.method_to_transform
 
     References
     ----------
