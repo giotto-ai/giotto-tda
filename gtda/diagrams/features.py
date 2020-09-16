@@ -406,10 +406,6 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
         - Input collections of persistence diagrams for this transformer must
           satisfy certain requirements, see e.g. :meth:`fit`.
-        - By default, persistence subdiagrams containing only triples with zero
-          lifetime will have corresponding (normalized) entropies computed as
-          ``numpy.nan``. To avoid this, set a value of `nan_fill_value`
-          different from ``None``.
 
     Parameters
     ----------
@@ -468,7 +464,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute the number of points of diagrams in `X`.
+        """Compute the number of (off-diagonal) points of diagrams in `X`.
 
         Parameters
         ----------
