@@ -6,11 +6,11 @@
 ########## Config
 
 ifndef GITDIR
-GITDIR    = ../../gtda-docs
+GITDIR    = ../../../Projects/gtda-docs
 endif
 
 ifndef VERSION
-VERSION = stable
+VERSION = latest
 endif
 
 ifndef RUNNOTEBOOKS
@@ -43,7 +43,7 @@ check_installs:
 
 copy-to-docs-location:
 	@mkdir -p "$(CURRENTDOCFOLDER)"
-	@cp -a build/html/ "$(CURRENTDOCFOLDER)"
+	@cp -r build/html/* "$(CURRENTDOCFOLDER)"
 
 test-notebooks:
 	@make run-notebooks
@@ -60,14 +60,17 @@ clean-gh:
 	@rm -f theory/glossary.rst
 	@make gh-remove
 
+update-versions:
+	@export VERSION=$(VERSION); python3 update_versions.py $(GITDIR)
+
 update-versions-list:
 	@cd $(GITDIR); find . -type d -depth 1 > versions
 	@mv $(GITDIR)/versions versions
-	@python3 update_versions.py $(GITDIR)
+	@make update-versions
 
 run-notebooks:
 	@cp ../examples/*.ipynb notebooks/
-	@cp ../examples/*.py notebooks/
+	@cp -r ../examples/data notebooks/
 	@cp -r ../examples/images notebooks/
 	@jupyter nbconvert notebooks/*.ipynb --execute --to rst --ExecutePreprocessor.timeout=1200
 
