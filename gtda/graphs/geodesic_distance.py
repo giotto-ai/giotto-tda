@@ -174,7 +174,7 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
             delayed(self._geodesic_distance)(x, i=i) for i, x in enumerate(X))
 
         x0_shape = Xt[0].shape
-        if reduce(and_, (x.shape == x0_shape for x in X), True):
+        if reduce(and_, (x.shape == x0_shape for x in Xt), True):
             Xt = np.asarray(Xt)
 
         return Xt
