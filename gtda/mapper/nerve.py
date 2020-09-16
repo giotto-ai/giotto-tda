@@ -121,7 +121,7 @@ class Nerve(BaseEstimator, TransformerMixin):
             Undirected Mapper graph according to `X` and `min_intersection`.
             Each node is an :class:`igraph.Vertex` object with attributes
             ``"pullback_set_label"``, ``"partial_cluster_label"`` and
-            ``"node_elements"'``. Each edge is an :class:`igraph.Edge` object
+            ``"node_elements"``. Each edge is an :class:`igraph.Edge` object
             with a ``"weight"`` attribute which is equal to the size of the
             intersection between the data subsets associated to its two nodes.
             If `store_edge_elements` is ``True`` each edge also has an
