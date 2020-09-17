@@ -36,7 +36,7 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
     ----------
     .. [1] C. Bandt and B. Pompe, "Permutation Entropy: A Natural Complexity
            Measure for Time Series"; *Phys. Rev. Lett.*, **88**.17, 2002;
-           `doi: 10.1103/physrevlett.88.174102
+           `DOI: 10.1103/physrevlett.88.174102
            <https://doi.org/10.1103/physrevlett.88.174102>`_.
 
     """

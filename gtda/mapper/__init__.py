@@ -26,4 +26,4 @@ __all__ = [
     'plot_interactive_mapper_graph',
     'method_to_transform',
     'transformer_from_callable_on_rows'
-]
+    ]

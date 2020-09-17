@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import sphinx_rtd_theme
+import warnings
 
 from gtda import __version__
 
@@ -40,7 +40,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.imgconverter',
+    #'sphinx.ext.imgconverter',
     'sphinx_issues',
     'sphinx_rtd_theme',
     'sphinx.ext.napoleon'
@@ -118,9 +118,13 @@ html_theme_options = {
 # List versions
 current_version = os.environ['VERSION']
 html_theme_options.update({'current_version': current_version})
-with open('versions', 'r') as f:
-    _versions = [c[2:] for c in f.read().splitlines()]
-_versions = list(filter(lambda c: not(c.startswith('.')), _versions))
+try:
+    with open('versions', 'r') as f:
+        _versions = [c[2:] for c in f.read().splitlines()]
+    _versions = list(filter(lambda c: not(c.startswith('.')), _versions))
+except FileNotFoundError:
+    warnings.warn("Versions not found. Test mode.")
+    _versions = ['test', current_version]
 html_theme_options.update({
     'versions': [
         (c, f'../{c}/index.html')
@@ -143,3 +147,9 @@ rst_epilog = """
 """.format(
     versionnum=release,
 )
+
+supported_image_types = [
+    'image/svg+xml',
+    'image/gif',
+    'image/jpeg'
+]

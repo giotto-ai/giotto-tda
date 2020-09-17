@@ -197,16 +197,16 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
-        barcodes", 2019; `arXiv:1908.02518 \
-        <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
+           persistence barcodes", 2019; `arXiv:1908.02518
+           <https://arxiv.org/abs/1908.02518>`_.
 
-    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
-        Flag Complexes"; in *36th International Symposium on Computational \
-        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
-        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
-        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
-        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+    .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
+           Flag Complexes"; in *36th International Symposium on Computational
+           Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
+           Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19
+           <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """
     if n_perm and sparse.issparse(X):
