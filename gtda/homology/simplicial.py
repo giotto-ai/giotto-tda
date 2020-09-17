@@ -118,14 +118,14 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips \
-           persistence barcodes", 2019; `arXiv:1908.02518 \
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
+           persistence barcodes", 2019; `arXiv:1908.02518
            <https://arxiv.org/abs/1908.02518>`_.
 
-    .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
-           Flag Complexes"; in *36th International Symposium on Computational \
-           Geometry (SoCG 2020)*, pp. 19:1–19:15, \
-           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020; \
+    .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
+           Flag Complexes"; in *36th International Symposium on Computational
+           Geometry (SoCG 2020)*, pp. 19:1–19:15,
+           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
            `DOI: 10.4230/LIPIcs.SoCG.2020.19
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
@@ -406,7 +406,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
+    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference
            Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
            cohomology.html>`_.
 
@@ -659,15 +659,15 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     Delaunay triangulation are computed by :class:`scipy.spatial.Delaunay`.
-    Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
+    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
     for computing Vietoris–Rips persistent homology. Python bindings were
     modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     References
     ----------
-    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips \
-           persistence barcodes", 2019; `arXiv:1908.02518 \
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
+           persistence barcodes", 2019; `arXiv:1908.02518
            <https://arxiv.org/abs/1908.02518>`_.
 
     """
@@ -906,7 +906,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
+    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference
            Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
            cohomology.html>`_.
 
@@ -1164,8 +1164,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing \
-           persistent homology of directed flag complexes", *Algorithms*, \
+    .. [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing
+           persistent homology of directed flag complexes", *Algorithms*,
            13(1), 2020.
 
     """
