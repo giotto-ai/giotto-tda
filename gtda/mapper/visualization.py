@@ -589,7 +589,7 @@ def plot_interactive_mapper_graph(
     colorscale_for_hoverlabel = None
     if layout_dim == 3:
         # In plot_static_mapper_graph, hoverlabel bgcolors are set to white if
-        # something goes wrong computing them according to the colorscale.
+        # something goes wrong in computing them according to the colorscale.
         is_bgcolor_not_white = fig.data[1].hoverlabel.bgcolor != "white"
         user_hoverlabel_bgcolor = False
         if plotly_params:
