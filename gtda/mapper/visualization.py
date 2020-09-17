@@ -63,7 +63,7 @@ def plot_static_mapper_graph(
     layout : None, str or callable, optional, default: ``"kamada-kawai"``
         Layout algorithm for the graph. Can be any accepted value for the
         ``layout`` parameter in the :meth:`layout` method of
-        :class:`igraph.Graph`. [1]_
+        :class:`igraph.Graph` [1]_.
 
     layout_dim : int, default: ``2``
         The number of dimensions for the layout. Can be 2 or 3.
@@ -148,8 +148,7 @@ def plot_static_mapper_graph(
 
     See also
     --------
-    gtda.mapper.visualization.plot_interactive_mapper_graph, \
-    gtda.mapper.pipeline.make_mapper_pipeline
+    plot_interactive_mapper_graph, gtda.mapper.make_mapper_pipeline
 
     References
     ----------
@@ -296,8 +295,8 @@ def plot_interactive_mapper_graph(
     """Plot Mapper graphs with interactivity on pipeline parameters.
 
     Extends :func:`~gtda.mapper.visualization.plot_static_mapper_graph` by
-    providing functionality to interactively update parameters from the cover
-    and clustering steps defined in `pipeline`.
+    providing functionality to interactively update parameters from the cover,
+    clustering and graph construction steps defined in `pipeline`.
 
     Parameters
     ----------
@@ -310,7 +309,7 @@ def plot_interactive_mapper_graph(
     layout : None, str or callable, optional, default: ``"kamada-kawai"``
         Layout algorithm for the graph. Can be any accepted value for the
         ``layout`` parameter in the :meth:`layout` method of
-        :class:`igraph.Graph`. [1]_
+        :class:`igraph.Graph` [1]_.
 
     layout_dim : int, default: ``2``
         The number of dimensions for the layout. Can be 2 or 3.
@@ -372,8 +371,7 @@ def plot_interactive_mapper_graph(
 
     See also
     --------
-    gtda.mapper.visualization.plot_static_mapper_graph, \
-    gtda.mapper.pipeline.make_mapper_pipeline
+    plot_static_mapper_graph, gtda.mapper.pipeline.make_mapper_pipeline
 
     References
     ----------
