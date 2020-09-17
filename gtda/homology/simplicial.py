@@ -407,7 +407,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference
-           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent__\
            cohomology.html>`_.
 
     """
@@ -907,7 +907,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference
-           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
+           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent__\
            cohomology.html>`_.
 
     """
