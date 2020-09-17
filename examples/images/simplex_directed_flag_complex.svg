@@ -39,9 +39,9 @@
      inkscape:window-height="1395"
      id="namedview27"
      showgrid="false"
-     inkscape:zoom="2.36"
-     inkscape:cx="252.54237"
-     inkscape:cy="437.28814"
+     inkscape:zoom="1"
+     inkscape:cx="147.0339"
+     inkscape:cy="13.559326"
      inkscape:window-x="-13"
      inkscape:window-y="-13"
      inkscape:window-maximized="1"
@@ -69,7 +69,7 @@
      sodipodi:insensitive="true">
     <path
        style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend0)"
-       d="M 381.06606,14.492687 19.592791,196.26982"
+       d="M 0,0 V 0"
        id="path0"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
@@ -79,7 +79,7 @@
        inkscape:connection-end-point="d4" />
     <path
        style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend0)"
-       d="M 388.77161,380.00013 388.02044,19.80197"
+       d="M 0,0 V 0"
        id="path1"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
@@ -89,7 +89,7 @@
        inkscape:connection-end-point="d4" />
     <path
        style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend0)"
-       d="M 379.8437,385.5372 18.005487,205.08622"
+       d="M 0,0 V 0"
        id="path2"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
