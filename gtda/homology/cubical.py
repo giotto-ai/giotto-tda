@@ -85,8 +85,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing cubical persistent homology [1]_. Python bindings were modified
-    for performance.
+    for computing cubical persistent homology [1]_. Python bindings were
+    modified for performance.
 
     References
     ----------

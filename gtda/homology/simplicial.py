@@ -659,9 +659,9 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     Delaunay triangulation are computed by :class:`scipy.spatial.Delaunay`.
-    Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend for
-    computing Vietoris–Rips persistent homology. Python bindings were modified
-    for performance from the `ripser.py
+    Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     References
