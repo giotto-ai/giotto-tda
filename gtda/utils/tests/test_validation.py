@@ -263,7 +263,7 @@ def test_check_collection_ragged_array():
 
 
 def test_check_collection_array_of_list():
-    X = np.array([list(range(2)), list(range(3))])
+    X = np.array([list(range(2)), list(range(3))], dtype=object)
     with pytest.raises(ValueError):
         check_collection(X)
 

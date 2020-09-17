@@ -404,7 +404,6 @@ def plot_interactive_mapper_graph(
                 yield (key, widgets.ToggleButton(
                     value=value,
                     description=description,
-                    continuous_update=False,
                     disabled=False,
                     layout=Layout(width="90%"),
                     style=style
