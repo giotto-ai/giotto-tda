@@ -347,21 +347,22 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     >>> import numpy as np
     >>> from gtda.time_series import SingleTakensEmbedding
     >>> # Create a noisy signal
+    >>> rng = np.random.default_rng()
     >>> n_samples = 10000
-    >>> signal_noise = np.asarray([np.sin(x / 50) + 0.5 * np.random.random()
-    ...     for x in range(n_samples)])
+    >>> signal = np.asarray([np.sin(x / 50) + 0.5 * rng.random()
+    ...                      for x in range(n_samples)])
     >>> # Set up the transformer
-    >>> embedder = SingleTakensEmbedding(parameters_type='search', dimension=5,
-    ...                            time_delay=5, n_jobs=-1)
+    >>> STE = SingleTakensEmbedding(parameters_type='search', dimension=5,
+    ...                             time_delay=5, n_jobs=-1)
     >>> # Fit and transform
-    >>> embedded_noise = embedder.fit_transform(signal_noise)
+    >>> signal_embedded = STE.fit_transform(signal)
     >>> print('Optimal time delay based on mutual information:',
-    ...       embedder.time_delay_)
+    ...       STE.time_delay_)
     Optimal time delay based on mutual information: 5
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
-    ...       embedder.dimension_)
+    ...       STE.dimension_)
     Optimal embedding dimension based on false nearest neighbors: 2
-    >>> print(embedded_noise.shape)
+    >>> print(signal_embedded.shape)
     (9995, 2)
 
     See also
@@ -551,20 +552,24 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     >>> import numpy as np
     >>> from gtda.time_series import TakensEmbedding
-    # Two univariate time series of duration 4
+
+    Two univariate time series of duration 4:
+
     >>> X = np.arange(8).reshape(2, 4)
     >>> print(X)
     [[0 1 2 3]
      [4 5 6 7]]
     >>> TE = TakensEmbedding(time_delay=1, dimension=2)
-    >>> print(embedder.fit_transform(X))
+    >>> print(TE.fit_transform(X))
     [[[0 1]
       [1 2]
       [2 3]]
      [[5 6]
       [6 7]
       [7 8]]]
-    # Two multivariate time series of duration 4, with 2 variables
+
+    Two multivariate time series of duration 4, with 2 variables:
+
     >>> x = np.arange(8).reshape(2, 1, 4)
     >>> X = np.concatenate([x, -x], axis=1)
     >>> print(X)
@@ -572,7 +577,9 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
       [ 0 -1 -2 -3]]
      [[ 4  5  6  7]
       [-4 -5 -6 -7]]]
-    # Pass `flatten` as `True` (default)
+
+    Pass `flatten` as ``True`` (default):
+
     >>> TE = TakensEmbedding(time_delay=1, dimension=2, flatten=True)
     >>> print(TE.fit_transform(X))
     [[[ 0  1  0 -1]
@@ -581,7 +588,9 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
      [[ 4  5 -4 -5]
       [ 5  6 -5 -6]
       [ 6  7 -6 -7]]]
-    # Pass `flatten` as `False`
+
+    Pass `flatten` as ``False``:
+
     >>> TE = TakensEmbedding(time_delay=1, dimension=2, flatten=False)
     >>> print(TE.fit_transform(X))
     [[[[ 0  1]
