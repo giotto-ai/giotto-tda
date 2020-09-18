@@ -338,7 +338,8 @@ endif()
 #                              Collapser                              #
 #######################################################################
 
-pybind11_add_module(gtda_collapser "${BINDINGS_DIR}/collapser_bindings.cpp")
+pybind11_add_module(gtda_collapser MODULE "${BINDINGS_DIR}/collapser_bindings.cpp")
+set_property(TARGET gtda_collapser PROPERTY CXX_STANDARD 14)
 
 if(OpenMP_FOUND)
     target_link_libraries(gtda_collapser PRIVATE OpenMP::OpenMP_CXX)
