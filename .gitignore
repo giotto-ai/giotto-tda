@@ -28,9 +28,6 @@ doc/gallery
 doc/notebooks/*.ipynb
 doc/notebooks/*.py
 
-# Pybind11
-gtda/externals/pybind11
-
 # Output files
 *.out
 
