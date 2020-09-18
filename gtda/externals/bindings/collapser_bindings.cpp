@@ -6,6 +6,7 @@
 #include <gudhi/Flag_complex_edge_collapser.h>
 
 #include <pybind11/eigen.h>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -13,7 +14,7 @@ namespace py = pybind11;
 
 /* GUDHI Collapser required types */
 using Filtration_value = float;
-using Vertex_handle = uint32_t;
+using Vertex_handle = int32_t;
 using Filtered_edge =
     std::tuple<Vertex_handle, Vertex_handle, Filtration_value>;
 using Filtered_edge_list = std::vector<Filtered_edge>;
@@ -29,7 +30,7 @@ using Filtration_values = std::vector<Filtration_value>;
 using COO_data = std::tuple<Row_idx, Col_idx, Filtration_values>;
 
 /* Dense matrix input types */
-using Distance_matrix = std::vector<std::vector<Filtration_value>>;
+using Distance_matrix_np = py::array_t<Filtration_value>;
 
 /* constants */
 const Filtration_value filtration_max =
@@ -86,13 +87,18 @@ PYBIND11_MODULE(gtda_collapser, m) {
         "collapses edges while preserving the persistent homology");
 
   m.def("flag_complex_collapse_edges_coo",
-        [](Row_idx& row, Col_idx& col, Filtration_values& data,
+        [](py::array_t<Vertex_handle>& row_, py::array_t<Vertex_handle>& col_,
+           py::array_t<Filtration_value>& data_,
            Filtration_value thresh = filtration_max) {
           Filtered_edge_list graph;
 
+          Vertex_handle* row = (Vertex_handle*)row_.request().ptr;
+          Vertex_handle* col = (Vertex_handle*)col_.request().ptr;
+          Filtration_value* data = (Filtration_value*)data_.request().ptr;
+
           /* Convert from COO input format to Filtered_edge_list */
           /* Applying threshold to the input data */
-          int size = data.size();
+          int size = data_.size();
           for (size_t k = 0; k < size; ++k)
             if (data[k] <= thresh)
               graph.push_back(Filtered_edge(row[k], col[k], data[k]));
@@ -108,15 +114,15 @@ PYBIND11_MODULE(gtda_collapser, m) {
         "collapses edges while preserving the persistent homology");
 
   m.def("flag_complex_collapse_edges_dense",
-        [](Distance_matrix& dm, Filtration_value thresh = filtration_max) {
+        [](Distance_matrix_np& dm, Filtration_value thresh = filtration_max) {
           Filtered_edge_list graph;
 
           /* Convert from dense format to Filtered edge list */
           /* Applying threshold to the input data */
-          for (size_t i = 0; i < dm.size(); i++)
-            for (size_t j = 0; j < dm[i].size(); j++)
-              if (j > i && (dm[i][j] <= thresh))
-                graph.push_back(Filtered_edge(i, j, dm[i][j]));
+          for (size_t i = 0; i < dm.shape(0); i++)
+            for (size_t j = 0; j < dm.shape(1); j++)
+              if (j > i && (*(dm.data(i, j)) <= thresh))
+                graph.push_back(Filtered_edge(i, j, *(dm.data(i, j))));
 
           /* Start collapser */
           auto vec_triples =
