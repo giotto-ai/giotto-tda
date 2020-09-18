@@ -295,8 +295,8 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             )
     else:
         # Only consider strict upper diagonal
-        idx = np.triu_indices(n_points, 1)
-        DParam = dm[idx].astype(np.float32)
+        DParam = dm[np.invert(np.tri(n_points, k=0, dtype=np.bool))].astype(
+            np.float32).flatten()
         res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
