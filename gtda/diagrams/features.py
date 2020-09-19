@@ -2,6 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -414,7 +415,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
@@ -456,7 +457,11 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         """
         X = check_diagrams(X)
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
 
         return self
@@ -541,16 +546,16 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
     n_distances_ : int
         Effective number of distances calculated in :meth:`fit`.
 
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     """
     _hyperparameters = {
         'n_distances': {'type': (int, type(None)),
-                      'in': Interval(1, np.inf, closed='left')},
+                        'in': Interval(1, np.inf, closed='left')},
         'metric': {'type': (str, FunctionType)},
-        'metric_params': {'type': dict},
-    }
+        'metric_params': {'type': dict}
+        }
 
     def __init__(self, n_distances=10, metric='chebyshev', metric_params={},
                  n_jobs=None):
@@ -586,7 +591,11 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
         if self.n_distances is None:
             self.n_distances_ = \
@@ -607,7 +616,7 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
         min_persistence = 0.5 * np.minimum(Xd[:, 1], Xd[:, 1].T)
         vector = np.flip(np.sort(
             np.triu(np.minimum(distances, min_persistence)), axis=None), 0
-        )
+            )
 
         dimension = min(len(vector), self.n_distances_)
         Xv[:dimension] = vector[:dimension]
@@ -640,7 +649,10 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._topological_vector)(
-                _subdiagrams(Xt, [dim], remove_dim=True)[s])
-            for dim in self.homology_dimensions_ for s in range(X.shape[0]))
+                _subdiagrams(Xt, [dim], remove_dim=True)
+                )
+            for dim in self.homology_dimensions_ for s in range(len(X))
+            )
+
         Xt = np.stack(Xt).reshape((X.shape[0], -1))
         return Xt
