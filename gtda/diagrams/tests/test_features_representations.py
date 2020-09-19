@@ -10,9 +10,9 @@ from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, TopologicalVector, \
-    BettiCurve, PersistenceLandscape, HeatKernel, PersistenceImage, \
-    Silhouette
+from gtda.diagrams import PersistenceEntropy, NumberOfPoints, \
+    TopologicalVector, BettiCurve, PersistenceLandscape, HeatKernel, \
+    PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -24,9 +24,10 @@ layout_params = {"title": "New title"}
 
 
 @pytest.mark.parametrize('transformer',
-                         [PersistenceEntropy(), TopologicalVector(),
-                          BettiCurve(), PersistenceLandscape(),
-                          HeatKernel(), PersistenceImage(), Silhouette()])
+                         [PersistenceEntropy(), NumberOfPoints(),
+                          TopologicalVector(), BettiCurve(),
+                          PersistenceLandscape(), HeatKernel(),
+                          PersistenceImage(), Silhouette()])
 def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
         transformer.transform(X)
@@ -84,13 +85,21 @@ def test_pe_transform(n_jobs):
 
 
 @pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_nop_transform(n_jobs):
+    nop = NumberOfPoints(n_jobs=n_jobs)
+    diagram_res = np.array([[2, 2]])
+
+    assert_almost_equal(nop.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
 def test_tv_transform(n_jobs):
     tv = TopologicalVector(n_distances=3, n_jobs=n_jobs)
     diagram_res = np.array([[0.5, 0., 0., 2, 0., 0.]])
 
     assert_almost_equal(tv.fit_transform(X), diagram_res)
 
-
+    
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
 @pytest.mark.parametrize('n_jobs', [1, 2, -1])
 def test_bc_transform_shape(n_bins, n_jobs):

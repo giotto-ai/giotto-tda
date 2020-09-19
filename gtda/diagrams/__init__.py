@@ -4,7 +4,8 @@ distances between diagrams."""
 
 from .preprocessing import ForgetDimension, Scaler, Filtering
 from .distance import PairwiseDistance
-from .features import PersistenceEntropy, Amplitude, TopologicalVector
+from .features import PersistenceEntropy, Amplitude, NumberOfPoints, \
+    TopologicalVector
 from .representations import BettiCurve, PersistenceLandscape, HeatKernel, \
     Silhouette, PersistenceImage
 
@@ -13,12 +14,13 @@ __all__ = [
     'Scaler',
     'Filtering',
     'PairwiseDistance',
+    'PersistenceEntropy',
     'Amplitude',
+    'NumberOfPoints',
     'TopologicalVector',
     'BettiCurve',
     'PersistenceLandscape',
     'HeatKernel',
-    'PersistenceEntropy',
     'Silhouette',
     'PersistenceImage'
     ]
