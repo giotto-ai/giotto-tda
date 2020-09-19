@@ -22,7 +22,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
-    Given a persistence diagrams consisting of birth-death-dimension triples
+    Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
     calculated as the (base 2) Shannon entropies of the collections of
@@ -64,9 +64,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
-    PersistenceImage, PairwiseDistance, Silhouette, \
-    gtda.homology.VietorisRipsPersistence
+    NumberOfPoints, Amplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
+    Silhouette, PersistenceImage
 
     References
     ----------
@@ -269,10 +268,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PairwiseDistance, Scaler, Filtering, \
-    BettiCurve, PersistenceLandscape, \
-    HeatKernel, Silhouette, \
-    gtda.homology.VietorisRipsPersistence
+    NumberOfPoints, PersistenceEntropy, PairwiseDistance, Scaler, Filtering, \
+    BettiCurve, PersistenceLandscape, HeatKernel, Silhouette, PersistenceImage
 
     Notes
     -----
@@ -395,12 +392,12 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class NumberOfPoints(BaseEstimator, TransformerMixin):
-    """Number of (off-diagonal) points per homology dimension of persistence
-    diagrams.
+    """Number of off-diagonal points in persistence diagrams, per homology
+    dimension.
 
-    Given a persistence diagrams consisting of birth-death-dimension triples
+    Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately, and their respective number of off-diagonal points
+    considered separately, and their respective numbers of off-diagonal points
     are calculated.
 
     **Important notes**:
@@ -422,9 +419,8 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, PersistenceEntropy, \
-    Amplitude, PersistenceImage, PairwiseDistance, Silhouette, \
-    gtda.homology.VietorisRipsPersistence
+    PersistenceEntropy, Amplitude, BettiCurve, PersistenceLandscape,
+    HeatKernel, Silhouette, PersistenceImage
 
     """
 
@@ -466,7 +462,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute the number of (off-diagonal) points of diagrams in `X`.
+        """Compute the number of off-diagonal points for each diagram in `X`.
 
         Parameters
         ----------
@@ -482,9 +478,9 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions)
-            Number of points: one value per sample and per homology
-            dimension seen in :meth:`fit`. Index i along axis 1 corresponds
-            to the i-th homology dimension in :attr:`homology_dimensions_`.
+            Number of points: one value per sample and per homology dimension
+            seen in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            i-th homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
