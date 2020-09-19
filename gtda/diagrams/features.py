@@ -493,8 +493,8 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._number_points)(_subdiagrams(X, [dim])[s])
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(
-                    X.shape[0], effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+            )
 
-        Xt = np.concatenate(Xt).reshape(self._n_dimensions, X.shape[0]).T
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, len(X)).T
         return Xt
