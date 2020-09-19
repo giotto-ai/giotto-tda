@@ -47,7 +47,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         When ``True``, the persistence entropy of each diagram is normalized by
         the logarithm of the sum of lifetimes of all points in the diagram.
         Can aid comparison between diagrams in an input collection when these
-        have different numbers of (non-trivial) points. [1]_
+        have different numbers of (non-trivial) points. See [1]_.
 
     nan_fill_value : float or None, optional, default: ``-1.``
         If a float, (normalized) persistence entropies initially computed as
@@ -504,11 +504,11 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class TopologicalVector(BaseEstimator, TransformerMixin):
-    """Computes topological vectors from persistence diagrams.
+    """Topological vectors from persistence diagrams.
 
     The topological vector associated to a persistence diagram is the sorted
     vector of a slight modification of the pairwise distances between the
-    persistence diagram points.
+    persistence diagram points. See [1]_.
 
     Parameters
     ----------
@@ -550,7 +550,20 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
     homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
+    See also
+    --------
+    PairwiseDistance, BettiCurve, PersistenceLandscape, HeatKernel, \
+    Silhouette, PersistenceImage
+
+    References
+    ----------
+    .. [1] M. Carrière, S. Y. Oudot, and M. Ovsjanikov, "Stable Topological
+           Signatures for Points on 3D Shapes"; *Computer Graphics Forum*
+           **34** (5), 2015; `DOI: 10.1111:cgf.12692`2015
+           <https://doi.org/10.1111:cgf.12692`2015>`_.
+
     """
+
     _hyperparameters = {
         'n_distances': {'type': (int, type(None)),
                         'in': Interval(1, np.inf, closed='left')},
