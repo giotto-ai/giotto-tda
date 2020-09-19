@@ -402,7 +402,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
     considered separately, and their respective numbers of off-diagonal points
     are calculated.
 
-    **Important notes**:
+    **Important note**:
 
         - Input collections of persistence diagrams for this transformer must
           satisfy certain requirements, see e.g. :meth:`fit`.
@@ -446,6 +446,9 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -476,6 +479,9 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -509,6 +515,11 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
     The topological vector associated to a persistence diagram is the sorted
     vector of a slight modification of the pairwise distances between the
     persistence diagram points. See [1]_.
+
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
 
     Parameters
     ----------
@@ -592,6 +603,9 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -646,6 +660,9 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
             Input data. Array of persistence diagrams, each a collection of
             triples [b, d, q] representing persistent topological features
             through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
