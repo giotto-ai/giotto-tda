@@ -21,6 +21,11 @@ images_3D = np.stack([
     np.concatenate([np.ones((7, 4, 4)), np.zeros((7, 4, 4))], axis=1),
     np.zeros((7, 8, 4))], axis=0)
 
+images_3D_float = np.stack([
+    2.5*np.ones((7, 8, 4)),
+    3.*np.concatenate([np.ones((7, 4, 4)), np.zeros((7, 4, 4))], axis=1),
+    np.zeros((7, 8, 4))], axis=0)
+
 
 def test_binarizer_not_fitted():
     binarizer = Binarizer()
@@ -68,7 +73,9 @@ images_3D_inverted = np.stack(
 
 @pytest.mark.parametrize("images, expected",
                          [(images_2D, images_2D_inverted),
-                          (images_3D, images_3D_inverted)])
+                          (images_3D, images_3D_inverted),
+                          (images_3D.astype(bool),
+                           images_3D_inverted.astype(bool))])
 def test_inverter_transform(images, expected):
     inverter = Inverter()
 
@@ -86,17 +93,19 @@ def test_padder_not_fitted():
         padder.transform(images_2D)
 
 
-@pytest.mark.parametrize("images, paddings",
+@pytest.mark.parametrize("images, padding",
                          [(images_2D, np.array([1, 1], dtype=np.int)),
                           (images_2D, None),
-                          (images_3D, np.array([2, 2, 2], dtype=np.int))])
-def test_padder_transform(images, paddings):
-    padder = Padder(paddings=paddings)
+                          (images_3D, np.array([2, 2, 2], dtype=np.int)),
+                          (images_3D_float,
+                           np.array([2, 2, 2], dtype=np.int))])
+def test_padder_transform(images, padding):
+    padder = Padder(padding=padding)
 
-    if paddings is None:
+    if padding is None:
         expected_shape = np.asarray(images.shape[1:]) + 2
     else:
-        expected_shape = images.shape[1:] + 2 * paddings
+        expected_shape = images.shape[1:] + 2 * padding
 
     assert_equal(padder.fit_transform(images).shape[1:],
                  expected_shape)
