@@ -2,7 +2,7 @@ The following is the list of code authors of the ``giotto-tda`` python package.
 
 Where component authors are known, add them here.
 
-| Guillaume Tauzin, guillaume.tauzin@epfl.ch
+| Guillaume Tauzin, gtauzin@protonmail.com
 | Umberto Lupo, umberto.lupo@epfl.ch
 | Lewis Tunstall, lewis.c.tunstall@gmail.com
 | Matteo Caorsi, m.caorsi@l2f.ch

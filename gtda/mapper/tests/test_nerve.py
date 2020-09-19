@@ -64,18 +64,14 @@ def test_edge_elements(X):
         assert graph.vs[attr_name] == graph_edge_elems.vs[attr_name]
     node_elements = graph.vs["node_elements"]
     node_elements_ee = graph_edge_elems.vs["node_elements"]
-    assert all([
-        np.array_equal(node, node_ee)
-        for node, node_ee in zip(node_elements, node_elements_ee)
-        ])
+    assert all([np.array_equal(node, node_ee)
+                for node, node_ee in zip(node_elements, node_elements_ee)])
     assert graph.vs.indices == graph_edge_elems.vs.indices
     # Edges
     assert graph.es.indices == graph_edge_elems.es.indices
     assert graph.es["weight"] == graph_edge_elems.es["weight"]
-    assert all([
-        edge.tuple == edge_ee.tuple
-        for edge, edge_ee in zip(graph.es, graph_edge_elems.es)
-        ])
+    assert all([edge.tuple == edge_ee.tuple
+                for edge, edge_ee in zip(graph.es, graph_edge_elems.es)])
 
     # Check that the arrays edge_elements contain precisely those indices which
     # are in the element sets associated to both the first and second vertex,
@@ -85,7 +81,7 @@ def test_edge_elements(X):
         v1, v2 = edge.vertex_tuple
         flag *= np.array_equal(
             edge["edge_elements"],
-            np.intersect1d(v1["node_elements"], v2["node_elements"]),
+            np.intersect1d(v1["node_elements"], v2["node_elements"])
             )
         flag *= len(edge["edge_elements"]) == edge["weight"]
     assert flag

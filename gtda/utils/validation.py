@@ -214,12 +214,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
 
     The input is checked to be either a single 3D array using a single call
     to :func:`~sklearn.utils.validation.check_array`, or a list of 2D arrays by
-    calling :func:`~sklearn.utils.validation.check_array` on each entry. In
-    the latter case, warnings are issued when not all point clouds are in
-    the same Euclidean space.
-
-    Conversions and copies may be triggered as per
-    :func:`~gtda.utils.validation.check_list_of_arrays`.
+    calling :func:`~sklearn.utils.validation.check_array` on each entry.
 
     Parameters
     ----------
