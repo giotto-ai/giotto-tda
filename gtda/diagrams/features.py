@@ -8,6 +8,7 @@ import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.neighbors import DistanceMetric
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
