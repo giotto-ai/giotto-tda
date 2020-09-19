@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 from sklearn.exceptions import DataDimensionalityWarning
 
-from gtda.utils.validation import check_diagrams, validate_params, \
-    check_point_clouds, check_collection
+from gtda.utils import check_collection, check_point_clouds, check_diagrams, \
+    validate_params
 
 
 # Testing for validate_params
@@ -256,19 +256,19 @@ def test_check_point_clouds_value_err_nan(force_all_finite):
             ex.X_list_rectang, force_all_finite=force_all_finite)
 
 
-def test_check_time_series_ragged_array():
+def test_check_collection_ragged_array():
     X = np.array([np.arange(2), np.arange(3)], dtype=object)
     with pytest.raises(ValueError):
         check_collection(X)
 
 
-def test_check_time_series_array_of_list():
-    X = np.array([list(range(2)), list(range(3))])
+def test_check_collection_array_of_list():
+    X = np.array([list(range(2)), list(range(3))], dtype=object)
     with pytest.raises(ValueError):
         check_collection(X)
 
 
-def test_check_time_series_list_of_list():
+def test_check_collection_list_of_list():
     X = [list(range(2)), list(range(3))]
     Xnew = check_collection(X)
     assert np.array_equal(np.array(X[0]), Xnew[0])

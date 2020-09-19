@@ -21,4 +21,4 @@ __all__ = [
     'ComplexPolynomial',
     'Silhouette',
     'PersistenceImage'
-]
+    ]
