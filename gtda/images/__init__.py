@@ -18,5 +18,5 @@ __all__ = [
     'DilationFiltration',
     'ErosionFiltration',
     'SignedDistanceFiltration',
-    'DensityFiltration',
-]
+    'DensityFiltration'
+    ]

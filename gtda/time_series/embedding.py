@@ -78,12 +78,12 @@ def takens_embedding_optimal_parameters(X, max_time_delay, max_dimension,
     .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
            D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
            1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
-           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
+           `DOI: 10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
     .. [2] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
            embedding dimension for phase-space reconstruction using a
            geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
-           1992; doi: `10.1103/PhysRevA.45.3403
+           1992; `DOI: 10.1103/PhysRevA.45.3403
            <https://doi.org/10.1103/PhysRevA.45.3403>`_.
 
     """
@@ -146,11 +146,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
     [[[ 2  3]
       [ 4  5]
       [ 6  7]]
-
      [[ 8  9]
       [10 11]
       [12 13]]
-
      [[14 15]
       [16 17]
       [18 19]]]
@@ -282,9 +280,9 @@ class SlidingWindow(BaseEstimator, TransformerResamplerMixin):
 class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     """Representation of a single univariate time series as a point cloud.
 
-    Based on a time-delay embedding technique named after F. Takens.[1]_ Given
-    a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of evenly
-    sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
+    Based on a time-delay embedding technique named after F. Takens [1]_ [2]_.
+    Given a discrete time series :math:`(X_0, X_1, \\ldots)` and a sequence of
+    evenly sampled times :math:`t_0, t_1, \\ldots`, one extracts a set of
     :math:`d`-dimensional vectors of the form :math:`(X_{t_i}, X_{t_i + \\tau},
     \\ldots , X_{t_i + (d-1)\\tau})` for :math:`i = 0, 1, \\ldots`. This set is
     called the :ref:`Takens embedding <takens_embedding>` of the time series
@@ -295,7 +293,7 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     (embedding) dimension.
 
     If :math:`d` and :math:`\\tau` are not explicitly set, suitable values are
-    searched for during :meth:`fit`. [2]_ [3]_
+    searched for during :meth:`fit` [3]_ [4]_.
 
     To compute time-delay embeddings of several time series simultaneously, use
     :class:`TakensEmbedding` instead.
@@ -349,21 +347,22 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     >>> import numpy as np
     >>> from gtda.time_series import SingleTakensEmbedding
     >>> # Create a noisy signal
+    >>> rng = np.random.default_rng()
     >>> n_samples = 10000
-    >>> signal_noise = np.asarray([np.sin(x / 50) + 0.5 * np.random.random()
-    ...     for x in range(n_samples)])
+    >>> signal = np.asarray([np.sin(x / 50) + 0.5 * rng.random()
+    ...                      for x in range(n_samples)])
     >>> # Set up the transformer
-    >>> embedder = SingleTakensEmbedding(parameters_type='search', dimension=5,
-    ...                            time_delay=5, n_jobs=-1)
+    >>> STE = SingleTakensEmbedding(parameters_type='search', dimension=5,
+    ...                             time_delay=5, n_jobs=-1)
     >>> # Fit and transform
-    >>> embedded_noise = embedder.fit_transform(signal_noise)
+    >>> signal_embedded = STE.fit_transform(signal)
     >>> print('Optimal time delay based on mutual information:',
-    ...       embedder.time_delay_)
+    ...       STE.time_delay_)
     Optimal time delay based on mutual information: 5
     >>> print('Optimal embedding dimension based on false nearest neighbors:',
-    ...       embedder.dimension_)
+    ...       STE.dimension_)
     Optimal embedding dimension based on false nearest neighbors: 2
-    >>> print(embedded_noise.shape)
+    >>> print(signal_embedded.shape)
     (9995, 2)
 
     See also
@@ -384,24 +383,24 @@ class SingleTakensEmbedding(BaseEstimator, TransformerResamplerMixin):
     .. [1] F. Takens, "Detecting strange attractors in turbulence". In: Rand
            D., Young LS. (eds) *Dynamical Systems and Turbulence, Warwick
            1980*. Lecture Notes in Mathematics, vol. 898. Springer, 1981;
-           doi: `10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
+           `DOI: 10.1007/BFb0091924 <https://doi.org/10.1007/BFb0091924>`_.
 
-    .. [2] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
+    .. [2] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
+           Application of Topological Methods to Signal Analysis"; \
+           *Foundations of Computational Mathematics*, **15**, \
+            pp. 799--838; `DOI: 10.1007/s10208-014-9206-z
+           <https://doi.org/10.1007/s10208-014-9206-z>`_.
+
+    .. [3] M. B. Kennel, R. Brown, and H. D. I. Abarbanel, "Determining
            embedding dimension for phase-space reconstruction using a
            geometrical construction"; *Phys. Rev. A* **45**, pp. 3403--3411,
-           1992; doi: `10.1103/PhysRevA.45.3403
+           1992; `DOI: 10.1103/PhysRevA.45.3403
            <https://doi.org/10.1103/PhysRevA.45.3403>`_.
 
-    .. [3] N. Sanderson, "Topological Data Analysis of Time Series using
+    .. [4] N. Sanderson, "Topological Data Analysis of Time Series using
            Witness Complexes"; PhD thesis, University of Colorado at
            Boulder, 2018; `https://scholar.colorado.edu/math_gradetds/67
            <https://scholar.colorado.edu/math_gradetds/67>`_.
-
-    [4] J. A. Perea and J. Harer, "Sliding Windows and Persistence: An \
-        Application of Topological Methods to Signal Analysis"; \
-        *Foundations of Computational Mathematics*, **15**, \
-        pp. 799--838; `doi:10.1007/s10208-014-9206-z \
-        <https://doi.org/10.1007/s10208-014-9206-z>`_.
 
     """
 
@@ -553,55 +552,56 @@ class TakensEmbedding(BaseEstimator, TransformerMixin, PlotterMixin):
     --------
     >>> import numpy as np
     >>> from gtda.time_series import TakensEmbedding
-    # Two univariate time series of duration 4
+
+    Two univariate time series of duration 4:
+
     >>> X = np.arange(8).reshape(2, 4)
     >>> print(X)
     [[0 1 2 3]
      [4 5 6 7]]
     >>> TE = TakensEmbedding(time_delay=1, dimension=2)
-    >>> print(embedder.fit_transform(X))
+    >>> print(TE.fit_transform(X))
     [[[0 1]
       [1 2]
       [2 3]]
-
      [[5 6]
       [6 7]
       [7 8]]]
-    # Two multivariate time series of duration 4, with 2 variables
+
+    Two multivariate time series of duration 4, with 2 variables:
+
     >>> x = np.arange(8).reshape(2, 1, 4)
     >>> X = np.concatenate([x, -x], axis=1)
     >>> print(X)
     [[[ 0  1  2  3]
       [ 0 -1 -2 -3]]
-
      [[ 4  5  6  7]
       [-4 -5 -6 -7]]]
-    # Pass `flatten` as `True` (default)
+
+    Pass `flatten` as ``True`` (default):
+
     >>> TE = TakensEmbedding(time_delay=1, dimension=2, flatten=True)
     >>> print(TE.fit_transform(X))
     [[[ 0  1  0 -1]
       [ 1  2 -1 -2]
       [ 2  3 -2 -3]]
-
      [[ 4  5 -4 -5]
       [ 5  6 -5 -6]
       [ 6  7 -6 -7]]]
-    # Pass `flatten` as `False`
+
+    Pass `flatten` as ``False``:
+
     >>> TE = TakensEmbedding(time_delay=1, dimension=2, flatten=False)
     >>> print(TE.fit_transform(X))
     [[[[ 0  1]
        [ 1  2]
        [ 2  3]]
-
       [[ 0 -1]
        [-1 -2]
        [-2 -3]]]
-
-
      [[[ 4  5]
        [ 5  6]
        [ 6  7]]
-
       [[-4 -5]
        [-5 -6]
        [-6 -7]]]]

@@ -28,9 +28,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`Vietoris–Rips filtrations
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, or an abstract :ref:`metric space
-    <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
     information about the appearance and disappearance of topological features
     (technically, :ref:`homology classes <homology_and_cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding
@@ -71,7 +71,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     collapse_edges : bool, optional, default: ``False``
         Whether to run the edge collapse algorithm in [2]_ prior to the
         persistent homology computation (see the Notes). Can reduce the runtime
-        dramatically when the data or the maximum homology dimension are large.
+        dramatically when the data or the maximum homology dimensions are
+        large.
 
     max_edge_length : float, optional, default: ``numpy.inf``
         Maximum value of the Vietoris–Rips filtration parameter. Points whose
@@ -107,9 +108,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
-    computing Vietoris–Rips persistent homology. Python bindings were modified
-    for performance from the `ripser.py
+    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
@@ -117,16 +118,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
-        barcodes", 2019; `arXiv:1908.02518 \
-        <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
+           persistence barcodes", 2019; `arXiv:1908.02518
+           <https://arxiv.org/abs/1908.02518>`_.
 
-    [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of \
-        Flag Complexes"; in *36th International Symposium on Computational \
-        Geometry (SoCG 2020)*, pp. 19:1–19:15, Schloss
-        Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
-        `DOI: 10.4230/LIPIcs.SoCG.2020.19 \
-        <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+    .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
+           Flag Complexes"; in *36th International Symposium on Computational
+           Geometry (SoCG 2020)*, pp. 19:1–19:15,
+           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19
+           <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """
 
@@ -321,9 +322,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`Sparse Vietoris–Rips filtrations
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, or an abstract :ref:`metric space
-    <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
     information about the appearance and disappearance of topological features
     (technically, :ref:`homology classes <homology_and_cohomology>`) of various
     dimensions and at different scales is summarised in the corresponding
@@ -400,14 +401,14 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing sparse Vietoris–Rips persistent homology. Python bindings
-    were modified for performance.
+    for computing sparse Vietoris–Rips persistent homology [1]_. Python
+    bindings were modified for performance.
 
     References
     ----------
-    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
-        Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
-        cohomology.html>`_.
+    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference
+           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent__\
+           cohomology.html>`_.
 
     """
 
@@ -590,11 +591,13 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
     :ref:`weak alpha filtrations <TODO>`.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Euclidean space, information about the appearance and disappearance of
-    topological features (technically, :ref:`homology classes
-    <homology_and_cohomology>`) of various dimension and at different scales is
-    summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     The weak alpha filtration of a point cloud is defined to be the
     :ref:`Vietoris–Rips filtration
@@ -656,16 +659,16 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     Delaunay triangulation are computed by :class:`scipy.spatial.Delaunay`.
-    Ripser <https://github.com/Ripser/ripser>`_ is used as a C++ backend for
-    computing Vietoris–Rips persistent homology. Python bindings were modified
-    for performance from the `ripser.py
+    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
     <https://github.com/scikit-tda/ripser.py>`_ package.
 
     References
     ----------
-    [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips persistence \
-        barcodes", 2019; `arXiv:1908.02518 \
-        <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
+           persistence barcodes", 2019; `arXiv:1908.02518
+           <https://arxiv.org/abs/1908.02518>`_.
 
     """
 
@@ -839,13 +842,15 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
-    `Cech filtrations <TODO>`_.
+    `Cech filtrations <cech_complex_and_cech_persistence>`_.
 
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Euclidean space, information about the appearance and disappearance of
-    topological features (technically, :ref:`homology classes
-    <homology_and_cohomology>`) of various dimensions and at different scales
-    is summarised in the corresponding persistence diagram.
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
+    information about the appearance and disappearance of topological features
+    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
+    dimensions and at different scales is summarised in the corresponding
+    persistence diagram.
 
     **Important note**:
 
@@ -896,14 +901,14 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for computing Cech persistent homology. Python bindings were modified for
-    performance.
+    for computing Cech persistent homology [1]_. Python bindings were modified
+    for performance.
 
     References
     ----------
-    [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference \
-        Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent_\
-        cohomology.html>`_.
+    .. [1] C. Maria, "Persistent Cohomology", 2020; `GUDHI User and Reference
+           Manual <http://gudhi.gforge.inria.fr/doc/3.1.0/group__persistent__\
+           cohomology.html>`_.
 
     """
 
@@ -1065,7 +1070,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
     :ref:`filtrations <filtered_complex>` of :ref:`directed or undirected flag
-    complexes <clique_and_flag_complexes>`.
+    complexes <clique_and_flag_complexes>` [1]_.
 
     Given a weighted directed or undirected graph, information about the
     appearance and disappearance of topological features (technically,
@@ -1159,9 +1164,9 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing \
-        persistent homology of directed flag complexes", Algorithms, 13(1), \
-        2020.
+    .. [1] D. Luetgehetmann, D. Govc, J. P. Smith, and R. Levi, "Computing
+           persistent homology of directed flag complexes", *Algorithms*,
+           13(1), 2020.
 
     """
 

@@ -69,10 +69,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -293,10 +293,10 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -503,10 +503,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -692,10 +692,10 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -883,10 +883,10 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
