@@ -8,4 +8,4 @@ from .rescaling import ConsistentRescaling, ConsecutiveRescaling
 __all__ = [
     'ConsistentRescaling',
     'ConsecutiveRescaling',
-]
+    ]
