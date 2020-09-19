@@ -90,18 +90,18 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
     ----------
     .. [1] M. Small, "Complex networks from time series: Capturing dynamics",
            *2013 IEEE International Symposium on Circuits and Systems
-           (IS-CAS2013)*, 2013; doi: `10.1109/iscas.2013.6572389
+           (IS-CAS2013)*, 2013; `DOI: 10.1109/iscas.2013.6572389
            <http://dx.doi.org/10.1109/iscas.2013.6572389>`_.
 
     .. [2] M. McCullough, M. Small, T. Stemler, and H. Ho-Ching Iu, "Time
            lagged ordinal partition networks for capturing dynamics of
            continuous dynamical systems"; *Chaos: An Interdisciplinary Journal
-           of Nonlinear Science* **25** (5), p. 053101, 2015; doi:
-           `10.1063/1.4919075 <http://dx.doi.org/10.1063/1.4919075>`_.
+           of Nonlinear Science* **25** (5), p. 053101, 2015; `DOI:
+           10.1063/1.4919075 <http://dx.doi.org/10.1063/1.4919075>`_.
 
     .. [3] A. Myers, E. Munch, and F. A. Khasawneh, "Persistent homology of
            complex networks for dynamic state detection"; *Phys. Rev. E*
-           **100**, 022314, 2019; doi: `10.1103/PhysRevE.100.022314
+           **100**, 022314, 2019; `DOI: 10.1103/PhysRevE.100.022314
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
