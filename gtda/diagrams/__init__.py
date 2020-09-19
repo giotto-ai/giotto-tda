@@ -13,12 +13,12 @@ __all__ = [
     'Scaler',
     'Filtering',
     'PairwiseDistance',
+    'PersistenceEntropy',
     'Amplitude',
     'NumberOfPoints',
     'BettiCurve',
     'PersistenceLandscape',
     'HeatKernel',
-    'PersistenceEntropy',
     'Silhouette',
     'PersistenceImage'
 ]
