@@ -431,7 +431,8 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
     def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
 
-    def _number_points(self, X):
+    @staticmethod
+    def _number_points(X):
         return np.count_nonzero(X[:, :, 1] - X[:, :, 0], axis=1)
 
     def fit(self, X, y=None):
