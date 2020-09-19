@@ -330,29 +330,6 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     Parameters
     ----------
-    relative_gap_size : float, optional, default: ``0.3``
-        The fraction of the largest linkage in the dendrogram to be used as
-        a threshold for determining a large enough gap.
-
-    max_fraction : float or None, optional, default: ``None``
-        When not ``None``, the algorithm is constrained to produce no more
-        than ``max_fraction * (n_samples - 1)`` clusters, even if a
-        candidate gap is observed in the iterative process which would produce
-        a greater number of clusters.
-
-    affinity : str, optional, default: ``'euclidean'``
-        Metric used to compute the linkage. Can be ``'euclidean'``, ``'l1'``,
-        ``'l2'``, ``'manhattan'``, ``'cosine'``, or ``'precomputed'``.
-        If linkage is ``'ward'``, only ``'euclidean'`` is accepted.
-        If ``'precomputed'``, a distance matrix (instead of a similarity
-        matrix) is needed as input for :meth:`fit`.
-
-    memory : None, str or object with the joblib.Memory interface, \
-        optional, default: ``None``
-        Used to cache the output of the computation of the tree.
-        By default, no caching is done. If a string is given, it is the
-        path to the caching directory.
-
     linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``, \
         optional, default: ``'single'``
         Which linkage criterion to use. The linkage criterion determines which
@@ -366,6 +343,29 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
           all observations of the two sets.
         - ``'single'`` uses the minimum of the distances between all
           observations of the two sets.
+
+    affinity : str, optional, default: ``'euclidean'``
+        Metric used to compute the linkage. Can be ``'euclidean'``, ``'l1'``,
+        ``'l2'``, ``'manhattan'``, ``'cosine'``, or ``'precomputed'``.
+        If linkage is ``'ward'``, only ``'euclidean'`` is accepted.
+        If ``'precomputed'``, a distance matrix (instead of a similarity
+        matrix) is needed as input for :meth:`fit`.
+
+    relative_gap_size : float, optional, default: ``0.3``
+        The fraction of the largest linkage in the dendrogram to be used as
+        a threshold for determining a large enough gap.
+
+    max_fraction : float, optional, default: ``1.``
+        When not ``None``, the algorithm is constrained to produce no more
+        than ``max_fraction * n_samples`` clusters, even if a candidate gap is
+        observed in the iterative process which would produce a greater number
+        of clusters.
+
+    memory : None, str or object with the joblib.Memory interface, \
+        optional, default: ``None``
+        Used to cache the output of the computation of the tree. By default, no
+        caching is performed. If a string is given, it is the path to the
+        caching directory.
 
     Attributes
     ----------
@@ -397,21 +397,20 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
     """
 
     _hyperparameters = {
+        'linkage': {'type': str},
+        'affinity': {'type': str},
         'relative_gap_size': {'type': Real,
                               'in': Interval(0, 1, closed='right')},
-        'max_fraction': {'type': (Real, type(None)),
-                         'in': Interval(0, 1, closed='right')},
-        'affinity': {'type': str},
-        'linkage': {'type': str}
+        'max_fraction': {'type': Real, 'in': Interval(0, 1, closed='right')}
         }
 
-    def __init__(self, relative_gap_size=0.3, max_fraction=None,
-                 affinity='euclidean', memory=None, linkage='single'):
+    def __init__(self, linkage='single', affinity='euclidean',
+                 relative_gap_size=0.3, max_fraction=1., memory=None):
+        self.linkage = linkage
+        self.affinity = affinity
         self.relative_gap_size = relative_gap_size
         self.max_fraction = max_fraction
-        self.affinity = affinity
         self.memory = memory
-        self.linkage = linkage
 
     def fit(self, X, y=None):
         """Fit the agglomerative clustering from features or distance matrix.
@@ -437,8 +436,6 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['memory'])
 
-        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
-
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
             self.n_clusters_ = 1
@@ -448,7 +445,7 @@ class FirstSimpleGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         min_gap_size = self.relative_gap_size * self.distances_[-1]
         self.n_clusters_ = _num_clusters_simple(
-            self.distances_, min_gap_size, _max_fraction)
+            self.distances_, min_gap_size, self.max_fraction)
 
         # Cut the tree to find labels
         # TODO: Verify whether Daniel Mullner's implementation of this step
@@ -464,42 +461,15 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
     Given a frequency threshold f and an initial integer k: 1) create a
     histogram of k equally spaced bins of the number of merges in the
-    dendrogram, as a function of the linkage parameter; 2) the value of
-    linkage at which the tree is to be cut is the first one after which a
-    bin of height no greater than f (i.e. a "gap") is observed; 3) if no gap is
-    observed, increase k and repeat 1) and 2) until termination. The algorithm
-    can be partially overridden to ensure that the final number of clusters
-    does not exceed a certain threshold, by passing a parameter `max_fraction`.
+    dendrogram, as a function of the linkage parameter; 2) the value of linkage
+    at which the tree is to be cut is the first one after which a bin of height
+    no greater than f (i.e. a "gap") is observed; 3) if no gap is observed,
+    increase k and repeat 1) and 2) until termination. The algorithm can be
+    partially overridden to ensure that the final number of clusters does not
+    exceed a certain threshold, by passing a parameter `max_fraction`.
 
     Parameters
     ----------
-    freq_threshold : int, optional, default: ``0``
-        The frequency threshold for declaring that a gap in the histogram of
-        merges is present.
-
-    max_fraction : float or None, optional, default: ``None``
-        When not ``None``, the algorithm is constrained to produce no more
-        than ``max_fraction * (n_samples - 1)`` clusters, even if a
-        candidate gap is observed in the iterative process which would produce
-        a greater number of clusters.
-
-    n_bins_start : int, optional, default: ``5``
-        The initial number of bins in the iterative process for finding a
-        gap in the histogram of merges.
-
-    affinity : str, optional, default: ``'euclidean'``
-        Metric used to compute the linkage. Can be ``'euclidean'``, ``'l1'``,
-        ``'l2'``, ``'manhattan'``, ``'cosine'``, or ``'precomputed'``.
-        If linkage is ``'ward'``, only ``'euclidean'`` is accepted.
-        If ``'precomputed'``, a distance matrix (instead of a similarity
-        matrix) is needed as input for :meth:`fit`.
-
-    memory : None, str or object with the joblib.Memory interface, \
-        optional, default: ``None``
-        Used to cache the output of the computation of the tree.
-        By default, no caching is done. If a string is given, it is the
-        path to the caching directory.
-
     linkage : ``'ward'`` | ``'complete'`` | ``'average'`` | ``'single'``, \
         optional, default: ``'single'``
         Which linkage criterion to use. The linkage criterion determines which
@@ -509,10 +479,37 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         - ``'ward'`` minimizes the variance of the clusters being merged.
         - ``'average'`` uses the average of the distances of each observation
           of the two sets.
-        - ``'complete'`` linkage uses the maximum distances between
-          all observations of the two sets.
+        - ``'complete'`` linkage uses the maximum distances between all
+          observations of the two sets.
         - ``'single'`` uses the minimum of the distances between all
           observations of the two sets.
+
+    affinity : str, optional, default: ``'euclidean'``
+        Metric used to compute the linkage. Can be ``'euclidean'``, ``'l1'``,
+        ``'l2'``, ``'manhattan'``, ``'cosine'``, or ``'precomputed'``.
+        If linkage is ``'ward'``, only ``'euclidean'`` is accepted.
+        If ``'precomputed'``, a distance matrix (instead of a similarity
+        matrix) is needed as input for :meth:`fit`.
+
+    freq_threshold : int, optional, default: ``0``
+        The frequency threshold for declaring that a gap in the histogram of
+        merges is present.
+
+    max_fraction : float, optional, default: ``1.``
+        When not ``None``, the algorithm is constrained to produce no more
+        than ``max_fraction * n_samples`` clusters, even if a candidate gap is
+        observed in the iterative process which would produce a greater number
+        of clusters.
+
+    n_bins_start : int, optional, default: ``5``
+        The initial number of bins in the iterative process for finding a gap
+        in the histogram of merges.
+
+    memory : None, str or object with the joblib.Memory interface, \
+        optional, default: ``None``
+        Used to cache the output of the computation of the tree. By default, no
+        caching is performed. If a string is given, it is the path to the
+        caching directory.
 
     Attributes
     ----------
@@ -550,24 +547,24 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
     """
 
     _hyperparameters = {
+        'linkage': {'type': str},
+        'affinity': {'type': str},
         'freq_threshold': {'type': int,
                            'in': Interval(0, np.inf, closed='left')},
-        'max_fraction': {'type': (Real, type(None)),
-                         'in': Interval(0, 1, closed='right')},
+        'max_fraction': {'type': Real, 'in': Interval(0, 1, closed='right')},
         'n_bins_start': {'type': int,
                          'in': Interval(1, np.inf, closed='left')},
-        'affinity': {'type': str},
-        'linkage': {'type': str}
         }
 
-    def __init__(self, freq_threshold=0, max_fraction=None, n_bins_start=5,
-                 affinity='euclidean', memory=None, linkage='single'):
+    def __init__(self, linkage='single', affinity='euclidean',
+                 freq_threshold=0, max_fraction=1., n_bins_start=5,
+                 memory=None):
+        self.linkage = linkage
+        self.affinity = affinity
         self.freq_threshold = freq_threshold
         self.max_fraction = max_fraction
         self.n_bins_start = n_bins_start
-        self.affinity = affinity
         self.memory = memory
-        self.linkage = linkage
 
     def fit(self, X, y=None):
         """Fit the agglomerative clustering from features or distance matrix.
@@ -593,8 +590,6 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['memory'])
 
-        _max_fraction = 1. if self.max_fraction is None else self.max_fraction
-
         if X.shape[0] == 1:
             self.labels_ = np.array([0])
             self.n_clusters_ = 1
@@ -604,7 +599,7 @@ class FirstHistogramGap(ClusterMixin, BaseEstimator, Agglomerative):
 
         self.n_clusters_ = _num_clusters_histogram(
             self.distances_, self.freq_threshold, self.n_bins_start,
-            _max_fraction)
+            self.max_fraction)
 
         # Cut the tree to find labels
         # TODO: Verify whether Daniel Mullner's implementation of this step

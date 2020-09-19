@@ -1,7 +1,7 @@
 :mod:`gtda.mapper`: Mapper
 ==========================
 
-.. automodule:: gtda.mapper
+.. automodule:: gtda
    :no-members:
    :no-inherited-members:
 
@@ -66,7 +66,7 @@ Pipeline
    :toctree: generated/mapper/pipeline/
    :template: function.rst
 
-   mapper.pipeline.make_mapper_pipeline
+   mapper.make_mapper_pipeline
 
 
 .. autosummary::
@@ -84,8 +84,8 @@ Visualization
    :toctree: generated/mapper/visualization
    :template: function.rst
 
-   mapper.visualization.plot_static_mapper_graph
-   mapper.visualization.plot_interactive_mapper_graph
+   mapper.plot_static_mapper_graph
+   mapper.plot_interactive_mapper_graph
 
 Utilities
 ---------
@@ -95,5 +95,5 @@ Utilities
    :toctree: generated/mapper/utils
    :template: function.rst
 
-   mapper.utils.decorators.method_to_transform
-   mapper.utils.pipeline.transformer_from_callable_on_rows
+   mapper.method_to_transform
+   mapper.transformer_from_callable_on_rows

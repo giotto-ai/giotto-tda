@@ -278,13 +278,14 @@ def test_hk_pi_big_sigma(transformer_cls, pts, dims):
     X = get_input(pts, dims)
     # To make the test less flaky, it helps to set al homology dimensions equal
     X[:, :, 2] = 0.
-    sigma = 100 * (np.max(X[:, :, :2]) - np.min(X[:, :, :2]))
+    max_difference = np.max(X[:, :, :2]) - np.min(X[:, :, :2])
+    sigma = 100 * (max_difference)
 
     hk = transformer_cls(sigma=sigma, n_bins=n_bins)
     X_t = hk.fit_transform(X)
 
     max_hk_abs_value = np.max(np.abs(X_t))
-    assert max_hk_abs_value <= 1e-4
+    assert max_hk_abs_value <= 1e-3
 
 
 @given(pts_gen)
