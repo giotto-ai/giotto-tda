@@ -3,7 +3,6 @@
 
 from numbers import Real
 from types import FunctionType
-from warnings import warn
 import itertools
 
 import numpy as np
@@ -117,15 +116,15 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.direction is None:
-            self.direction_ = np.ones(n_dimensions_,)
+            self.direction_ = np.ones(self.n_dimensions_,)
         else:
             self.direction_ = np.copy(self.direction)
         self.direction_ = self.direction_ / np.linalg.norm(self.direction_)
@@ -134,10 +133,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         mesh_range_list = \
             [np.arange(X.shape[order]) if self.direction_[i] >= 0
              else -np.flip(np.arange(X.shape[order])) for i, order
-             in enumerate(axis_order[: n_dimensions_])]
+             in enumerate(axis_order[: self.n_dimensions_])]
 
         self.mesh_ = np.stack(np.meshgrid(*mesh_range_list, indexing='xy'),
-                              axis=n_dimensions_)
+                              axis=self.n_dimensions_)
 
         self.max_value_ = 0.
         self.max_value_ = np.max(self._calculate_height(
@@ -348,26 +347,26 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         if self.center is None:
-            self.center_ = np.zeros(n_dimensions_)
+            self.center_ = np.zeros(self.n_dimensions_)
         else:
             self.center_ = np.copy(self.center)
         self.center_ = self.center_.reshape((1, -1))
 
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
-                           for i in axis_order[:n_dimensions_]]
+                           for i in axis_order[:self.n_dimensions_]]
 
         self.mesh_ = np.stack(
             np.meshgrid(*mesh_range_list),
-            axis=n_dimensions_).reshape((-1, n_dimensions_))
+            axis=self.n_dimensions_).reshape((-1, self.n_dimensions_))
         self.mesh_ = pairwise_distances(
             self.center_, self.mesh_, metric=self.metric,
             n_jobs=1, **self.metric_params).reshape(X.shape[1:])
@@ -489,6 +488,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     n_iterations_ : int
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
@@ -550,10 +552,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -677,6 +679,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     n_iterations_ : int
         Effective number of iterations in the erosion process. Set in
         :meth:`fit`.
@@ -738,10 +743,10 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -867,6 +872,9 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     n_iterations_ : int
         Effective number of iterations in the dilation process. Set in
         :meth:`fit`.
@@ -936,10 +944,10 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -1066,6 +1074,9 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     mask_ : ndarray of shape (radius, radius, [, radius])
         The mask applied around each pixel to calculate the weighted number of
         its activated neighbors. Set in :meth:`fit`.
@@ -1129,23 +1140,23 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         self._range = int(np.ceil(self.radius))
 
-        iterator_range_list = [range(-self._range, self._range + 1)] * self._n_dimensions \
-                               for _ in range(self._n_dimensions)] \
-            + [[0] * (3 - self._n_dimensions)]
+        iterator_range_list = [range(-self._range, self._range + 1)
+                               for _ in range(self.n_dimensions_)] \
+            + [[0] for _ in range(3 - self.n_dimensions_)]
         self._iterator = tuple(itertools.product(*iterator_range_list))
 
         # The mask is always 3D but not the iterator.
-        self.mask_ = np.ones(tuple([2 * self._range + 1] * 3,
-                             dtype=np.bool))
+        self.mask_ = np.ones(tuple(2 * self._range + 1 for _ in range(3)),
+                             dtype=np.bool)
         mesh_range_list = [np.arange(0, 2 * self._range + 1)] * 3
         self.mesh_ = np.stack(
             np.meshgrid(*mesh_range_list), axis=3).reshape((-1, 3))
@@ -1157,9 +1168,9 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.mask_ = self.mask_ <= self.radius
 
-        padding = np.asarray([self._range] * self._n_dimensions + \
-                             [0] * (3 - self._n_dimensions))
-        self._padder = Padder(paddings=padding)
+        padding = np.asarray([*[self._range] * self.n_dimensions_,
+                              *[0] * (3 - self.n_dimensions_)])
+        self._padder = Padder(padding=padding)
         self._padder.fit(X.reshape((*X.shape[:3], -1)))
 
         return self
@@ -1201,7 +1212,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Xt = Xt[:, self._range: -self._range, self._range: -self._range]
 
-        if self._n_dimensions == 3:
+        if self.n_dimensions_ == 3:
             Xt = Xt[:, :, :, self._range: -self._range]
 
         Xt = Xt.reshape(X.shape)

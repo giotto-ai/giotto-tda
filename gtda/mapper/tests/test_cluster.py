@@ -147,4 +147,4 @@ def test_precomputed_distances(inp):
                     for c in indices_cluster])
 
     assert get_partition_from_preds(preds) == \
-           get_partition_from_preds(preds_mat)
+        get_partition_from_preds(preds_mat)

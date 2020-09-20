@@ -92,6 +92,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
+        self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
@@ -206,6 +207,9 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     max_value_ : int ndarray of shape (padding_x, padding_y [, padding_z])
        Effective maximum value of the images' pixels. Set in :meth:`fit`.
 
@@ -254,10 +258,10 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(self.get_params(), self._hyperparameters,
                         exclude=['n_jobs'])
 
@@ -369,6 +373,9 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    self.n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     padding_ : int ndarray of shape (padding_x, padding_y [, padding_z])
        Effective padding along each of the axis. Set in :meth:`fit`.
 
@@ -416,25 +423,26 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
         validate_params(self.get_params(), self._hyperparameters,
                         exclude=['value', 'n_jobs'])
 
         if self.padding is None:
-            self.padding_ = np.ones((n_dimensions,), dtype=np.int)
-        elif len(self.padding) != n_dimensions:
+            self.padding_ = np.ones((self.n_dimensions_,), dtype=np.int)
+        elif len(self.padding) != self.n_dimensions_:
             raise ValueError(
                 f"`padding` has length {self.padding} while the input "
-                f"data requires it to have length equal to {n_dimensions}.")
+                f"data requires it to have length equal to "
+                f"{self.n_dimensions_}.")
         else:
             self.padding_ = self.padding
 
         self._pad_width = ((0, 0),
                            *[(self.padding_[axis], self.padding_[axis])
-                             for axis in range(n_dimensions)])
+                             for axis in range(self.n_dimensions_)])
 
         return self
 
@@ -533,6 +541,11 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     See also
     --------
     gtda.homology.VietorisRipsPersistence, gtda.homology.SparseRipsPersistence,
@@ -575,10 +588,10 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_array(X, allow_nd=True)
-        n_dimensions_ = X.ndim - 1
-        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+        self.n_dimensions_ = X.ndim - 1
+        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
-                             f"{n_dimensions_}.")
+                             f"{self.n_dimensions_}.")
 
         self._is_fitted = True
         return self
