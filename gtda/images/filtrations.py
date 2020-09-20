@@ -3,6 +3,8 @@
 
 from numbers import Real
 from types import FunctionType
+from warnings import warn
+import itertools
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -12,6 +14,7 @@ from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._utils import _dilate, _erode
+from .preprocessing import Padder
 from ..base import PlotterMixin
 from ..plotting import plot_heatmap
 from ..utils._docs import adapt_fit_transform_docs
@@ -66,10 +69,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -114,8 +117,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions = X.ndim - 1
-        if (n_dimensions < 2) or (n_dimensions > 3):
+        n_dimensions_ = X.ndim - 1
+        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{n_dimensions_}.")
         validate_params(
@@ -260,7 +263,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
 
-    metric_params : dict or None, optional, default: ``None``
+    metric_params : dict or None, optional, default: ``{}``
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
@@ -276,11 +279,6 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     center_ : ndarray of shape (:attr:`n_dimensions_`,)
         Effective center of the radial filtration. Set in :meth:`fit`.
 
-    effective_metric_params_ : dict
-        Dictionary containing all information present in
-        `metric_params`. If `metric_params` is ``None``, it is set to
-        the empty dictionary.
-
     mesh_ : ndarray of shape ( n_pixels_x, n_pixels_y [, n_pixels_z])
         greyscale image corresponding to the radial filtration of a binary
         image where each pixel is activated. Set in :meth:`fit`.
@@ -295,10 +293,10 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -306,11 +304,11 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         'center': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
-        'metric_params': {'type': (dict, type(None))}
+        'metric_params': {'type': dict}
         }
 
     def __init__(self, center=None, radius=np.inf, metric='euclidean',
-                 metric_params=None, n_jobs=None):
+                 metric_params={}, n_jobs=None):
         self.center = center
         self.radius = radius
         self.metric = metric
@@ -327,9 +325,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xr
 
     def fit(self, X, y=None):
-        """Calculate :attr:`center_`, :attr:`effective_metric_params_`,
-        :attr:`n_dimensions_`, :attr:`mesh_` and :attr:`max_value_` from a
-        collection of binary images. Then, return the estimator.
+        """Calculate :attr:`center_`, :attr:`n_dimensions_`, :attr:`mesh_` and
+        :attr:`max_value_` from a collection of binary images. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -350,8 +348,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions = X.ndim - 1
-        if (n_dimensions < 2) or (n_dimensions > 3):
+        n_dimensions_ = X.ndim - 1
+        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{n_dimensions_}.")
         validate_params(
@@ -363,11 +361,6 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             self.center_ = np.copy(self.center)
         self.center_ = self.center_.reshape((1, -1))
 
-        if self.metric_params is None:
-            self.effective_metric_params_ = {}
-        else:
-            self.effective_metric_params_ = self.metric_params.copy()
-
         axis_order = [2, 1, 3]
         mesh_range_list = [np.arange(0, X.shape[i])
                            for i in axis_order[:n_dimensions_]]
@@ -377,7 +370,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             axis=n_dimensions_).reshape((-1, n_dimensions_))
         self.mesh_ = pairwise_distances(
             self.center_, self.mesh_, metric=self.metric,
-            n_jobs=1, **self.effective_metric_params_).reshape(X.shape[1:])
+            n_jobs=1, **self.metric_params).reshape(X.shape[1:])
         self.mesh_[self.mesh_ > self.radius] = np.inf
 
         self.max_value_ = 0.
@@ -510,10 +503,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -557,9 +550,8 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-
-        n_dimensions = X.ndim - 1
-        if (n_dimensions < 2) or (n_dimensions > 3):
+        n_dimensions_ = X.ndim - 1
+        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{n_dimensions_}.")
         validate_params(
@@ -699,10 +691,10 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -746,8 +738,8 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions = X.ndim - 1
-        if (n_dimensions < 2) or (n_dimensions > 3):
+        n_dimensions_ = X.ndim - 1
+        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{n_dimensions_}.")
         validate_params(
@@ -890,10 +882,10 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -944,8 +936,8 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions = X.ndim - 1
-        if (n_dimensions < 2) or (n_dimensions > 3):
+        n_dimensions_ = X.ndim - 1
+        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{n_dimensions_}.")
         validate_params(
@@ -991,6 +983,229 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             delayed(self._calculate_signed_distance)(X[s])
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
+
+        return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, colorscale='greys', origin='upper',
+             plotly_params=None):
+        """Plot a sample from a collection of 2D greyscale images.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y)
+            Collection of 2D greyscale images, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        colorscale : str, optional, default: ``'greys'``
+            Color scale to be used in the heat map. Can be anything allowed by
+            :class:`plotly.graph_objects.Heatmap`.
+
+        origin : ``'upper'`` | ``'lower'``, optional, default: ``'upper'``
+            Position of the [0, 0] pixel of `data`, in the upper left or lower
+            left corner. The convention ``'upper'`` is typically used for
+            matrices and images.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"trace"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
+        """
+        return plot_heatmap(
+            Xt[sample], colorscale=colorscale, origin=origin,
+            title=f"Signed-distance filtration of image {sample}",
+            plotly_params=plotly_params
+            )
+
+
+@adapt_fit_transform_docs
+class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
+    """Filtrations of 2D/3D binary images based on the number of neighboring
+    activated pixels.
+
+    The density filtration assigns to each pixel of a binary image a greyscale
+    value equal to the weighted number of activated pixels within a ball
+    centered around it. The weights are calculated based on the distance of the
+    activated pixels to the center of the ball.
+
+    Parameters
+    ----------
+    radius : float, optional, default: ``1.``
+        The radius of the ball within which the number of activated pixels is
+        considered.
+
+    metric : string or callable, optional, default: ``'euclidean'``
+        Determines a rule with which to calculate distances between
+        pairs of pixels.
+        If ``metric`` is a string, it must be one of the options allowed by
+        ``scipy.spatial.distance.pdist`` for its metric parameter, or a metric
+        listed in ``sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS``, including
+        "euclidean", "manhattan", or "cosine".
+        If ``metric`` is a callable function, it is called on each pair of
+        instances and the resulting value recorded. The callable should take
+        two arrays from the entry in `X` as input, and return a value
+        indicating the distance between them.
+
+    metric_params : dict, optional, default: ``{}``
+        Additional keyword arguments for the metric function.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    mask_ : ndarray of shape (radius, radius, [, radius])
+        The mask applied around each pixel to calculate the weighted number of
+        its activated neighbors. Set in :meth:`fit`.
+
+    See also
+    --------
+    gtda.homology.CubicalPersistence, Binarizer
+
+    References
+    ----------
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
+
+    """
+
+    _hyperparameters = {
+        'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict},
+    }
+
+    def __init__(self, radius=3, metric='euclidean', metric_params={},
+                 n_jobs=None):
+        self.radius = radius
+        self.metric = metric
+        self.metric_params = metric_params
+        self.n_jobs = n_jobs
+
+    def _calculate_density(self, X):
+        Xd = np.zeros(X.shape)
+
+        for i, j, k in self._iterator:
+            Xd += np.roll(np.roll(
+                np.roll(X, k, axis=3), j, axis=2), i, axis=1) \
+                * self.mask_[self._range + i, self._range + j,
+                             self._range + k]
+        return Xd
+
+    def fit(self, X, y=None):
+        """Calculate :attr:`mask_` from a collection of binary images. Then,
+        return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_array(X, allow_nd=True)
+        n_dimensions_ = X.ndim - 1
+        if (n_dimensions_ < 2) or (n_dimensions_ > 3):
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{n_dimensions_}.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
+        self._range = int(np.ceil(self.radius))
+
+        iterator_range_list = [range(-self._range, self._range + 1)] * self._n_dimensions \
+                               for _ in range(self._n_dimensions)] \
+            + [[0] * (3 - self._n_dimensions)]
+        self._iterator = tuple(itertools.product(*iterator_range_list))
+
+        # The mask is always 3D but not the iterator.
+        self.mask_ = np.ones(tuple([2 * self._range + 1] * 3,
+                             dtype=np.bool))
+        mesh_range_list = [np.arange(0, 2 * self._range + 1)] * 3
+        self.mesh_ = np.stack(
+            np.meshgrid(*mesh_range_list), axis=3).reshape((-1, 3))
+
+        center = self._range * np.ones((1, 3))
+        self.mask_ = pairwise_distances(
+            center, self.mesh_, metric=self.metric,
+            n_jobs=1, **self.metric_params).reshape(self.mask_.shape)
+
+        self.mask_ = self.mask_ <= self.radius
+
+        padding = np.asarray([self._range] * self._n_dimensions + \
+                             [0] * (3 - self._n_dimensions))
+        self._padder = Padder(paddings=padding)
+        self._padder.fit(X.reshape((*X.shape[:3], -1)))
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each binary image in the collection `X`, calculate a
+        corresponding greyscale image based on the density of its pixels.
+        Return the collection of greyscale images.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
+            Input data. Each entry along axis 0 is interpreted as a 2D or 3D
+            binary image.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_pixels_x,
+            n_pixels_y [, n_pixels_z])
+            Transformed collection of images. Each entry along axis 0 is a
+            2D or 3D greyscale image.
+
+        """
+        check_is_fitted(self)
+        Xt = check_array(X, allow_nd=True, copy=True)
+
+        Xt = Xt.reshape((*X.shape[:3], -1))
+        Xt = self._padder.transform(Xt)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._calculate_density)(Xt[s])
+            for s in gen_even_slices(Xt.shape[0],
+                                     effective_n_jobs(self.n_jobs)))
+        Xt = np.concatenate(Xt)
+
+        Xt = Xt[:, self._range: -self._range, self._range: -self._range]
+
+        if self._n_dimensions == 3:
+            Xt = Xt[:, :, :, self._range: -self._range]
+
+        Xt = Xt.reshape(X.shape)
 
         return Xt
 
