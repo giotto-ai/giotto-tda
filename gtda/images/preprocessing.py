@@ -4,7 +4,6 @@
 from functools import reduce
 from operator import iconcat
 from numbers import Real
-from warnings import warn
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -49,10 +48,10 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
-           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
-           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -95,8 +94,8 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
         if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
-            warn(f"Input of `fit` contains arrays of dimension "
-                 f"{self.n_dimensions_}.")
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -185,54 +184,26 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
-    """Invert all 2D/3D images in a collection.
-
-    Applies an inversion function to the value of all pixels of all images in
-    the input collection. If the images are binary, the inversion function is
-    defined as the logical NOT function. Otherwise, it is the function
-    :math:`f(x) = M - x`, where `x` is a pixel value and `M` is
-    :attr:`max_value_`.
+    """Invert all 2D/3D binary images in a collection.
 
     Parameters
     ----------
-    max_value : bool, int, float or None, optional, default: ``None``
-        Maximum possible pixel value in the images. It should be a boolean if
-        input images are binary and an int or a float if they are greyscale.
-        If ``None``, it is calculated from the collection of images passed in
-        :meth:`fit`.
-
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    Attributes
-    ----------
-    max_value_ : int ndarray of shape (padding_x, padding_y [, padding_z])
-       Effective maximum value of the images' pixels. Set in :meth:`fit`.
-
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
-           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
-           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: \
+        Classification  of MNIST  using  TDA"; 19th International \
+        IEEE Conference on Machine Learning and Applications (ICMLA 2020), \
+        2019; arXiv: `1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
-    _hyperparameters = {
-        'max_value': {'type': (bool, Real, type(None))}
-    }
-
-    def __init__(self, max_value=None, n_jobs=None):
-        self.max_value = max_value
+    def __init__(self, n_jobs=None):
         self.n_jobs = n_jobs
-
-    def _invert(self, X):
-        if self.max_value_ is True:
-            return np.logical_not(X)
-        else:
-            return self.max_value_ - X
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
@@ -244,7 +215,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -256,18 +227,12 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_array(X, allow_nd=True)
+        n_dimensions = X.ndim - 1
+        if (n_dimensions < 2) or (n_dimensions > 3):
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{n_dimensions_}.")
 
-        validate_params(self.get_params(), self._hyperparameters,
-                        exclude=['n_jobs'])
-
-        if self.max_value is None:
-            if X.dtype == np.bool:
-                self.max_value_ = True
-            else:
-                self.max_value_ = np.max(X)
-        else:
-            self.max_value_ = self.max_value
-
+        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -292,11 +257,11 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             2D or 3D binary image.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, ['_is_fitted'])
         Xt = check_array(X, allow_nd=True)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
-            self._invert)(Xt[s])
+            np.logical_not)(Xt[s])
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
@@ -347,19 +312,19 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
-    """Pad all 2D/3D images in a collection.
+    """Pad all 2D/3D binary images in a collection.
 
     Parameters
     ----------
-    padding : int ndarray of shape (padding_x, padding_y [, padding_z]) or \
+    paddings : int ndarray of shape (padding_x, padding_y [, padding_z]) or \
         None, optional, default: ``None``
         Number of pixels to pad the images along each axis and on both side of
         the images. By default, a frame of a single pixel width is added
         around the image (``1 = padding_x = padding_y [= padding_z]``).
 
-    value : bool, int, or float, optional, default: ``0``
-        Value given to the padded pixels. It should be a boolean if the input
-        images are binary and an int or float if they are greyscale.
+    activated : bool, optional, default: ``False``
+        If ``True``, the padded pixels are activated. If ``False``, they are
+        deactivated.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -368,33 +333,31 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    padding_ : int ndarray of shape (padding_x, padding_y [, padding_z])
+    paddings_ : int ndarray of shape (padding_x, padding_y [, padding_z])
        Effective padding along each of the axis. Set in :meth:`fit`.
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
-           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
-           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
     _hyperparameters = {
-        'padding': {
-            'type': (np.ndarray, type(None)),
-            'of': {'type': int}},
-        'value': {'type': (bool, Real)}
-    }
+        'paddings': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
+        'activated': {'type': bool}
+        }
 
-    def __init__(self, padding=None, value=False, n_jobs=None):
-        self.padding = padding
-        self.value = value
+    def __init__(self, paddings=None, activated=False, n_jobs=None):
+        self.paddings = paddings
+        self.activated = activated
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Calculate :attr:`padding_` from a collection of images. Then,
-        return the estimator.
+        """Calculate :attr:`paddings_` from a collection of binary images.
+        Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -403,7 +366,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -416,24 +379,23 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         n_dimensions = X.ndim - 1
-        if n_dimensions < 2 or n_dimensions > 3:
-            warn(f"Input of `fit` contains arrays of dimension "
-                 f"{self.n_dimensions_}.")
+        if (n_dimensions < 2) or (n_dimensions > 3):
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{n_dimensions_}.")
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        validate_params(self.get_params(), self._hyperparameters,
-                        exclude=['value', 'n_jobs'])
-
-        if self.padding is None:
-            self.padding_ = np.ones((n_dimensions,), dtype=np.int)
-        elif len(self.padding) != n_dimensions:
+        if self.paddings is None:
+            self.paddings_ = np.ones((n_dimensions,), dtype=np.int)
+        elif len(self.paddings) != n_dimensions:
             raise ValueError(
-                f"`padding` has length {self.padding} while the input "
+                f"`paddings` has length {self.paddings} while the input "
                 f"data requires it to have length equal to {n_dimensions}.")
         else:
-            self.padding_ = self.padding
+            self.paddings_ = self.paddings
 
         self._pad_width = ((0, 0),
-                           *[(self.padding_[axis], self.padding_[axis])
+                           *[(self.paddings_[axis], self.paddings_[axis])
                              for axis in range(n_dimensions)])
 
         return self
@@ -446,7 +408,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray of shape (n_samples, n_pixels_x, n_pixels_y [, n_pixels_z])
             Input data. Each entry along axis 0 is interpreted as a 2D or 3D
-            image.
+            binary image.
 
         y : None
             There is no need of a target in a transformer, yet the pipeline API
@@ -465,7 +427,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(
             np.pad)(Xt[s], pad_width=self._pad_width,
-                    constant_values=self.value)
+                    constant_values=self.activated)
             for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
@@ -540,10 +502,10 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
-           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
-           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
+    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
+        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
+        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
+        <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -577,9 +539,9 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         check_array(X, allow_nd=True)
 
         n_dimensions = X.ndim - 1
-        if n_dimensions < 2 or n_dimensions > 3:
-            warn(f"Input of `fit` contains arrays of dimension "
-                 f"{self.n_dimensions_}.")
+        if (n_dimensions < 2) or (n_dimensions > 3):
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{n_dimensions_}.")
 
         self._is_fitted = True
         return self
