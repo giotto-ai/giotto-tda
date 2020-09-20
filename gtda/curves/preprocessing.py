@@ -24,7 +24,7 @@ class Derivative(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     order : int, optional, default: ``1``
-        The number of time the multi-channels curves are derivated.
+        The number of time the multi-channels curves are derived.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
