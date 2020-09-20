@@ -1035,9 +1035,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     activated pixels.
 
     The density filtration assigns to each pixel of a binary image a greyscale
-    value equal to the weighted number of activated pixels within a ball
-    centered around it. The weights are calculated based on the distance of the
-    activated pixels to the center of the ball.
+    value equal to the sum of the distance between this pixel and all activated
+    pixels within a ball centered around it.
 
     Parameters
     ----------
