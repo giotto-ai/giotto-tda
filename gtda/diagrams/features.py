@@ -457,7 +457,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         'polynomial_type': {'type': str,
                             'in': _AVAILABLE_POLYNOMIALS.keys()},
         'n_coefficients': {'type': (int, type(None), list),
-                           #'in': Interval(1, np.inf, closed='left'),
+                           # 'in': Interval(1, np.inf, closed='left'),
                            'of': {'type': int,
                                   'in': Interval(1, np.inf, closed='left')}},
     }
@@ -530,7 +530,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         roots = self._polynomial_function(X)
         coefficients = np.poly(roots)
 
-        coefficients = np.array(coefficients[::-1])
+        coefficients = np.array(coefficients[1:])
         dimension = min(n_coefficients, coefficients.shape[0])
         Xt[:dimension] = coefficients[:dimension].real
         Xt[n_coefficients:n_coefficients + dimension] = \
