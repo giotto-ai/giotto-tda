@@ -166,9 +166,9 @@ def validate_params(parameters, references, exclude=None):
         - ``'type'``, mapping to a class or tuple of classes. ``parameter``
           is checked to be an instance of this class or tuple of classes.
 
-        - ``'in'``, mapping to a dictionary, when the value of ``'type'`` is
+        - ``'in'``, mapping to an object, when the value of ``'type'`` is
           not one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
-          Letting ``ref_in`` denote that dictionary, the following check is
+          Letting ``ref_in`` denote that object, the following check is
           performed: ``parameter in ref_in``.
 
         - ``'of'``, mapping to a dictionary, when the value of ``'type'``
