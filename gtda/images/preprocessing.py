@@ -3,7 +3,7 @@
 
 from functools import reduce
 from operator import iconcat
-from numbers import Real
+from numbers import Real, Integral
 from warnings import warn
 
 import numpy as np
@@ -382,7 +382,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'padding': {'type': (np.ndarray, type(None)),
-                    'of': {'type': int}},
+                    'of': {'type': Integral}},
         'value': {'type': (bool, Real)}
         }
 
