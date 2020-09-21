@@ -84,8 +84,8 @@ def test_pe_transform(n_jobs):
 
 
 def test_cp_transform():
-    cp = ComplexPolynomial(n_coefficients=2, polynomial_type='R')
-    diagram_res = np.array([[-3., -2., 2., -4., -28., -6., 36., -12.]])
+    cp = ComplexPolynomial(n_coefficients=[2, 1], polynomial_type='R')
+    diagram_res = np.array([[-3., -2., 2., -4., -28., 36.]])
 
     assert_almost_equal(cp.fit_transform(X), diagram_res)
 

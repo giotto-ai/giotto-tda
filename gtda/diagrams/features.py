@@ -396,15 +396,15 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ComplexPolynomial(BaseEstimator, TransformerMixin):
-    """Computes oefficients of the complex polynomials whose roots are points
-    from the diagrams.
+    """Coefficients of the complex polynomials whose roots are the points on the
+    persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective complex polynomial are computed
     using the persistence points as roots. The :attr:`n_coefficients`
     coefficients of those polynomial are returned as a vector of their real
-    parts concatenated with a vector of their imaginary parts. [1]_
+    parts concatenated with a vector of their imaginary parts [1]_.
 
     **Important notes**:
 
@@ -456,8 +456,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     _hyperparameters = {
         'polynomial_type': {'type': str,
                             'in': _AVAILABLE_POLYNOMIALS.keys()},
-        'n_coefficients': {'type': (int, type(None)),
-                           'in': Interval(1, np.inf, closed='left')},
+        'n_coefficients': {'type': (int, type(None), list),
+                           #'in': Interval(1, np.inf, closed='left'),
+                           'of': {'type': int,
+                                  'in': Interval(1, np.inf, closed='left')}},
     }
 
     def __init__(self, polynomial_type='R', n_coefficients=10, n_jobs=None):
@@ -537,7 +539,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         return Xt
 
     def transform(self, X, y=None):
-        """Compute the real and imaginary parts of the complex vector of
+        """Computes the real and imaginary parts of the complex vector of
         coefficients for each diagram individually and concatenate the results.
 
         Parameters
@@ -569,8 +571,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
             delayed(self._complex_polynomial)(
                 _subdiagrams(Xt, [dim], remove_dim=True)[s],
                 self.n_coefficients_[d])
-            for d, dim in enumerate(self.homology_dimensions_)
-            for s in range(X.shape[0]))
-        Xt = np.stack(Xt).reshape((X.shape[0], -1))
+            for s in range(X.shape[0])
+            for d, dim in enumerate(self.homology_dimensions_))
+        Xt = np.concatenate(Xt).reshape((X.shape[0], -1))
 
         return Xt
