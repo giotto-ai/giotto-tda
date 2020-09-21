@@ -406,7 +406,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     coefficients of those polynomial are returned as a vector of their real
     parts concatenated with a vector of their imaginary parts [1]_.
 
-    **Important notes**:
+    **Important note**:
 
         - Input collections of persistence diagrams for this transformer must
           satisfy certain requirements, see e.g. :meth:`fit`.
@@ -417,10 +417,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         ``'R'``
         Type of complex polynomial to compute.
 
-    n_coefficients : int or list of int or None, optional, default: ``10``
+    n_coefficients : int, list of int or None, optional, default: ``10``
         Number of coefficients per homology dimension. This is the dimension of
         the complex vector of coefficients, i.e., the number of coefficients
-        corresponding to the largest degree terms of the polynomial. It it is
+        corresponding to the largest degree terms of the polynomial. If it is
         an int, then the number of coefficients will be equal to that value for
         each homology dimensions. If ``None``, those numbers are computed for
         each homology dimension from the list of persistence diagrams by
@@ -448,9 +448,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    .. [1] B. Di Fabio and M. Ferri, “Comparing Persistence Diagrams Through
-           Complex Vectors”; Image Analysis and Processing (ICIAP 2015), 2015,
-           doi: 10.1007/978-3-319-23231-7_27.
+    .. [1] B. Di Fabio and M. Ferri, "Comparing Persistence Diagrams Through
+           Complex Vectors"; in *Image Analysis and Processing — ICIAP 2015*,
+           2015; `DOI: 10.1007/978-3-319-23231-7_27
+           <https://doi.org/10.1007/978-3-319-23231-7_27>_.
 
     """
     _hyperparameters = {
@@ -500,7 +501,9 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         # Find the unique homology dimensions in the 3D array X passed to `fit`
         # assuming that they can all be found in its zero-th entry
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
         if self.n_coefficients is None:
             self.n_coefficients_ = \
