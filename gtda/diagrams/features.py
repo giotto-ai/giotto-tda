@@ -575,7 +575,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
                 _subdiagrams(Xt[s], [dim], remove_dim=True),
                 self.n_coefficients_[d])
             for s in range(len(X))
-            for d, dim in enumerate(self.homology_dimensions_))
+            for d, dim in enumerate(self.homology_dimensions_)
+            )
         Xt = np.concatenate(Xt).reshape(len(X), -1)
 
         return Xt
