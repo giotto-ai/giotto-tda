@@ -372,7 +372,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         and topological features at scales larger than this value will not be
         detected.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
@@ -1119,7 +1119,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         filtration and topological features at scales larger than this value
         will not be detected.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `max_edge_weight`. ``None`` means that this death
         value is declared to be equal to `max_edge_weight`.
