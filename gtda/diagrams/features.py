@@ -527,7 +527,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         return self
 
     def _complex_polynomial(self, X, n_coefficients):
-        Xt = np.zeros(2 * n_coefficients, )
+        Xt = np.zeros(2 * n_coefficients,)
         X = X[X[:, 0] != X[:, 1]]
 
         roots = self._polynomial_function(X)
@@ -572,10 +572,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
-                _subdiagrams(Xt, [dim], remove_dim=True)[s],
+                _subdiagrams(Xt[s], [dim], remove_dim=True),
                 self.n_coefficients_[d])
-            for s in range(X.shape[0])
+            for s in range(len(X))
             for d, dim in enumerate(self.homology_dimensions_))
-        Xt = np.concatenate(Xt).reshape((X.shape[0], -1))
+        Xt = np.concatenate(Xt).reshape(len(X), -1)
 
         return Xt
