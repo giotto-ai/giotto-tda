@@ -460,8 +460,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         'n_coefficients': {'type': (int, type(None), list),
                            # 'in': Interval(1, np.inf, closed='left'),
                            'of': {'type': int,
-                                  'in': Interval(1, np.inf, closed='left')}},
-    }
+                                  'in': Interval(1, np.inf, closed='left')}}
+        }
 
     def __init__(self, polynomial_type='R', n_coefficients=10, n_jobs=None):
         self.n_coefficients = n_coefficients
