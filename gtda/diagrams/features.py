@@ -405,8 +405,8 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
         - Input collections of persistence diagrams for this transformer must
           satisfy certain requirements, see e.g. :meth:`fit`.
- 
-     Parameters
+
+    Parameters
     ----------
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless

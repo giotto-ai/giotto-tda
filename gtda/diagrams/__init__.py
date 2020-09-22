@@ -17,10 +17,10 @@ __all__ = [
     'PersistenceEntropy',
     'Amplitude',
     'NumberOfPoints',
+    'ComplexPolynomial',
     'BettiCurve',
     'PersistenceLandscape',
     'HeatKernel',
-    'ComplexPolynomial',
     'Silhouette',
     'PersistenceImage'
     ]
