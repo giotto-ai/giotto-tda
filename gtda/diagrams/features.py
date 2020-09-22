@@ -23,7 +23,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
-    Given a persistence diagrams consisting of birth-death-dimension triples
+    Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
     considered separately, and their respective persistence entropies are
     calculated as the (base 2) Shannon entropies of the collections of
@@ -65,9 +65,8 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    BettiCurve, PersistenceLandscape, HeatKernel, Amplitude, \
-    PersistenceImage, PairwiseDistance, Silhouette, \
-    gtda.homology.VietorisRipsPersistence
+    NumberOfPoints, Amplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
+    Silhouette, PersistenceImage
 
     References
     ----------
@@ -270,10 +269,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PairwiseDistance, Scaler, Filtering, \
-    BettiCurve, PersistenceLandscape, \
-    HeatKernel, Silhouette, \
-    gtda.homology.VietorisRipsPersistence
+    NumberOfPoints, PersistenceEntropy, PairwiseDistance, Scaler, Filtering, \
+    BettiCurve, PersistenceLandscape, HeatKernel, Silhouette, PersistenceImage
 
     Notes
     -----
@@ -390,6 +387,118 @@ class Amplitude(BaseEstimator, TransformerMixin):
                                  self.n_jobs)
         if self.order is not None:
             Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
+
+        return Xt
+
+
+@adapt_fit_transform_docs
+class NumberOfPoints(BaseEstimator, TransformerMixin):
+    """Number of off-diagonal points in persistence diagrams, per homology
+    dimension.
+
+    Given a persistence diagram consisting of birth-death-dimension triples
+    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
+    considered separately, and their respective numbers of off-diagonal points
+    are calculated.
+
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+ 
+     Parameters
+    ----------
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    homology_dimensions_ : list
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    See also
+    --------
+    PersistenceEntropy, Amplitude, BettiCurve, PersistenceLandscape,
+    HeatKernel, Silhouette, PersistenceImage
+
+    """
+
+    def __init__(self, n_jobs=None):
+        self.n_jobs = n_jobs
+
+    @staticmethod
+    def _number_points(X):
+        return np.count_nonzero(X[:, :, 1] - X[:, :, 0], axis=1)
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_`. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_diagrams(X)
+
+        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        self._n_dimensions = len(self.homology_dimensions_)
+
+        return self
+
+    def transform(self, X, y=None):
+        """Compute the number of off-diagonal points for each diagram in `X`.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
+    
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_homology_dimensions)
+            Number of points: one value per sample and per homology dimension
+            seen in :meth:`fit`. Index i along axis 1 corresponds to the i-th
+            i-th homology dimension in :attr:`homology_dimensions_`.
+
+        """
+        check_is_fitted(self)
+        X = check_diagrams(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._number_points)(_subdiagrams(X, [dim])[s])
+            for dim in self.homology_dimensions_
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+            )
+        Xt = np.concatenate(Xt).reshape(self._n_dimensions, len(X)).T
 
         return Xt
 
