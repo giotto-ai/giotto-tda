@@ -1,7 +1,7 @@
 """Filtrations of 2D/3D binary images."""
 # License: GNU AGPLv3
 
-from numbers import Real
+from numbers import Real, Integral
 from types import FunctionType
 import itertools
 
@@ -300,7 +300,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'center': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
+        'center': {'type': (np.ndarray, type(None)), 'of': {'type': Integral}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': dict}
@@ -373,8 +373,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         self.mesh_[self.mesh_ > self.radius] = np.inf
 
         self.max_value_ = 0.
-        self.max_value_ = np.max(self._calculate_radial(
-            np.ones((1, *X.shape[1:])))) + 1
+        self.max_value_ = \
+            np.max(self._calculate_radial(np.ones((1, *X.shape[1:])))) + 1
 
         return self
 
