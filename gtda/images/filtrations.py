@@ -1042,8 +1042,8 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
-    """Filtrations of 2D/3D binary images based on the number of neighboring
-    activated pixels.
+    """Filtrations of 2D/3D binary images based on the number of activated
+    neighboring pixels.
 
     The density filtration assigns to each pixel of a binary image a greyscale
     value equal to the sum of the distance between this pixel and all activated
@@ -1101,7 +1101,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': dict},
-    }
+        }
 
     def __init__(self, radius=3, metric='euclidean', metric_params={},
                  n_jobs=None):
@@ -1152,9 +1152,9 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self._range = int(np.ceil(self.radius))
 
-        iterator_range_list = [range(-self._range, self._range + 1)
-                               for _ in range(self.n_dimensions_)] \
-            + [[0] for _ in range(3 - self.n_dimensions_)]
+        iterator_range_list = ([range(-self._range, self._range + 1)
+                               for _ in range(self.n_dimensions_)] +
+                               [[0] for _ in range(3 - self.n_dimensions_)])
         self._iterator = tuple(itertools.product(*iterator_range_list))
 
         # The mask is always 3D but not the iterator.
@@ -1195,8 +1195,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_pixels_x,
-            n_pixels_y [, n_pixels_z])
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y \
+            [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D greyscale image.
 
