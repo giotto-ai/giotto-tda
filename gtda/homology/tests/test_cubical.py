@@ -21,8 +21,8 @@ X_cp_res = np.array([[[2., 2.79848711, 0],
                       [0., 0., 1]]])
 
 X_cp_res_periodic = np.array([[[0., 0., 0.],
-                               [2., 2.9893582, 1.],
-                               [2.7984871, 2.9893582, 1.],
+                               [2., np.inf, 1.],
+                               [2.7984871, np.inf, 1.],
                                [2.7984871, 2.841471, 1.]]])
 
 
@@ -35,8 +35,8 @@ def test_cp_not_fitted():
 
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
 def test_cp_fit_transform_plot(hom_dims):
-    CubicalPersistence().fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
+    CubicalPersistence().fit_transform_plot(X, sample=0,
+                                            homology_dimensions=hom_dims)
 
 
 @pytest.mark.parametrize("periodic_dimensions, expected",
