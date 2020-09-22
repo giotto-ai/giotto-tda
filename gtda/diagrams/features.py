@@ -614,25 +614,28 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         # Find the unique homology dimensions in the 3D array X passed to `fit`
         # assuming that they can all be found in its zero-th entry
-        homology_dimensions_fit = np.unique(X[0, :, 2])
+        homology_dimensions_fit, counts = np.unique(X[0, :, 2],
+                                                    return_counts=True)
         self.homology_dimensions_ = \
             _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
+        _n_homology_dimensions = len(self.homology_dimensions_)
+        _homology_dimensions_counts = dict(zip(homology_dimensions_fit,
+                                               counts))
         if self.n_coefficients is None:
-            self.n_coefficients_ = \
-                [_subdiagrams(X, [dim]).shape[1]
-                 for dim in self.homology_dimensions_]
+            self.n_coefficients_ = [_homology_dimensions_counts[dim]
+                                    for dim in self.homology_dimensions_]
         elif type(self.n_coefficients) == list:
-            if len(self.n_coefficients) != len(self.homology_dimensions_):
-                raise ValueError(f'n_coefficients has been passed as a list '
-                                 f'of length {len(self.n_coefficients)} while '
-                                 f'diagrams in `X` have '
-                                 f'{len(self.homology_dimensions_)} homology '
-                                 f'dimensions.')
+            if len(self.n_coefficients) != _n_homology_dimensions:
+                raise ValueError(
+                    f'`n_coefficients` has been passed as a list of length '
+                    f'{len(self.n_coefficients)} while diagrams in `X` have '
+                    f'{_n_homology_dimensions} homology dimensions.'
+                    )
             self.n_coefficients_ = self.n_coefficients
         else:
             self.n_coefficients_ = \
-                [self.n_coefficients] * len(self.homology_dimensions_)
+                [self.n_coefficients] * _n_homology_dimensions
 
         self._polynomial_function = \
             _implemented_polynomial_recipes[self.polynomial_type]
