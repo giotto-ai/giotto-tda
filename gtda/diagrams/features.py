@@ -460,7 +460,11 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         """
         X = check_diagrams(X)
 
-        self.homology_dimensions_ = sorted(set(X[0, :, 2]))
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit = np.unique(X[0, :, 2])
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
         self._n_dimensions = len(self.homology_dimensions_)
 
         return self
@@ -567,7 +571,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         'polynomial_type': {'type': str,
                             'in': _AVAILABLE_POLYNOMIALS.keys()},
         'n_coefficients': {'type': (int, type(None), list),
-                           # 'in': Interval(1, np.inf, closed='left'),
+                           'in': Interval(1, np.inf, closed='left'),
                            'of': {'type': int,
                                   'in': Interval(1, np.inf, closed='left')}}
         }
