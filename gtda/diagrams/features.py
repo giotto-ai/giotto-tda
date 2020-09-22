@@ -177,6 +177,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
                 for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
                 )
         Xt = np.concatenate(Xt).reshape(self._n_dimensions, len(X)).T
+
         return Xt
 
 
@@ -509,8 +510,8 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ComplexPolynomial(BaseEstimator, TransformerMixin):
-    """Coefficients of the complex polynomials whose roots are the points on the
-    persistence diagrams.
+    """Coefficients of the complex polynomials whose roots are the points on
+    the persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
