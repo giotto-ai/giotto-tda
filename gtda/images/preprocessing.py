@@ -35,7 +35,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    n_dimensions_ : int
+    n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in meth:`fit`.
 
     max_value_ : float
@@ -49,7 +49,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -210,13 +210,13 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
-    max_value_ : int ndarray of shape (padding_x, padding_y [, padding_z])
+    max_value_ : int, float or bool
        Effective maximum value of the images' pixels. Set in :meth:`fit`.
 
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -237,7 +237,8 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             return self.max_value_ - X
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`n_dimensions_` and :attr:`max_value_` from the
+        collection of images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -373,16 +374,16 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    self.n_dimensions_ : ``2`` or ``3``
+    n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
     padding_ : int ndarray of shape (padding_x, padding_y [, padding_z])
-       Effective padding along each of the axis. Set in :meth:`fit`.
+       Effective padding along each of the axes. Set in :meth:`fit`.
 
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -400,8 +401,8 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Calculate :attr:`padding_` from a collection of images. Then,
-        return the estimator.
+        """Calculate :attr:`n_dimensions_` and :attr:`padding_` from a
+        collection of images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -553,7 +554,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -567,7 +568,9 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         return [np.argwhere(x) for x in X]
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`n_dimensions_` from a collection of binary images.
+        Then, return the estimator.
+
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 

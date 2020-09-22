@@ -69,7 +69,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -93,7 +93,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xh
 
     def fit(self, X, y=None):
-        """Calculate :attr:`direction_`, :attr:`n_dimensions_`, :attr:`mesh_`
+        """Calculate :attr:`n_dimensions_`, :attr:`direction_`, :attr:`mesh_`
         and :attr:`max_value_` from a collection of binary images. Then,
         return the estimator.
 
@@ -163,8 +163,8 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_pixels_x,
-            n_pixels_y [, n_pixels_z])
+        Xt : ndarray of shape (n_samples, n_pixels_x, n_pixels_y \
+            [, n_pixels_z])
             Transformed collection of images. Each entry along axis 0 is a
             2D or 3D greyscale image.
 
@@ -293,7 +293,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -506,7 +506,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -530,8 +530,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xd
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
-        collection of binary images. Then, return the estimator.
+        """Calculate :attr:`n_dimensions_`, :attr:`n_iterations_` and
+        :attr:`max_value_` from a collection of binary images. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -697,7 +698,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -721,8 +722,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xe
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
-        collection of binary images. Then, return the estimator.
+        """Calculate :attr:`n_dimensions_`, :attr:`n_iterations_` and
+        :attr:`max_value_` from a collection of binary images. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -891,7 +893,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -922,8 +924,9 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return (Xd + Xe)
 
     def fit(self, X, y=None):
-        """Calculate :attr:`n_iterations_` and :attr:`max_value_` from a
-        collection of binary images. Then, return the estimator.
+        """Calculate :attr:`n_dimensions_`, :attr:`n_iterations_` and
+        :attr:`max_value_` from a collection of binary images. Then, return the
+        estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -1118,8 +1121,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         return Xd
 
     def fit(self, X, y=None):
-        """Calculate :attr:`mask_` from a collection of binary images. Then,
-        return the estimator.
+        """Calculate :attr:`n_dimensions_` and :attr:`mask_` from a collection
+        of binary images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
