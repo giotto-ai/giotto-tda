@@ -64,6 +64,11 @@ class Derivative(BaseEstimator, TransformerMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
+        if self.order > X.shape[-1]:
+            raise ValueError(f'The number of bins in `X` is not sufficient to '
+                             f'calculate its derivative at order {self.order}. '
+                             f'It is `n_bins`= {n_bins}.'
+
         self._is_fitted = True
 
         return self
