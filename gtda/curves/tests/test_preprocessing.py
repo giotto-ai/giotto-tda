@@ -5,7 +5,7 @@ import numpy as np
 import plotly.io as pio
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
-from giotto.curves import Derivative
+from gtda.curves import Derivative
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -21,11 +21,12 @@ def test_derivative_not_fitted():
 
 
 X_res = {
-    1: np.array([[[ 0.16637586, -0.11242599, -0.05788019, -0.12122838],
+    1: np.array([[[0.16637586, -0.11242599, -0.05788019, -0.12122838],
                   [-0.2083069, 0.45418579, 0.07188976, -0.58022124]]]),
     2: np.array([[[-0.27880185, 0.0545458, -0.06334819],
-                  [ 0.66249269, -0.38229603, -0.652111]]]),
+                  [0.66249269, -0.38229603, -0.652111]]]),
 }
+
 
 @pytest.mark.parametrize('order', [1, 2])
 def test_derivative_transform(order):
