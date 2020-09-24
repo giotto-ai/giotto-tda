@@ -527,8 +527,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     .. math::
 
-       R(b, d) &= b + \\mathrm{i} d, \\\
-       S(b, d) &= \\frac{d - b}{\\sqrt{2} r} (b + \\mathrm{i} d), \\\
+       R(b, d) &= b + \\mathrm{i} d, \\\\
+       S(b, d) &= \\frac{d - b}{\\sqrt{2} r} (b + \\mathrm{i} d), \\\\
        T(b, d) &= \\frac{d - b}{2} [\\cos{r} - \\sin{r} + \
        \\mathrm{i}(\\cos{r} + \\sin{r})],
 
