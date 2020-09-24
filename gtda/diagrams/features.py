@@ -482,7 +482,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
             It is important that, for each possible homology dimension, the
             number of triples for which q equals that homology dimension is
             constants across the entries of `X`.
-    
+
         y : None
             There is no need for a target in a transformer, yet the pipeline
             API requires this parameter.
@@ -689,7 +689,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
-                _subdiagrams(Xt[s], [dim], remove_dim=True),
+                _subdiagrams(Xt, [dim], remove_dim=True)[s],
                 self.n_coefficients_[d])
             for s in range(len(X))
             for d, dim in enumerate(self.homology_dimensions_)
