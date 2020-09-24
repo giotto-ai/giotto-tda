@@ -510,15 +510,32 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ComplexPolynomial(BaseEstimator, TransformerMixin):
-    """Coefficients of the complex polynomials whose roots are the points on
-    the persistence diagrams.
+    """Coefficients of complex polynomials whose roots are points in
+    persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately, and their respective complex polynomial are computed
-    using the persistence points as roots. The :attr:`n_coefficients`
-    coefficients of those polynomial are returned as a vector of their real
-    parts concatenated with a vector of their imaginary parts [1]_.
+    first considered separately, and coefficients of the complex polynomials
+    whose roots are complex numbers obtained from their respective birth-death
+    pairs are computed. Then, these complex coefficients are represented as a
+    single vector obtained by concatenating all real parts with all imaginary
+    parts [1]_. Finally, all such vectors coming from different homology
+    dimensions are concatenated.
+
+    There are three possibilities for mapping birth-death pairs :math:`(b, d)`
+    to complex polynomial roots. They are:
+
+    .. math::
+       :nowrap:
+
+       \\begin{gather*}
+       R(b, d) = b + \\mathrm{i} d, \\\
+       S(b, d) = \\frac{d - b}{\\sqrt{2} r} (b + \\mathrm{i} d), \\\
+       T(b, d) = \\frac{d - b}{2} [\\cos{r} - \\sin{r} + \
+       \\mathrm{i}(\\cos{r} + \\sin{r})],
+       \\end{gather*}
+
+    where :math:`r = \\sqrt{b^2 + d^2}`.
 
     **Important note**:
 
@@ -531,7 +548,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         ``'R'``
         Type of complex polynomial to compute.
 
-    n_coefficients : int, list of int or None, optional, default: ``10``
+    n_coefficients : int, list or None, optional, default: ``10``
         Number of coefficients per homology dimension. This is the dimension of
         the complex vector of coefficients, i.e., the number of coefficients
         corresponding to the largest degree terms of the polynomial. If it is
@@ -552,8 +569,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
-    n_coefficients_ : list of int
-        Effective number of coefficients per homology dimension. Set in
+    n_coefficients_ : list
+        Effective number of complex coefficients per homology dimension. Set in
         :meth:`fit`.
 
     See also

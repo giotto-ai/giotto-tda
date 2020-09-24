@@ -186,7 +186,7 @@ def validate_params(parameters, references, exclude=None):
         - ``'other'``, which should map to a callable defining custom checks on
           ``parameter``.
 
-    exclude : list of str, or None, optional, default: ``None``
+    exclude : list or None, optional, default: ``None``
         List of parameter names which are among the keys in `parameters` but
         should be excluded from validation. ``None`` is equivalent to
         passing the empty list.
