@@ -689,7 +689,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
-                _subdiagrams(Xt, [dim], remove_dim=True)[s],
+                _subdiagrams(Xt[[s]], [dim], remove_dim=True)[0],
                 self.n_coefficients_[d])
             for s in range(len(X))
             for d, dim in enumerate(self.homology_dimensions_)
