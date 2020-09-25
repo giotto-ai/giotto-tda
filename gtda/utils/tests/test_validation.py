@@ -1,12 +1,15 @@
 """Tests for validation functions."""
 # License: GNU AGPLv3
 
+from numbers import Integral
+
 import numpy as np
 import pytest
 from sklearn.exceptions import DataDimensionalityWarning
 
-from gtda.utils.validation import check_diagrams, validate_params, \
-    check_point_clouds
+from gtda.utils import check_collection, check_point_clouds, check_diagrams, \
+    validate_params
+from gtda.utils.intervals import Interval
 
 
 # Testing for validate_params
@@ -36,10 +39,44 @@ def test_validate_params_list():
     references[parameter_name]['of']."""
     references = {
         'par1': {'type': list, 'of': {'type': float, 'in': [1., 2.]}}
-    }
+        }
     parameters = {'par1': [1.]}
 
     validate_params(parameters, references)
+
+
+def test_validate_params_tuple_of_types():
+    references = {
+        'n_coefficients': {'type': (type(None), list, int),
+                           'in': Interval(1, np.inf, closed='left'),
+                           'of': {'type': Integral,
+                                  'in': Interval(1, np.inf, closed='left')}}
+        }
+    parameters = {'n_coefficients': None}
+
+    validate_params(parameters, references)
+
+    parameters['n_coefficients'] = 1
+    validate_params(parameters, references)
+
+    parameters['n_coefficients'] = 1.
+    with pytest.raises(TypeError):
+        validate_params(parameters, references)
+
+    parameters['n_coefficients'] = 0
+    with pytest.raises(ValueError):
+        validate_params(parameters, references)
+
+    parameters['n_coefficients'] = [1, 2]
+    validate_params(parameters, references)
+
+    parameters['n_coefficients'] = [1., 2.]
+    with pytest.raises(TypeError):
+        validate_params(parameters, references)
+
+    parameters['n_coefficients'] = [0, 2]
+    with pytest.raises(ValueError):
+        validate_params(parameters, references)
 
 
 # Testing check_diagrams
@@ -61,9 +98,8 @@ def test_inputs_arrayStruc_V():
 # Testing check_point_clouds
 # Create several kinds of inputs
 class CreateInputs:
-    def __init__(
-            self, n_samples, n_1, n_2, n_samples_extra, n_1_extra, n_2_extra
-    ):
+    def __init__(self, n_samples, n_1, n_2, n_samples_extra, n_1_extra,
+                 n_2_extra):
         N = n_samples * n_1 * n_2
         n_1_rectang = n_1 + 1
         n_2_rectang = n_2 - 1
@@ -254,3 +290,21 @@ def test_check_point_clouds_value_err_nan(force_all_finite):
     with pytest.raises(ValueError):
         check_point_clouds(
             ex.X_list_rectang, force_all_finite=force_all_finite)
+
+
+def test_check_collection_ragged_array():
+    X = np.array([np.arange(2), np.arange(3)], dtype=object)
+    with pytest.raises(ValueError):
+        check_collection(X)
+
+
+def test_check_collection_array_of_list():
+    X = np.array([list(range(2)), list(range(3))], dtype=object)
+    with pytest.raises(ValueError):
+        check_collection(X)
+
+
+def test_check_collection_list_of_list():
+    X = [list(range(2)), list(range(3))]
+    Xnew = check_collection(X)
+    assert np.array_equal(np.array(X[0]), Xnew[0])

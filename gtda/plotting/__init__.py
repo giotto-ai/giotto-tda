@@ -12,4 +12,4 @@ __all__ = [
     'plot_heatmap',
     'plot_betti_curves',
     'plot_betti_surfaces'
-]
+    ]

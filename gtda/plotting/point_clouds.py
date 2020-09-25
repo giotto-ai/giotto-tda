@@ -46,8 +46,8 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
         raise ValueError("The value of the dimension is different from 2 or 3")
     elif dimension == 2:
         layout = {
-            "width": 800,
-            "height": 800,
+            "width": 600,
+            "height": 600,
             "xaxis1": {
                 "title": "0th",
                 "side": "bottom",

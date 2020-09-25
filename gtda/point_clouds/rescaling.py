@@ -86,7 +86,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     ----------
     .. [1] T. Berry and T. Sauer, "Consistent manifold representation for
            topological data analysis"; *Foundations of data analysis* **1**,
-           pp. 1--38, 2019; doi: `10.3934/fods.2019001
+           pp. 1--38, 2019; `DOI: 10.3934/fods.2019001
            <http://dx.doi.org/10.3934/fods.2019001>`_.
 
     """
@@ -296,7 +296,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))},
         'factor': {'type': Real, 'in': Interval(0, np.inf, closed='both')}
-    }
+        }
 
     def __init__(self, metric='euclidean', metric_params=None, factor=0.,
                  n_jobs=None):

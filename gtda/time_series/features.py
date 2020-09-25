@@ -29,13 +29,14 @@ class PermutationEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    TakensEmbedding, gtda.diagrams.PersistenceEntropy
+    SlidingWindow, TakensEmbedding, \
+    SingleTakensEmbedding, gtda.diagrams.PersistenceEntropy
 
     References
     ----------
     .. [1] C. Bandt and B. Pompe, "Permutation Entropy: A Natural Complexity
            Measure for Time Series"; *Phys. Rev. Lett.*, **88**.17, 2002;
-           `doi: 10.1103/physrevlett.88.174102
+           `DOI: 10.1103/physrevlett.88.174102
            <https://doi.org/10.1103/physrevlett.88.174102>`_.
 
     """
