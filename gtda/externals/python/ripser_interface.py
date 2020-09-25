@@ -21,10 +21,7 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     else:
         ret = gtda_ripser_coeff.rips_dm(DParam, DParam.shape[0], coeff,
                                         maxHomDim, thresh, do_cocycles)
-    ret_rips = {}
-    ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
-    ret_rips.update({"num_edges": ret.num_edges})
-    return ret_rips
+    return ret
 
 
 def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
@@ -34,10 +31,7 @@ def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     else:
         ret = gtda_ripser_coeff.rips_dm_sparse(I, J, V, I.size, N, coeff,
                                                maxHomDim, thresh, do_cocycles)
-    ret_rips = {}
-    ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
-    ret_rips.update({"num_edges": ret.num_edges})
-    return ret_rips
+    return ret
 
 
 def dpoint2pointcloud(X, i, metric):
@@ -295,19 +289,19 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             )
     else:
         # Only consider strict upper diagonal
-        idx = np.triu_indices(n_points, 1)
-        DParam = dm[idx].astype(np.float32)
+        DParam = dm[np.invert(np.tri(n_points, k=0, dtype=np.bool))].astype(
+            np.float32).flatten()
         res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
-    dgms = res["births_and_deaths_by_dim"]
+    dgms = res.births_and_deaths_by_dim
     for dim in range(len(dgms)):
         N = int(len(dgms[dim]) / 2)
         dgms[dim] = np.reshape(np.array(dgms[dim]), [N, 2])
 
     ret = {
         "dgms": dgms,
-        "num_edges": res["num_edges"],
+        "num_edges": res.num_edges,
         "dperm2all": dperm2all,
         "idx_perm": idx_perm,
         "r_cover": r_cover,
