@@ -39,14 +39,13 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
     metric : string or callable, optional, default: ``'euclidean'``
         Metric to use for distance computation. Any metric from scikit-learn
-        or :mod:`scipy.spatial.distance` can be used.
-        If metric is a callable function, it is called on each
-        pair of instances (rows) and the resulting value recorded. The callable
-        should take two arrays as input and return one value indicating the
-        distance between them. This works for Scipy's metrics, but is less
-        efficient than passing the metric name as a string.
-        Distance matrices are not supported.
-        Valid values for `metric` are:
+        or :mod:`scipy.spatial.distance` can be used. If `metric` is a
+        callable, it is called on each pair of instances (rows) and the
+        resulting value recorded. The callable should take two arrays as input
+        and return one value indicating the distance between them. This works
+        for SciPy's metrics, but is less efficient than passing the metric name
+        as a string. Distance matrices are not supported. Valid values for
+        `metric` are:
 
         - from scikit-learn: [``'cityblock'``, ``'cosine'``, ``'euclidean'``,
           ``'l1'``, ``'l2'``, ``'manhattan'``]
@@ -60,16 +59,13 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         See the documentation for :mod:`scipy.spatial.distance` for details on
         these metrics.
 
-    metric_params : dict or None, optional, default: ``None``
-        Additional keyword arguments for the metric function.
-
     p : int, optional, default: ``2``
         Parameter for the Minkowski (i.e. :math:`\\ell^p`) metric from
         :func:`sklearn.metrics.pairwise.pairwise_distances`. Only relevant
         when `metric` is ``'minkowski'``. `p` = 1 is the Manhattan distance,
         and `p` = 2 reduces to the Euclidean distance.
 
-    metric_params : dict, optional, default: ``{}``
+    metric_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the metric function.
 
     n_jobs : int or None, optional, default: ``None``
