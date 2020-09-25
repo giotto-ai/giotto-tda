@@ -12,6 +12,9 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._metrics import _AVAILABLE_AMPLITUDE_METRICS, _parallel_amplitude
 from ._utils import _subdiagrams, _bin, _homology_dimensions_to_sorted_ints
+from ._atol import _AVAILABLE_QUANTISERS, _AVAILABLE_CONTRAST_FUNCTIONS, \
+    _AVAILABLE_WEIGHT_FUNCTIONS, implemented_quantiser_recipes, \
+    implemented_contrast_recipes, implemented_weight_recipes
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_diagrams
@@ -391,6 +394,7 @@ class Amplitude(BaseEstimator, TransformerMixin):
             Xt = np.linalg.norm(Xt, axis=1, ord=self.order).reshape(-1, 1)
 
         return Xt
+
 
 @adapt_fit_transform_docs
 class ATOL(BaseEstimator, TransformerMixin):
