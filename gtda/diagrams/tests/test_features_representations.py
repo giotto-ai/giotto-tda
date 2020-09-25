@@ -97,7 +97,15 @@ def test_nop_transform(n_jobs):
 def test_cp_transform(n_coefficients):
     cp = ComplexPolynomial(n_coefficients=n_coefficients, polynomial_type='R')
     diagram_res = np.array([[-2., -3., -4., 2., -6., -28., -12., 36.]])
+    assert_almost_equal(cp.fit_transform(X), diagram_res)
 
+    cp.set_params(polynomial_type='S')
+    diagram_res = np.array(
+        [[-np.sqrt(2/13), -3/(2*np.sqrt(13)),
+          (-3-np.sqrt(13))/np.sqrt(26), 1/np.sqrt(13),
+          -2*(np.sqrt(2/13)+1/np.sqrt(5)), -np.sqrt(8/(13*5))*7,
+          -3*(np.sqrt(2/13)+2/np.sqrt(5)), np.sqrt(8/(13*5))*9]]
+        )
     assert_almost_equal(cp.fit_transform(X), diagram_res)
 
 
