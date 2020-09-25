@@ -143,8 +143,7 @@ def test_list_feature_union_transform(X):
 def test_list_feature_union_drops(X):
     """Check the the drop of ``ListFeatureUnion`` keeps the correct number
     of samples"""
-    drop_0_1 = ListFeatureUnion([('drop' + str(k), 'drop')
-                                 for k in range(2)])
+    drop_0_1 = ListFeatureUnion([('drop' + str(k), 'drop') for k in range(2)])
     x_01_a = drop_0_1.fit_transform(X)
     x_01_b = drop_0_1.transform(X)
     assert x_01_a.shape == (X.shape[0], 0)

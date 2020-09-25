@@ -61,7 +61,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
     See also
     --------
     PersistenceLandscape, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage,\
+    PairwiseDistance, Silhouette, PersistenceImage, \
     gtda.homology.VietorisRipsPersistence
 
     Notes
@@ -564,7 +564,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
     .. [1] J. Reininghaus, S. Huber, U. Bauer, and R. Kwitt, "A Stable
            Multi-Scale Kernel for Topological Machine Learning"; *2015 IEEE
            Conference on Computer Vision and Pattern Recognition (CVPR)*,
-           pp. 4741--4748, 2015; doi: `10.1109/CVPR.2015.7299106
+           pp. 4741--4748, 2015; `DOI: 10.1109/CVPR.2015.7299106
            <http://dx.doi.org/10.1109/CVPR.2015.7299106>`_.
 
     """
@@ -711,6 +711,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
         if homology_dimension != np.inf:
             homology_dimension = int(homology_dimension)
         x = self.samplings_[homology_dimension]
+
         return plot_heatmap(
             Xt[sample][homology_dimension_idx], x=x, y=x[::-1],
             colorscale=colorscale, origin="lower",
@@ -722,7 +723,7 @@ class HeatKernel(BaseEstimator, TransformerMixin, PlotterMixin):
 
 @adapt_fit_transform_docs
 class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
-    """:ref:`Persistence images <persistence_image>` of persistence
+    """:ref:`Persistence images <TODO>` of persistence
     diagrams.
 
     Based on ideas in [1]_. Given a persistence diagram consisting of
@@ -799,7 +800,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
            S. Chepushtanova, E. Hanson, F. Motta, and L. Ziegelmeier,
            "Persistence Images: A Stable Vector Representation of Persistent
            Homology"; *Journal of Machine Learning Research 18, 1*,
-           pp. 218-252, 2017; doi: `10.5555/3122009.3122017
+           pp. 218-252, 2017; `DOI: 10.5555/3122009.3122017
            <http://dx.doi.org/10.5555/3122009.3122017>`_.
 
     """
@@ -963,6 +964,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
         if homology_dimension != np.inf:
             homology_dimension = int(homology_dimension)
         samplings_x, samplings_y = self.samplings_[homology_dimension]
+
         return plot_heatmap(
             Xt[sample][homology_dimension_idx],
             x=samplings_x,
@@ -1035,7 +1037,7 @@ class Silhouette(BaseEstimator, TransformerMixin, PlotterMixin):
            "Stochastic Convergence of Persistence Landscapes and Silhouettes";
            *In Proceedings of the thirtieth annual symposium on Computational
            Geometry*, Kyoto, Japan, 2014, pp. 474–483;
-           doi: `10.1145/2582112.2582128
+           `DOI: 10.1145/2582112.2582128
            <http://dx.doi.org/10.1145/2582112.2582128>`_.
 
     """

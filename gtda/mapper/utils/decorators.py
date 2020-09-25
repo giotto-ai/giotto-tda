@@ -9,7 +9,7 @@ def method_to_transform(cls, method_name):
     existing method.
 
     An example of use is for classes possessing a :meth:`score` method such as
-    kernel density estimators and anomaly/novelty detection estimators, to
+    kernel density estimators and anomaly/novelty detection estimators,
     allow for these estimators are to be used as steps in a pipeline.
 
     Note that 1D array outputs are reshaped into 2D column vectors before
@@ -40,29 +40,33 @@ def method_to_transform(cls, method_name):
     >>> from gtda.mapper import method_to_transform
     >>> X = np.random.random((100, 2))
     >>> kde = KernelDensity()
-    >>> kde_extended = method_to_transform(
-    ...     KernelDensity, 'score_samples')()
+
+    Extend ``KernelDensity`` to give it a ``transform`` method as an alias
+    of ``score_samples`` (up to output shape). The new class is instantiated
+    with the same parameters as the original one.
+
+    >>> ExtendedKDE = method_to_transform(KernelDensity, 'score_samples')
+    >>> extended_kde = ExtendedKDE()
     >>> Xt = kde.fit(X).score_samples(X)
     >>> print(Xt.shape)
     (100,)
-    >>> Xt_extended = kde_extended.fit_transform(X)
+    >>> Xt_extended = extended_kde.fit_transform(X)
     >>> print(Xt_extended.shape)
     (100, 1)
     >>> np.array_equal(Xt, Xt_extended.flatten())
     True
 
     """
-    def wrapper(wrapped):
-        class ExtendedEstimator(wrapped, TransformerMixin):
-            def transform(self, X, y=None):
-                has_method = hasattr(self, method_name)
-                if has_method:
-                    Xt = getattr(self, method_name)(X)
-                    # reshape 1D estimators to have shape (n_samples, 1)
-                    if Xt.ndim == 1:
-                        Xt = Xt[:, None]
-                    return Xt
-        ExtendedEstimator.__name__ = 'Extended' + wrapped.__name__
-        return ExtendedEstimator
-    wrapped_cls = wrapper(cls)
-    return wrapped_cls
+    class ExtendedEstimator(cls, TransformerMixin):
+        def transform(self, X, y=None):
+            has_method = hasattr(self, method_name)
+            if has_method:
+                Xt = getattr(self, method_name)(X)
+                # reshape 1D estimators to have shape (n_samples, 1)
+                if Xt.ndim == 1:
+                    Xt = Xt[:, None]
+                return Xt
+
+    ExtendedEstimator.__name__ = 'Extended' + cls.__name__
+
+    return ExtendedEstimator

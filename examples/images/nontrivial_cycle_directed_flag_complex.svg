@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by igraph (http://igraph.org/) for use in Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="400px"
+   height="400px"
+   version="1.1"
+   id="svg25"
+   sodipodi:docname="nontrivial_cycle_directed_flag_complex.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata29">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1395"
+     id="namedview27"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="-50.745484"
+     inkscape:cy="287.23091"
+     inkscape:window-x="-13"
+     inkscape:window-y="-13"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs3">
+    <marker
+       inkscape:stockid="Arrow2Lend0"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lend0"
+       style="overflow:visible;">
+      <path
+         id="pathArrow0"
+         style="font-size:12.0;fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;fill:black"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) rotate(180) translate(1,0)" />
+    </marker>
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Lines"
+     sodipodi:insensitive="true">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend0)"
+       d="m 389.95111,380.00602 0.009,-359.992368"
+       id="path0"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#g0"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g1"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend0)"
+       d="M 381.00685,14.466298 18.627696,194.6744"
+       id="path1"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#g1"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g2"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Lend0)"
+       d="M 19.029567,204.41974 380.36507,387.15822"
+       id="path2"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#g2"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g0"
+       inkscape:connection-end-point="d4" />
+  </g>
+  <g
+     inkscape:label="Nodes"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <!-- Vertices -->
+    <g
+       id="g0"
+       transform="translate(389.9508,390.00602)">
+      <circle
+         cx="0"
+         cy="0"
+         r="10"
+         id="circle9"
+         style="fill:#ff0000" />
+      <text
+         y="5"
+         x="0"
+         id="text0"
+         style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none">
+        <tspan
+           y="5"
+           x="0"
+           id="tspan0"
+           sodipodi:role="line">1</tspan>
+      </text>
+    </g>
+    <g
+       id="g1"
+       transform="translate(389.96064,10.013654)">
+      <circle
+         cx="0"
+         cy="0"
+         r="10"
+         id="circle14"
+         style="fill:#ff0000" />
+      <text
+         y="5"
+         x="0"
+         id="text1"
+         style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none">
+        <tspan
+           y="5"
+           x="0"
+           id="tspan1"
+           sodipodi:role="line">2</tspan>
+      </text>
+    </g>
+    <g
+       id="g2"
+       transform="translate(10.105932,199.90678)">
+      <circle
+         cx="0"
+         cy="0"
+         r="10"
+         id="circle19"
+         style="fill:#ff0000" />
+      <text
+         y="5"
+         x="0"
+         id="text2"
+         style="font-style:normal;font-weight:normal;font-size:16px;line-height:125%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none">
+        <tspan
+           y="5"
+           x="0"
+           id="tspan2"
+           sodipodi:role="line">3</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

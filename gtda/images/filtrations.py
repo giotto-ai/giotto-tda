@@ -1,7 +1,7 @@
 """Filtrations of 2D/3D binary images."""
 # License: GNU AGPLv3
 
-from numbers import Real
+from numbers import Real, Integral
 from types import FunctionType
 from warnings import warn
 
@@ -67,10 +67,10 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -296,15 +296,15 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
     _hyperparameters = {
-        'center': {'type': (np.ndarray, type(None)), 'of': {'type': int}},
+        'center': {'type': (np.ndarray, type(None)), 'of': {'type': Integral}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))}
@@ -382,8 +382,8 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         self.mesh_[self.mesh_ > self.radius] = np.inf
 
         self.max_value_ = 0.
-        self.max_value_ = np.max(self._calculate_radial(
-            np.ones((1, *X.shape[1:])))) + 1
+        self.max_value_ = \
+            np.max(self._calculate_radial(np.ones((1, *X.shape[1:])))) + 1
 
         return self
 
@@ -511,10 +511,10 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -700,10 +700,10 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 
@@ -891,10 +891,10 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     References
     ----------
-    [1] A. Garin and G. Tauzin, "A topological reading lesson: Classification
-        of MNIST  using  TDA"; 19th International IEEE Conference on Machine
-        Learning and Applications (ICMLA 2020), 2019; arXiv: `1910.08345 \
-        <https://arxiv.org/abs/1910.08345>`_.
+    .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
+           Classification of MNIST  using  TDA"; 19th International IEEE
+           Conference on Machine Learning and Applications (ICMLA 2020), 2019;
+           `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
     """
 

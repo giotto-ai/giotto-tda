@@ -4,13 +4,13 @@
 import numpy as np
 import plotly.io as pio
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, BettiCurve, \
+from gtda.diagrams import PersistenceEntropy, NumberOfPoints, BettiCurve, \
     PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
@@ -23,8 +23,8 @@ layout_params = {"title": "New title"}
 
 
 @pytest.mark.parametrize('transformer',
-                         [PersistenceEntropy(), BettiCurve(),
-                          PersistenceLandscape(), HeatKernel(),
+                         [PersistenceEntropy(), NumberOfPoints(),
+                          BettiCurve(), PersistenceLandscape(), HeatKernel(),
                           PersistenceImage(), Silhouette()])
 def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
@@ -40,7 +40,7 @@ def test_fit_transform_plot_one_hom_dim(transformer, hom_dim_idx):
     transformer.fit_transform_plot(
         X, sample=0, homology_dimension_idx=hom_dim_idx,
         plotly_params=plotly_params
-    )
+        )
 
 
 @pytest.mark.parametrize('transformer',
@@ -51,7 +51,7 @@ def test_fit_transform_plot_many_hom_dims(transformer, hom_dims):
         {"traces": line_plots_traces_params, "layout": layout_params}
     transformer.fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims, plotly_params=plotly_params
-    )
+        )
 
 
 @pytest.mark.parametrize('transformer',
@@ -70,8 +70,9 @@ def test_fit_transform_plot_wrong_hom_dims(transformer):
         transformer.fit_transform_plot(X, sample=0, homology_dimensions=(2,))
 
 
-def test_pe_transform():
-    pe = PersistenceEntropy()
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_pe_transform(n_jobs):
+    pe = PersistenceEntropy(n_jobs=n_jobs)
     diagram_res = np.array([[1., 0.91829583405]])
 
     assert_almost_equal(pe.fit_transform(X), diagram_res)
@@ -81,23 +82,34 @@ def test_pe_transform():
     assert_almost_equal(pe_normalize.fit_transform(X), diagram_res)
 
 
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_nop_transform(n_jobs):
+    nop = NumberOfPoints(n_jobs=n_jobs)
+    diagram_res = np.array([[2, 2]])
+
+    assert_almost_equal(nop.fit_transform(X), diagram_res)
+
+
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
-def test_bc_transform_shape(n_bins):
-    bc = BettiCurve(n_bins=n_bins)
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_bc_transform_shape(n_bins, n_jobs):
+    bc = BettiCurve(n_bins=n_bins, n_jobs=n_jobs)
     X_res = bc.fit_transform(X)
     assert X_res.shape == (1, bc._n_dimensions, n_bins)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
 @pytest.mark.parametrize('n_layers', list(range(1, 10)))
-def test_pl_transform_shape(n_bins, n_layers):
-    pl = PersistenceLandscape(n_bins=n_bins, n_layers=n_layers)
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_pl_transform_shape(n_bins, n_layers, n_jobs):
+    pl = PersistenceLandscape(n_bins=n_bins, n_layers=n_layers, n_jobs=n_jobs)
     X_res = pl.fit_transform(X)
     assert X_res.shape == (1, pl._n_dimensions, n_layers, n_bins)
 
 
-def test_pi_zero_weight_function():
-    pi = PersistenceImage(weight_function=lambda x: x * 0.)
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_pi_zero_weight_function(n_jobs):
+    pi = PersistenceImage(weight_function=lambda x: x * 0., n_jobs=n_jobs)
     X_res = pi.fit_transform(X)
     assert np.array_equal(X_res, np.zeros_like(X_res))
 
@@ -139,7 +151,7 @@ def test_pi_positive(pts):
     assert np.all(pi.fit_transform(diagrams) >= 0.)
 
 
-def test_large_pi_null_multithreaded():
+def test_large_pi_null_parallel():
     """Test that pi is computed correctly when the input array is at least 1MB
     and more than 1 process is used, triggering joblib's use of memmaps"""
     X = np.linspace(0, 100, 300000)
@@ -153,8 +165,9 @@ def test_large_pi_null_multithreaded():
     assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
 
 
-def test_silhouette_transform():
-    sht = Silhouette(n_bins=31, power=1.)
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_silhouette_transform(n_jobs):
+    sht = Silhouette(n_bins=31, power=1., n_jobs=n_jobs)
     X_sht_res = np.array([0., 0.05, 0.1, 0.15, 0.2, 0.25, 0.2, 0.15, 0.1,
                           0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0., 0.05,
                           0.1, 0.15, 0.2, 0.25, 0.2, 0.15, 0.1, 0.05, 0.])
@@ -162,9 +175,10 @@ def test_silhouette_transform():
     assert_almost_equal(sht.fit_transform(X)[0][0], X_sht_res)
 
 
-def test_silhouette_big_order():
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_silhouette_big_order(n_jobs):
     diagrams = np.array([[[0, 2, 0], [1, 4, 0]]])
-    sht_10 = Silhouette(n_bins=41, power=10.)
+    sht_10 = Silhouette(n_bins=41, power=10., n_jobs=n_jobs)
     X_sht_res = np.array([0., 0.00170459, 0.00340919, 0.00511378, 0.00681837,
                           0.00852296, 0.01022756, 0.01193215, 0.01363674,
                           0.01534133, 0.01704593, 0.11363674, 0.21022756,
@@ -179,10 +193,11 @@ def test_silhouette_big_order():
     assert_almost_equal(sht_10.fit_transform(diagrams)[0][0], X_sht_res)
 
 
-@pytest.mark.parametrize('transformer', [HeatKernel(), PersistenceImage()])
-def test_all_pts_the_same(transformer):
+@pytest.mark.parametrize('transformer_cls', [HeatKernel, PersistenceImage])
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_all_pts_the_same(transformer_cls, n_jobs):
     X = np.zeros((1, 4, 3))
-    X_res = transformer.fit_transform(X)
+    X_res = transformer_cls(n_jobs=n_jobs).fit_transform(X)
     assert np.array_equal(X_res, np.zeros_like(X_res))
 
 
@@ -222,13 +237,15 @@ def get_input(pts, dims):
     return X
 
 
+@pytest.mark.parametrize('n_jobs', [1, 2])
+@settings(deadline=None)
 @given(pts_gen, dims_gen)
-def test_hk_shape(pts, dims):
+def test_hk_shape(n_jobs, pts, dims):
     n_bins = 10
     X = get_input(pts, dims)
     sigma = (np.max(X[:, :, :2]) - np.min(X[:, :, :2])) / 2
 
-    hk = HeatKernel(sigma=sigma, n_bins=n_bins)
+    hk = HeatKernel(sigma=sigma, n_bins=n_bins, n_jobs=n_jobs)
     num_dimensions = len(np.unique(dims))
     X_t = hk.fit_transform(X)
 
@@ -258,13 +275,14 @@ def test_hk_pi_big_sigma(transformer_cls, pts, dims):
     X = get_input(pts, dims)
     # To make the test less flaky, it helps to set al homology dimensions equal
     X[:, :, 2] = 0.
-    sigma = 100 * (np.max(X[:, :, :2]) - np.min(X[:, :, :2]))
+    max_difference = np.max(X[:, :, :2]) - np.min(X[:, :, :2])
+    sigma = 100 * (max_difference)
 
     hk = transformer_cls(sigma=sigma, n_bins=n_bins)
     X_t = hk.fit_transform(X)
 
     max_hk_abs_value = np.max(np.abs(X_t))
-    assert max_hk_abs_value <= 1e-4
+    assert max_hk_abs_value <= 1e-3
 
 
 @given(pts_gen)
@@ -286,7 +304,7 @@ def test_hk_with_diag_points(pts):
     assert_almost_equal(X_with_diag_points_t, X_t, decimal=13)
 
 
-def test_large_hk_shape_multithreaded():
+def test_large_hk_shape_parallel():
     """Test that HeatKernel returns something of the right shape when the input
     array is at least 1MB and more than 1 process is used, triggering joblib's
     use of memmaps"""
