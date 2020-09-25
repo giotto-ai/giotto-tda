@@ -3,7 +3,7 @@ from numbers import Real
 import numpy as np
 from sklearn.metrics import pairwise_distances
 from sklearn.cluster import KMeans, MiniBatchKMeans
-from giotto.utils.intervals import Interval
+from gtda.utils.intervals import Interval
 
 
 _AVAILABLE_QUANTISERS = {
