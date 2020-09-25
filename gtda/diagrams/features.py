@@ -587,15 +587,15 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {
-        'polynomial_type': {'type': str,
-                            'in': _AVAILABLE_POLYNOMIALS.keys()},
         'n_coefficients': {'type': (int, type(None), list),
                            'in': Interval(1, np.inf, closed='left'),
                            'of': {'type': int,
-                                  'in': Interval(1, np.inf, closed='left')}}
+                                  'in': Interval(1, np.inf, closed='left')}},
+        'polynomial_type': {'type': str,
+                            'in': _AVAILABLE_POLYNOMIALS.keys()}
         }
 
-    def __init__(self, polynomial_type='R', n_coefficients=10, n_jobs=None):
+    def __init__(self, n_coefficients=10, polynomial_type='R', n_jobs=None):
         self.n_coefficients = n_coefficients
         self.polynomial_type = polynomial_type
         self.n_jobs = n_jobs
