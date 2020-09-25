@@ -501,7 +501,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ATOL(BaseEstimator, TransformerMixin):
-    """Implementation of Automatic Topologically-Oriented Learning. Vectorizes
+    """Implementation of Automatic Topologically-Oriented Learning. Vectorises
     persistence diagrams after a quantisation step.
 
     Parameters
@@ -512,8 +512,8 @@ class ATOL(BaseEstimator, TransformerMixin):
 
     quantiser_params : dict or list of n_dimensions dicts, optional, \
         default: ``{'n_clusters': 10}``
-        Keyword argument for the quantiser. If it is a list, the each
-        dictionnary corresponds to the keyword argument for the quantiser
+        Keyword argument for the quantiser. If it is a list, then each
+        dictionary corresponds to the keyword argument for the quantiser
         applied to its corresponding homology dimension.
 
     weight_function : ``'uniform'`` or None, optional, default: ``None``
@@ -522,7 +522,7 @@ class ATOL(BaseEstimator, TransformerMixin):
 
     contrast_function : ``'gaussian'`` | ``'laplacian'`` | ``'indicator'``, \
         optional, default: ``'gaussian'``
-        Constant function for evaluating proximity of a measure with respect
+        Contrast function for evaluating proximity of a measure with respect
         to centers.
 
     n_jobs : int or None, optional, default: ``None``
