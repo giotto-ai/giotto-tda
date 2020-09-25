@@ -94,11 +94,9 @@ def test_nop_transform(n_jobs):
 def test_atol_transform(n_jobs):
     atol = ATOL(quantiser_params={'n_clusters': 2, 'random_state':0},
                 n_jobs=n_jobs)
-    dist_res = np.array([[0.9944026, 0.9003059, 0.821102, 0.9477455],
-                         [0.9501663, 0.008954 , 1.0016616, 0.4676446],
-                         [1.0407622, 0.4676446, 0., 0.]])
+    diagram_res = np.array([[1.01831564, 1.01831564, 1.01831564, 1.01831564]])
 
-    assert_almost_equal(atol.fit_transform(X), dist_res)
+    assert_almost_equal(atol.fit_transform(X), diagram_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
