@@ -471,7 +471,8 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
-        """Compute the number of off-diagonal points for each diagram in `X`.
+        """Compute a vector of numbers of off-diagonal points for each diagram
+        in `X`.
 
         Parameters
         ----------
@@ -492,7 +493,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
         Xt : ndarray of shape (n_samples, n_homology_dimensions)
             Number of points: one value per sample and per homology dimension
             seen in :meth:`fit`. Index i along axis 1 corresponds to the i-th
-            i-th homology dimension in :attr:`homology_dimensions_`.
+            homology dimension in :attr:`homology_dimensions_`.
 
         """
         check_is_fitted(self)
@@ -510,17 +511,20 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ComplexPolynomial(BaseEstimator, TransformerMixin):
-    """Coefficients of complex polynomials whose roots are points in
-    persistence diagrams.
+    """Coefficients of complex polynomials whose roots are obtained from points
+    in persistence diagrams.
 
     Given a persistence diagram consisting of birth-death-dimension triples
     [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    first considered separately, and coefficients of the complex polynomials
-    whose roots are complex numbers obtained from their respective birth-death
-    pairs are computed. Then, these complex coefficients are represented as a
-    single vector obtained by concatenating all real parts with all imaginary
-    parts [1]_. Finally, all such vectors coming from different homology
-    dimensions are concatenated.
+    first considered separately. For each subdiagram, the polynomial whose
+    roots are complex numbers obtained from its birth-death pairs is
+    computed, and its :attr:`n_coefficients_` highest-degree complex
+    coefficients excluding the top one are stored into a single real vector
+    by concatenating the vector of all real parts with the vector of all
+    imaginary parts [1]_ (if not enough coefficients are available to form a
+    vector of the required length, padding with zeros is performed). Finally,
+    all such vectors coming from different subdiagrams are concatenated to
+    yield a single vector for the diagram.
 
     There are three possibilities for mapping birth-death pairs :math:`(b, d)`
     to complex polynomial roots. They are:
@@ -544,20 +548,17 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    polynomial_type : ``'R'`` | ``'S'`` | ``'T'``, optional, default: \
-        ``'R'``
+    polynomial_type : ``'R'`` | ``'S'`` | ``'T'``, optional, default: ``'R'``
         Type of complex polynomial to compute.
 
-    n_coefficients : int, list or None, optional, default: ``10``
-        Number of coefficients per homology dimension. This is the dimension of
-        the complex vector of coefficients, i.e., the number of coefficients
-        corresponding to the largest degree terms of the polynomial. If it is
-        an int, then the number of coefficients will be equal to that value for
-        each homology dimensions. If ``None``, those numbers are computed for
-        each homology dimension from the list of persistence diagrams by
-        considering the ones with the largest number of points and using the
-        dimension of its corresponding complex vector of coefficients as the
-        number of coefficients.
+    n_coefficients : list, int or None, optional, default: ``10``
+        Number of complex coefficients per homology dimension. If an int then
+        the number of coefficients will be equal to that value for each
+        homology dimension. If ``None`` then, for each homology dimension in
+        the collection of persistence diagrams seen in :meth:`fit`, the number
+        of complex coefficients is defined to be the largest number of
+        off-diagonal points seen among all subdiagrams in that homology
+        dimension, minus one.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -676,8 +677,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         return Xt
 
     def transform(self, X, y=None):
-        """Computes the real and imaginary parts of the complex vector of
-        coefficients for each diagram individually and concatenate the results.
+        """Compute vectors of real and imaginary parts of coefficients of
+        complex polynomials obtained from each diagram in `X`.
 
         Parameters
         ----------
@@ -696,9 +697,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions * 2 \
-            * n_coefficients)
-            Polynomial coefficients: Real and imaginary parts of the complex
-            polynomial for each homology dimension of each diagrams in `X`.
+            * n_coefficients_)
+            Polynomial coefficients: real and imaginary parts of the complex
+            polynomials obtained in each homology dimension from each diagram
+            in `X`.
 
         """
         check_is_fitted(self)
