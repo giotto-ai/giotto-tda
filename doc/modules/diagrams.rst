@@ -51,4 +51,5 @@ Features
 
    diagrams.Amplitude
    diagrams.PersistenceEntropy
+   diagrams.NumberOfPoints
    diagrams.ATOL
