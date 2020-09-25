@@ -526,11 +526,14 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     to complex polynomial roots. They are:
 
     .. math::
+       :nowrap:
 
-       R(b, d) &= b + \\mathrm{i} d, \\\\
-       S(b, d) &= \\frac{d - b}{\\sqrt{2} r} (b + \\mathrm{i} d), \\\\
-       T(b, d) &= \\frac{d - b}{2} [\\cos{r} - \\sin{r} + \
+       \\begin{gather*}
+       R(b, d) = b + \\mathrm{i} d, \\\\
+       S(b, d) = \\frac{d - b}{\\sqrt{2} r} (b + \\mathrm{i} d), \\\\
+       T(b, d) = \\frac{d - b}{2} [\\cos{r} - \\sin{r} + \
        \\mathrm{i}(\\cos{r} + \\sin{r})],
+       \\end{gather*}
 
     where :math:`r = \\sqrt{b^2 + d^2}`.
 
