@@ -7,6 +7,7 @@ import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
@@ -585,7 +586,7 @@ class ATOL(BaseEstimator, TransformerMixin):
 
         """
         X = check_diagrams(X)
-        validate_params(self.get_params(), _hyperparameters,
+        validate_params(self.get_params(), self._hyperparameters,
                         exclude=['quantiser_params', 'n_jobs'])
 
         self.homology_dimensions_ = sorted(set(X[0, :, 2]))
@@ -612,7 +613,7 @@ class ATOL(BaseEstimator, TransformerMixin):
         }
 
         for quantiser_params in effective_quantiser_params_:
-            params = {'quantiser_params': effective_quantiser_params_}
+            params = {'quantiser_params': quantiser_params}
             validate_params(params, _hyperparameters)
 
         n_clusters = [

@@ -98,7 +98,7 @@ def test_atol_transform(n_jobs):
                          [0.9501663, 0.008954 , 1.0016616, 0.4676446],
                          [1.0407622, 0.4676446, 0., 0.]])
 
-    assert_almost_equal(atol.fit_transform(X_label, y_label), dist_res)
+    assert_almost_equal(atol.fit_transform(X), dist_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
