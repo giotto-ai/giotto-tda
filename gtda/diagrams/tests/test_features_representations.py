@@ -134,7 +134,7 @@ def test_tv_transform(n_jobs):
 
     assert_almost_equal(tv.fit_transform(X), diagram_res)
 
-    
+
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
 @pytest.mark.parametrize('n_jobs', [1, 2, -1])
 def test_bc_transform_shape(n_bins, n_jobs):
