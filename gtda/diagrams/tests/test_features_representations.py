@@ -10,12 +10,14 @@ from hypothesis.strategies import floats, integers
 from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, NumberOfPoints, BettiCurve, \
-    PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette
+from gtda.diagrams import PersistenceEntropy, NumberOfPoints, \
+    ComplexPolynomial, BettiCurve, PersistenceLandscape, HeatKernel, \
+    PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
 
-X = np.array([[[0., 1., 0.], [2., 3., 0.], [4., 6., 1.], [2., 6., 1.]]])
+X = np.array([[[0., 0., 0.], [0., 1., 0.], [2., 3., 0.],
+               [4., 6., 1.], [2., 6., 1.]]])
 
 line_plots_traces_params = {"mode": "lines+markers"}
 heatmap_trace_params = {"colorscale": "viridis"}
@@ -24,7 +26,8 @@ layout_params = {"title": "New title"}
 
 @pytest.mark.parametrize('transformer',
                          [PersistenceEntropy(), NumberOfPoints(),
-                          BettiCurve(), PersistenceLandscape(), HeatKernel(),
+                          ComplexPolynomial(), BettiCurve(),
+                          PersistenceLandscape(), HeatKernel(),
                           PersistenceImage(), Silhouette()])
 def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
@@ -88,6 +91,39 @@ def test_nop_transform(n_jobs):
     diagram_res = np.array([[2, 2]])
 
     assert_almost_equal(nop.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_coefficients', [2, [2, 2]])
+def test_cp_transform(n_coefficients):
+    cp = ComplexPolynomial(n_coefficients=n_coefficients, polynomial_type='R')
+    diagram_res = np.array([[-2., -3., -4., 2., -6., -28., -12., 36.]])
+    assert_almost_equal(cp.fit_transform(X), diagram_res)
+
+    cp.set_params(polynomial_type='S')
+    diagram_res = np.array(
+        [[-np.sqrt(2/13), -3 / (2 * np.sqrt(13)),
+          (-3 - np.sqrt(13)) / np.sqrt(26), 1 / np.sqrt(13),
+          -2 * (np.sqrt(2/13) + 1 / np.sqrt(5)), -np.sqrt(8 / (13 * 5)) * 7,
+          -3 * (np.sqrt(2/13) + 2 / np.sqrt(5)), np.sqrt(8 / (13 * 5)) * 9]]
+        )
+    assert_almost_equal(cp.fit_transform(X), diagram_res)
+
+    cp.set_params(polynomial_type='T')
+    u_01, v_01 = (np.cos(1) - np.sin(1),
+                  np.cos(1) + np.sin(1))
+    u_02, v_02 = (np.cos(np.sqrt(13)) - np.sin(np.sqrt(13)),
+                  np.cos(np.sqrt(13)) + np.sin(np.sqrt(13)))
+    u_11, v_11 = (np.cos(np.sqrt(52)) - np.sin(np.sqrt(52)),
+                  np.cos(np.sqrt(52)) + np.sin(np.sqrt(52)))
+    u_12, v_12 = (np.cos(np.sqrt(40)) - np.sin(np.sqrt(40)),
+                  np.cos(np.sqrt(40)) + np.sin(np.sqrt(40)))
+    diagram_res = np.array(
+        [[-1/2 * (u_01 + u_02), 1/4 * (u_01 * u_02 - v_01 * v_02),
+          -1/2 * (v_01 + v_02), 1/4 * (u_01 * v_02 + u_02 * v_01),
+          -(u_11 + 2 * u_12),  2 * (u_11 * u_12 - v_11 * v_12),
+          -(v_11 + 2 * v_12), 2 * (u_11 * v_12 + u_12 * v_11)]]
+        )
+    assert_almost_equal(cp.fit_transform(X), diagram_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))
