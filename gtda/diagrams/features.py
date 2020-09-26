@@ -67,8 +67,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    NumberOfPoints, Amplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
-    Silhouette, PersistenceImage
+    NumberOfPoints, Amplitude, TopologicalVector, ComplexPolynomial
 
     References
     ----------
@@ -272,8 +271,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    NumberOfPoints, PersistenceEntropy, PairwiseDistance, Scaler, Filtering, \
-    BettiCurve, PersistenceLandscape, HeatKernel, Silhouette, PersistenceImage
+    NumberOfPoints, PersistenceEntropy, TopologicalVector, ComplexPolynomial, \
+    PairwiseDistance, Scaler, Filtering
 
     Notes
     -----
@@ -423,8 +422,7 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PersistenceEntropy, Amplitude, BettiCurve, PersistenceLandscape,
-    HeatKernel, Silhouette, PersistenceImage
+    Amplitude, PersistenceEntropy, TopologicalVector, ComplexPolynomial
 
     """
 
@@ -578,7 +576,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    Amplitude, PersistenceEntropy
+    NumberOfPoints, Amplitude, PersistenceEntropy, TopologicalVector
 
     References
     ----------
@@ -726,7 +724,7 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
     The topological vector associated to a persistence diagram is the sorted
     vector of a slight modification of the pairwise distances between the
-    persistence diagram points. See [1]_.
+    points in the persistence diagram. See [1]_.
 
     **Important note**:
 
@@ -775,8 +773,8 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    PairwiseDistance, BettiCurve, PersistenceLandscape, HeatKernel, \
-    Silhouette, PersistenceImage
+    NumberOfPoints, Amplitude, PersistenceEntropy, ComplexPolynomial, \     
+    PairwiseDistance
 
     References
     ----------
