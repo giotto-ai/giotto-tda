@@ -3,7 +3,7 @@
 
 from functools import reduce
 from operator import iconcat
-from numbers import Real
+from numbers import Real, Integral
 from warnings import warn
 
 import numpy as np
@@ -222,7 +222,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'max_value': {'type': (bool, Real, type(None))}
-    }
+        }
 
     def __init__(self, max_value=None, n_jobs=None):
         self.max_value = max_value
@@ -381,11 +381,10 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'padding': {
-            'type': (np.ndarray, type(None)),
-            'of': {'type': int}},
+        'padding': {'type': (np.ndarray, type(None)),
+                    'of': {'type': Integral}},
         'value': {'type': (bool, Real)}
-    }
+        }
 
     def __init__(self, padding=None, value=False, n_jobs=None):
         self.padding = padding

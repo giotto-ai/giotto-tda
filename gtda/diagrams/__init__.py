@@ -5,7 +5,7 @@ distances between diagrams."""
 from .preprocessing import ForgetDimension, Scaler, Filtering
 from .distance import PairwiseDistance
 from .features import PersistenceEntropy, Amplitude, NumberOfPoints, \
-    TopologicalVector
+    ComplexPolynomial, TopologicalVector
 from .representations import BettiCurve, PersistenceLandscape, HeatKernel, \
     Silhouette, PersistenceImage
 
@@ -17,6 +17,7 @@ __all__ = [
     'PersistenceEntropy',
     'Amplitude',
     'NumberOfPoints',
+    'ComplexPolynomial',
     'TopologicalVector',
     'BettiCurve',
     'PersistenceLandscape',

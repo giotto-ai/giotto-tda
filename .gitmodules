@@ -11,3 +11,6 @@
 [submodule "gtda/externals/eigen"]
 	path = gtda/externals/eigen
 	url = https://gitlab.com/libeigen/eigen
+[submodule "gtda/externals/pybind11"]
+	path = gtda/externals/pybind11
+	url = https://github.com/pybind/pybind11

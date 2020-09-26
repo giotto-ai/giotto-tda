@@ -52,4 +52,6 @@ Features
    diagrams.NumberOfPoints
    diagrams.Amplitude
    diagrams.PersistenceEntropy
+   diagrams.NumberOfPoints
+   diagrams.ComplexPolynomial
    diagrams.TopologicalVector

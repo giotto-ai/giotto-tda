@@ -88,45 +88,50 @@ def check_graph(X):
     return X
 
 
-def _validate_params_single(parameter, reference, name):
-    if reference is None:
-        return
-
-    ref_type = reference.get('type', None)
-
-    # Check that parameter has the correct type
-    if (ref_type is not None) and (not isinstance(parameter, ref_type)):
-        raise TypeError(
-            f"Parameter `{name}` is of type {type(parameter)} while "
-            f"it should be of type {ref_type}.")
-
-    # If the reference type parameter is not list, tuple, np.ndarray or dict,
-    # the checks are performed on the parameter object directly.
-    elif ref_type not in [list, tuple, np.ndarray, dict]:
-        ref_in = reference.get('in', None)
-        ref_other = reference.get('other', None)
-        if parameter is not None:
-            if (ref_in is not None) and (parameter not in ref_in):
-                raise ValueError(
-                    f"Parameter `{name}` is {parameter}, which is not in "
-                    f"{ref_in}.")
-        # Perform any other checks via the callable ref_others
-        if ref_other is not None:
-            return ref_other(parameter)
-
-    # Explicitly return the type of reference if one of list, tuple, np.ndarray
-    # or dict.
-    else:
-        return ref_type
-
-
 def _validate_params(parameters, references, rec_name=None):
+    types_tuple = (list, tuple, np.ndarray, dict)
+
+    def _validate_params_single(_parameter, _reference, _name):
+        if _reference is None:
+            return
+
+        _ref_type = _reference.get('type', None)
+
+        # Check that _parameter has the correct type
+        if not ((_ref_type is None) or isinstance(_parameter, _ref_type)):
+            raise TypeError(
+                f"Parameter `{_name}` is of type {type(_parameter)} while it "
+                f"should be of type {_ref_type}."
+                )
+
+        # If neither the reference type is list, tuple, np.ndarray or dict,
+        # nor _parameter is an instance of one of these types, the checks are
+        # performed on _parameter directly.
+        elif not ((_ref_type in types_tuple)
+                  or isinstance(_parameter, types_tuple)):
+            ref_in = _reference.get('in', None)
+            ref_other = _reference.get('other', None)
+            if _parameter is not None:
+                if not ((ref_in is None) or _parameter in ref_in):
+                    raise ValueError(
+                        f"Parameter `{_name}` is {_parameter}, which is not in"
+                        f"{ref_in}.")
+            # Perform any other checks via the callable ref_others
+            if ref_other is not None:
+                return ref_other(_parameter)
+
+        # Explicitly return the type of _reference if one of list, tuple,
+        # np.ndarray or dict.
+        else:
+            return _ref_type
+
     for name, parameter in parameters.items():
         if name not in references.keys():
             name_extras = "" if rec_name is None else f" in `{rec_name}`"
             raise KeyError(
                 f"`{name}`{name_extras} is not an available parameter. "
-                f"Available parameters are in {list(references.keys())}.")
+                f"Available parameters are in {list(references.keys())}."
+                )
 
         reference = references[name]
         ref_type = _validate_params_single(parameter, reference, name)
@@ -136,8 +141,8 @@ def _validate_params(parameters, references, rec_name=None):
                 _validate_params(parameter, ref_of, rec_name=name)
             else:  # List, tuple or ndarray type
                 for i, parameter_elem in enumerate(parameter):
-                    _validate_params_single(
-                        parameter_elem, ref_of, f"{name}[{i}]")
+                    _validate_params_single(parameter_elem, ref_of,
+                                            f"{name}[{i}]")
 
 
 def validate_params(parameters, references, exclude=None):
@@ -161,9 +166,9 @@ def validate_params(parameters, references, exclude=None):
         - ``'type'``, mapping to a class or tuple of classes. ``parameter``
           is checked to be an instance of this class or tuple of classes.
 
-        - ``'in'``, mapping to a dictionary, when the value of ``'type'`` is
+        - ``'in'``, mapping to an object, when the value of ``'type'`` is
           not one of ``list``, ``tuple``, ``numpy.ndarray`` or ``dict``.
-          Letting ``ref_in`` denote that dictionary, the following check is
+          Letting ``ref_in`` denote that object, the following check is
           performed: ``parameter in ref_in``.
 
         - ``'of'``, mapping to a dictionary, when the value of ``'type'``
@@ -181,7 +186,7 @@ def validate_params(parameters, references, exclude=None):
         - ``'other'``, which should map to a callable defining custom checks on
           ``parameter``.
 
-    exclude : list of str, or None, optional, default: ``None``
+    exclude : list or None, optional, default: ``None``
         List of parameter names which are among the keys in `parameters` but
         should be excluded from validation. ``None`` is equivalent to
         passing the empty list.
