@@ -663,7 +663,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         return self
 
     def _complex_polynomial(self, X, n_coefficients):
-        Xt = np.zeros(2 * n_coefficients,)
+        Xt = np.zeros(2 * n_coefficients)
         X = X[X[:, 0] != X[:, 1]]
 
         roots = self._polynomial_function(X)
@@ -705,12 +705,13 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_diagrams(X, copy=True)
+        Xt = check_diagrams(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
                 _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0],
-                self.n_coefficients_[d])
+                self.n_coefficients_[d]
+                )
             for s in range(len(X))
             for d, dim in enumerate(self.homology_dimensions_)
             )
@@ -857,17 +858,16 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
         return self
 
-    def _topological_vector(self, Xd):
-        Xv = np.zeros((self.n_distances_,))
+    def _topological_vector(self, Xd, n_distances):
+        Xv = np.zeros(n_distances)
         distances = self._distance_function.pairwise(Xd)
 
-        Xd[:, 1] = Xd[:, 1] - Xd[:, 0]
-        min_persistence = 0.5 * np.minimum(Xd[:, 1], Xd[:, 1].T)
+        min_persistence = 0.5 * (Xd[:, 1] - Xd[:, 0])
         vector = np.flip(np.sort(
             np.triu(np.minimum(distances, min_persistence)), axis=None), 0
             )
 
-        dimension = min(len(vector), self.n_distances_)
+        dimension = min(len(vector), n_distances)
         Xv[:dimension] = vector[:dimension]
 
         return Xv
@@ -903,11 +903,12 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._topological_vector)(
-                _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0]
-                )
-            for dim in self.homology_dimensions_
-            for s in range(len(X))
+                _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0],
+                self.n_distances_[d]
             )
-        Xt = np.stack(Xt).reshape((X.shape[0], -1))
+            for s in range(len(X))
+            for d, dim in enumerate(self.homology_dimensions_)
+            )
+        Xt = np.concatenate(Xt).reshape(len(X), -1)
 
         return Xt
