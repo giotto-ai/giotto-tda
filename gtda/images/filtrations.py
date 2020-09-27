@@ -1046,8 +1046,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     neighboring pixels.
 
     The density filtration assigns to each pixel of a binary image a greyscale
-    value equal to the sum of the distance between this pixel and all activated
-    pixels within a ball centered around it.
+    value equal to the number of activated pixels within a ball centered around
+    it.
 
     Parameters
     ----------
@@ -1116,8 +1116,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         for i, j, k in self._iterator:
             Xd += np.roll(np.roll(
                 np.roll(X, k, axis=3), j, axis=2), i, axis=1) \
-                * self.mask_[self._range + i, self._range + j,
-                             self._range + k]
+                * self.mask_[self._size + i, self._size + j,
+                             self._size + k]
         return Xd
 
     def fit(self, X, y=None):
@@ -1150,28 +1150,35 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        self._range = int(np.ceil(self.radius))
+        # Determine the size of the mask based on the radius and metric
+        self._size = int(np.ceil(
+            pairwise_distances([[0]], [[self.radius]], metric=self.metric,
+                               **self.metric_params)
+        ))
+        # The mask is always 3D but not the iterator.
+        self.mask_ = np.ones(tuple(2 * self._size + 1 for _ in range(3)),
+                             dtype=np.bool)
 
-        iterator_range_list = ([range(-self._range, self._range + 1)
+        # Create an iterator for applying the mask to every pixel at once
+        iterator_size_list = ([range(-self._size, self._size + 1)
                                for _ in range(self.n_dimensions_)] +
                                [[0] for _ in range(3 - self.n_dimensions_)])
-        self._iterator = tuple(itertools.product(*iterator_range_list))
+        self._iterator = tuple(itertools.product(*iterator_size_list))
 
-        # The mask is always 3D but not the iterator.
-        self.mask_ = np.ones(tuple(2 * self._range + 1 for _ in range(3)),
-                             dtype=np.bool)
-        mesh_range_list = [np.arange(0, 2 * self._range + 1)] * 3
+        mesh_size_list = [np.arange(0, 2 * self._size + 1)] * 3
         self.mesh_ = np.stack(
-            np.meshgrid(*mesh_range_list), axis=3).reshape((-1, 3))
+            np.meshgrid(*mesh_size_list), axis=3).reshape((-1, 3))
 
-        center = self._range * np.ones((1, 3))
+        # Set the mask values so that it corresponds to a ball
+        center = self._size * np.ones((1, 3))
         self.mask_ = pairwise_distances(
             center, self.mesh_, metric=self.metric,
             n_jobs=1, **self.metric_params).reshape(self.mask_.shape)
 
         self.mask_ = self.mask_ <= self.radius
 
-        padding = np.asarray([*[self._range] * self.n_dimensions_,
+        # Instanciate a padder to handle image boundaries
+        padding = np.asarray([*[self._size] * self.n_dimensions_,
                               *[0] * (3 - self.n_dimensions_)])
         self._padder = Padder(padding=padding)
         self._padder.fit(X.reshape((*X.shape[:3], -1)))
@@ -1213,10 +1220,10 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
                                      effective_n_jobs(self.n_jobs)))
         Xt = np.concatenate(Xt)
 
-        Xt = Xt[:, self._range: -self._range, self._range: -self._range]
+        Xt = Xt[:, self._size: -self._size, self._size: -self._size]
 
         if self.n_dimensions_ == 3:
-            Xt = Xt[:, :, :, self._range: -self._range]
+            Xt = Xt[:, :, :, self._size: -self._size]
 
         Xt = Xt.reshape(X.shape)
 
