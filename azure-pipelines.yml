@@ -356,7 +356,7 @@ jobs:
       displayName: 'Make the documentation (execute notebooks, build html)'
       condition: ne(variables['Build.Reason'], 'PullRequest')
 
-    - task: PublishDocs@1
+    - task: PublishBuildArtifacts
       inputs:
         targetPath: $(System.DefaultWorkingDirectory)/doc/build/html
         artifactName: documentation
