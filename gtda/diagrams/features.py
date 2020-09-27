@@ -551,14 +551,14 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     polynomial_type : ``'R'`` | ``'S'`` | ``'T'``, optional, default: ``'R'``
         Type of complex polynomial to compute.
 
-    n_coefficients : list, int or None, optional, default: ``10``
+    n_coefficients : list, tuple, int or None, optional, default: ``10``
         Number of complex coefficients per homology dimension. If an int then
         the number of coefficients will be equal to that value for each
         homology dimension. If ``None`` then, for each homology dimension in
         the collection of persistence diagrams seen in :meth:`fit`, the number
-        of complex coefficients is defined to be the largest number of
-        off-diagonal points seen among all subdiagrams in that homology
-        dimension, minus one.
+        of complex coefficients is defined to be the (constant, see
+        **Important note**) number of points in each subdiagram in that
+        homology dimension.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -567,10 +567,10 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
-    n_coefficients_ : list
+    n_coefficients_ : tuple
         Effective number of complex coefficients per homology dimension. Set in
         :meth:`fit`.
 
@@ -587,7 +587,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {
-        'n_coefficients': {'type': (int, type(None), list),
+        'n_coefficients': {'type': (int, type(None), list, tuple),
                            'in': Interval(1, np.inf, closed='left'),
                            'of': {'type': int,
                                   'in': Interval(1, np.inf, closed='left')}},
@@ -642,19 +642,20 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         _homology_dimensions_counts = dict(zip(homology_dimensions_fit,
                                                counts))
         if self.n_coefficients is None:
-            self.n_coefficients_ = [_homology_dimensions_counts[dim]
-                                    for dim in self.homology_dimensions_]
-        elif type(self.n_coefficients) == list:
+            self.n_coefficients_ = \
+                tuple([_homology_dimensions_counts[dim]
+                       for dim in self.homology_dimensions_])
+        elif type(self.n_coefficients) in (list, tuple):
             if len(self.n_coefficients) != _n_homology_dimensions:
                 raise ValueError(
-                    f'`n_coefficients` has been passed as a list of length '
-                    f'{len(self.n_coefficients)} while diagrams in `X` have '
-                    f'{_n_homology_dimensions} homology dimensions.'
+                    f'`n_coefficients` has length {len(self.n_coefficients)} '
+                    f'while diagrams in `X` have {_n_homology_dimensions} '
+                    f'homology dimensions.'
                     )
             self.n_coefficients_ = self.n_coefficients
         else:
             self.n_coefficients_ = \
-                [self.n_coefficients] * _n_homology_dimensions
+                tuple([self.n_coefficients] * _n_homology_dimensions)
 
         self._polynomial_function = \
             _implemented_polynomial_recipes[self.polynomial_type]
@@ -696,11 +697,11 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions * 2 \
-            * n_coefficients_)
+        Xt : ndarray of shape (n_samples, n_features_new)
             Polynomial coefficients: real and imaginary parts of the complex
             polynomials obtained in each homology dimension from each diagram
-            in `X`.
+            in `X`. ``n_features_new`` is equal to twice the sum of all entries
+            in :attr:`n_coefficients_`.
 
         """
         check_is_fitted(self)
@@ -708,7 +709,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
-                _subdiagrams(Xt[[s]], [dim], remove_dim=True)[0],
+                _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0],
                 self.n_coefficients_[d])
             for s in range(len(X))
             for d, dim in enumerate(self.homology_dimensions_)
@@ -733,27 +734,18 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    n_distances : int or None, optional, default: ``10``
-        Number of distances to keep. This is the dimension of the topological
-        vector. If ``None``, this number is computed from persistence diagrams
-        in :meth:`fit` by considering the one with the largest number of points
-        and using the dimension of its corresponding topological vector as
-        the number of distances.
+    n_distances : list, tuple, int or None, optional, default: ``10``
+        Number of distances to keep per homology dimension. If an int then the
+        number of distances will be equal to that value for each homology
+        dimension. If ``None`` then, for each homology dimension in the
+        collection of persistence diagrams seen in :meth:`fit`, the number of
+        distances is defined to be the (constant, see **Important note**)
+        number of points in each subdiagram in that homology dimension.
 
-    metric : string or callable, optional, default: ``'euclidean'``
-        If set to ``'precomputed'``, each entry in `X` along axis 0 is
-        interpreted to be a distance matrix. Otherwise, entries are
-        interpreted as feature arrays, and `metric` determines a rule with
-        which to calculate distances between pairs of instances (i.e. rows)
-        in these arrays.
-        If `metric` is a string, it must be one of the options allowed by
-        :func:`scipy.spatial.distance.pdist` for its metric parameter, or a
-        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
-        including "euclidean", "manhattan" or "cosine".
-        If `metric` is a callable function, it is called on each pair of
-        instances and the resulting value recorded. The callable should take
-        two arrays from the entry in `X` as input, and return a value
-        indicating the distance between them.
+    metric : string or callable, optional, default: ``'chebyshev'``
+        The distance metric to use. See the documentation of
+        :class:`sklearn.neighbors.DistanceMetric` for a list of available
+        metrics. The default ``'chebyshev'`` is as proposed in [1]_.
 
     metric_params : dict or None, optional, default: ``{}``
         Additional keyword arguments for the metric function.
@@ -765,15 +757,16 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    n_distances_ : int
-        Effective number of distances calculated in :meth:`fit`.
-
     homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
+    n_distances_ : tuple
+        Effective number of distances per homology dimension. Set in
+        :meth:`fit`.
+
     See also
     --------
-    NumberOfPoints, Amplitude, PersistenceEntropy, ComplexPolynomial, \     
+    NumberOfPoints, Amplitude, PersistenceEntropy, ComplexPolynomial, \
     PairwiseDistance
 
     References
@@ -786,8 +779,10 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
     """
 
     _hyperparameters = {
-        'n_distances': {'type': (int, type(None)),
-                        'in': Interval(1, np.inf, closed='left')},
+        'n_distances': {'type': (int, type(None), list, tuple),
+                        'in': Interval(1, np.inf, closed='left'),
+                        'of': {'type': int,
+                               'in': Interval(1, np.inf, closed='left')}},
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': dict}
         }
@@ -801,8 +796,8 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and compute :attr:`n_distances_` and
-        :attr:`effective_metric_params`. Then, return the estimator.
+        :attr:`homology_dimensions_` and compute :attr:`n_distances_`. Then,
+        return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -828,21 +823,37 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
         """
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        X = check_diagrams(X)
 
         # Find the unique homology dimensions in the 3D array X passed to `fit`
         # assuming that they can all be found in its zero-th entry
-        homology_dimensions_fit = np.unique(X[0, :, 2])
+        homology_dimensions_fit, counts = np.unique(X[0, :, 2],
+                                                    return_counts=True)
         self.homology_dimensions_ = \
             _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
 
+        _n_homology_dimensions = len(self.homology_dimensions_)
+        _homology_dimensions_counts = dict(zip(homology_dimensions_fit,
+                                               counts))
+
         if self.n_distances is None:
             self.n_distances_ = \
-                np.array([X[i].shape[0] for i in range(len(X))]).max()
-        else:
+                tuple([_homology_dimensions_counts[dim]
+                       for dim in self.homology_dimensions_])
+        elif type(self.n_distances) in [list, tuple]:
+            if len(self.n_distances) != _n_homology_dimensions:
+                raise ValueError(
+                    f'`n_distances` has length {len(self.n_distances)} '
+                    f'while diagrams in `X` have {_n_homology_dimensions} '
+                    f'homology dimensions.'
+                    )
             self.n_distances_ = self.n_distances
+        else:
+            self.n_distances_ = \
+                tuple([self.n_distances] * self.homology_dimensions_)
 
-        self._distance_function = DistanceMetric.get_metric(
-            self.metric, **self.metric_params)
+        self._distance_function = \
+            DistanceMetric.get_metric(self.metric, **self.metric_params)
 
         return self
 
@@ -881,8 +892,10 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
         Returns
         -------
 
-        Xt : ndarray of shape (n_samples, n_homology_dimensions * n_distances)
+        Xt : ndarray of shape (n_samples, n_features_new)
             Output data. Topological vectors of the diagrams in `X`.
+            ``n_features_new`` is equal to the sum of all entries in
+            :attr:`n_distances_`.
 
         """
         check_is_fitted(self)
@@ -890,10 +903,11 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._topological_vector)(
-                _subdiagrams(Xt, [dim], remove_dim=True)
+                _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0]
                 )
-            for dim in self.homology_dimensions_ for s in range(len(X))
+            for dim in self.homology_dimensions_
+            for s in range(len(X))
             )
-
         Xt = np.stack(Xt).reshape((X.shape[0], -1))
+
         return Xt
