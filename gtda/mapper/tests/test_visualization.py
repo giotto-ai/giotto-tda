@@ -1,17 +1,14 @@
 """Testing for Mapper plotting functions."""
 # License: GNU AGPLv3
 
-import warnings
 from unittest import TestCase
 
 import numpy as np
 import plotly.io as pio
 import pytest
 
-from gtda.mapper import FirstSimpleGap
-from gtda.mapper import make_mapper_pipeline
-from gtda.mapper import (plot_interactive_mapper_graph,
-                         plot_static_mapper_graph)
+from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
+    plot_static_mapper_graph, plot_interactive_mapper_graph
 
 
 class TestCaseNoTemplate(TestCase):
@@ -72,7 +69,7 @@ def test_valid_hoverlabel_bgcolor(layout_dim):
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim,
         plotly_params={"node_trace": {"hoverlabel_bgcolor": "white"}}
-    )
+        )
     assert fig.data[1]["hoverlabel"]["bgcolor"] == "white"
 
 
@@ -82,7 +79,7 @@ def test_unsuitable_colorscale_for_hoverlabel_3d():
         _ = plot_static_mapper_graph(
             pipe, X, layout_dim=3,
             plotly_params={"node_trace": {"marker_colorscale": hsl_colorscale}}
-        )
+            )
 
 
 def test_valid_colorscale():
@@ -91,11 +88,11 @@ def test_valid_colorscale():
     fig_2d = plot_static_mapper_graph(
         pipe, X, layout_dim=2,
         plotly_params={"node_trace": {"marker_colorscale": "blues"}}
-    )
+        )
     fig_3d = plot_static_mapper_graph(
         pipe, X, layout_dim=3,
         plotly_params={"node_trace": {"marker_colorscale": "blues"}}
-    )
+        )
 
     # Test that the custom colorscale is correctly applied both in 2d and in 3d
     marker_colorscale = fig_2d.data[1]["marker"]["colorscale"]
@@ -118,11 +115,11 @@ def test_colors_same_2d_3d(color_variable, node_color_statistic):
     fig_2d = plot_static_mapper_graph(
         pipe, X, layout_dim=2, color_variable=color_variable,
         node_color_statistic=node_color_statistic
-    )
+        )
     fig_3d = plot_static_mapper_graph(
         pipe, X, layout_dim=3, color_variable=color_variable,
         node_color_statistic=node_color_statistic
-    )
+        )
     assert fig_2d.data[1].marker.color == fig_3d.data[1].marker.color
 
 
@@ -131,7 +128,7 @@ def test_color_by_column_dropdown_2d(layout_dim):
     pipe = make_mapper_pipeline()
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim, color_by_columns_dropdown=True
-    )
+        )
     fig_buttons = fig.layout.updatemenus[0].buttons
 
     assert list(fig.data[1].marker.color) == \
@@ -140,7 +137,7 @@ def test_color_by_column_dropdown_2d(layout_dim):
     for i in range(X.shape[1]):
         fig_col_i = plot_static_mapper_graph(
             pipe, X, layout_dim=layout_dim, color_variable=i
-        )
+            )
         assert list(fig_col_i.data[1].marker.color) == \
             list(fig_buttons[i + 1].args[0]["marker.color"][1])
 
@@ -156,7 +153,6 @@ class TestStaticPlot(TestCaseNoTemplate):
         """Verify that what we see in the graph corresponds to
         the number of samples in the graph."""
         pipe = make_mapper_pipeline()
-        warnings.simplefilter("ignore")
         fig = plot_static_mapper_graph(pipe, X,
                                        color_variable=colors,
                                        clone_pipeline=False)
@@ -171,34 +167,88 @@ class TestStaticPlot(TestCaseNoTemplate):
         fig_colors = fig.data[1].marker.color
         assert len(fig_colors) == num_nodes
 
-
-def _get_widget_by_trait(fig, key, val=None):
-    for k, v in fig.widgets.items():
-        try:
-            b = getattr(v, key) == val if val is not None \
-                else getattr(v, key)
-            if b:
-                return fig.widgets[k]
-        except (AttributeError, TypeError):
-            pass
-
-
-class TestInteractivePlot(TestCaseNoTemplate):
-
     def test_cluster_sizes(self):
         """Verify that the total number of calculated clusters is equal to
         the number of displayed clusters."""
         pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
-        warnings.simplefilter("ignore")
-        fig = plot_interactive_mapper_graph(pipe, X)
-        w_scatter = _get_widget_by_trait(fig, 'data')
+        fig = plot_static_mapper_graph(pipe, X)
+        node_trace = fig.data[1]
 
-        node_sizes_vis = [
-            _get_size_from_hovertext(s_)
-            for s_ in w_scatter.data[1].hovertext
-        ]
+        node_sizes_vis = [_get_size_from_hovertext(ht) for ht in
+                          node_trace.hovertext]
 
         g = pipe.fit_transform(X)
         node_size_real = [len(node) for node in g.vs['node_elements']]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
+
+
+def _get_widgets_by_trait(fig, key, val=None):
+    """Returns a list of widgets containing attribute `key` which currently
+    evaluates to the value `val`."""
+    widgets = []
+    for k, v in fig.widgets.items():
+        try:
+            b = getattr(v, key) == val if val is not None else getattr(v, key)
+            if b:
+                widgets.append(fig.widgets[k])
+        except (AttributeError, TypeError):
+            continue
+    return widgets
+
+
+@pytest.mark.parametrize("clone_pipeline", [False, True])
+@pytest.mark.parametrize("layout_dim", [2, 3])
+def test_pipeline_cloned(clone_pipeline, layout_dim):
+    """Verify that the pipeline is changed on interaction if and only if
+    `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
+    # TODO: Monitor development of the ipytest project to convert these into
+    # true notebook tests integrated with pytest
+    params = {
+        "cover": {
+            "initial": {"n_intervals": 10, "kind": "uniform",
+                        "overlap_frac": 0.1},
+            "new": {"n_intervals": 15, "kind": "balanced", "overlap_frac": 0.2}
+            },
+        "clusterer": {
+            "initial": {"affinity": "euclidean"},
+            "new": {"affinity": "manhattan"}
+            },
+        "contract_nodes": {"initial": True, "new": False},
+        "min_intersection": {"initial": 4, "new": 1},
+        }
+
+    pipe = make_mapper_pipeline(
+        cover=CubicalCover(**params["cover"]["initial"]),
+        clusterer=FirstSimpleGap(**params["clusterer"]["initial"]),
+        contract_nodes=params["contract_nodes"]["initial"],
+        min_intersection=params["min_intersection"]["initial"]
+        )
+    fig = plot_interactive_mapper_graph(
+        pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim
+        )
+
+    # Get relevant widgets and change their states, then check final values
+    for step, values in params.items():
+        if step in ["cover", "clusterer"]:
+            for param_name, initial_param_value in values["initial"].items():
+                new_param_value = values["new"][param_name]
+                widgets = _get_widgets_by_trait(fig, "description", param_name)
+                for w in widgets:
+                    w.set_state({'value': new_param_value})
+                final_param_value_actual = \
+                    pipe.get_mapper_params()[f"{step}__{param_name}"]
+                final_param_value_expected = \
+                    initial_param_value if clone_pipeline else new_param_value
+                assert final_param_value_actual == final_param_value_expected
+        else:
+            initial_param_value = values["initial"]
+            new_param_value = values["new"]
+            widgets = _get_widgets_by_trait(fig, "description", step)
+            for w in widgets:
+                w.set_state({'value': new_param_value})
+            final_param_value_actual = \
+                pipe.get_mapper_params()[f"{step}"]
+            final_param_value_expected = \
+                initial_param_value if clone_pipeline else new_param_value
+            assert final_param_value_actual == final_param_value_expected
