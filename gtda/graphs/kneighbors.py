@@ -20,7 +20,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     high-dimensional space, the corresponding :math:`k`NN graph is a directed
     graph with a vertex for every vector in the array, and a directed edge from
     vertex :math:`i` to vertex :math:`j \\neq i` whenever vector :math:`j` is
-    among the k nearest neighbors of vector :math:`i`.
+    among the :math:`k` nearest neighbors of vector :math:`i`.
 
     Parameters
     ----------
