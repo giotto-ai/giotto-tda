@@ -102,7 +102,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             n_points, n_dimensions) or (n_samples, n_points, n_points)
             Input data representing a collection of point clouds. Each entry
             in `X` is a 2D array of shape ``(n_points, n_dimensions)`` if
-            `metric` is not ``'precomputed'``, and a 2D array of shape
+            `metric` is not ``'precomputed'``, or a 2D array of shape
             ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
 
         y : None
@@ -130,7 +130,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             n_points, n_dimensions)
             Input data representing a collection of point clouds. Each entry
             in `X` is a 2D array of shape ``(n_points, n_dimensions)`` if
-            `metric` is not ``'precomputed'``, and a 2D array of shape
+            `metric` is not ``'precomputed'``, or a 2D array of shape
             ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
 
         y : None
