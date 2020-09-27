@@ -359,7 +359,7 @@ jobs:
 
     - task: PublishBuildArtifacts@1
       inputs:
-        targetPath: $(System.DefaultWorkingDirectory)/doc/build/html
+        targetPath: doc/build/html
         artifactName: documentation
 
     - script: |
