@@ -342,7 +342,7 @@ jobs:
     - script: |
         set -e
         python -m pip install --upgrade pip setuptools
-        python -m pip install -e ".[dev,doc]"
+        python -m pip install -e ".[dev,doc,examples]"
       displayName: 'Install dependencies and dev environment'
     - script: |
         set -e
