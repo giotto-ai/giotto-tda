@@ -199,7 +199,7 @@ def validate_params(parameters, references, exclude=None):
 
 
 def _check_array_mod(X, **kwargs):
-    """Modified version of :func:`~sklearn.utils.validation.check_array. When
+    """Modified version of :func:`sklearn.utils.validation.check_array. When
     keyword parameter `force_all_finite` is set to False, NaNs are not
     accepted but infinity is."""
     if not kwargs.get('force_all_finite', True):
@@ -218,8 +218,8 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
     clouds or of distance/adjacency matrices.
 
     The input is checked to be either a single 3D array using a single call
-    to :func:`~sklearn.utils.validation.check_array`, or a list of 2D arrays by
-    calling :func:`~sklearn.utils.validation.check_array` on each entry.
+    to :func:`sklearn.utils.validation.check_array`, or a list of 2D arrays by
+    calling :func:`sklearn.utils.validation.check_array` on each entry.
 
     Parameters
     ----------
@@ -233,14 +233,14 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
 
     **kwargs
         Keyword arguments accepted by
-        :func:`~sklearn.utils.validation.check_array`, with the following
+        :func:`sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) if not passed
         explicitly, `force_all_finite` is set to be the boolean negation of
         `distance_matrices`; 3) when `force_all_finite` is set to ``False``,
         NaN inputs are not allowed; 4) `accept_sparse` and
         `accept_large_sparse` are only meaningful in the case of lists of 2D
         arrays, in which case they are passed to individual instances of
-        :func:`~sklearn.utils.validation.check_array` validating each entry
+        :func:`sklearn.utils.validation.check_array` validating each entry
         in the list.
 
     Returns
@@ -330,7 +330,7 @@ def check_collection(X, **kwargs):
 
     **kwargs
         Keyword arguments accepted by
-        :func:`~sklearn.utils.validation.check_array`, with the following
+        :func:`sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) when
         `force_all_finite` is set to ``False``, NaN inputs are not allowed.
 
