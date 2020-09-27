@@ -14,22 +14,19 @@ from ..utils.validation import check_point_clouds
 
 @adapt_fit_transform_docs
 class KNeighborsGraph(BaseEstimator, TransformerMixin):
-    """Adjacency matrices of k-nearest neighbor graphs.
+    """Adjacency matrices of :math:`k`-nearest neighbor graphs.
 
     Given a two-dimensional array of row vectors seen as points in
-    high-dimensional space, the corresponding kNN graph is a simple,
-    undirected and unweighted graph with a vertex for every vector in the
-    array, and an edge between two vertices whenever either the first
-    corresponding vector is among the k nearest neighbors of the
-    second, or vice-versa.
-
-    :func:`sklearn.neighbors.kneighbors_graph` is used to compute the
-    adjacency matrices of kNN graphs.
+    high-dimensional space, the corresponding :math:`k`NN graph is a directed
+    graph with a vertex for every vector in the array, and a directed edge from
+    vertex :math:`i` to vertex :math:`j \\neq i` whenever vector :math:`j` is
+    among the k nearest neighbors of vector :math:`i`.
 
     Parameters
     ----------
     n_neighbors : int, optional, default: ``4``
-        Number of neighbors to use.
+        Number of neighbors to use. A point is not considered as its own
+        neighbour.
 
     mode : ``'connectivity'`` | ``'distance'``, optional, \
         default: ``'connectivity'``
@@ -38,26 +35,10 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         between neighbors according to the given metric.
 
     metric : string or callable, optional, default: ``'euclidean'``
-        Metric to use for distance computation. Any metric from scikit-learn
-        or :mod:`scipy.spatial.distance` can be used. If `metric` is a
-        callable, it is called on each pair of instances (rows) and the
-        resulting value recorded. The callable should take two arrays as input
-        and return one value indicating the distance between them. This works
-        for SciPy's metrics, but is less efficient than passing the metric name
-        as a string. Distance matrices are not supported. Valid values for
-        `metric` are:
-
-        - from scikit-learn: [``'cityblock'``, ``'cosine'``, ``'euclidean'``,
-          ``'l1'``, ``'l2'``, ``'manhattan'``]
-        - from :mod:`scipy.spatial.distance`: [``'braycurtis'``,
-          ``'canberra'``, ``'chebyshev'``, ``'correlation'``, ``'dice'``,
-          ``'hamming'``, ``'jaccard'``, ``'kulsinski'``, ``'mahalanobis'``,
-          ``'minkowski'``, ``'rogerstanimoto'``, ``'russellrao'``,
-          ``'seuclidean'``, ``'sokalmichener'``, ``'sokalsneath'``,
-          ``'sqeuclidean'``, ``'yule'``]
-
-        See the documentation for :mod:`scipy.spatial.distance` for details on
-        these metrics.
+        The distance metric to use. See the documentation of
+        :class:`sklearn.neighbors.DistanceMetric` for a list of available
+        metrics. If set to ``'precomputed'``, input data is interpreted as a
+        collection of distance matrices.
 
     p : int, optional, default: ``2``
         Parameter for the Minkowski (i.e. :math:`\\ell^p`) metric from
@@ -93,9 +74,14 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
     --------
     TransitionGraph, GraphGeodesicDistance
 
+    Notes
+    -----
+    :func:`sklearn.neighbors.kneighbors_graph` is used to compute the
+    adjacency matrices of kNN graphs.
+
     """
 
-    def __init__(self, mode='connectivity', n_neighbors=4, metric='euclidean',
+    def __init__(self, n_neighbors=4, mode='connectivity', metric='euclidean',
                  p=2, metric_params=None, n_jobs=None):
         self.n_neighbors = n_neighbors
         self.mode = mode
@@ -113,9 +99,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : list of length n_samples, or ndarray of shape (n_samples, \
-            n_points, n_dimensions)
+            n_points, n_dimensions) or (n_samples, n_points, n_points)
             Input data representing a collection of point clouds. Each entry
-            in `X` is a 2D array of shape ``(n_points, n_dimensions)``.
+            in `X` is a 2D array of shape ``(n_points, n_dimensions)`` if
+            `metric` is not ``'precomputed'``, and a 2D array of shape
+            ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -126,7 +114,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_point_clouds(X)
+        self._is_precomputed = self.metric == 'precomputed'
+        check_point_clouds(X, distance_matrices=self._is_precomputed)
 
         self._is_fitted = True
         return self
@@ -140,7 +129,9 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         X : list of length n_samples, or ndarray of shape (n_samples, \
             n_points, n_dimensions)
             Input data representing a collection of point clouds. Each entry
-            in `X` is a 2D array of shape ``(n_points, n_dimensions)``.
+            in `X` is a 2D array of shape ``(n_points, n_dimensions)`` if
+            `metric` is not ``'precomputed'``, and a 2D array of shape
+            ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -156,7 +147,7 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        Xt = check_point_clouds(X)
+        Xt = check_point_clouds(X, distance_matrices=self._is_precomputed)
 
         _adjacency_matrix_func = partial(
             kneighbors_graph, n_neighbors=self.n_neighbors, metric=self.metric,
@@ -165,4 +156,5 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             )
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(_adjacency_matrix_func)(x)
                                           for x in Xt)
+
         return Xt
