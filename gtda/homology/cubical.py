@@ -53,8 +53,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value ``numpy.inf``. ``None`` is equivalent to
-        ``numpy.inf``.
+        filtration value ``numpy.inf``. ``None`` assigns the maximum pixel
+        values within all images passed to :meth:`fit`.
 
     reduced_homology : bool, optional, default: ``True``
        If ``True``, the earliest-born triple in homology dimension 0 which has
@@ -166,7 +166,10 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                 self.periodic_dimensions_
 
         if self.infinity_values is None:
-            self.infinity_values_ = np.inf
+            if hasattr(X, 'shape'):
+                self.infinity_values_ = np.max(X)
+            else:
+                self.infinity_values_ = max(map(np.max, X))
         else:
             self.infinity_values_ = self.infinity_values
 
