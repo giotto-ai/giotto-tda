@@ -74,16 +74,19 @@ run-notebooks:
 	@cp -r ../examples/images notebooks/
 	@jupyter nbconvert notebooks/*.ipynb --execute --to rst --ExecutePreprocessor.timeout=1200
 
-all-gh:
+docs:
 	@make clean-gh
 	@make theory-gl
 	@if ($(RUNNOTEBOOKS)); then\
 	   make run-notebooks;\
 	fi
+	@make html-docs
+
+all-gh:
+	@make docs
 	@if ($(UPDATE_VERSIONS)); then\
 	    make update-versions-list;\
 	fi
-	@make html-docs
 	@make copy-to-docs-location
 
 gh-remove:
