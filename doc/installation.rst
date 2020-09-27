@@ -110,7 +110,7 @@ Pre-built binaries
 For Windows, Boost propose pre-built binaries to ease the installation in your system. In the
 `website <https://sourceforge.net/projects/boost/files/boost-binaries/>`_, you'll have access to all versions of Boost.
 At the time of writing this documentation, the most recent version of Boost is `1.72.0`. If you go into the folder,
-you'll find different executables - choose the version corresponding to your system (32, 64 bits). In our case, we
+you'll find different executables – choose the version corresponding to your system (32, 64 bits). In our case, we
 downloaded `boost_1_72_0-msvc-14.2-64.exe`. Follow the installation instructions, and when prompted to specify the
 folder to install Boost, go for `C:\\local\\`.
 
