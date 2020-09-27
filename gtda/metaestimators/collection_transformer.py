@@ -3,6 +3,7 @@
 
 from functools import reduce
 from operator import and_
+from warnings import warn
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -81,6 +82,15 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
         self.parallel_backend_prefer = parallel_backend_prefer
 
+    def _validate_transformer(self):
+        if not hasattr(self.transformer, "fit_transform"):
+            raise ValueError("`transformer` must possess a fit_transform "
+                             "method.")
+        if not isinstance(self.transformer, BaseEstimator):
+            warn("`transformer` is not an instance of "
+                 "sklearn.base.BaseEstimator. This will lead to limited "
+                 "functionality in a scikit-learn context.")
+
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
@@ -103,7 +113,9 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
         """
         check_collection(X, accept_sparse=True, accept_large_sparse=True,
                          force_all_finite=False)
+        self._validate_transformer()
 
+        self._is_fitted = True
         return self
 
     @if_delegate_has_method(delegate="transformer")
@@ -128,6 +140,7 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
         """
         Xt = check_collection(X, accept_sparse=True, accept_large_sparse=True,
                               force_all_finite=False)
+        self._validate_transformer()
 
         Xt = Parallel(n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer)(
             delayed(clone(self.transformer).fit_transform)(x) for x in Xt
