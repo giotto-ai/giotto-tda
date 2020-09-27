@@ -627,9 +627,9 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-        X = check_diagrams(X)
 
         # Find the unique homology dimensions in the 3D array X passed to `fit`
         # assuming that they can all be found in its zero-th entry
@@ -822,9 +822,9 @@ class TopologicalVector(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-        X = check_diagrams(X)
 
         # Find the unique homology dimensions in the 3D array X passed to `fit`
         # assuming that they can all be found in its zero-th entry
