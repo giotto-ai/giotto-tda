@@ -354,7 +354,7 @@ jobs:
         cd doc/
         make docs
       displayName: 'Make the documentation (execute notebooks, build html)'
-      condition: ne(variables['Build.Reason'], 'PullRequest')
+      condition:
 
     - task: PublishBuildArtifacts@1
       inputs:
