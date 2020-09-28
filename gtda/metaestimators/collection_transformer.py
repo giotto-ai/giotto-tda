@@ -43,6 +43,12 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
         used in conjunction with `n_jobs`. The default process-based backend is
         "loky" and the default thread-based backend is "threading". See [1]_.
 
+    parallel_backend_require : ``"sharedmem"`` or None, optional, default: \
+        ``None``
+        Hard constraint to select the backend. If set to ``'sharedmem'``, the
+        selected backend will be single-host and thread-based even if the user
+        asked for a non-thread based backend with parallel_backend.
+
     Examples
     --------
     >>> import numpy as np
@@ -77,10 +83,12 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, transformer, n_jobs=None, parallel_backend_prefer=None):
+    def __init__(self, transformer, n_jobs=None, parallel_backend_prefer=None,
+                 parallel_backend_require=None):
         self.transformer = transformer
         self.n_jobs = n_jobs
         self.parallel_backend_prefer = parallel_backend_prefer
+        self.parallel_backend_require = parallel_backend_require
 
     def _validate_transformer(self):
         if not hasattr(self.transformer, "fit_transform"):
@@ -143,7 +151,8 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
                               force_all_finite=False)
         self._validate_transformer()
 
-        Xt = Parallel(n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer)(
+        Xt = Parallel(n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer,
+                      require=self.parallel_backend_require)(
             delayed(clone(self.transformer).fit_transform)(x) for x in Xt
             )
 
