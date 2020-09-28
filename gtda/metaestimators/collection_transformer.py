@@ -39,9 +39,8 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
     parallel_backend_prefer :  ``"processes"`` | ``"threads"`` | ``None``, \
         optional, default: ``None``
         Soft hint for the default joblib backend to use in a joblib-parallel
-        application  of `transformer`'s ``fit_transform`` to each input. To be
-        used in conjunction with `n_jobs`. The default process-based backend is
-        "loky" and the default thread-based backend is "threading". See [1]_.
+        application  of `transformer`'s ``fit_transform`` to each input. See
+        [1]_.
 
     parallel_backend_require : ``"sharedmem"`` or None, optional, default: \
         ``None``
