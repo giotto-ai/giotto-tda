@@ -1,7 +1,9 @@
+import gc
 from warnings import warn
 
 import numpy as np
 from scipy import sparse
+from scipy.spatial.distance import squareform
 from sklearn.metrics.pairwise import pairwise_distances
 
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
@@ -166,11 +168,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             second column representing the death time of each pair.
         'num_edges': int
             The number of edges added during the computation
-        'dperm2all': ndarray(n_samples, n_samples) or ndarray (n_perm, \
-            n_samples) if n_perm
-            The distance matrix used in the computation if n_perm is none.
-            Otherwise, the distance from all points in the permutation to
-            all points in the dataset
+        'dperm2all': None or ndarray (n_perm, n_samples)
+            ``None`` if n_perm is ``None``. Otherwise, the distance from all
+            points in the permutation to all points in the dataset.
         'idx_perm': ndarray(n_perm) if n_perm > 0
             Index into the original point cloud of the points used
             as a subsample in the greedy permutation
@@ -231,7 +231,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             dm = X
         else:
             dm = pairwise_distances(X, metric=metric)
-        dperm2all = dm
+        dperm2all = None
 
     n_points = max(dm.shape)
     sort_coo = True
@@ -289,8 +289,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             )
     else:
         # Only consider strict upper diagonal
-        DParam = dm[np.invert(np.tri(n_points, k=0, dtype=np.bool))].astype(
-            np.float32).flatten()
+        DParam = squareform(dm, checks=False).astype(np.float32)
+        # Run garbage collector to free up memory taken by `dm`
+        del dm
+        gc.collect()
         res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
