@@ -9,6 +9,7 @@ This page contains examples of use of ``giotto-tda``.
 
    classifying_shapes
    lorenz_attractor
+   MNIST_classification
    voids_on_the_plane
 
 ..
