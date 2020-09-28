@@ -1,4 +1,5 @@
 """Feature extraction from curves."""
+# License: GNU AGPLv3
 
 from types import FunctionType
 
