@@ -89,7 +89,7 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
         if not isinstance(self.transformer, BaseEstimator):
             warn("`transformer` is not an instance of "
                  "sklearn.base.BaseEstimator. This will lead to limited "
-                 "functionality in a scikit-learn context.")
+                 "functionality in a scikit-learn context.", UserWarning)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.

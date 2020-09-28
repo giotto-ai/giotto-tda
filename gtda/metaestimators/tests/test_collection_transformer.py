@@ -14,12 +14,31 @@ X_arr = rng.random((200, 100, 50))
 X_list = list(X_arr)
 
 
-def test_collection_transformer_fit():
+def test_collection_transformer_input_with_nan():
     multi_pca = CollectionTransformer(PCA())
     X = X_arr.copy()
     X[0, 0, 0] = np.nan
     with pytest.raises(ValueError):
         multi_pca.fit(X)
+
+
+def test_collection_transformer_invalid_transformer():
+    multi_pca = CollectionTransformer(np.mean)
+    with pytest.raises(ValueError):
+        multi_pca.fit(X_arr)
+
+
+def test_collection_transformer_no_baseestimator_warn():
+    class TestTransformer:
+        def __init__(self):
+            pass
+
+        def fit_transform(self):
+            pass
+
+    test_transformer = TestTransformer()
+    with pytest.warns(UserWarning):
+        CollectionTransformer(test_transformer).fit(X_arr)
 
 
 @pytest.mark.parametrize("X", [X_arr, X_list])
