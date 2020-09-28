@@ -1,3 +1,5 @@
+# License: GNU AGPLv3
+
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from sklearn.utils import gen_even_slices
@@ -12,11 +14,11 @@ _AVAILABLE_FUNCTIONS = {
     'mean': {},
     'std': {},
     'median': {},
-    'average': {'weights': {'type': np.ndarray}},
-}
+    'average': {'weights': {'type': np.ndarray}}
+    }
 
 _implemented_function_recipes = {
-    'flatten': lambda X, axis: np.reshape(X, (X.shape[0], -1)),
+    'flatten': lambda X, axis: X.reshape(len(X), -1),
     'argmax': np.argmax,
     'argmin': np.argmin,
     'min': np.min,
@@ -24,16 +26,15 @@ _implemented_function_recipes = {
     'mean': np.mean,
     'std': np.std,
     'median': np.median,
-    'average': np.average,
-}
+    'average': np.average
+    }
 
 
 def _parallel_featurization(Xt, function, function_params, n_jobs):
     Xt = Parallel(n_jobs=n_jobs)(
         delayed(function)(Xt[s], axis=-1, **function_params)
-        for s in gen_even_slices(
-                Xt.shape[0], effective_n_jobs(n_jobs))
-    )
+        for s in gen_even_slices(len(Xt), effective_n_jobs(n_jobs))
+        )
     Xt = np.concatenate(Xt)
 
     return Xt

@@ -4,5 +4,5 @@ curves."""
 from .features import StandardFeature
 
 __all__ = [
-    'StandardFeature',
-]
+    'StandardFeature'
+    ]
