@@ -120,7 +120,8 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
 
     @if_delegate_has_method(delegate="transformer")
     def fit_transform(self, X, y=None):
-        """Fit-transform a clone of `transformer` to each input in `X`.
+        """Fit-transform a clone of `transformer` to each element in the
+        collection `X`.
 
         Parameters
         ----------
