@@ -24,8 +24,8 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
     ----------
     function : string or callable, optional, default: ``max``
         Function to transform a single-channel curve into scalar features per
-        channel. Implemented functions are [``"argmin"``, `"argmax"``,
-        ``"min"``, ``"max"``, ``"mean"``, ``"std"``, ``"median"``,
+        channel. Implemented functions are [``"identity"``, ``"argmin"``,
+        `"argmax"``, ``"min"``, ``"max"``, ``"mean"``, ``"std"``, ``"median"``,
         ``"average"``].
 
     function_params : dict, optional, default: ``None``

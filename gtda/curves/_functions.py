@@ -5,6 +5,7 @@ import numpy as np
 from joblib import Parallel, delayed
 
 _AVAILABLE_FUNCTIONS = {
+    "identity": {},
     "argmax": {},
     "argmin": {},
     "min": {},
@@ -16,6 +17,7 @@ _AVAILABLE_FUNCTIONS = {
     }
 
 _implemented_function_recipes = {
+    "identity": lambda X, axis: X.reshape(len(X), -1),
     "argmax": np.argmax,
     "argmin": np.argmin,
     "min": np.min,

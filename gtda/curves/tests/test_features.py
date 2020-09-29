@@ -60,6 +60,7 @@ def test_standard_function_params_ignored(function):
 
 
 X_res = {
+    "identity": X.reshape(X.shape[0], -1),
     "argmax": np.array([[8, 0],
                         [12, 12],
                         [9, 3]]),
