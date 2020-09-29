@@ -106,3 +106,28 @@ def test_standard_transform(function, n_jobs):
     sf = StandardFeatures(function=function, n_jobs=n_jobs)
 
     assert_almost_equal(sf.fit_transform(X), X_res[function])
+
+
+@pytest.mark.parametrize("n_jobs", [1, 2])
+def test_standard_transform_mixed_vector(n_jobs):
+    vector_fn_2 = lambda x: vector_fn(x)[:-1]
+    sf = StandardFeatures(function=[vector_fn, vector_fn_2], n_jobs=n_jobs)
+    Xt = sf.fit_transform(X)
+
+    assert Xt.shape == (len(X), 2 * X.shape[-1] - 1)
+    assert_almost_equal(Xt[:, :X.shape[2]], X[:, 0, :])
+    assert_almost_equal(Xt[:, X.shape[2]:], X[:, 1, :-1])
+
+
+@pytest.mark.parametrize("n_jobs", [1, 2])
+def test_standard_transform_mixed_vector_scalar(n_jobs):
+    sf = StandardFeatures(function=[vector_fn, scalar_fn], n_jobs=n_jobs)
+    Xt = sf.fit_transform(X)
+
+    assert Xt.shape == (len(X), X.shape[-1] + 1)
+    assert_almost_equal(Xt[:, :X.shape[2]], X[:, 0, :])
+
+    sf.set_params(function=[None, vector_fn])
+    Xt = sf.fit_transform(X)
+
+    assert_almost_equal(Xt, X[:, 1, :])

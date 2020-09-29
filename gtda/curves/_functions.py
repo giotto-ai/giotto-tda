@@ -38,4 +38,8 @@ def _parallel_featurization(Xt, function, function_params, n_jobs):
         index_tups = product(*map(range, Xt.shape[:-2]), channel_idx)
         Xt = Parallel(n_jobs=n_jobs)(delayed(function[tup[-1]])(Xt[tup])
                                      for tup in index_tups)
-        return np.array(Xt).reshape(n_samples, -1)
+        Xt = np.array(Xt)
+        if Xt.dtype == np.dtype('object'):
+            Xt = np.concatenate(list(map(np.ravel, Xt)))
+
+        return Xt.reshape(n_samples, -1)
