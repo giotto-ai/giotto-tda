@@ -130,7 +130,7 @@ def _validate_params(parameters, references, rec_name=None):
             name_extras = "" if rec_name is None else f" in `{rec_name}`"
             raise KeyError(
                 f"`{name}`{name_extras} is not an available parameter. "
-                f"Available parameters are in {list(references.keys())}."
+                f"Available parameters are in {tuple(references.keys())}."
                 )
 
         reference = references[name]

@@ -1,6 +1,7 @@
 """Feature extraction from curves."""
 # License: GNU AGPLv3
 
+from inspect import signature
 from types import FunctionType
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -13,7 +14,7 @@ from ..utils.validation import validate_params
 
 
 @adapt_fit_transform_docs
-class StandardFeature(BaseEstimator, TransformerMixin):
+class StandardFeatures(BaseEstimator, TransformerMixin):
     """Standard features from multi-channel curves.
 
     Applies functions to extract features from each channel in each
@@ -23,17 +24,17 @@ class StandardFeature(BaseEstimator, TransformerMixin):
     ----------
     function : string or callable, optional, default: ``max``
         Function to transform a single-channel curve into scalar features per
-        channel. Implemented functions are [``"flatten"``, ``"argmin"``,
-        ``"argmax"``, ``"min"``, ``"max"``, ``"mean"``, ``"std"``,
-        ``"median"``, ``"average"``].
+        channel. Implemented functions are [``"argmin"``, `"argmax"``,
+        ``"min"``, ``"max"``, ``"mean"``, ``"std"``, ``"median"``,
+        ``"average"``].
 
-    function_params : dict or None, optional, default: ``None``
-        Additional keyword arguments for the function (passing
-        ``None`` is equivalent to passing the defaults described below):
+    function_params : dict, optional, default: ``None``
+        Additional keyword arguments for `function`. Passing ``None`` is
+        equivalent to passing no arguments. Additionally:
 
         - If ``function == "average"``, the only argument is `weights`
-        (np.ndarray or None, default: ``None``),
-        - Else, there is not arguments.
+          (np.ndarray or None, default: ``None``).
+        - Otherwise, there are no arguments.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -42,8 +43,10 @@ class StandardFeature(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
+    n_channels_ : int
+
     function_ : callable
-        Function used to transform a single-channel curves into scalar
+        Function used to transform single-channel curves into scalar
         features. Set in :meth:`fit`.
 
     effective_function_params_ : dict
@@ -99,21 +102,40 @@ class StandardFeature(BaseEstimator, TransformerMixin):
 
         """
         check_array(X, allow_nd=True)
+        if X.ndim != 3:
+            raise ValueError("Input must be 3-dimensional with shape "
+                             "(n_samples, n_channels, n_bins).")
         self._validate_params()
 
-        if type(self.function) == str:
-            self.function_ = _implemented_function_recipes[self.function]
+        self.n_channels_ = X.shape[-2]
+
+        if isinstance(self.function, str):
+            self._function = _implemented_function_recipes[self.function]
+            self.function_ = tuple([self._function] * self.n_channels_)
 
             if self.function_params is None:
                 self.effective_function_params_ = {}
             else:
                 self.effective_function_params_ = self.function_params.copy()
-            validate_params(
-                self.effective_function_params_,
-                _AVAILABLE_FUNCTIONS[self.function])
+            validate_params(self.effective_function_params_,
+                            _AVAILABLE_FUNCTIONS[self.function])
         else:
-            self.function_ = self.function
-            self.effective_function_params_ = self.function_params.copy()
+            if isinstance(self.function, FunctionType):
+                self.function_ = tuple([self.function] * self.n_channels_)
+                if "axis" in signature(self.function).parameters:
+                    self._function = self.function
+                else:
+                    self._function = self.function_
+            else:
+                n_functions = len(self.function)
+                if len(self.function) != self.n_channels_:
+                    raise ValueError(
+                        f"`function` has length {n_functions} while curves in "
+                        f"`X` have {self.n_channels_} channels."
+                        )
+                self.function_ = tuple(self.function)
+                self._function = self.function_
+            self.effective_function_params_ = {}
 
         return self
 
@@ -140,7 +162,7 @@ class StandardFeature(BaseEstimator, TransformerMixin):
         check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
 
-        Xt = _parallel_featurization(Xt, self.function_,
+        Xt = _parallel_featurization(Xt, self._function,
                                      self.effective_function_params_,
                                      self.n_jobs)
 

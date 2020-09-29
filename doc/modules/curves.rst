@@ -13,4 +13,4 @@ Feature extraction
    :toctree: generated/curves
    :template: class.rst
 
-   curves.StandardFeature
+   curves.StandardFeatures
