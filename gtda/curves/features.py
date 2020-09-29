@@ -14,7 +14,7 @@ from ..utils.validation import validate_params
 
 @adapt_fit_transform_docs
 class StandardFeature(BaseEstimator, TransformerMixin):
-    """Computes standard features of multi-channel curves.
+    """Standard features from multi-channel curves.
 
     Given a multi-channel curve applies any function to extract features from
     it channel-wise.
