@@ -5,8 +5,8 @@
    :no-members:
    :no-inherited-members:
 
-Simplicial homology
--------------------
+Undirected simplicial homology
+------------------------------
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -17,6 +17,9 @@ Simplicial homology
    homology.SparseRipsPersistence
    homology.WeakAlphaPersistence
    homology.EuclideanCechPersistence
+
+Directed simplicial homology
+----------------------------
    homology.FlagserPersistence
 
 Cubical homology
