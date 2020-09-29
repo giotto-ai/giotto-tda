@@ -11,8 +11,12 @@ np.random.seed(0)
 X = np.random.rand(3, 2, 20)
 
 
-def dummy_fn(x):
+def scalar_fn(x):
     return x[0]
+
+
+def vector_fn(x):
+    return x
 
 
 def test_standard_not_fitted():
@@ -37,8 +41,8 @@ def test_standard_invalid_function_params():
 
 @pytest.mark.parametrize("function", ["argmax", "argmin", "min", "max", "mean",
                                       "std", "median", "average", np.max,
-                                      dummy_fn, [dummy_fn, np.max]])
-def test_standard_shape(function):
+                                      scalar_fn, [scalar_fn, np.max]])
+def test_standard_shape_scalar_function(function):
     sf = StandardFeatures(function=function)
     Xt = sf.fit_transform(X)
 
@@ -53,7 +57,7 @@ def test_standard_shape_function_list_with_none():
     assert_almost_equal(Xt, sf.fit_transform(X)[:, [1]])
 
 
-@pytest.mark.parametrize("function", [np.max, dummy_fn, [dummy_fn, np.max]])
+@pytest.mark.parametrize("function", [np.max, scalar_fn, [scalar_fn, np.max]])
 def test_standard_function_params_ignored(function):
     sf = StandardFeatures(function=function, function_params={"param": 2})
     sf.fit(X)
@@ -61,6 +65,8 @@ def test_standard_function_params_ignored(function):
 
 X_res = {
     "identity": X.reshape(X.shape[0], -1),
+    vector_fn: X.reshape(X.shape[0], -1),
+    (vector_fn, vector_fn): X.reshape(X.shape[0], -1),
     "argmax": np.array([[8, 0],
                         [12, 12],
                         [9, 3]]),
