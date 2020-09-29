@@ -114,8 +114,8 @@ def _validate_params(parameters, references, rec_name=None):
             if _parameter is not None:
                 if not ((ref_in is None) or _parameter in ref_in):
                     raise ValueError(
-                        f"Parameter `{_name}` is {_parameter}, which is not in"
-                        f"{ref_in}.")
+                        f"Parameter `{_name}` is {_parameter}, which is not "
+                        f"in {ref_in}.")
             # Perform any other checks via the callable ref_others
             if ref_other is not None:
                 return ref_other(_parameter)
