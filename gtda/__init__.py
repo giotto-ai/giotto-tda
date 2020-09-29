@@ -1,4 +1,17 @@
 from ._version import __version__
 
-__all__ = ['mapper', 'homology', 'time_series', 'graphs', 'diagrams', 'images',
-           'utils', 'point_clouds', 'externals', 'plotting', '__version__']
+__all__ = [
+    'mapper',
+    'time_series',
+    'graphs',
+    'images',
+    'point_clouds',
+    'homology',
+    'diagrams',
+    'curves',
+    'plotting',
+    'externals',
+    'utils',
+    '__version__'
+    ]
+

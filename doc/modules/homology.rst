@@ -5,6 +5,8 @@
    :no-members:
    :no-inherited-members:
 
+Simplicial homology
+-------------------
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -16,4 +18,13 @@
    homology.WeakAlphaPersistence
    homology.EuclideanCechPersistence
    homology.FlagserPersistence
+
+Cubical homology
+----------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/homology/
+   :template: class.rst
+
    homology.CubicalPersistence
