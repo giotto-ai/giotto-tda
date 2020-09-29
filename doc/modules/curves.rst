@@ -5,6 +5,8 @@
    :no-members:
    :no-inherited-members:
 
+Feature extraction
+------------------
 .. currentmodule:: gtda
 
 .. autosummary::
