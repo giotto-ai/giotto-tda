@@ -6,27 +6,27 @@ from sklearn.utils import gen_even_slices
 
 
 _AVAILABLE_FUNCTIONS = {
-    'flatten': {},
-    'argmax': {},
-    'argmin': {},
-    'min': {},
-    'max': {},
-    'mean': {},
-    'std': {},
-    'median': {},
-    'average': {'weights': {'type': np.ndarray}}
+    "flatten": {},
+    "argmax": {},
+    "argmin": {},
+    "min": {},
+    "max": {},
+    "mean": {},
+    "std": {},
+    "median": {},
+    "average": {"weights": {"type": np.ndarray}}
     }
 
 _implemented_function_recipes = {
-    'flatten': lambda X, axis: X.reshape(len(X), -1),
-    'argmax': np.argmax,
-    'argmin': np.argmin,
-    'min': np.min,
-    'max': np.max,
-    'mean': np.mean,
-    'std': np.std,
-    'median': np.median,
-    'average': np.average
+    "flatten": lambda X, axis: X.reshape(len(X), -1),
+    "argmax": np.argmax,
+    "argmin": np.argmin,
+    "min": np.min,
+    "max": np.max,
+    "mean": np.mean,
+    "std": np.std,
+    "median": np.median,
+    "average": np.average
     }
 
 

@@ -54,12 +54,15 @@ X_res = {
     'average': np.array([[0.58155482, 0.56784552],
                          [0.39983943, 0.40521714],
                          [0.40951229, 0.61738194]]),
-}
+    np.max: np.array([[0.96366276, 0.97861834],
+                      [0.98837384, 0.97676109],
+                      [0.9292962, 0.96218855]])
+    }
 
 
 @pytest.mark.parametrize('function', ['flatten', 'argmax', 'argmin', 'min',
                                       'max', 'mean', 'std', 'median',
-                                      'average'])
+                                      'average', np.max])
 def test_standard_transform(function):
     sf = StandardFeature(function=function)
 

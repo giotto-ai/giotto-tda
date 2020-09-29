@@ -16,22 +16,22 @@ from ..utils.validation import validate_params
 class StandardFeature(BaseEstimator, TransformerMixin):
     """Standard features from multi-channel curves.
 
-    Given a multi-channel curve applies any function to extract features from
-    it channel-wise.
+    Applies functions to extract features from each channel in each
+    multi-channel curve in a collection.
 
     Parameters
     ----------
     function : string or callable, optional, default: ``max``
         Function to transform a single-channel curve into scalar features per
-        channel. Implemented functions are [``'flatten'``, ``'argmin'``,
-        ``'argmax'``, ``'min'``, ``'max'``, ``'mean'``, ``'std'``,
-        ``'median'``, ``'average'``].
+        channel. Implemented functions are [``"flatten"``, ``"argmin"``,
+        ``"argmax"``, ``"min"``, ``"max"``, ``"mean"``, ``"std"``,
+        ``"median"``, ``"average"``].
 
     function_params : dict or None, optional, default: ``None``
         Additional keyword arguments for the function (passing
         ``None`` is equivalent to passing the defaults described below):
 
-        - If ``function == 'average'``, the only argument is `weights`
+        - If ``function == "average"``, the only argument is `weights`
         (np.ndarray or None, default: ``None``),
         - Else, there is not arguments.
 
@@ -52,15 +52,30 @@ class StandardFeature(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {
-        'function': {'type': (str, FunctionType),
-                     'in': _AVAILABLE_FUNCTIONS.keys()},
-        'function_params': {'type': (dict, type(None))},
-    }
+        "function": {"type": (str, FunctionType, list, tuple),
+                     "in": tuple(_AVAILABLE_FUNCTIONS.keys()),
+                     "of": {"type": (str, FunctionType, type(None)),
+                            "in": tuple(_AVAILABLE_FUNCTIONS.keys())}},
+        "function_params": {"type": (dict, type(None))},
+        }
 
-    def __init__(self, function='max', function_params=None, n_jobs=None):
+    def __init__(self, function="max", function_params=None, n_jobs=None):
         self.function = function
         self.function_params = function_params
         self.n_jobs = n_jobs
+
+    def _validate_params(self):
+        try:
+            validate_params(
+                self.get_params(), self._hyperparameters, exclude=["n_jobs"])
+        # Another go if we fail because function is or contains instances of
+        # FunctionType and the "in" key checks fail
+        except ValueError:
+            _hyperparameters = self._hyperparameters.copy()
+            _hyperparameters["function"].pop("in")
+            _hyperparameters["function"]["of"].pop("in")
+            validate_params(
+                self.get_params(), _hyperparameters, exclude=["n_jobs"])
 
     def fit(self, X, y=None):
         """Compute :attr:`function_` and :attr:`effective_function_params_`.
@@ -83,9 +98,8 @@ class StandardFeature(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
-        validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        check_array(X, allow_nd=True)
+        self._validate_params()
 
         if type(self.function) == str:
             self.function_ = _implemented_function_recipes[self.function]
