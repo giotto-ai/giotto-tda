@@ -117,7 +117,7 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(
@@ -348,7 +348,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(
@@ -554,7 +554,7 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(
@@ -746,7 +746,7 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(
@@ -948,7 +948,7 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(
@@ -1144,7 +1144,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(

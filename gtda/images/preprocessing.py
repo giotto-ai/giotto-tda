@@ -93,7 +93,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(
@@ -260,7 +260,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(self.get_params(), self._hyperparameters,
@@ -424,7 +424,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
         validate_params(self.get_params(), self._hyperparameters,
@@ -591,7 +591,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
+        if self.n_dimensions_ > 3:
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
 
