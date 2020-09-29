@@ -384,7 +384,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions * n_layers, \
             n_bins)
-            Persistence lanscapes: one landscape (represented as a
+            Persistence landscapes: one landscape (represented as a
             stacked one-dimensional array) per sample and per homology
             dimension seen in :meth:`fit` and layer. Index i along axis 1
             corresponds to the :math:`i / n_layers`-th homology dimension in
