@@ -58,10 +58,10 @@ def test_standard_invalid_shape(shape):
     sf = StandardFeatures()
 
     with pytest.raises(ValueError, match="Input must be 3-dimensional."):
-        sf.fit(np.empty(shape))
+        sf.fit(np.ones(shape))
 
     with pytest.raises(ValueError, match="Input must be 3-dimensional."):
-        sf.fit(X).transform(np.empty(shape))
+        sf.fit(X).transform(np.ones(shape))
 
 
 def test_standard_transform_channels_different_from_fit_channels():
