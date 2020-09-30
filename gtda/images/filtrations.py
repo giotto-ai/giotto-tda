@@ -1164,14 +1164,15 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         self._size = int(np.ceil(
             pairwise_distances([[0]], [[self.radius]], metric=self.metric,
                                **self.metric_params)
-            ))
+        ))
         # The mask is always 3D but not the iterator.
-        self.mask_ = np.ones([2 * self._size + 1] * 3, dtype=np.bool)
+        self.mask_ = np.ones(tuple(2 * self._size + 1 for _ in range(3)),
+                             dtype=np.bool)
 
         # Create an iterator for applying the mask to every pixel at once
-        iterator_size_list = \
-            [range(-self._size, self._size + 1)] * self.n_dimensions_ + \
-            [0] * (3 - self.n_dimensions_)
+        iterator_size_list = ([range(-self._size, self._size + 1)
+                               for _ in range(self.n_dimensions_)] +
+                              [[0] for _ in range(3 - self.n_dimensions_)])
         self._iterator = tuple(itertools.product(*iterator_size_list))
 
         mesh_size_list = [np.arange(0, 2 * self._size + 1)] * 3
@@ -1186,7 +1187,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.mask_ = self.mask_ <= self.radius
 
-        # Instantiate a padder to handle image boundaries
+        # Instanciate a padder to handle image boundaries
         padding = np.asarray([*[self._size] * self.n_dimensions_,
                               *[0] * (3 - self.n_dimensions_)])
         self._padder = Padder(padding=padding)
