@@ -50,6 +50,7 @@ KEYWORDS = "machine learning, topological data analysis, persistent " \
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
     "tests": [
+        "pandas",
         "pytest",
         "pytest-cov",
         "pytest-azurepipelines",
@@ -66,10 +67,9 @@ EXTRAS_REQUIRE = {
         "numpydoc"],
     "examples": [
         "jupyter",
-        "pandas",
         "openml",
         "matplotlib"]
-}
+    }
 
 
 def combine_requirements(base_keys):
