@@ -37,7 +37,7 @@ def _parallel_featurization(Xt, function, function_params, n_jobs):
         n_samples = len(Xt)
         index_tups = product(*map(range, Xt.shape[:-2]), channel_idx)
         Xt = Parallel(n_jobs=n_jobs)(
-            delayed(function[tup[-1]])(Xt[tup], function_params[tup[-1]])
+            delayed(function[tup[-1]])(Xt[tup], **function_params[tup[-1]])
             for tup in index_tups
             )
         Xt = np.array(Xt)

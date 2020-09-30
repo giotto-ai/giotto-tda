@@ -45,10 +45,6 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
     ----------
     n_channels_ : int
 
-    function_ : callable
-        Function used to transform single-channel curves into scalar
-        features. Set in :meth:`fit`.
-
     effective_function_params_ : dict
         Dictionary containing all information present in `function_params` as
         well as on any relevant quantities computed in :meth:`fit`.
@@ -120,17 +116,13 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         self : object
 
         """
-        check_array(X, allow_nd=True)
-        if X.ndim != 3:
-            raise ValueError("Input must be 3-dimensional with shape "
-                             "(n_samples, n_channels, n_bins).")
+        check_array(X, ensure_2d=True, allow_nd=True)
         self._validate_params()
 
         self.n_channels_ = X.shape[-2]
 
         if isinstance(self.function, str):
             self._function = _implemented_function_recipes[self.function]
-            self.function_ = tuple([self._function] * self.n_channels_)
 
             if self.function_params is None:
                 self.effective_function_params_ = {}
@@ -141,7 +133,14 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         else:
             if isinstance(self.function, FunctionType):
-                self.function_ = tuple([self.function] * self.n_channels_)
+                self._function = tuple([self.function] * self.n_channels_)
+                if self.function_params is None:
+                    self.effective_function_params_ = \
+                        tuple([{}] * self.n_channels_)
+                else:
+                    self.effective_function_params_ = \
+                        tuple(self.function_params.copy()
+                              for _ in range(self.n_channels_))
             else:
                 n_functions = len(self.function)
                 if len(self.function) != self.n_channels_:
@@ -149,30 +148,34 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                         f"`function` has length {n_functions} while curves in "
                         f"`X` have {self.n_channels_} channels."
                         )
-                if self.function_params is not None:
-                    if len(self.function_params) != self.n_channels_:
-                        raise ValueError(
-                            f"`function_params` has length {n_functions} "
-                            f"while curves in `X` have {self.n_channels_} "
-                            f"channels."
-                            )
-                    self.function_ = []
-                    self.effective_function_params_ = []
-                    for f, p in zip(self.function, self.function_params):
-                        if isinstance(f, str):
-                            validate_params(p, _AVAILABLE_FUNCTIONS[f])
-                        self.function_.append(f)
-                        self.effective_function_params_.append({} if p is None
-                                                               else p.copy())
-                    self.function_ = tuple(self.function_)
-                    self.effective_function_params_ = \
-                        tuple(self.effective_function_params_)
-                    self.function_ = tuple(self.function_)
-                else:
-                    self.effective_function_params_ = \
-                        tuple([{}] * self.n_channels_)
 
-            self._function = self.function_
+                if self.function_params is None:
+                    self._effective_function_params = [{}] * self.n_channels_
+                else:
+                    self._effective_function_params = self.function_params
+
+                n_function_params = len(self._effective_function_params)
+                if n_function_params != self.n_channels_:
+                    raise ValueError(
+                        f"`function_params` has length {n_function_params} "
+                        f"while curves in `X` have {self.n_channels_} "
+                        f"channels."
+                        )
+
+                self._function = []
+                self.effective_function_params_ = []
+                for f, p in zip(self.function,
+                                self._effective_function_params):
+                    if isinstance(f, str):
+                        validate_params(p, _AVAILABLE_FUNCTIONS[f])
+                        self._function.append(_implemented_function_recipes[f])
+                    else:
+                        self._function.append(f)
+                    self.effective_function_params_.append({} if p is None
+                                                           else p.copy())
+                self._function = tuple(self._function)
+                self.effective_function_params_ = \
+                    tuple(self.effective_function_params_)
 
         return self
 
@@ -197,12 +200,13 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_array(X, allow_nd=True)
+        Xt = check_array(X, ensure_2d=True, allow_nd=True)
         if Xt.shape[-2] != self.n_channels_:
             raise ValueError(f"Number of channels must be the same as in "
                              f"`fit`. Passed {Xt.shape[-2]}, expected "
                              f"{self.n_channels_}.")
 
+        print(self.effective_function_params_)
         Xt = _parallel_featurization(Xt, self._function,
                                      self.effective_function_params_,
                                      self.n_jobs)

@@ -33,7 +33,7 @@ def test_standard_invalid_shape():
     sf = StandardFeatures()
 
     with pytest.raises(ValueError):
-        sf.fit(np.empty((1, 2, 3, 4)))
+        sf.fit(np.empty(2))
 
 
 def test_standard_transform_channels_different_from_fit_channels():
@@ -88,12 +88,6 @@ def test_standard_shape_function_list_with_none():
     sf.set_params(function="max")
 
     assert_almost_equal(Xt, sf.fit_transform(X)[:, [1]])
-
-
-@pytest.mark.parametrize("function", [np.max, scalar_fn, [scalar_fn, np.max]])
-def test_standard_function_params_ignored(function):
-    sf = StandardFeatures(function=function, function_params={"param": 2})
-    sf.fit(X)
 
 
 X_res = {
