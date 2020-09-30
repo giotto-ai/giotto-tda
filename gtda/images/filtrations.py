@@ -1080,7 +1080,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in :meth:`fit`.
 
-    mask_ : ndarray of shape (radius, radius, [, radius])
+    mask_ : ndarray of shape (radius, radius [, radius])
         The mask applied around each pixel to calculate the weighted number of
         its activated neighbors. Set in :meth:`fit`.
 
