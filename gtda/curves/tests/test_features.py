@@ -29,11 +29,15 @@ def test_standard_not_fitted():
         sf.transform(X)
 
 
-def test_standard_invalid_shape():
+@pytest.mark.parametrize("shape", [(2,), (2, 3), (2, 3, 4, 5)])
+def test_standard_invalid_shape(shape):
     sf = StandardFeatures()
 
-    with pytest.raises(ValueError):
-        sf.fit(np.empty(2))
+    with pytest.raises(ValueError, match="Input must be 3-dimensional."):
+        sf.fit(np.empty(shape))
+
+    with pytest.raises(ValueError, match="Input must be 3-dimensional."):
+        sf.fit(X).transform(np.empty(shape))
 
 
 def test_standard_transform_channels_different_from_fit_channels():
