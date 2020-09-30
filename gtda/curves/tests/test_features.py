@@ -36,6 +36,13 @@ def test_standard_invalid_shape():
         sf.fit(np.empty((1, 2, 3, 4)))
 
 
+def test_standard_transform_channels_different_from_fit_channels():
+    sf = StandardFeatures()
+
+    with pytest.raises(ValueError):
+        sf.fit(X).transform(X[:, :-1, :])
+
+
 def test_standard_invalid_function_params():
     sf = StandardFeatures(function_params={"param": 2})
 
