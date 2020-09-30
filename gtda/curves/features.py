@@ -58,7 +58,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+        processors. Ignored if `function` is one of the allowed string options.
 
     Attributes
     ----------
@@ -157,51 +157,47 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                                 _AVAILABLE_FUNCTIONS[self.function])
                 self.effective_function_params_ = self.function_params.copy()
 
-        else:
-            if isinstance(self.function, FunctionType):
-                self._function = tuple([self.function] * self.n_channels_)
-                if self.function_params is None:
-                    self.effective_function_params_ = \
-                        tuple([{}] * self.n_channels_)
-                else:
-                    self.effective_function_params_ = \
-                        tuple(self.function_params.copy()
-                              for _ in range(self.n_channels_))
-            else:
-                n_functions = len(self.function)
-                if len(self.function) != self.n_channels_:
-                    raise ValueError(
-                        f"`function` has length {n_functions} while curves in "
-                        f"`X` have {self.n_channels_} channels."
-                        )
-
-                if self.function_params is None:
-                    self._effective_function_params = [{}] * self.n_channels_
-                else:
-                    self._effective_function_params = self.function_params
-
-                n_function_params = len(self._effective_function_params)
-                if n_function_params != self.n_channels_:
-                    raise ValueError(
-                        f"`function_params` has length {n_function_params} "
-                        f"while curves in `X` have {self.n_channels_} "
-                        f"channels."
-                        )
-
-                self._function = []
-                self.effective_function_params_ = []
-                for f, p in zip(self.function,
-                                self._effective_function_params):
-                    if isinstance(f, str):
-                        validate_params(p, _AVAILABLE_FUNCTIONS[f])
-                        self._function.append(_implemented_function_recipes[f])
-                    else:
-                        self._function.append(f)
-                    self.effective_function_params_.append({} if p is None
-                                                           else p.copy())
-                self._function = tuple(self._function)
+        elif isinstance(self.function, FunctionType):
+            self._function = tuple([self.function] * self.n_channels_)
+            if self.function_params is None:
                 self.effective_function_params_ = \
-                    tuple(self.effective_function_params_)
+                    tuple([{}] * self.n_channels_)
+            else:
+                self.effective_function_params_ = \
+                    tuple(self.function_params.copy()
+                          for _ in range(self.n_channels_))
+        else:
+            n_functions = len(self.function)
+            if len(self.function) != self.n_channels_:
+                raise ValueError(
+                    f"`function` has length {n_functions} while curves in `X` "
+                    f"have {self.n_channels_} channels."
+                    )
+            if self.function_params is None:
+                self._effective_function_params = [{}] * self.n_channels_
+            else:
+                self._effective_function_params = self.function_params
+
+            n_function_params = len(self._effective_function_params)
+            if n_function_params != self.n_channels_:
+                raise ValueError(
+                    f"`function_params` has length {n_function_params} while "
+                    f"curves in `X` have {self.n_channels_} channels."
+                    )
+
+            self._function = []
+            self.effective_function_params_ = []
+            for f, p in zip(self.function, self._effective_function_params):
+                if isinstance(f, str):
+                    validate_params(p, _AVAILABLE_FUNCTIONS[f])
+                    self._function.append(_implemented_function_recipes[f])
+                else:
+                    self._function.append(f)
+                self.effective_function_params_.append({} if p is None
+                                                       else p.copy())
+            self._function = tuple(self._function)
+            self.effective_function_params_ = \
+                tuple(self.effective_function_params_)
 
         return self
 
