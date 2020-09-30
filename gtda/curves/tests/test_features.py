@@ -7,7 +7,7 @@ from sklearn.exceptions import NotFittedError
 
 from gtda.curves import StandardFeatures
 
-# Generated on 30.09.2020 by
+# Generated on 30/09/2020 by
 # np.random.seed(0); X = np.random.rand(3, 2, 20)
 X = np.array([[[0.5488135, 0.71518937, 0.60276338, 0.54488318, 0.4236548,
                 0.64589411, 0.43758721, 0.891773, 0.96366276, 0.38344152,
