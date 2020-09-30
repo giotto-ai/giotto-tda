@@ -64,7 +64,9 @@ class HeightFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    gtda.homology.CubicalPersistence, Binarizer
+    RadialFiltration, DilationFiltration, ErosionFiltration, \
+    SignedDistanceFiltration, DensityFiltration, \
+    gtda.homology.CubicalPersistence
 
     References
     ----------
@@ -288,7 +290,9 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    gtda.homology.CubicalPersistence, Binarizer
+    HeightFiltration, DilationFiltration, ErosionFiltration, \
+    SignedDistanceFiltration, DensityFiltration, \
+    gtda.homology.CubicalPersistence
 
     References
     ----------
@@ -501,7 +505,9 @@ class DilationFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    gtda.homology.CubicalPersistence, Binarizer
+    HeightFiltration, RadialFiltration, ErosionFiltration, \
+    SignedDistanceFiltration, DensityFiltration, \
+    gtda.homology.CubicalPersistence
 
     References
     ----------
@@ -693,7 +699,9 @@ class ErosionFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    gtda.homology.CubicalPersistence, Binarizer
+    HeightFiltration, RadialFiltration, DilationFiltration, \
+    SignedDistanceFiltration, DensityFiltration, \
+    gtda.homology.CubicalPersistence
 
     References
     ----------
@@ -887,8 +895,8 @@ class SignedDistanceFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    gtda.homology.CubicalPersistence, Binarizer, ErosionFiltration, \
-    DilationFiltration
+    HeightFiltration, RadialFiltration, DilationFiltration, \
+    ErosionFiltration, DensityFiltration, gtda.homology.CubicalPersistence
 
     References
     ----------
@@ -1086,7 +1094,9 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    gtda.homology.CubicalPersistence, Binarizer
+    HeightFiltration, RadialFiltration, DilationFiltration, \
+    ErosionFiltration, SignedDistanceFiltration, \
+    gtda.homology.CubicalPersistence
 
     References
     ----------
