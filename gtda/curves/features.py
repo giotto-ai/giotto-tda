@@ -161,6 +161,10 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
+        if Xt.shape[-2] != self.n_channels_:
+            raise ValueError(f"Number of channels must be the same as in "
+                             f"`fit`. Passed {Xt.shape[-2]}, expected "
+                             f"{self.n_channels_}.")
 
         Xt = _parallel_featurization(Xt, self._function,
                                      self.effective_function_params_,
