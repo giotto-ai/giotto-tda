@@ -7,8 +7,8 @@ from sklearn.exceptions import NotFittedError
 
 from gtda.curves import StandardFeatures
 
-np.random.seed(0)
-X = np.random.rand(3, 2, 20)
+rng = np.random.default_rng()
+X = rng.random((3, 2, 20))
 
 
 def scalar_fn(x):
@@ -68,6 +68,14 @@ def test_standard_invalid_function_function_params():
 
     sf.set_params(function=["max", "min"], function_params={})
     with pytest.raises(TypeError, match="If `function` is a list/tuple"):
+        sf.fit(X)
+
+    sf.set_params(function_params=[{}])
+    with pytest.raises(ValueError, match="`function_params` has length"):
+        sf.fit(X)
+
+    sf.set_params(function=["max"], function_params=None)
+    with pytest.raises(ValueError, match="`function` has length"):
         sf.fit(X)
 
 
@@ -157,3 +165,24 @@ def test_standard_transform_mixed_vector_scalar(n_jobs):
     Xt = sf.fit_transform(X)
 
     assert_almost_equal(Xt, X[:, 1, :])
+
+
+def test_standard_transform_function_params():
+    weights = np.zeros(X.shape[-1])
+    weights[0] = 1
+    sf = StandardFeatures(function="average",
+                          function_params={"weights": weights})
+    Xt = sf.fit_transform(X)
+
+    assert_almost_equal(Xt, X[:, :, 0])
+
+    sf.set_params(function=np.average)
+    Xt = sf.fit_transform(X)
+
+    assert_almost_equal(Xt, X[:, :, 0])
+
+    sf.set_params(function=[np.average, np.average],
+                  function_params=[{"weights": weights}, {"weights": weights}])
+    Xt = sf.fit_transform(X)
+
+    assert_almost_equal(Xt, X[:, :, 0])
