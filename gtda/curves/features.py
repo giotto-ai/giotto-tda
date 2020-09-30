@@ -1,7 +1,7 @@
 """Feature extraction from curves."""
 # License: GNU AGPLv3
 
-from inspect import signature
+from copy import deepcopy
 from types import FunctionType
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -59,7 +59,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                      "in": tuple(_AVAILABLE_FUNCTIONS.keys()),
                      "of": {"type": (str, FunctionType, type(None)),
                             "in": tuple(_AVAILABLE_FUNCTIONS.keys())}},
-        "function_params": {"type": (dict, type(None))},
+        "function_params": {"type": (dict, type(None), list, tuple)},
         }
 
     def __init__(self, function="max", function_params=None, n_jobs=None):
@@ -68,17 +68,36 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         self.n_jobs = n_jobs
 
     def _validate_params(self):
-        try:
-            validate_params(
-                self.get_params(), self._hyperparameters, exclude=["n_jobs"])
-        # Another go if we fail because function is or contains instances of
-        # FunctionType and the "in" key checks fail
-        except ValueError:
-            _hyperparameters = self._hyperparameters.copy()
+        params = self.get_params().copy()
+        _hyperparameters = deepcopy(self._hyperparameters)
+        if not isinstance(self.function, str):
             _hyperparameters["function"].pop("in")
-            _hyperparameters["function"]["of"].pop("in")
-            validate_params(
-                self.get_params(), _hyperparameters, exclude=["n_jobs"])
+        try:
+            validate_params(params, _hyperparameters, exclude=["n_jobs"])
+        # Another go if we fail because function is a list/tuple containing
+        # instances of FunctionType and the "in" key checks fail
+        except ValueError as ve:
+            end_string = f"which is not in " \
+                         f"{tuple(_AVAILABLE_FUNCTIONS.keys())}."
+            function = params["function"]
+            if ve.args[0].endswith(end_string) \
+                    and isinstance(function, (list, tuple)):
+                params["function"] = [f for f in function
+                                      if isinstance(f, str)]
+                validate_params(params, _hyperparameters, exclude=["n_jobs"])
+            else:
+                raise ve
+
+        if isinstance(self.function, (list, tuple)) \
+                and isinstance(self.function_params, dict):
+            raise TypeError("If `function` is a list/tuple then "
+                            "`function_params` must be a list/tuple of dict, "
+                            "or None.")
+        elif isinstance(self.function, (str, FunctionType)) \
+                and isinstance(self.function_params, (list, tuple)):
+            raise TypeError("If `function` is a string or a callable "
+                            "function then `function_params` must be a dict "
+                            "or None.")
 
     def fit(self, X, y=None):
         """Compute :attr:`function_` and :attr:`effective_function_params_`.
@@ -116,16 +135,13 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
             if self.function_params is None:
                 self.effective_function_params_ = {}
             else:
+                validate_params(self.function_params,
+                                _AVAILABLE_FUNCTIONS[self.function])
                 self.effective_function_params_ = self.function_params.copy()
-            validate_params(self.effective_function_params_,
-                            _AVAILABLE_FUNCTIONS[self.function])
+
         else:
             if isinstance(self.function, FunctionType):
                 self.function_ = tuple([self.function] * self.n_channels_)
-                if "axis" in signature(self.function).parameters:
-                    self._function = self.function
-                else:
-                    self._function = self.function_
             else:
                 n_functions = len(self.function)
                 if len(self.function) != self.n_channels_:
@@ -133,9 +149,30 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                         f"`function` has length {n_functions} while curves in "
                         f"`X` have {self.n_channels_} channels."
                         )
-                self.function_ = tuple(self.function)
-                self._function = self.function_
-            self.effective_function_params_ = {}
+                if self.function_params is not None:
+                    if len(self.function_params) != self.n_channels_:
+                        raise ValueError(
+                            f"`function_params` has length {n_functions} "
+                            f"while curves in `X` have {self.n_channels_} "
+                            f"channels."
+                            )
+                    self.function_ = []
+                    self.effective_function_params_ = []
+                    for f, p in zip(self.function, self.function_params):
+                        if isinstance(f, str):
+                            validate_params(p, _AVAILABLE_FUNCTIONS[f])
+                        self.function_.append(f)
+                        self.effective_function_params_.append({} if p is None
+                                                               else p.copy())
+                    self.function_ = tuple(self.function_)
+                    self.effective_function_params_ = \
+                        tuple(self.effective_function_params_)
+                    self.function_ = tuple(self.function_)
+                else:
+                    self.effective_function_params_ = \
+                        tuple([{}] * self.n_channels_)
+
+            self._function = self.function_
 
         return self
 

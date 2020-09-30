@@ -99,10 +99,9 @@ def _validate_params(parameters, references, rec_name=None):
 
         # Check that _parameter has the correct type
         if not ((_ref_type is None) or isinstance(_parameter, _ref_type)):
-            raise TypeError(
-                f"Parameter `{_name}` is of type {type(_parameter)} while it "
-                f"should be of type {_ref_type}."
-                )
+            raise TypeError(f"Parameter `{_name}` is of type "
+                            f"{type(_parameter)} while it should be of type "
+                            f"{_ref_type}.")
 
         # If neither the reference type is list, tuple, np.ndarray or dict,
         # nor _parameter is an instance of one of these types, the checks are
@@ -113,9 +112,8 @@ def _validate_params(parameters, references, rec_name=None):
             ref_other = _reference.get('other', None)
             if _parameter is not None:
                 if not ((ref_in is None) or _parameter in ref_in):
-                    raise ValueError(
-                        f"Parameter `{_name}` is {_parameter}, which is not "
-                        f"in {ref_in}.")
+                    raise ValueError(f"Parameter `{_name}` is {_parameter}, "
+                                     f"which is not in {ref_in}.")
             # Perform any other checks via the callable ref_others
             if ref_other is not None:
                 return ref_other(_parameter)
@@ -128,10 +126,9 @@ def _validate_params(parameters, references, rec_name=None):
     for name, parameter in parameters.items():
         if name not in references.keys():
             name_extras = "" if rec_name is None else f" in `{rec_name}`"
-            raise KeyError(
-                f"`{name}`{name_extras} is not an available parameter. "
-                f"Available parameters are in {tuple(references.keys())}."
-                )
+            raise KeyError(f"`{name}`{name_extras} is not an available "
+                           f"parameter. Available parameters are in "
+                           f"{tuple(references.keys())}.")
 
         reference = references[name]
         ref_type = _validate_params_single(parameter, reference, name)
@@ -205,10 +202,9 @@ def _check_array_mod(X, **kwargs):
     if not kwargs.get('force_all_finite', True):
         Xnew = check_array(X, **kwargs)
         if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
-            raise ValueError(
-                "Input contains NaNs. Only finite values and infinity are "
-                "allowed when parameter `force_all_finite` is False."
-                )
+            raise ValueError("Input contains NaNs. Only finite values and "
+                             "infinity are allowed when parameter "
+                             "`force_all_finite` is False.")
         return Xnew
     return check_array(X, **kwargs)
 

@@ -39,20 +39,42 @@ def test_standard_invalid_shape():
 def test_standard_transform_channels_different_from_fit_channels():
     sf = StandardFeatures()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Number of channels must be the "
+                                         "same as in `fit`"):
         sf.fit(X).transform(X[:, :-1, :])
 
 
-def test_standard_invalid_function_params():
-    sf = StandardFeatures(function_params={"param": 2})
+def test_standard_invalid_function_function_params():
+    sf = StandardFeatures(function="wrong")
+    with pytest.raises(ValueError):
+        sf.fit(X)
 
+    sf.set_params(function=0)
+    with pytest.raises(TypeError):
+        sf.fit(X)
+
+    sf.set_params(function="max", function_params={"param": 2})
     with pytest.raises(KeyError):
+        sf.fit(X)
+
+    sf.set_params(function_params=[])
+    with pytest.raises(TypeError, match="If `function` is a string or a "
+                                        "callable function"):
+        sf.fit(X)
+
+    sf.set_params(function=["wrong", "max"])
+    with pytest.raises(ValueError, match="which is not in"):
+        sf.fit(X)
+
+    sf.set_params(function=["max", "min"], function_params={})
+    with pytest.raises(TypeError, match="If `function` is a list/tuple"):
         sf.fit(X)
 
 
 @pytest.mark.parametrize("function", ["argmax", "argmin", "min", "max", "mean",
                                       "std", "median", "average", np.max,
-                                      scalar_fn, [scalar_fn, np.max]])
+                                      scalar_fn, [scalar_fn, "max"],
+                                      [scalar_fn, np.max]])
 def test_standard_shape_scalar_function(function):
     sf = StandardFeatures(function=function)
     Xt = sf.fit_transform(X)
