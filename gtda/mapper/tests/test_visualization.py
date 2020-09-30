@@ -4,6 +4,7 @@
 from unittest import TestCase
 
 import numpy as np
+import pandas as pd
 import plotly.io as pio
 import pytest
 
@@ -21,7 +22,8 @@ class TestCaseNoTemplate(TestCase):
 
 N = 50
 d = 3
-X = np.random.randn(N, d)
+X_arr = np.random.randn(N, d)
+X_df = pd.DataFrame(X_arr, columns=["a", "b", "c"])
 colors = np.random.randint(0, 10, N)
 
 viridis_colorscale = ((0.0, '#440154'),
@@ -40,8 +42,9 @@ hsl_colorscale = ['hsl(19.0, 96.0%, 67.0%)',
                   'hsl(203.0, 51.0%, 71.0%)']
 
 
+@pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_valid_layout_dim(layout_dim):
+def test_valid_layout_dim(X, layout_dim):
     pipe = make_mapper_pipeline()
     fig = plot_static_mapper_graph(pipe, X, layout_dim=layout_dim)
     edge_trace = fig.data[0]
@@ -50,21 +53,24 @@ def test_valid_layout_dim(layout_dim):
     assert is_z_present if layout_dim == 3 else not is_z_present
 
 
+@pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("layout_dim", [1, 4])
-def test_invalid_layout_dim(layout_dim):
+def test_invalid_layout_dim(X, layout_dim):
     with pytest.raises(ValueError):
         pipe = make_mapper_pipeline()
         _ = plot_static_mapper_graph(pipe, X, layout_dim=layout_dim)
 
 
-def test_invalid_layout_algorithm():
+@pytest.mark.parametrize("X", [X_arr, X_df])
+def test_invalid_layout_algorithm(X):
     with pytest.raises(KeyError):
         pipe = make_mapper_pipeline()
         _ = plot_static_mapper_graph(pipe, X, layout="foobar")
 
 
+@pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_valid_hoverlabel_bgcolor(layout_dim):
+def test_valid_hoverlabel_bgcolor(X, layout_dim):
     pipe = make_mapper_pipeline()
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim,
@@ -73,7 +79,8 @@ def test_valid_hoverlabel_bgcolor(layout_dim):
     assert fig.data[1]["hoverlabel"]["bgcolor"] == "white"
 
 
-def test_unsuitable_colorscale_for_hoverlabel_3d():
+@pytest.mark.parametrize("X", [X_arr, X_df])
+def test_unsuitable_colorscale_for_hoverlabel_3d(X):
     pipe = make_mapper_pipeline()
     with pytest.warns(RuntimeWarning):
         _ = plot_static_mapper_graph(
@@ -82,7 +89,8 @@ def test_unsuitable_colorscale_for_hoverlabel_3d():
             )
 
 
-def test_valid_colorscale():
+@pytest.mark.parametrize("X", [X_arr, X_df])
+def test_valid_colorscale(X):
     pipe = make_mapper_pipeline()
 
     fig_2d = plot_static_mapper_graph(
@@ -108,9 +116,10 @@ def test_valid_colorscale():
     assert marker_colorscale != marker_colorscale_default
 
 
+@pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("color_variable", [None, colors])
 @pytest.mark.parametrize("node_color_statistic", [None, np.max])
-def test_colors_same_2d_3d(color_variable, node_color_statistic):
+def test_colors_same_2d_3d(X, color_variable, node_color_statistic):
     pipe = make_mapper_pipeline()
     fig_2d = plot_static_mapper_graph(
         pipe, X, layout_dim=2, color_variable=color_variable,
@@ -123,8 +132,10 @@ def test_colors_same_2d_3d(color_variable, node_color_statistic):
     assert fig_2d.data[1].marker.color == fig_3d.data[1].marker.color
 
 
+@pytest.mark.parametrize("X, columns", [(X_arr, range(X_arr.shape[1])),
+                                        (X_df, X_df.columns)])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_color_by_column_dropdown_2d(layout_dim):
+def test_color_by_column_dropdown_2d(X, columns, layout_dim):
     pipe = make_mapper_pipeline()
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim, color_by_columns_dropdown=True
@@ -132,14 +143,14 @@ def test_color_by_column_dropdown_2d(layout_dim):
     fig_buttons = fig.layout.updatemenus[0].buttons
 
     assert list(fig.data[1].marker.color) == \
-        list(fig_buttons[0].args[0]["marker.color"][1])
+           list(fig_buttons[0].args[0]["marker.color"][1])
 
-    for i in range(X.shape[1]):
-        fig_col_i = plot_static_mapper_graph(
-            pipe, X, layout_dim=layout_dim, color_variable=i
+    for i, col in enumerate(columns):
+        fig_col = plot_static_mapper_graph(
+            pipe, X, layout_dim=layout_dim, color_variable=col
             )
-        assert list(fig_col_i.data[1].marker.color) == \
-            list(fig_buttons[i + 1].args[0]["marker.color"][1])
+        assert list(fig_col.data[1].marker.color) == \
+               list(fig_buttons[i + 1].args[0]["marker.color"][1])
 
 
 def _get_size_from_hovertext(s):
@@ -197,9 +208,10 @@ def _get_widgets_by_trait(fig, key, val=None):
     return widgets
 
 
+@pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("clone_pipeline", [False, True])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_pipeline_cloned(clone_pipeline, layout_dim):
+def test_pipeline_cloned(X, clone_pipeline, layout_dim):
     """Verify that the pipeline is changed on interaction if and only if
     `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
     # TODO: Monitor development of the ipytest project to convert these into
