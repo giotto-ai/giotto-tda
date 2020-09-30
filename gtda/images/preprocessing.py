@@ -595,7 +595,6 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
             raise ValueError(f"Input of `fit` contains arrays of dimension "
                              f"{self.n_dimensions_}.")
 
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -616,13 +615,12 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_pixels_x * n_pixels_y [* \
-            n_pixels_z],
-            n_dimensions)
+            n_pixels_z], n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
             point cloud in ``n_dimensions``-dimensional space.
 
         """
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
 
         Xt = np.swapaxes(np.flip(Xt, axis=1), 1, 2)
