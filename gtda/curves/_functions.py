@@ -1,6 +1,8 @@
 # License: GNU AGPLv3
 
 from itertools import product
+from warnings import simplefilter
+
 import numpy as np
 from joblib import Parallel, delayed
 
@@ -40,7 +42,8 @@ def _parallel_featurization(Xt, function, function_params, n_jobs):
             delayed(function[tup[-1]])(Xt[tup], **function_params[tup[-1]])
             for tup in index_tups
             )
-        Xt = np.array(Xt)
+        with simplefilter("ignore", category=DeprecationWarning):
+            Xt = np.array(Xt)
         if Xt.dtype == np.dtype('object'):
             Xt = np.concatenate(list(map(np.ravel, Xt)))
 
