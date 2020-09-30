@@ -24,6 +24,16 @@ images_3D = np.stack([np.ones((3, 4, 2)),
                       np.zeros((3, 4, 2))], axis=0)
 
 
+@pytest.mark.parametrize("transformer",
+                         [HeightFiltration(), RadialFiltration(),
+                          DilationFiltration(), ErosionFiltration(),
+                          SignedDistanceFiltration(), DensityFiltration()])
+def test_invalid_input_shape(transformer):
+    X = np.ones((1, 1, 1, 1, 1))
+    with pytest.raises(ValueError, match="Input of `fit`"):
+        transformer.fit(X)
+
+
 def test_height_not_fitted():
     height = HeightFiltration()
     with pytest.raises(NotFittedError):
@@ -319,3 +329,7 @@ def test_density_transform(radius, images, expected):
 
     assert_almost_equal(density.fit_transform(images),
                         expected)
+
+
+def test_density_fit_transform_plot():
+    DensityFiltration().fit_transform_plot(images_2D, sample=0)
