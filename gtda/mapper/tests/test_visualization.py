@@ -164,7 +164,7 @@ class TestStaticPlot(TestCaseNoTemplate):
         """Verify that what we see in the graph corresponds to
         the number of samples in the graph."""
         pipe = make_mapper_pipeline()
-        fig = plot_static_mapper_graph(pipe, X,
+        fig = plot_static_mapper_graph(pipe, X_arr,
                                        color_variable=colors,
                                        clone_pipeline=False)
         node_trace_x = fig.data[1].x
@@ -173,7 +173,7 @@ class TestStaticPlot(TestCaseNoTemplate):
         assert node_trace_x.shape[0] == node_trace_y.shape[0]
 
         num_nodes = node_trace_x.shape[0]
-        assert len(X) >= num_nodes
+        assert len(X_arr) >= num_nodes
 
         fig_colors = fig.data[1].marker.color
         assert len(fig_colors) == num_nodes
@@ -182,13 +182,13 @@ class TestStaticPlot(TestCaseNoTemplate):
         """Verify that the total number of calculated clusters is equal to
         the number of displayed clusters."""
         pipe = make_mapper_pipeline(clusterer=FirstSimpleGap())
-        fig = plot_static_mapper_graph(pipe, X)
+        fig = plot_static_mapper_graph(pipe, X_arr)
         node_trace = fig.data[1]
 
         node_sizes_vis = [_get_size_from_hovertext(ht) for ht in
                           node_trace.hovertext]
 
-        g = pipe.fit_transform(X)
+        g = pipe.fit_transform(X_arr)
         node_size_real = [len(node) for node in g.vs['node_elements']]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
