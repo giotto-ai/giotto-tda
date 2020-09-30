@@ -19,6 +19,10 @@ def vector_fn(x):
     return x
 
 
+def vector_fn_2(x):
+    return x[:-1]
+
+
 def test_standard_not_fitted():
     sf = StandardFeatures()
     with pytest.raises(NotFittedError):
@@ -110,7 +114,6 @@ def test_standard_transform(function, n_jobs):
 
 @pytest.mark.parametrize("n_jobs", [1, 2])
 def test_standard_transform_mixed_vector(n_jobs):
-    vector_fn_2 = lambda x: vector_fn(x)[:-1]
     sf = StandardFeatures(function=[vector_fn, vector_fn_2], n_jobs=n_jobs)
     Xt = sf.fit_transform(X)
 
