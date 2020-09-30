@@ -7,7 +7,7 @@ from sklearn.exceptions import NotFittedError
 
 from gtda.curves import StandardFeatures
 
-rng = np.random.default_rng()
+rng = np.random.default_rng(0)
 X = rng.random((3, 2, 20))
 
 
