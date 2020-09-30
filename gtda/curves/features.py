@@ -17,24 +17,43 @@ from ..utils.validation import validate_params
 class StandardFeatures(BaseEstimator, TransformerMixin):
     """Standard features from multi-channel curves.
 
-    Applies functions to extract features from each channel in each
-    multi-channel curve in a collection.
+    A multi-channel (sampled) curve is a 2D array of shape
+    ``(n_channels, n_samplings)``, where each row represents the y-values in
+    one of channels. This transformer applies scalar or vector-valued functions
+    channel-wise to extract features from a collection of multi-channel curves,
+    of shape ``(n_samples, n_channels, n_samplings)``. The output is always a
+    2D array such that row ``i`` is the concatenation of the outputs of the
+    chosen functions on the channels in the ``i``-th (multi-)curve in the
+    collection.
 
     Parameters
     ----------
-    function : string or callable, optional, default: ``max``
-        Function to transform a single-channel curve into scalar features per
-        channel. Implemented functions are [``"identity"``, ``"argmin"``,
-        `"argmax"``, ``"min"``, ``"max"``, ``"mean"``, ``"std"``, ``"median"``,
-        ``"average"``].
+    function : string, callable, list or tuple, optional, default: ``"max"``
+        Function or list/tuple of functions to apply to each channel of each
+        multi-channel curve. Functions can map to scalars or to 1D arrays. If a
+        string (see below) or a callable, then the same function is applied to
+        all channels. Otherwise, `function` is a list/tuple of the same length
+        as the number of entries along axis 1 in the collection passed to
+        :meth:`fit`. Lists/tuples may contain allowed strings (see below),
+        callables, and ``None`` in some positions to indicate that no feature
+        should be extracted from the corresponding channel. Available strings
+        are ``"identity"``, ``"argmin"``, ``"argmax"``, ``"min"``, ``"max"``,
+        ``"mean"``, ``"std"``, ``"median"`` and ``"average"``.
 
-    function_params : dict, optional, default: ``None``
-        Additional keyword arguments for `function`. Passing ``None`` is
-        equivalent to passing no arguments. Additionally:
+    function_params : dict, None, list or tuple, optional, default: ``None``
+        Additional keyword arguments for the function or functions in
+        `function`. Passing ``None`` is equivalent to passing no arguments.
+        Otherwise, if `function` is a single string or callable then
+        `function_params` must be a dictionary. For functions encoded by
+        allowed strings, the dictionary keys are as follows:
 
-        - If ``function == "average"``, the only argument is `weights`
+        - If ``function == "average"``, the only key is ``"weights"``
           (np.ndarray or None, default: ``None``).
-        - Otherwise, there are no arguments.
+        - Otherwise, there are no allowed keys.
+
+        If `function` is a list or tuple, `function_params` must be a list or
+        tuple of dictionaries (or ``None``) as above, of the same length as
+        `function`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -44,10 +63,15 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     n_channels_ : int
+        Number of channels present in the 3D array passed to :meth:`fit`. Must
+        match the number of channels in the 3D array passed to
+        :meth:`transform`.
 
-    effective_function_params_ : dict
-        Dictionary containing all information present in `function_params` as
-        well as on any relevant quantities computed in :meth:`fit`.
+    effective_function_params_ : dict or tuple
+        Dictionary or tuple of dictionaries containing all information present
+        in `function_params` as well as relevant quantities computed in
+        :meth:`fit`. It is a single dict only when `function` was passed as a
+        string. ``None``s are converted to empty dictionaries.
 
     """
     _hyperparameters = {
@@ -96,7 +120,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                             "or None.")
 
     def fit(self, X, y=None):
-        """Compute :attr:`function_` and :attr:`effective_function_params_`.
+        """Compute :attr:`n_channels_` and :attr:`effective_function_params_`.
         Then, return the estimator.
 
         This function is here to implement the usual scikit-learn API and hence
@@ -104,7 +128,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_channels, n_bins)
+        X : ndarray of shape (n_samples, n_channels, n_samplings)
             Input data. Collection of multi-channel curves.
 
         y : None
@@ -186,7 +210,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_channels, n_bins)
+        X : ndarray of shape (n_samples, n_channels, n_samplings)
             Input collection of multi-channel curves.
 
         y : None
@@ -195,10 +219,10 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_channels * n_features)
-            Output collection of curves features. ``n_features`` denotes the
-            number of features output byt :attr:`function_` for each channel of
-            the multi-channel curve.
+        Xt : ndarray of shape (n_samples, n_features)
+            Output collection of features of multi-channel curves.
+            ``n_features`` is the sum of the number of features output by the
+            (non-``None``) functions on their respective channels.
 
         """
         check_is_fitted(self)
