@@ -1123,6 +1123,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     def _calculate_density(self, X):
         Xd = np.zeros(X.shape)
 
+        # The idea behind this is to sum up pixel values of the image
+        # rolled according to the 3D mask
         for i, j, k in self._iterator:
             Xd += np.roll(np.roll(
                 np.roll(X, k, axis=3), j, axis=2), i, axis=1) \
@@ -1175,11 +1177,14 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             [[0] for _ in range(3 - self.n_dimensions_)]
         self._iterator = tuple(itertools.product(*iterator_size_list))
 
+        # We create a mesh so that we have an array with coordinates and we can
+        # calculate the distance of each point to the center
         mesh_size_list = [np.arange(0, 2 * self._size + 1)] * 3
         self.mesh_ = np.stack(
             np.meshgrid(*mesh_size_list), axis=3).reshape((-1, 3))
 
-        # Set the mask values so that it corresponds to a ball
+        # Calculate those distances to the center and use them to set the mask
+        # values so that it corresponds to a ball
         center = self._size * np.ones((1, 3))
         self.mask_ = pairwise_distances(
             center, self.mesh_, metric=self.metric,
@@ -1187,7 +1192,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
         self.mask_ = self.mask_ <= self.radius
 
-        # Instantiate a padder to handle image boundaries
+        # Instantiate a padder to pad all images with 0 so that the rolling of
+        # the mask also works at the boundary of the images
         padding = np.asarray([*[self._size] * self.n_dimensions_,
                               *[0] * (3 - self.n_dimensions_)])
         self._padder = Padder(padding=padding)
@@ -1221,6 +1227,8 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         Xt = check_array(X, allow_nd=True, copy=True)
 
+        # Reshape the images to 3D so that they can be rolled according to their
+        # 3D mask
         Xt = Xt.reshape((*X.shape[:3], -1))
         Xt = self._padder.transform(Xt)
 
