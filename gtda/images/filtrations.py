@@ -1227,7 +1227,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         Xt = check_array(X, allow_nd=True, copy=True)
 
-        # Reshape the images to 3D so that they can be rolled according to their
+        # Reshape the images to 3D so that they can be rolled according to the
         # 3D mask
         Xt = Xt.reshape((*X.shape[:3], -1))
         Xt = self._padder.transform(Xt)
