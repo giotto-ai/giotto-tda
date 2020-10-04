@@ -144,6 +144,7 @@ jobs:
 
   - script: |
       set -e
+      brew update && brew upgrade
       brew install boost ccache
     displayName: 'Install system dependencies'
 
