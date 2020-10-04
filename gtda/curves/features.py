@@ -164,8 +164,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                     tuple([{}] * self.n_channels_)
             else:
                 self.effective_function_params_ = \
-                    tuple(self.function_params.copy()
-                          for _ in range(self.n_channels_))
+                    tuple([self.function_params.copy()] * self.n_channels_)
         else:
             n_functions = len(self.function)
             if len(self.function) != self.n_channels_:
