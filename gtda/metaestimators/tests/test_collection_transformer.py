@@ -31,7 +31,7 @@ def test_collection_transformer_invalid_transformer():
 
 
 def test_collection_transformer_is_fitted():
-    multi_pca = CollectionTransformer()
+    multi_pca = CollectionTransformer(PCA())
     multi_pca.fit(X_arr)
 
     assert multi_pca._is_fitted
