@@ -24,6 +24,10 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
     fit-transforms a clone of `transformer`. A collection (list or ndarray) of
     outputs is returned.
 
+    Note: to have compatibility with scikit-learn and giotto-tda pipelines, a
+    :meth:`transform` method is also present but it is simply an alias for
+    :meth:`fit_transform`.
+
     Parameters
     ----------
     transformer : object
@@ -160,3 +164,27 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
             Xt = np.asarray(Xt)
 
         return Xt
+
+    def transform(self, X, y=None):
+        """Alias for :meth:`fit_transform`.
+
+        Allows for this class to be used as an intermediate step in a
+        scikit-learn pipeline.
+
+        Parameters
+        ----------
+        X : list of length n_samples, or ndarray of shape (n_samples, ...)
+            Collection of inputs to be fit-transformed by `transformer`.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : list of length n_samples, or ndarray of shape (n_samples, ...)
+            Collection of outputs. It is a list unless all outputs have the
+            same shape, in which case it is converted to an ndarray.
+
+        """
+        return self.fit_transform(X, y)

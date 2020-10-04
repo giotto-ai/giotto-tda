@@ -243,7 +243,8 @@ class ParallelClustering(BaseEstimator):
     def fit_transform(self, X, y=None, **fit_params):
         """Alias for :meth:`fit_predict`.
 
-        Allows for this class to be used as a step in a scikit-learn pipeline.
+        Allows for this class to be used as an intermediate step in a
+        scikit-learn pipeline.
 
         Parameters
         ----------

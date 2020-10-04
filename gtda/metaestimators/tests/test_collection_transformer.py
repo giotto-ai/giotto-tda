@@ -18,14 +18,23 @@ def test_collection_transformer_input_with_nan():
     multi_pca = CollectionTransformer(PCA())
     X = X_arr.copy()
     X[0, 0, 0] = np.nan
+
     with pytest.raises(ValueError):
         multi_pca.fit(X)
 
 
 def test_collection_transformer_invalid_transformer():
     multi_pca = CollectionTransformer(np.mean)
+
     with pytest.raises(ValueError):
         multi_pca.fit(X_arr)
+
+
+def test_collection_transformer_is_fitted():
+    multi_pca = CollectionTransformer()
+    multi_pca.fit(X_arr)
+
+    assert multi_pca._is_fitted
 
 
 def test_collection_transformer_no_baseestimator_warn():
@@ -53,3 +62,10 @@ def test_collection_transformer_fit_transform(X, n_jobs):
     first_few_outputs_actual = Xt[:10]
     first_few_outputs_exp = np.asarray([pca.fit_transform(x) for x in X[:10]])
     assert_almost_equal(first_few_outputs_actual, first_few_outputs_exp)
+
+
+def test_collection_transformer_transform():
+    """Test that transform is an alias of fit-transform."""
+    pca = PCA()
+    assert_almost_equal(CollectionTransformer(pca).fit_transform(X_arr),
+                        CollectionTransformer(pca).transform(X_arr))
