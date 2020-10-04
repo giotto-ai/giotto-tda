@@ -145,7 +145,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
             raise ValueError("Input must be 3-dimensional.")
         self._validate_params()
 
-        self.n_channels_ = X.shape[-2]
+        self.n_channels_ = X.shape[1]
 
         if isinstance(self.function, str):
             self._function = _implemented_function_recipes[self.function]
@@ -224,9 +224,9 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
         if Xt.ndim != 3:
             raise ValueError("Input must be 3-dimensional.")
-        if Xt.shape[-2] != self.n_channels_:
+        if Xt.shape[1] != self.n_channels_:
             raise ValueError(f"Number of channels must be the same as in "
-                             f"`fit`. Passed {Xt.shape[-2]}, expected "
+                             f"`fit`. Passed {Xt.shape[1]}, expected "
                              f"{self.n_channels_}.")
 
         Xt = _parallel_featurization(Xt, self._function,
