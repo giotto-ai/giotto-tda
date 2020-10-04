@@ -767,7 +767,7 @@ class ATOL(BaseEstimator, TransformerMixin):
     """
     _hyperparameters = {
         'quantiser': {'type': str, 'in': _AVAILABLE_QUANTISERS.keys()},
-        'quantiser_params': {'type': dict},
+        'quantiser_params': {'type': (dict, list)},
         'contrast_function': {'type': str,
                               'in': _AVAILABLE_CONTRAST_FUNCTIONS.keys()},
         'weight_function': {'type': (str, type(None)),
@@ -818,6 +818,10 @@ class ATOL(BaseEstimator, TransformerMixin):
             implemented_contrast_recipes[self.contrast_function]
 
         if isinstance(self.quantiser_params, list):
+            if len(self.quantiser_params) != n_dimensions:
+                raise ValueError(f"The number of homology dimensions ("
+                                 f"{n_dimensions}) is different than the "
+                                 "length of quantizer_params.")
             effective_quantiser_params_ = self.quantiser_params
         else:
             effective_quantiser_params_ = \
@@ -850,7 +854,7 @@ class ATOL(BaseEstimator, TransformerMixin):
         for i, dim in enumerate(self.homology_dimensions_):
             Xd_sub = _subdiagrams(X, [dim], remove_dim=True).reshape(-1, 2)
             # Remove diagonal points
-            Xd_sub = Xd_sub[Xd_sub[:, 1] != Xd_sub[:, 0]].reshape(-1, 2)
+            # Xd_sub = Xd_sub[Xd_sub[:, 1] != Xd_sub[:, 0]].reshape(-1, 2)
 
             sample_weight = self._weight_function(Xd_sub)
             quantiser = quantiser_estimator(**effective_quantiser_params_[i])
