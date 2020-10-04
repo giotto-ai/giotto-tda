@@ -18,7 +18,8 @@ This pages contains a list of available features in the library.
    plotting.rst
    base.rst
    pipeline.rst
-   validation.rst
+   metaestimators.rst
+   utils.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning
