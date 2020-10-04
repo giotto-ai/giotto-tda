@@ -8,7 +8,8 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.images import HeightFiltration, RadialFiltration, \
-    DilationFiltration, ErosionFiltration, SignedDistanceFiltration
+   DilationFiltration, ErosionFiltration, SignedDistanceFiltration, \
+   DensityFiltration
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -21,6 +22,16 @@ images_3D = np.stack([np.ones((3, 4, 2)),
                       np.concatenate([np.ones((3, 2, 2)),
                                       np.zeros((3, 2, 2))], axis=1),
                       np.zeros((3, 4, 2))], axis=0)
+
+
+@pytest.mark.parametrize("transformer",
+                         [HeightFiltration(), RadialFiltration(),
+                          DilationFiltration(), ErosionFiltration(),
+                          SignedDistanceFiltration(), DensityFiltration()])
+def test_invalid_input_shape(transformer):
+    X = np.ones((1, 1, 1, 1, 1))
+    with pytest.raises(ValueError, match="Input of `fit`"):
+        transformer.fit(X)
 
 
 def test_height_not_fitted():
@@ -276,3 +287,49 @@ def test_signed_transform(n_iterations, images, expected):
 
 def test_signed_fit_transform_plot():
     SignedDistanceFiltration().fit_transform_plot(images_2D, sample=0)
+
+
+def test_density_not_fitted():
+    density = DensityFiltration()
+    with pytest.raises(NotFittedError):
+        density.transform(images_2D)
+
+
+def test_density_errors():
+    radius = 'a'
+    density = DensityFiltration(radius=radius)
+    with pytest.raises(TypeError):
+        density.fit(images_2D)
+
+
+images_2D_density = np.array(
+    [[[6., 8., 8., 6.], [7., 10., 10., 7.], [6., 8., 8., 6.]],
+     [[5., 5., 3., 1.], [6., 6., 4., 1.], [5., 5., 3., 1.]],
+     [[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 0., 0.]]])
+
+
+images_3D_density = np.array(
+    [[[[10., 10.], [14., 14.], [14., 14.], [10., 10.]],
+      [[13., 13.], [19., 19.], [19., 19.], [13., 13.]],
+      [[10., 10.], [14., 14.], [14., 14.], [10., 10.]]],
+     [[[9., 9.], [9., 9.], [5., 5.], [1., 1.]],
+      [[12., 12.], [12., 12.], [7., 7.], [1., 1.]],
+      [[9., 9.], [9., 9.], [5., 5.], [1., 1.]]],
+     [[[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+      [[0., 0.], [0., 0.], [0., 0.], [0., 0.]]]])
+
+
+@pytest.mark.parametrize("radius, images, expected",
+                         [(2., images_2D, images_2D_density),
+                          (2.2, images_2D, images_2D_density),
+                          (2., images_3D, images_3D_density)])
+def test_density_transform(radius, images, expected):
+    density = DensityFiltration(radius=radius)
+
+    assert_almost_equal(density.fit_transform(images),
+                        expected)
+
+
+def test_density_fit_transform_plot():
+    DensityFiltration().fit_transform_plot(images_2D, sample=0)
