@@ -2,11 +2,12 @@
 persistence diagrams, extract features from them, or compute pairwise
 distances between diagrams."""
 
-from .preprocessing import ForgetDimension, Scaler, Filtering
 from .distance import PairwiseDistance
-from .features import PersistenceEntropy, Amplitude, NumberOfPoints, ATOL
-from .representations import BettiCurve, PersistenceLandscape, HeatKernel, \
-    Silhouette, PersistenceImage
+from .features import PersistenceEntropy, Amplitude, ATOL, ComplexPolynomial,\
+    NumberOfPoints, PersistenceEntropy
+from .preprocessing import Filtering, ForgetDimension, Scaler
+from .representations import BettiCurve, HeatKernel, PersistenceImage,\
+    PersistenceLandscape, Silhouette
 
 __all__ = [
     'ForgetDimension',
@@ -17,6 +18,7 @@ __all__ = [
     'Amplitude',
     'NumberOfPoints',
     'ATOL',
+    'ComplexPolynomial',
     'BettiCurve',
     'PersistenceLandscape',
     'HeatKernel',

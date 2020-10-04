@@ -372,7 +372,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         and topological features at scales larger than this value will not be
         detected.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `max_edge_length`. ``None`` means that this death
         value is declared to be equal to `max_edge_length`.
@@ -592,12 +592,10 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     :ref:`weak alpha filtrations <TODO>`.
 
     Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
-    Euclidean space, or an abstract :ref:`metric space
-    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
-    information about the appearance and disappearance of topological features
-    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
-    dimensions and at different scales is summarised in the corresponding
-    persistence diagram.
+    Euclidean space, information about the appearance and disappearance of
+    topological features (technically, :ref:`homology classes
+    <homology_and_cohomology>`) of various dimensions and at different scales
+    is summarised in the corresponding persistence diagram.
 
     The weak alpha filtration of a point cloud is defined to be the
     :ref:`Vietoris–Rips filtration
@@ -845,12 +843,10 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     `Cech filtrations <cech_complex_and_cech_persistence>`_.
 
     Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
-    Euclidean space, or an abstract :ref:`metric space
-    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
-    information about the appearance and disappearance of topological features
-    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
-    dimensions and at different scales is summarised in the corresponding
-    persistence diagram.
+    Euclidean space, information about the appearance and disappearance of
+    topological features (technically, :ref:`homology classes
+    <homology_and_cohomology>`) of various dimensions and at different scales
+    is summarised in the corresponding persistence diagram.
 
     **Important note**:
 
@@ -1119,7 +1115,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         filtration and topological features at scales larger than this value
         will not be detected.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value `max_edge_weight`. ``None`` means that this death
         value is declared to be equal to `max_edge_weight`.
