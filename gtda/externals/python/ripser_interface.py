@@ -1,7 +1,9 @@
+import gc
 from warnings import warn
 
 import numpy as np
 from scipy import sparse
+from scipy.spatial.distance import squareform
 from sklearn.metrics.pairwise import pairwise_distances
 
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
@@ -21,10 +23,7 @@ def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     else:
         ret = gtda_ripser_coeff.rips_dm(DParam, DParam.shape[0], coeff,
                                         maxHomDim, thresh, do_cocycles)
-    ret_rips = {}
-    ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
-    ret_rips.update({"num_edges": ret.num_edges})
-    return ret_rips
+    return ret
 
 
 def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
@@ -34,10 +33,7 @@ def DRFDMSparse(I, J, V, N, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     else:
         ret = gtda_ripser_coeff.rips_dm_sparse(I, J, V, I.size, N, coeff,
                                                maxHomDim, thresh, do_cocycles)
-    ret_rips = {}
-    ret_rips.update({"births_and_deaths_by_dim": ret.births_and_deaths_by_dim})
-    ret_rips.update({"num_edges": ret.num_edges})
-    return ret_rips
+    return ret
 
 
 def dpoint2pointcloud(X, i, metric):
@@ -172,11 +168,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             second column representing the death time of each pair.
         'num_edges': int
             The number of edges added during the computation
-        'dperm2all': ndarray(n_samples, n_samples) or ndarray (n_perm, \
-            n_samples) if n_perm
-            The distance matrix used in the computation if n_perm is none.
-            Otherwise, the distance from all points in the permutation to
-            all points in the dataset
+        'dperm2all': None or ndarray (n_perm, n_samples)
+            ``None`` if n_perm is ``None``. Otherwise, the distance from all
+            points in the permutation to all points in the dataset.
         'idx_perm': ndarray(n_perm) if n_perm > 0
             Index into the original point cloud of the points used
             as a subsample in the greedy permutation
@@ -237,7 +231,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             dm = X
         else:
             dm = pairwise_distances(X, metric=metric)
-        dperm2all = dm
+        dperm2all = None
 
     n_points = max(dm.shape)
     sort_coo = True
@@ -295,19 +289,21 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             )
     else:
         # Only consider strict upper diagonal
-        idx = np.triu_indices(n_points, 1)
-        DParam = dm[idx].astype(np.float32)
+        DParam = squareform(dm, checks=False).astype(np.float32)
+        # Run garbage collector to free up memory taken by `dm`
+        del dm
+        gc.collect()
         res = DRFDM(DParam, maxdim, thresh, coeff)
 
     # Unwrap persistence diagrams
-    dgms = res["births_and_deaths_by_dim"]
+    dgms = res.births_and_deaths_by_dim
     for dim in range(len(dgms)):
         N = int(len(dgms[dim]) / 2)
         dgms[dim] = np.reshape(np.array(dgms[dim]), [N, 2])
 
     ret = {
         "dgms": dgms,
-        "num_edges": res["num_edges"],
+        "num_edges": res.num_edges,
         "dperm2all": dperm2all,
         "idx_perm": idx_perm,
         "r_cover": r_cover,

@@ -296,7 +296,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
         'metric': {'type': (str, FunctionType)},
         'metric_params': {'type': (dict, type(None))},
         'factor': {'type': Real, 'in': Interval(0, np.inf, closed='both')}
-    }
+        }
 
     def __init__(self, metric='euclidean', metric_params=None, factor=0.,
                  n_jobs=None):
