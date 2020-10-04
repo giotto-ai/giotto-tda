@@ -145,7 +145,8 @@ jobs:
   - script: |
       set -e
       brew update
-      brew install openssl boost ccache
+      brew reinstall openssl@1.1
+      brew install boost ccache
     displayName: 'Install system dependencies'
 
   - script: |
