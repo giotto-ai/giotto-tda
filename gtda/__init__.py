@@ -12,5 +12,6 @@ __all__ = [
     'plotting',
     'externals',
     'utils',
+    'metaestimators',
     '__version__'
     ]
