@@ -107,9 +107,9 @@ jobs:
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'macOS1014'
+- job: 'macOS1015'
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
   strategy:
     matrix:
       Python36:
@@ -145,7 +145,6 @@ jobs:
   - script: |
       set -e
       brew update
-      brew reinstall python
       brew install boost ccache
     displayName: 'Install system dependencies'
 
