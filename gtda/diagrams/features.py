@@ -723,8 +723,8 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
 @adapt_fit_transform_docs
 class ATOL(BaseEstimator, TransformerMixin):
-    """Implementation of Automatic Topologically-Oriented Learning. Vectorises
-    persistence diagrams after a quantisation step.
+    """Unsupervised quantisation of measures associated to persistence diagram.
+    Implementation of Automatic Topologically-Oriented Learning.
 
     Parameters
     ----------
@@ -734,8 +734,8 @@ class ATOL(BaseEstimator, TransformerMixin):
 
     quantiser_params : dict or list of n_dimensions dicts, optional, \
         default: ``{'n_clusters': 10}``
-        Keyword argument for the quantiser. If it is a list, then each
-        dictionary corresponds to the keyword argument for the quantiser
+        Keyword arguments for the quantiser. If it is a list, then each
+        dictionary corresponds to the keyword arguments for the quantiser
         applied to its corresponding homology dimension.
 
     weight_function : ``'uniform'`` or None, optional, default: ``None``
@@ -755,13 +755,13 @@ class ATOL(BaseEstimator, TransformerMixin):
     Attributes
     ----------
     effective_quantiser_params_ : list of n_dimensions dict
-        List of dictionary containing all information present in
-        `quantiser_params` for each homology dimensions.
+        List of dictionaries containing all information present in
+        `quantiser_params` for each homology dimension.
 
     homology_dimensions_ : list
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
-    centers_ : ndarray of shape (1, n_clusters, 3)
+    centers_ : ndarray of shape (1, sum(n_clusters), 3)
         Diagram made of cluster centers for each homology dimensions.
 
     """
@@ -787,9 +787,6 @@ class ATOL(BaseEstimator, TransformerMixin):
         """Store all observed homology dimensions in
         :attr:`homology_dimensions_` and compute :attr:`pdfs_` and
         :attr:`classes_`. Then, return the estimator.
-
-        This method is here to implement the usual scikit-learn API and hence
-        work in pipelines.
 
         Parameters
         ----------
