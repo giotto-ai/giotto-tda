@@ -144,8 +144,6 @@ jobs:
 
   - script: |
       set -e
-      brew update
-      brew reinstall python@$(python.version)
       brew install boost ccache
     displayName: 'Install system dependencies'
 
