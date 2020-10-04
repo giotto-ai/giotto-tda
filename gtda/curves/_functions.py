@@ -35,12 +35,12 @@ def _parallel_featurization(Xt, function, function_params, n_jobs):
     if callable(function):
         return function(Xt, axis=-1, **function_params)
     else:  # Assume function is a list or tuple of functions or None
-        channel_idx = [i for i, f in enumerate(function) if f is not None]
+        channel_idx = [j for j, f in enumerate(function) if f is not None]
         n_samples = len(Xt)
-        index_tups = product(*map(range, Xt.shape[:-2]), channel_idx)
+        index_pairs = product(range(n_samples), channel_idx)
         Xt = Parallel(n_jobs=n_jobs)(
-            delayed(function[tup[-1]])(Xt[tup], **function_params[tup[-1]])
-            for tup in index_tups
+            delayed(function[j])(Xt[i, j], **function_params[j])
+            for i, j in index_pairs
             )
         with warnings.catch_warnings():
             warnings.simplefilter("ignore",
