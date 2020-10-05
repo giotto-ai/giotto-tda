@@ -67,6 +67,11 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         match the number of channels in the 3D array passed to
         :meth:`transform`.
 
+    effective_function_ : callable or tuple
+        Callable, or tuple of callables or ``None``, describing the function(s)
+        used to compute features in each available channel. It is a single
+        callable only when `function` was passed as a string.
+
     effective_function_params_ : dict or tuple
         Dictionary or tuple of dictionaries containing all information present
         in `function_params` as well as relevant quantities computed in
@@ -148,7 +153,8 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         self.n_channels_ = X.shape[1]
 
         if isinstance(self.function, str):
-            self._function = _implemented_function_recipes[self.function]
+            self.effective_function_ = \
+                _implemented_function_recipes[self.function]
 
             if self.function_params is None:
                 self.effective_function_params_ = {}
@@ -158,7 +164,9 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                 self.effective_function_params_ = self.function_params.copy()
 
         elif isinstance(self.function, FunctionType):
-            self._function = tuple([self.function] * self.n_channels_)
+            self.effective_function_ = \
+                tuple([self.function] * self.n_channels_)
+
             if self.function_params is None:
                 self.effective_function_params_ = \
                     tuple([{}] * self.n_channels_)
@@ -172,29 +180,29 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                     f"`function` has length {n_functions} while curves in `X` "
                     f"have {self.n_channels_} channels."
                     )
+
             if self.function_params is None:
                 self._effective_function_params = [{}] * self.n_channels_
             else:
                 self._effective_function_params = self.function_params
+                n_function_params = len(self._effective_function_params)
+                if n_function_params != self.n_channels_:
+                    raise ValueError(f"`function_params` has length "
+                                     f"{n_function_params} while curves in "
+                                     f"`X` have {self.n_channels_} channels.")
 
-            n_function_params = len(self._effective_function_params)
-            if n_function_params != self.n_channels_:
-                raise ValueError(
-                    f"`function_params` has length {n_function_params} while "
-                    f"curves in `X` have {self.n_channels_} channels."
-                    )
-
-            self._function = []
+            self.effective_function_ = []
             self.effective_function_params_ = []
             for f, p in zip(self.function, self._effective_function_params):
                 if isinstance(f, str):
                     validate_params(p, _AVAILABLE_FUNCTIONS[f])
-                    self._function.append(_implemented_function_recipes[f])
+                    self.effective_function_.\
+                        append(_implemented_function_recipes[f])
                 else:
-                    self._function.append(f)
+                    self.effective_function_.append(f)
                 self.effective_function_params_.append({} if p is None
                                                        else p.copy())
-            self._function = tuple(self._function)
+            self.effective_function_ = tuple(self.effective_function_)
             self.effective_function_params_ = \
                 tuple(self.effective_function_params_)
 
@@ -229,7 +237,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                              f"`fit`. Passed {Xt.shape[1]}, expected "
                              f"{self.n_channels_}.")
 
-        Xt = _parallel_featurization(Xt, self._function,
+        Xt = _parallel_featurization(Xt, self.effective_function_,
                                      self.effective_function_params_,
                                      self.n_jobs)
 
