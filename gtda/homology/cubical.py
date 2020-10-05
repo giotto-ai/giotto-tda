@@ -44,7 +44,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     periodic_dimensions : boolean ndarray of shape (n_dimensions,) or None, \
         optional, default: ``None``
-        Periodicity of the boundaries along each of the axis, where
+        Periodicity of the boundaries along each of the axes, where
         ``n_dimensions`` is the dimension of the images of the collection. The
         boolean in the `d`th position expresses whether the boundaries along
         the `d`th axis are periodic. The default ``None`` is equivalent to
@@ -69,7 +69,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Attributes
     ----------
     periodic_dimensions_ : boolean ndarray of shape (n_dimensions,)
-       Effective periodicity of the boundaries along each of the axis. Set in
+       Effective periodicity of the boundaries along each of the axes. Set in
        :meth:`fit`.
 
     infinity_values_ : float

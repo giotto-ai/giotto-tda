@@ -31,3 +31,4 @@ Filtrations
    images.DilationFiltration
    images.ErosionFiltration
    images.SignedDistanceFiltration
+   images.DensityFiltration

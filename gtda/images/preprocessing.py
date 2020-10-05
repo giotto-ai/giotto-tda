@@ -4,7 +4,6 @@
 from functools import reduce
 from operator import iconcat
 from numbers import Real, Integral
-from warnings import warn
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -36,7 +35,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    n_dimensions_ : int
+    n_dimensions_ : ``2`` or ``3``
         Dimension of the images. Set in meth:`fit`.
 
     max_value_ : float
@@ -50,7 +49,7 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -94,9 +93,9 @@ class Binarizer(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         X = check_array(X, allow_nd=True)
         self.n_dimensions_ = X.ndim - 1
-        if (self.n_dimensions_ < 2) or (self.n_dimensions_ > 3):
-            warn(f"Input of `fit` contains arrays of dimension "
-                 f"{self.n_dimensions_}.")
+        if self.n_dimensions_ > 3:
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{self.n_dimensions_}.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -208,13 +207,16 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
-    max_value_ : int ndarray of shape (padding_x, padding_y [, padding_z])
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
+    max_value_ : int, float or bool
        Effective maximum value of the images' pixels. Set in :meth:`fit`.
 
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -235,7 +237,8 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
             return self.max_value_ - X
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`n_dimensions_` and :attr:`max_value_` from the
+        collection of images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -256,7 +259,10 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_array(X, allow_nd=True)
-
+        self.n_dimensions_ = X.ndim - 1
+        if self.n_dimensions_ > 3:
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{self.n_dimensions_}.")
         validate_params(self.get_params(), self._hyperparameters,
                         exclude=['n_jobs'])
 
@@ -368,13 +374,16 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Attributes
     ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     padding_ : int ndarray of shape (padding_x, padding_y [, padding_z])
-       Effective padding along each of the axis. Set in :meth:`fit`.
+       Effective padding along each of the axes. Set in :meth:`fit`.
 
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -392,8 +401,8 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Calculate :attr:`padding_` from a collection of images. Then,
-        return the estimator.
+        """Calculate :attr:`n_dimensions_` and :attr:`padding_` from a
+        collection of images. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -414,26 +423,26 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         X = check_array(X, allow_nd=True)
-        n_dimensions = X.ndim - 1
-        if n_dimensions < 2 or n_dimensions > 3:
-            warn(f"Input of `fit` contains arrays of dimension "
-                 f"{self.n_dimensions_}.")
-
+        self.n_dimensions_ = X.ndim - 1
+        if self.n_dimensions_ > 3:
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{self.n_dimensions_}.")
         validate_params(self.get_params(), self._hyperparameters,
                         exclude=['value', 'n_jobs'])
 
         if self.padding is None:
-            self.padding_ = np.ones((n_dimensions,), dtype=np.int)
-        elif len(self.padding) != n_dimensions:
+            self.padding_ = np.ones((self.n_dimensions_,), dtype=np.int)
+        elif len(self.padding) != self.n_dimensions_:
             raise ValueError(
                 f"`padding` has length {self.padding} while the input "
-                f"data requires it to have length equal to {n_dimensions}.")
+                f"data requires it to have length equal to "
+                f"{self.n_dimensions_}.")
         else:
             self.padding_ = self.padding
 
         self._pad_width = ((0, 0),
                            *[(self.padding_[axis], self.padding_[axis])
-                             for axis in range(n_dimensions)])
+                             for axis in range(self.n_dimensions_)])
 
         return self
 
@@ -532,6 +541,11 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    n_dimensions_ : ``2`` or ``3``
+        Dimension of the images. Set in :meth:`fit`.
+
     See also
     --------
     gtda.homology.VietorisRipsPersistence, gtda.homology.SparseRipsPersistence,
@@ -540,7 +554,7 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
     References
     ----------
     .. [1] A. Garin and G. Tauzin, "A topological reading lesson:
-           Classification of MNIST  using  TDA"; 19th International IEEE
+           Classification of MNIST using TDA"; 19th International IEEE
            Conference on Machine Learning and Applications (ICMLA 2020), 2019;
            `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
 
@@ -554,7 +568,9 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         return [np.argwhere(x) for x in X]
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator unchanged.
+        """Calculate :attr:`n_dimensions_` from a collection of binary images.
+        Then, return the estimator.
+
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
@@ -574,13 +590,11 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_array(X, allow_nd=True)
+        self.n_dimensions_ = X.ndim - 1
+        if self.n_dimensions_ > 3:
+            raise ValueError(f"Input of `fit` contains arrays of dimension "
+                             f"{self.n_dimensions_}.")
 
-        n_dimensions = X.ndim - 1
-        if n_dimensions < 2 or n_dimensions > 3:
-            warn(f"Input of `fit` contains arrays of dimension "
-                 f"{self.n_dimensions_}.")
-
-        self._is_fitted = True
         return self
 
     def transform(self, X, y=None):
@@ -601,13 +615,12 @@ class ImageToPointCloud(BaseEstimator, TransformerMixin, PlotterMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_pixels_x * n_pixels_y [* \
-            n_pixels_z],
-            n_dimensions)
+            n_pixels_z], n_dimensions)
             Transformed collection of images. Each entry along axis 0 is a
             point cloud in ``n_dimensions``-dimensional space.
 
         """
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         Xt = check_array(X, allow_nd=True)
 
         Xt = np.swapaxes(np.flip(Xt, axis=1), 1, 2)

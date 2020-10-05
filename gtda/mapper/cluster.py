@@ -28,8 +28,6 @@ class ParallelClustering(BaseEstimator):
     location of a portion of ``X_tot`` to cluster separately. Parallelism is
     achieved over the columns of ``masks``.
 
-    This estimator is not intended for direct use.
-
     Parameters
     ----------
     clusterer : object, optional, default: ``None``
@@ -42,10 +40,11 @@ class ParallelClustering(BaseEstimator):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    parallel_backend_prefer : ``'processes'`` | ``'threads'``, optional, \
-        default: ``'threads'``
-        Selects the default joblib backend. The default process-based backend
-        is 'loky' and the default thread-based backend is 'threading'.
+    parallel_backend_prefer : ``"processes"`` | ``"threads"`` | ``None``, \
+        optional, default: ``None``
+        Soft hint for the selection of the default joblib backend. The default
+        process-based backend is 'loky' and the default thread-based backend is
+        'threading'. See [1]_.
 
     Attributes
     ----------
@@ -62,11 +61,16 @@ class ParallelClustering(BaseEstimator):
        cluster label and ``indices`` is the array of indices of points
        belonging to cluster ``(i, label)``.
 
+    References
+    ----------
+    .. [1] "Thread-based parallelism vs process-based parallelism", in
+       `joblib documentation
+       <https://joblib.readthedocs.io/en/latest/parallel.html>`_.
+
     """
 
-    def __init__(self, clusterer=None,
-                 n_jobs=None,
-                 parallel_backend_prefer='threads'):
+    def __init__(self, clusterer=None, n_jobs=None,
+                 parallel_backend_prefer=None):
         self.clusterer = clusterer
         self.n_jobs = n_jobs
         self.parallel_backend_prefer = parallel_backend_prefer
@@ -239,7 +243,8 @@ class ParallelClustering(BaseEstimator):
     def fit_transform(self, X, y=None, **fit_params):
         """Alias for :meth:`fit_predict`.
 
-        Allows for this class to be used as a step in a scikit-learn pipeline.
+        Allows for this class to be used as an intermediate step in a
+        scikit-learn pipeline.
 
         Parameters
         ----------
