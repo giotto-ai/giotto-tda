@@ -144,7 +144,6 @@ jobs:
 
   - script: |
       set -e
-      brew update
       echo 'export PATH="/usr/local/opt/python@$(python.version)/bin:$PATH"' >> /Users/runner/.bash_profile
       brew install boost ccache
     displayName: 'Install system dependencies'
