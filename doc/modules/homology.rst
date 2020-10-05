@@ -5,6 +5,8 @@
    :no-members:
    :no-inherited-members:
 
+Undirected simplicial homology
+------------------------------
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -15,5 +17,17 @@
    homology.SparseRipsPersistence
    homology.WeakAlphaPersistence
    homology.EuclideanCechPersistence
+
+Directed simplicial homology
+----------------------------
    homology.FlagserPersistence
+
+Cubical homology
+----------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/homology/
+   :template: class.rst
+
    homology.CubicalPersistence
