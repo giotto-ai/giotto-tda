@@ -17,14 +17,13 @@ from ..utils.validation import validate_params
 class StandardFeatures(BaseEstimator, TransformerMixin):
     """Standard features from multi-channel curves.
 
-    A multi-channel (sampled) curve is a 2D array of shape
-    ``(n_channels, n_samplings)``, where each row represents the y-values in
-    one of channels. This transformer applies scalar or vector-valued functions
-    channel-wise to extract features from a collection of multi-channel curves,
-    of shape ``(n_samples, n_channels, n_samplings)``. The output is always a
-    2D array such that row ``i`` is the concatenation of the outputs of the
-    chosen functions on the channels in the ``i``-th (multi-)curve in the
-    collection.
+    A multi-channel (integer sampled) curve is a 2D array of shape
+    ``(n_channels, n_bins)``, where each row represents the y-values in one of
+    the channels. This transformer applies scalar or vector-valued functions
+    channel-wise to extract features from each multi-channel curve in a
+    collection. The output is always a 2D array such that row ``i`` is the
+    concatenation of the outputs of the chosen functions on the channels in the
+    ``i``-th (multi-)curve in the collection.
 
     Parameters
     ----------
@@ -133,7 +132,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_channels, n_samplings)
+        X : ndarray of shape (n_samples, n_channels, n_bins)
             Input data. Collection of multi-channel curves.
 
         y : None
@@ -213,7 +212,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_channels, n_samplings)
+        X : ndarray of shape (n_samples, n_channels, n_bins)
             Input collection of multi-channel curves.
 
         y : None
