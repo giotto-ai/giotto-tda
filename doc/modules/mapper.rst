@@ -9,7 +9,6 @@
 
 Filters
 -------
-
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -22,7 +21,6 @@ Filters
 
 Covers
 -------
-
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -34,7 +32,6 @@ Covers
 
 Clustering
 ----------
-
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -47,7 +44,6 @@ Clustering
 
 Nerve (graph construction)
 --------------------------
-
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -59,7 +55,6 @@ Nerve (graph construction)
 
 Pipeline
 --------
-
 .. currentmodule:: gtda
 
 .. autosummary::
@@ -77,7 +72,6 @@ Pipeline
 
 Visualization
 -------------
-
 .. currentmodule:: gtda
 
 .. autosummary::

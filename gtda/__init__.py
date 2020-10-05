@@ -2,12 +2,13 @@ from ._version import __version__
 
 __all__ = [
     'mapper',
-    'homology',
     'time_series',
     'graphs',
-    'diagrams',
     'images',
     'point_clouds',
+    'homology',
+    'diagrams',
+    'curves',
     'plotting',
     'externals',
     'utils',
