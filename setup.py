@@ -29,7 +29,7 @@ MAINTAINER = "Umberto Lupo, Lewis Tunstall"
 MAINTAINER_EMAIL = "maintainers@giotto.ai"
 URL = "https://github.com/giotto-ai/giotto-tda"
 LICENSE = "GNU AGPLv3"
-DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.2.2"
+DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.3.0"
 VERSION = __version__  # noqa
 CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Intended Audience :: Developers",
