@@ -5,6 +5,6 @@ from .preprocessing import Derivative
 from .features import StandardFeatures
 
 __all__ = [
-    "Derivative"
+    "Derivative",
     "StandardFeatures"
     ]
