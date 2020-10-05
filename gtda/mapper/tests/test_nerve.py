@@ -15,8 +15,8 @@ from gtda.mapper import Projection, OneDimensionalCover, make_mapper_pipeline
 @given(X=arrays(dtype=np.float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
-                                min_value=-1e10,
-                                max_value=1e10),
+                                min_value=-1e5,
+                                max_value=1e5),
                 shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
 def test_node_intersection(X):
     # TODO: Replace pipe and graph by Nerve transformer
