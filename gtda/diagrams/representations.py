@@ -394,16 +394,14 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_diagrams(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
-                _subdiagrams(X[s], [dim], remove_dim=True),
-                self._samplings[dim],
-                self.n_layers)
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(landscapes)(_subdiagrams(X[s], [dim], remove_dim=True),
+                                self._samplings[dim],
+                                self.n_layers)
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
-        Xt = np.concatenate(Xt).\
-            reshape(self._n_dimensions, len(X), self.n_layers, self.n_bins).\
-            transpose((1, 0, 2, 3))
-        Xt = Xt.reshape((Xt.shape[0], -1, Xt.shape[-1]))
+            )
+        Xt = np.concatenate(Xt).reshape(len(X), -1, self.n_bins)
 
         return Xt
 
