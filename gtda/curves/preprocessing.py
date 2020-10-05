@@ -34,6 +34,11 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
+    Attributes
+    ----------
+    n_channels_ : int
+        Number of channels present in the 3D array passed to :meth:`fit`.
+
     """
     _hyperparameters = {
         'order': {'type': int, 'in': Interval(1, np.inf, closed='left')},
@@ -77,7 +82,7 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
                 f"order {self.order}."
                 )
 
-        self._is_fitted = True
+        self.n_channels_ = X.shape[1]
 
         return self
 
@@ -100,7 +105,7 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
             differences of order `order` in each channel in the curves in `X`.
 
         """
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
         Xt = check_array(X, ensure_2d=False, allow_nd=True)
         if Xt.ndim != 3:
             raise ValueError("Input must be 3-dimensional.")
@@ -127,8 +132,8 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
             Index of the sample in `Xt` to be plotted.
 
         channels : list, tuple or None, optional, default: ``None``
-            Which channels to include in the plot. ``None`` means
-            plotting all channels.
+            Which channels to include in the plot. ``None`` means plotting the
+            first :attr:`n_channels_` channels.
 
         plotly_params : dict or None, optional, default: ``None``
             Custom parameters to configure the plotly figure. Allowed keys are
@@ -143,7 +148,7 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
             Plotly figure.
 
         """
-        check_is_fitted(self, '_is_fitted')
+        check_is_fitted(self)
 
         layout_axes_common = {
             "type": "linear",
@@ -176,7 +181,7 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
         fig = Figure(layout=layout)
 
         if channels is None:
-            channels = np.arange(Xt.shape[1], dtype=int)
+            channels = range(self.n_channels_)
 
         samplings = np.arange(Xt[sample].shape[0])
         for ix, channel in enumerate(channels):
