@@ -1,10 +1,11 @@
 """Preprocessing transformers for curves."""
+# License: GNU AGPLv3
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from plotly.graph_objs import Figure, Scatter
-from sklearn.utils import gen_even_slices
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted, check_array
 
 from ..base import PlotterMixin
@@ -15,15 +16,18 @@ from ..utils.validation import validate_params
 
 @adapt_fit_transform_docs
 class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
-    """Computes the derivative of multi-channel curves.
+    """Derivatives of multi-channel curves.
 
-    Given a multi-channel curve computes the corresponding multi-channel
-    derivative.
+    A multi-channel (integer sampled) curve is a 2D array of shape
+    ``(n_channels, n_bins)``, where each row represents the y-values in one of
+    the channels. This transformer computes the n-th order derivative of each
+    channel in each multi-channel curve in a collection, by discrete
+    differences. The output is another collection of multi-channel curves.
 
     Parameters
     ----------
     order : int, optional, default: ``1``
-        The number of time the multi-channels curves are derived.
+        Order of the derivative to be taken.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -59,22 +63,26 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_array(X, allow_nd=True)
+        check_array(X, ensure_2d=False, allow_nd=True)
+        if X.ndim != 3:
+            raise ValueError("Input must be 3-dimensional.")
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
-        n_bins = X.shape[-1]
+        n_bins = X.shape[2]
         if self.order >= n_bins:
-            raise ValueError(f"The number of bins in `X` is not sufficient to "
-                             f"calculate its derivative at order {self.order}."
-                             f" It is `n_bins`= {n_bins}.")
+            raise ValueError(
+                f"Input channels have length {n_bins} but they must have at "
+                f"least length {self.order + 1} to calculate derivatives of "
+                f"order {self.order}."
+                )
 
         self._is_fitted = True
 
         return self
 
     def transform(self, X, y=None):
-        """Compute the derivatives of the input multi-channel curves.
+        """Compute derivatives of multi-channel curves.
 
         Parameters
         ----------
@@ -87,18 +95,20 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_channels, n_bins-order)
-            Output collection of the multi-channel curves' derivative.
+        Xt : ndarray of shape (n_samples, n_channels, n_bins - order)
+            Output collection of multi-channel curves given by taking discrete
+            differences of order `order` in each channel in the curves in `X`.
 
         """
         check_is_fitted(self, '_is_fitted')
-        Xt = check_array(X, allow_nd=True)
+        Xt = check_array(X, ensure_2d=False, allow_nd=True)
+        if Xt.ndim != 3:
+            raise ValueError("Input must be 3-dimensional.")
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(np.diff)(Xt[s], n=self.order, axis=-1)
-            for s in gen_even_slices(
-                    Xt.shape[0], effective_n_jobs(self.n_jobs))
-        )
+            for s in gen_even_slices(len(Xt), effective_n_jobs(self.n_jobs))
+            )
         Xt = np.concatenate(Xt)
 
         return Xt
