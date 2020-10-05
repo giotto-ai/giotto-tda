@@ -47,12 +47,6 @@ jobs:
 
   - script: |
       set -e
-      brew update
-      brew install boost ccache
-    displayName: 'Install system dependencies'
-
-  - script: |
-      set -e
       which python
       python -m pip install --upgrade pip setuptools
       python -m pip install wheel
