@@ -64,7 +64,7 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
         n_bins = X.shape[-1]
-        if self.order > n_bins:
+        if self.order >= n_bins:
             raise ValueError(f"The number of bins in `X` is not sufficient to "
                              f"calculate its derivative at order {self.order}."
                              f" It is `n_bins`= {n_bins}.")

@@ -8,6 +8,11 @@ from sklearn.exceptions import NotFittedError
 from gtda.curves import Derivative
 
 pio.renderers.default = 'plotly_mimetype'
+line_plots_traces_params = {"mode": "lines+markers"}
+layout_params = {"title": "New title"}
+plotly_params = \
+    {"traces": line_plots_traces_params, "layout": layout_params}
+
 
 np.random.seed(0)
 X = np.random.rand(1, 2, 5)
@@ -18,6 +23,13 @@ def test_derivative_not_fitted():
 
     with pytest.raises(NotFittedError):
         d.transform(X)
+
+
+def test_derivative_big_order():
+    d = Derivative(order=5)
+
+    with pytest.raises(ValueError):
+        d.fit(X)
 
 
 X_res = {
@@ -38,4 +50,4 @@ def test_derivative_transform(order):
 def test_consistent_fit_transform_plot():
     d = Derivative()
     Xt = d.fit_transform(X)
-    d.plot(Xt)
+    d.plot(Xt, plotly_params=plotly_params)
