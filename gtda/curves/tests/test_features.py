@@ -115,8 +115,7 @@ def test_standard_invalid_function_function_params():
                           ([np.max, np.min], [{}, None],
                            (np.max, np.min), ({}, {})),
                           ([np.max, None], [{}, None],
-                           (np.max, None), ({}, {}))
-                          ])
+                           (np.max, None), ({}, {}))])
 def test_standard_fit_attrs(function, function_params,
                             effective_function, effective_function_params):
     sf = StandardFeatures(function=function, function_params=function_params)
