@@ -53,6 +53,7 @@ jobs:
 
   - script: |
       set -e
+      which python
       python -m pip install --upgrade pip setuptools
       python -m pip install wheel
       source .azure-ci/setup_ccache.sh
