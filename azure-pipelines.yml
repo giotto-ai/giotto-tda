@@ -146,7 +146,7 @@ jobs:
       set -e
       brew update
       brew reinstall openssl@1.1
-      brew uninstall python
+      brew uninstall --ignore-dependencies python
       brew install boost ccache
     displayName: 'Install system dependencies'
 
