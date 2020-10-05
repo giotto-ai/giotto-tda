@@ -49,7 +49,7 @@ class Derivative(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Do nothing and return the estimator.
+        """Compute :attr:`n_channels_`. Then, return the estimator.
 
         This function is here to implement the usual scikit-learn API and hence
         work in pipelines.

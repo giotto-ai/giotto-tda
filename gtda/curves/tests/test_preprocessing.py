@@ -32,6 +32,17 @@ def test_derivative_big_order():
         d.fit(X)
 
 
+@pytest.mark.parametrize("shape", [(2,), (2, 3), (2, 3, 4, 5)])
+def test_standard_invalid_shape(shape):
+    sf = Derivative()
+
+    with pytest.raises(ValueError, match="Input must be 3-dimensional."):
+        sf.fit(np.ones(shape))
+
+    with pytest.raises(ValueError, match="Input must be 3-dimensional."):
+        sf.fit(X).transform(np.ones(shape))
+
+
 X_res = {
     1: np.array([[[0.16637586, -0.11242599, -0.05788019, -0.12122838],
                   [-0.2083069, 0.45418579, 0.07188976, -0.58022124]]]),
