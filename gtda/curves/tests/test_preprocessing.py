@@ -37,7 +37,7 @@ X_res = {
                   [-0.2083069, 0.45418579, 0.07188976, -0.58022124]]]),
     2: np.array([[[-0.27880185, 0.0545458, -0.06334819],
                   [0.66249269, -0.38229603, -0.652111]]]),
-}
+    }
 
 
 @pytest.mark.parametrize('order', [1, 2])
@@ -47,7 +47,8 @@ def test_derivative_transform(order):
     assert_almost_equal(d.fit_transform(X), X_res[order])
 
 
-def test_consistent_fit_transform_plot():
+@pytest.mark.parametrize("channels", [None, [1], [0, 1]])
+def test_consistent_fit_transform_plot(channels):
     d = Derivative()
     Xt = d.fit_transform(X)
-    d.plot(Xt, plotly_params=plotly_params)
+    d.plot(Xt, channels=channels, plotly_params=plotly_params)
