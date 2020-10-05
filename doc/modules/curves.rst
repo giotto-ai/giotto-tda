@@ -1,5 +1,5 @@
 :mod:`gtda.curves`: Curves
-============================
+==========================
 
 .. automodule:: gtda.curves
    :no-members:
@@ -14,3 +14,13 @@ Preprocessing
    :template: class.rst
 
    curves.Derivative
+
+Feature extraction
+------------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/curves
+   :template: class.rst
+
+   curves.StandardFeatures

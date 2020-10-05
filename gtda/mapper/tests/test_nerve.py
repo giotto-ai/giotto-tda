@@ -3,7 +3,7 @@
 
 import numpy as np
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats
 from sklearn.cluster import DBSCAN
@@ -12,11 +12,12 @@ from sklearn.datasets import make_circles
 from gtda.mapper import Projection, OneDimensionalCover, make_mapper_pipeline
 
 
+@settings(deadline=5000)
 @given(X=arrays(dtype=np.float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
-                                min_value=-1e10,
-                                max_value=1e10),
+                                min_value=-1e6,
+                                max_value=1e6),
                 shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
 def test_node_intersection(X):
     # TODO: Replace pipe and graph by Nerve transformer
@@ -36,11 +37,12 @@ def test_node_intersection(X):
     assert not any(disjoint_nodes)
 
 
+@settings(deadline=5000)
 @given(X=arrays(dtype=np.float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
-                                min_value=-1e10,
-                                max_value=1e10),
+                                min_value=-1e6,
+                                max_value=1e6),
                 shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
 def test_edge_elements(X):
     # TODO: Replace pipe and graph by Nerve transformer
@@ -87,12 +89,13 @@ def test_edge_elements(X):
     assert flag
 
 
+@settings(deadline=5000)
 @pytest.mark.parametrize("min_intersection", [1, 2, 3, 10])
 @given(X=arrays(dtype=np.float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
-                                min_value=-1e10,
-                                max_value=1e10),
+                                min_value=-1e6,
+                                max_value=1e6),
                 shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
 def test_min_intersection(X, min_intersection):
     # TODO: Replace pipe and graph by Nerve transformer

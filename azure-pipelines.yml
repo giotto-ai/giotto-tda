@@ -41,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.09.10" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.10.05" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -138,12 +138,13 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.09.10" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.10.05" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
   - script: |
       set -e
+      export HOMEBREW_NO_INSTALL_CLEANUP=1
       brew update
       brew install boost ccache
     displayName: 'Install system dependencies'
@@ -197,6 +198,7 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
+    condition: eq(variables['notebooks_check'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -314,4 +316,3 @@ jobs:
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
-

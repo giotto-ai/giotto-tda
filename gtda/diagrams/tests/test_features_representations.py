@@ -140,7 +140,7 @@ def test_bc_transform_shape(n_bins, n_jobs):
 def test_pl_transform_shape(n_bins, n_layers, n_jobs):
     pl = PersistenceLandscape(n_bins=n_bins, n_layers=n_layers, n_jobs=n_jobs)
     X_res = pl.fit_transform(X)
-    assert X_res.shape == (1, pl._n_dimensions, n_layers, n_bins)
+    assert X_res.shape == (1, pl._n_dimensions * n_layers, n_bins)
 
 
 @pytest.mark.parametrize('n_jobs', [1, 2, -1])
