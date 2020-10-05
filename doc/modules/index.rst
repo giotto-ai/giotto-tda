@@ -16,7 +16,6 @@ This pages contains a list of available features in the library.
    time_series.rst
    graphs.rst
    images.rst
-   curves.rst
    plotting.rst
    base.rst
    pipeline.rst
