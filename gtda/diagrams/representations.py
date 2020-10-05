@@ -291,16 +291,15 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage, \
-    gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, PairwiseDistance, \
+    Silhouette, PersistenceImage, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
     The samplings in :attr:`samplings_` are in general different between
     different homology dimensions. This means that the j-th entry of the
-    k-layer of a persistence landscape in homology dimension q typically
-    arises from a different parameter value to the j-th entry of a k-layer in
+    k-layer of a persistence landscape in homology dimension q typically arises
+    from a different parameter value to the j-th entry of a k-layer in
     dimension q'.
 
     """
@@ -317,9 +316,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
+        :attr:`homology_dimensions_` and, for each dimension separately, store
+        evenly sample filtration parameter values in :attr:`samplings_`. Then,
+        return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -384,7 +383,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions * n_layers, \
             n_bins)
-            Persistence landscapes: one landscape (represented as a
+            Persistence landscapes. one landscape (represented as a
             stacked one-dimensional array) per sample and per homology
             dimension seen in :meth:`fit` and layer. Index i along axis 1
             corresponds to the :math:`i / n_layers`-th homology dimension in
@@ -403,8 +402,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             )
         Xt = np.concatenate(Xt).\
             reshape(self._n_dimensions, len(X), self.n_layers, self.n_bins).\
-            transpose((1, 0, 2, 3))
-        Xt = Xt.reshape((Xt.shape[0], -1, Xt.shape[-1]))
+            transpose((1, 0, 2, 3)).\
+            reshape(len(X), self._n_dimensions * self.n_layers, self.n_bins)
 
         return Xt
 
