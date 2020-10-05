@@ -107,6 +107,27 @@ def test_standard_invalid_function_function_params():
         sf.fit(X)
 
 
+@pytest.mark.parametrize("function, function_params, effective_function, "
+                         "effective_function_params",
+                         [('max', None, np.max, {}), ('max', {}, np.max, {}),
+                          (np.max, None, (np.max, np.max), ({}, {})),
+                          (np.max, {}, (np.max, np.max), ({}, {})),
+                          ([np.max, np.min], [{}, None],
+                           (np.max, np.min), ({}, {})),
+                          ([np.max, None], [{}, None],
+                           (np.max, None), ({}, {}))
+                          ])
+def test_standard_fit_attrs(function, function_params,
+                            effective_function, effective_function_params):
+    sf = StandardFeatures(function=function, function_params=function_params)
+    sf.fit(X)
+
+    assert sf.n_channels_ == X.shape[1]
+
+    assert sf.effective_function_ == effective_function \
+           and sf.effective_function_params_ == effective_function_params
+
+
 @pytest.mark.parametrize("function", ["argmax", "argmin", "min", "max", "mean",
                                       "std", "median", "average", np.max,
                                       scalar_fn, [scalar_fn, "max"],
