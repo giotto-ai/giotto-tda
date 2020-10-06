@@ -85,12 +85,10 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
             x=point_cloud[:, 0],
             y=point_cloud[:, 1],
             mode="markers",
-            marker={
-                "size": 4,
-                "color": list(range(point_cloud.shape[0])),
-                "colorscale": "Viridis",
-                "opacity": 0.8
-                }
+            marker={"size": 4,
+                    "color": list(range(point_cloud.shape[0])),
+                    "colorscale": "Viridis",
+                    "opacity": 0.8}
             ))
 
     elif dimension == 3:
@@ -123,12 +121,10 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
             y=point_cloud[:, 1],
             z=point_cloud[:, 2],
             mode="markers",
-            marker={
-                "size": 4,
-                "color": list(range(point_cloud.shape[0])),
-                "colorscale": "Viridis",
-                "opacity": 0.8
-                }
+            marker={"size": 4,
+                    "color": list(range(point_cloud.shape[0])),
+                    "colorscale": "Viridis",
+                    "opacity": 0.8}
             ))
 
     # Update trace and layout according to user input
