@@ -135,7 +135,7 @@ def test_colors_same_2d_3d(X, color_variable, node_color_statistic):
 @pytest.mark.parametrize("X, columns", [(X_arr, range(X_arr.shape[1])),
                                         (X_df, X_df.columns)])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_color_by_column_dropdown_2d(X, columns, layout_dim):
+def test_color_by_column_dropdown(X, columns, layout_dim):
     pipe = make_mapper_pipeline()
     fig = plot_static_mapper_graph(
         pipe, X, layout_dim=layout_dim, color_by_columns_dropdown=True
@@ -211,7 +211,9 @@ def _get_widgets_by_trait(fig, key, val=None):
 @pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("clone_pipeline", [False, True])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_pipeline_cloned(X, clone_pipeline, layout_dim):
+@pytest.mark.parametrize("color_by_columns_dropdown", [True, False])
+def test_pipeline_cloned(X, clone_pipeline, layout_dim,
+                         color_by_columns_dropdown):
     """Verify that the pipeline is changed on interaction if and only if
     `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
     # TODO: Monitor development of the ipytest project to convert these into
@@ -237,7 +239,8 @@ def test_pipeline_cloned(X, clone_pipeline, layout_dim):
         min_intersection=params["min_intersection"]["initial"]
         )
     fig = plot_interactive_mapper_graph(
-        pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim
+        pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim,
+        color_by_columns_dropdown=color_by_columns_dropdown
         )
 
     # Get relevant widgets and change their states, then check final values
