@@ -95,8 +95,8 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
 
     def _validate_transformer(self):
         if not hasattr(self.transformer, "fit_transform"):
-            raise ValueError("`transformer` must possess a fit_transform "
-                             "method.")
+            raise TypeError("`transformer` must possess a fit_transform "
+                            "method.")
         if not isinstance(self.transformer, BaseEstimator):
             warn("`transformer` is not an instance of "
                  "sklearn.base.BaseEstimator. This will lead to limited "

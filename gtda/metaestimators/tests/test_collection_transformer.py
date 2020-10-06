@@ -26,7 +26,7 @@ def test_collection_transformer_input_with_nan():
 def test_collection_transformer_invalid_transformer():
     multi_pca = CollectionTransformer(np.mean)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         multi_pca.fit(X_arr)
 
 
