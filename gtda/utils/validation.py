@@ -11,6 +11,20 @@ from sklearn.exceptions import DataDimensionalityWarning
 from sklearn.utils.validation import check_array
 
 
+def _check_array_mod(X, **kwargs):
+    """Modified version of :func:`sklearn.utils.validation.check_array. When
+    keyword parameter `force_all_finite` is set to False, NaNs are not
+    accepted but infinity is."""
+    if not kwargs.get('force_all_finite', True):
+        Xnew = check_array(X, **kwargs)
+        if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
+            raise ValueError("Input contains NaNs. Only finite values and "
+                             "infinity are allowed when parameter "
+                             "`force_all_finite` is False.")
+        return Xnew
+    return check_array(X, **kwargs)
+
+
 def check_diagrams(X, copy=False):
     """Input validation for collections of persistence diagrams.
 
@@ -33,11 +47,8 @@ def check_diagrams(X, copy=False):
         The converted and validated array of persistence diagrams.
 
     """
-    X_array = np.asarray(X)
-    if X_array.ndim == 0:
-        raise ValueError(
-            f"Expected 3D array, got scalar array instead:\narray={X_array}."
-            )
+    X_array = _check_array_mod(X, ensure_2d=False, allow_nd=True,
+                               force_all_finite=False, copy=copy)
     if X_array.ndim != 3:
         raise ValueError(
             f"Input should be a 3D ndarray, the shape is {X_array.shape}."
@@ -48,26 +59,21 @@ def check_diagrams(X, copy=False):
             f"components, but there are {X_array.shape[2]} components."
             )
 
-    X_array = X_array.astype(float, copy=False)
     homology_dimensions = sorted(np.unique(X_array[0, :, 2]))
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:
                 raise ValueError(
-                    f"np.inf is a valid homology dimension for a stacked "
+                    f"numpy.inf is a valid homology dimension for a stacked "
                     f"diagram but it should be the only one: "
                     f"homology_dimensions = {homology_dimensions}."
                     )
         else:
-            if dim != int(dim):
+            if (dim != int(dim)) or (dim < 0):
                 raise ValueError(
-                    f"All homology dimensions should be integer valued: "
-                    f"{dim} can't be cast to an int of the same value."
-                    )
-            if dim != np.abs(dim):
-                raise ValueError(
-                    f"All homology dimensions should be integer valued: "
-                    f"{dim} can't be cast to an int of the same value."
+                    f"Homology dimensions should be positive integers or "
+                    f"numpy.inf: {dim} can't be cast to an int of the same "
+                    f"value."
                     )
 
     n_points_below_diag = np.sum(X_array[:, :, 1] < X_array[:, :, 0])
@@ -77,8 +83,6 @@ def check_diagrams(X, copy=False):
             f"diagonal, i.e. X[:, :, 1] >= X[:, :, 0]. {n_points_below_diag} "
             f"points are below the diagonal."
             )
-    if copy:
-        X_array = np.copy(X_array)
 
     return X_array
 
@@ -193,20 +197,6 @@ def validate_params(parameters, references, exclude=None):
     parameters_ = {key: value for key, value in parameters.items()
                    if key not in exclude_}
     return _validate_params(parameters_, references)
-
-
-def _check_array_mod(X, **kwargs):
-    """Modified version of :func:`sklearn.utils.validation.check_array. When
-    keyword parameter `force_all_finite` is set to False, NaNs are not
-    accepted but infinity is."""
-    if not kwargs.get('force_all_finite', True):
-        Xnew = check_array(X, **kwargs)
-        if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
-            raise ValueError("Input contains NaNs. Only finite values and "
-                             "infinity are allowed when parameter "
-                             "`force_all_finite` is False.")
-        return Xnew
-    return check_array(X, **kwargs)
 
 
 def check_point_clouds(X, distance_matrices=False, **kwargs):
