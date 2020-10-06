@@ -411,7 +411,7 @@ def make_mapper_pipeline(scaler=None,
             [("clustering_preprocessing", _clustering_preprocessing),
              ("map_and_cover", map_and_cover)])),
         ("clustering", ParallelClustering(
-            clusterer=_clusterer,
+            _clusterer,
             n_jobs=n_jobs,
             parallel_backend_prefer=parallel_backend_prefer))
         ]

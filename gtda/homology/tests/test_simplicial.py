@@ -32,6 +32,8 @@ X_dist_list = list(X_dist)
 X_pc_sparse = [csr_matrix(x) for x in X_pc]
 X_dist_sparse = [csr_matrix(x) for x in X_dist]
 
+X_dist_disconnected = np.array([[[0, np.inf], [np.inf, 0]]])
+
 # 8-point sampling of a noisy circle
 X_circle = np.array([
     [[1.00399159, -0.00797583],
@@ -113,14 +115,12 @@ def test_vrp_low_infinity_values(X, metric):
 
 @pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
                                        (X_pc_list, 'euclidean'),
-                                       (X_pc_sparse, 'euclidean'),
-                                       (X_dist, 'precomputed'),
-                                       (X_dist_list, 'precomputed'),
-                                       (X_dist_sparse, 'precomputed')])
+                                       (X_dist_disconnected, 'precomputed')])
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
 def test_vrp_fit_transform_plot(X, metric, hom_dims):
     VietorisRipsPersistence(metric=metric).fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
+        X, sample=0, homology_dimensions=hom_dims
+        )
 
 
 def test_srp_params():
@@ -161,15 +161,11 @@ def test_srp_transform(X, metric, epsilon, diagrams):
                         np.sort(diagrams, axis=1))
 
 
-@pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
-                                       (X_pc_list, 'euclidean'),
-                                       (X_pc_sparse, 'euclidean'),
-                                       (X_dist, 'precomputed'),
-                                       (X_dist_list, 'precomputed')])
+@pytest.mark.parametrize('X', [X_pc, X_pc_list])
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
-def test_srp_fit_transform_plot(X, metric, hom_dims):
-    SparseRipsPersistence(metric=metric).fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
+def test_srp_fit_transform_plot(X, hom_dims):
+    SparseRipsPersistence().fit_transform_plot(X, sample=0,
+                                               homology_dimensions=hom_dims)
 
 
 def test_wap_params():
@@ -248,7 +244,8 @@ def test_wap_low_infinity_values(X):
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
 def test_wap_fit_transform_plot(X, hom_dims):
     WeakAlphaPersistence().fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
+        X, sample=0, homology_dimensions=hom_dims
+        )
 
 
 def test_cp_params():
@@ -291,7 +288,8 @@ def test_cp_transform(X):
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
 def test_cp_fit_transform_plot(X, hom_dims):
     EuclideanCechPersistence().fit_transform_plot(
-        X, sample=0, homology_dimensions=hom_dims)
+        X, sample=0, homology_dimensions=hom_dims
+        )
 
 
 def test_fp_params():
@@ -373,8 +371,9 @@ def test_fp_transform_high_hom_dim(delta):
                         np.array([0., 0., n_points + delta - 1], dtype=float))
 
 
-@pytest.mark.parametrize('X', [X_dist, X_dist_list, X_dist_sparse])
+@pytest.mark.parametrize('X', [X_dist, X_dist_list, X_dist_disconnected])
 @pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
 def test_fp_fit_transform_plot(X, hom_dims):
     FlagserPersistence(directed=False).fit_transform_plot(
-        X_dist, sample=0, homology_dimensions=hom_dims)
+        X_dist, sample=0, homology_dimensions=hom_dims
+        )

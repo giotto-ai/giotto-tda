@@ -230,5 +230,9 @@ def test_takens_embedding_3D_no_flatten():
 
 
 def test_takens_embedding_plot():
+    trace_params = {"mode": "lines+markers"}
+    layout_params = {"title": "New title"}
     TE = TakensEmbedding()
-    _ = TE.fit_transform_plot([np.arange(20)], sample=0)
+    plotly_params = {"trace": trace_params, "layout": layout_params}
+    TE.fit_transform_plot([np.arange(20)], sample=0,
+                          plotly_params=plotly_params)

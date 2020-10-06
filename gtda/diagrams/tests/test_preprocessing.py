@@ -305,7 +305,7 @@ def test_filt_transform_unfiltered_hom_dims(homology_dimensions):
             if dim not in homology_dimensions
             ]
     assert total_lifetimes_in_dims(X_1, unfiltered_hom_dims) == \
-        total_lifetimes_in_dims(X_1_res, unfiltered_hom_dims)
+           total_lifetimes_in_dims(X_1_res, unfiltered_hom_dims)
 
 
 lifetimes_1 = X_1[:, :, 1] - X_1[:, :, 0]

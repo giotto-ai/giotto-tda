@@ -79,19 +79,45 @@ def test_validate_params_tuple_of_types():
         validate_params(parameters, references)
 
 
-# Testing check_diagrams
-# Test for the wrong array key value
-def test_inputs_keys_V():
-    X = np.array([[[1, 1, 0], [2, 2, -1]]])
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize("bad_dim", [-1, 0.2])
+def test_check_diagrams_invalid_homology_dimensions(bad_dim):
+    X = np.array([[[1, 1, 0], [2, 2, bad_dim]]])
+    with pytest.raises(
+            ValueError,
+            match="Homology dimensions should be positive integers"
+            ):
+        check_diagrams(X)
+
+
+def test_check_diagrams_inf_mixed_with_finite_homology_dimensions():
+    X = np.array([[[1, 1, 0], [2, 2, np.inf]]])
+    with pytest.raises(
+            ValueError,
+            match="numpy.inf is a valid homology dimension"
+            ):
         check_diagrams(X)
 
 
 # Test for the wrong structure dimension
-def test_inputs_arrayStruc_V():
+def test_check_diagrams_bad_input_dimension():
     X = np.array([[[[1, 1, 0], [2, 2, 1]]]])
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input should be a 3D ndarray"):
+        check_diagrams(X)
+
+
+# Test that axis 2 has length 3
+def test_check_diagrams_bad_axis_2_length():
+    X = np.array([[[1, 1, 0, 4], [2, 2, 1, 4]]])
+
+    with pytest.raises(ValueError, match="with a 3rd dimension of 3"):
+        check_diagrams(X)
+
+
+def test_check_diagrams_points_below_diagonal():
+    X = np.array([[[1, 0, 0], [2, 2, 1]]])
+
+    with pytest.raises(ValueError, match="should be above the diagonal"):
         check_diagrams(X)
 
 

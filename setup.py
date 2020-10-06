@@ -48,28 +48,24 @@ CLASSIFIERS = ["Intended Audience :: Science/Research",
 KEYWORDS = "machine learning, topological data analysis, persistent " \
            "homology, persistence diagrams, Mapper"
 INSTALL_REQUIRES = requirements
-EXTRAS_REQUIRE = {
-    "tests": [
-        "pytest",
-        "pytest-cov",
-        "pytest-azurepipelines",
-        "pytest-benchmark",
-        "jupyter_contrib_nbextensions",
-        "flake8",
-        "hypothesis"],
-    "doc": [
-        "openml",
-        "sphinx",
-        "nbconvert",
-        "sphinx-issues",
-        "sphinx_rtd_theme",
-        "numpydoc"],
-    "examples": [
-        "jupyter",
-        "pandas",
-        "openml",
-        "matplotlib"]
-}
+EXTRAS_REQUIRE = {"tests": ["pandas",
+                            "pytest",
+                            "pytest-cov",
+                            "pytest-azurepipelines",
+                            "pytest-benchmark",
+                            "jupyter_contrib_nbextensions",
+                            "flake8",
+                            "hypothesis"],
+                  "doc": ["openml",
+                          "sphinx",
+                          "nbconvert",
+                          "sphinx-issues",
+                          "sphinx_rtd_theme",
+                          "numpydoc"],
+                  "examples": ["jupyter",
+                               "pandas",
+                               "openml",
+                               "matplotlib"]}
 
 
 def combine_requirements(base_keys):
