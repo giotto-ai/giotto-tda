@@ -1,14 +1,96 @@
-"""Testing for FirstHistogramGap and FirstSimpleGap clusterers."""
+"""Testing for FirstHistogramGap and FirstSimpleGap clusterers, and testing
+for ParallelClustering."""
 # License: GNU AGPLv3
 
 import numpy as np
+import pytest
+import sklearn as sk
 from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats, integers, composite
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
-from gtda.mapper import FirstHistogramGap, FirstSimpleGap
+from gtda.mapper import ParallelClustering, FirstHistogramGap, FirstSimpleGap
+
+
+def test_parallel_clustering_bad_input():
+    pc = ParallelClustering(sk.cluster.DBSCAN())
+    X = [np.random.random((5, 4)), np.random.random((5, 4))]
+
+    with pytest.raises(TypeError, match="`masks` must be a boolean array."):
+        pc.fit(X)
+
+    X[1] = np.ones((6, 4), dtype=bool)
+    with pytest.raises(ValueError,
+                       match="`X_tot` and `masks` must have the same number"):
+        pc.fit(X)
+
+
+def test_parallel_clustering_bad_clusterer():
+    pc = ParallelClustering(sk.decomposition.PCA())
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+
+    with pytest.raises(TypeError, match="`clusterer` must be an instance of"):
+        pc.fit(X)
+
+
+def test_parallel_clustering_transform_not_implemented():
+    pc = ParallelClustering(sk.cluster.DBSCAN())
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+
+    with pytest.raises(NotImplementedError):
+        pc.transform(X)
+
+
+@pytest.mark.parametrize("sample_weight", [None, np.random.random(5)])
+def test_parallel_clustering_kmeans(sample_weight):
+    kmeans = sk.cluster.KMeans(n_clusters=2, random_state=0)
+    pc = ParallelClustering(kmeans)
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+    single_labels = kmeans.fit_predict(X[0], sample_weight=sample_weight)
+    unique_labels, inverse = np.unique(single_labels, return_inverse=True)
+
+    res = pc.fit_predict(X, sample_weight=sample_weight)
+    res = [[(i, label, list(indices)) for [i, label, indices] in sublist]
+           for sublist in res]
+    exp = [[(i, label, list(np.flatnonzero(inverse == label)))
+            for label in unique_labels]
+           for i in range(X[1].shape[1])]
+
+    assert res == exp
+
+
+def test_parallel_clustering_metric_affinity_precomputed_not_implemented():
+    class DummyClusterer(sk.base.BaseEstimator, sk.base.ClusterMixin):
+        def __init__(self, metric="precomputed", affinity="precomputed"):
+            self.metric = metric
+            self.affinity = affinity
+
+    pc = ParallelClustering(DummyClusterer())
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+
+    with pytest.raises(NotImplementedError,
+                       match="Behaviour when metric and affinity"):
+        pc.fit(X)
+
+
+def test_parallel_clustering_precomputed():
+    pc = ParallelClustering(sk.cluster.DBSCAN())
+    masks = np.random.choice([True, False], size=20).reshape((10, 2))
+    X = [np.random.random((10, 4)), masks]
+    pc_precomp = ParallelClustering(sk.cluster.DBSCAN(metric="precomputed"))
+    X_precomp = [sk.metrics.pairwise_distances(X[0]), masks]
+
+    res = pc.fit_predict(X)
+    res_precomp = pc_precomp.fit_predict(X_precomp)
+    res = [[(i, label, list(indices)) for [i, label, indices] in sublist]
+           for sublist in res]
+    res_precomp = [[(i, label, list(indices))
+                    for [i, label, indices] in sublist]
+                   for sublist in res_precomp]
+
+    assert res == res_precomp
 
 
 @composite
