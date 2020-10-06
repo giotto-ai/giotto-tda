@@ -77,7 +77,7 @@ class ParallelClustering(BaseEstimator):
 
         """
         if not isinstance(self.clusterer, ClusterMixin):
-            raise TypeError("`clusterer` must be an instance of " 
+            raise TypeError("`clusterer` must be an instance of "
                             "sklearn.base.ClusterMixin.")
         params = [param for param in ['metric', 'affinity']
                   if param in signature(self.clusterer.__init__).parameters]
