@@ -81,7 +81,7 @@ Graphs
 
 -  List input is now accepted by all transformers in ``gtda.graphs``, and outputs are consistently either lists or 3D arrays (`#478 <https://github.com/giotto-ai/giotto-tda/pull/478>`_).
 
--  Sparse matrices returned by ``KNeighborsGraph`` and ``TransitionGraph`` now have int dtype (0-1 adjacency matrices), and are necessarily symmetric (`#478 <https://github.com/giotto-ai/giotto-tda/pull/478>`_).
+-  Sparse matrices returned by ``KNeighborsGraph`` and ``TransitionGraph`` now have int dtype (0-1 adjacency matrices), and are not necessarily symmetric (`#478 <https://github.com/giotto-ai/giotto-tda/pull/478>`_).
 
 Mapper
 ------
