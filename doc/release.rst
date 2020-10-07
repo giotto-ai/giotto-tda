@@ -16,7 +16,7 @@ This is a major release which adds substantial new functionality and introduces 
 Persistent homology of directed flag complexes via ``pyflagser``
 ----------------------------------------------------------------
 
--  The ``pyflagser`` package (`source <https://github.com/giotto-ai/pyflagser>`_), `docs <https://docs-pyflagser.giotto.ai/>`_) is now an official dependency of ``giotto-tda``.
+-  The ``pyflagser`` package (`source <https://github.com/giotto-ai/pyflagser>`_, `docs <https://docs-pyflagser.giotto.ai/>`_) is now an official dependency of ``giotto-tda``.
 -  The ``FlagserPersistence`` transformer has been added to ``gtda.homology`` (`#339 <https://github.com/giotto-ai/giotto-tda/pull/339>`_). It wraps ``pyflagser.flagser_weighted`` to allow for computations of persistence diagrams from directed or undirected weighted graphs. A `new notebook <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/persistent_homology_graphs.html>`_ demonstrates its use.
 
 Edge collapsing and performance improvements for persistent homology
