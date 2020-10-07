@@ -150,7 +150,7 @@ Bug Fixes
 -  ``CubicalPersistence`` now does not create pairs with negative persistence when ``infinity_values`` is set too low (`#467 <https://github.com/giotto-ai/giotto-tda/pull/467>`_).
 -  Warnings are no longer thrown by ``KNeighborsGraph`` when ``metric="precomputed"`` (`#506 <https://github.com/giotto-ai/giotto-tda/pull/506>`_).
 -  A bug in ``Labeller.resample`` affecting cases in which ``n_steps_future >= size - 1``, has been fixed (`#460 <https://github.com/giotto-ai/giotto-tda/pull/460>`_).
--  A bug in ``validate_params``, affecting the case of tuples of allowed types, has been fixed (`<https://github.com/giotto-ai/giotto-tda/pull/502>`_).
+-  A bug in ``validate_params``, affecting the case of tuples of allowed types, has been fixed (`#502 <https://github.com/giotto-ai/giotto-tda/pull/502>`_).
 
 Backwards-Incompatible Changes
 ==============================
@@ -620,4 +620,4 @@ for this implementation.
 Release 0.1a.0
 **************
 
-Initial release of the library, original named ``giotto-learn``.
+Initial release of the library, originally named ``giotto-learn``.
