@@ -697,7 +697,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         Returns
         -------
         Xt : ndarray of shape (n_samples, n_homology_dimensions * 2 \
-            * n_coefficients)
+            * n_coefficients_)
             Polynomial coefficients: real and imaginary parts of the complex
             polynomials obtained in each homology dimension from each diagram
             in `X`.
