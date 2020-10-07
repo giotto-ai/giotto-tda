@@ -19,15 +19,15 @@ Persistent homology of directed flag complexes via ``pyflagser``
 -  The ``pyflagser`` package (`source <https://github.com/giotto-ai/pyflagser>`_), `docs <https://docs-pyflagser.giotto.ai/>`_) is now an official dependency of ``giotto-tda``.
 -  The ``FlagserPersistence`` transformer has been added to ``gtda.homology`` (`#339 <https://github.com/giotto-ai/giotto-tda/pull/339>`_). It wraps ``pyflagser.flagser_weighted`` to allow for computations of persistence diagrams from directed or undirected weighted graphs. A `new notebook <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/persistent_homology_graphs.html>`_ demonstrates its use.
 
-Edge collapsing and other performance improvements
---------------------------------------------------
+Edge collapsing and performance improvements for persistent homology
+--------------------------------------------------------------------
 
 -  GUDHI C++ components have been updated to the state of GUDHI v3.3.0, yielding performance improvements in ``SparseRipsPersistence``, ``EuclideanCechPersistence`` and ``CubicalPersistence`` (`#468 <https://github.com/giotto-ai/giotto-tda/pull/468>`_).
 -  Bindings for GUDHI's `edge collapser <https://hal.inria.fr/hal-02395227>`_ have been created and can now be used as an optional preprocessing step via the optional keyword argument ``collapse_edges`` in ``VietorisRipsPersistence`` and in ``gtda.externals.ripser`` (`#469 <https://github.com/giotto-ai/giotto-tda/pull/469>`_ and `#483 <https://github.com/giotto-ai/giotto-tda/pull/483>`_). When ``collapse_edges=True``, and the input data and/or number of required homology dimensions is sufficiently large, the resulting runtimes for Vietoris–Rips persistent homology are state of the art.
 -  The performance of the Ripser bindings has otherwise been improved by avoiding unnecessary data copies, better managing the memory, and using more efficient matrix routines (`#501 <https://github.com/giotto-ai/giotto-tda/pull/501>`_ and `#507 <https://github.com/giotto-ai/giotto-tda/pull/507>`_).
 
-Other additions and improvements in ``gtda.homology``
------------------------------------------------------
+New transformers and functionality in ``gtda.homology``
+-------------------------------------------------------
 
 -  The ``WeakAlphaPersistence`` transformer has been added to ``gtda.homology`` (`#464 <https://github.com/giotto-ai/giotto-tda/pull/464>`_). Like ``VietorisRipsPersistence``, ``SparseRipsPersistence`` and ``EuclideanCechPersistence``, it computes persistent homology from point clouds, but its runtime can scale much better with size in low dimensions.
 -  ``VietorisRipsPersistence`` now accepts sparse input when ``metric="precomputed"`` (`#424 <https://github.com/giotto-ai/giotto-tda/pull/424>`_).
@@ -115,7 +115,7 @@ New tutorials and examples
 
 The following new tutorials have been added:
 
--  `Topology of time series <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/time_series_classification.html>`_, which explains the theory of the Takens time-delay embedding and its use with persistent homology, demonstrates the new ``API`` of several components in ``gtda.time_series``, and shows how to construct time series *classification* pipelines in ``giotto-tda`` by partially reproducing `arXiv:1910:08245 <https://arxiv.org/abs/1910.08245>_`.
+-  `Topology of time series <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/time_series_classification.html>`_, which explains the theory of the Takens time-delay embedding and its use with persistent homology, demonstrates the new ``API`` of several components in ``gtda.time_series``, and shows how to construct time series *classification* pipelines in ``giotto-tda`` by partially reproducing `arXiv:1910:08245 <https://arxiv.org/abs/1910.08245>`_.
 -  `Topology in time series forecasting <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/time_series_forecasting.html>`_, which explains how to set up time series *forecasting* pipelines in ``giotto-tda`` via ``TransformerResamplerMixin``s and the ``giotto-tda`` ``Pipeline`` class.
 -  `Topological feature extraction from graphs <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/persistent_homology_graphs.html>`_, which explains what the features extracted from directed or undirected graphs by ``VietorisRipsPersistence``, ``SparseRipsPersistence`` and ``FlagserPersistence`` are.
 -  `Classifying handwritten digits <https://giotto-ai.github.io/gtda-docs/0.3.0/notebooks/MNIST_classification.html>`_, which presents a fully-fledged machine learning pipeline in which cubical persistent homology is applied to the classification of handwritten images from he MNIST dataset, partially reproducing `arXiv:1910.08345 <https://arxiv.org/abs/1910.08345>`_.
@@ -141,7 +141,7 @@ Bug Fixes
 -  A bug which led to the incorrect handling of the ``homology_dimensions`` parameter in ``Filtering`` has been fixed (`#439 <https://github.com/giotto-ai/giotto-tda/pull/439>`_).
 -  An issue with the use of ``joblib.Parallel``, which led to errors when attempting to run ``HeatKernel``, ``PersistenceImage``, and the corresponding amplitudes and distances on large datasets, has been fixed (`#428 <https://github.com/giotto-ai/giotto-tda/pull/428>`_ and `#481 <https://github.com/giotto-ai/giotto-tda/pull/481>`_).
 -  A bug leading to plots of persistence diagrams not showing points with negative births or deaths has been fixed, as has a bug with the computation of the range to be shown in the plot (`#437 <https://github.com/giotto-ai/giotto-tda/pull/437>`_).
--  A bug in the handling of persistence pairs with negative death values by ``Filtering`` has been fixed (`#436 <https://github.com/giotto-ai/giotto-tda/pull/436>_`).
+-  A bug in the handling of persistence pairs with negative death values by ``Filtering`` has been fixed (`#436 <https://github.com/giotto-ai/giotto-tda/pull/436>`_).
 -  A bug in the handling of ``homology_dimension_ix`` (now renamed to ``homology_dimension_idx``) in the ``plot`` methods of ``HeatKernel`` and ``PersistenceImage`` has been fixed (`#452 <https://github.com/giotto-ai/giotto-tda/pull/452>`_).
 -  A bug in the labelling of axes in ``HeatKernel`` and ``PersistenceImage`` plots has ben fixed (`#453 <https://github.com/giotto-ai/giotto-tda/pull/453>`_ and `#454 <https://github.com/giotto-ai/giotto-tda/pull/454>`_).
 -  ``PersistenceLandscape`` plots now show all homology dimensions, instead of just the first (`#454 <https://github.com/giotto-ai/giotto-tda/pull/454>`_).
