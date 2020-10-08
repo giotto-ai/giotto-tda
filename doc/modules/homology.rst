@@ -20,6 +20,12 @@ Undirected simplicial homology
 
 Directed simplicial homology
 ----------------------------
+.. currentmodule:: gtda
+
+.. autosummary::
+   :toctree: generated/homology/
+   :template: class.rst
+
    homology.FlagserPersistence
 
 Cubical homology

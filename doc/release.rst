@@ -130,7 +130,7 @@ Installation improvements
 -------------------------
 
 -  ``pybind11`` is now treated as a standard git submodule in the developer installation (`#459 <https://github.com/giotto-ai/giotto-tda/pull/459>`_).
--  `pandas <https://github.com/giotto-ai/giotto-tda/pull/508>`_ is now part of the testing requirements when intalling from source (`#508 <https://github.com/giotto-ai/giotto-tda/pull/508>`_).
+-  ``pandas`` is now part of the testing requirements when intalling from source (`#508 <https://github.com/giotto-ai/giotto-tda/pull/508>`_).
 
 Bug Fixes
 =========
