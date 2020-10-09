@@ -31,7 +31,7 @@ Guiding principles
 30s guide to ``giotto-tda``
 ***************************
 
-.. figure:: ../images/giotto-tda_workflow.png
+.. figure:: images/giotto-tda_workflow.png
 
 For installation instructions, see :ref:`the installation instructions <installation>`.
 
