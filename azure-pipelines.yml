@@ -41,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.10.05" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.10.27" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -139,7 +139,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.10.05" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.10.27" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -275,7 +275,7 @@ jobs:
   - script: |
       python -m pip uninstall -y giotto-tda
       python -m pip uninstall -y giotto-tda-nightly
-    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - bash: |
       set -e
