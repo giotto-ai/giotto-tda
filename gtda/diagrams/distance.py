@@ -66,7 +66,8 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
 
         - If ``metric == 'bottleneck'`` the only argument is `delta` (float,
           default: ``0.01``). When equal to ``0.``, an exact algorithm is used;
-          otherwise, a faster approximate algorithm is used.
+          otherwise, a faster approximate algorithm is used and symmetry is not
+          guaranteed.
         - If ``metric == 'wasserstein'`` the available arguments are `p`
           (float, default: ``2.``) and `delta` (float, default: ``0.01``).
           Unlike the case of ``'bottleneck'``, `delta` cannot be set to ``0.``
