@@ -36,10 +36,7 @@ def _time_delay_embedding(X, time_delay=1, dimension=2, stride=1,
         func = partial(_time_delay_embedding, time_delay=time_delay,
                        dimension=dimension, stride=stride, flatten=flatten,
                        ensure_last_value=ensure_last_value)
-        X_embedded = []
-        for x in X:
-            x_embedded = func(x[None, ...])[0]
-            X_embedded.append(x_embedded)
+        X_embedded = [func(x[None, ...])[0] for x in X]
 
     return X_embedded
 

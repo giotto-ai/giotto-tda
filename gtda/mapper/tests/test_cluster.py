@@ -5,7 +5,7 @@ for ParallelClustering."""
 import numpy as np
 import pytest
 import sklearn as sk
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats, integers, composite
 from numpy.testing import assert_almost_equal
@@ -138,6 +138,7 @@ def get_input(draw, n_clusters=None, n_points_per_cluster=None,
                      dim, std=std))
 
 
+@settings(deadline=500)
 @given(inp=get_input(n_clusters=1, n_points_per_cluster=1, std=1))
 def test_on_trivial_input(inp):
     """Test that with one cluster, and one point, we always get one cluster,
@@ -152,6 +153,7 @@ def test_on_trivial_input(inp):
     assert fh.n_clusters_ == n_clusters
 
 
+@settings(deadline=500)
 @given(inp=get_input(std=0.02))
 def test_firstsimplegap(inp):
     """For a multimodal distribution, check that ``FirstSimpleGap`` with
@@ -169,6 +171,7 @@ def test_firstsimplegap(inp):
     assert_almost_equal(counts, n_points_per_cluster)
 
 
+@settings(deadline=500)
 @given(inp=get_input(n_clusters=2, std=0.02))
 def test_firsthistogramgap(inp):
     """For a multimodal distribution, check that the ``FirstHistogramGap`` with
@@ -185,6 +188,7 @@ def test_firsthistogramgap(inp):
     assert_almost_equal(counts, n_points_per_cluster)
 
 
+@settings(deadline=500)
 @given(inp=get_input(), max_frac=floats(min_value=0., exclude_min=True,
                                         max_value=1., exclude_max=False))
 def test_max_fraction_clusters(inp, max_frac):
@@ -202,6 +206,7 @@ def test_max_fraction_clusters(inp, max_frac):
     assert fh.n_clusters_ <= np.floor(max_num_clusters)
 
 
+@settings(deadline=500)
 @given(inp=get_input())
 def test_precomputed_distances(inp):
     """Verify that the clustering based on a distance matrix is the same as
