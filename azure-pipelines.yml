@@ -41,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.11.01" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.11.03" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -139,7 +139,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.11.01" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.11.03" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
