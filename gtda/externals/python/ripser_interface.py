@@ -9,13 +9,6 @@ from sklearn.metrics.pairwise import pairwise_distances
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
 
 
-def _lexsort_coo_data(row, col, data):
-    lex_sort_idx = np.lexsort((col, row))
-    row, col, data = \
-        row[lex_sort_idx], col[lex_sort_idx], data[lex_sort_idx]
-    return row, col, data
-
-
 def DRFDM(DParam, maxHomDim, thresh=-1, coeff=2, do_cocycles=0):
     if coeff == 2:
         ret = gtda_ripser.rips_dm(DParam, DParam.shape[0], coeff, maxHomDim,
@@ -204,26 +197,20 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
     """
     if n_perm and sparse.issparse(X):
-        raise Exception(
-            "Greedy permutation is not supported for sparse distance matrices"
-        )
+        raise Exception("Greedy permutation is not supported for sparse "
+                        "distance matrices")
     if n_perm and n_perm > X.shape[0]:
-        raise Exception(
-            "Number of points in greedy permutation is greater"
-            " than number of points in the point cloud"
-        )
+        raise Exception("Number of points in greedy permutation is greater "
+                        "than number of points in the point cloud")
     if n_perm and n_perm < 0:
-        raise Exception(
-            "Should be a strictly positive number of points in the greedy "
-            "permutation"
-        )
+        raise Exception("There should be a strictly positive number of points "
+                        "in the greedy permutation")
 
     idx_perm = np.arange(X.shape[0])
     r_cover = 0.0
     if n_perm:
-        idx_perm, lambdas, dperm2all = get_greedy_perm(
-            X, n_perm=n_perm, metric=metric
-        )
+        idx_perm, lambdas, dperm2all = \
+            get_greedy_perm(X, n_perm=n_perm, metric=metric)
         r_cover = lambdas[-1]
         dm = dperm2all[:, idx_perm]
     else:
@@ -234,7 +221,6 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         dperm2all = None
 
     n_points = max(dm.shape)
-    sort_coo = True
     if (dm.diagonal() != 0).any():
         if collapse_edges:
             warn("Edge collapses are not supported when any of the diagonal "
@@ -246,11 +232,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             # format, because currently that's the only format that handles
             # nonzero births
             dm = sparse.coo_matrix(dm)
-            sort_coo = False
 
     if sparse.issparse(dm) or collapse_edges:
         if collapse_edges:
-            sort_coo = True
             if not sparse.issparse(dm):
                 row, col, data = \
                     gtda_collapser.flag_complex_collapse_edges_dense(dm,
@@ -262,31 +246,17 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                                                                    coo.col,
                                                                    coo.data,
                                                                    thresh)
-        else:
-            if sparse.isspmatrix_coo(dm):
-                # If the matrix is already COO, we need to order the row and
-                # column indices lexicographically to avoid errors. See
-                # https://github.com/scikit-tda/ripser.py/issues/103
-                row, col, data = dm.row, dm.col, dm.data
-            else:
-                coo = dm.tocoo()
-                row, col, data = coo.row, coo.col, coo.data
-                sort_coo = False
+        elif sparse.issparse(dm):
+            coo = dm.tocoo()
+            row, col, data = coo.row, coo.col, coo.data
 
-        if sort_coo:
-            row, col, data = _lexsort_coo_data(np.asarray(row),
-                                               np.asarray(col),
-                                               np.asarray(data))
-
-        res = DRFDMSparse(
-            row.astype(dtype=np.int32, order="C"),
-            col.astype(dtype=np.int32, order="C"),
-            np.array(data, dtype=np.float32, order="C"),
-            n_points,
-            maxdim,
-            thresh,
-            coeff
-            )
+        res = DRFDMSparse(row.astype(dtype=np.int32, order="C"),
+                          col.astype(dtype=np.int32, order="C"),
+                          np.array(data, dtype=np.float32, order="C"),
+                          n_points,
+                          maxdim,
+                          thresh,
+                          coeff)
     else:
         # Only consider strict upper diagonal
         DParam = squareform(dm, checks=False).astype(np.float32)
@@ -301,11 +271,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         N = int(len(dgms[dim]) / 2)
         dgms[dim] = np.reshape(np.array(dgms[dim]), [N, 2])
 
-    ret = {
-        "dgms": dgms,
-        "num_edges": res.num_edges,
-        "dperm2all": dperm2all,
-        "idx_perm": idx_perm,
-        "r_cover": r_cover,
-    }
+    ret = {"dgms": dgms,
+           "num_edges": res.num_edges,
+           "dperm2all": dperm2all,
+           "idx_perm": idx_perm,
+           "r_cover": r_cover}
+
     return ret
