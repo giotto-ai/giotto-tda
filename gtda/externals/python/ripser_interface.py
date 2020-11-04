@@ -250,9 +250,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             coo = dm.tocoo()
             row, col, data = coo.row, coo.col, coo.data
 
-        res = DRFDMSparse(row.astype(dtype=np.int32, order="C"),
-                          col.astype(dtype=np.int32, order="C"),
-                          np.array(data, dtype=np.float32, order="C"),
+        res = DRFDMSparse(np.asarray(row, dtype=np.int32, order="C"),
+                          np.asarray(col, dtype=np.int32, order="C"),
+                          np.asarray(data, dtype=np.float32, order="C"),
                           n_points,
                           maxdim,
                           thresh,
