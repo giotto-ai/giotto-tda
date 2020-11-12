@@ -107,7 +107,7 @@ We provide a number of :ref:`tutorials and examples <notebooks_index>`, which of
 Use cases
 =========
 
-A selection of use cases for ``giotto-tda`` is collected at `this page <https://giotto.ai/learn/course-content>`_.
+A selection of use cases for ``giotto-tda`` is collected at `this page <https://giotto.ai/use-cases>`_.
 The related GitHub repositories can be found at `github <https://github.com/giotto-ai>`_.
 
 **********
