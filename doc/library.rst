@@ -79,8 +79,7 @@ optimised via grid-searches, etc.:
   model.fit(X_train, y_train)
   model.score(X_valid, y_valid)
 
-``giotto-tda`` also implements the `Mapper algorithm <https://research.math.osu.edu/tgda/mapperPBG.pdf>`_ as a highly customisable ``scikit-learn`` :class:`Pipeline`, and provides simple plotting functions
-for visualizing output Mapper graphs and have real-time interaction with the pipeline parameters:
+``giotto-tda`` also implements the `Mapper algorithm <https://research.math.osu.edu/tgda/mapperPBG.pdf>`_ as a highly customisable ``scikit-learn`` :class:`Pipeline`, and provides simple plotting functions for visualizing output Mapper graphs and have real-time interaction with the pipeline parameters:
 
 .. code-block:: python
 
@@ -108,7 +107,10 @@ Use cases
 =========
 
 A selection of use cases for ``giotto-tda`` is collected at `this page <https://giotto.ai/use-cases>`_.
-The related GitHub repositories can be found at `github <https://github.com/giotto-ai>`_.
+Please note, however, that some of these were written for past versions of ``giotto-tda``. In some cases,
+only small modifications are needed to run them on recent versions, while in other cases it is best to
+install the relevant past version of ``giotto-tda`` (preferably in a fresh environmnent). In a couple of
+cases, the legacy ``giotto-learn`` or ``giotto-learn-nightly`` will be needed.
 
 **********
 What's new
