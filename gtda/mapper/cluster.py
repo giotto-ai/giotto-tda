@@ -144,16 +144,12 @@ class ParallelClustering(BaseEstimator):
 
         labels_idx = Parallel(
             n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer
-            )(delayed(single_labels_idx)(
-                X_tot,
-                np.flatnonzero(mask),
-                mask_num,
-                sample_weight=sample_weights[mask_num]
-                )
-              for mask_num, mask in enumerate(masks.T))
+            )(delayed(single_labels_idx)(X_tot, np.flatnonzero(masks[:, i]), i,
+                                         sample_weight=sample_weights[i])
+              for i in range(masks.shape[1]))
 
         self.labels_ = np.empty(len(X_tot), dtype=object)
-        self.labels_[:] = [[]] * len(X_tot)
+        self.labels_[:] = [tuple([])] * len(X_tot)
         for relative_indices, mask_num_rel_labels in labels_idx:
             self.labels_[relative_indices] += mask_num_rel_labels
 
@@ -165,7 +161,7 @@ class ParallelClustering(BaseEstimator):
 
         mask_num_rel_labels = np.empty(len(relative_indices), dtype=object)
         mask_num_rel_labels[:] = [
-            [(mask_num, label)]
+            ((mask_num, label),)
             for label in self._single_labels(X, relative_2d_indices,
                                              sample_weight)
             ]
@@ -177,7 +173,7 @@ class ParallelClustering(BaseEstimator):
 
         mask_num_rel_labels = np.empty(len(relative_indices), dtype=object)
         mask_num_rel_labels[:] = [
-            [(mask_num, label)]
+            ((mask_num, label),)
             for label in self._single_labels(X, relative_indices,
                                              sample_weight)
             ]
