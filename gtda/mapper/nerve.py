@@ -130,22 +130,28 @@ class Nerve(BaseEstimator, TransformerMixin):
         """
         # TODO: Include a validation step for X
         # Graph construction -- vertices with their metadata
-        nodes = reduce(iconcat, X, [])
-        graph = ig.Graph(len(nodes))
+        nodes_dict = {}
+        for i, sample in enumerate(X):
+            for node_id_pair in sample:
+                nodes_dict.setdefault(node_id_pair, []).append(i)
+        nodes_dict = {key: np.array(value, dtype=np.int32)
+                      for key, value in nodes_dict.items()}
 
-        # Since `nodes` is a list, say of length N, of triples of the form
-        # (pullback_set_label, partial_cluster_label, node_elements),
-        # zip(*nodes) generates three tuples of length N, each corresponding to
-        # a type of node attribute.
-        node_attributes = zip(*nodes)
-        attribute_names = ["pullback_set_label", "partial_cluster_label",
-                           "node_elements"]
-        for i, node_attribute in enumerate(node_attributes):
-            graph.vs[attribute_names[i]] = node_attribute
+        graph = ig.Graph(len(nodes_dict))
+
+        # `nodes_dict` is a dictionary of, say, N key-value pairs of the form
+        # (pullback_set_label, partial_cluster_label): node_elements. Hence,
+        # zip(*nodes_dict) generates two tuples of length N, each corresponding
+        # to a type of node attribute in the final graph.
+        node_attributes = zip(*nodes_dict)
+        graph.vs["pullback_set_label"] = next(node_attributes)
+        graph.vs["partial_cluster_label"] = next(node_attributes)
+        graph.vs["node_elements"] = [*nodes_dict.values()]
 
         # Graph construction -- edges with weights given by intersection sizes.
         # In general, we need all information in `nodes` to narrow down the set
-        # of combinations to check when `contract_nodes` is True
+        # of combinations to check, especially when `contract_nodes` is True.
+        nodes = zip(*zip(*nodes_dict), nodes_dict.values())
         node_index_pairs, weights, intersections, mapping = \
             self._generate_edge_data(nodes)
         graph.es["weight"] = 1
