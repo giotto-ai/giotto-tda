@@ -11,7 +11,7 @@ Release 0.3.1
 Major Features and Improvements
 ===============================
 
-- The latest changes made to the ``ripser.py`` submodule have been pulled (`#530 <https://github.com/giotto-ai/giotto-tda/pull/530>`_, see also `532 <https://github.com/giotto-ai/giotto-tda/pull/532>`_). This includes in particular the performance improvements to the C++ backend submitted by Julian Burella Pérez via `scikit-tda/ripser.py#106 <https://github.com/scikit-tda/ripser.py/pull/106>`_. The developer installation now includes a new dependency in `robinhood hashmap <https://github.com/martinus/robin-hood-hashing>`_. These changes do not affect functionality.
+- The latest changes made to the ``ripser.py`` submodule have been pulled (`#530 <https://github.com/giotto-ai/giotto-tda/pull/530>`_, see also `#532 <https://github.com/giotto-ai/giotto-tda/pull/532>`_). This includes in particular the performance improvements to the C++ backend submitted by Julian Burella Pérez via `scikit-tda/ripser.py#106 <https://github.com/scikit-tda/ripser.py/pull/106>`_. The developer installation now includes a new dependency in `robinhood hashmap <https://github.com/martinus/robin-hood-hashing>`_. These changes do not affect functionality.
 - The example notebook `classifying_shapes.ipynb <https://github.com/giotto-ai/giotto-tda/blob/46b18a48205e5611f3c2e0eaa21072a93ada5bcb/examples/classifying_shapes.ipynb>`_ has been modified and improved (`#523 <https://github.com/giotto-ai/giotto-tda/pull/523>`_).
 - The tutorial previously called ``time_series_classification.ipynb`` has been split into an introductory tutorial on the Takens embedding ideas (`topology_time_series.ipynb <https://github.com/wreise/giotto-tda/blob/b5321f5858eb12103a5f08126ad68d597b41aca9/examples/topology_time_series.ipynb>`_) and an example notebook on gravitational wave detection (`gravitational_waves_detection.ipynb <https://github.com/wreise/giotto-tda/blob/b5321f5858eb12103a5f08126ad68d597b41aca9/examples/gravitational_waves_detection.ipynb>`_) which presents a time series classification task (`#529 <https://github.com/giotto-ai/giotto-tda/pull/529>`_).
 - The documentation for ``PairwiseDistance`` has been improved (`#525 <https://github.com/giotto-ai/giotto-tda/pull/525>`_).
@@ -24,7 +24,7 @@ Bug Fixes
 Backwards-Incompatible Changes
 ==============================
 
-- Due to poor support for ``brew`` in the macOS 10.14 virtual machines by Azure, the CI for macOS systems is now run on 10.15 virtual machines and 10.14 is no longer supported by the wheels (`<#527 https://github.com/giotto-ai/giotto-tda/pull/527>`_)
+- Due to poor support for ``brew`` in the macOS 10.14 virtual machines by Azure, the CI for macOS systems is now run on 10.15 virtual machines and 10.14 is no longer supported by the wheels (`#527 <https://github.com/giotto-ai/giotto-tda/pull/527>`_)
 
 Thanks to our Contributors
 ==========================
