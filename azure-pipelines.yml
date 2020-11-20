@@ -41,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.10.05" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2020.11.03" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -73,6 +73,7 @@ jobs:
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+    condition: eq(variables['test_wheels'], 'true')
     displayName: 'Test the wheels with pytest'
 
   - script: |
@@ -84,7 +85,7 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
-    condition: eq(variables['notebooks_check'], 'true')
+    condition: eq(variables['test_notebooks'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -107,9 +108,9 @@ jobs:
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'macOS1014'
+- job: 'macOS1015'
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
   strategy:
     matrix:
       Python36:
@@ -138,7 +139,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.10.05" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2020.11.03" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -170,8 +171,8 @@ jobs:
 
   - script: |
       set -e
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
+      python -m pip uninstall -y giotto-tda
+      python -m pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
@@ -187,6 +188,7 @@ jobs:
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+    condition: eq(variables['test_wheels'], 'true')
     displayName: 'Test the wheels with pytest'
 
   - script: |
@@ -198,7 +200,7 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
-    condition: eq(variables['notebooks_check'], 'true')
+    condition: eq(variables['test_notebooks'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -273,7 +275,7 @@ jobs:
   - script: |
       python -m pip uninstall -y giotto-tda
       python -m pip uninstall -y giotto-tda-nightly
-    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - bash: |
       set -e
@@ -288,6 +290,7 @@ jobs:
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+    condition: eq(variables['test_wheels'], 'true')
     displayName: 'Test the wheels with pytest'
 
   - script: |
@@ -295,7 +298,7 @@ jobs:
       python -m pip install papermill
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
-    condition: eq(variables['notebooks_check'], 'true')
+    condition: eq(variables['test_notebooks'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2

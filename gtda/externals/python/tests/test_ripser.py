@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats, integers, composite
 from numpy.testing import assert_almost_equal
@@ -47,6 +47,7 @@ def get_sparse_distance_matrices(draw):
 
 @pytest.mark.parametrize('thresh', [False, True])
 @pytest.mark.parametrize('coeff', [2, 7])
+@settings(deadline=500)
 @given(distance_matrix=get_dense_distance_matrices())
 def test_collapse_consistent_with_no_collapse_dense(thresh,
                                                     coeff, distance_matrix):
@@ -66,6 +67,7 @@ def test_collapse_consistent_with_no_collapse_dense(thresh,
 
 @pytest.mark.parametrize('thresh', [False, True])
 @pytest.mark.parametrize('coeff', [2, 7])
+@settings(deadline=500)
 @given(distance_matrix=get_sparse_distance_matrices())
 def test_collapse_consistent_with_no_collapse_coo(thresh,
                                                   coeff, distance_matrix):
