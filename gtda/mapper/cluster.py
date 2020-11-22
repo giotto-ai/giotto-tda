@@ -133,54 +133,41 @@ class ParallelClustering(BaseEstimator):
 
         fit_params = signature(self.clusterer.fit).parameters
         if sample_weight is not None and "sample_weight" in fit_params:
-            sample_weight_computer = self._sample_weight_computer
+            self._sample_weight_computer = lambda rel_indices, sample_weight: \
+                {"sample_weight": sample_weight[rel_indices]}
         else:
-            sample_weight_computer = lambda *args: {}
+            self._sample_weight_computer = lambda *args: {}
 
         if self._precomputed:
-            idx_computer = self._idx_computer_precomputed
+            self._indices_computer = lambda rel_indices: \
+                np.ix_(rel_indices, rel_indices)
         else:
-            idx_computer = self._idx_computer
+            self._indices_computer = lambda rel_indices: rel_indices
 
-        labels_idx = Parallel(n_jobs=self.n_jobs,
-                              prefer=self.parallel_backend_prefer)(
-            delayed(self._single_labels_idx)(
-                X_tot[idx_computer(i, masks)],
-                i,
-                sample_weight_computer(i, masks, sample_weight)
-                )
+        labels_single = Parallel(n_jobs=self.n_jobs,
+                                 prefer=self.parallel_backend_prefer)(
+            delayed(self._labels_single)(X_tot, np.flatnonzero(masks[:, i]),
+                                         sample_weight)
             for i in range(masks.shape[1])
             )
 
         self.labels_ = np.empty(len(X_tot), dtype=object)
         self.labels_[:] = [tuple([])] * len(X_tot)
-        for i, mask_num_rel_labels in enumerate(labels_idx):
-            self.labels_[idx_computer(i, masks)] += mask_num_rel_labels
+        for i, (rel_indices, rel_labels) in enumerate(labels_single):
+            n_labels = len(rel_labels)
+            labels_i = np.empty(n_labels, dtype=object)
+            labels_i[:] = [((i, rel_label),) for rel_label in rel_labels]
+            self.labels_[rel_indices] += labels_i
 
         return self
 
-    @staticmethod
-    def _idx_computer(i, masks):
-        return np.flatnonzero(masks[:, i])
-
-    @staticmethod
-    def _idx_computer_precomputed(i, masks):
-        idx_one = np.flatnonzero(masks[:, i])
-        return np.ix_(idx_one, idx_one)
-
-    @staticmethod
-    def _sample_weight_computer(i, masks, sample_weight):
-        return {"sample_weight": sample_weight[masks[:, i]]}
-
-    def _single_labels_idx(self, X, mask_num, kwargs):
+    def _labels_single(self, X, rel_indices, sample_weight):
         cloned_clusterer = clone(self.clusterer)
-        mask_num_rel_labels = np.empty(len(X), dtype=object)
-        mask_num_rel_labels[:] = [
-            ((mask_num, label),)
-            for label in cloned_clusterer.fit(X, **kwargs).labels_
-            ]
+        X_sub = X[self._indices_computer(rel_indices)]
+        kwargs = self._sample_weight_computer(rel_indices, sample_weight)
 
-        return mask_num_rel_labels
+        return (rel_indices,
+                cloned_clusterer.fit(X_sub, **kwargs).labels_)
 
     def fit_predict(self, X, y=None, sample_weight=None):
         """Fit to the data, and return the found clusters.
