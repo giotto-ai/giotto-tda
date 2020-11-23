@@ -144,11 +144,16 @@ class ParallelClustering(BaseEstimator):
         else:
             self._indices_computer = lambda rel_indices: rel_indices
 
+        # This seems necessary to avoid large overheads when running fit a
+        # second time. Probably due to refcounts. NOTE: Only works if done
+        # before assigning labels_single. TODO: Investigate
+        self.labels_ = None
+
         labels_single = Parallel(n_jobs=self.n_jobs,
                                  prefer=self.parallel_backend_prefer)(
-            delayed(self._labels_single)(X_tot, np.flatnonzero(masks[:, i]),
+            delayed(self._labels_single)(X_tot[rel_indices], rel_indices,
                                          sample_weight)
-            for i in range(masks.shape[1])
+            for rel_indices in map(np.flatnonzero, masks.T)
             )
 
         self.labels_ = np.empty(len(X_tot), dtype=object)
@@ -163,11 +168,9 @@ class ParallelClustering(BaseEstimator):
 
     def _labels_single(self, X, rel_indices, sample_weight):
         cloned_clusterer = clone(self.clusterer)
-        X_sub = X[self._indices_computer(rel_indices)]
         kwargs = self._sample_weight_computer(rel_indices, sample_weight)
 
-        return (rel_indices,
-                cloned_clusterer.fit(X_sub, **kwargs).labels_)
+        return rel_indices, cloned_clusterer.fit(X, **kwargs).labels_
 
     def fit_predict(self, X, y=None, sample_weight=None):
         """Fit to the data, and return the found clusters.
