@@ -1,9 +1,7 @@
 """Construct the nerve of a refined Mapper cover."""
 # License: GNU AGPLv3
 
-from functools import reduce
 from itertools import combinations, filterfalse
-from operator import iconcat
 
 import igraph as ig
 import numpy as np
