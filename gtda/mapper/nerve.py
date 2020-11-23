@@ -134,8 +134,8 @@ class Nerve(BaseEstimator, TransformerMixin):
                 nodes_dict.setdefault(node_id_pair, []).append(i)
         labels_to_indices = {key: np.array(value, dtype=np.int32)
                              for key, value in nodes_dict.items()}
-
-        graph = ig.Graph(len(labels_to_indices))
+        n_nodes = len(labels_to_indices)
+        graph = ig.Graph(n_nodes)
 
         # `nodes_dict` is a dictionary of, say, N key-value pairs of the form
         # (pullback_set_label, partial_cluster_label): node_elements. Hence,
@@ -151,7 +151,7 @@ class Nerve(BaseEstimator, TransformerMixin):
         # of combinations to check, especially when `contract_nodes` is True.
         nodes = zip(*zip(*labels_to_indices), labels_to_indices.values())
         node_index_pairs, weights, intersections, mapping = \
-            self._generate_edge_data(nodes)
+            self._generate_edge_data(nodes, n_nodes)
         graph.es["weight"] = 1
         graph.add_edges(node_index_pairs)
         graph.es["weight"] = weights
@@ -174,7 +174,7 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         return graph
 
-    def _generate_edge_data(self, nodes):
+    def _generate_edge_data(self, nodes, n_nodes):
         def _in_same_pullback_set(_node_tuple):
             return _node_tuple[0][1][0] == _node_tuple[1][1][0]
 
@@ -226,7 +226,7 @@ class Nerve(BaseEstimator, TransformerMixin):
             intersection_behavior = _do_nothing
 
         if self.contract_nodes:
-            mapping = np.arange(len(nodes))
+            mapping = np.arange(n_nodes)
             behavior = _subset_check_metadata_append
         else:
             mapping = None
