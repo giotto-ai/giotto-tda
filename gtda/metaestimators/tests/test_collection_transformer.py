@@ -51,7 +51,7 @@ def test_collection_transformer_no_baseestimator_warn():
 
 
 @pytest.mark.parametrize("X", [X_arr, X_list])
-@pytest.mark.parametrize("n_jobs", [None, 2, -1])
+@pytest.mark.parametrize("n_jobs", [1, 2, -1])
 def test_collection_transformer_fit_transform(X, n_jobs):
     n_components = 3
     pca = PCA(n_components=n_components)

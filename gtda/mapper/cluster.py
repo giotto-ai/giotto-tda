@@ -151,8 +151,11 @@ class ParallelClustering(BaseEstimator):
 
         labels_single = Parallel(n_jobs=self.n_jobs,
                                  prefer=self.parallel_backend_prefer)(
-            delayed(self._labels_single)(X_tot[rel_indices], rel_indices,
-                                         sample_weight)
+            delayed(self._labels_single)(
+                X_tot[self._indices_computer(rel_indices)],
+                rel_indices,
+                sample_weight
+                )
             for rel_indices in map(np.flatnonzero, masks.T)
             )
 
