@@ -372,7 +372,7 @@ def make_mapper_pipeline(scaler=None,
     else:
         _scaler = scaler
 
-    # If filter_func is not a scikit-learn transformer, hope it is a callable
+    # If filter_func is not a scikit-learn transformer, assume it is a callable
     # to be applied on each row separately. Then attempt to create a
     # FunctionTransformer object to implement this behaviour.
     if filter_func is None:

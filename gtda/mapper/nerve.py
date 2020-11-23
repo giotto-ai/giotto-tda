@@ -134,24 +134,24 @@ class Nerve(BaseEstimator, TransformerMixin):
         for i, sample in enumerate(X):
             for node_id_pair in sample:
                 nodes_dict.setdefault(node_id_pair, []).append(i)
-        nodes_dict = {key: np.array(value, dtype=np.int32)
-                      for key, value in nodes_dict.items()}
+        labels_to_indices = {key: np.array(value, dtype=np.int32)
+                             for key, value in nodes_dict.items()}
 
-        graph = ig.Graph(len(nodes_dict))
+        graph = ig.Graph(len(labels_to_indices))
 
         # `nodes_dict` is a dictionary of, say, N key-value pairs of the form
         # (pullback_set_label, partial_cluster_label): node_elements. Hence,
         # zip(*nodes_dict) generates two tuples of length N, each corresponding
         # to a type of node attribute in the final graph.
-        node_attributes = zip(*nodes_dict)
+        node_attributes = zip(*labels_to_indices)
         graph.vs["pullback_set_label"] = next(node_attributes)
         graph.vs["partial_cluster_label"] = next(node_attributes)
-        graph.vs["node_elements"] = [*nodes_dict.values()]
+        graph.vs["node_elements"] = [*labels_to_indices.values()]
 
         # Graph construction -- edges with weights given by intersection sizes.
         # In general, we need all information in `nodes` to narrow down the set
         # of combinations to check, especially when `contract_nodes` is True.
-        nodes = zip(*zip(*nodes_dict), nodes_dict.values())
+        nodes = zip(*zip(*labels_to_indices), labels_to_indices.values())
         node_index_pairs, weights, intersections, mapping = \
             self._generate_edge_data(nodes)
         graph.es["weight"] = 1
