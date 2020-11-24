@@ -22,10 +22,10 @@ class ParallelClustering(BaseEstimator):
     An arbitrary clustering class which stores a ``labels_`` attribute in
     ``fit`` can be passed to the constructor. Examples are most classes in
     ``sklearn.cluster``. The input of :meth:`fit` is of the form ``[X_tot,
-    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a
-    two-dimensional boolean array, each column of which indicates the
-    location of a portion of ``X_tot`` to cluster separately. Parallelism is
-    achieved over the columns of ``masks``.
+    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a 2D boolean
+    array, each column of which indicates the location of a portion of
+    ``X_tot`` to cluster separately. Parallelism is achieved over the columns
+    of ``masks``.
 
     Parameters
     ----------
@@ -45,16 +45,12 @@ class ParallelClustering(BaseEstimator):
 
     Attributes
     ----------
-    clusterers_ : tuple of object
-        Clones of `clusterer` fitted to the portions of the full data array
-        specified in :meth:`fit`.
-
-    clusters_ : list of list of tuple
-       Labels and indices of each cluster found in :meth:`fit`. The i-th
-       entry corresponds to the i-th portion of the data; it is a list of
-       triples of the form ``(i, label, indices)``, where ``label`` is a
-       cluster label and ``indices`` is the array of indices of points
-       belonging to cluster ``(i, label)``.
+    labels_ : ndarray of shape (n_samples,)
+       For each point in the dataset passed to :meth:`fit`, a tuple of pairs
+       of the form ``(i, partial_label)`` where ``i`` is the index of a boolean
+       mask which selects that point and ``partial_label`` is the cluster label
+       assigned to the point when clustering the subset of the data selected by
+       mask ``i``.
 
     References
     ----------
@@ -161,10 +157,11 @@ class ParallelClustering(BaseEstimator):
 
         self.labels_ = np.empty(len(X_tot), dtype=object)
         self.labels_[:] = [tuple([])] * len(X_tot)
-        for i, (rel_indices, rel_labels) in enumerate(labels_single):
-            n_labels = len(rel_labels)
+        for i, (rel_indices, partial_labels) in enumerate(labels_single):
+            n_labels = len(partial_labels)
             labels_i = np.empty(n_labels, dtype=object)
-            labels_i[:] = [((i, rel_label),) for rel_label in rel_labels]
+            labels_i[:] = [((i, partial_label),)
+                           for partial_label in partial_labels]
             self.labels_[rel_indices] += labels_i
 
         return self
@@ -199,8 +196,8 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        clusters : list of list of tuple
-            See :attr:`clusters_`.
+        labels : ndarray of shape (n_samples,)
+            See :attr:`labels_`.
 
         """
         self.fit(X, sample_weight=sample_weight)
@@ -249,8 +246,8 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        Xt : list of list of tuple
-            See :attr:`clusters_`.
+        Xt : ndarray of shape (n_samples,)
+            See :attr:`labels_`.
 
         """
         Xt = self.fit_predict(X, y, **fit_params)

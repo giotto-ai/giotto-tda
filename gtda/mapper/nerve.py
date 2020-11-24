@@ -34,8 +34,6 @@ class Nerve(BaseEstimator, TransformerMixin):
     by :func:`gtda.mapper.make_mapper_pipeline`. It corresponds the last two
     arrows in `this diagram <../../../../_images/mapper_pipeline.svg>`_.
 
-    This transformer is not intended for direct use.
-
     Parameters
     ----------
     min_intersection : int, optional, default: ``1``
@@ -94,20 +92,16 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : list of list of tuple
-            Data structure describing a cover of a dataset (e.g. as depicted in
-            `this diagram <../../../../_images/mapper_pipeline.svg>`_) produced
-            by the clustering step of a :class:`gtda.mapper.MapperPipeline`.
-            Each sublist corresponds to a (non-empty) pullback cover set --
-            equivalently, to a cover set in the filter range which has
-            non-empty preimage. It contains triples of the form
-            ``(pullback_set_label, partial_cluster_label, node_elements)``
-            where ``partial_cluster_label`` is a cluster label within the
-            pullback cover set identified by ``pullback_set_label``, and
-            ``node_elements`` is an array of integer indices. To each pair
-            ``(pullback_set_label, partial_cluster_label)`` there corresponds
-            a unique node in the output Mapper graph. This node represents
-            the data subset defined by the indices in ``node_elements``.
+        X : ndarray of shape (n_samples,)
+            Cluster labels describing a refined cover of a dataset produced by
+            the clustering step of a :class:`gtda.mapper.MapperPipeline`,
+            as depicted in
+            `this diagram <../../../../_images/mapper_pipeline.svg>`_. Each
+            entry is a tuple of pairs of the form
+            ``(pullback_cluster_label, partial_label)`` where
+            ``partial_cluster_label`` is a cluster label within the pullback
+            cover set identified by ``pullback_set_label``. Unique such pairs
+            correspond to nodes in the output graph.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
