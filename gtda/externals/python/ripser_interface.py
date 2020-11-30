@@ -122,6 +122,28 @@ def get_greedy_perm(X, n_perm=None, metric="euclidean"):
     return idx_perm, lambdas, dperm2all
 
 
+def _resolve_symmetry_conflicts(coo):
+    _row, _col, _data = coo.row, coo.col, coo.data
+
+    upper_triangle = _col >= _row
+    row = _row[upper_triangle] 
+    col = _col[upper_triangle]
+    data = _data[upper_triangle]
+    below_diag = np.logical_not(upper_triangle)
+    _info_below_diag = _row[below_diag], _col[below_diag], _data[below_diag]
+
+    upper_triangle_indices = set(zip(row, col))
+    additions = tuple(zip(*((j, i, x) for (i, j, x) in zip(*_info_below_diag)
+                            if (j, i) not in upper_triangle_indices)))
+    if additions:
+        row_add, col_add, data_add = additions
+        row = np.concatenate([row, row_add])
+        col = np.concatenate([col, col_add])
+        data = np.concatenate([data, data_add])
+    
+    return row, col, data
+
+
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
            n_perm=None, collapse_edges=False):
     """Compute persistence diagrams for X data array using Ripser [1]_.
@@ -253,22 +275,20 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             # nonzero births
             dm = sparse.coo_matrix(dm)
 
-    if sparse.issparse(dm) or collapse_edges:
-        if collapse_edges:
-            if not sparse.issparse(dm):
-                row, col, data = \
-                    gtda_collapser.flag_complex_collapse_edges_dense(dm,
-                                                                     thresh)
-            else:
-                coo = dm.tocoo()
-                row, col, data = \
-                    gtda_collapser.flag_complex_collapse_edges_coo(coo.row,
-                                                                   coo.col,
-                                                                   coo.data,
-                                                                   thresh)
-        elif sparse.issparse(dm):
+    is_sparse = sparse.issparse(dm)
+    if is_sparse or collapse_edges:
+        if is_sparse:
             coo = dm.tocoo()
-            row, col, data = coo.row, coo.col, coo.data
+            row, col, data = _resolve_symmetry_conflicts(coo)
+            if collapse_edges:
+                row, col, data = \
+                    gtda_collapser.flag_complex_collapse_edges_coo(row,
+                                                                   col,
+                                                                   data,
+                                                                   thresh)
+        else:
+            row, col, data = \
+                gtda_collapser.flag_complex_collapse_edges_dense(dm, thresh)
 
         res = DRFDMSparse(np.asarray(row, dtype=np.int32, order="C"),
                           np.asarray(col, dtype=np.int32, order="C"),
