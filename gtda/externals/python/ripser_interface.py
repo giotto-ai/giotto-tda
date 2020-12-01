@@ -278,8 +278,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     is_sparse = sparse.issparse(dm)
     if is_sparse or collapse_edges:
         if is_sparse:
-            coo = dm.tocoo()
-            row, col, data = _resolve_symmetry_conflicts(coo)
+            row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
             if collapse_edges:
                 row, col, data = \
                     gtda_collapser.flag_complex_collapse_edges_coo(row,
