@@ -123,18 +123,26 @@ def get_greedy_perm(X, n_perm=None, metric="euclidean"):
 
 
 def _resolve_symmetry_conflicts(coo):
+    """Given a sparse matrix in COO format, filter out any entry at location
+    (i, j) strictly below the diagonal if the entry at (j, i) is also
+    stored."""
     _row, _col, _data = coo.row, coo.col, coo.data
 
-    upper_triangle = _col >= _row
-    row = _row[upper_triangle] 
-    col = _col[upper_triangle]
-    data = _data[upper_triangle]
-    below_diag = np.logical_not(upper_triangle)
-    _info_below_diag = _row[below_diag], _col[below_diag], _data[below_diag]
+    in_upper_triangle = _col >= _row
+    # Initialize filtered COO data with information in the upper triangle
+    row = _row[in_upper_triangle]
+    col = _col[in_upper_triangle]
+    data = _data[in_upper_triangle]
 
+    # Filter out entries below the diagonal for which entries at transposed
+    # positions are already available
     upper_triangle_indices = set(zip(row, col))
-    additions = tuple(zip(*((j, i, x) for (i, j, x) in zip(*_info_below_diag)
+    below_diag = np.logical_not(in_upper_triangle)
+    additions = tuple(zip(*((j, i, x) for (i, j, x) in zip(_row[below_diag],
+                                                           _col[below_diag],
+                                                           _data[below_diag])
                             if (j, i) not in upper_triangle_indices)))
+    # Add surviving entries below the diagonal to final COO data
     if additions:
         row_add, col_add, data_add = additions
         row = np.concatenate([row, row_add])
