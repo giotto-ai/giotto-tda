@@ -12,15 +12,6 @@ pip install --upgrade pip setuptools
 # Install CMake
 pip install cmake
 
-# workaround CentOS 6.10 that reached EOL
-# https://github.com/pypa/manylinux/issues/836
-sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
-sed -i 's/mirrorlist/#mirrorlist/' /etc/yum.repos.d/CentOS-*.repo
-sed -i 's/#\(baseurl.*\)mirror.centos.org/\1vault.centos.org/' /etc/yum.repos.d/CentOS-Base.repo
-rm -f /etc/yum.repos.d/CentOS-SCLo-scl*
-
-yum makecache
-
 # Setup ccache
 yum install -y ccache
 source /io/.azure-ci/setup_ccache.sh
