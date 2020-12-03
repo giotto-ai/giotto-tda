@@ -12,6 +12,9 @@ pip install --upgrade pip setuptools
 # Install CMake
 pip install cmake
 
+# https://github.com/Qiskit/qiskit-aer/pull/1066/files
+yum install -y https://archives.fedoraproject.org/pub/archive/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
 # Setup ccache
 yum install -y ccache
 source /io/.azure-ci/setup_ccache.sh
