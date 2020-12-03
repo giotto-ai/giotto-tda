@@ -25,7 +25,8 @@ def get_dense_distance_matrices(draw):
 
 @composite
 def get_sparse_distance_matrices(draw):
-    """Generate 2d sparse matrices of floats, with zero along the diagonal."""
+    """Generate 2d upper triangular sparse matrices of floats, with zero along
+    the diagonal."""
     shapes = draw(integers(min_value=2, max_value=40))
     distance_matrix = draw(arrays(dtype=np.float,
                                   elements=floats(allow_nan=False,
@@ -40,9 +41,48 @@ def get_sparse_distance_matrices(draw):
     row = row[not_inf_idx]
     col = col[not_inf_idx]
     data = data[not_inf_idx]
-    shape = (np.max(row) + 1, np.max(col) + 1) if not_inf_idx.any() else (0, 0)
-    distance_matrix = coo_matrix((data, (row, col)), shape=shape)
+    shape_kwargs = {"shape": (0, 0)} if not_inf_idx.any() else {}
+    distance_matrix = coo_matrix((data, (row, col)), **shape_kwargs)
     return distance_matrix
+
+
+@settings(deadline=500)
+@given(distance_matrix=get_sparse_distance_matrices())
+def test_coo_below_diagonal_and_mixed_same_as_above(distance_matrix):
+    """Test that if we feed sparse matrices representing the same undirected
+    weighted graph we obtain the same results regardless of whether all entries
+    are above the diagonal, all are below the diagonal, or neither.
+    Furthermore, test that conflicts between stored data in the upper and lower
+    triangle are resolved in favour of the upper triangle."""
+    kwargs = {"maxdim": 2, "metric": "precomputed"}
+
+    pd_above = ripser(distance_matrix, **kwargs)['dgms']
+
+    pd_below = ripser(distance_matrix.T, **kwargs)['dgms']
+
+    _row, _col, _data = (distance_matrix.row, distance_matrix.col,
+                         distance_matrix.data)
+    to_transpose_mask = np.full(len(_row), False)
+    to_transpose_mask[np.random.choice(range(len(_row)), size=len(_row) // 2,
+                                       replace=False)] = True
+    row = np.concatenate([_col[to_transpose_mask, _row[~to_transpose_mask]]])
+    col = np.concatenate([_row[to_transpose_mask], _col[~to_transpose_mask]])
+    distance_matrix_mixed = coo_matrix((_data, (row, col)))
+    pd_mixed = ripser(distance_matrix_mixed, **kwargs)['dgms']
+
+    row = np.concatenate([row, _row[to_transpose_mask]])
+    col = np.concatenate([col, _col[to_transpose_mask]])
+    data = np.random.random(len(row))
+    data[:len(_row)] = _data
+    distance_matrix_conflicts = coo_matrix((data, (row, col)))
+    pd_conflicts = ripser(distance_matrix_conflicts, **kwargs)['dgms']
+
+    for i in range(kwargs["maxdim"] + 1):
+        pd_above[i] = np.sort(pd_above[i], axis=0)
+        pd_below[i] = np.sort(pd_below[i], axis=0)
+        pd_mixed[i] = np.sort(pd_mixed[i], axis=0)
+        pd_conflicts[i] = np.sort(pd_conflicts[i], axis=0)
+        assert_almost_equal(pd_above[i], pd_below[i])
 
 
 @pytest.mark.parametrize('thresh', [False, True])
