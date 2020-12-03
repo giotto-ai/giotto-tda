@@ -72,6 +72,7 @@ PYBIND11_MODULE(gtda_collapser, m) {
           for (size_t k = 0; k < size; ++k)
             for (Eigen::SparseMatrix<Filtration_value>::InnerIterator it(sm, k);
                  it; ++it) {
+              /* Apply threshold to the input data, ignoring lower diagonal entries */
               if (it.col() > it.row() && it.value() <= thresh)
                 graph.push_back(Filtered_edge(it.row(), it.col(), it.value()));
             }
@@ -100,6 +101,7 @@ PYBIND11_MODULE(gtda_collapser, m) {
           /* Applying threshold to the input data */
           int size = data_.size();
           for (size_t k = 0; k < size; ++k)
+            /* Apply threshold to the input data, ignoring lower diagonal entries */
             if (col[k] > row[k] && data[k] <= thresh)
               graph.push_back(Filtered_edge(row[k], col[k], data[k]));
 
@@ -121,6 +123,7 @@ PYBIND11_MODULE(gtda_collapser, m) {
           /* Applying threshold to the input data */
           for (size_t i = 0; i < dm.shape(0); i++)
             for (size_t j = 0; j < dm.shape(1); j++)
+              /* Apply threshold to the input data, ignoring lower diagonal entries */
               if (j > i && (*(dm.data(i, j)) <= thresh))
                 graph.push_back(Filtered_edge(i, j, *(dm.data(i, j))));
 
