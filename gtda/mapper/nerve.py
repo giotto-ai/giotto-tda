@@ -97,8 +97,8 @@ class Nerve(BaseEstimator, TransformerMixin):
             the clustering step of a :class:`gtda.mapper.MapperPipeline`,
             as depicted in
             `this diagram <../../../../_images/mapper_pipeline.svg>`_. Each
-            entry is a tuple of pairs of the form
-            ``(pullback_cluster_label, partial_label)`` where
+            entry in `X` is a tuple of pairs of the form
+            ``(pullback_set_label, partial_cluster_label)`` where
             ``partial_cluster_label`` is a cluster label within the pullback
             cover set identified by ``pullback_set_label``. Unique such pairs
             correspond to nodes in the output graph.
