@@ -1,5 +1,5 @@
-"""The module :mod:`gtda.plotting` implements function to plot the
-outputs of giotto-tda transformers."""
+"""The module :mod:`gtda.plotting` implements function to plot the outputs of
+giotto-tda transformers."""
 
 from .point_clouds import plot_point_cloud
 from .persistence_diagrams import plot_diagram

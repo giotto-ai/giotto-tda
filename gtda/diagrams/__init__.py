@@ -1,6 +1,6 @@
 """The module :mod:`gtda.diagrams` implements transformers to preprocess
-persistence diagrams, extract features from them, or compute pairwise
-distances between diagrams."""
+persistence diagrams, extract features from them, or compute pairwise distances
+between diagrams."""
 
 from .preprocessing import ForgetDimension, Scaler, Filtering
 from .distance import PairwiseDistance
