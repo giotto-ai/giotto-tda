@@ -122,19 +122,19 @@ class Nerve(BaseEstimator, TransformerMixin):
         """
         # TODO: Include a validation step for X
         # Graph construction -- vertices with their metadata
-        nodes_dict = {}
+        labels_to_indices = {}
         for i, sample in enumerate(X):
             for node_id_pair in sample:
-                nodes_dict.setdefault(node_id_pair, []).append(i)
-        labels_to_indices = {key: np.array(value, dtype=np.int32)
-                             for key, value in nodes_dict.items()}
+                labels_to_indices.setdefault(node_id_pair, []).append(i)
+        labels_to_indices = {key: np.array(value)
+                             for key, value in labels_to_indices.items()}
         n_nodes = len(labels_to_indices)
         graph = ig.Graph(n_nodes)
 
-        # `nodes_dict` is a dictionary of, say, N key-value pairs of the form
-        # (pullback_set_label, partial_cluster_label): node_elements. Hence,
-        # zip(*nodes_dict) generates two tuples of length N, each corresponding
-        # to a type of node attribute in the final graph.
+        # labels_to_indices is a dictionary of, say, N key-value pairs of the
+        # form (pullback_set_label, partial_cluster_label): node_elements.
+        # Hence, zip(*labels_to_indices) generates two tuples of length N, each
+        # corresponding to a type of node attribute in the final graph.
         node_attributes = zip(*labels_to_indices)
         graph.vs["pullback_set_label"] = next(node_attributes)
         graph.vs["partial_cluster_label"] = next(node_attributes)
