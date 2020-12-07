@@ -134,20 +134,24 @@ def _resolve_symmetry_conflicts(coo):
     col = _col[in_upper_triangle]
     data = _data[in_upper_triangle]
 
-    # Filter out entries below the diagonal for which entries at transposed
-    # positions are already available
-    upper_triangle_indices = set(zip(row, col))
-    below_diag = np.logical_not(in_upper_triangle)
-    additions = tuple(zip(*((j, i, x) for (i, j, x) in zip(_row[below_diag],
-                                                           _col[below_diag],
-                                                           _data[below_diag])
-                            if (j, i) not in upper_triangle_indices)))
-    # Add surviving entries below the diagonal to final COO data
-    if additions:
-        row_add, col_add, data_add = additions
-        row = np.concatenate([row, row_add])
-        col = np.concatenate([col, col_add])
-        data = np.concatenate([data, data_add])
+    # Check if there is anything below the main diagonal
+    if len(data) < len(_data):
+        # Filter out entries below the diagonal for which entries at
+        # transposed positions are already available
+        upper_triangle_indices = set(zip(row, col))
+        below_diag = np.logical_not(in_upper_triangle)
+        additions = tuple(
+            zip(*((j, i, x) for (i, j, x) in zip(_row[below_diag],
+                                                 _col[below_diag],
+                                                 _data[below_diag])
+                  if (j, i) not in upper_triangle_indices))
+            )
+        # Add surviving entries below the diagonal to final COO data
+        if additions:
+            row_add, col_add, data_add = additions
+            row = np.concatenate([row, row_add])
+            col = np.concatenate([col, col_add])
+            data = np.concatenate([data, data_add])
     
     return row, col, data
 
