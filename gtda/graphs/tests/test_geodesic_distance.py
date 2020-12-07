@@ -64,10 +64,11 @@ X_ggd.append(
 X_ggd_csr_int = [csr_matrix(X_ggd_int[0])]
 X_ggd.append((X_ggd_csr_int, X_ggd_bool_res))
 
-X_ggd_csr_int_rectang = [csr_matrix(X_ggd_int[0]).resize(2, 3)]
+X_ggd_csr_int_rectang = [csr_matrix(X_ggd_int[0])]
+X_ggd_csr_int_rectang[0].resize(2, 3)
 X_ggd.append((X_ggd_csr_int_rectang, X_ggd_bool_res))
 
-X_ggd_coo_int_rectang = [coo_matrix(X_ggd_int[0]).resize(2, 3)]
+X_ggd_coo_int_rectang = [X_ggd_csr_int_rectang[0].tocoo()]
 X_ggd.append((X_ggd_coo_int_rectang, X_ggd_bool_res))
 
 X_ggd_csr_int_with_zeros = [
