@@ -128,18 +128,18 @@ def _resolve_symmetry_conflicts(coo):
     stored."""
     _row, _col, _data = coo.row, coo.col, coo.data
 
-    in_upper_triangle = _col >= _row
-    # Initialize filtered COO data with information in the upper triangle
-    row = _row[in_upper_triangle]
-    col = _col[in_upper_triangle]
-    data = _data[in_upper_triangle]
-
+    below_diag = _col < _row
     # Check if there is anything below the main diagonal
-    if len(data) < len(_data):
+    if below_diag.any():
+        # Initialize filtered COO data with information in the upper triangle
+        in_upper_triangle = np.logical_not(below_diag)
+        row = _row[in_upper_triangle]
+        col = _col[in_upper_triangle]
+        data = _data[in_upper_triangle]
+
         # Filter out entries below the diagonal for which entries at
         # transposed positions are already available
         upper_triangle_indices = set(zip(row, col))
-        below_diag = np.logical_not(in_upper_triangle)
         additions = tuple(
             zip(*((j, i, x) for (i, j, x) in zip(_row[below_diag],
                                                  _col[below_diag],
@@ -152,8 +152,10 @@ def _resolve_symmetry_conflicts(coo):
             row = np.concatenate([row, row_add])
             col = np.concatenate([col, col_add])
             data = np.concatenate([data, data_add])
-    
-    return row, col, data
+
+        return row, col, data
+    else:
+        return _row, _col, _data
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
