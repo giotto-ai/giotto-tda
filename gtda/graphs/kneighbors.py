@@ -102,8 +102,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
             n_points, n_dimensions) or (n_samples, n_points, n_points)
             Input data representing a collection of point clouds. Each entry
             in `X` is a 2D array of shape ``(n_points, n_dimensions)`` if
-            `metric` is not ``'precomputed'``, or a 2D array of shape
-            ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
+            `metric` is not ``'precomputed'``, or a 2D array or sparse matrix
+            of shape ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -115,7 +115,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         self._is_precomputed = self.metric == 'precomputed'
-        check_point_clouds(X, distance_matrices=self._is_precomputed)
+        check_point_clouds(X, accept_sparse=True,
+                           distance_matrices=self._is_precomputed)
 
         self._is_fitted = True
         return self
@@ -127,11 +128,11 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : list of length n_samples, or ndarray of shape (n_samples, \
-            n_points, n_dimensions)
+            n_points, n_dimensions) or (n_samples, n_points, n_points)
             Input data representing a collection of point clouds. Each entry
             in `X` is a 2D array of shape ``(n_points, n_dimensions)`` if
-            `metric` is not ``'precomputed'``, or a 2D array of shape
-            ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
+            `metric` is not ``'precomputed'``, or a 2D array or sparse matrix
+            of shape ``(n_points, n_points)`` if `metric` is ``'precomputed'``.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -147,7 +148,8 @@ class KNeighborsGraph(BaseEstimator, TransformerMixin):
 
         """
         check_is_fitted(self, '_is_fitted')
-        Xt = check_point_clouds(X, distance_matrices=self._is_precomputed)
+        Xt = check_point_clouds(X, accept_sparse=True,
+                                distance_matrices=self._is_precomputed)
 
         _adjacency_matrix_func = partial(
             kneighbors_graph, n_neighbors=self.n_neighbors, metric=self.metric,
