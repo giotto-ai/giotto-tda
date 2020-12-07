@@ -19,8 +19,6 @@ sed -i 's/mirrorlist/#mirrorlist/' /etc/yum.repos.d/CentOS-*.repo
 sed -i 's/#\(baseurl.*\)mirror.centos.org/\1vault.centos.org/' /etc/yum.repos.d/CentOS-Base.repo
 rm -f /etc/yum.repos.d/CentOS-SCLo-scl*
 
-yum makecache
-
 # Setup ccache
 yum install -y ccache
 source /io/.azure-ci/setup_ccache.sh
