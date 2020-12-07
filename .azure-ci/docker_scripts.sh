@@ -13,7 +13,6 @@ pip install --upgrade pip setuptools
 pip install cmake
 
 # Setup ccache
-yum install -y yum-plugin-fastestmirror
 yum install -y ccache
 source /io/.azure-ci/setup_ccache.sh
 
