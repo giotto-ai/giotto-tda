@@ -7,7 +7,7 @@ import plotly.io as pio
 import pytest
 from numpy.ma import masked_array
 from numpy.testing import assert_almost_equal
-from scipy.sparse import csr_matrix, coo_matrix
+from scipy.sparse import csr_matrix
 from sklearn.exceptions import NotFittedError
 
 from gtda.graphs import GraphGeodesicDistance
