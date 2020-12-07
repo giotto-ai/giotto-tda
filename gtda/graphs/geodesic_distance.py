@@ -9,7 +9,7 @@ import numpy as np
 from joblib import Parallel, delayed
 from numpy.ma import masked_invalid
 from numpy.ma.core import MaskedArray
-from scipy.sparse import issparse
+from scipy.sparse import issparse, isspmatrix_csr
 from scipy.sparse.csgraph import shortest_path
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -106,16 +106,19 @@ class GraphGeodesicDistance(BaseEstimator, TransformerMixin, PlotterMixin):
                         f"Methods 'auto' and 'FW' are not supported when "
                         f"some edge weights are zero. Using '{method_}' "
                         f"instead for graph {i}."
-                    )
+                        )
             if not isinstance(X, MaskedArray):
                 # Convert to a masked array with mask given by positions in
                 # which infs or NaNs occur.
                 if X.dtype != bool:
                     X = masked_invalid(X)
-        X_distance = shortest_path(X, directed=self.directed,
-                                   unweighted=self.unweighted,
-                                   method=method_)
-        return X_distance
+        elif X.shape[0] != X.shape[1]:
+            n_vertices = max(X.shape)
+            X = X.copy() if isspmatrix_csr(X) else X.tocsr()
+            X.resize(n_vertices, n_vertices)
+
+        return shortest_path(X, directed=self.directed,
+                             unweighted=self.unweighted, method=method_)
 
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
