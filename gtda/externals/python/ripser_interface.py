@@ -161,9 +161,9 @@ def _resolve_symmetry_conflicts(coo):
 
 def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
     if p == np.inf:
-        return np.maximum.reduce([data, weights[row], weights[col]]) / 2
+        return np.maximum(np.maximum(data, weights[row]), weights[col]) / 2
     elif p == 1:
-        return np.sum.reduce([data, weights[row], weights[col]]) / 2
+        return (data + weights[row] + weights[col]) / 2
     elif p == 2:
         return np.sqrt(
             ((weights[col] + weights[row])**2 + data**2) *
@@ -175,14 +175,14 @@ def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
 
 def weigh_filtration_dense(dm, weights, p=np.inf):
     if p == np.inf:
-        return np.maximum.reduce([dm, weights, weights[:, None]])
+        return np.maximum(np.maximum(dm, weights.flat), weights) / 2
     elif p == 1:
-        return np.sum.reduce([dm, weights, weights[:, None]])
+        return (dm + weights.flat + weights) / 2
     elif p == 2:
-        weights_column = weights[:, None]
+        weights_1d = weights.flat
         return np.sqrt(
-            ((weights_column + weights)**2 + dm**2) *
-            ((weights_column - weights)**2 + dm**2)
+            ((weights_1d + weights)**2 + dm**2) *
+            ((weights_1d - weights)**2 + dm**2)
             ) / (2 * dm)
     else:
         raise NotImplementedError(f"Weighting not supported for p = {p}")
@@ -370,7 +370,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                 dm += dm.T
             knn = kneighbors_graph(dm, **weight_params, metric="precomputed",
                                    mode="distance", include_self=False)
-            weights = np.linalg.norm(knn, axis=1) / np.sqrt(n_neighbors)
+            weights = np.sqrt(np.sum(knn**2, axis=1) / n_neighbors)
             dm = weigh_filtration_dense(dm, weights, p=weights_p)
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only
