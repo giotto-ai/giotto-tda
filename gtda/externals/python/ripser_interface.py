@@ -160,26 +160,29 @@ def _resolve_symmetry_conflicts(coo):
 
 
 def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
+    weights_1d = weights.flatten()
     if p == np.inf:
-        return np.maximum(np.maximum(data, weights[row]), weights[col]) / 2
+        return np.maximum(np.maximum(data / 2, weights_1d[row]),
+                          weights_1d[col])
     elif p == 1:
-        return (data + weights[row] + weights[col]) / 2
+        return (data + weights_1d[row] + weights_1d[col]) / 2
     elif p == 2:
         return np.sqrt(
-            ((weights[col] + weights[row])**2 + data**2) *
-            ((weights[col] - weights[row])**2 + data**2)
+            ((weights_1d[col] + weights_1d[row])**2 + data**2) *
+            ((weights_1d[col] - weights_1d[row])**2 + data**2)
             ) / (2 * data)
     else:
         raise NotImplementedError(f"Weighting not supported for p = {p}")
 
 
 def weigh_filtration_dense(dm, weights, p=np.inf):
+    weights_1d = weights.flatten()
+    dm_weighted = np.maximum(weights, weights_1d)
     if p == np.inf:
-        return np.maximum(np.maximum(dm, weights.flat), weights) / 2
+        return np.maximum(dm / 2, dm_weighted)
     elif p == 1:
-        return (dm + weights.flat + weights) / 2
+        return (dm + weights_1d + weights) / 2
     elif p == 2:
-        weights_1d = weights.flat
         return np.sqrt(
             ((weights_1d + weights)**2 + dm**2) *
             ((weights_1d - weights)**2 + dm**2)
@@ -338,9 +341,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
             dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
             dm += triu(dm, k=1).T
-            knn = kneighbors_graph(dm, **weight_params, metric="precomputed",
-                                   mode="distance", include_self=False)
-            weights = np.sqrt(np.sum(knn**2, axis=1) / n_neighbors)
+            knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
+                                   metric="precomputed", mode="distance",
+                                   include_self=False)
+            weights = np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
             data = weigh_filtration_sparse(row, col, data, weights,
                                            p=weights_p)
 
@@ -368,9 +372,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             if not np.array_equal(dm, dm.T):
                 dm = np.triu(dm, k=1)
                 dm += dm.T
-            knn = kneighbors_graph(dm, **weight_params, metric="precomputed",
-                                   mode="distance", include_self=False)
-            weights = np.sqrt(np.sum(knn**2, axis=1) / n_neighbors)
+            knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
+                                   metric="precomputed", mode="distance",
+                                   include_self=False)
+            weights = np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
             dm = weigh_filtration_dense(dm, weights, p=weights_p)
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only
