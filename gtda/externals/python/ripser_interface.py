@@ -22,9 +22,10 @@ import gc
 from warnings import warn
 
 import numpy as np
-from scipy import sparse
+from scipy.sparse import issparse, coo_matrix, triu
 from scipy.spatial.distance import squareform
 from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.neighbors import kneighbors_graph
 
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
 
@@ -159,7 +160,7 @@ def _resolve_symmetry_conflicts(coo):
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           n_perm=None, collapse_edges=False):
+           metric_params, n_perm=None, collapse_edges=False):
     """Compute persistence diagrams for X data array using Ripser [1]_.
 
     If X is not a distance matrix, it will be converted to a distance matrix
@@ -194,6 +195,8 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         should take pairs of vectors (1D arrays) as input and, for each two
         vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
+
+    metric_params : TODO
 
     n_perm : int or None, optional, default: ``None``
         The number of points to subsample in a "greedy permutation", or a
@@ -252,7 +255,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
     """
-    if n_perm and sparse.issparse(X):
+    if n_perm and issparse(X):
         raise Exception("Greedy permutation is not supported for sparse "
                         "distance matrices")
     if n_perm and n_perm > X.shape[0]:
@@ -273,26 +276,63 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         if metric == 'precomputed':
             dm = X
         else:
-            dm = pairwise_distances(X, metric=metric)
+            dm = pairwise_distances(X, metric=metric, **metric_params)
         dperm2all = None
 
     n_points = max(dm.shape)
+    is_sparse = issparse(dm)
+    symmetric = False
+
+    if weights:
+        if (dm.diagonal() != 0).any():
+            raise ValueError("Distance matrix has non-negative entries in "
+                             "its main diagonal. Weighted Rips filtration "
+                             "unavailable.")
+        n_neighbors = nn_params["n_neighbors"]
+        if is_sparse:
+            if (dm < 0).nnz:
+                raise ValueError("Distance matrix has negative entries. "
+                                 "Weighted Rips filtration unavailable.")
+            row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+            dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
+            dm += triu(dm, k=1).T
+            knn = kneighbors_graph(dm, **nn_params, metric="precomputed",
+                                   mode="distance", include_self=False)
+            weights = np.sqrt(np.sum(knn**2, axis=1) / n_neighbors)
+            data = np.maximum.reduce([data, weights[row], weights[col]])
+            dm = coo_matrix((data, (row, col)))
+            symmetric = True
+        else:
+            if (dm < 0).any():
+                raise ValueError("Distance matrix has negative entries. "
+                                 "Weighted Rips filtration unavailable.")
+            if not np.array_equal(dm, dm.T):
+                dm = np.triu(dm, k=1)
+                dm += dm.T
+            knn = kneighbors_graph(dm, **nn_params, metric="precomputed",
+                                   mode="distance", include_self=False)
+            weights = np.linalg.norm(knn, axis=1) / np.sqrt(n_neighbors)
+            dm = np.maximum.reduce([dm, weights, weights[:, None]])
+
     if (dm.diagonal() != 0).any():
         if collapse_edges:
             warn("Edge collapses are not supported when any of the diagonal "
                  "entries are non-zero. Computing persistent homology without "
                  "using edge collapse.")
             collapse_edges = False
-        if not sparse.issparse(dm):
+        if not is_sparse:
             # If any of the diagonal elements are nonzero, convert to sparse
             # format, because currently that's the only format that handles
             # nonzero births
-            dm = sparse.coo_matrix(dm)
+            dm = coo_matrix(dm)
+            is_sparse = True
 
-    is_sparse = sparse.issparse(dm)
     if is_sparse or collapse_edges:
         if is_sparse:
-            row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+            if symmetric:
+                row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+            else:
+                row, col, data = dm.row, dm.col, dm.data
             if collapse_edges:
                 row, col, data = \
                     gtda_collapser.flag_complex_collapse_edges_coo(row,
