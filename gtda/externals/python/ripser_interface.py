@@ -366,7 +366,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             knn = kneighbors_graph(dm, **weight_params, metric="precomputed",
                                    mode="distance", include_self=False)
             weights = np.linalg.norm(knn, axis=1) / np.sqrt(n_neighbors)
-            dm = weigh_filtration_sparse(dm, weights, p=weights_p)
+            dm = weigh_filtration_dense(dm, weights, p=weights_p)
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only
             # one handling nonzero births
