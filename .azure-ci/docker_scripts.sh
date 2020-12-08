@@ -20,7 +20,7 @@ ccache -s
 
 # Install boost
 yum install -y wget tar
-wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
+wget --no-check-certificate https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
 tar -zxvf /boost_1_69_0.tar.gz
 mkdir boost
 cd /boost_1_69_0
