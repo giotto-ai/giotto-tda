@@ -160,6 +160,7 @@ def _resolve_symmetry_conflicts(coo):
 
 
 def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
+    # TODO fix
     weights_1d = weights.flatten()
     if p == np.inf:
         return np.maximum(np.maximum(data / 2, weights_1d[row]),
@@ -177,16 +178,19 @@ def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
 
 def weigh_filtration_dense(dm, weights, p=np.inf):
     weights_1d = weights.flatten()
-    dm_weighted = np.maximum(weights, weights_1d)
     if p == np.inf:
-        return np.maximum(dm / 2, dm_weighted)
+        return np.maximum(dm / 2, np.maximum(weights, weights_1d))
     elif p == 1:
-        return (dm + weights_1d + weights) / 2
+        return np.where(dm <= np.abs(weights - weights_1d),
+                        np.maximum(weights, weights_1d),
+                        (dm + weights_1d + weights) / 2)
     elif p == 2:
-        return np.sqrt(
-            ((weights_1d + weights)**2 + dm**2) *
-            ((weights_1d - weights)**2 + dm**2)
-            ) / (2 * dm)
+        return np.where(dm <= np.abs(weights**2 - weights_1d**2)**.5,
+                        np.maximum(weights, weights_1d),
+                        np.sqrt(
+                            ((weights_1d + weights)**2 + dm**2) *
+                            ((weights_1d - weights)**2 + dm**2)
+                            ) / (2 * dm))
     else:
         raise NotImplementedError(f"Weighting not supported for p = {p}")
 
