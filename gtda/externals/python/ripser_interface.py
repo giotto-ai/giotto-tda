@@ -159,8 +159,38 @@ def _resolve_symmetry_conflicts(coo):
         return _row, _col, _data
 
 
+def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
+    if p == np.inf:
+        return np.maximum.reduce([data, weights[row], weights[col]]) / 2
+    elif p == 1:
+        return np.sum.reduce([data, weights[row], weights[col]]) / 2
+    elif p == 2:
+        return np.sqrt(
+            ((weights[col] + weights[row])**2 + data**2) *
+            ((weights[col] - weights[row])**2 + data**2)
+            ) / (2 * data)
+    else:
+        raise NotImplementedError(f"Weighting not supported for p = {p}")
+
+
+def weigh_filtration_dense(dm, weights, p=np.inf):
+    if p == np.inf:
+        return np.maximum.reduce([dm, weights, weights[:, None]])
+    elif p == 1:
+        return np.sum.reduce([dm, weights, weights[:, None]])
+    elif p == 2:
+        weights_column = weights[:, None]
+        return np.sqrt(
+            ((weights_column + weights)**2 + dm**2) *
+            ((weights_column - weights)**2 + dm**2)
+            ) / (2 * dm)
+    else:
+        raise NotImplementedError(f"Weighting not supported for p = {p}")
+
+
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           metric_params, n_perm=None, collapse_edges=False):
+           metric_params=None, weights=None, weight_params=None,
+           collapse_edges=False, n_perm=None):
     """Compute persistence diagrams for X data array using Ripser [1]_.
 
     If X is not a distance matrix, it will be converted to a distance matrix
@@ -198,16 +228,20 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
     metric_params : TODO
 
+    weights : TODO
+
+    weight_params : TODO
+
+    collapse_edges : bool, optional, default: ``False``
+        Whether to use the edge collapse algorithm as described in [2]_ prior
+        to calling ``ripser``.
+
     n_perm : int or None, optional, default: ``None``
         The number of points to subsample in a "greedy permutation", or a
         furthest point sampling of the points. These points will be used in
         lieu of the full point cloud for a faster computation, at the expense
         of some accuracy, which can be bounded as a maximum bottleneck distance
         to all diagrams on the original point set.
-
-    collapse_edges : bool, optional, default: ``False``
-        Whether to use the edge collapse algorithm as described in [2]_ prior
-        to calling ``ripser``.
 
     Returns
     -------
@@ -280,69 +314,75 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         dperm2all = None
 
     n_points = max(dm.shape)
-    is_sparse = issparse(dm)
-    symmetric = False
 
-    if weights:
-        if (dm.diagonal() != 0).any():
-            raise ValueError("Distance matrix has non-negative entries in "
-                             "its main diagonal. Weighted Rips filtration "
-                             "unavailable.")
-        n_neighbors = nn_params["n_neighbors"]
-        if is_sparse:
+    use_sparse_computer = True
+    if issparse(dm):
+        row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+
+        if weights:
+            if (dm.diagonal() != 0).any():
+                raise ValueError("Distance matrix has non-negative entries in "
+                                 "its main diagonal. Weighted Rips filtration "
+                                 "unavailable.")
             if (dm < 0).nnz:
                 raise ValueError("Distance matrix has negative entries. "
                                  "Weighted Rips filtration unavailable.")
-            row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+
+            n_neighbors = weight_params["n_neighbors"]
+            weights_p = weight_params["p"]
+
             dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
             dm += triu(dm, k=1).T
-            knn = kneighbors_graph(dm, **nn_params, metric="precomputed",
+            knn = kneighbors_graph(dm, **weight_params, metric="precomputed",
                                    mode="distance", include_self=False)
             weights = np.sqrt(np.sum(knn**2, axis=1) / n_neighbors)
-            data = np.maximum.reduce([data, weights[row], weights[col]])
-            dm = coo_matrix((data, (row, col)))
-            symmetric = True
-        else:
+            data = weigh_filtration_sparse(row, col, data, weights,
+                                           p=weights_p)
+
+        if collapse_edges:
+            if (dm.diagonal() != 0).any():
+                warn("Edge collapses are not supported when any of the "
+                     "diagonal entries are non-zero. Computing persistent "
+                     "homology without using edge collapse.")
+            else:
+                row, col, data = gtda_collapser.\
+                    flag_complex_collapse_edges_coo(row, col, data, thresh)
+    else:
+        if weights:
+            if (dm.diagonal() != 0).any():
+                raise ValueError("Distance matrix has non-negative entries in "
+                                 "its main diagonal. Weighted Rips filtration "
+                                 "unavailable.")
             if (dm < 0).any():
                 raise ValueError("Distance matrix has negative entries. "
                                  "Weighted Rips filtration unavailable.")
+
+            n_neighbors = weight_params["n_neighbors"]
+            weights_p = weight_params["p"]
+
             if not np.array_equal(dm, dm.T):
                 dm = np.triu(dm, k=1)
                 dm += dm.T
-            knn = kneighbors_graph(dm, **nn_params, metric="precomputed",
+            knn = kneighbors_graph(dm, **weight_params, metric="precomputed",
                                    mode="distance", include_self=False)
             weights = np.linalg.norm(knn, axis=1) / np.sqrt(n_neighbors)
-            dm = np.maximum.reduce([dm, weights, weights[:, None]])
-
-    if (dm.diagonal() != 0).any():
-        if collapse_edges:
-            warn("Edge collapses are not supported when any of the diagonal "
-                 "entries are non-zero. Computing persistent homology without "
-                 "using edge collapse.")
-            collapse_edges = False
-        if not is_sparse:
-            # If any of the diagonal elements are nonzero, convert to sparse
-            # format, because currently that's the only format that handles
-            # nonzero births
-            dm = coo_matrix(dm)
-            is_sparse = True
-
-    if is_sparse or collapse_edges:
-        if is_sparse:
-            if symmetric:
-                row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
-            else:
-                row, col, data = dm.row, dm.col, dm.data
+            dm = weigh_filtration_sparse(dm, weights, p=weights_p)
+        if (dm.diagonal() != 0).any():
+            # Convert to sparse format, because currently that's the only
+            # one handling nonzero births
+            (row, col), data = np.triu_indices_from(dm), np.triu(dm)
             if collapse_edges:
-                row, col, data = \
-                    gtda_collapser.flag_complex_collapse_edges_coo(row,
-                                                                   col,
-                                                                   data,
-                                                                   thresh)
-        else:
-            row, col, data = \
-                gtda_collapser.flag_complex_collapse_edges_dense(dm, thresh)
+                warn("Edge collapses are not supported when any of the "
+                     "diagonal entries are non-zero. Computing persistent "
+                     "homology without using edge collapse.")
 
+        elif collapse_edges:
+            row, col, data = gtda_collapser.\
+                flag_complex_collapse_edges_dense(dm, thresh)
+        else:
+            use_sparse_computer = False
+
+    if use_sparse_computer:
         res = DRFDMSparse(np.asarray(row, dtype=np.int32, order="C"),
                           np.asarray(col, dtype=np.int32, order="C"),
                           np.asarray(data, dtype=np.float32, order="C"),
