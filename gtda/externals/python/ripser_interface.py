@@ -310,7 +310,12 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         if metric == 'precomputed':
             dm = X
         else:
-            dm = pairwise_distances(X, metric=metric, **metric_params)
+            if metric_params is None:
+                effective_metric_params = {}
+            else:
+                effective_metric_params = metric_params.copy()
+            dm = pairwise_distances(X, metric=metric,
+                                    **effective_metric_params)
         dperm2all = None
 
     n_points = max(dm.shape)
