@@ -384,7 +384,8 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only
             # one handling nonzero births
-            (row, col), data = np.triu_indices_from(dm), np.triu(dm)
+            (row, col) = np.triu_indices_from(dm)
+            data = dm[(row, col)]
             if collapse_edges:
                 warn("Edge collapses are not supported when any of the "
                      "diagonal entries are non-zero. Computing persistent "
