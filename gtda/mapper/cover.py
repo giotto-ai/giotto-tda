@@ -156,7 +156,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
         return fitter(X)
 
     def _transform(self, X):
-        return (X > self.left_limits_) & (X < self.right_limits_)
+        return np.logical_and(X > self.left_limits_, X < self.right_limits_)
 
     def transform(self, X, y=None):
         """Compute a cover of `X` according to the cover of the real line
@@ -213,7 +213,7 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
         X_rank = np.broadcast_to(X_rank[:, None],
                                  (X.shape[0], self.n_intervals))
-        Xt = (X_rank > self._left_limits) & (X_rank < self._right_limits)
+        Xt = np.logical_and(X_rank > self._left_limits, X_rank < self._right_limits)
         return Xt
 
     def _fit_transform(self, X):
