@@ -1285,6 +1285,6 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_heatmap(
             Xt[sample], colorscale=colorscale, origin=origin,
-            title=f"Signed-distance filtration of image {sample}",
+            title=f"Density filtration of image {sample}",
             plotly_params=plotly_params
             )
