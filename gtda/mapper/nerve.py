@@ -100,7 +100,7 @@ class Nerve(BaseEstimator, TransformerMixin):
             entry in `X` is a tuple of pairs of the form
             ``(pullback_set_label, partial_cluster_label)`` where
             ``partial_cluster_label`` is a cluster label within the pullback
-            cover set identified by ``pullback_set_label``. Unique such pairs
+            cover set identified by ``pullback_set_label``. Then unique pairs
             correspond to nodes in the output graph.
 
         y : None
