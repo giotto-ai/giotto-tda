@@ -213,7 +213,8 @@ class OneDimensionalCover(BaseEstimator, TransformerMixin):
             X_rank, self.n_intervals, self.overlap_frac, is_uniform=False)
         X_rank = np.broadcast_to(X_rank[:, None],
                                  (X.shape[0], self.n_intervals))
-        Xt = np.logical_and(X_rank > self._left_limits, X_rank < self._right_limits)
+        Xt = np.logical_and(X_rank > self._left_limits,
+                            X_rank < self._right_limits)
         return Xt
 
     def _fit_transform(self, X):
