@@ -43,22 +43,24 @@ def test_parallel_clustering_transform_not_implemented():
         pc.transform(X)
 
 
+@pytest.mark.parametrize("n_jobs", [1, 2, -1])
 @pytest.mark.parametrize("sample_weight", [None, np.random.random(5)])
-def test_parallel_clustering_kmeans(sample_weight):
+def test_parallel_clustering_kmeans(n_jobs, sample_weight):
     kmeans = sk.cluster.KMeans(n_clusters=2, random_state=0)
     pc = ParallelClustering(kmeans)
     X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
     single_labels = kmeans.fit_predict(X[0], sample_weight=sample_weight)
-    unique_labels, inverse = np.unique(single_labels, return_inverse=True)
+    _, inverse = np.unique(single_labels, return_inverse=True)
 
     res = pc.fit_predict(X, sample_weight=sample_weight)
-    res = [[(i, label, list(indices)) for [i, label, indices] in sublist]
-           for sublist in res]
-    exp = [[(i, label, list(np.flatnonzero(inverse == label)))
-            for label in unique_labels]
-           for i in range(X[1].shape[1])]
+    exp = np.empty(5, dtype=object)
+    exp[:] = [tuple([])] * 5
+    for i in range(4):
+        labels_i = np.empty(len(single_labels), dtype=object)
+        labels_i[:] = [((i, rel_label),) for rel_label in inverse]
+        exp[:] += labels_i
 
-    assert res == exp
+    assert np.array_equal(res, exp)
 
 
 def test_parallel_clustering_metric_affinity_precomputed_not_implemented():
@@ -75,7 +77,8 @@ def test_parallel_clustering_metric_affinity_precomputed_not_implemented():
         pc.fit(X)
 
 
-def test_parallel_clustering_precomputed():
+@pytest.mark.parametrize("n_jobs", [1, 2, -1])
+def test_parallel_clustering_precomputed(n_jobs):
     pc = ParallelClustering(sk.cluster.DBSCAN())
     masks = np.random.choice([True, False], size=20).reshape((10, 2))
     X = [np.random.random((10, 4)), masks]
@@ -84,13 +87,8 @@ def test_parallel_clustering_precomputed():
 
     res = pc.fit_predict(X)
     res_precomp = pc_precomp.fit_predict(X_precomp)
-    res = [[(i, label, list(indices)) for [i, label, indices] in sublist]
-           for sublist in res]
-    res_precomp = [[(i, label, list(indices))
-                    for [i, label, indices] in sublist]
-                   for sublist in res_precomp]
 
-    assert res == res_precomp
+    assert np.array_equal(res, res_precomp)
 
 
 @composite

@@ -22,10 +22,10 @@ class ParallelClustering(BaseEstimator):
     An arbitrary clustering class which stores a ``labels_`` attribute in
     ``fit`` can be passed to the constructor. Examples are most classes in
     ``sklearn.cluster``. The input of :meth:`fit` is of the form ``[X_tot,
-    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a
-    two-dimensional boolean array, each column of which indicates the
-    location of a portion of ``X_tot`` to cluster separately. Parallelism is
-    achieved over the columns of ``masks``.
+    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a 2D boolean
+    array, each column of which indicates the location of a portion of
+    ``X_tot`` to cluster separately. Parallelism is achieved over the columns
+    of ``masks``.
 
     Parameters
     ----------
@@ -45,16 +45,12 @@ class ParallelClustering(BaseEstimator):
 
     Attributes
     ----------
-    clusterers_ : tuple of object
-        Clones of `clusterer` fitted to the portions of the full data array
-        specified in :meth:`fit`.
-
-    clusters_ : list of list of tuple
-       Labels and indices of each cluster found in :meth:`fit`. The i-th
-       entry corresponds to the i-th portion of the data; it is a list
-       of triples of the form ``(i, label, indices)``, where ``label`` is a
-       cluster label and ``indices`` is the array of indices of points
-       belonging to cluster ``(i, label)``.
+    labels_ : ndarray of shape (n_samples,)
+       For each point in the dataset passed to :meth:`fit`, a tuple of pairs
+       of the form ``(i, partial_label)`` where ``i`` is the index of a boolean
+       mask which selects that point and ``partial_label`` is the cluster label
+       assigned to the point when clustering the subset of the data selected by
+       mask ``i``.
 
     References
     ----------
@@ -131,65 +127,50 @@ class ParallelClustering(BaseEstimator):
                              "of rows.")
         self._validate_clusterer()
 
-        if sample_weight is not None:
-            sample_weights = [sample_weight[masks[:, i]]
-                              for i in range(masks.shape[1])]
+        fit_params = signature(self.clusterer.fit).parameters
+        if sample_weight is not None and "sample_weight" in fit_params:
+            self._sample_weight_computer = lambda rel_indices, sample_weight: \
+                {"sample_weight": sample_weight[rel_indices]}
         else:
-            sample_weights = [None] * masks.shape[1]
+            self._sample_weight_computer = lambda *args: {}
 
         if self._precomputed:
-            single_fitter = self._fit_single_abs_labels_precomputed
+            self._indices_computer = lambda rel_indices: \
+                np.ix_(rel_indices, rel_indices)
         else:
-            single_fitter = self._fit_single_abs_labels
+            self._indices_computer = lambda rel_indices: rel_indices
 
-        self.clusterers_ = Parallel(
-            n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer
-            )(delayed(single_fitter)(X_tot,
-                                     np.flatnonzero(mask),
-                                     mask_num,
-                                     sample_weight=sample_weights[mask_num])
-              for mask_num, mask in enumerate(masks.T))
-        self.clusters_ = [clusterer.abs_labels_ for clusterer in
-                          self.clusterers_]
+        # This seems necessary to avoid large overheads when running fit a
+        # second time. Probably due to refcounts. NOTE: Only works if done
+        # before assigning labels_single. TODO: Investigate
+        self.labels_ = None
+
+        labels_single = Parallel(n_jobs=self.n_jobs,
+                                 prefer=self.parallel_backend_prefer)(
+            delayed(self._labels_single)(
+                X_tot[self._indices_computer(rel_indices)],
+                rel_indices,
+                sample_weight
+                )
+            for rel_indices in map(np.flatnonzero, masks.T)
+            )
+
+        self.labels_ = np.empty(len(X_tot), dtype=object)
+        self.labels_[:] = [tuple([])] * len(X_tot)
+        for i, (rel_indices, partial_labels) in enumerate(labels_single):
+            n_labels = len(partial_labels)
+            labels_i = np.empty(n_labels, dtype=object)
+            labels_i[:] = [((i, partial_label),)
+                           for partial_label in partial_labels]
+            self.labels_[rel_indices] += labels_i
+
         return self
 
-    def _fit_single_abs_labels(self, X, relative_indices, mask_num,
-                               sample_weight=None):
-        cloned_clusterer, unique_labels, unique_labels_inverse = \
-            self._fit_single(X, relative_indices, sample_weight)
-        self._create_abs_labels(cloned_clusterer, relative_indices, mask_num,
-                                unique_labels, unique_labels_inverse)
-        return cloned_clusterer
-
-    def _fit_single_abs_labels_precomputed(self, X, relative_indices, mask_num,
-                                           sample_weight=None):
-        relative_2d_indices = np.ix_(relative_indices, relative_indices)
-        cloned_clusterer, unique_labels, unique_labels_inverse = \
-            self._fit_single(X, relative_2d_indices, sample_weight)
-        self._create_abs_labels(cloned_clusterer, relative_indices, mask_num,
-                                unique_labels, unique_labels_inverse)
-        return cloned_clusterer
-
-    def _fit_single(self, X, relative_indices, sample_weight):
+    def _labels_single(self, X, rel_indices, sample_weight):
         cloned_clusterer = clone(self.clusterer)
-        X_sub = X[relative_indices]
+        kwargs = self._sample_weight_computer(rel_indices, sample_weight)
 
-        fit_params = signature(cloned_clusterer.fit).parameters
-        if 'sample_weight' in fit_params:
-            cloned_clusterer.fit(X_sub, sample_weight=sample_weight)
-        else:
-            cloned_clusterer.fit(X_sub)
-
-        unique_labels, unique_labels_inverse = np.unique(
-            cloned_clusterer.labels_, return_inverse=True)
-        return cloned_clusterer, unique_labels, unique_labels_inverse
-
-    @staticmethod
-    def _create_abs_labels(cloned_clusterer, relative_indices, mask_num,
-                           unique_labels, inv):
-        cloned_clusterer.abs_labels_ = [
-            (mask_num, label, relative_indices[inv == i])
-            for i, label in enumerate(unique_labels)]
+        return rel_indices, cloned_clusterer.fit(X, **kwargs).labels_
 
     def fit_predict(self, X, y=None, sample_weight=None):
         """Fit to the data, and return the found clusters.
@@ -215,12 +196,12 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        clusters : list of list of tuple
-            See :attr:`clusters_`.
+        labels : ndarray of shape (n_samples,)
+            See :attr:`labels_`.
 
         """
         self.fit(X, sample_weight=sample_weight)
-        return self.clusters_
+        return self.labels_
 
     def transform(self, X, y=None):
         """Not implemented.
@@ -265,8 +246,8 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        Xt : list of list of tuple
-            See :attr:`clusters_`.
+        Xt : ndarray of shape (n_samples,)
+            See :attr:`labels_`.
 
         """
         Xt = self.fit_predict(X, y, **fit_params)
