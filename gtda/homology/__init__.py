@@ -1,6 +1,5 @@
-"""The module :mod:`gtda.homology` implements transformers
-to generate persistence diagrams.
-"""
+"""The module :mod:`gtda.homology` implements transformers to generate
+persistence diagrams."""
 # License: GNU AGPLv3
 
 from .simplicial import VietorisRipsPersistence, SparseRipsPersistence, \

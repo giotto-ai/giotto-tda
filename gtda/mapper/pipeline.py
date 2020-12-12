@@ -372,8 +372,8 @@ def make_mapper_pipeline(scaler=None,
     else:
         _scaler = scaler
 
-    # If filter_func is not a scikit-learn transformer, hope it as a
-    # callable to be applied on each row separately. Then attempt to create a
+    # If filter_func is not a scikit-learn transformer, assume it is a callable
+    # to be applied on each row separately. Then attempt to create a
     # FunctionTransformer object to implement this behaviour.
     if filter_func is None:
         from sklearn.decomposition import PCA
@@ -425,4 +425,5 @@ def make_mapper_pipeline(scaler=None,
 
     mapper_pipeline = MapperPipeline(
         steps=all_steps, memory=memory, verbose=verbose)
+
     return mapper_pipeline
