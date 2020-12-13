@@ -159,40 +159,41 @@ def _resolve_symmetry_conflicts(coo):
         return _row, _col, _data
 
 
-def weigh_filtration_sparse(row, col, data, weights, p=np.inf):
-    # TODO fix
-    weights_1d = weights.flatten()
+def _weigh_filtration(weights_x, weights_y, distances, p):
+    """Create a DTM-weighted distance matrix. For dense data, `weights_x` is
+    a column vector, `weights_y` is a 1D array, `distances` is the original
+    original distance matrix, and the computations exploit array broadcasting.
+    For sparse data, all three are 1D arrays. `p` can only be ``numpy.inf``,
+    ``1``, or ``2``."""
     if p == np.inf:
-        return np.maximum(np.maximum(data / 2, weights_1d[row]),
-                          weights_1d[col])
+        return np.maximum(distances, np.maximum(weights_x, weights_y))
     elif p == 1:
-        return (data + weights_1d[row] + weights_1d[col]) / 2
+        return np.where(distances <= np.abs(weights_x - weights_y),
+                        np.maximum(weights_x, weights_y),
+                        distances + weights_x + weights_y)
     elif p == 2:
-        return np.sqrt(
-            ((weights_1d[col] + weights_1d[row])**2 + data**2) *
-            ((weights_1d[col] - weights_1d[row])**2 + data**2)
-            ) / (2 * data)
+        return np.where(
+            distances <= np.abs(weights_x**2 - weights_y**2)**.5,
+            np.maximum(weights_x, weights_y),
+            np.sqrt(((weights_x + weights_y)**2 + distances**2) *
+                    ((weights_x - weights_y)**2 + distances**2)) / distances
+            )
     else:
         raise NotImplementedError(f"Weighting not supported for p = {p}")
 
 
-def weigh_filtration_dense(dm, weights, p=np.inf):
+def _weigh_filtration_sparse(row, col, data, weights, p):
     weights_1d = weights.flatten()
-    if p == np.inf:
-        return np.maximum(dm / 2, np.maximum(weights, weights_1d))
-    elif p == 1:
-        return np.where(dm <= np.abs(weights - weights_1d),
-                        np.maximum(weights, weights_1d),
-                        (dm + weights_1d + weights) / 2)
-    elif p == 2:
-        return np.where(dm <= np.abs(weights**2 - weights_1d**2)**.5,
-                        np.maximum(weights, weights_1d),
-                        np.sqrt(
-                            ((weights_1d + weights)**2 + dm**2) *
-                            ((weights_1d - weights)**2 + dm**2)
-                            ) / (2 * dm))
-    else:
-        raise NotImplementedError(f"Weighting not supported for p = {p}")
+    weights_y = weights_1d[row]
+    weights_x = weights_1d[col]
+
+    return _weigh_filtration(weights_x, weights_y, data, p)
+
+
+def _weigh_filtration_dense(dm, weights, p):
+    weights_1d = weights.flatten()
+
+    return _weigh_filtration(weights, weights_1d, dm, p)
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
@@ -348,9 +349,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
                                    metric="precomputed", mode="distance",
                                    include_self=False)
-            weights = np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
-            data = weigh_filtration_sparse(row, col, data, weights,
-                                           p=weights_p)
+            weights = \
+                2 * np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
+            data = _weigh_filtration_sparse(row, col, data, weights,
+                                            p=weights_p)
 
         if collapse_edges:
             if (dm.diagonal() != 0).any():
@@ -379,8 +381,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
                                    metric="precomputed", mode="distance",
                                    include_self=False)
-            weights = np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
-            dm = weigh_filtration_dense(dm, weights, p=weights_p)
+            weights = \
+                2 * np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
+            dm = _weigh_filtration_dense(dm, weights, p=weights_p)
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only
             # one handling nonzero births
