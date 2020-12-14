@@ -177,12 +177,12 @@ def _weigh_filtration(weights_x, weights_y, distances, p):
     if p == np.inf:
         return np.maximum(distances, np.maximum(weights_x, weights_y))
     elif p == 1:
-        return np.where(distances <= np.abs(weights_x - weights_y),
+        return np.where(distances <= np.abs(weights_x - weights_y) / 2,
                         np.maximum(weights_x, weights_y),
                         distances + (weights_x + weights_y) / 2)
     elif p == 2:
         return np.where(
-            distances <= np.abs(weights_x**2 - weights_y**2)**.5,
+            distances <= np.abs(weights_x**2 - weights_y**2)**.5 / 2,
             np.maximum(weights_x, weights_y),
             np.sqrt((distances**2 + ((weights_x + weights_y) / 2)**2) *
                     (distances**2 + ((weights_x - weights_y) / 2)**2)) /
