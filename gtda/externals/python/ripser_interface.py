@@ -164,9 +164,8 @@ def _compute_dtm_weights(dm, n_neighbors, weights_r):
                            metric="precomputed", mode="distance",
                            include_self=False)
 
-    return 2 * np.asarray(
-        (np.sum(knn ** weights_r, axis=1) / n_neighbors) ** (1 / weights_r)
-        )
+    return 2 * np.asarray(knn.power(weights_r).sum(axis=1) /
+                          n_neighbors) ** (1 / weights_r)
 
 
 def _weigh_filtration(weights_x, weights_y, distances, p):
