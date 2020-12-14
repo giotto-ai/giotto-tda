@@ -159,6 +159,16 @@ def _resolve_symmetry_conflicts(coo):
         return _row, _col, _data
 
 
+def _compute_dtm_weights(dm, n_neighbors, weights_r):
+    knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
+                           metric="precomputed", mode="distance",
+                           include_self=False)
+
+    return 2 * np.asarray(
+        (np.sum(knn ** weights_r, axis=1) / n_neighbors) ** (1 / weights_r)
+        )
+
+
 def _weigh_filtration(weights_x, weights_y, distances, p):
     """Create a DTM-weighted distance matrix. For dense data, `weights_x` is
     a column vector, `weights_y` is a 1D array, `distances` is the original
@@ -170,13 +180,14 @@ def _weigh_filtration(weights_x, weights_y, distances, p):
     elif p == 1:
         return np.where(distances <= np.abs(weights_x - weights_y),
                         np.maximum(weights_x, weights_y),
-                        distances + weights_x + weights_y)
+                        distances + (weights_x + weights_y) / 2)
     elif p == 2:
         return np.where(
             distances <= np.abs(weights_x**2 - weights_y**2)**.5,
             np.maximum(weights_x, weights_y),
-            np.sqrt(((weights_x + weights_y)**2 + distances**2) *
-                    ((weights_x - weights_y)**2 + distances**2)) / distances
+            np.sqrt((distances**2 + ((weights_x + weights_y) / 2)**2) *
+                    (distances**2 + ((weights_x - weights_y) / 2)**2)) /
+            distances
             )
     else:
         raise NotImplementedError(f"Weighting not supported for p = {p}")
@@ -197,7 +208,7 @@ def _weigh_filtration_dense(dm, weights, p):
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           metric_params=None, weights=None, weight_params=None,
+           metric_params=None, weights=None, weight_params={},
            collapse_edges=False, n_perm=None):
     """Compute persistence diagrams for X data array using Ripser [1]_.
 
@@ -334,23 +345,21 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
         if weights:
             if (dm.diagonal() != 0).any():
-                raise ValueError("Distance matrix has non-negative entries in "
-                                 "its main diagonal. Weighted Rips filtration "
+                raise ValueError("Distance matrix has non-zero entries in its "
+                                 "main diagonal. DTM-weighted Rips filtration "
                                  "unavailable.")
             if (dm < 0).nnz:
                 raise ValueError("Distance matrix has negative entries. "
-                                 "Weighted Rips filtration unavailable.")
+                                 "DTM-weighted Rips filtration unavailable.")
 
-            n_neighbors = weight_params["n_neighbors"]
-            weights_p = weight_params["p"]
+            n_neighbors = weight_params.get("n_neighbors", 1)
+            weights_r = weight_params.get("r", 2)
+            weights_p = weight_params.get("p", np.inf)
 
             dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
             dm += triu(dm, k=1).T
-            knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
-                                   metric="precomputed", mode="distance",
-                                   include_self=False)
-            weights = \
-                2 * np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
+
+            weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
             data = _weigh_filtration_sparse(row, col, data, weights,
                                             p=weights_p)
 
@@ -365,25 +374,24 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     else:
         if weights:
             if (dm.diagonal() != 0).any():
-                raise ValueError("Distance matrix has non-negative entries in "
-                                 "its main diagonal. Weighted Rips filtration "
+                raise ValueError("Distance matrix has non-zero entries in its "
+                                 "main diagonal. DTM-weighted Rips filtration "
                                  "unavailable.")
             if (dm < 0).any():
                 raise ValueError("Distance matrix has negative entries. "
-                                 "Weighted Rips filtration unavailable.")
+                                 "DTM-weighted Rips filtration unavailable.")
 
-            n_neighbors = weight_params["n_neighbors"]
-            weights_p = weight_params["p"]
+            n_neighbors = weight_params.get("n_neighbors", 1)
+            weights_r = weight_params.get("r", 2)
+            weights_p = weight_params.get("p", np.inf)
 
             if not np.array_equal(dm, dm.T):
                 dm = np.triu(dm, k=1)
                 dm += dm.T
-            knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
-                                   metric="precomputed", mode="distance",
-                                   include_self=False)
-            weights = \
-                2 * np.asarray(np.sqrt(np.sum(knn**2, axis=1) / n_neighbors))
+
+            weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
             dm = _weigh_filtration_dense(dm, weights, p=weights_p)
+
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only
             # one handling nonzero births
