@@ -170,7 +170,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                  collapse_edges=False, coeff=2, max_edge_length=np.inf,
                  infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
-        self.metric_params = metric_params,
+        self.metric_params = metric_params
         self.homology_dimensions = homology_dimensions
         self.weights = weights
         self.weight_params = weight_params
