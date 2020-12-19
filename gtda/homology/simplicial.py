@@ -1,7 +1,7 @@
 """Persistent homology on point clouds or finite metric spaces."""
 # License: GNU AGPLv3
 
-from numbers import Real
+from numbers import Real, Integral
 from types import FunctionType
 
 import numpy as np
@@ -20,6 +20,18 @@ from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_point_clouds
+
+_AVAILABLE_RIPS_WEIGHTS = {
+    'DTM': {
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'r': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        'n_neighbors': {'type': Integral,
+                        'in': Interval(1, np.inf, closed='left')}
+        },
+    'other': {
+        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+        }
+    }
 
 
 @adapt_fit_transform_docs
@@ -59,9 +71,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         each two vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
 
+    metric_params : dict, optional, default: ``{}``
+
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
+
+    weights : ``'DTM'``, callable or None, optional, default: ``None``
+
+    weight_params : dict, optional, default: ``{}``
 
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
@@ -133,10 +151,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict},
         'homology_dimensions': {
             'type': (list, tuple),
             'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
             },
+        'weights': {'type': (str, FunctionType, type(None))},
+        'weight_params': {'type': dict},
         'collapse_edges': {'type': bool},
         'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
         'max_edge_length': {'type': Real},
@@ -144,11 +165,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         'reduced_homology': {'type': bool}
         }
 
-    def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
+    def __init__(self, metric='euclidean', metric_params={},
+                 homology_dimensions=(0, 1), weights=None, weight_params={},
                  collapse_edges=False, coeff=2, max_edge_length=np.inf,
                  infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
+        self.metric_params = metric_params,
         self.homology_dimensions = homology_dimensions
+        self.weights = weights
+        self.weight_params = weight_params
         self.collapse_edges = collapse_edges
         self.coeff = coeff
         self.max_edge_length = max_edge_length
@@ -157,10 +182,16 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
+        if isinstance(self.weights, FunctionType):
+            weights = self.weights(X)
+        else:
+            weights = self.weights
         Xdgms = ripser(
             X, maxdim=self._max_homology_dimension,
-            thresh=self.max_edge_length, coeff=self.coeff,
-            metric=self.metric, collapse_edges=self.collapse_edges
+            thresh=self.max_edge_length, coeff=self.coeff, metric=self.metric,
+            metric_params=self.metric_params, weights=weights,
+            weight_params=self.weight_params,
+            collapse_edges=self.collapse_edges
             )['dgms']
 
         return Xdgms
@@ -204,6 +235,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+        if isinstance(self.weights, str) and self.weights != "DTM":
+            raise ValueError(f"'{self.weights}' passed for `weights` but the "
+                             f"only allowed string is 'DTM'.")
+        if self.weights is not None:
+            key = "other" if self.weights != "DTM" else self.weights
+            validate_params(self.weight_params, _AVAILABLE_RIPS_WEIGHTS[key])
+
         self._is_precomputed = self.metric == 'precomputed'
         check_point_clouds(X, accept_sparse=True,
                            distance_matrices=self._is_precomputed)

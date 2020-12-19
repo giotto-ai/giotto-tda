@@ -26,6 +26,7 @@ from scipy.sparse import issparse, coo_matrix, triu
 from scipy.spatial.distance import squareform
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
+from sklearn.utils.validation import column_or_1d
 
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
 
@@ -164,11 +165,12 @@ def _compute_dtm_weights(dm, n_neighbors, weights_r):
                            metric="precomputed", mode="distance",
                            include_self=False)
 
-    return 2 * np.asarray(knn.power(weights_r).sum(axis=1) /
-                          n_neighbors) ** (1 / weights_r)
+    return 2 * (
+            np.asarray(knn.power(weights_r)).sum(axis=1) / n_neighbors
+            ) ** (1 / weights_r)
 
 
-def _weigh_filtration(weights_x, weights_y, distances, p):
+def _weigh_filtration(distances, weights_x, weights_y, p):
     """Create a DTM-weighted distance matrix. For dense data, `weights_x` is
     a column vector, `weights_y` is a 1D array, `distances` is the original
     original distance matrix, and the computations exploit array broadcasting.
@@ -193,21 +195,20 @@ def _weigh_filtration(weights_x, weights_y, distances, p):
 
 
 def _weigh_filtration_sparse(row, col, data, weights, p):
-    weights_1d = weights.flatten()
-    weights_y = weights_1d[row]
-    weights_x = weights_1d[col]
+    weights_x = weights[row]
+    weights_y = weights[col]
 
-    return _weigh_filtration(weights_x, weights_y, data, p)
+    return _weigh_filtration(data, weights_x, weights_y, p)
 
 
 def _weigh_filtration_dense(dm, weights, p):
-    weights_1d = weights.flatten()
+    weights_2d = weights[:, None]
 
-    return _weigh_filtration(weights, weights_1d, dm, p)
+    return _weigh_filtration(dm, weights_2d, weights, p)
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           metric_params=None, weights=None, weight_params={},
+           metric_params={}, weights=None, weight_params={},
            collapse_edges=False, n_perm=None):
     """Compute persistence diagrams for X data array using Ripser [1]_.
 
@@ -328,12 +329,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         if metric == 'precomputed':
             dm = X
         else:
-            if metric_params is None:
-                effective_metric_params = {}
-            else:
-                effective_metric_params = metric_params.copy()
-            dm = pairwise_distances(X, metric=metric,
-                                    **effective_metric_params)
+            dm = pairwise_distances(X, metric=metric, **metric_params)
         dperm2all = None
 
     n_points = max(dm.shape)
@@ -342,23 +338,32 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     if issparse(dm):
         row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
 
-        if weights:
+        if weights is not None:
             if (dm.diagonal() != 0).any():
                 raise ValueError("Distance matrix has non-zero entries in its "
-                                 "main diagonal. DTM-weighted Rips filtration "
+                                 "main diagonal. Weighted Rips filtration "
                                  "unavailable.")
             if (dm < 0).nnz:
                 raise ValueError("Distance matrix has negative entries. "
-                                 "DTM-weighted Rips filtration unavailable.")
-
-            n_neighbors = weight_params.get("n_neighbors", 1)
-            weights_r = weight_params.get("r", 2)
+                                 "Weighted Rips filtration unavailable.")
             weights_p = weight_params.get("p", np.inf)
 
-            dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
-            dm += triu(dm, k=1).T
+            if weights == "DTM":
+                n_neighbors = weight_params.get("n_neighbors", 1)
+                weights_r = weight_params.get("r", 2)
 
-            weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
+                dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
+                dm += triu(dm, k=1).T
+
+                weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
+            else:
+                weights = column_or_1d(weights)
+                if len(weights) != n_points:
+                    raise ValueError(
+                        f"Input distance/adjacency matrix implies {n_points} "
+                        f"vertices but {len(weights)} weights were passed."
+                        )
+
             data = _weigh_filtration_sparse(row, col, data, weights,
                                             p=weights_p)
 
@@ -371,7 +376,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                 row, col, data = gtda_collapser.\
                     flag_complex_collapse_edges_coo(row, col, data, thresh)
     else:
-        if weights:
+        if weights is not None:
             if (dm.diagonal() != 0).any():
                 raise ValueError("Distance matrix has non-zero entries in its "
                                  "main diagonal. DTM-weighted Rips filtration "
@@ -379,16 +384,25 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             if (dm < 0).any():
                 raise ValueError("Distance matrix has negative entries. "
                                  "DTM-weighted Rips filtration unavailable.")
-
-            n_neighbors = weight_params.get("n_neighbors", 1)
-            weights_r = weight_params.get("r", 2)
             weights_p = weight_params.get("p", np.inf)
 
-            if not np.array_equal(dm, dm.T):
-                dm = np.triu(dm, k=1)
-                dm += dm.T
+            if weights == "DTM":
+                n_neighbors = weight_params.get("n_neighbors", 1)
+                weights_r = weight_params.get("r", 2)
 
-            weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
+                if not np.array_equal(dm, dm.T):
+                    dm = np.triu(dm, k=1)
+                    dm += dm.T
+
+                weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
+            else:
+                weights = column_or_1d(weights)
+                if len(weights) != n_points:
+                    raise ValueError(
+                        f"Input distance/adjacency matrix implies {n_points} "
+                        f"vertices but {len(weights)} weights were passed."
+                        )
+
             dm = _weigh_filtration_dense(dm, weights, p=weights_p)
 
         if (dm.diagonal() != 0).any():
