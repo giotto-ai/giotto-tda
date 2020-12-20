@@ -1,6 +1,7 @@
 """Construct the nerve of a refined Mapper cover."""
 # License: GNU AGPLv3
 
+from collections import defaultdict
 from itertools import combinations, filterfalse
 
 import igraph as ig
@@ -122,10 +123,10 @@ class Nerve(BaseEstimator, TransformerMixin):
         """
         # TODO: Include a validation step for X
         # Graph construction -- vertices with their metadata
-        labels_to_indices = {}
+        labels_to_indices = defaultdict(list)
         for i, sample in enumerate(X):
             for node_id_pair in sample:
-                labels_to_indices.setdefault(node_id_pair, []).append(i)
+                labels_to_indices[node_id_pair].append(i)
         labels_to_indices = {key: np.array(value)
                              for key, value in labels_to_indices.items()}
         n_nodes = len(labels_to_indices)
