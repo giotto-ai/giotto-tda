@@ -9,8 +9,8 @@ from gtda.images.preprocessing import Binarizer, Inverter
 
 # mark checks to skip
 SKIP_TESTS = {
-    'Binarizer':  [],
-    'Inverter':  [],
+    "Binarizer":  ["check_transformer_preserve_dtypes"],
+    "Inverter":  [],
     }
 
 # mark tests as a known failure
