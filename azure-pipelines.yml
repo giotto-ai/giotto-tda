@@ -152,6 +152,7 @@ jobs:
 
   - script: |
       set -e
+      brew unlink python@2
       export HOMEBREW_NO_INSTALL_CLEANUP=1
       brew update
       brew install boost ccache
