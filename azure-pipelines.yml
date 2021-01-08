@@ -152,7 +152,8 @@ jobs:
 
   - script: |
       set -e
-      brew update && brew upgrade
+      brew update
+      rm '/usr/local/bin/2to3'
       brew install boost ccache
     displayName: 'Install system dependencies'
 
