@@ -353,8 +353,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 @adapt_fit_transform_docs
 class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """:ref:`Persistence diagrams <persistence_diagram>` resulting from
-    :ref:`weighted Vietoris–Rips filtrations
-    <TODO>` as in [3]_.
+    :ref:`weighted Vietoris–Rips filtrations <TODO>` as in [3]_.
 
     Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
     Euclidean space, an abstract :ref:`metric space
