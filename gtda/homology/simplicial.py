@@ -433,11 +433,6 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         :math:`x` (:math:`x` is not considered a neighbour of itself),
         :math:`n` is the number of nearest neighbors to include, and :math:`r`
         is a parameter (see `weight_params`).
-        :math:`w(x) = 2 \\left(\\frac{1}{n+1} \\sum_{i=1}^n
-        \\mathrm{dist}(x, x_i)^r \\right)^{1/r}`, where :math:`\\mathrm{dist}`
-        is the distance metric used and :math:`x_i` is the :math:`i`-th
-        :math:`\\mathrm{dist}`-nearest neighbour of :math:`x` (:math:`x` is not
-        considered a neighbour of itself).
 
     weight_params : dict, optional, default: ``None``
         Additional parameters for the weighted filtration. ``"p"`` determines
