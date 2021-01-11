@@ -452,15 +452,15 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         dramatically when the data or the maximum homology dimensions are
         large.
 
-    max_edge_length : float, optional, default: ``numpy.inf``
+    max_edge_weight : float, optional, default: ``numpy.inf``
         Maximum value of the filtration parameter in the modified adjacency
         matrix. Edges with weight greater than this value will be considered
         absent.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
-        filtration value `max_edge_length`. ``None`` means that this death
-        value is declared to be equal to `max_edge_length`.
+        filtration value `max_edge_weight`. ``None`` means that this death
+        value is declared to be equal to `max_edge_weight`.
 
     reduced_homology : bool, optional, default: ``True``
        If ``True``, the earliest-born triple in homology dimension 0 which has
@@ -476,7 +476,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     ----------
     infinity_values_ : float
         Effective death value to assign to features which are still alive at
-        filtration value `max_edge_length`.
+        filtration value `max_edge_weight`.
 
     effective_weight_params_ : dict
         Effective parameters involved in computing the weighted Rips
@@ -529,14 +529,14 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         "weight_params": {"type": (dict, type(None))},
         "collapse_edges": {"type": bool},
         "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
-        "max_edge_length": {"type": Real},
+        "max_edge_weight": {"type": Real},
         "infinity_values": {"type": (Real, type(None))},
         "reduced_homology": {"type": bool}
         }
 
     def __init__(self, metric="euclidean", metric_params={},
                  homology_dimensions=(0, 1), weights="DTM", weight_params=None,
-                 collapse_edges=False, coeff=2, max_edge_length=np.inf,
+                 collapse_edges=False, coeff=2, max_edge_weight=np.inf,
                  infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
@@ -545,7 +545,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.weight_params = weight_params
         self.collapse_edges = collapse_edges
         self.coeff = coeff
-        self.max_edge_length = max_edge_length
+        self.max_edge_weight = max_edge_weight
         self.infinity_values = infinity_values
         self.reduced_homology = reduced_homology
         self.n_jobs = n_jobs
@@ -557,7 +557,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             weights = self.weights
         Xdgms = ripser(
             X, maxdim=self._max_homology_dimension,
-            thresh=self.max_edge_length, coeff=self.coeff, metric=self.metric,
+            thresh=self.max_edge_weight, coeff=self.coeff, metric=self.metric,
             metric_params=self.metric_params, weights=weights,
             weight_params=self.effective_weight_params_,
             collapse_edges=self.collapse_edges
@@ -623,7 +623,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                            distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
-            self.infinity_values_ = self.max_edge_length
+            self.infinity_values_ = self.max_edge_weight
         else:
             self.infinity_values_ = self.infinity_values
 
