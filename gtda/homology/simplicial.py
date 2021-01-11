@@ -453,10 +453,9 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         large.
 
     max_edge_length : float, optional, default: ``numpy.inf``
-        Maximum value of the Vietoris–Rips filtration parameter. Points whose
-        distance is greater than this value will never be connected by an edge,
-        and topological features at scales larger than this value will not be
-        detected.
+        Maximum value of the filtration parameter in the modified adjacency
+        matrix. Edges with weight greater than this value will be considered
+        absent.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
@@ -536,7 +535,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         }
 
     def __init__(self, metric="euclidean", metric_params={},
-                 homology_dimensions=(0, 1), weights=None, weight_params=None,
+                 homology_dimensions=(0, 1), weights="DTM", weight_params=None,
                  collapse_edges=False, coeff=2, max_edge_length=np.inf,
                  infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
