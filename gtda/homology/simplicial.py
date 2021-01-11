@@ -22,14 +22,14 @@ from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_point_clouds
 
 _AVAILABLE_RIPS_WEIGHTS = {
-    'DTM': {
-        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
-        'r': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
-        'n_neighbors': {'type': Integral,
-                        'in': Interval(1, np.inf, closed='left')}
+    "DTM": {
+        "p": {"type": Real, "in": [1, 2, np.inf]},
+        "r": {"type": Real, "in": Interval(0, np.inf, closed="right")},
+        "n_neighbors": {"type": Integral,
+                        "in": Interval(1, np.inf, closed="left")}
         },
-    'other': {
-        'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
+    "general": {
+        "p": {"type": Real, "in": [1, 2, np.inf]},
         }
     }
 
@@ -41,12 +41,13 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     <vietoris-rips_complex_and_vietoris-rips_persistence>`.
 
     Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
-    Euclidean space, or an abstract :ref:`metric space
-    <distance_matrices_and_point_clouds>` encoded by a distance matrix,
-    information about the appearance and disappearance of topological features
-    (technically, :ref:`homology classes <homology_and_cohomology>`) of various
-    dimensions and at different scales is summarised in the corresponding
-    persistence diagram.
+    Euclidean space, an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix, or the
+    adjacency matrix of a weighted undirected graph, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
+    and at different scales is summarised in the corresponding persistence
+    diagram.
 
     **Important note**:
 
@@ -56,8 +57,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Parameters
     ----------
-    metric : string or callable, optional, default: ``'euclidean'``
-        If set to ``'precomputed'``, input data is to be interpreted as a
+    metric : string or callable, optional, default: ``"euclidean"``
+        If set to ``"precomputed"``, input data is to be interpreted as a
         collection of distance matrices or of adjacency matrices of weighted
         undirected graphs. Otherwise, input data is to be interpreted as a
         collection of point clouds (i.e. feature arrays), and `metric`
@@ -66,20 +67,17 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         the options allowed by :func:`scipy.spatial.distance.pdist` for its
         metric parameter, or a metric listed in
         :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
-        ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If `metric` is a
+        ``"euclidean"``, ``"manhattan"`` or ``"cosine"``. If `metric` is a
         callable, it should take pairs of vectors (1D arrays) as input and, for
         each two vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
 
     metric_params : dict, optional, default: ``{}``
+        Additional parameters to be passed to the distance function.
 
     homology_dimensions : list or tuple, optional, default: ``(0, 1)``
         Dimensions (non-negative integers) of the topological features to be
         detected.
-
-    weights : ``'DTM'``, callable or None, optional, default: ``None``
-
-    weight_params : dict, optional, default: ``{}``
 
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
@@ -121,8 +119,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    FlagserPersistence, SparseRipsPersistence, WeakAlphaPersistence, \
-    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
+    WeightedRipsPersistence, FlagserPersistence, SparseRipsPersistence,
+    WeakAlphaPersistence, EuclideanCechPersistence, ConsistentRescaling,
+    ConsecutiveRescaling
 
     Notes
     -----
@@ -150,30 +149,26 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'metric': {'type': (str, FunctionType)},
-        'metric_params': {'type': dict},
-        'homology_dimensions': {
-            'type': (list, tuple),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "metric": {"type": (str, FunctionType)},
+        "metric_params": {"type": dict},
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'weights': {'type': (str, FunctionType, type(None))},
-        'weight_params': {'type': dict},
-        'collapse_edges': {'type': bool},
-        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))},
-        'reduced_homology': {'type': bool}
+        "collapse_edges": {"type": bool},
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "max_edge_length": {"type": Real},
+        "infinity_values": {"type": (Real, type(None))},
+        "reduced_homology": {"type": bool}
         }
 
-    def __init__(self, metric='euclidean', metric_params={},
-                 homology_dimensions=(0, 1), weights=None, weight_params={},
-                 collapse_edges=False, coeff=2, max_edge_length=np.inf,
-                 infinity_values=None, reduced_homology=True, n_jobs=None):
+    def __init__(self, metric="euclidean", metric_params={},
+                 homology_dimensions=(0, 1), collapse_edges=False, coeff=2,
+                 max_edge_length=np.inf, infinity_values=None,
+                 reduced_homology=True, n_jobs=None):
         self.metric = metric
         self.metric_params = metric_params
         self.homology_dimensions = homology_dimensions
-        self.weights = weights
-        self.weight_params = weight_params
         self.collapse_edges = collapse_edges
         self.coeff = coeff
         self.max_edge_length = max_edge_length
@@ -182,17 +177,12 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        if isinstance(self.weights, FunctionType):
-            weights = self.weights(X)
-        else:
-            weights = self.weights
         Xdgms = ripser(
             X, maxdim=self._max_homology_dimension,
             thresh=self.max_edge_length, coeff=self.coeff, metric=self.metric,
-            metric_params=self.metric_params, weights=weights,
-            weight_params=self.weight_params,
+            metric_params=self.metric_params,
             collapse_edges=self.collapse_edges
-            )['dgms']
+            )["dgms"]
 
         return Xdgms
 
@@ -206,21 +196,27 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
-            was not set to ``'precomputed'``, and of distance matrices or
+            was not set to ``"precomputed"``, and of distance matrices or
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, then:
+            `metric` was set to ``"precomputed"``, then:
 
-                - if entries of `X` are dense, only their upper diagonal
-                  portions (including the diagonal) are considered;
-                - if entries of `X` are sparse, they do not need to be upper
+                - Diagonal entries indicate vertex weights, i.e. the filtration
+                  parameters at which vertices appear.
+                - If entries of `X` are dense, only their upper diagonal
+                  portions (including the diagonal) are considered.
+                - If entries of `X` are sparse, they do not need to be upper
                   diagonal or symmetric, but correct results can only be
                   guaranteed when only one between entry (i, j) and entry
                   (j, i) is stored, or both are stored but they are equal.
-                - entries of `X` should be compatible with a filtration, i.e.
+                  Diagonal entries which are not explicitly stored are assumed
+                  to be zero, while off-diagonal entries which are not
+                  explicitly stored are treated as infinite, indicating absent
+                  edges.
+                - Entries of `X` should be compatible with a filtration, i.e.
                   the value at index (i, j) should be no smaller than the
                   values at diagonal indices (i, i) and (j, j).
 
@@ -234,15 +230,9 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-        if isinstance(self.weights, str) and self.weights != "DTM":
-            raise ValueError(f"'{self.weights}' passed for `weights` but the "
-                             f"only allowed string is 'DTM'.")
-        if self.weights is not None:
-            key = "other" if self.weights != "DTM" else self.weights
-            validate_params(self.weight_params, _AVAILABLE_RIPS_WEIGHTS[key])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
-        self._is_precomputed = self.metric == 'precomputed'
+        self._is_precomputed = self.metric == "precomputed"
         check_point_clouds(X, accept_sparse=True,
                            distance_matrices=self._is_precomputed)
 
@@ -272,23 +262,416 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
-            was not set to ``'precomputed'``, and of distance matrices or
+            was not set to ``"precomputed"``, and of distance matrices or
             adjacency matrices of weighted undirected graphs otherwise. Can be
             either a 3D ndarray whose zeroth dimension has size ``n_samples``,
             or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, then:
+            `metric` was set to ``"precomputed"``, then:
 
-                - if entries of `X` are dense, only their upper diagonal
-                  portions (including the diagonal) are considered;
-                - if entries of `X` are sparse, they do not need to be upper
+                - Diagonal entries indicate vertex weights, i.e. the filtration
+                  parameters at which vertices appear.
+                - If entries of `X` are dense, only their upper diagonal
+                  portions (including the diagonal) are considered.
+                - If entries of `X` are sparse, they do not need to be upper
                   diagonal or symmetric, but correct results can only be
                   guaranteed when only one between entry (i, j) and entry
                   (j, i) is stored, or both are stored but they are equal.
-                - entries of `X` should be compatible with a filtration, i.e.
+                  Diagonal entries which are not explicitly stored are assumed
+                  to be zero, while off-diagonal entries which are not
+                  explicitly stored are treated as infinite, indicating absent
+                  edges.
+                - Entries of `X` should be compatible with a filtration, i.e.
                   the value at index (i, j) should be no smaller than the
                   values at diagonal indices (i, i) and (j, j).
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Array of persistence diagrams computed from the feature arrays or
+            distance matrices in `X`. ``n_features`` equals
+            :math:`\\sum_q n_q`, where :math:`n_q` is the maximum number of
+            topological features in dimension :math:`q` across all samples in
+            `X`.
+
+        """
+        check_is_fitted(self)
+        X = check_point_clouds(X, accept_sparse=True,
+                               distance_matrices=self._is_precomputed)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._ripser_diagram)(x) for x in X)
+
+        Xt = _postprocess_diagrams(
+            Xt, "ripser", self._homology_dimensions, self.infinity_values_,
+            self.reduced_homology
+            )
+        return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
+        """
+        return plot_diagram(
+            Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+            )
+
+
+@adapt_fit_transform_docs
+class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """:ref:`Persistence diagrams <persistence_diagram>` resulting from
+    :ref:`weighted Vietoris–Rips filtrations
+    <TODO>` as in [3]_.
+
+    Given a :ref:`point cloud <distance_matrices_and_point_clouds>` in
+    Euclidean space, an abstract :ref:`metric space
+    <distance_matrices_and_point_clouds>` encoded by a distance matrix, or the
+    adjacency matrix of a weighted undirected graph, information about the
+    appearance and disappearance of topological features (technically,
+    :ref:`homology classes <homology_and_cohomology>`) of various dimensions
+    and at different scales is summarised in the corresponding persistence
+    diagram.
+
+    Weighted (Vietoris–)Rips filtrations can be useful to highlight topological
+    features against outliers and noise. Among them, the distance-to-measure
+    (DTM) filtration is particularly suited to point clouds due to several
+    favourable properties. This implementation follows the general framework
+    described in [3]_. The idea is that, starting from a way to compute vertex
+    weights :math:`\\{w_i\\}_i` from an input point cloud/distance
+    matrix/adjacency matrix, a modified adjacency matrix is determined whose
+    diagonal entries are the :math:`\\{w_i\\}_i`, and whose edge weights are
+
+    .. math:: w_{ij} = \\begin{cases} \\max\\{ w_i, w_j \\} &\\text{if }
+       2\\mathrm{dist}_{ij} \\leq |w_i^p - w_j^p|^{\\frac{1}{p}} \\
+       t &\\text{otherwise} \\end{cases}
+
+    where :math:`t` is the only positive root of
+
+    .. math:: 2 \\mathrm{dist}_{ij} = (t^p - w_i^p)^\\frac{1}{p} +
+       (t^p - w_j^p)^\\frac{1}{p}
+
+    and :math:`p` is a parameter (see `metric_params`). The modified adjacency
+    matrices are then treated exactly as in :class:`VietorisRipsPersistence`.
+
+    **Important notes**:
+
+        - Vertex and edge weights are twice the ones in [3]_ so that the same
+          results as :class:`VietorisRipsPersistence` are obtained when all
+          vertex weights are zero.
+        - Persistence diagrams produced by this class must be interpreted with
+          care due to the presence of padding triples which carry no
+          information. See :meth:`transform` for additional information.
+
+    Parameters
+    ----------
+    metric : string or callable, optional, default: ``"euclidean"``
+        If set to ``"precomputed"``, input data is to be interpreted as a
+        collection of distance matrices or of adjacency matrices of weighted
+        undirected graphs. Otherwise, input data is to be interpreted as a
+        collection of point clouds (i.e. feature arrays), and `metric`
+        determines a rule with which to calculate distances between pairs of
+        points (i.e. row vectors). If `metric` is a string, it must be one of
+        the options allowed by :func:`scipy.spatial.distance.pdist` for its
+        metric parameter, or a metric listed in
+        :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
+        ``"euclidean"``, ``"manhattan"`` or ``"cosine"``. If `metric` is a
+        callable, it should take pairs of vectors (1D arrays) as input and, for
+        each two vectors in a pair, it should return a scalar indicating the
+        distance/dissimilarity between them.
+
+    metric_params : dict, optional, default: ``{}``
+        Additional parameters to be passed to the distance function.
+
+    homology_dimensions : list or tuple, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological features to be
+        detected.
+
+    weights : ``"DTM"`` or callable, optional, default: ``"DTM"``
+        Function that will be applied to each input point cloud/distance
+        matrix/adjacency matrix to compute vertex weights in the modified
+        adjacency matrices. The default ``"DTM"`` denotes the empirical
+        distance-to-measure function defined, following [3]_, by
+
+        .. math:: w(x) = 2\\left\\(\\frac{1}{n+1} \\sum_{k=1}^n
+           \\mathrm{dist}(x, x_k)^r \\right)^{1/r}.
+
+        Here, :math:`\\mathrm{dist}` is the distance metric used, :math:`x_k`
+        is the :math:`k`-th :math:`\\mathrm{dist}`-nearest neighbour of
+        :math:`x` (:math:`x` is not considered a neighbour of itself),
+        :math:`n` is the number of nearest neighbors to include, and :math:`r`
+        is a parameter (see `weight_params`).
+        :math:`w(x) = 2\\left\\(\\frac{1}{n+1} \\sum_{i=1}^n
+        \\mathrm{dist}(x, x_i)^r \\right)^{1/r}`, where :math:`\\mathrm{dist}`
+        is the distance metric used and :math:`x_i` is the :math:`i`-th
+        :math:`\\mathrm{dist}`-nearest neighbour of :math:`x` (:math:`x` is not
+        considered a neighbour of itself).
+
+    weight_params : dict, optional, default: ``None``
+        Additional parameters for the weighted filtration. ``"p"`` determines
+        the power to be used in computing edge weights from vertex weights. It
+        can be one of ``1``, ``2`` or ``np.inf`` and defaults to ``1``. If
+        `weights` is ``"DTM"``, the additional keys ``"r"`` (default: ``2``)
+        and ``"n_neighbors"`` (default: ``3``) are available (see `weights`,
+        where the latter corresponds to :math:`n`).
+
+    coeff : int prime, optional, default: ``2``
+        Compute homology with coefficients in the prime field
+        :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where :math:`p`
+        equals `coeff`.
+
+    collapse_edges : bool, optional, default: ``False``
+        Whether to run the edge collapse algorithm in [2]_ prior to the
+        persistent homology computation (see the Notes). Can reduce the runtime
+        dramatically when the data or the maximum homology dimensions are
+        large.
+
+    max_edge_length : float, optional, default: ``numpy.inf``
+        Maximum value of the Vietoris–Rips filtration parameter. Points whose
+        distance is greater than this value will never be connected by an edge,
+        and topological features at scales larger than this value will not be
+        detected.
+
+    infinity_values : float or None, default: ``None``
+        Which death value to assign to features which are still alive at
+        filtration value `max_edge_length`. ``None`` means that this death
+        value is declared to be equal to `max_edge_length`.
+
+    reduced_homology : bool, optional, default: ``True``
+       If ``True``, the earliest-born triple in homology dimension 0 which has
+       infinite death is discarded from each diagram computed in
+       :meth:`transform`.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
+
+    Attributes
+    ----------
+    infinity_values_ : float
+        Effective death value to assign to features which are still alive at
+        filtration value `max_edge_length`.
+
+    effective_weight_params_ : dict
+        Effective parameters involved in computing the weighted Rips
+        filtration.
+
+    See also
+    --------
+    VietorisRipsPersistence, SparseRipsPersistence, FlagserPersistence,
+    WeakAlphaPersistence, EuclideanCechPersistence, ConsistentRescaling,
+    ConsecutiveRescaling
+
+    Notes
+    -----
+    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
+    for computing Vietoris–Rips persistent homology. Python bindings were
+    modified for performance from the `ripser.py
+    <https://github.com/scikit-tda/ripser.py>`_ package.
+
+    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
+    for the edge collapse algorithm described in [2]_.
+
+    References
+    ----------
+    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
+           persistence barcodes", 2019; `arXiv:1908.02518
+           <https://arxiv.org/abs/1908.02518>`_.
+
+    .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
+           Flag Complexes"; in *36th International Symposium on Computational
+           Geometry (SoCG 2020)*, pp. 19:1–19:15,
+           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19
+           <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+
+    .. [3] H. Anai et al, "DTM-Based Filtrations"; in *Topological Data
+           Analysis* (Abel Symposia, vol 15), Springer, 2020;
+           `DOI: 10.1007/978-3-030-43408-3_2
+           <https://doi.org/10.1007/978-3-030-43408-3_2>`_.
+
+    """
+
+    _hyperparameters = {
+        "metric": {"type": (str, FunctionType)},
+        "metric_params": {"type": dict},
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
+            },
+        "weights": {"type": (str, FunctionType)},
+        "weight_params": {"type": (dict, type(None))},
+        "collapse_edges": {"type": bool},
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "max_edge_length": {"type": Real},
+        "infinity_values": {"type": (Real, type(None))},
+        "reduced_homology": {"type": bool}
+        }
+
+    def __init__(self, metric="euclidean", metric_params={},
+                 homology_dimensions=(0, 1), weights=None, weight_params=None,
+                 collapse_edges=False, coeff=2, max_edge_length=np.inf,
+                 infinity_values=None, reduced_homology=True, n_jobs=None):
+        self.metric = metric
+        self.metric_params = metric_params
+        self.homology_dimensions = homology_dimensions
+        self.weights = weights
+        self.weight_params = weight_params
+        self.collapse_edges = collapse_edges
+        self.coeff = coeff
+        self.max_edge_length = max_edge_length
+        self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
+        self.n_jobs = n_jobs
+
+    def _ripser_diagram(self, X):
+        if isinstance(self.weights, FunctionType):
+            weights = self.weights(X)
+        else:
+            weights = self.weights
+        Xdgms = ripser(
+            X, maxdim=self._max_homology_dimension,
+            thresh=self.max_edge_length, coeff=self.coeff, metric=self.metric,
+            metric_params=self.metric_params, weights=weights,
+            weight_params=self.effective_weight_params_,
+            collapse_edges=self.collapse_edges
+            )["dgms"]
+
+        return Xdgms
+
+    def fit(self, X, y=None):
+        """Calculate :attr:`infinity_values_`. Then, return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray or list of length n_samples
+            Input data representing a collection of point clouds if `metric`
+            was not set to ``"precomputed"``, and of distance matrices or
+            adjacency matrices of weighted undirected graphs otherwise. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
+            Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
+            `X` is a list these shapes can vary between point clouds. If
+            `metric` was set to ``"precomputed"``, then:
+
+                - If entries of `X` are dense, only their upper diagonal
+                  portions are considered.
+                - If entries of `X` are sparse, they do not need to be upper
+                  diagonal or symmetric, but correct results can only be
+                  guaranteed when only one between entry (i, j) and entry
+                  (j, i) is stored, or both are stored but they are equal.
+                  Off-diagonal entries which are not explicitly stored are
+                  treated as infinite, indicating absent edges.
+                - All entries of `X` should be non-negative.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
+        if isinstance(self.weights, str) and self.weights != "DTM":
+            raise ValueError(f"'{self.weights}' passed for `weights` but the "
+                             f"only allowed string is 'DTM'.")
+        self.effective_weight_params_ = {"p": 1}
+        if self.weights == "DTM":
+            key = "DTM"
+            self.effective_weight_params_.update({"n_neighbors": 3, "r": 2})
+        else:
+            key = "general"
+        if self.weight_params is not None:
+            self.effective_weight_params_.update(self.weight_params)
+            validate_params(self.effective_weight_params_,
+                            _AVAILABLE_RIPS_WEIGHTS[key])
+
+        self._is_precomputed = self.metric == "precomputed"
+        check_point_clouds(X, accept_sparse=True,
+                           distance_matrices=self._is_precomputed)
+
+        if self.infinity_values is None:
+            self.infinity_values_ = self.max_edge_length
+        else:
+            self.infinity_values_ = self.infinity_values
+
+        self._homology_dimensions = sorted(self.homology_dimensions)
+        self._max_homology_dimension = self._homology_dimensions[-1]
+
+        return self
+
+    def transform(self, X, y=None):
+        """For each point cloud or distance matrix in `X`, compute the
+        relevant persistence diagram as an array of triples [b, d, q]. Each
+        triple represents a persistent topological feature in dimension q
+        (belonging to `homology_dimensions`) which is born at b and dies at d.
+        Only triples in which b < d are meaningful. Triples in which b and d
+        are equal ("diagonal elements") may be artificially introduced during
+        the computation for padding purposes, since the number of non-trivial
+        persistent topological features is typically not constant across
+        samples. They carry no information and hence should be effectively
+        ignored by any further computation.
+
+        Parameters
+        ----------
+        X : ndarray or list of length n_samples
+            Input data representing a collection of point clouds if `metric`
+            was not set to ``"precomputed"``, and of distance matrices or
+            adjacency matrices of weighted undirected graphs otherwise. Can be
+            either a 3D ndarray whose zeroth dimension has size ``n_samples``,
+            or a list containing ``n_samples`` 2D ndarrays/sparse matrices.
+            Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
+            `X` is a list these shapes can vary between point clouds. If
+            `metric` was set to ``"precomputed"``, then:
+
+                - If entries of `X` are dense, only their upper diagonal
+                  portions are considered.
+                - If entries of `X` are sparse, they do not need to be upper
+                  diagonal or symmetric, but correct results can only be
+                  guaranteed when only one between entry (i, j) and entry
+                  (j, i) is stored, or both are stored but they are equal.
+                  Off-diagonal entries which are not explicitly stored are
+                  treated as infinite, indicating absent edges.
+                - All entries of `X` should be non-negative.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -376,8 +759,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Parameters
     ----------
-    metric : string or callable, optional, default: ``'euclidean'``
-        If set to ``'precomputed'``, input data is to be interpreted as a
+    metric : string or callable, optional, default: ``"euclidean"``
+        If set to ``"precomputed"``, input data is to be interpreted as a
         collection of distance matrices. Otherwise, input data is to be
         interpreted as a collection of point clouds (i.e. feature arrays), and
         `metric` determines a rule with which to calculate distances between
@@ -433,8 +816,9 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, FlagserPersistence, WeakAlphaPersistence, \
-    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
+    VietorisRipsPersistence, WeightedRipsPersistence, FlagserPersistence,
+    WeakAlphaPersistence, EuclideanCechPersistence, ConsistentRescaling,
+    ConsecutiveRescaling
 
     Notes
     -----
@@ -451,19 +835,19 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'metric': {'type': (str, FunctionType)},
-        'homology_dimensions': {
-            'type': (list, tuple),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "metric": {"type": (str, FunctionType)},
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'epsilon': {'type': Real, 'in': Interval(0, 1, closed='both')},
-        'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))},
-        'reduced_homology': {'type': bool}
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "epsilon": {"type": Real, "in": Interval(0, 1, closed="both")},
+        "max_edge_length": {"type": Real},
+        "infinity_values": {"type": (Real, type(None))},
+        "reduced_homology": {"type": bool}
         }
 
-    def __init__(self, metric='euclidean', homology_dimensions=(0, 1),
+    def __init__(self, metric="euclidean", homology_dimensions=(0, 1),
                  coeff=2, epsilon=0.1, max_edge_length=np.inf,
                  infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
@@ -500,12 +884,12 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
-            was not set to ``'precomputed'``, and of distance matrices
+            was not set to ``"precomputed"``, and of distance matrices
             otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, each entry of `X` should be
+            `metric` was set to ``"precomputed"``, each entry of `X` should be
             compatible with a filtration, i.e. the value at index (i, j) should
             be no smaller than the values at diagonal indices (i, i) and
             (j, j).
@@ -520,8 +904,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-        self._is_precomputed = self.metric == 'precomputed'
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
+        self._is_precomputed = self.metric == "precomputed"
         check_point_clouds(X, accept_sparse=True,
                            distance_matrices=self._is_precomputed)
 
@@ -550,12 +934,12 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         ----------
         X : ndarray or list of length n_samples
             Input data representing a collection of point clouds if `metric`
-            was not set to ``'precomputed'``, and of distance matrices
+            was not set to ``"precomputed"``, and of distance matrices
             otherwise. Can be either a 3D ndarray whose zeroth dimension has
             size ``n_samples``, or a list containing ``n_samples`` 2D ndarrays.
             Point cloud arrays have shape ``(n_points, n_dimensions)``, and if
             `X` is a list these shapes can vary between point clouds. If
-            `metric` was set to ``'precomputed'``, each entry of `X` should be
+            `metric` was set to ``"precomputed"``, each entry of `X` should be
             compatible with a filtration, i.e. the value at index (i, j) should
             be no smaller than the values at diagonal indices (i, i) and
             (j, j).
@@ -689,8 +1073,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, FlagserPersistence, SparseRipsPersistence, \
-    EuclideanCechPersistence
+    VietorisRipsPersistence, WeightedRipsPersistence, SparseRipsPersistence,
+    FlagserPersistence, EuclideanCechPersistence
 
     Notes
     -----
@@ -709,14 +1093,14 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'homology_dimensions': {
-            'type': (list, tuple),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'max_edge_length': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))},
-        'reduced_homology': {'type': bool}
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "max_edge_length": {"type": Real},
+        "infinity_values": {"type": (Real, type(None))},
+        "reduced_homology": {"type": bool}
         }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
@@ -749,7 +1133,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Xdgms = ripser(dm, maxdim=self._max_homology_dimension,
                        thresh=self.max_edge_length, coeff=self.coeff,
-                       metric='precomputed')['dgms']
+                       metric="precomputed")["dgms"]
 
         return Xdgms
 
@@ -778,7 +1162,7 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
         check_point_clouds(X)
 
         if self.infinity_values is None:
@@ -947,16 +1331,16 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'homology_dimensions': {
-            'type': (list, tuple),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'max_edge_length': {'type': Real,
-                            'in': Interval(0, np.inf, closed='right')},
-        'infinity_values': {'type': (Real, type(None)),
-                            'in': Interval(0, np.inf, closed='neither')},
-        'reduced_homology': {'type': bool}
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "max_edge_length": {"type": Real,
+                            "in": Interval(0, np.inf, closed="right")},
+        "infinity_values": {"type": (Real, type(None)),
+                            "in": Interval(0, np.inf, closed="neither")},
+        "reduced_homology": {"type": bool}
         }
 
     def __init__(self, homology_dimensions=(0, 1), coeff=2,
@@ -1005,7 +1389,7 @@ class EuclideanCechPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_point_clouds(X)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_length
@@ -1136,11 +1520,11 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
           collection of symmetric dense matrices, or a collection of sparse
           upper-triangular matrices.
 
-    filtration : string, optional, default: ``'max'``
+    filtration : string, optional, default: ``"max"``
         Algorithm determining the filtration values of higher order simplices
         from the weights of the vertices and edges. Possible values are:
-        ['dimension', 'zero', 'max', 'max3', 'max_plus_one', 'product', 'sum',
-        'pmean', 'pmoment', 'remove_edges', 'vertex_degree']
+        ["dimension", "zero", "max", "max3", "max_plus_one", "product", "sum",
+        "pmean", "pmoment", "remove_edges", "vertex_degree"]
 
     coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
@@ -1184,8 +1568,9 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    VietorisRipsPersistence, SparseRipsPersistence, WeakAlphaPersistence,
-    EuclideanCechPersistence, ConsistentRescaling, ConsecutiveRescaling
+    VietorisRipsPersistence, WeightedRipsPersistence, SparseRipsPersistence,
+    WeakAlphaPersistence, EuclideanCechPersistence, ConsistentRescaling,
+    ConsecutiveRescaling
 
     Notes
     -----
@@ -1205,20 +1590,20 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'homology_dimensions': {
-            'type': (list, tuple),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'directed': {'type': bool},
-        'coeff': {'type': int, 'in': Interval(2, np.inf, closed='left')},
-        'max_edge_weight': {'type': Real},
-        'infinity_values': {'type': (Real, type(None))},
-        'reduced_homology': {'type': bool},
-        'max_entries': {'type': int}
+        "directed": {"type": bool},
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "max_edge_weight": {"type": Real},
+        "infinity_values": {"type": (Real, type(None))},
+        "reduced_homology": {"type": bool},
+        "max_entries": {"type": int}
         }
 
     def __init__(self, homology_dimensions=(0, 1), directed=True,
-                 filtration='max', coeff=2, max_edge_weight=np.inf,
+                 filtration="max", coeff=2, max_edge_weight=np.inf,
                  infinity_values=None, reduced_homology=True, max_entries=-1,
                  n_jobs=None):
         self.homology_dimensions = homology_dimensions
@@ -1238,7 +1623,7 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                                   max_dimension=self._max_homology_dimension,
                                   directed=self.directed,
                                   filtration=self.filtration, coeff=self.coeff,
-                                  approximation=self.max_entries)['dgms']
+                                  approximation=self.max_entries)["dgms"]
         n_missing_dims = self._max_homology_dimension + 1 - len(Xdgms)
         if n_missing_dims:
             Xdgms += [np.empty((0, 2), dtype=float)] * n_missing_dims
@@ -1259,16 +1644,16 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             dimension has size ``n_samples``, or a list containing
             ``n_samples`` 2D ndarrays/sparse matrices. In each adjacency
             matrix, diagonal elements are vertex weights and off-diagonal
-            elements are edges weights. It is assumed that a vertex weight
-            cannot be larger than the weight of the edges it
-            forms. The way zero values are handled depends on the format of the
-            matrix. If the matrix is a dense ``numpy.ndarray``, zero values
-            denote zero-weighted edges. If the matrix is a sparse
-            ``scipy.sparse`` matrix, explicitly stored off-diagonal zeros and
-            all diagonal zeros denote zero-weighted edges. Off-diagonal values
-            that have not been explicitly stored are treated by
-            ``scipy.sparse`` as zeros but will be understood as
-            infinitely-valued edges, i.e., edges absent from the filtration.
+            elements are edge weights. It is assumed that a vertex weight
+            cannot be larger than the weight of the edges it forms. The way
+            zero values are handled depends on the format of the matrix. If the
+            matrix is a dense ``numpy.ndarray``, zero values denote
+            zero-weighted edges. If the matrix is a sparse ``scipy.sparse``
+            matrix, explicitly stored off-diagonal zeros and all diagonal zeros
+            denote zero-weighted edges. Off-diagonal values that have not been
+            explicitly stored are treated by ``scipy.sparse`` as zeros but will
+            be understood as infinitely-valued edges, i.e., edges absent from
+            the filtration.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -1281,8 +1666,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         check_point_clouds(X, accept_sparse=True, distance_matrices=True)
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs',
-                                                               'filtration'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs",
+                                                               "filtration"])
 
         if self.infinity_values is None:
             self.infinity_values_ = self.max_edge_weight
@@ -1316,15 +1701,15 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             ``n_samples`` 2D ndarrays/sparse matrices. In each adjacency
             matrix, diagonal elements are vertex weights and off-diagonal
             elements are edges weights. It is assumed that a vertex weight
-            cannot be larger than the weight of the edges it
-            forms. The way zero values are handled depends on the format of the
-            matrix. If the matrix is a dense ``numpy.ndarray``, zero values
-            denote zero-weighted edges. If the matrix is a sparse
-            ``scipy.sparse`` matrix, explicitly stored off-diagonal zeros and
-            all diagonal zeros denote zero-weighted edges. Off-diagonal values
-            that have not been explicitly stored are treated by
-            ``scipy.sparse`` as zeros but will be understood as
-            infinitely-valued edges, i.e., edges absent from the filtration.
+            cannot be larger than the weight of the edges it forms. The way
+            zero values are handled depends on the format of the matrix. If
+            the matrix is a dense ``numpy.ndarray``, zero values denote
+            zero-weighted edges. If the matrix is a sparse ``scipy.sparse``
+            matrix, explicitly stored off-diagonal zeros and all diagonal zeros
+            denote zero-weighted edges. Off-diagonal values that have not been
+            explicitly stored are treated by ``scipy.sparse`` as zeros but will
+            be understood as infinitely-valued edges, i.e., edges absent from
+            the filtration.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline

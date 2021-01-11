@@ -166,7 +166,7 @@ def _compute_dtm_weights(dm, n_neighbors, weights_r):
                            include_self=False)
 
     return 2 * (
-            np.asarray(knn.power(weights_r)).sum(axis=1) / n_neighbors
+            np.asarray(knn.power(weights_r)).sum(axis=1) / (n_neighbors + 1)
             ) ** (1 / weights_r)
 
 
@@ -208,7 +208,7 @@ def _weigh_filtration_dense(dm, weights, p):
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           metric_params={}, weights=None, weight_params={},
+           metric_params={}, weights=None, weight_params=None,
            collapse_edges=False, n_perm=None):
     """Compute persistence diagrams for X data array using Ripser [1]_.
 
@@ -245,11 +245,50 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
 
-    metric_params : TODO
+    metric_params : dict, optional, default: ``{}``
+        Additional parameters to be passed to the distance function.
 
-    weights : TODO
+    weights : ``"DTM"``, ndarray or None, optional, default: ``None``
+        If not ``None``, the persistence of a weighted Vietoris-Rips filtration
+        is computed as described in [3]_, and this parameter determines the
+        vertex weights in the modified adjacency matrix. ``"DTM"`` denotes the
+        empirical distance-to-measure function defined, following [3]_, by
 
-    weight_params : TODO
+        .. math:: w(x) = 2\\left\\(\\frac{1}{n+1} \\sum_{k=1}^n
+           \\mathrm{dist}(x, x_k)^r \\right)^{1/r}.
+
+        Here, :math:`\\mathrm{dist}` is the distance metric used, :math:`x_k`
+        is the :math:`k`-th :math:`\\mathrm{dist}`-nearest neighbour of
+        :math:`x` (:math:`x` is not considered a neighbour of itself),
+        :math:`n` is the number of nearest neighbors to include, and :math:`r`
+        is a parameter (see `weight_params`). If an ndarray is passed, it is
+        interpreted as a user-defined list of vertex weights for the modified
+        adjacency matrix. In either case, the edge weights
+        :math:`\\{w_{ij}\\}_{i, j}` for the modified adjacency matrix are
+        computed from the original distances and the new vertex weights
+        :math:`\\{w_i\\}_i` as follows:
+
+        .. math:: w_{ij} = \\begin{cases} \\max\\{ w_i, w_j \\}
+           &\\text{if } 2\\mathrm{dist}_{ij} \\leq
+           |w_i^p - w_j^p|^{\\frac{1}{p}} \\
+           t &\\text{otherwise} \\end{cases}
+
+        where :math:`t` is the only positive root of
+
+        .. math:: 2 \\mathrm{dist}_{ij} = (t^p - w_i^p)^\\frac{1}{p} +
+           (t^p - w_j^p)^\\frac{1}{p}
+
+        and :math:`p` is a parameter specified in `metric_params`.
+
+    weight_params : dict or None, optional, default: ``None``
+        Parameters to be used in the case of weighted filtrations, see
+        `weights`. In this case, the key ``"p"`` determines the power to be
+        used in computing edge weights from vertex weights. It can be one of
+        ``1``, ``2`` or ``np.inf`` and defaults to ``1``. If `weights` is
+        ``"DTM"``, the additional keys ``"r"`` (default: ``2``) and
+        ``"n_neighbors"`` (default: ``3``) are available (see `weights`,
+        where the latter corresponds to :math:`n`).
+
 
     collapse_edges : bool, optional, default: ``False``
         Whether to use the edge collapse algorithm as described in [2]_ prior
@@ -307,6 +346,11 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
            `DOI: 10.4230/LIPIcs.SoCG.2020.19
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
+    .. [3] H. Anai et al, "DTM-Based Filtrations"; in *Topological Data
+           Analysis* (Abel Symposia, vol 15), Springer, 2020;
+           `DOI: 10.1007/978-3-030-43408-3_2
+           <https://doi.org/10.1007/978-3-030-43408-3_2>`_.
+
     """
     if n_perm and issparse(X):
         raise Exception("Greedy permutation is not supported for sparse "
@@ -339,6 +383,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
 
         if weights is not None:
+            weight_params = {} if weight_params is None else weight_params
             if (dm.diagonal() != 0).any():
                 raise ValueError("Distance matrix has non-zero entries in its "
                                  "main diagonal. Weighted Rips filtration "
@@ -346,10 +391,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             if (dm < 0).nnz:
                 raise ValueError("Distance matrix has negative entries. "
                                  "Weighted Rips filtration unavailable.")
-            weights_p = weight_params.get("p", np.inf)
+            weights_p = weight_params.get("p", 1)
 
             if weights == "DTM":
-                n_neighbors = weight_params.get("n_neighbors", 1)
+                n_neighbors = weight_params.get("n_neighbors", 3)
                 weights_r = weight_params.get("r", 2)
 
                 dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
@@ -377,6 +422,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                     flag_complex_collapse_edges_coo(row, col, data, thresh)
     else:
         if weights is not None:
+            weight_params = {} if weight_params is None else weight_params
             if (dm.diagonal() != 0).any():
                 raise ValueError("Distance matrix has non-zero entries in its "
                                  "main diagonal. DTM-weighted Rips filtration "
@@ -384,10 +430,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             if (dm < 0).any():
                 raise ValueError("Distance matrix has negative entries. "
                                  "DTM-weighted Rips filtration unavailable.")
-            weights_p = weight_params.get("p", np.inf)
+            weights_p = weight_params.get("p", 1)
 
             if weights == "DTM":
-                n_neighbors = weight_params.get("n_neighbors", 1)
+                n_neighbors = weight_params.get("n_neighbors", 3)
                 weights_r = weight_params.get("r", 2)
 
                 if not np.array_equal(dm, dm.T):
