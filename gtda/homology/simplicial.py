@@ -375,7 +375,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     diagonal entries are the :math:`\\{w_i\\}_i`, and whose edge weights are
 
     .. math:: w_{ij} = \\begin{cases} \\max\\{ w_i, w_j \\} &\\text{if }
-       2\\mathrm{dist}_{ij} \\leq |w_i^p - w_j^p|^{\\frac{1}{p}} \\
+       2\\mathrm{dist}_{ij} \\leq |w_i^p - w_j^p|^{\\frac{1}{p}}, \\\\
        t &\\text{otherwise} \\end{cases}
 
     where :math:`t` is the only positive root of
@@ -425,15 +425,15 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         adjacency matrices. The default ``"DTM"`` denotes the empirical
         distance-to-measure function defined, following [3]_, by
 
-        .. math:: w(x) = 2\\left\\(\\frac{1}{n+1} \\sum_{k=1}^n
-           \\mathrm{dist}(x, x_k)^r \\right)^{1/r}.
+        .. math:: w(x) = 2\\left(\\frac{1}{n+1} \\sum_{k=1}^n
+           \\mathrm{dist}(x, x_k)^r\\right)^{1/r}.
 
         Here, :math:`\\mathrm{dist}` is the distance metric used, :math:`x_k`
         is the :math:`k`-th :math:`\\mathrm{dist}`-nearest neighbour of
         :math:`x` (:math:`x` is not considered a neighbour of itself),
         :math:`n` is the number of nearest neighbors to include, and :math:`r`
         is a parameter (see `weight_params`).
-        :math:`w(x) = 2\\left\\(\\frac{1}{n+1} \\sum_{i=1}^n
+        :math:`w(x) = 2 \\left(\\frac{1}{n+1} \\sum_{i=1}^n
         \\mathrm{dist}(x, x_i)^r \\right)^{1/r}`, where :math:`\\mathrm{dist}`
         is the distance metric used and :math:`x_i` is the :math:`i`-th
         :math:`\\mathrm{dist}`-nearest neighbour of :math:`x` (:math:`x` is not
