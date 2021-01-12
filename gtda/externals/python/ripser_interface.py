@@ -165,46 +165,62 @@ def _compute_dtm_weights(dm, n_neighbors, weights_r):
                            metric="precomputed", mode="distance",
                            include_self=False)
 
-    return 2 * (
-            np.asarray(knn.power(weights_r)).sum(axis=1) / (n_neighbors + 1)
-            ) ** (1 / weights_r)
+    weights = np.squeeze(np.asarray(knn.power(weights_r).sum(axis=1)))
+    weights /= n_neighbors + 1
+    weights **= (1 / weights_r)
+    weights *= 2
+
+    return weights
 
 
-def _weigh_filtration(distances, weights_x, weights_y, p):
-    """Create a DTM-weighted distance matrix. For dense data, `weights_x` is
-    a column vector, `weights_y` is a 1D array, `distances` is the original
-    original distance matrix, and the computations exploit array broadcasting.
-    For sparse data, all three are 1D arrays. `p` can only be ``numpy.inf``,
-    ``1``, or ``2``."""
+def _weight_filtration(dist, weights_x, weights_y, p):
+    """Create a weighted distance matrix. For dense data, `weights_x` is a
+    column vector, `weights_y` is a 1D array, `dist` is the original distance
+    matrix, and the computations exploit array broadcasting. For sparse data,
+    all three are 1D arrays. `p` can only be ``numpy.inf``, ``1``, or ``2``."""
     if p == np.inf:
-        return np.maximum(distances, np.maximum(weights_x, weights_y))
+        return np.maximum(dist, np.maximum(weights_x, weights_y))
     elif p == 1:
-        return np.where(distances <= np.abs(weights_x - weights_y) / 2,
+        return np.where(dist <= np.abs(weights_x - weights_y) / 2,
                         np.maximum(weights_x, weights_y),
-                        distances + (weights_x + weights_y) / 2)
+                        dist + (weights_x + weights_y) / 2)
     elif p == 2:
-        return np.where(
-            distances <= np.abs(weights_x**2 - weights_y**2)**.5 / 2,
-            np.maximum(weights_x, weights_y),
-            np.sqrt((distances**2 + ((weights_x + weights_y) / 2)**2) *
-                    (distances**2 + ((weights_x - weights_y) / 2)**2)) /
-            distances
-            )
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return np.where(
+                dist <= np.abs(weights_x**2 - weights_y**2)**.5 / 2,
+                np.maximum(weights_x, weights_y),
+                np.sqrt((dist**2 + ((weights_x + weights_y) / 2)**2) *
+                        (dist**2 + ((weights_x - weights_y) / 2)**2)) / dist
+                )
     else:
         raise NotImplementedError(f"Weighting not supported for p = {p}")
 
 
-def _weigh_filtration_sparse(row, col, data, weights, p):
+def _weight_filtration_sparse(row, col, data, weights, p):
     weights_x = weights[row]
     weights_y = weights[col]
 
-    return _weigh_filtration(data, weights_x, weights_y, p)
+    return _weight_filtration(data, weights_x, weights_y, p)
 
 
-def _weigh_filtration_dense(dm, weights, p):
+def _weight_filtration_dense(dm, weights, p):
     weights_2d = weights[:, None]
 
-    return _weigh_filtration(dm, weights_2d, weights, p)
+    return _weight_filtration(dm, weights_2d, weights, p)
+
+
+def _check_weights(weights, n_points):
+    weights = column_or_1d(weights)
+    if len(weights) != n_points:
+        raise ValueError(
+            f"Input distance/adjacency matrix implies {n_points} "
+            f"vertices but {len(weights)} weights were passed."
+        )
+    if np.any(weights < 0):
+        raise ValueError("All weights must be non-negative."
+                         "Negative weights passed.")
+
+    return weights
 
 
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
@@ -381,39 +397,47 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     use_sparse_computer = True
     if issparse(dm):
         row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+        has_nonzeros_in_diag = (dm.diagonal() != 0).any()
 
         if weights is not None:
-            weight_params = {} if weight_params is None else weight_params
-            if (dm.diagonal() != 0).any():
-                raise ValueError("Distance matrix has non-zero entries in its "
-                                 "main diagonal. Weighted Rips filtration "
-                                 "unavailable.")
             if (dm < 0).nnz:
                 raise ValueError("Distance matrix has negative entries. "
                                  "Weighted Rips filtration unavailable.")
+
+            weight_params = {} if weight_params is None else weight_params
             weights_p = weight_params.get("p", 1)
 
-            if weights == "DTM":
+            if isinstance(weights, str) and (weights == "DTM"):
                 n_neighbors = weight_params.get("n_neighbors", 3)
                 weights_r = weight_params.get("r", 2)
 
                 dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
                 dm += triu(dm, k=1).T
+                # Need to explicitly set the diagonal to 0 to prevent
+                # kneighbors_graph with include_self=False from skipping the
+                # first true neighbor (this seems to be a bug in sklearn)
+                dm.setdiag(0)
 
                 weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
             else:
-                weights = column_or_1d(weights)
-                if len(weights) != n_points:
-                    raise ValueError(
-                        f"Input distance/adjacency matrix implies {n_points} "
-                        f"vertices but {len(weights)} weights were passed."
-                        )
+                weights = _check_weights(weights, n_points)
 
-            data = _weigh_filtration_sparse(row, col, data, weights,
-                                            p=weights_p)
+            # Restrict to off-diagonal entries for weights computation since
+            # diagonal ones are given by `weights`
+            off_diag_mask = row != col
+            row, col, data = \
+                row[off_diag_mask], col[off_diag_mask], data[off_diag_mask]
+            data = _weight_filtration_sparse(row, col, data, weights,
+                                             p=weights_p)
+            # Add diagonal information given by `weights`
+            row, col, data = (np.concatenate([row, np.arange(n_points)]),
+                              np.concatenate([col, np.arange(n_points)]),
+                              np.concatenate([data, weights]))
+
+            has_nonzeros_in_diag = np.any(weights)
 
         if collapse_edges:
-            if (dm.diagonal() != 0).any():
+            if has_nonzeros_in_diag:
                 warn("Edge collapses are not supported when any of the "
                      "diagonal entries are non-zero. Computing persistent "
                      "homology without using edge collapse.")
@@ -422,17 +446,14 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
                     flag_complex_collapse_edges_coo(row, col, data, thresh)
     else:
         if weights is not None:
-            weight_params = {} if weight_params is None else weight_params
-            if (dm.diagonal() != 0).any():
-                raise ValueError("Distance matrix has non-zero entries in its "
-                                 "main diagonal. DTM-weighted Rips filtration "
-                                 "unavailable.")
             if (dm < 0).any():
                 raise ValueError("Distance matrix has negative entries. "
-                                 "DTM-weighted Rips filtration unavailable.")
+                                 "Weighted Rips filtration unavailable.")
+
+            weight_params = {} if weight_params is None else weight_params
             weights_p = weight_params.get("p", 1)
 
-            if weights == "DTM":
+            if isinstance(weights, str) and (weights == "DTM"):
                 n_neighbors = weight_params.get("n_neighbors", 3)
                 weights_r = weight_params.get("r", 2)
 
@@ -442,14 +463,10 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
                 weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
             else:
-                weights = column_or_1d(weights)
-                if len(weights) != n_points:
-                    raise ValueError(
-                        f"Input distance/adjacency matrix implies {n_points} "
-                        f"vertices but {len(weights)} weights were passed."
-                        )
+                weights = _check_weights(weights, n_points)
 
-            dm = _weigh_filtration_dense(dm, weights, p=weights_p)
+            dm = _weight_filtration_dense(dm, weights, p=weights_p)
+            np.fill_diagonal(dm, weights)
 
         if (dm.diagonal() != 0).any():
             # Convert to sparse format, because currently that's the only

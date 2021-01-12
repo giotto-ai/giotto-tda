@@ -209,11 +209,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                 - If entries of `X` are dense, only their upper diagonal
                   portions (including the diagonal) are considered.
                 - If entries of `X` are sparse, they do not need to be upper
-                  diagonal or symmetric, but correct results can only be
-                  guaranteed when only one between entry (i, j) and entry
-                  (j, i) is stored, or both are stored but they are equal.
-                  Diagonal entries which are not explicitly stored are assumed
-                  to be zero, while off-diagonal entries which are not
+                  diagonal or symmetric. If only one of entry (i, j) and (j, i)
+                  is stored, its value is taken as the weight of the undirected
+                  edge {i, j}. If both are stored, the value in the upper
+                  diagonal is taken. Off-diagonal entries which are not
                   explicitly stored are treated as infinite, indicating absent
                   edges.
                 - Entries of `X` should be compatible with a filtration, i.e.
@@ -275,11 +274,10 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                 - If entries of `X` are dense, only their upper diagonal
                   portions (including the diagonal) are considered.
                 - If entries of `X` are sparse, they do not need to be upper
-                  diagonal or symmetric, but correct results can only be
-                  guaranteed when only one between entry (i, j) and entry
-                  (j, i) is stored, or both are stored but they are equal.
-                  Diagonal entries which are not explicitly stored are assumed
-                  to be zero, while off-diagonal entries which are not
+                  diagonal or symmetric. If only one of entry (i, j) and (j, i)
+                  is stored, its value is taken as the weight of the undirected
+                  edge {i, j}. If both are stored, the value in the upper
+                  diagonal is taken. Off-diagonal entries which are not
                   explicitly stored are treated as infinite, indicating absent
                   edges.
                 - Entries of `X` should be compatible with a filtration, i.e.
@@ -420,9 +418,9 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     weights : ``"DTM"`` or callable, optional, default: ``"DTM"``
         Function that will be applied to each input point cloud/distance
-        matrix/adjacency matrix to compute vertex weights in the modified
-        adjacency matrices. The default ``"DTM"`` denotes the empirical
-        distance-to-measure function defined, following [3]_, by
+        matrix/adjacency matrix to compute a 1D array of vertex weights for the
+        the modified adjacency matrices. The default ``"DTM"`` denotes the
+        empirical distance-to-measure function defined, following [3]_, by
 
         .. math:: w(x) = 2\\left(\\frac{1}{n+1} \\sum_{k=1}^n
            \\mathrm{dist}(x, x_k)^r\\right)^{1/r}.
@@ -431,7 +429,8 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         is the :math:`k`-th :math:`\\mathrm{dist}`-nearest neighbour of
         :math:`x` (:math:`x` is not considered a neighbour of itself),
         :math:`n` is the number of nearest neighbors to include, and :math:`r`
-        is a parameter (see `weight_params`).
+        is a parameter (see `weight_params`). If a callable, it must return
+        non-negative 1D arrays.
 
     weight_params : dict, optional, default: ``None``
         Additional parameters for the weighted filtration. ``"p"`` determines
@@ -583,15 +582,19 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             `X` is a list these shapes can vary between point clouds. If
             `metric` was set to ``"precomputed"``, then:
 
+                - All entries of `X` should not contain infinities or negative
+                  values (contrary to :class:`VietorisRipsPersistence`).
+                - The diagonals of entries of `X` are ignored (after the vertex
+                  weights are computed, when `weights` is a callable).
                 - If entries of `X` are dense, only their upper diagonal
                   portions are considered.
                 - If entries of `X` are sparse, they do not need to be upper
-                  diagonal or symmetric, but correct results can only be
-                  guaranteed when only one between entry (i, j) and entry
-                  (j, i) is stored, or both are stored but they are equal.
-                  Off-diagonal entries which are not explicitly stored are
-                  treated as infinite, indicating absent edges.
-                - All entries of `X` should be non-negative.
+                  diagonal or symmetric. If only one of entry (i, j) and (j, i)
+                  is stored, its value is taken as the weight of the undirected
+                  edge {i, j}. If both are stored, the value in the upper
+                  diagonal is taken. Off-diagonal entries which are not
+                  explicitly stored are treated as infinite, indicating absent
+                  edges.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -619,7 +622,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                             _AVAILABLE_RIPS_WEIGHTS[key])
 
         self._is_precomputed = self.metric == "precomputed"
-        check_point_clouds(X, accept_sparse=True,
+        check_point_clouds(X, accept_sparse=True, force_all_finite=True,
                            distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
@@ -656,15 +659,19 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             `X` is a list these shapes can vary between point clouds. If
             `metric` was set to ``"precomputed"``, then:
 
+                - All entries of `X` should not contain infinities or negative
+                  values (contrary to :class:`VietorisRipsPersistence`).
+                - The diagonals of entries of `X` are ignored (after the vertex
+                  weights are computed, when `weights` is a callable).
                 - If entries of `X` are dense, only their upper diagonal
                   portions are considered.
                 - If entries of `X` are sparse, they do not need to be upper
-                  diagonal or symmetric, but correct results can only be
-                  guaranteed when only one between entry (i, j) and entry
-                  (j, i) is stored, or both are stored but they are equal.
-                  Off-diagonal entries which are not explicitly stored are
-                  treated as infinite, indicating absent edges.
-                - All entries of `X` should be non-negative.
+                  diagonal or symmetric. If only one of entry (i, j) and (j, i)
+                  is stored, its value is taken as the weight of the undirected
+                  edge {i, j}. If both are stored, the value in the upper
+                  diagonal is taken. Off-diagonal entries which are not
+                  explicitly stored are treated as infinite, indicating absent
+                  edges.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -681,7 +688,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, accept_sparse=True,
+        X = check_point_clouds(X, accept_sparse=True, force_all_finite=True,
                                distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
