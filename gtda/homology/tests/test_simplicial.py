@@ -10,23 +10,20 @@ from scipy.spatial.distance import pdist, squareform
 from scipy.spatial.qhull import QhullError
 from sklearn.exceptions import NotFittedError
 
-from gtda.homology import VietorisRipsPersistence, SparseRipsPersistence, \
-    WeakAlphaPersistence, EuclideanCechPersistence, FlagserPersistence
+from gtda.homology import VietorisRipsPersistence, WeightedRipsPersistence, \
+    SparseRipsPersistence, WeakAlphaPersistence, EuclideanCechPersistence, \
+    FlagserPersistence
 
 pio.renderers.default = 'plotly_mimetype'
 
-X_pc = np.array([
-    [[2., 2.47942554],
-     [2.47942554, 2.84147098],
-     [2.98935825, 2.79848711],
-     [2.79848711, 2.41211849],
-     [2.41211849, 1.92484888]]
-    ])
+X_pc = np.array([[[2., 2.47942554],
+                  [2.47942554, 2.84147098],
+                  [2.98935825, 2.79848711],
+                  [2.79848711, 2.41211849],
+                  [2.41211849, 1.92484888]]])
 X_pc_list = list(X_pc)
 
-X_dist = np.array([
-    squareform(pdist(x)) for x in X_pc
-    ])
+X_dist = np.array([squareform(pdist(x)) for x in X_pc])
 X_dist_list = list(X_dist)
 
 X_pc_sparse = [csr_matrix(x) for x in X_pc]
@@ -35,16 +32,14 @@ X_dist_sparse = [csr_matrix(x) for x in X_dist]
 X_dist_disconnected = np.array([[[0, np.inf], [np.inf, 0]]])
 
 # 8-point sampling of a noisy circle
-X_circle = np.array([
-    [[1.00399159, -0.00797583],
-     [0.70821787, 0.68571714],
-     [-0.73369765, -0.71298056],
-     [0.01110395, -1.03739883],
-     [-0.64968271, 0.7011624],
-     [0.03895963, 0.94494511],
-     [0.76291108, -0.68774373],
-     [-1.01932365, -0.05793851]]
-    ])
+X_circle = np.array([[[1.00399159, -0.00797583],
+                      [0.70821787, 0.68571714],
+                      [-0.73369765, -0.71298056],
+                      [0.01110395, -1.03739883],
+                      [-0.64968271, 0.7011624],
+                      [0.03895963, 0.94494511],
+                      [0.76291108, -0.68774373],
+                      [-1.01932365, -0.05793851]]])
 
 
 def test_vrp_params():
@@ -62,13 +57,11 @@ def test_vrp_not_fitted():
         vrp.transform(X_pc)
 
 
-X_vrp_exp = np.array([
-    [[0., 0.43094373, 0.],
-     [0., 0.5117411, 0.],
-     [0., 0.60077095, 0.],
-     [0., 0.62186205, 0.],
-     [0.69093919, 0.80131882, 1.]]
-    ])
+X_vrp_exp = np.array([[[0., 0.43094373, 0.],
+                       [0., 0.5117411, 0.],
+                       [0., 0.60077095, 0.],
+                       [0., 0.62186205, 0.],
+                       [0.69093919, 0.80131882, 1.]]])
 
 
 @pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
@@ -123,6 +116,109 @@ def test_vrp_fit_transform_plot(X, metric, hom_dims):
         )
 
 
+def test_wrp_params():
+    metric = 'not_defined'
+    wrp = WeightedRipsPersistence(metric=metric)
+
+    with pytest.raises(ValueError):
+        wrp.fit_transform(X_pc)
+
+
+def test_wrp_not_fitted():
+    wrp = WeightedRipsPersistence()
+
+    with pytest.raises(NotFittedError):
+        wrp.transform(X_pc)
+
+
+def test_wrp_notimplemented_string_weights():
+    wrp = WeightedRipsPersistence(weights="foo")
+
+    with pytest.raises(ValueError, match="'foo' passed for `weights` but the "
+                                         "only allowed string is 'DTM'"):
+        wrp.fit(X_pc)
+
+
+def test_wrp_notimplemented_p():
+    wrp = WeightedRipsPersistence(weight_params={'p': 1.2})
+
+    with pytest.raises(ValueError):
+        wrp.fit(X_pc)
+
+
+@pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
+                                       (X_pc_list, 'euclidean'),
+                                       (X_pc_sparse, 'euclidean'),
+                                       (X_dist, 'precomputed'),
+                                       (X_dist_list, 'precomputed'),
+                                       (X_dist_sparse, 'precomputed')])
+@pytest.mark.parametrize('weight_params', [{'p': 1}, {'p': 2}, {'p': np.inf}])
+@pytest.mark.parametrize('collapse_edges', [True, False])
+@pytest.mark.parametrize('max_edge_weight', [np.inf, 0.8])
+@pytest.mark.parametrize('infinity_values', [10, 30])
+def test_wrp_same_as_vrp_when_zero_weights(X, metric, weight_params,
+                                           collapse_edges, max_edge_weight,
+                                           infinity_values):
+    weights = lambda x: np.zeros(x.shape[0])
+    wrp = WeightedRipsPersistence(weights=weights,
+                                  weight_params=weight_params,
+                                  metric=metric,
+                                  collapse_edges=collapse_edges,
+                                  max_edge_weight=max_edge_weight,
+                                  infinity_values=infinity_values)
+
+    # This is not generally true, it is only a way to obtain the res array
+    # in this specific case
+    X_exp = X_vrp_exp.copy()
+    X_exp[:, :, :2][X_exp[:, :, :2] >= max_edge_weight] = infinity_values
+    assert_almost_equal(wrp.fit_transform(X), X_exp)
+
+
+X_wrp_exp = {1: np.array([[[0.95338798, 1.474913, 0.],
+                           [1.23621261, 1.51234496, 0.],
+                           [1.21673107, 1.68583047, 0.],
+                           [1.30722439, 1.73876917, 0.],
+                           [0., 0., 1.]]]),
+             2: np.array([[[0.95338798, 1.08187652, 0.],
+                           [1.23621261, 1.2369417, 0.],
+                           [1.21673107, 1.26971364, 0.],
+                           [1.30722439, 1.33688354, 0.],
+                           [0., 0., 1.]]]),
+             np.inf: np.array([[[0., 0., 0.],
+                                [0., 0., 1.]]])}
+
+
+@pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
+                                       (X_pc_list, 'euclidean'),
+                                       (X_pc_sparse, 'euclidean'),
+                                       (X_dist, 'precomputed'),
+                                       (X_dist_list, 'precomputed'),
+                                       (X_dist_sparse, 'precomputed')])
+@pytest.mark.parametrize('weight_params', [{'p': 1}, {'p': 2}, {'p': np.inf}])
+@pytest.mark.parametrize('collapse_edges', [True, False])
+def test_wrp_transform(X, metric, weight_params, collapse_edges):
+    wrp = WeightedRipsPersistence(weight_params=weight_params,
+                                  metric=metric,
+                                  collapse_edges=collapse_edges)
+
+    assert_almost_equal(wrp.fit_transform(X), X_wrp_exp[weight_params['p']])
+
+
+def test_wrp_infinity_error():
+    with pytest.raises(ValueError, match="Input contains"):
+        wrp = WeightedRipsPersistence(metric='precomputed')
+        wrp.fit_transform(X_dist_disconnected)
+
+
+@pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
+                                       (X_pc_list, 'euclidean')])
+@pytest.mark.parametrize('hom_dims', [None, (0,), (1,), (0, 1)])
+def test_wrp_fit_transform_plot(X, metric, hom_dims):
+    WeightedRipsPersistence(
+        metric=metric, weight_params={'n_neighbors': 1}
+        ).fit_transform_plot(X, sample=0, homology_dimensions=hom_dims)
+
+
 def test_srp_params():
     metric = 'not_defined'
     vrp = SparseRipsPersistence(metric=metric)
@@ -138,13 +234,11 @@ def test_srp_not_fitted():
         srp.transform(X_pc)
 
 
-X_srp_exp = np.array([
-    [[0., 0.43094373, 0.],
-     [0., 0.5117411, 0.],
-     [0., 0.60077095, 0.],
-     [0., 0.62186205, 0.],
-     [0.69093919, 0.80131882, 1.]]
-    ])
+X_srp_exp = np.array([[[0., 0.43094373, 0.],
+                       [0., 0.5117411, 0.],
+                       [0., 0.60077095, 0.],
+                       [0., 0.62186205, 0.],
+                       [0.69093919, 0.80131882, 1.]]])
 
 
 @pytest.mark.parametrize('X, metric', [(X_pc, 'euclidean'),
@@ -263,18 +357,16 @@ def test_cp_not_fitted():
         cp.transform(X_pc)
 
 
-X_cp_exp = np.array([
-    [[0., 0.31093103, 0.],
-     [0., 0.30038548, 0.],
-     [0., 0.25587055, 0.],
-     [0., 0.21547186, 0.],
-     [0.34546959, 0.41473758, 1.],
-     [0.51976681, 0.55287585, 1.],
-     [0.26746207, 0.28740871, 1.],
-     [0.52355742, 0.52358794, 1.],
-     [0.40065941, 0.40067135, 1.],
-     [0.45954496, 0.45954497, 1.]]
-    ])
+X_cp_exp = np.array([[[0., 0.31093103, 0.],
+                      [0., 0.30038548, 0.],
+                      [0., 0.25587055, 0.],
+                      [0., 0.21547186, 0.],
+                      [0.34546959, 0.41473758, 1.],
+                      [0.51976681, 0.55287585, 1.],
+                      [0.26746207, 0.28740871, 1.],
+                      [0.52355742, 0.52358794, 1.],
+                      [0.40065941, 0.40067135, 1.],
+                      [0.45954496, 0.45954497, 1.]]])
 
 
 @pytest.mark.parametrize('X', [X_pc, X_pc_list])
@@ -315,13 +407,11 @@ X_dir_graph_list = [x for x in X_dir_graph]
 
 X_dir_graph_sparse = [csr_matrix(x) for x in X_dir_graph]
 
-X_fp_dir_exp = np.array([
-    [[0., 0.30038548, 0.],
-     [0., 0.34546959, 0.],
-     [0., 0.40065941, 0.],
-     [0., 0.43094373, 0.],
-     [0.5117411,  0.51976681, 1.]]
-    ])
+X_fp_dir_exp = np.array([[[0., 0.30038548, 0.],
+                          [0., 0.34546959, 0.],
+                          [0., 0.40065941, 0.],
+                          [0., 0.43094373, 0.],
+                          [0.5117411,  0.51976681, 1.]]])
 
 
 @pytest.mark.parametrize('X',
