@@ -14,6 +14,7 @@ Undirected simplicial homology
    :template: class.rst
 
    homology.VietorisRipsPersistence
+   homology.WeightedRipsPersistence
    homology.SparseRipsPersistence
    homology.WeakAlphaPersistence
    homology.EuclideanCechPersistence

@@ -22,9 +22,11 @@ import gc
 from warnings import warn
 
 import numpy as np
-from scipy import sparse
+from scipy.sparse import issparse, coo_matrix, triu
 from scipy.spatial.distance import squareform
 from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.neighbors import kneighbors_graph
+from sklearn.utils.validation import column_or_1d
 
 from ..modules import gtda_ripser, gtda_ripser_coeff, gtda_collapser
 
@@ -158,8 +160,72 @@ def _resolve_symmetry_conflicts(coo):
         return _row, _col, _data
 
 
+def _compute_dtm_weights(dm, n_neighbors, weights_r):
+    knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
+                           metric="precomputed", mode="distance",
+                           include_self=False)
+
+    weights = np.squeeze(np.asarray(knn.power(weights_r).sum(axis=1)))
+    weights /= n_neighbors + 1
+    weights **= (1 / weights_r)
+    weights *= 2
+
+    return weights
+
+
+def _weight_filtration(dist, weights_x, weights_y, p):
+    """Create a weighted distance matrix. For dense data, `weights_x` is a
+    column vector, `weights_y` is a 1D array, `dist` is the original distance
+    matrix, and the computations exploit array broadcasting. For sparse data,
+    all three are 1D arrays. `p` can only be ``numpy.inf``, ``1``, or ``2``."""
+    if p == np.inf:
+        return np.maximum(dist, np.maximum(weights_x, weights_y))
+    elif p == 1:
+        return np.where(dist <= np.abs(weights_x - weights_y) / 2,
+                        np.maximum(weights_x, weights_y),
+                        dist + (weights_x + weights_y) / 2)
+    elif p == 2:
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return np.where(
+                dist <= np.abs(weights_x**2 - weights_y**2)**.5 / 2,
+                np.maximum(weights_x, weights_y),
+                np.sqrt((dist**2 + ((weights_x + weights_y) / 2)**2) *
+                        (dist**2 + ((weights_x - weights_y) / 2)**2)) / dist
+                )
+    else:
+        raise NotImplementedError(f"Weighting not supported for p = {p}")
+
+
+def _weight_filtration_sparse(row, col, data, weights, p):
+    weights_x = weights[row]
+    weights_y = weights[col]
+
+    return _weight_filtration(data, weights_x, weights_y, p)
+
+
+def _weight_filtration_dense(dm, weights, p):
+    weights_2d = weights[:, None]
+
+    return _weight_filtration(dm, weights_2d, weights, p)
+
+
+def _check_weights(weights, n_points):
+    weights = column_or_1d(weights)
+    if len(weights) != n_points:
+        raise ValueError(
+            f"Input distance/adjacency matrix implies {n_points} "
+            f"vertices but {len(weights)} weights were passed."
+        )
+    if np.any(weights < 0):
+        raise ValueError("All weights must be non-negative."
+                         "Negative weights passed.")
+
+    return weights
+
+
 def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
-           n_perm=None, collapse_edges=False):
+           metric_params={}, weights=None, weight_params=None,
+           collapse_edges=False, n_perm=None):
     """Compute persistence diagrams for X data array using Ripser [1]_.
 
     If X is not a distance matrix, it will be converted to a distance matrix
@@ -195,16 +261,61 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
 
+    metric_params : dict, optional, default: ``{}``
+        Additional parameters to be passed to the distance function.
+
+    weights : ``"DTM"``, ndarray or None, optional, default: ``None``
+        If not ``None``, the persistence of a weighted Vietoris-Rips filtration
+        is computed as described in [3]_, and this parameter determines the
+        vertex weights in the modified adjacency matrix. ``"DTM"`` denotes the
+        empirical distance-to-measure function defined, following [3]_, by
+
+        .. math:: w(x) = 2\\left\\(\\frac{1}{n+1} \\sum_{k=1}^n
+           \\mathrm{dist}(x, x_k)^r \\right)^{1/r}.
+
+        Here, :math:`\\mathrm{dist}` is the distance metric used, :math:`x_k`
+        is the :math:`k`-th :math:`\\mathrm{dist}`-nearest neighbour of
+        :math:`x` (:math:`x` is not considered a neighbour of itself),
+        :math:`n` is the number of nearest neighbors to include, and :math:`r`
+        is a parameter (see `weight_params`). If an ndarray is passed, it is
+        interpreted as a user-defined list of vertex weights for the modified
+        adjacency matrix. In either case, the edge weights
+        :math:`\\{w_{ij}\\}_{i, j}` for the modified adjacency matrix are
+        computed from the original distances and the new vertex weights
+        :math:`\\{w_i\\}_i` as follows:
+
+        .. math:: w_{ij} = \\begin{cases} \\max\\{ w_i, w_j \\}
+           &\\text{if } 2\\mathrm{dist}_{ij} \\leq
+           |w_i^p - w_j^p|^{\\frac{1}{p}} \\
+           t &\\text{otherwise} \\end{cases}
+
+        where :math:`t` is the only positive root of
+
+        .. math:: 2 \\mathrm{dist}_{ij} = (t^p - w_i^p)^\\frac{1}{p} +
+           (t^p - w_j^p)^\\frac{1}{p}
+
+        and :math:`p` is a parameter specified in `metric_params`.
+
+    weight_params : dict or None, optional, default: ``None``
+        Parameters to be used in the case of weighted filtrations, see
+        `weights`. In this case, the key ``"p"`` determines the power to be
+        used in computing edge weights from vertex weights. It can be one of
+        ``1``, ``2`` or ``np.inf`` and defaults to ``1``. If `weights` is
+        ``"DTM"``, the additional keys ``"r"`` (default: ``2``) and
+        ``"n_neighbors"`` (default: ``3``) are available (see `weights`,
+        where the latter corresponds to :math:`n`).
+
+
+    collapse_edges : bool, optional, default: ``False``
+        Whether to use the edge collapse algorithm as described in [2]_ prior
+        to calling ``ripser``.
+
     n_perm : int or None, optional, default: ``None``
         The number of points to subsample in a "greedy permutation", or a
         furthest point sampling of the points. These points will be used in
         lieu of the full point cloud for a faster computation, at the expense
         of some accuracy, which can be bounded as a maximum bottleneck distance
         to all diagrams on the original point set.
-
-    collapse_edges : bool, optional, default: ``False``
-        Whether to use the edge collapse algorithm as described in [2]_ prior
-        to calling ``ripser``.
 
     Returns
     -------
@@ -251,8 +362,13 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
            `DOI: 10.4230/LIPIcs.SoCG.2020.19
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
 
+    .. [3] H. Anai et al, "DTM-Based Filtrations"; in *Topological Data
+           Analysis* (Abel Symposia, vol 15), Springer, 2020;
+           `DOI: 10.1007/978-3-030-43408-3_2
+           <https://doi.org/10.1007/978-3-030-43408-3_2>`_.
+
     """
-    if n_perm and sparse.issparse(X):
+    if n_perm and issparse(X):
         raise Exception("Greedy permutation is not supported for sparse "
                         "distance matrices")
     if n_perm and n_perm > X.shape[0]:
@@ -273,36 +389,102 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
         if metric == 'precomputed':
             dm = X
         else:
-            dm = pairwise_distances(X, metric=metric)
+            dm = pairwise_distances(X, metric=metric, **metric_params)
         dperm2all = None
 
     n_points = max(dm.shape)
-    if (dm.diagonal() != 0).any():
-        if collapse_edges:
-            warn("Edge collapses are not supported when any of the diagonal "
-                 "entries are non-zero. Computing persistent homology without "
-                 "using edge collapse.")
-            collapse_edges = False
-        if not sparse.issparse(dm):
-            # If any of the diagonal elements are nonzero, convert to sparse
-            # format, because currently that's the only format that handles
-            # nonzero births
-            dm = sparse.coo_matrix(dm)
 
-    is_sparse = sparse.issparse(dm)
-    if is_sparse or collapse_edges:
-        if is_sparse:
-            row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
-            if collapse_edges:
-                row, col, data = \
-                    gtda_collapser.flag_complex_collapse_edges_coo(row,
-                                                                   col,
-                                                                   data,
-                                                                   thresh)
-        else:
+    use_sparse_computer = True
+    if issparse(dm):
+        row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+        has_nonzeros_in_diag = (dm.diagonal() != 0).any()
+
+        if weights is not None:
+            if (dm < 0).nnz:
+                raise ValueError("Distance matrix has negative entries. "
+                                 "Weighted Rips filtration unavailable.")
+
+            weight_params = {} if weight_params is None else weight_params
+            weights_p = weight_params.get("p", 1)
+
+            if isinstance(weights, str) and (weights == "DTM"):
+                n_neighbors = weight_params.get("n_neighbors", 3)
+                weights_r = weight_params.get("r", 2)
+
+                dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
+                dm += triu(dm, k=1).T
+                # Need to explicitly set the diagonal to 0 to prevent
+                # kneighbors_graph with include_self=False from skipping the
+                # first true neighbor (this seems to be a bug in sklearn)
+                dm.setdiag(0)
+
+                weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
+            else:
+                weights = _check_weights(weights, n_points)
+
+            # Restrict to off-diagonal entries for weights computation since
+            # diagonal ones are given by `weights`
+            off_diag_mask = row != col
             row, col, data = \
-                gtda_collapser.flag_complex_collapse_edges_dense(dm, thresh)
+                row[off_diag_mask], col[off_diag_mask], data[off_diag_mask]
+            data = _weight_filtration_sparse(row, col, data, weights,
+                                             weights_p)
+            # Add diagonal information given by `weights`
+            row, col, data = (np.concatenate([row, np.arange(n_points)]),
+                              np.concatenate([col, np.arange(n_points)]),
+                              np.concatenate([data, weights]))
 
+            has_nonzeros_in_diag = np.any(weights)
+
+        if collapse_edges:
+            if has_nonzeros_in_diag:
+                warn("Edge collapses are not supported when any of the "
+                     "diagonal entries are non-zero. Computing persistent "
+                     "homology without using edge collapse.")
+            else:
+                row, col, data = gtda_collapser.\
+                    flag_complex_collapse_edges_coo(row, col, data, thresh)
+    else:
+        if weights is not None:
+            if (dm < 0).any():
+                raise ValueError("Distance matrix has negative entries. "
+                                 "Weighted Rips filtration unavailable.")
+
+            weight_params = {} if weight_params is None else weight_params
+            weights_p = weight_params.get("p", 1)
+
+            if isinstance(weights, str) and (weights == "DTM"):
+                n_neighbors = weight_params.get("n_neighbors", 3)
+                weights_r = weight_params.get("r", 2)
+
+                if not np.array_equal(dm, dm.T):
+                    dm = np.triu(dm, k=1)
+                    dm += dm.T
+
+                weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
+            else:
+                weights = _check_weights(weights, n_points)
+
+            dm = _weight_filtration_dense(dm, weights, weights_p)
+            np.fill_diagonal(dm, weights)
+
+        if (dm.diagonal() != 0).any():
+            # Convert to sparse format, because currently that's the only
+            # one handling nonzero births
+            (row, col) = np.triu_indices_from(dm)
+            data = dm[(row, col)]
+            if collapse_edges:
+                warn("Edge collapses are not supported when any of the "
+                     "diagonal entries are non-zero. Computing persistent "
+                     "homology without using edge collapse.")
+
+        elif collapse_edges:
+            row, col, data = gtda_collapser.\
+                flag_complex_collapse_edges_dense(dm, thresh)
+        else:
+            use_sparse_computer = False
+
+    if use_sparse_computer:
         res = DRFDMSparse(np.asarray(row, dtype=np.int32, order="C"),
                           np.asarray(col, dtype=np.int32, order="C"),
                           np.asarray(data, dtype=np.float32, order="C"),
