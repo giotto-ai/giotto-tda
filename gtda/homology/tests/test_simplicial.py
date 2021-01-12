@@ -159,8 +159,7 @@ def test_wrp_notimplemented_p():
 def test_wrp_same_as_vrp_when_zero_weights(X, metric, weight_params,
                                            collapse_edges, max_edge_weight,
                                            infinity_values):
-    weights = lambda x: np.zeros(x.shape[0])
-    wrp = WeightedRipsPersistence(weights=weights,
+    wrp = WeightedRipsPersistence(weights=lambda x: np.zeros(x.shape[0]),
                                   weight_params=weight_params,
                                   metric=metric,
                                   collapse_edges=collapse_edges,
