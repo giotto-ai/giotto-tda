@@ -5,6 +5,41 @@ Release Notes
 .. _stable:
 
 *************
+Release 0.4.0
+*************
+
+Major Features and Improvements
+===============================
+
+- Wheels for Python 3.9 have been added (`#528 <https://github.com/giotto-ai/giotto-tda/pull/528>`_).
+- Weighted Rips filtrations, and in particular distance-to-measure (DTM) based filtrations, are now supported in ``ripser`` and by the new ``WeightedRipsPersistence`` transformer (`#541 <https://github.com/giotto-ai/giotto-tda/pull/541>`_).
+- See "Backwards-Incompatible Changes" for major improvements to ``ParallelClustering`` and therefore ``make_mapper_pipeline`` which are also major breaking changes.
+- ``GraphGeodesicDistance`` can now take rectangular input (the number of vertices is inferred to be ``max(x.shape)``), and ``KNeighborsGraph`` can now take sparse input (`#537 <https://github.com/giotto-ai/giotto-tda/pull/537>`_).
+- ``VietorisRipsPersistence`` now takes a ``metric_params`` parameter (`#541 <https://github.com/giotto-ai/giotto-tda/pull/541>`_).
+
+Bug Fixes
+=========
+
+- A documentation bug affecting plots from ``DensityFiltration`` has been fixed (`#540 <https://github.com/giotto-ai/giotto-tda/pull/540>`_).
+- A bug affecting the bindings for GUDHI's edge collapser, which incorrectly did not ignore lower diagonal entries, has been fixed (`#538 <https://github.com/giotto-ai/giotto-tda/pull/538>`_).
+- Symmetry conflicts in the case of sparse input to ``ripser`` and ``VietorisRipsPersistence`` are now handled in a way true to the documentation, i.e. by favouring upper diagonal entries if different values in transpose positions are also stored (`#537 <https://github.com/giotto-ai/giotto-tda/pull/537>`_).
+
+Backwards-Incompatible Changes
+==============================
+
+- The minimum required version of ``pyflagser`` is now 0.4.3 (`#537 <https://github.com/giotto-ai/giotto-tda/pull/537>`_).
+- ``ParallelClustering.fit_transform`` now outputs one array of cluster labels per sample, bringing it closer to ``scikit-learn`` convention for clusterers, and the fitted single clusterers are no longer stored in the ``clusterers_`` attribute of the fitted object (`#535 <https://github.com/giotto-ai/giotto-tda/pull/535>`_ and `#552 <https://github.com/giotto-ai/giotto-tda/pull/552>`_).
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Julian Burella Pérez, and Wojciech Reise.
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of inspiring discussions.
+
+*************
 Release 0.3.1
 *************
 
@@ -34,7 +69,6 @@ This release contains contributions from many people:
 Julian Burella Pérez, Umberto Lupo, Lewis Tunstall, Wojciech Reise, and Rayna Andreeva.
 
 We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of inspiring discussions.
-
 
 *************
 Release 0.3.0
