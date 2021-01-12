@@ -428,7 +428,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             row, col, data = \
                 row[off_diag_mask], col[off_diag_mask], data[off_diag_mask]
             data = _weight_filtration_sparse(row, col, data, weights,
-                                             p=weights_p)
+                                             weights_p)
             # Add diagonal information given by `weights`
             row, col, data = (np.concatenate([row, np.arange(n_points)]),
                               np.concatenate([col, np.arange(n_points)]),
@@ -465,7 +465,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             else:
                 weights = _check_weights(weights, n_points)
 
-            dm = _weight_filtration_dense(dm, weights, p=weights_p)
+            dm = _weight_filtration_dense(dm, weights, weights_p)
             np.fill_diagonal(dm, weights)
 
         if (dm.diagonal() != 0).any():
