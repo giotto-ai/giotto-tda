@@ -53,7 +53,7 @@ html-docs:
 	@export VERSION=$(VERSION); make html
 
 theory-gl:
-	@pandoc theory/glossary.tex -f latex -t rst --toc -s --bibliography=theory/bibliography.bib -o theory/glossary.rst
+	@pandoc theory/glossary.tex -f latex -t rst --toc -s --bibliography=theory/bibliography.bib -o theory/glossary.rst --citeproc
 
 clean-gh:
 	@make clean
