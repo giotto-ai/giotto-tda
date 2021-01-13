@@ -14,6 +14,7 @@ Major Features and Improvements
 - Wheels for Python 3.9 have been added (`#528 <https://github.com/giotto-ai/giotto-tda/pull/528>`_).
 - Weighted Rips filtrations, and in particular distance-to-measure (DTM) based filtrations, are now supported in ``ripser`` and by the new ``WeightedRipsPersistence`` transformer (`#541 <https://github.com/giotto-ai/giotto-tda/pull/541>`_).
 - See "Backwards-Incompatible Changes" for major improvements to ``ParallelClustering`` and therefore ``make_mapper_pipeline`` which are also major breaking changes.
+- GUDHI's edge collapser can now be used with arbitrary vertex and edge weights (`#558 <https://github.com/giotto-ai/giotto-tda/pull/558>`_).
 - ``GraphGeodesicDistance`` can now take rectangular input (the number of vertices is inferred to be ``max(x.shape)``), and ``KNeighborsGraph`` can now take sparse input (`#537 <https://github.com/giotto-ai/giotto-tda/pull/537>`_).
 - ``VietorisRipsPersistence`` now takes a ``metric_params`` parameter (`#541 <https://github.com/giotto-ai/giotto-tda/pull/541>`_).
 

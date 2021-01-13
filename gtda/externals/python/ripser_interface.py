@@ -162,6 +162,19 @@ def _resolve_symmetry_conflicts(coo):
         return _row, _col, _data
 
 
+def _collapse_coo(row, col, data, thresh):
+    """Run edge collapser on off-diagonal data and then reinsert diagonal
+    data."""
+    diag = row == col
+    row_diag, col_diag, data_diag = row[diag], col[diag], data[diag]
+    row, col, data = gtda_collapser. \
+        flag_complex_collapse_edges_coo(row, col, data, thresh)
+
+    return (np.hstack([row_diag, row]),
+            np.hstack([col_diag, col]),
+            np.hstack([data_diag, data]))
+
+
 def _compute_dtm_weights(dm, n_neighbors, weights_r):
     with catch_warnings():
         simplefilter("ignore", category=EfficiencyWarning)
@@ -401,7 +414,6 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
     use_sparse_computer = True
     if issparse(dm):
         row, col, data = _resolve_symmetry_conflicts(dm.tocoo())  # Upper diag
-        has_nonzeros_in_diag = (dm.diagonal() != 0).any()
 
         if weights is not None:
             if (dm < 0).nnz:
@@ -437,16 +449,9 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             data = _weight_filtration_sparse(row, col, data, weights,
                                              weights_p)
 
-            has_nonzeros_in_diag = np.any(weights)
-
         if collapse_edges:
-            if has_nonzeros_in_diag:
-                warn("Edge collapses are not supported when any of the "
-                     "diagonal entries are non-zero. Computing persistent "
-                     "homology without using edge collapse.")
-            else:
-                row, col, data = gtda_collapser.\
-                    flag_complex_collapse_edges_coo(row, col, data, thresh)
+            row, col, data = _collapse_coo(row, col, data, thresh)
+
     else:
         if weights is not None:
             if (dm < 0).any():
@@ -477,10 +482,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             (row, col) = np.triu_indices_from(dm)
             data = dm[(row, col)]
             if collapse_edges:
-                warn("Edge collapses are not supported when any of the "
-                     "diagonal entries are non-zero. Computing persistent "
-                     "homology without using edge collapse.")
-
+                row, col, data = _collapse_coo(row, col, data, thresh)
         elif collapse_edges:
             row, col, data = gtda_collapser.\
                 flag_complex_collapse_edges_dense(dm, thresh)
