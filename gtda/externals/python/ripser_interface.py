@@ -19,11 +19,12 @@ SOFTWARE.
 """
 
 import gc
-from warnings import warn
+from warnings import warn, catch_warnings, simplefilter
 
 import numpy as np
-from scipy.sparse import issparse, coo_matrix, triu
+from scipy.sparse import issparse, csr_matrix
 from scipy.spatial.distance import squareform
+from sklearn.exceptions import EfficiencyWarning
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.neighbors import kneighbors_graph
 from sklearn.utils.validation import column_or_1d
@@ -127,7 +128,8 @@ def get_greedy_perm(X, n_perm=None, metric="euclidean"):
 def _resolve_symmetry_conflicts(coo):
     """Given a sparse matrix in COO format, filter out any entry at location
     (i, j) strictly below the diagonal if the entry at (j, i) is also
-    stored."""
+    stored. Return row, column and data information for an upper diagonal
+    COO matrix."""
     _row, _col, _data = coo.row, coo.col, coo.data
 
     below_diag = _col < _row
@@ -161,9 +163,11 @@ def _resolve_symmetry_conflicts(coo):
 
 
 def _compute_dtm_weights(dm, n_neighbors, weights_r):
-    knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
-                           metric="precomputed", mode="distance",
-                           include_self=False)
+    with catch_warnings():
+        simplefilter("ignore", category=EfficiencyWarning)
+        knn = kneighbors_graph(dm, n_neighbors=n_neighbors,
+                               metric="precomputed", mode="distance",
+                               include_self=False)
 
     weights = np.squeeze(np.asarray(knn.power(weights_r).sum(axis=1)))
     weights /= n_neighbors + 1
@@ -396,7 +400,7 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
 
     use_sparse_computer = True
     if issparse(dm):
-        row, col, data = _resolve_symmetry_conflicts(dm.tocoo())
+        row, col, data = _resolve_symmetry_conflicts(dm.tocoo())  # Upper diag
         has_nonzeros_in_diag = (dm.diagonal() != 0).any()
 
         if weights is not None:
@@ -407,32 +411,31 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             weight_params = {} if weight_params is None else weight_params
             weights_p = weight_params.get("p", 1)
 
+            # Restrict to off-diagonal entries for weights computation since
+            # diagonal ones are given by `weights`. Explicitly set the diagonal
+            # to 0 -- this is also important for DTM since otherwise
+            # kneighbors_graph with include_self=False skips the first true
+            # neighbor.
+            off_diag = row != col
+            row, col, data = (np.hstack([row[off_diag], np.arange(n_points)]),
+                              np.hstack([col[off_diag], np.arange(n_points)]),
+                              np.hstack([data[off_diag], np.zeros(n_points)]))
+
             if isinstance(weights, str) and (weights == "DTM"):
                 n_neighbors = weight_params.get("n_neighbors", 3)
                 weights_r = weight_params.get("r", 2)
 
-                dm = coo_matrix((data, (row, col)), shape=(n_points, n_points))
-                dm += triu(dm, k=1).T
-                # Need to explicitly set the diagonal to 0 to prevent
-                # kneighbors_graph with include_self=False from skipping the
-                # first true neighbor (this seems to be a bug in sklearn)
-                dm.setdiag(0)
-
+                # CSR matrix must be symmetric for kneighbors_graph to give
+                # correct results
+                dm = csr_matrix((np.hstack([data, data[:-n_points]]),
+                                 (np.hstack([row, col[:-n_points]]),
+                                  np.hstack([col, row[:-n_points]]))))
                 weights = _compute_dtm_weights(dm, n_neighbors, weights_r)
             else:
                 weights = _check_weights(weights, n_points)
 
-            # Restrict to off-diagonal entries for weights computation since
-            # diagonal ones are given by `weights`
-            off_diag_mask = row != col
-            row, col, data = \
-                row[off_diag_mask], col[off_diag_mask], data[off_diag_mask]
-            data = _weight_filtration_sparse(row, col, data, weights,
-                                             weights_p)
-            # Add diagonal information given by `weights`
-            row, col, data = (np.concatenate([row, np.arange(n_points)]),
-                              np.concatenate([col, np.arange(n_points)]),
-                              np.concatenate([data, weights]))
+            data[:] = _weight_filtration_sparse(row, col, data, weights,
+                                                weights_p)
 
             has_nonzeros_in_diag = np.any(weights)
 
