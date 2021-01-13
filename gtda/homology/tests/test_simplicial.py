@@ -195,7 +195,6 @@ X_wrp_exp = {1: np.array([[[0.95338798, 1.474913, 0.],
                                        (X_dist_sparse, 'precomputed')])
 @pytest.mark.parametrize('weight_params', [{'p': 1}, {'p': 2}, {'p': np.inf}])
 @pytest.mark.parametrize('collapse_edges', [True, False])
-@pytest.mark.filterwarnings('ignore:Edge collapses are not supported')
 def test_wrp_transform(X, metric, weight_params, collapse_edges):
     wrp = WeightedRipsPersistence(weight_params=weight_params,
                                   metric=metric,
