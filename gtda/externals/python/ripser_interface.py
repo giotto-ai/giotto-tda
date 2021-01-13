@@ -434,8 +434,8 @@ def ripser(X, maxdim=1, thresh=np.inf, coeff=2, metric="euclidean",
             else:
                 weights = _check_weights(weights, n_points)
 
-            data[:] = _weight_filtration_sparse(row, col, data, weights,
-                                                weights_p)
+            data = _weight_filtration_sparse(row, col, data, weights,
+                                             weights_p)
 
             has_nonzeros_in_diag = np.any(weights)
 
