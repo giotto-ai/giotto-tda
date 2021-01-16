@@ -341,7 +341,7 @@ jobs:
         python.version: '3.8'
   variables:
     EXECUTE: 'true'
-    RUNNOTEBOOKS: TRUE
+    RUNNOTEBOOKS: FALSE
     VERSION: azure-test
     GITDIR: /tmp/gtda-docs
 
