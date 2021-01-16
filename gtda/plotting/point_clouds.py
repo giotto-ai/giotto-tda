@@ -4,6 +4,8 @@
 import numpy as np
 import plotly.graph_objs as gobj
 
+from ..utils.validation import validate_params
+
 
 def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
     """Plot the first 2 or 3 coordinates of a point cloud.
@@ -34,6 +36,8 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
 
     """
     # TODO: increase the marker size
+    validate_params({"dimension": dimension},
+                    {"dimension": {"type": (int, type(None)), "in": [2, 3]}})
     if dimension is None:
         dimension = np.min((3, point_cloud.shape[1]))
 
@@ -42,8 +46,6 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
         raise ValueError("Not enough dimensions available in the input point "
                          "cloud.")
 
-    if dimension not in [2, 3]:
-        raise ValueError("The value of the dimension is different from 2 or 3")
     elif dimension == 2:
         layout = {
             "width": 600,
@@ -83,12 +85,10 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
             x=point_cloud[:, 0],
             y=point_cloud[:, 1],
             mode="markers",
-            marker={
-                "size": 4,
-                "color": list(range(point_cloud.shape[0])),
-                "colorscale": "Viridis",
-                "opacity": 0.8
-                }
+            marker={"size": 4,
+                    "color": list(range(point_cloud.shape[0])),
+                    "colorscale": "Viridis",
+                    "opacity": 0.8}
             ))
 
     elif dimension == 3:
@@ -121,12 +121,10 @@ def plot_point_cloud(point_cloud, dimension=None, plotly_params=None):
             y=point_cloud[:, 1],
             z=point_cloud[:, 2],
             mode="markers",
-            marker={
-                "size": 4,
-                "color": list(range(point_cloud.shape[0])),
-                "colorscale": "Viridis",
-                "opacity": 0.8
-                }
+            marker={"size": 4,
+                    "color": list(range(point_cloud.shape[0])),
+                    "colorscale": "Viridis",
+                    "opacity": 0.8}
             ))
 
     # Update trace and layout according to user input

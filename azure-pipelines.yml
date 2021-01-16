@@ -31,6 +31,11 @@ jobs:
         plat: manylinux2010_x86_64
         python_ver: '38'
         python.version: '3.8'
+      Python39:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '39'
+        python.version: '3.9'
   variables:
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
@@ -41,7 +46,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2020.09.10" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2021.01.12" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -69,22 +74,23 @@ jobs:
 
   - script: |
       set -e
-      python -m pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
+      python -m pip install pandas pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+    condition: eq(variables['test_wheels'], 'true')
     displayName: 'Test the wheels with pytest'
 
   - script: |
       set -e
-      python -m pip install pandas openml matplotlib
+      python -m pip install openml matplotlib
       python -m pip install papermill
       cd examples
       for n in *.ipynb
       do
         papermill --start_timeout 2000 $n -
       done
-    condition: eq(variables['notebooks_check'], 'true')
+    condition: eq(variables['test_notebooks'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -107,9 +113,9 @@ jobs:
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'macOS1014'
+- job: 'macOS1015'
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
   strategy:
     matrix:
       Python36:
@@ -118,6 +124,8 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   variables:
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
@@ -138,13 +146,17 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2020.09.10" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2021.01.12" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
+  # Python and gcc hotfixes following https://github.com/actions/virtual-environments/issues/2322 and https://github.com/actions/virtual-environments/issues/2391
   - script: |
       set -e
       brew update
+      rm '/usr/local/bin/2to3'
+      brew unlink gcc@8 && brew unlink gcc@9
+      brew upgrade      
       brew install boost ccache
     displayName: 'Install system dependencies'
 
@@ -169,8 +181,8 @@ jobs:
 
   - script: |
       set -e
-      pip uninstall -y giotto-tda
-      pip uninstall -y giotto-tda-nightly
+      python -m pip uninstall -y giotto-tda
+      python -m pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - script: |
@@ -186,6 +198,7 @@ jobs:
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+    condition: eq(variables['test_wheels'], 'true')
     displayName: 'Test the wheels with pytest'
 
   - script: |
@@ -197,6 +210,7 @@ jobs:
       do
         papermill --start_timeout 2000 $n -
       done
+    condition: eq(variables['test_notebooks'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2
@@ -238,6 +252,8 @@ jobs:
       Python38:
         python_ver: '38'
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
 
   steps:
   - task: UsePythonVersion@0
@@ -271,7 +287,7 @@ jobs:
   - script: |
       python -m pip uninstall -y giotto-tda
       python -m pip uninstall -y giotto-tda-nightly
-    displayName: 'Uninstall giotto-tda/giotto-tda-nightly dev'
+    displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
   - bash: |
       set -e
@@ -286,6 +302,7 @@ jobs:
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+    condition: eq(variables['test_wheels'], 'true')
     displayName: 'Test the wheels with pytest'
 
   - script: |
@@ -293,7 +310,7 @@ jobs:
       python -m pip install papermill
       cd examples
       FOR %%n in (*.ipynb) DO (papermill --start_timeout 2000 %%n - || exit /b)
-    condition: eq(variables['notebooks_check'], 'true')
+    condition: eq(variables['test_notebooks'], 'true')
     displayName: 'Test jupyter notebooks with papermill'
 
   - task: CopyFiles@2

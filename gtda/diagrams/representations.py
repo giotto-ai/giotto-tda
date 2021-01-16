@@ -166,6 +166,7 @@ class BettiCurve(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = np.concatenate(Xt).\
             reshape(self._n_dimensions, len(X), -1).\
             transpose((1, 0, 2))
+
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
@@ -290,16 +291,15 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     See also
     --------
-    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, \
-    PairwiseDistance, Silhouette, PersistenceImage, \
-    gtda.homology.VietorisRipsPersistence
+    BettiCurve, PersistenceEntropy, HeatKernel, Amplitude, PairwiseDistance, \
+    Silhouette, PersistenceImage, gtda.homology.VietorisRipsPersistence
 
     Notes
     -----
     The samplings in :attr:`samplings_` are in general different between
     different homology dimensions. This means that the j-th entry of the
-    k-layer of a persistence landscape in homology dimension q typically
-    arises from a different parameter value to the j-th entry of a k-layer in
+    k-layer of a persistence landscape in homology dimension q typically arises
+    from a different parameter value to the j-th entry of a k-layer in
     dimension q'.
 
     """
@@ -316,9 +316,9 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
-        :attr:`homology_dimensions_` and, for each dimension separately,
-        store evenly sample filtration parameter values in :attr:`samplings_`.
-        Then, return the estimator.
+        :attr:`homology_dimensions_` and, for each dimension separately, store
+        evenly sample filtration parameter values in :attr:`samplings_`. Then,
+        return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
@@ -381,27 +381,31 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions, \
-            n_layers, n_bins)
-            Persistence lanscapes: one landscape (represented as a
-            two-dimensional array) per sample and per homology dimension seen
-            in :meth:`fit`. Each landscape contains a number `n_layers` of
-            layers. Index i along axis 1 corresponds to the i-th homology
-            dimension in :attr:`homology_dimensions_`.
+        Xt : ndarray of shape (n_samples, n_homology_dimensions * n_layers, \
+            n_bins)
+            Persistence landscapes, where ``n_homology_dimensions`` is the
+            number of distinct homology dimensions seen in :meth:`fit`.
+            Landscapes coming from different homology dimensions are stacked
+            for each sample, so layer ``k`` of the landscape in the ``j``-th
+            homology dimension in :attr:`homology_dimensions_` is
+            ``X[i, n_homology_dimensions * j + k]``.
 
         """
         check_is_fitted(self)
         X = check_diagrams(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(delayed(landscapes)(
-                _subdiagrams(X[s], [dim], remove_dim=True),
-                self._samplings[dim],
-                self.n_layers)
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(landscapes)(_subdiagrams(X[s], [dim], remove_dim=True),
+                                self._samplings[dim],
+                                self.n_layers)
             for dim in self.homology_dimensions_
-            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs)))
+            for s in gen_even_slices(len(X), effective_n_jobs(self.n_jobs))
+            )
         Xt = np.concatenate(Xt).\
             reshape(self._n_dimensions, len(X), self.n_layers, self.n_bins).\
-            transpose((1, 0, 2, 3))
+            transpose((1, 0, 2, 3)).\
+            reshape(len(X), self._n_dimensions * self.n_layers, self.n_bins)
+
         return Xt
 
     def plot(self, Xt, sample=0, homology_dimensions=None, plotly_params=None):
@@ -469,7 +473,8 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             }
 
         Xt_sample = Xt[sample]
-        n_layers = Xt_sample.shape[1]
+        n_dims = len(self.homology_dimensions_)
+        n_layers = Xt_sample.shape[0] // n_dims
         subplot_titles = [f"H{dim}" for _, dim in homology_dimensions_mapping]
         fig = make_subplots(rows=len(homology_dimensions_mapping), cols=1,
                             subplot_titles=subplot_titles)
@@ -480,7 +485,7 @@ class PersistenceLandscape(BaseEstimator, TransformerMixin, PlotterMixin):
             for layer in range(n_layers):
                 fig.add_trace(
                     Scatter(x=self.samplings_[dim],
-                            y=Xt_sample[inv_idx, layer],
+                            y=Xt_sample[inv_idx * n_layers + layer],
                             mode="lines",
                             showlegend=True,
                             hoverinfo="none",

@@ -11,6 +11,7 @@ This pages contains a list of available features in the library.
    mapper.rst
    homology.rst
    diagrams.rst
+   curves.rst
    point_clouds.rst
    time_series.rst
    graphs.rst
@@ -18,7 +19,8 @@ This pages contains a list of available features in the library.
    plotting.rst
    base.rst
    pipeline.rst
-   validation.rst
+   metaestimators.rst
+   utils.rst
 
 ..
    :mod:`gtda.manifold`: Manifold learning

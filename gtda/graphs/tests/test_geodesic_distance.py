@@ -43,8 +43,8 @@ X_ggd_float_list = list(X_ggd_float)
 X_ggd.append((X_ggd_float_list, X_ggd_float_res))
 
 X_ggd_bool = [np.array([[False, True, False],
-                       [True, False, False],
-                       [False, False, False]])]
+                        [True, False, False],
+                        [False, False, False]])]
 X_ggd_bool_res = np.array([[[0., 1., np.inf],
                             [1., 0., np.inf],
                             [np.inf, np.inf, 0.]]])
@@ -63,6 +63,13 @@ X_ggd.append(
 
 X_ggd_csr_int = [csr_matrix(X_ggd_int[0])]
 X_ggd.append((X_ggd_csr_int, X_ggd_bool_res))
+
+X_ggd_csr_int_rectang = [csr_matrix(X_ggd_int[0])]
+X_ggd_csr_int_rectang[0].resize(2, 3)
+X_ggd.append((X_ggd_csr_int_rectang, X_ggd_bool_res))
+
+X_ggd_coo_int_rectang = [X_ggd_csr_int_rectang[0].tocoo()]
+X_ggd.append((X_ggd_coo_int_rectang, X_ggd_bool_res))
 
 X_ggd_csr_int_with_zeros = [
     csr_matrix(([1, 1, 0, 0], ([0, 1, 0, 2], [1, 0, 2, 0])))
@@ -94,7 +101,7 @@ def test_ggd_fit_transform_plot():
 
 @pytest.mark.parametrize("X, X_res", X_ggd)
 @pytest.mark.parametrize("method", ["auto", "FW", "D", "J", "BF"])
-def test_ggd_transform(X, X_res, method):
+def test_ggd_transform_undirected(X, X_res, method):
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="Methods .*")
         ggd = GraphGeodesicDistance(directed=False, method=method)

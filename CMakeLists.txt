@@ -13,6 +13,7 @@ set(RIPSER_SRC_DIR "gtda/externals/ripser")
 set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
 set(HERA_DIR "gtda/externals/hera")
 set(EIGEN_DIR "gtda/externals/eigen")
+set(ROBINHOOD_DIR "gtda/externals/robinhood")
 
 #######################################################################
 #                               Ripser                                #
@@ -27,6 +28,8 @@ endif()
 
 target_compile_definitions(gtda_ripser PRIVATE ASSEMBLE_REDUCTION_MATRIX=1)
 target_include_directories(gtda_ripser PRIVATE "${RIPSER_SRC_DIR}/ripser")
+target_compile_definitions(gtda_ripser PRIVATE USE_ROBINHOOD_HASHMAP=1)
+target_include_directories(gtda_ripser PRIVATE "${ROBINHOOD_DIR}/src/include")
 
 if(MSVC)
     target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)
@@ -49,6 +52,8 @@ endif()
 
 target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
 target_include_directories(gtda_ripser_coeff PRIVATE "${RIPSER_SRC_DIR}/ripser")
+target_compile_definitions(gtda_ripser_coeff PRIVATE USE_ROBINHOOD_HASHMAP=1)
+target_include_directories(gtda_ripser_coeff PRIVATE "${ROBINHOOD_DIR}/src/include")
 
 if(MSVC)
     target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)

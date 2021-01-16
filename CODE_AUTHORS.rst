@@ -14,3 +14,4 @@ Where component authors are known, add them here.
 | Wojciech Reise, reisewojciech@gmail.com
 | Roman Yurchak, roman.yurchak@symerio.com
 | Nick Sale, nicholas.j.sale@gmail.com
+| Rayna Andreeva, r.andreeva@sms.ed.ac.uk

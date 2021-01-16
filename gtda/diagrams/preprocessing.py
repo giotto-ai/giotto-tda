@@ -471,7 +471,7 @@ class Filtering(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt : ndarray of shape (n_samples, n_features_filtered, 3)
             Filtered persistence diagrams. Only the subdiagrams corresponding
             to dimensions in :attr:`homology_dimensions_` are filtered.
-            ``n_features_filtered`` is less than or equal to ``n_features`.
+            ``n_features_filtered`` is less than or equal to ``n_features``.
 
         """
         check_is_fitted(self)

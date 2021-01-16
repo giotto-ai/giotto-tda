@@ -9,7 +9,6 @@
 
 Preprocessing
 -------------
-
 .. autosummary::
    :toctree: generated/images
    :template: class.rst
@@ -21,7 +20,6 @@ Preprocessing
 
 Filtrations
 -----------
-
 .. autosummary::
    :toctree: generated/images
    :template: class.rst
@@ -31,3 +29,4 @@ Filtrations
    images.DilationFiltration
    images.ErosionFiltration
    images.SignedDistanceFiltration
+   images.DensityFiltration

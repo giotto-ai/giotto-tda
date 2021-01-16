@@ -1,5 +1,5 @@
-:mod:`gtda.utils`: Validation
-=============================
+:mod:`gtda.utils`: Utilities
+============================
 
 .. automodule:: gtda.utils
    :no-members:

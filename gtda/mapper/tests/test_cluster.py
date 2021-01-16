@@ -1,14 +1,94 @@
-"""Testing for FirstHistogramGap and FirstSimpleGap clusterers."""
+"""Testing for FirstHistogramGap and FirstSimpleGap clusterers, and testing
+for ParallelClustering."""
 # License: GNU AGPLv3
 
 import numpy as np
-from hypothesis import given
+import pytest
+import sklearn as sk
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats, integers, composite
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
-from gtda.mapper import FirstHistogramGap, FirstSimpleGap
+from gtda.mapper import ParallelClustering, FirstHistogramGap, FirstSimpleGap
+
+
+def test_parallel_clustering_bad_input():
+    pc = ParallelClustering(sk.cluster.DBSCAN())
+    X = [np.random.random((5, 4)), np.random.random((5, 4))]
+
+    with pytest.raises(TypeError, match="`masks` must be a boolean array."):
+        pc.fit(X)
+
+    X[1] = np.ones((6, 4), dtype=bool)
+    with pytest.raises(ValueError,
+                       match="`X_tot` and `masks` must have the same number"):
+        pc.fit(X)
+
+
+def test_parallel_clustering_bad_clusterer():
+    pc = ParallelClustering(sk.decomposition.PCA())
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+
+    with pytest.raises(TypeError, match="`clusterer` must be an instance of"):
+        pc.fit(X)
+
+
+def test_parallel_clustering_transform_not_implemented():
+    pc = ParallelClustering(sk.cluster.DBSCAN())
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+
+    with pytest.raises(NotImplementedError):
+        pc.transform(X)
+
+
+@pytest.mark.parametrize("n_jobs", [1, 2, -1])
+@pytest.mark.parametrize("sample_weight", [None, np.random.random(5)])
+def test_parallel_clustering_kmeans(n_jobs, sample_weight):
+    kmeans = sk.cluster.KMeans(n_clusters=2, random_state=0)
+    pc = ParallelClustering(kmeans)
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+    single_labels = kmeans.fit_predict(X[0], sample_weight=sample_weight)
+    _, inverse = np.unique(single_labels, return_inverse=True)
+
+    res = pc.fit_predict(X, sample_weight=sample_weight)
+    exp = np.empty(5, dtype=object)
+    exp[:] = [tuple([])] * 5
+    for i in range(4):
+        labels_i = np.empty(len(single_labels), dtype=object)
+        labels_i[:] = [((i, rel_label),) for rel_label in inverse]
+        exp[:] += labels_i
+
+    assert np.array_equal(res, exp)
+
+
+def test_parallel_clustering_metric_affinity_precomputed_not_implemented():
+    class DummyClusterer(sk.base.BaseEstimator, sk.base.ClusterMixin):
+        def __init__(self, metric="precomputed", affinity="precomputed"):
+            self.metric = metric
+            self.affinity = affinity
+
+    pc = ParallelClustering(DummyClusterer())
+    X = [np.random.random((5, 4)), np.ones((5, 4), dtype=bool)]
+
+    with pytest.raises(NotImplementedError,
+                       match="Behaviour when metric and affinity"):
+        pc.fit(X)
+
+
+@pytest.mark.parametrize("n_jobs", [1, 2, -1])
+def test_parallel_clustering_precomputed(n_jobs):
+    pc = ParallelClustering(sk.cluster.DBSCAN())
+    masks = np.random.choice([True, False], size=20).reshape((10, 2))
+    X = [np.random.random((10, 4)), masks]
+    pc_precomp = ParallelClustering(sk.cluster.DBSCAN(metric="precomputed"))
+    X_precomp = [sk.metrics.pairwise_distances(X[0]), masks]
+
+    res = pc.fit_predict(X)
+    res_precomp = pc_precomp.fit_predict(X_precomp)
+
+    assert np.array_equal(res, res_precomp)
 
 
 @composite
@@ -56,6 +136,7 @@ def get_input(draw, n_clusters=None, n_points_per_cluster=None,
                      dim, std=std))
 
 
+@settings(deadline=500)
 @given(inp=get_input(n_clusters=1, n_points_per_cluster=1, std=1))
 def test_on_trivial_input(inp):
     """Test that with one cluster, and one point, we always get one cluster,
@@ -70,6 +151,7 @@ def test_on_trivial_input(inp):
     assert fh.n_clusters_ == n_clusters
 
 
+@settings(deadline=500)
 @given(inp=get_input(std=0.02))
 def test_firstsimplegap(inp):
     """For a multimodal distribution, check that ``FirstSimpleGap`` with
@@ -87,6 +169,7 @@ def test_firstsimplegap(inp):
     assert_almost_equal(counts, n_points_per_cluster)
 
 
+@settings(deadline=500)
 @given(inp=get_input(n_clusters=2, std=0.02))
 def test_firsthistogramgap(inp):
     """For a multimodal distribution, check that the ``FirstHistogramGap`` with
@@ -103,6 +186,7 @@ def test_firsthistogramgap(inp):
     assert_almost_equal(counts, n_points_per_cluster)
 
 
+@settings(deadline=500)
 @given(inp=get_input(), max_frac=floats(min_value=0., exclude_min=True,
                                         max_value=1., exclude_max=False))
 def test_max_fraction_clusters(inp, max_frac):
@@ -120,6 +204,7 @@ def test_max_fraction_clusters(inp, max_frac):
     assert fh.n_clusters_ <= np.floor(max_num_clusters)
 
 
+@settings(deadline=500)
 @given(inp=get_input())
 def test_precomputed_distances(inp):
     """Verify that the clustering based on a distance matrix is the same as
@@ -147,4 +232,4 @@ def test_precomputed_distances(inp):
                     for c in indices_cluster])
 
     assert get_partition_from_preds(preds) == \
-        get_partition_from_preds(preds_mat)
+           get_partition_from_preds(preds_mat)

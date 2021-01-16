@@ -31,6 +31,8 @@ Guiding principles
 30s guide to ``giotto-tda``
 ***************************
 
+.. figure:: images/giotto-tda_workflow.png
+
 For installation instructions, see :ref:`the installation instructions <installation>`.
 
 The functionalities of ``giotto-tda`` are provided in ``scikit-learn``–style transformers.
@@ -77,8 +79,7 @@ optimised via grid-searches, etc.:
   model.fit(X_train, y_train)
   model.score(X_valid, y_valid)
 
-``giotto-tda`` also implements the `Mapper algorithm <https://research.math.osu.edu/tgda/mapperPBG.pdf>`_ as a highly customisable ``scikit-learn`` :class:`Pipeline`, and provides simple plotting functions
-for visualizing output Mapper graphs and have real-time interaction with the pipeline parameters:
+``giotto-tda`` also implements the `Mapper algorithm <https://research.math.osu.edu/tgda/mapperPBG.pdf>`_ as a highly customisable ``scikit-learn`` :class:`Pipeline`, and provides simple plotting functions for visualizing output Mapper graphs and have real-time interaction with the pipeline parameters:
 
 .. code-block:: python
 
@@ -105,8 +106,11 @@ We provide a number of :ref:`tutorials and examples <notebooks_index>`, which of
 Use cases
 =========
 
-A selection of use cases for ``giotto-tda`` is collected at `this page <https://giotto.ai/learn/course-content>`_.
-The related GitHub repositories can be found at `github <https://github.com/giotto-ai>`_.
+A selection of use cases for ``giotto-tda`` is collected at `this page <https://giotto.ai/use-cases>`_.
+Please note, however, that some of these were written for past versions of ``giotto-tda``. In some cases,
+only small modifications are needed to run them on recent versions, while in others it is best to install
+the relevant past version of ``giotto-tda`` (preferably in a fresh environmnent). In a couple of cases,
+the legacy ``giotto-learn`` or ``giotto-learn-nightly`` will be needed.
 
 **********
 What's new
@@ -114,5 +118,5 @@ What's new
 
 .. include::
    release.rst
-   :start-after: Release 0.2.2
-   :end-before: Release 0.2.1
+   :start-after: Release 0.4.0
+   :end-before: Release 0.3.1

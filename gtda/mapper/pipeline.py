@@ -146,7 +146,7 @@ def make_mapper_pipeline(scaler=None,
                          clustering_preprocessing=None,
                          clusterer=None,
                          n_jobs=None,
-                         parallel_backend_prefer="threads",
+                         parallel_backend_prefer=None,
                          graph_step=True,
                          min_intersection=1,
                          store_edge_elements=False,
@@ -200,8 +200,8 @@ def make_mapper_pipeline(scaler=None,
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    parallel_backend_prefer : ``"processes"`` | ``"threads"``, optional, \
-        default: ``"threads"``
+    parallel_backend_prefer : ``"processes"`` | ``"threads"`` | ``None``, \
+        optional, default: ``None``
         Soft hint for the default joblib backend to use in a joblib-parallel
         application of the clustering step across pullback cover sets. To be
         used in conjunction with `n_jobs`. The default process-based backend is
@@ -372,8 +372,8 @@ def make_mapper_pipeline(scaler=None,
     else:
         _scaler = scaler
 
-    # If filter_func is not a scikit-learn transformer, hope it as a
-    # callable to be applied on each row separately. Then attempt to create a
+    # If filter_func is not a scikit-learn transformer, assume it is a callable
+    # to be applied on each row separately. Then attempt to create a
     # FunctionTransformer object to implement this behaviour.
     if filter_func is None:
         from sklearn.decomposition import PCA
@@ -411,7 +411,7 @@ def make_mapper_pipeline(scaler=None,
             [("clustering_preprocessing", _clustering_preprocessing),
              ("map_and_cover", map_and_cover)])),
         ("clustering", ParallelClustering(
-            clusterer=_clusterer,
+            _clusterer,
             n_jobs=n_jobs,
             parallel_backend_prefer=parallel_backend_prefer))
         ]
@@ -425,4 +425,5 @@ def make_mapper_pipeline(scaler=None,
 
     mapper_pipeline = MapperPipeline(
         steps=all_steps, memory=memory, verbose=verbose)
+
     return mapper_pipeline

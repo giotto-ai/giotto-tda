@@ -11,6 +11,20 @@ from sklearn.exceptions import DataDimensionalityWarning
 from sklearn.utils.validation import check_array
 
 
+def _check_array_mod(X, **kwargs):
+    """Modified version of :func:`sklearn.utils.validation.check_array. When
+    keyword parameter `force_all_finite` is set to False, NaNs are not
+    accepted but infinity is."""
+    if not kwargs.get('force_all_finite', True):
+        Xnew = check_array(X, **kwargs)
+        if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
+            raise ValueError("Input contains NaNs. Only finite values and "
+                             "infinity are allowed when parameter "
+                             "`force_all_finite` is False.")
+        return Xnew
+    return check_array(X, **kwargs)
+
+
 def check_diagrams(X, copy=False):
     """Input validation for collections of persistence diagrams.
 
@@ -33,11 +47,8 @@ def check_diagrams(X, copy=False):
         The converted and validated array of persistence diagrams.
 
     """
-    X_array = np.asarray(X)
-    if X_array.ndim == 0:
-        raise ValueError(
-            f"Expected 3D array, got scalar array instead:\narray={X_array}."
-            )
+    X_array = _check_array_mod(X, ensure_2d=False, allow_nd=True,
+                               force_all_finite=False, copy=copy)
     if X_array.ndim != 3:
         raise ValueError(
             f"Input should be a 3D ndarray, the shape is {X_array.shape}."
@@ -48,26 +59,21 @@ def check_diagrams(X, copy=False):
             f"components, but there are {X_array.shape[2]} components."
             )
 
-    X_array = X_array.astype(float, copy=False)
     homology_dimensions = sorted(np.unique(X_array[0, :, 2]))
     for dim in homology_dimensions:
         if dim == np.inf:
             if len(homology_dimensions) != 1:
                 raise ValueError(
-                    f"np.inf is a valid homology dimension for a stacked "
+                    f"numpy.inf is a valid homology dimension for a stacked "
                     f"diagram but it should be the only one: "
                     f"homology_dimensions = {homology_dimensions}."
                     )
         else:
-            if dim != int(dim):
+            if (dim != int(dim)) or (dim < 0):
                 raise ValueError(
-                    f"All homology dimensions should be integer valued: "
-                    f"{dim} can't be cast to an int of the same value."
-                    )
-            if dim != np.abs(dim):
-                raise ValueError(
-                    f"All homology dimensions should be integer valued: "
-                    f"{dim} can't be cast to an int of the same value."
+                    f"Homology dimensions should be positive integers or "
+                    f"numpy.inf: {dim} can't be cast to an int of the same "
+                    f"value."
                     )
 
     n_points_below_diag = np.sum(X_array[:, :, 1] < X_array[:, :, 0])
@@ -77,8 +83,6 @@ def check_diagrams(X, copy=False):
             f"diagonal, i.e. X[:, :, 1] >= X[:, :, 0]. {n_points_below_diag} "
             f"points are below the diagonal."
             )
-    if copy:
-        X_array = np.copy(X_array)
 
     return X_array
 
@@ -99,10 +103,9 @@ def _validate_params(parameters, references, rec_name=None):
 
         # Check that _parameter has the correct type
         if not ((_ref_type is None) or isinstance(_parameter, _ref_type)):
-            raise TypeError(
-                f"Parameter `{_name}` is of type {type(_parameter)} while it "
-                f"should be of type {_ref_type}."
-                )
+            raise TypeError(f"Parameter `{_name}` is of type "
+                            f"{type(_parameter)} while it should be of type "
+                            f"{_ref_type}.")
 
         # If neither the reference type is list, tuple, np.ndarray or dict,
         # nor _parameter is an instance of one of these types, the checks are
@@ -113,9 +116,8 @@ def _validate_params(parameters, references, rec_name=None):
             ref_other = _reference.get('other', None)
             if _parameter is not None:
                 if not ((ref_in is None) or _parameter in ref_in):
-                    raise ValueError(
-                        f"Parameter `{_name}` is {_parameter}, which is not in"
-                        f"{ref_in}.")
+                    raise ValueError(f"Parameter `{_name}` is {_parameter}, "
+                                     f"which is not in {ref_in}.")
             # Perform any other checks via the callable ref_others
             if ref_other is not None:
                 return ref_other(_parameter)
@@ -128,10 +130,9 @@ def _validate_params(parameters, references, rec_name=None):
     for name, parameter in parameters.items():
         if name not in references.keys():
             name_extras = "" if rec_name is None else f" in `{rec_name}`"
-            raise KeyError(
-                f"`{name}`{name_extras} is not an available parameter. "
-                f"Available parameters are in {list(references.keys())}."
-                )
+            raise KeyError(f"`{name}`{name_extras} is not an available "
+                           f"parameter. Available parameters are in "
+                           f"{tuple(references.keys())}.")
 
         reference = references[name]
         ref_type = _validate_params_single(parameter, reference, name)
@@ -198,28 +199,13 @@ def validate_params(parameters, references, exclude=None):
     return _validate_params(parameters_, references)
 
 
-def _check_array_mod(X, **kwargs):
-    """Modified version of :func:`~sklearn.utils.validation.check_array. When
-    keyword parameter `force_all_finite` is set to False, NaNs are not
-    accepted but infinity is."""
-    if not kwargs.get('force_all_finite', True):
-        Xnew = check_array(X, **kwargs)
-        if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
-            raise ValueError(
-                "Input contains NaNs. Only finite values and infinity are "
-                "allowed when parameter `force_all_finite` is False."
-                )
-        return Xnew
-    return check_array(X, **kwargs)
-
-
 def check_point_clouds(X, distance_matrices=False, **kwargs):
     """Input validation on arrays or lists representing collections of point
     clouds or of distance/adjacency matrices.
 
     The input is checked to be either a single 3D array using a single call
-    to :func:`~sklearn.utils.validation.check_array`, or a list of 2D arrays by
-    calling :func:`~sklearn.utils.validation.check_array` on each entry.
+    to :func:`sklearn.utils.validation.check_array`, or a list of 2D arrays by
+    calling :func:`sklearn.utils.validation.check_array` on each entry.
 
     Parameters
     ----------
@@ -233,14 +219,14 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
 
     **kwargs
         Keyword arguments accepted by
-        :func:`~sklearn.utils.validation.check_array`, with the following
+        :func:`sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) if not passed
         explicitly, `force_all_finite` is set to be the boolean negation of
         `distance_matrices`; 3) when `force_all_finite` is set to ``False``,
         NaN inputs are not allowed; 4) `accept_sparse` and
         `accept_large_sparse` are only meaningful in the case of lists of 2D
         arrays, in which case they are passed to individual instances of
-        :func:`~sklearn.utils.validation.check_array` validating each entry
+        :func:`sklearn.utils.validation.check_array` validating each entry
         in the list.
 
     Returns
@@ -330,7 +316,7 @@ def check_collection(X, **kwargs):
 
     **kwargs
         Keyword arguments accepted by
-        :func:`~sklearn.utils.validation.check_array`, with the following
+        :func:`sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) when
         `force_all_finite` is set to ``False``, NaN inputs are not allowed.
 

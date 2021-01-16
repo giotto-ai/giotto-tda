@@ -1,12 +1,11 @@
 """Construct the nerve of a refined Mapper cover."""
 # License: GNU AGPLv3
 
-from functools import reduce
+from collections import defaultdict
 from itertools import combinations, filterfalse
-from operator import iconcat
 
-import igraph as ig
 import numpy as np
+from igraph import Graph
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -35,8 +34,6 @@ class Nerve(BaseEstimator, TransformerMixin):
     :class:`gtda.mapper.pipeline.MapperPipeline` objects created
     by :func:`gtda.mapper.make_mapper_pipeline`. It corresponds the last two
     arrows in `this diagram <../../../../_images/mapper_pipeline.svg>`_.
-
-    This transformer is not intended for direct use.
 
     Parameters
     ----------
@@ -96,20 +93,16 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : list of list of tuple
-            Data structure describing a cover of a dataset (e.g. as depicted in
-            `this diagram <../../../../_images/mapper_pipeline.svg>`_) produced
-            by the clustering step of a :class:`gtda.mapper.MapperPipeline`.
-            Each sublist corresponds to a (non-empty) pullback cover set --
-            equivalently, to a cover set in the filter range which has
-            non-empty preimage. It contains triples of the form
-            ``(pullback_set_label, partial_cluster_label, node_elements)``
-            where ``partial_cluster_label`` is a cluster label within the
-            pullback cover set identified by ``pullback_set_label``, and
-            ``node_elements`` is an array of integer indices. To each pair
-            ``(pullback_set_label, partial_cluster_label)`` there corresponds
-            a unique node in the output Mapper graph. This node represents
-            the data subset defined by the indices in ``node_elements``.
+        X : ndarray of shape (n_samples,)
+            Cluster labels describing a refined cover of a dataset produced by
+            the clustering step of a :class:`gtda.mapper.MapperPipeline`,
+            as depicted in
+            `this diagram <../../../../_images/mapper_pipeline.svg>`_. Each
+            entry in `X` is a tuple of pairs of the form
+            ``(pullback_set_label, partial_cluster_label)`` where
+            ``partial_cluster_label`` is a cluster label within the pullback
+            cover set identified by ``pullback_set_label``. The unique pairs
+            correspond to nodes in the output graph.
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -130,24 +123,30 @@ class Nerve(BaseEstimator, TransformerMixin):
         """
         # TODO: Include a validation step for X
         # Graph construction -- vertices with their metadata
-        nodes = reduce(iconcat, X, [])
-        graph = ig.Graph(len(nodes))
+        labels_to_indices = defaultdict(list)
+        for i, sample in enumerate(X):
+            for node_id_pair in sample:
+                labels_to_indices[node_id_pair].append(i)
+        labels_to_indices = {key: np.array(value)
+                             for key, value in labels_to_indices.items()}
+        n_nodes = len(labels_to_indices)
+        graph = Graph(n_nodes)
 
-        # Since `nodes` is a list, say of length N, of triples of the form
-        # (pullback_set_label, partial_cluster_label, node_elements),
-        # zip(*nodes) generates three tuples of length N, each corresponding to
-        # a type of node attribute.
-        node_attributes = zip(*nodes)
-        attribute_names = ["pullback_set_label", "partial_cluster_label",
-                           "node_elements"]
-        for i, node_attribute in enumerate(node_attributes):
-            graph.vs[attribute_names[i]] = node_attribute
+        # labels_to_indices is a dictionary of, say, N key-value pairs of the
+        # form (pullback_set_label, partial_cluster_label): node_elements.
+        # Hence, zip(*labels_to_indices) generates two tuples of length N, each
+        # corresponding to a type of node attribute in the final graph.
+        node_attributes = zip(*labels_to_indices)
+        graph.vs["pullback_set_label"] = next(node_attributes)
+        graph.vs["partial_cluster_label"] = next(node_attributes)
+        graph.vs["node_elements"] = [*labels_to_indices.values()]
 
         # Graph construction -- edges with weights given by intersection sizes.
         # In general, we need all information in `nodes` to narrow down the set
-        # of combinations to check when `contract_nodes` is True
+        # of combinations to check, especially when `contract_nodes` is True.
+        nodes = zip(*zip(*labels_to_indices), labels_to_indices.values())
         node_index_pairs, weights, intersections, mapping = \
-            self._generate_edge_data(nodes)
+            self._generate_edge_data(nodes, n_nodes)
         graph.es["weight"] = 1
         graph.add_edges(node_index_pairs)
         graph.es["weight"] = weights
@@ -170,7 +169,7 @@ class Nerve(BaseEstimator, TransformerMixin):
 
         return graph
 
-    def _generate_edge_data(self, nodes):
+    def _generate_edge_data(self, nodes, n_nodes):
         def _in_same_pullback_set(_node_tuple):
             return _node_tuple[0][1][0] == _node_tuple[1][1][0]
 
@@ -222,7 +221,7 @@ class Nerve(BaseEstimator, TransformerMixin):
             intersection_behavior = _do_nothing
 
         if self.contract_nodes:
-            mapping = np.arange(len(nodes))
+            mapping = np.arange(n_nodes)
             behavior = _subset_check_metadata_append
         else:
             mapping = None

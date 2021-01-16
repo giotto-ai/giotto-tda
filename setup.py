@@ -29,7 +29,7 @@ MAINTAINER = "Umberto Lupo, Lewis Tunstall"
 MAINTAINER_EMAIL = "maintainers@giotto.ai"
 URL = "https://github.com/giotto-ai/giotto-tda"
 LICENSE = "GNU AGPLv3"
-DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.2.2"
+DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.4.0"
 VERSION = __version__  # noqa
 CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Intended Audience :: Developers",
@@ -44,32 +44,29 @@ CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Operating System :: MacOS",
                "Programming Language :: Python :: 3.6",
                "Programming Language :: Python :: 3.7",
-               "Programming Language :: Python :: 3.8"]
+               "Programming Language :: Python :: 3.8",
+               "Programming Language :: Python :: 3.9"]
 KEYWORDS = "machine learning, topological data analysis, persistent " \
            "homology, persistence diagrams, Mapper"
 INSTALL_REQUIRES = requirements
-EXTRAS_REQUIRE = {
-    "tests": [
-        "pytest",
-        "pytest-cov",
-        "pytest-azurepipelines",
-        "pytest-benchmark",
-        "jupyter_contrib_nbextensions",
-        "flake8",
-        "hypothesis"],
-    "doc": [
-        "openml",
-        "sphinx",
-        "nbconvert",
-        "sphinx-issues",
-        "sphinx_rtd_theme",
-        "numpydoc"],
-    "examples": [
-        "jupyter",
-        "pandas",
-        "openml",
-        "matplotlib"]
-}
+EXTRAS_REQUIRE = {"tests": ["pandas",
+                            "pytest",
+                            "pytest-cov",
+                            "pytest-azurepipelines",
+                            "pytest-benchmark",
+                            "jupyter_contrib_nbextensions",
+                            "flake8",
+                            "hypothesis"],
+                  "doc": ["openml",
+                          "sphinx",
+                          "nbconvert",
+                          "sphinx-issues",
+                          "sphinx_rtd_theme",
+                          "numpydoc"],
+                  "examples": ["jupyter",
+                               "pandas",
+                               "openml",
+                               "matplotlib"]}
 
 
 def combine_requirements(base_keys):

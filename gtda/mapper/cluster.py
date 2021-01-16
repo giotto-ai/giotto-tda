@@ -7,7 +7,6 @@ from numbers import Real
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, ClusterMixin, clone
-from sklearn.cluster import DBSCAN
 from sklearn.cluster._agglomerative import _TREE_BUILDERS, _hc_cut
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_memory
@@ -23,68 +22,62 @@ class ParallelClustering(BaseEstimator):
     An arbitrary clustering class which stores a ``labels_`` attribute in
     ``fit`` can be passed to the constructor. Examples are most classes in
     ``sklearn.cluster``. The input of :meth:`fit` is of the form ``[X_tot,
-    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a
-    two-dimensional boolean array, each column of which indicates the
-    location of a portion of ``X_tot`` to cluster separately. Parallelism is
-    achieved over the columns of ``masks``.
-
-    This estimator is not intended for direct use.
+    masks]`` where ``X_tot`` is the full dataset, and ``masks`` is a 2D boolean
+    array, each column of which indicates the location of a portion of
+    ``X_tot`` to cluster separately. Parallelism is achieved over the columns
+    of ``masks``.
 
     Parameters
     ----------
-    clusterer : object, optional, default: ``None``
-        Clustering object such as derived from
-        :class:`sklearn.base.ClusterMixin`. ``None`` means that the default
-        :class:`sklearn.cluster.DBSCAN` is used.
+    clusterer : object
+        Clustering object derived from :class:`sklearn.base.ClusterMixin`.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
 
-    parallel_backend_prefer : ``'processes'`` | ``'threads'``, optional, \
-        default: ``'threads'``
-        Selects the default joblib backend. The default process-based backend
-        is 'loky' and the default thread-based backend is 'threading'.
+    parallel_backend_prefer : ``"processes"`` | ``"threads"`` | ``None``, \
+        optional, default: ``None``
+        Soft hint for the selection of the default joblib backend. The default
+        process-based backend is 'loky' and the default thread-based backend is
+        'threading'. See [1]_.
 
     Attributes
     ----------
-    clusterers_ : tuple of object
-        If `clusterer` is not ``None``, clones of `clusterer` fitted
-        to the portions of the full data array specified in :meth:`fit`.
-        Otherwise, clones of a default instance of
-        :class:`sklearn.cluster.DBSCAN`, fitted in the same way.
+    labels_ : ndarray of shape (n_samples,)
+       For each point in the dataset passed to :meth:`fit`, a tuple of pairs
+       of the form ``(i, partial_label)`` where ``i`` is the index of a boolean
+       mask which selects that point and ``partial_label`` is the cluster label
+       assigned to the point when clustering the subset of the data selected by
+       mask ``i``.
 
-    clusters_ : list of list of tuple
-       Labels and indices of each cluster found in :meth:`fit`. The i-th
-       entry corresponds to the i-th portion of the data; it is a list
-       of triples of the form ``(i, label, indices)``, where ``label`` is a
-       cluster label and ``indices`` is the array of indices of points
-       belonging to cluster ``(i, label)``.
+    References
+    ----------
+    .. [1] "Thread-based parallelism vs process-based parallelism", in
+       `joblib documentation
+       <https://joblib.readthedocs.io/en/latest/parallel.html>`_.
 
     """
 
-    def __init__(self, clusterer=None,
-                 n_jobs=None,
-                 parallel_backend_prefer='threads'):
+    def __init__(self, clusterer, n_jobs=None, parallel_backend_prefer=None):
         self.clusterer = clusterer
         self.n_jobs = n_jobs
         self.parallel_backend_prefer = parallel_backend_prefer
 
-    def _validate_clusterer(self, default=DBSCAN()):
-        """Set :attr:`clusterer_` depending on the value of  `clusterer`.
+    def _validate_clusterer(self):
+        """Set :attr:`clusterer_` depending on the value of `clusterer`.
 
         Also verify whether calculations are to be based on precomputed
         metric/affinity information or not.
 
         """
-        if self.clusterer is not None:
-            self._clusterer = self.clusterer
-        else:
-            self._clusterer = default
+        if not isinstance(self.clusterer, ClusterMixin):
+            raise TypeError("`clusterer` must be an instance of "
+                            "sklearn.base.ClusterMixin.")
         params = [param for param in ['metric', 'affinity']
-                  if param in signature(self._clusterer.__init__).parameters]
-        precomputed = [(getattr(self._clusterer, param) == 'precomputed')
+                  if param in signature(self.clusterer.__init__).parameters]
+        precomputed = [(getattr(self.clusterer, param) == 'precomputed')
                        for param in params]
         if not precomputed:
             self._precomputed = False
@@ -124,66 +117,60 @@ class ParallelClustering(BaseEstimator):
         self : object
 
         """
-        self._validate_clusterer()
         X_tot, masks = X
-        if sample_weight is not None:
-            sample_weights = [sample_weight[masks[:, i]]
-                              for i in range(masks.shape[1])]
+        check_array(X_tot, ensure_2d=True)
+        check_array(masks, ensure_2d=True)
+        if masks.dtype != np.bool_:
+            raise TypeError("`masks` must be a boolean array.")
+        if len(X_tot) != len(masks):
+            raise ValueError("`X_tot` and `masks` must have the same number "
+                             "of rows.")
+        self._validate_clusterer()
+
+        fit_params = signature(self.clusterer.fit).parameters
+        if sample_weight is not None and "sample_weight" in fit_params:
+            self._sample_weight_computer = lambda rel_indices, sample_weight: \
+                {"sample_weight": sample_weight[rel_indices]}
         else:
-            sample_weights = [None] * masks.shape[1]
+            self._sample_weight_computer = lambda *args: {}
 
         if self._precomputed:
-            single_fitter = self._fit_single_abs_labels_precomputed
+            self._indices_computer = lambda rel_indices: \
+                np.ix_(rel_indices, rel_indices)
         else:
-            single_fitter = self._fit_single_abs_labels
+            self._indices_computer = lambda rel_indices: rel_indices
 
-        self.clusterers_ = Parallel(n_jobs=self.n_jobs,
-                                    prefer=self.parallel_backend_prefer)(
-            delayed(single_fitter)(
-                X_tot, np.flatnonzero(mask),
-                mask_num, sample_weight=sample_weights[mask_num])
-            for mask_num, mask in enumerate(masks.T))
-        self.clusters_ = [clusterer.abs_labels_ for clusterer in
-                          self.clusterers_]
+        # This seems necessary to avoid large overheads when running fit a
+        # second time. Probably due to refcounts. NOTE: Only works if done
+        # before assigning labels_single. TODO: Investigate
+        self.labels_ = None
+
+        labels_single = Parallel(n_jobs=self.n_jobs,
+                                 prefer=self.parallel_backend_prefer)(
+            delayed(self._labels_single)(
+                X_tot[self._indices_computer(rel_indices)],
+                rel_indices,
+                sample_weight
+                )
+            for rel_indices in map(np.flatnonzero, masks.T)
+            )
+
+        self.labels_ = np.empty(len(X_tot), dtype=object)
+        self.labels_[:] = [tuple([])] * len(X_tot)
+        for i, (rel_indices, partial_labels) in enumerate(labels_single):
+            n_labels = len(partial_labels)
+            labels_i = np.empty(n_labels, dtype=object)
+            labels_i[:] = [((i, partial_label),)
+                           for partial_label in partial_labels]
+            self.labels_[rel_indices] += labels_i
+
         return self
 
-    def _fit_single_abs_labels(self, X, relative_indices, mask_num,
-                               sample_weight=None):
-        cloned_clusterer, unique_labels, unique_labels_inverse = \
-            self._fit_single(X, relative_indices, sample_weight)
-        self._create_abs_labels(cloned_clusterer, relative_indices, mask_num,
-                                unique_labels, unique_labels_inverse)
-        return cloned_clusterer
+    def _labels_single(self, X, rel_indices, sample_weight):
+        cloned_clusterer = clone(self.clusterer)
+        kwargs = self._sample_weight_computer(rel_indices, sample_weight)
 
-    def _fit_single_abs_labels_precomputed(self, X, relative_indices, mask_num,
-                                           sample_weight=None):
-        relative_2d_indices = np.ix_(relative_indices, relative_indices)
-        cloned_clusterer, unique_labels, unique_labels_inverse = \
-            self._fit_single(X, relative_2d_indices, sample_weight)
-        self._create_abs_labels(cloned_clusterer, relative_indices, mask_num,
-                                unique_labels, unique_labels_inverse)
-        return cloned_clusterer
-
-    def _fit_single(self, X, relative_indices, sample_weight):
-        cloned_clusterer = clone(self._clusterer)
-        X_sub = X[relative_indices]
-
-        fit_params = signature(cloned_clusterer.fit).parameters
-        if 'sample_weight' in fit_params:
-            cloned_clusterer.fit(X_sub, sample_weight=sample_weight)
-        else:
-            cloned_clusterer.fit(X_sub)
-
-        unique_labels, unique_labels_inverse = np.unique(
-            cloned_clusterer.labels_, return_inverse=True)
-        return cloned_clusterer, unique_labels, unique_labels_inverse
-
-    @staticmethod
-    def _create_abs_labels(cloned_clusterer, relative_indices, mask_num,
-                           unique_labels, inv):
-        cloned_clusterer.abs_labels_ = [
-            (mask_num, label, relative_indices[inv == i])
-            for i, label in enumerate(unique_labels)]
+        return rel_indices, cloned_clusterer.fit(X, **kwargs).labels_
 
     def fit_predict(self, X, y=None, sample_weight=None):
         """Fit to the data, and return the found clusters.
@@ -209,12 +196,12 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        clusters : list of list of tuple
-            See :attr:`clusters_`.
+        labels : ndarray of shape (n_samples,)
+            See :attr:`labels_`.
 
         """
         self.fit(X, sample_weight=sample_weight)
-        return self.clusters_
+        return self.labels_
 
     def transform(self, X, y=None):
         """Not implemented.
@@ -234,12 +221,14 @@ class ParallelClustering(BaseEstimator):
         """
         raise NotImplementedError(
             "Transforming new data with a fitted ParallelClustering object "
-            "not yet implemented, use fit_transform instead.")
+            "not yet implemented, use fit_transform instead."
+            )
 
     def fit_transform(self, X, y=None, **fit_params):
         """Alias for :meth:`fit_predict`.
 
-        Allows for this class to be used as a step in a scikit-learn pipeline.
+        Allows for this class to be used as an intermediate step in a
+        scikit-learn pipeline.
 
         Parameters
         ----------
@@ -257,8 +246,8 @@ class ParallelClustering(BaseEstimator):
 
         Returns
         -------
-        Xt : list of list of tuple
-            See :attr:`clusters_`.
+        Xt : ndarray of shape (n_samples,)
+            See :attr:`labels_`.
 
         """
         Xt = self.fit_predict(X, y, **fit_params)

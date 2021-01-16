@@ -44,14 +44,14 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     periodic_dimensions : boolean ndarray of shape (n_dimensions,) or None, \
         optional, default: ``None``
-        Periodicity of the boundaries along each of the axis, where
+        Periodicity of the boundaries along each of the axes, where
         ``n_dimensions`` is the dimension of the images of the collection. The
         boolean in the `d`th position expresses whether the boundaries along
         the `d`th axis are periodic. The default ``None`` is equivalent to
         passing ``numpy.zeros((n_dimensions,), dtype=np.bool)``, i.e. none of
         the boundaries are periodic.
 
-    infinity_values : float or None, default : ``None``
+    infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
         filtration value ``numpy.inf``. ``None`` assigns the maximum pixel
         values within all images passed to :meth:`fit`.
@@ -69,7 +69,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Attributes
     ----------
     periodic_dimensions_ : boolean ndarray of shape (n_dimensions,)
-       Effective periodicity of the boundaries along each of the axis. Set in
+       Effective periodicity of the boundaries along each of the axes. Set in
        :meth:`fit`.
 
     infinity_values_ : float
@@ -166,7 +166,10 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                 self.periodic_dimensions_
 
         if self.infinity_values is None:
-            self.infinity_values_ = np.max(X)
+            if hasattr(X, 'shape'):
+                self.infinity_values_ = np.max(X)
+            else:
+                self.infinity_values_ = max(map(np.max, X))
         else:
             self.infinity_values_ = self.infinity_values
 

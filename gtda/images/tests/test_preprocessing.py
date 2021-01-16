@@ -27,6 +27,15 @@ images_3D_float = np.stack([
     np.zeros((7, 8, 4))], axis=0)
 
 
+@pytest.mark.parametrize("transformer",
+                         [Binarizer(), Inverter(), Padder(),
+                          ImageToPointCloud()])
+def test_invalid_input_shape(transformer):
+    X = np.ones((1, 1, 1, 1, 1))
+    with pytest.raises(ValueError, match="Input of `fit`"):
+        transformer.fit(X)
+
+
 def test_binarizer_not_fitted():
     binarizer = Binarizer()
     with pytest.raises(NotFittedError):
