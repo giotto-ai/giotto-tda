@@ -354,7 +354,6 @@ jobs:
         set -e
         brew update
         brew install boost
-        brew install pandoc-citeproc
       displayName: 'Install system dependencies'
     - script: |
         set -e
