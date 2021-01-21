@@ -334,14 +334,14 @@ jobs:
 
 - job: 'Documentation'
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
   strategy:
     matrix:
       Python38:
         python.version: '3.8'
   variables:
     EXECUTE: 'true'
-    RUNNOTEBOOKS: FALSE
+    RUNNOTEBOOKS: TRUE
     VERSION: azure-test
     GITDIR: /tmp/gtda-docs
 
