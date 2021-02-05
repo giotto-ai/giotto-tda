@@ -1900,9 +1900,8 @@ class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._diagram_computer)(x) for x in X)
 
-        format = "extended" if self.extended else "ripser"
         Xt = _postprocess_diagrams(
-            Xt, format, self._homology_dimensions, self.infinity_values,
+            Xt, self._format, self._homology_dimensions, self.infinity_values,
             self.reduced_homology
             )
         return Xt
