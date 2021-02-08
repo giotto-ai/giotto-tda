@@ -5,14 +5,14 @@ import numpy as np
 import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, coo_matrix
 from scipy.spatial.distance import pdist, squareform
 from scipy.spatial.qhull import QhullError
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, WeightedRipsPersistence, \
     SparseRipsPersistence, WeakAlphaPersistence, EuclideanCechPersistence, \
-    FlagserPersistence
+    FlagserPersistence, LowerStarFlagPersistence
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -466,3 +466,23 @@ def test_fp_fit_transform_plot(X, hom_dims):
     FlagserPersistence(directed=False).fit_transform_plot(
         X_dist, sample=0, homology_dimensions=hom_dims
         )
+
+
+X_lsp_cp = coo_matrix((np.array([1, 2, -1, 3, -2, 0.5,
+                                1, 1, 1, 1, 1, 1]),
+                      (np.array([0, 1, 2, 3, 4, 5,
+                                 0, 1, 2, 3, 4, 0]),
+                       np.array([0, 1, 2, 3, 4, 5,
+                                 1, 2, 3, 4, 5, 5])))
+                     )
+diag_lsp_cp = np.array([[-2, 3, 0, -1],
+                 [-1, 2, 0, 1],
+                 [2, -1, 1, 1],
+                 [3, -2, 1, 1]])
+
+
+def test_lsp_fit_transform():
+    lp = LowerStarFlagPersistence()
+    result = lp.fit_transform([X_lsp_cp])[0]
+    assert_almost_equal(np.sort(result, axis=1),
+                        np.sort(diag_lsp_cp, axis=1))
