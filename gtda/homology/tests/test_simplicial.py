@@ -113,7 +113,7 @@ def test_vrp_low_infinity_values(X, metric):
 def test_vrp_fit_transform_plot(X, metric, hom_dims):
     VietorisRipsPersistence(metric=metric).fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 def test_wrp_params():
@@ -215,7 +215,7 @@ def test_wrp_infinity_error():
 def test_wrp_fit_transform_plot(X, metric, hom_dims):
     WeightedRipsPersistence(
         metric=metric, weight_params={'n_neighbors': 1}
-        ).fit_transform_plot(X, sample=0, homology_dimensions=hom_dims)
+    ).fit_transform_plot(X, sample=0, homology_dimensions=hom_dims)
 
 
 def test_srp_params():
@@ -338,7 +338,7 @@ def test_wap_low_infinity_values(X):
 def test_wap_fit_transform_plot(X, hom_dims):
     WeakAlphaPersistence().fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 def test_cp_params():
@@ -380,7 +380,7 @@ def test_cp_transform(X):
 def test_cp_fit_transform_plot(X, hom_dims):
     EuclideanCechPersistence().fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 def test_fp_params():
@@ -410,7 +410,7 @@ X_fp_dir_exp = np.array([[[0., 0.30038548, 0.],
                           [0., 0.34546959, 0.],
                           [0., 0.40065941, 0.],
                           [0., 0.43094373, 0.],
-                          [0.5117411,  0.51976681, 1.]]])
+                          [0.5117411, 0.51976681, 1.]]])
 
 
 @pytest.mark.parametrize('X',
@@ -465,24 +465,26 @@ def test_fp_transform_high_hom_dim(delta):
 def test_fp_fit_transform_plot(X, hom_dims):
     FlagserPersistence(directed=False).fit_transform_plot(
         X_dist, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 X_lsp_cp = coo_matrix((np.array([1, 2, -1, 3, -2, 0.5,
-                                1, 1, 1, 1, 1, 1]),
-                      (np.array([0, 1, 2, 3, 4, 5,
-                                 0, 1, 2, 3, 4, 0]),
-                       np.array([0, 1, 2, 3, 4, 5,
-                                 1, 2, 3, 4, 5, 5])))
-                     )
+                                 1, 1, 1, 1, 1, 1]),
+                       (np.array([0, 1, 2, 3, 4, 5,
+                                  0, 1, 2, 3, 4, 0]),
+                        np.array([0, 1, 2, 3, 4, 5,
+                                  1, 2, 3, 4, 5, 5])))
+                      )
+
 diag_lsp_cp = np.array([[-2, 3, 0, -1],
-                 [-1, 2, 0, 1],
-                 [2, -1, 1, 1],
-                 [3, -2, 1, 1]])
+                        [-1, 2, 0, 1],
+                        [2, -1, 1, 1],
+                        [3, -2, 1, -1]], dtype=float)
 
 
 def test_lsp_fit_transform():
     lp = LowerStarFlagPersistence()
     result = lp.fit_transform([X_lsp_cp])[0]
-    assert_almost_equal(np.sort(result, axis=1),
-                        np.sort(diag_lsp_cp, axis=1))
+    assert_almost_equal(np.sort(result, axis=0),
+                        np.sort(diag_lsp_cp, axis=0))
+
