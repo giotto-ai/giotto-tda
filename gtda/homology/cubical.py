@@ -48,8 +48,8 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         ``n_dimensions`` is the dimension of the images of the collection. The
         boolean in the `d`th position expresses whether the boundaries along
         the `d`th axis are periodic. The default ``None`` is equivalent to
-        passing ``numpy.zeros((n_dimensions,), dtype=np.bool)``, i.e. none of
-        the boundaries are periodic.
+        passing ``numpy.zeros((n_dimensions,), dtype=bool)``, i.e. none of the
+        boundaries are periodic.
 
     infinity_values : float or None, default: ``None``
         Which death value to assign to features which are still alive at
@@ -157,11 +157,11 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         if self.periodic_dimensions is None or \
            np.sum(self.periodic_dimensions) == 0:
             self._filtration = CubicalComplex
-            self.periodic_dimensions_ = np.zeros(len(X) - 1, dtype=np.bool)
+            self.periodic_dimensions_ = np.zeros(len(X) - 1, dtype=bool)
         else:
             self._filtration = PeriodicCubicalComplex
             self.periodic_dimensions_ = np.array(self.periodic_dimensions,
-                                                 dtype=np.bool)
+                                                 dtype=bool)
             self._filtration_kwargs['periodic_dimensions'] = \
                 self.periodic_dimensions_
 

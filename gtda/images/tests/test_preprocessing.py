@@ -103,11 +103,11 @@ def test_padder_not_fitted():
 
 
 @pytest.mark.parametrize("images, padding",
-                         [(images_2D, np.array([1, 1], dtype=np.int)),
+                         [(images_2D, np.array([1, 1], dtype=int)),
                           (images_2D, None),
-                          (images_3D, np.array([2, 2, 2], dtype=np.int)),
+                          (images_3D, np.array([2, 2, 2], dtype=int)),
                           (images_3D_float,
-                           np.array([2, 2, 2], dtype=np.int))])
+                           np.array([2, 2, 2], dtype=int))])
 def test_padder_transform(images, padding):
     padder = Padder(padding=padding)
 

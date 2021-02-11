@@ -16,7 +16,7 @@ from gtda.mapper.utils._list_feature_union import ListFeatureUnion
 from gtda.mapper.utils.decorators import method_to_transform
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e3,
@@ -30,7 +30,7 @@ def test_eccentricity_shape_equals_number_of_samples(X, exponent):
     assert Xt.shape == (len(X), 1)
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e3,
@@ -43,7 +43,7 @@ def test_eccentricity_values_with_infinity_norm_equals_max_row_values(X):
     assert_almost_equal(Xt, np.max(distance_matrix, axis=1).reshape(-1, 1))
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e3,
@@ -62,7 +62,7 @@ def test_entropy_values_for_negative_inputs(X):
     assert_almost_equal(Xt, entropies[:, None])
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=1,
@@ -79,7 +79,7 @@ def test_entropy_values_for_positive_inputs(X):
     assert_almost_equal(Xt, entropies[:, None])
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e3,
@@ -93,7 +93,7 @@ def test_projection_values_equal_slice(X):
     assert_almost_equal(Xt, X[:, columns])
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=1,
@@ -111,7 +111,7 @@ def test_gaussian_density_values(X):
     assert_almost_equal(Xt_actual, Xt_desired)
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=1,
@@ -133,7 +133,7 @@ def test_list_feature_union_transform(X):
     assert_almost_equal(x_12, x_1_2)
 
 
-@given(X=arrays(dtype=np.float,
+@given(X=arrays(dtype=float,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=1,

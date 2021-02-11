@@ -21,7 +21,7 @@ def get_filter_values(draw, shape=None):
     given, generate a shape of at least (4,)."""
     if shape is None:
         shape = array_shapes(min_dims=1, max_dims=1, min_side=4)
-    return draw(arrays(dtype=np.float,
+    return draw(arrays(dtype=float,
                        elements=floats(allow_nan=False,
                                        allow_infinity=False,
                                        min_value=-1e10,
