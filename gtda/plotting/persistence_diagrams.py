@@ -177,7 +177,10 @@ def plot_extended_diagram(diagram, homology_dimensions=None,
     if homology_dimensions is None:
         homology_dimensions = np.unique(diagram[:, 2])
 
-    diag = diagram[diagram[:, 0] != diagram[:, 1]]
+    nontrivial_mask = np.logical_not(
+        np.logical_and(diagram[:, 0] == diagram[:, 1], diagram[:, 3] == 1.)
+        )
+    diag = diagram[nontrivial_mask]
     diag_no_dims = diag[:, :2]
     posinfinite_mask = np.isposinf(diag_no_dims)
     neginfinite_mask = np.isneginf(diag_no_dims)
