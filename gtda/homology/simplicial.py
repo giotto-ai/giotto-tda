@@ -302,8 +302,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_point_clouds(X, accept_sparse=True,
                                distance_matrices=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._ripser_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "ripser", self._homology_dimensions, self.infinity_values_,
@@ -691,8 +691,8 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_point_clouds(X, accept_sparse=True, force_all_finite=True,
                                distance_matrices=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._ripser_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "ripser", self._homology_dimensions, self.infinity_values_,
@@ -962,8 +962,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_point_clouds(X, accept_sparse=True,
                                distance_matrices=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "gudhi", self._homology_dimensions, self.infinity_values_,
@@ -1213,8 +1213,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_point_clouds(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._weak_alpha_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._weak_alpha_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "ripser", self._homology_dimensions, self.infinity_values_,
@@ -1728,8 +1728,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_point_clouds(X, accept_sparse=True, distance_matrices=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._flagser_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._flagser_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "flagser", self._homology_dimensions, self.infinity_values_,
@@ -1804,7 +1804,7 @@ class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         n_points = max(X.shape)
         n_points_cone = n_points + 1
         n_diag = min(X.shape)
-        X = X.tocoo()
+        X = X.tocoo().astype(np.float32)  # ripser needs single precision
 
         data_diag = np.zeros(n_points_cone, dtype=X.dtype)
         data_diag[:n_diag] = X.diagonal()
@@ -1897,8 +1897,8 @@ class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self, "_is_fitted")
         X = check_point_clouds(X, accept_sparse=True, distance_matrices=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._diagram_computer)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._diagram_computer)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, self._format, self._homology_dimensions, self.infinity_values,
