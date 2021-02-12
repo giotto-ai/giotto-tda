@@ -1169,7 +1169,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
             ))
         # The mask is always 3D but not the iterator.
         self.mask_ = np.ones(tuple(2 * self._size + 1 for _ in range(3)),
-                             dtype=np.bool)
+                             dtype=bool)
 
         # Create an iterator for applying the mask to every pixel at once
         iterator_size_list = \

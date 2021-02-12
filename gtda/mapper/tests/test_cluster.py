@@ -95,7 +95,7 @@ def test_parallel_clustering_precomputed(n_jobs):
 def get_one_cluster(draw, n_points, dim):
     """Get an array of n_points in a dim-dimensional space, in the
     [-1, 1]-hypercube."""
-    return draw(arrays(dtype=np.float,
+    return draw(arrays(dtype=float,
                        elements=floats(allow_nan=False,
                                        allow_infinity=False,
                                        min_value=-1.,
@@ -107,7 +107,7 @@ def get_one_cluster(draw, n_points, dim):
 def get_clusters(draw, n_clusters, n_points_per_cluster, dim, std=1):
     """Get n_clusters clusters, with n_points_per_cluster points per cluster
     embedded in dim."""
-    positions = np.repeat(draw(arrays(dtype=np.float,
+    positions = np.repeat(draw(arrays(dtype=float,
                                       elements=integers(min_value=-100,
                                                         max_value=100),
                                       shape=(1, dim),
