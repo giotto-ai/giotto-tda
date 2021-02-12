@@ -4,9 +4,8 @@
 import numpy as np
 
 
-def _postprocess_diagrams(
-        Xt, format, homology_dimensions, infinity_values, reduced
-        ):
+def _postprocess_diagrams(Xt, format, homology_dimensions, infinity_values,
+                          reduced):
     # NOTE: `homology_dimensions` must be sorted in ascending order
     def replace_infinity_values(subdiagram):
         np.nan_to_num(subdiagram, posinf=infinity_values, copy=False)
@@ -21,7 +20,7 @@ def _postprocess_diagrams(
                   for dim in homology_dimensions}
         Xt = [{dim: replace_infinity_values(diagram[dim][slices[dim]])
                for dim in homology_dimensions} for diagram in Xt]
-        feature_vect_len = 3
+        n_diagram_cols = 3
     elif format == "gudhi":  # Input is list of list of [dim, (birth, death)]
         # In H0, remove one infinite bar placed at the beginning by GUDHI only
         # if `reduce` is True
@@ -32,11 +31,11 @@ def _postprocess_diagrams(
                       if pers_info[0] == dim]).reshape(-1, 2)[slices[dim]]
             )
             for dim in homology_dimensions} for diagram in Xt]
-        feature_vect_len = 3
+        n_diagram_cols = 3
     elif format == "extended":  # Input is list of list of subdiagrams
         Xt = [{dim: diagram[dim]
                for dim in homology_dimensions} for diagram in Xt]
-        feature_vect_len = 4
+        n_diagram_cols = 4
     else:
         raise ValueError(f"Unknown input format {format} for collection of "
                          f"diagrams.")
@@ -52,7 +51,7 @@ def _postprocess_diagrams(
     min_values = [min_value if min_value != np.inf else 0
                   for min_value in min_values]
     n_features = start_idx_per_dim[-1]
-    Xt_padded = np.empty((len(Xt), n_features, feature_vect_len), dtype=float)
+    Xt_padded = np.empty((len(Xt), n_features, n_diagram_cols), dtype=float)
     Xt_padded[:, :, 3:] = 1.  # Only applies to extended persistence
 
     for i, dim in enumerate(homology_dimensions):
