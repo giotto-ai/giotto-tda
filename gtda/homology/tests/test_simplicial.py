@@ -519,11 +519,12 @@ def get_circle_matrix(draw):
     diag = draw(arrays(dtype=np.float32,
                        elements=integers(min_value=1, max_value=int(1e2)),
                        shape=(n_points,), unique=True))
+    sign = 2*int(draw(booleans())) - 1
     n_edges = n_points
     rows = np.arange(n_points)
     cols = draw(permutations(rows))
 
-    X = coo_matrix((np.concatenate([diag, np.ones(n_edges)]),
+    X = coo_matrix((np.concatenate([sign*diag, np.ones(n_edges)]),
                     (np.concatenate([np.arange(n_points), rows]),
                      np.concatenate([np.arange(n_points), cols]))))
     return X.toarray()
