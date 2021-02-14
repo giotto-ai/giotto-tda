@@ -1809,7 +1809,7 @@ class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         data_diag = np.zeros(n_points_cone, dtype=X.dtype)
         data_diag[:n_diag] = X.diagonal()
         max_value = data_diag[:n_diag].max()
-        min_value = data_diag[:n_diag].min()
+        min_value = data_diag[:n_points].min()
         data_diag[-1] = min_value - 1
 
         off_diag = X.row != X.col
@@ -1819,7 +1819,7 @@ class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         col = np.concatenate([col_off_diag, np.full(n_points, n_points)])
         data = np.concatenate([
             np.maximum(data_diag[row_off_diag], data_diag[col_off_diag]),
-            2 * max_value + 1 - data_diag[:n_points]
+            np.sign(max_value)*2 * max_value + 1 - data_diag[:n_points]
             ])
 
         X = coo_matrix((data, (row, col)),
@@ -1837,7 +1837,7 @@ class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                 np.logical_xor.reduce(mask_down_sweep, axis=1,
                                       keepdims=True)).astype(int) - 1
             Xdgms[i][mask_down_sweep] = \
-                2 * max_value + 1 - Xdgms[i][mask_down_sweep]
+                np.sign(max_value)*2 * max_value + 1 - Xdgms[i][mask_down_sweep]
             if not i:
                 Xdgms[i] = np.hstack([Xdgms[i][:-1, :], sgn[:-1, :]])
             else:

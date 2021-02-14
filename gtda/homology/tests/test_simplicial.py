@@ -6,7 +6,7 @@ import plotly.io as pio
 import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays, array_shapes
-from hypothesis.strategies import composite, integers, floats, booleans, sets, tuples, lists
+from hypothesis.strategies import composite, integers, floats, booleans, sets, tuples, lists, permutations
 from numpy.testing import assert_almost_equal
 from scipy.sparse import csr_matrix, coo_matrix
 from scipy.spatial.distance import pdist, squareform
@@ -497,11 +497,8 @@ def get_lsp_matrix(draw):
     """Generate a 1d array of floats, of a given shape. If the shape is not
     given, generate a shape of at least (4,)."""
     n_points = draw(integers(3, 10))
-    diag = draw(arrays(dtype=np.float,
-                       elements=floats(allow_nan=False,
-                                       allow_infinity=False,
-                                       min_value=1,
-                                       max_value=1e2),
+    diag = draw(arrays(dtype=np.float32,
+                       elements=integers(min_value=1, max_value=int(1e2)),
                        shape=(n_points,), unique=True))
     n_edges = draw(integers(2, int(n_points*(n_points-1)/2)))
     list_vertices = lists(integers(min_value=0, max_value=n_points),
@@ -516,21 +513,55 @@ def get_lsp_matrix(draw):
     return X.toarray()
 
 
-@given(X=get_lsp_matrix())
+@composite
+def get_circle_matrix(draw):
+    n_points = draw(integers(3, 10))
+    diag = draw(arrays(dtype=np.float32,
+                       elements=integers(min_value=1, max_value=int(1e2)),
+                       shape=(n_points,), unique=True))
+    n_edges = n_points
+    rows = np.arange(n_points)
+    cols = draw(permutations(rows))
+
+    X = coo_matrix((np.concatenate([diag, np.ones(n_edges)]),
+                    (np.concatenate([np.arange(n_points), rows]),
+                     np.concatenate([np.arange(n_points), cols]))))
+    return X.toarray()
+
+
+@given(X=get_circle_matrix())
+def test_lsp_transform_symmetry(X):
+    X = coo_matrix(X)
+    hom_dims = (0, 1)
+    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
+    result, result_m = lp.fit_transform([X])[0], lp.fit_transform([-X])[0]
+    result, result_m = [r[np.where(np.logical_not(
+        np.logical_and(np.isclose(r[:, 0] - r[:, 1], 0), r[:, 3] == 1.)))]
+                        for r in [result, result_m]]
+    same_sweep, same_sweep_m = [r[np.where(r[:, 3] == 1)]
+                                for r in [result, result_m]]
+    max_dim = max(hom_dims)
+    for dim in range(max_dim):
+        dual_dim = max_dim - dim - 1
+        primary, dual = [s[np.where(s[:, 2] == d)]
+                         for s, d in zip([same_sweep, same_sweep_m], [dim, dual_dim])]
+        assert_almost_equal(np.sort(primary[:, [0, 1]], axis=0),
+                            np.sort(- dual[:, [1, 0]], axis=0), decimal=3)
+
+
+@given(X=get_circle_matrix())
 def test_lsp_transform_duality(X):
     X = coo_matrix(X)
     hom_dims = (0, 1)
     lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
     result = lp.fit_transform([X])[0]
-    result = result[np.where(np.logical_not(
-        np.logical_and(np.isclose(result[:, 0] - result[:, 1], 0), result[:, 3] == 1.))
-    )]
+    result = result[np.where(np.logical_not(np.logical_and(
+        np.isclose(result[:, 0] - result[:, 1], 0), result[:, 3] == 1.)))]
     same_sweep = result[np.where(result[:, 3] == 1)]
     max_dim = max(hom_dims)
-    for dim in hom_dims:
+    for dim in range(max_dim):
         dual_dim = max_dim - dim
         primary, dual = [same_sweep[np.where(same_sweep[:, 2] == d)]
                          for d in [dim, dual_dim]]
         assert_almost_equal(np.sort(primary[:, [0, 1]], axis=0),
-                            np.sort(dual[:, [1, 0]], axis=0))
-
+                            np.sort(dual[:, [1, 0]], axis=0), decimal=3)
