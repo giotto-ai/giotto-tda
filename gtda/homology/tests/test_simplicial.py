@@ -6,8 +6,8 @@ import plotly.io as pio
 import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays
-from hypothesis.strategies import composite, integers, booleans,\
-    lists, permutations
+from hypothesis.strategies import composite, integers, booleans, \
+    lists, permutations, floats
 from numpy.testing import assert_almost_equal
 from scipy.sparse import csr_matrix, coo_matrix
 from scipy.spatial.distance import pdist, squareform
@@ -495,8 +495,7 @@ def test_lsp_fit_transform():
 
 @composite
 def get_lsp_matrix(draw):
-    """Generate a 1d array of floats, of a given shape. If the shape is not
-    given, generate a shape of at least (4,)."""
+    """Generate a matrix"""
     n_points = draw(integers(3, 10))
     diag = draw(arrays(dtype=np.float32,
                        elements=integers(min_value=1, max_value=int(1e2)),
@@ -509,14 +508,31 @@ def get_lsp_matrix(draw):
                                        for k in range(n_edges))))
 
     edges = np.array(edges)
+    c = draw(floats(min_value=-10, max_value=10, allow_nan=False,
+                    allow_infinity=False, width=32))
     X = coo_matrix((np.concatenate([diag, np.ones(n_edges)]),
                     (np.concatenate([np.arange(n_points), edges[0]]),
                      np.concatenate([np.arange(n_points), edges[1]]))))
-    return X.toarray()
+    X2 = coo_matrix((np.concatenate([diag + c, np.ones(n_edges)]),
+                    (np.concatenate([np.arange(n_points), edges[0]]),
+                     np.concatenate([np.arange(n_points), edges[1]]))))
+    return X.toarray(), X2.toarray(), c
+
+
+@given(Xs=get_lsp_matrix())
+def test_lsp_transform_equivariance(Xs):
+    X, X2, c = Xs
+    X, X2 = coo_matrix(X), coo_matrix(X2)
+    hom_dims = (0, 1)
+    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
+    result, result_m = lp.fit_transform([X, X2])
+    result_m[:, 0:2] -= c
+    assert_almost_equal(np.sort(result, axis=0),
+                        np.sort(result_m, axis=0), decimal=3)
 
 
 @composite
-def get_circle_matrix(draw):
+def get_sparse_matrix(draw):
     n_points = draw(integers(3, 50))
     diag = draw(arrays(dtype=np.float32,
                        elements=integers(min_value=1, max_value=int(1e2)),
@@ -532,7 +548,7 @@ def get_circle_matrix(draw):
     return X.toarray()
 
 
-@given(X=get_circle_matrix())
+@given(X=get_sparse_matrix())
 def test_lsp_transform_symmetry(X):
     X = coo_matrix(X)
     hom_dims = (0, 1)
@@ -553,7 +569,7 @@ def test_lsp_transform_symmetry(X):
                             np.sort(- dual[:, [1, 0]], axis=0), decimal=3)
 
 
-@given(X=get_circle_matrix())
+@given(X=get_sparse_matrix())
 def test_lsp_transform_duality(X):
     X = coo_matrix(X)
     hom_dims = (0, 1)
