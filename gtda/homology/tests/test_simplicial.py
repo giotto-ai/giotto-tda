@@ -5,8 +5,9 @@ import numpy as np
 import plotly.io as pio
 import pytest
 from hypothesis import given
-from hypothesis.extra.numpy import arrays, array_shapes
-from hypothesis.strategies import composite, integers, floats, booleans, sets, tuples, lists, permutations
+from hypothesis.extra.numpy import arrays
+from hypothesis.strategies import composite, integers, booleans,\
+    lists, permutations
 from numpy.testing import assert_almost_equal
 from scipy.sparse import csr_matrix, coo_matrix
 from scipy.spatial.distance import pdist, squareform
@@ -504,7 +505,8 @@ def get_lsp_matrix(draw):
     list_vertices = lists(integers(min_value=0, max_value=n_points),
                           min_size=n_edges, max_size=n_edges)
     edges = draw(lists(list_vertices, min_size=2, max_size=2,
-                       unique_by=tuple(lambda x: x[k] for k in range(n_edges))))
+                       unique_by=tuple(lambda x: x[k]
+                                       for k in range(n_edges))))
 
     edges = np.array(edges)
     X = coo_matrix((np.concatenate([diag, np.ones(n_edges)]),
@@ -515,7 +517,7 @@ def get_lsp_matrix(draw):
 
 @composite
 def get_circle_matrix(draw):
-    n_points = draw(integers(3, 10))
+    n_points = draw(integers(3, 50))
     diag = draw(arrays(dtype=np.float32,
                        elements=integers(min_value=1, max_value=int(1e2)),
                        shape=(n_points,), unique=True))
@@ -545,7 +547,8 @@ def test_lsp_transform_symmetry(X):
     for dim in range(max_dim):
         dual_dim = max_dim - dim - 1
         primary, dual = [s[np.where(s[:, 2] == d)]
-                         for s, d in zip([same_sweep, same_sweep_m], [dim, dual_dim])]
+                         for s, d in zip([same_sweep, same_sweep_m],
+                                         [dim, dual_dim])]
         assert_almost_equal(np.sort(primary[:, [0, 1]], axis=0),
                             np.sort(- dual[:, [1, 0]], axis=0), decimal=3)
 
