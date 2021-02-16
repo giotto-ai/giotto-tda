@@ -501,7 +501,7 @@ def get_lsp_matrix(draw):
                        elements=integers(min_value=1, max_value=int(1e2)),
                        shape=(n_points,), unique=True))
     n_edges = draw(integers(2, int(n_points*(n_points-1)/2)))
-    list_vertices = lists(integers(min_value=0, max_value=n_points),
+    list_vertices = lists(integers(min_value=0, max_value=n_points-1),
                           min_size=n_edges, max_size=n_edges)
     edges = draw(lists(list_vertices, min_size=2, max_size=2,
                        unique_by=tuple(lambda x: x[k]
@@ -519,13 +519,21 @@ def get_lsp_matrix(draw):
     return X.toarray(), X2.toarray(), c
 
 
+def filter_true_zero_persistence(r):
+    """Filter out the rows of a persistence diagram, where the points are
+    truly of 0 persistence."""
+    return r[np.where(np.logical_not(
+        np.logical_and(np.isclose(r[:, 0] - r[:, 1], 0), r[:, 3] == 1.)))]
+
+
 @given(Xs=get_lsp_matrix())
 def test_lsp_transform_equivariance(Xs):
     X, X2, c = Xs
     X, X2 = coo_matrix(X), coo_matrix(X2)
     hom_dims = (0, 1)
     lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
-    result, result_m = lp.fit_transform([X, X2])
+    result, result_m = [filter_true_zero_persistence(r)
+                        for r in lp.fit_transform([X, X2])]
     result_m[:, 0:2] -= c
     assert_almost_equal(np.sort(result, axis=0),
                         np.sort(result_m, axis=0), decimal=3)
@@ -554,8 +562,7 @@ def test_lsp_transform_symmetry(X):
     hom_dims = (0, 1)
     lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
     result, result_m = lp.fit_transform([X])[0], lp.fit_transform([-X])[0]
-    result, result_m = [r[np.where(np.logical_not(
-        np.logical_and(np.isclose(r[:, 0] - r[:, 1], 0), r[:, 3] == 1.)))]
+    result, result_m = [filter_true_zero_persistence(r)
                         for r in [result, result_m]]
     same_sweep, same_sweep_m = [r[np.where(r[:, 3] == 1)]
                                 for r in [result, result_m]]
@@ -575,8 +582,7 @@ def test_lsp_transform_duality(X):
     hom_dims = (0, 1)
     lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
     result = lp.fit_transform([X])[0]
-    result = result[np.where(np.logical_not(np.logical_and(
-        np.isclose(result[:, 0] - result[:, 1], 0), result[:, 3] == 1.)))]
+    result = filter_true_zero_persistence(result)
     same_sweep = result[np.where(result[:, 3] == 1)]
     max_dim = max(hom_dims)
     for dim in range(max_dim):
