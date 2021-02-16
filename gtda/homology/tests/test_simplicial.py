@@ -519,21 +519,30 @@ def get_lsp_matrix(draw):
     return X.toarray(), X2.toarray(), c
 
 
-def filter_true_zero_persistence(r):
+def filter_true_zero_persistence(r, is_extended=True):
     """Filter out the rows of a persistence diagram, where the points are
     truly of 0 persistence."""
-    return r[np.where(np.logical_not(
-        np.logical_and(np.isclose(r[:, 0] - r[:, 1], 0), r[:, 3] == 1.)))]
+    is_close = np.isclose(r[:, 0] - r[:, 1], 0)
+    if is_extended:
+        is_close_and_same_sweep = np.logical_and(np.isclose(
+            r[:, 0] - r[:, 1], 0), r[:, 3] == 1.)
+        mask = is_close_and_same_sweep
+    else:
+        mask = is_close
+    return r[np.where(np.logical_not(mask))]
 
 
-@given(Xs=get_lsp_matrix())
-def test_lsp_transform_equivariance(Xs):
+@given(Xs=get_lsp_matrix(), is_extended=booleans())
+def test_lsp_transform_equivariance(Xs, is_extended):
     X, X2, c = Xs
     X, X2 = coo_matrix(X), coo_matrix(X2)
     hom_dims = (0, 1)
-    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
-    result, result_m = [filter_true_zero_persistence(r)
+    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims,
+                                  extended=is_extended)
+    result, result_m = [filter_true_zero_persistence(r,
+                                                     is_extended=is_extended)
                         for r in lp.fit_transform([X, X2])]
+
     result_m[:, 0:2] -= c
     assert_almost_equal(np.sort(result, axis=0),
                         np.sort(result_m, axis=0), decimal=3)
