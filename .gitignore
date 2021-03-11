@@ -53,4 +53,5 @@ test-output.xml
 *.pdf
 *.synctex.gz
 *.toc
+*.txss
 doc/theory/glossary_backup
