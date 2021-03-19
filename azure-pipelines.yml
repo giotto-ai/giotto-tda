@@ -268,8 +268,8 @@ jobs:
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
-  - script: |
-      # Use the boost_1_72_0-msvc-14.1-64.exe for Windows 2016
+  # Use the boost_1_72_0-msvc-14.1-64.exe for Windows 2016
+  - powershell: |
       $Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.72.0/boost_1_72_0-msvc-14.2-64.exe"
       (New-Object System.Net.WebClient).DownloadFile($Url, "$env:TEMP\boost.exe")
       Start-Process -Wait -FilePath "$env:TEMP\boost.exe" "/SILENT","/SP-","/SUPPRESSMSGBOXES","/DIR=C:\hostedtoolcache\windows\Boost\1.72.0\x86_64"
