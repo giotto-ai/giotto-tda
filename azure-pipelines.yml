@@ -270,7 +270,7 @@ jobs:
 
   # Use the boost_1_72_0-msvc-14.1-64.exe for Windows 2016
   # Following issue https://github.com/actions/virtual-environments/issues/2667
-  # Now it necessary to download manually Boost, great work ! ...
+  # As of March 2021, it is necessary to download Boost manually
   # DIR: installation dir, this value need to be forwarded to BOOST_ROOT_PIPELINE
   - powershell: |
       $Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.72.0/boost_1_72_0-msvc-14.2-64.exe"
