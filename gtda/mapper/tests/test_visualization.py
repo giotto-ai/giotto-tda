@@ -89,6 +89,16 @@ def test_unsuitable_colorscale_for_hoverlabel_3d(X):
             )
 
 
+def test_node_color_statistic_as_ndarray():
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_color_statistic = np.arange(len(graph.vs))
+    fig = plot_static_mapper_graph(pipe, X_arr,
+                                   node_color_statistic=node_color_statistic)
+
+    assert np.array_equal(fig.data[1].marker.color, node_color_statistic)
+
+
 @pytest.mark.parametrize("X", [X_arr, X_df])
 def test_valid_colorscale(X):
     pipe = make_mapper_pipeline()
