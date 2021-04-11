@@ -161,7 +161,10 @@ def plot_static_mapper_graph(
     # Compute the graph and fetch the indices of points in each node
     _pipeline = clone(pipeline) if clone_pipeline else pipeline
 
-    _node_color_statistic = node_color_statistic or np.mean
+    if node_color_statistic is None:
+        _node_color_statistic = np.mean
+    else:
+        _node_color_statistic = node_color_statistic
 
     # Simple duck typing to determine whether data is likely a pandas dataframe
     is_data_dataframe = hasattr(data, "columns")
