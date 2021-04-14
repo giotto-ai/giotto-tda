@@ -144,7 +144,7 @@ class PairwiseDistance(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         """Store all observed homology dimensions in
         :attr:`homology_dimensions_` and compute
-        :attr:`effective_metric_params`. Then, return the estimator.
+        :attr:`effective_metric_params_`. Then, return the estimator.
 
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
