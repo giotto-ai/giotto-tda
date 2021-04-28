@@ -4,7 +4,7 @@ persistence diagrams."""
 
 from .simplicial import VietorisRipsPersistence, WeightedRipsPersistence, \
     SparseRipsPersistence, WeakAlphaPersistence, EuclideanCechPersistence, \
-    FlagserPersistence
+    FlagserPersistence, LowerStarFlagPersistence
 from .cubical import CubicalPersistence
 
 __all__ = [
@@ -14,5 +14,6 @@ __all__ = [
     'WeakAlphaPersistence',
     'EuclideanCechPersistence',
     'FlagserPersistence',
+    'LowerStarFlagPersistence',
     'CubicalPersistence',
     ]

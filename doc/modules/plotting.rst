@@ -14,5 +14,6 @@
    plotting.plot_point_cloud
    plotting.plot_heatmap
    plotting.plot_diagram
+   plotting.plot_extended_diagram
    plotting.plot_betti_curves
    plotting.plot_betti_surfaces

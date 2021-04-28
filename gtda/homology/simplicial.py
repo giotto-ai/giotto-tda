@@ -16,7 +16,7 @@ from sklearn.utils.validation import check_is_fitted
 from ._utils import _postprocess_diagrams
 from ..base import PlotterMixin
 from ..externals.python import ripser, SparseRipsComplex, CechComplex
-from ..plotting import plot_diagram
+from ..plotting import plot_diagram, plot_extended_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
 from ..utils.validation import validate_params, check_point_clouds
@@ -302,8 +302,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_point_clouds(X, accept_sparse=True,
                                distance_matrices=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._ripser_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "ripser", self._homology_dimensions, self.infinity_values_,
@@ -691,8 +691,8 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_point_clouds(X, accept_sparse=True, force_all_finite=True,
                                distance_matrices=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._ripser_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._ripser_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "ripser", self._homology_dimensions, self.infinity_values_,
@@ -962,8 +962,8 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         X = check_point_clouds(X, accept_sparse=True,
                                distance_matrices=self._is_precomputed)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._gudhi_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "gudhi", self._homology_dimensions, self.infinity_values_,
@@ -1213,8 +1213,8 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_point_clouds(X)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._weak_alpha_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._weak_alpha_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "ripser", self._homology_dimensions, self.infinity_values_,
@@ -1728,8 +1728,8 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         check_is_fitted(self)
         X = check_point_clouds(X, accept_sparse=True, distance_matrices=True)
 
-        Xt = Parallel(n_jobs=self.n_jobs)(
-            delayed(self._flagser_diagram)(x) for x in X)
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._flagser_diagram)(x)
+                                          for x in X)
 
         Xt = _postprocess_diagrams(
             Xt, "flagser", self._homology_dimensions, self.infinity_values_,
@@ -1770,5 +1770,183 @@ class FlagserPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         """
         return plot_diagram(
             Xt[sample], homology_dimensions=homology_dimensions,
+            plotly_params=plotly_params
+            )
+
+
+# @adapt_fit_transform_docs
+class LowerStarFlagPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
+    """TODO"""
+    _hyperparameters = {
+        "homology_dimensions": {
+            "type": (list, tuple),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
+            },
+        "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
+        "extended": {"type": bool},
+        "infinity_values": {"type": (Real, type(None))},
+        "reduced_homology": {"type": bool},
+        "collapse_edges": {"type": bool}
+        }
+
+    def __init__(self, homology_dimensions=(0, 1), coeff=2, extended=True,
+                 infinity_values=np.inf, reduced_homology=False,
+                 collapse_edges=False, n_jobs=None):
+        self.homology_dimensions = homology_dimensions
+        self.coeff = coeff
+        self.extended = extended
+        self.infinity_values = infinity_values
+        self.reduced_homology = reduced_homology
+        self.collapse_edges = collapse_edges
+        self.n_jobs = n_jobs
+
+    def _lower_star_extended_diagram(self, X):
+        n_points = max(X.shape)
+        n_points_cone = n_points + 1
+        n_diag = min(X.shape)
+        X = X.tocoo().astype(np.float32)  # ripser needs single precision
+
+        data_diag = np.zeros(n_points_cone, dtype=X.dtype)
+        data_diag[:n_diag] = X.diagonal()
+        max_value = data_diag[:n_points].max()
+        min_value = data_diag[:n_points].min()
+        data_diag[-1] = min_value - 1
+
+        off_diag = X.row != X.col
+        row_off_diag, col_off_diag = X.row[off_diag], X.col[off_diag]
+
+        row = np.concatenate([row_off_diag, np.arange(n_points)])
+        col = np.concatenate([col_off_diag, np.full(n_points, n_points)])
+        data = np.concatenate([
+            np.maximum(data_diag[row_off_diag], data_diag[col_off_diag]),
+            min_value + 2 * (max_value - min_value) + 1
+            - (data_diag[:n_points]-min_value)
+            ])
+
+        X = coo_matrix((data, (row, col)),
+                       shape=(n_points_cone, n_points_cone))
+        X.setdiag(data_diag)
+
+        Xdgms = ripser(
+            X, metric="precomputed", maxdim=self._max_homology_dimension,
+            coeff=self.coeff, collapse_edges=self.collapse_edges
+            )["dgms"]
+
+        for i in range(len(Xdgms)):
+            mask_down_sweep = Xdgms[i] > max_value
+            sgn = 2 * np.logical_not(
+                np.logical_xor.reduce(mask_down_sweep, axis=1,
+                                      keepdims=True)).astype(int) - 1
+            Xdgms[i][mask_down_sweep] = \
+                min_value + 2 * (max_value - min_value) + 1\
+                - (Xdgms[i][mask_down_sweep]-min_value)
+            if not i:
+                Xdgms[i] = np.hstack([Xdgms[i][:-1, :], sgn[:-1, :]])
+            else:
+                Xdgms[i] = np.hstack([Xdgms[i], sgn])
+
+        return Xdgms
+
+    def _lower_star_diagram(self, X):
+        n_points = max(X.shape)
+        n_diag = min(X.shape)
+        X = X.tocoo()
+
+        data_diag = np.zeros(n_points, dtype=X.dtype)
+        data_diag[:n_diag] = X.diagonal()
+
+        off_diag = X.row != X.col
+        row_off_diag, col_off_diag = X.row[off_diag], X.col[off_diag]
+
+        row = np.concatenate([row_off_diag, np.arange(n_points)])
+        col = np.concatenate([col_off_diag, np.arange(n_points)])
+        data = np.concatenate([
+            np.maximum(data_diag[row_off_diag], data_diag[col_off_diag]),
+            data_diag]
+            )
+
+        X = coo_matrix((data, (row, col)))
+
+        Xdgms = ripser(
+            X, metric="precomputed", maxdim=self._max_homology_dimension,
+            coeff=self.coeff, collapse_edges=self.collapse_edges
+            )["dgms"]
+
+        return Xdgms
+
+    def fit(self, X, y=None):
+        """TODO"""
+        check_point_clouds(X, accept_sparse=True, distance_matrices=True)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
+
+        self._homology_dimensions = sorted(self.homology_dimensions)
+        self._max_homology_dimension = self._homology_dimensions[-1]
+
+        if self.extended:
+            self._diagram_computer = self._lower_star_extended_diagram
+            self._format = "extended"
+        else:
+            self._diagram_computer = self._lower_star_diagram
+            self._format = "ripser"
+
+        self._is_fitted = True
+
+        return self
+
+    def transform(self, X, y=None):
+        """TODO"""
+        check_is_fitted(self, "_is_fitted")
+        X = check_point_clouds(X, accept_sparse=True, distance_matrices=True)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._diagram_computer)(x)
+                                          for x in X)
+
+        Xt = _postprocess_diagrams(
+            Xt, self._format, self._homology_dimensions, self.infinity_values,
+            self.reduced_homology
+            )
+        return Xt
+
+    @staticmethod
+    def plot(Xt, sample=0, homology_dimensions=None, plotly_params=None):
+        """Plot a sample from a collection of persistence diagrams, with
+        homology in multiple dimensions.
+
+        Parameters
+        ----------
+        Xt : ndarray of shape (n_samples, n_features, 3)
+            Collection of persistence diagrams, such as returned by
+            :meth:`transform`.
+
+        sample : int, optional, default: ``0``
+            Index of the sample in `Xt` to be plotted.
+
+        homology_dimensions : list, tuple or None, optional, default: ``None``
+            Which homology dimensions to include in the plot. ``None`` means
+            plotting all dimensions present in ``Xt[sample]``.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"traces"`` and ``"layout"``, and the corresponding values should
+            be dictionaries containing keyword arguments as would be fed to the
+            :meth:`update_traces` and :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        fig : :class:`plotly.graph_objects.Figure` object
+            Plotly figure.
+
+        """
+        Xt_sample = Xt[sample]
+        if Xt_sample.shape[1] == 4:
+            return plot_extended_diagram(
+                Xt_sample, homology_dimensions=homology_dimensions,
+                plotly_params=plotly_params
+                )
+
+        return plot_diagram(
+            Xt_sample, homology_dimensions=homology_dimensions,
             plotly_params=plotly_params
             )
