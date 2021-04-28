@@ -1,6 +1,4 @@
-
 import re
-import io
 from functools import reduce
 from operator import add
 
@@ -57,7 +55,6 @@ if __name__ == '__main__':
     from glob import glob
     path = sys.argv[1]
     file_names = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*.html'))]
-    print(file_names)
 
     with open('versions', 'r') as f:
         versions = [c[2:].rstrip() for c in f.readlines()]
