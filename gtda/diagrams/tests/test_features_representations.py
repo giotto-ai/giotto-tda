@@ -7,17 +7,20 @@ import pytest
 from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats, integers
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_equal
 from sklearn.exceptions import NotFittedError
 
-from gtda.diagrams import PersistenceEntropy, NumberOfPoints, \
-    ComplexPolynomial, BettiCurve, PersistenceLandscape, HeatKernel, \
-    PersistenceImage, Silhouette
+from gtda.diagrams import PersistenceEntropy, NumberOfPoints, ATOL, BettiCurve, \
+    PersistenceLandscape, HeatKernel, PersistenceImage, Silhouette, ComplexPolynomial
 
 pio.renderers.default = 'plotly_mimetype'
 
 X = np.array([[[0., 0., 0.], [0., 1., 0.], [2., 3., 0.],
                [4., 6., 1.], [2., 6., 1.]]])
+
+X_trivial_points = np.concatenate([X, np.array([[[1., 1., 2],
+                                                 [2., 2., 2]]])],
+                                  axis=1)
 
 line_plots_traces_params = {"mode": "lines+markers"}
 heatmap_trace_params = {"colorscale": "viridis"}
@@ -91,6 +94,35 @@ def test_nop_transform(n_jobs):
     diagram_res = np.array([[2, 2]])
 
     assert_almost_equal(nop.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_atol_transform(n_jobs):
+    atol = ATOL(quantiser_params={'n_clusters': 2, 'random_state':0},
+                n_jobs=n_jobs)
+    diagram_res = np.array([[1.01831564, 1.01831564, 1.01831564, 1.01831564]])
+
+    assert_almost_equal(atol.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_clusters', [[2, 2], [2, 1], [1, 1]])
+def test_atol_different_n_clusters(n_clusters):
+    atol = ATOL(quantiser_params=[{'n_clusters': n, 'random_state': 0}
+                                  for n in n_clusters])
+    assert_equal(atol.fit_transform(X).shape[1], np.sum(n_clusters))
+
+
+def test_atol_wrong_params():
+    atol = ATOL(quantiser_params=[{'n_clusters': 2, 'random_state': 0}])
+    with pytest.raises(ValueError):
+        atol.fit_transform(X)
+
+
+def test_atol_trivial_points():
+    n_clusters = [2, 2, 1]
+    atol = ATOL(quantiser_params=[{'n_clusters': n, 'random_state': 0}
+                                  for n in n_clusters])
+    _ = atol.fit_transform(X_trivial_points)
 
 
 @pytest.mark.parametrize('n_coefficients', [2, [2, 2]])

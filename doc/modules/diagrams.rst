@@ -50,6 +50,7 @@ Features
    :template: class.rst
 
    diagrams.Amplitude
-   diagrams.PersistenceEntropy
-   diagrams.NumberOfPoints
+   diagrams.ATOL
    diagrams.ComplexPolynomial
+   diagrams.NumberOfPoints
+   diagrams.PersistenceEntropy
