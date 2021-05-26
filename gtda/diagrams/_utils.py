@@ -56,7 +56,7 @@ def _sample_image(image, diagram_pixel_coords):
     # WARNING: Modifies `image` in-place
     unique, counts = \
         np.unique(diagram_pixel_coords, axis=0, return_counts=True)
-    unique = tuple(tuple(row) for row in unique.astype(np.int).T)
+    unique = tuple(tuple(row) for row in unique.astype(int).T)
     image[unique] = counts
 
 
@@ -66,7 +66,7 @@ def _multirange(counts):
     memory-efficient way."""
     cumsum = np.cumsum(counts)
     reset_index = cumsum[:-1]
-    incr = np.ones(cumsum[-1], dtype=np.int32)
+    incr = np.ones(cumsum[-1], dtype=int)
     incr[0] = 0
 
     # For each index in reset_index, we insert the negative value necessary

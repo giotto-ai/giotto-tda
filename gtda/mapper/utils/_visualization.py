@@ -365,9 +365,9 @@ def _get_colors_for_vals(vals, vmin, vmax, colorscale, return_hex=True):
 
     if colors[0][:3] == "rgb":
         colors = np.asarray([literal_eval(color[3:]) for color in colors],
-                            dtype=np.float_)
+                            dtype=float)
     elif colors[0][0] == "#":
-        colors = np.asarray(list(map(_hex_to_rgb, colors)), dtype=np.float_)
+        colors = np.asarray(list(map(_hex_to_rgb, colors)), dtype=float)
     else:
         raise ValueError("This colorscale is not supported.")
 

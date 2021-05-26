@@ -150,7 +150,7 @@ def test_pi_zero_weight_function(n_jobs):
     assert np.array_equal(X_res, np.zeros_like(X_res))
 
 
-@given(X=arrays(dtype=np.float, unique=True,
+@given(X=arrays(dtype=float, unique=True,
                 elements=floats(min_value=-10, max_value=10),
                 shape=array_shapes(min_dims=1, max_dims=1, min_side=11)))
 def test_pi_null(X):
@@ -170,7 +170,7 @@ def test_pi_null(X):
     assert_almost_equal(pi.fit_transform(diagrams)[0], 0)
 
 
-@given(pts=arrays(dtype=np.float, unique=True,
+@given(pts=arrays(dtype=float, unique=True,
                   elements=floats(allow_nan=False,
                                   allow_infinity=False,
                                   min_value=-10,
@@ -238,7 +238,7 @@ def test_all_pts_the_same(transformer_cls, n_jobs):
 
 
 pts_gen = arrays(
-    dtype=np.float,
+    dtype=float,
     elements=floats(allow_nan=False,
                     allow_infinity=False,
                     min_value=1.,
@@ -246,7 +246,7 @@ pts_gen = arrays(
     shape=(1, 20, 2), unique=True
     )
 dims_gen = arrays(
-    dtype=np.int,
+    dtype=int,
     elements=integers(min_value=0,
                       max_value=3),
     shape=(1, 20, 1)

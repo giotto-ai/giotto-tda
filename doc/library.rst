@@ -8,6 +8,12 @@ Overview
 ``giotto-tda`` is a high performance topological machine learning toolbox in Python built on top of
 ``scikit-learn`` and is distributed under the GNU AGPLv3 license. It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
 
+.. raw:: html
+
+    <div style="position: relative; margin-bottom: 2em; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+     <iframe src="https://www.youtube.com/embed/hY5TYAq1Rwo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+   </div>
+
 .. _guiding_principles:
 
 ******************

@@ -14,7 +14,7 @@ def get_dense_distance_matrices(draw):
     """Generate 2d dense square arrays of floats, with zero along the
     diagonal."""
     shapes = draw(integers(min_value=2, max_value=30))
-    dm = draw(arrays(dtype=np.float,
+    dm = draw(arrays(dtype=float,
                      elements=floats(allow_nan=False,
                                      allow_infinity=True,
                                      min_value=0),
@@ -28,7 +28,7 @@ def get_sparse_distance_matrices(draw):
     """Generate 2d upper triangular sparse matrices of floats, with zero along
     the diagonal."""
     shapes = draw(integers(min_value=2, max_value=40))
-    dm = draw(arrays(dtype=np.float,
+    dm = draw(arrays(dtype=float,
                      elements=floats(allow_nan=False,
                                      allow_infinity=True,
                                      min_value=0),
@@ -160,7 +160,7 @@ def test_coo_results_independent_of_order():
                           [0., 2.],
                           [0., 5.],
                           [0., np.inf]]),
-                np.array([], dtype=np.float64).reshape(0, 2)]
+                np.array([], dtype=float).reshape(0, 2)]
     for i in range(2):
         assert np.array_equal(diagrams[i], expected[i])
         assert np.array_equal(diagrams_csr[i], expected[i])

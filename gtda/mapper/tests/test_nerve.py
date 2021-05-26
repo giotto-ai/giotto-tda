@@ -13,7 +13,7 @@ from gtda.mapper import Projection, OneDimensionalCover, make_mapper_pipeline
 
 
 @settings(deadline=5000)
-@given(X=arrays(dtype=np.float, unique=True,
+@given(X=arrays(dtype=float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e6,
@@ -38,7 +38,7 @@ def test_node_intersection(X):
 
 
 @settings(deadline=5000)
-@given(X=arrays(dtype=np.float, unique=True,
+@given(X=arrays(dtype=float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e6,
@@ -91,7 +91,7 @@ def test_edge_elements(X):
 
 @settings(deadline=5000)
 @pytest.mark.parametrize("min_intersection", [1, 2, 3, 10])
-@given(X=arrays(dtype=np.float, unique=True,
+@given(X=arrays(dtype=float, unique=True,
                 elements=floats(allow_nan=False,
                                 allow_infinity=False,
                                 min_value=-1e6,

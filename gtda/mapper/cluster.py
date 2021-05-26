@@ -120,7 +120,7 @@ class ParallelClustering(BaseEstimator):
         X_tot, masks = X
         check_array(X_tot, ensure_2d=True)
         check_array(masks, ensure_2d=True)
-        if masks.dtype != np.bool_:
+        if not np.issubdtype(masks.dtype, bool):
             raise TypeError("`masks` must be a boolean array.")
         if len(X_tot) != len(masks):
             raise ValueError("`X_tot` and `masks` must have the same number "

@@ -267,7 +267,7 @@ class Inverter(BaseEstimator, TransformerMixin, PlotterMixin):
                         exclude=['n_jobs'])
 
         if self.max_value is None:
-            if X.dtype == np.bool:
+            if np.issubdtype(X.dtype, bool):
                 self.max_value_ = True
             else:
                 self.max_value_ = np.max(X)
@@ -431,7 +431,7 @@ class Padder(BaseEstimator, TransformerMixin, PlotterMixin):
                         exclude=['value', 'n_jobs'])
 
         if self.padding is None:
-            self.padding_ = np.ones((self.n_dimensions_,), dtype=np.int)
+            self.padding_ = np.ones((self.n_dimensions_,), dtype=int)
         elif len(self.padding) != self.n_dimensions_:
             raise ValueError(
                 f"`padding` has length {self.padding} while the input "
