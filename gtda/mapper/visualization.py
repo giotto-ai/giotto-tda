@@ -21,9 +21,9 @@ from .utils._visualization import (
 
 
 def plot_static_mapper_graph(
-        pipeline, data, layout="kamada_kawai", layout_dim=2,
-        color_variable=None, node_color_statistic=None,
-        color_by_columns_dropdown=False, clone_pipeline=True, n_sig_figs=3,
+        pipeline, data, color_data=None, color_variable=None,
+        node_color_statistic=None, color_by_columns_dropdown=False,
+        layout="kamada_kawai", layout_dim=2, clone_pipeline=True, n_sig_figs=3,
         node_scale=12, plotly_params=None
         ):
     """Plot Mapper graphs without interactivity on pipeline parameters.
@@ -60,17 +60,15 @@ def plot_static_mapper_graph(
     data : array-like of shape (n_samples, n_features)
         Data used to generate the Mapper graph. Can be a pandas dataframe.
 
-    layout : None, str or callable, optional, default: ``"kamada-kawai"``
-        Layout algorithm for the graph. Can be any accepted value for the
-        ``layout`` parameter in the :meth:`layout` method of
-        :class:`igraph.Graph` [1]_.
-
-    layout_dim : int, default: ``2``
-        The number of dimensions for the layout. Can be 2 or 3.
+    color_data : array-like of shape (n_samples, n_features), or None, \
+        optional, default: ``None``
+        Data to be used to construct node colors in the Mapper graph (according
+        to `color_variable` and `node_color_statistic`). Must have the same
+        length as `data`. ``None`` means that this is the same as `data`.
 
     color_variable : object or None, optional, default: ``None``
         Specifies a feature of interest to be used, together with
-        `node_color_statistic`, to determine node colors.
+        `node_color_statistic`, to determine node colors from `color_data`.
 
             1. If a numpy array or pandas dataframe, it must have the same
                length as `data`.
@@ -94,8 +92,16 @@ def plot_static_mapper_graph(
 
     color_by_columns_dropdown : bool, optional, default: ``False``
         If ``True``, a dropdown widget is generated which allows the user to
-        color Mapper nodes according to any column in `data` (still using
-        `node_color_statistic`) in addition to `color_variable`.
+        color Mapper nodes according to any column in `color_data` (still using
+        `node_color_statistic`), in addition to `color_variable`.
+
+    layout : None, str or callable, optional, default: ``"kamada-kawai"``
+        Layout algorithm for the graph. Can be any accepted value for the
+        ``layout`` parameter in the :meth:`layout` method of
+        :class:`igraph.Graph` [1]_.
+
+    layout_dim : int, default: ``2``
+        The number of dimensions for the layout. Can be 2 or 3.
 
     clone_pipeline : bool, optional, default: ``True``
         If ``True``, the input `pipeline` is cloned before computing the
