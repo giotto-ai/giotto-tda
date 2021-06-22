@@ -74,7 +74,7 @@ def plot_static_mapper_graph(
 
             1. If a numpy array or pandas dataframe, it must have the same
                length as `data`.
-            2. ``None`` is equivalent to passing `data`.
+            2. ``None`` is equivalent to passing ``numpy.arange(len(data))``.
             3. If an object implementing :meth:`transform` or
                :meth:`fit_transform`, it is applied to `data` to generate the
                feature of interest.
@@ -323,7 +323,7 @@ def plot_interactive_mapper_graph(
 
             1. If a numpy array or pandas dataframe, it must have the same
                length as `data`.
-            2. ``None`` is equivalent to passing `data`.
+            2. ``None`` is equivalent to passing ``numpy.arange(len(data))``.
             3. If an object implementing :meth:`transform` or
                :meth:`fit_transform`, it is applied to `data` to generate the
                feature of interest.
