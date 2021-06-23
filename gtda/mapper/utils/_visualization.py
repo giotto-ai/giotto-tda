@@ -214,7 +214,10 @@ def _get_node_summary_statistics(
     elif color_variable_kind == "callable":
         color_data = color_variable(data)
     elif color_variable_kind == "none":
-        color_data = np.arange(len(data))
+        if is_data_dataframe:
+            color_data = data.to_numpy()
+        else:
+            color_data = data
     else:
         if is_data_dataframe:
             color_data = data[color_variable].to_numpy()
