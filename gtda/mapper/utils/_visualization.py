@@ -1,12 +1,13 @@
 """Graph layout functions and plotly layout functions."""
 # License: GNU AGPLv3
 
-from operator import iconcat
 from copy import deepcopy
 from functools import reduce, partial
+from operator import iconcat
 
 import numpy as np
 import plotly.graph_objs as go
+from sklearn.utils.validation import check_array
 
 PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
     "name": "node_trace",
@@ -104,14 +105,18 @@ def _get_node_text(
         ]
 
 
-def _get_node_summary(data, node_elements, summary_statistic):
-    return list(map(summary_statistic, (data[itr] for itr in node_elements)))
+def _get_node_summaries(color_data_transformed, node_elements,
+                        summary_statistic):
+    n_columns = color_data_transformed.shape[1]
+
+    return np.array([[summary_statistic(color_data_transformed[itr, i])
+                      for i in range(n_columns)]
+                     for itr in node_elements])
 
 
 def _get_column_color_buttons(
-        data, is_data_dataframe, node_elements, node_colors_color_variable,
-        summary_statistic, hovertext_color_variable,
-        colorscale_for_hoverlabel, n_sig_figs
+        node_colors_color_features, hovertext_color_features,
+        colorscale_for_hoverlabel, n_sig_figs, column_names_dropdown
         ):
     # TODO: Consider opting for just-in-time computation instead of computing
     # all node summary values ahead of time. Solution should preserve scroll
@@ -122,42 +127,28 @@ def _get_column_color_buttons(
             f" {_round_to_n_sig_figs(new_statistic, n=n_sig_figs)}"
         return new_hovertext
 
-    if is_data_dataframe:
-        columns_to_color = data.columns
-    else:
-        columns_to_color = range(data.shape[1])
-
     column_color_buttons = [
         {
             "args": [{
-                "marker.color": [None, node_colors_color_variable],
-                "hovertext": [None, hovertext_color_variable]
+                "marker.color": [None, node_colors_color_features[:, 0]],
+                "hovertext": [None, hovertext_color_features]
                 }],
-            "label": "color_variable",
+            "label": f"{column_names_dropdown[0]}",
             "method": "restyle"
             }
         ]
 
-    for column in columns_to_color:
-        if is_data_dataframe:
-            column_values = data[column].to_numpy()
-        else:
-            column_values = data[:, column]
-
-        node_colors = _get_node_summary(
-            column_values, node_elements, summary_statistic
-            )
-        hovertext = list(map(
-            replace_summary_statistic, hovertext_color_variable,
-            node_colors
-            ))
+    for column in range(1, len(column_names_dropdown)):
+        node_colors = node_colors_color_features[:, column]
+        hovertext = list(map(replace_summary_statistic,
+                             hovertext_color_features, node_colors))
 
         new_button = {
             "args": [{
                 "marker.color": [None, node_colors],
                 "hovertext": [None, hovertext]
                 }],
-            "label": f"Column {column}",
+            "label": f"{column_names_dropdown[column]}",
             "method": "restyle"
             }
 
@@ -176,60 +167,71 @@ def _get_column_color_buttons(
     return column_color_buttons
 
 
-def _infer_color_variable_kind(color_variable, data):
-    """Determine whether color_variable is array, pandas dataframe, callable,
+def _infer_color_features_kind(color_features):
+    """Determine whether color_features is array, pandas dataframe, callable,
     or scikit-learn (fit-)transformer."""
-    if hasattr(color_variable, "dtype") or hasattr(color_variable, "dtypes"):
-        if len(color_variable) != len(data):
-            raise ValueError(
-                "color_variable and data must have the same length.")
-        color_variable_kind = "scalars"
-    elif hasattr(color_variable, "transform"):
-        color_variable_kind = "transformer"
-    elif hasattr(color_variable, "fit_transform"):
-        color_variable_kind = "fit_transformer"
-    elif callable(color_variable):
-        color_variable_kind = "callable"
-    elif color_variable is None:
-        color_variable_kind = "none"
-    else:  # Assume color_variable is a selection of columns
-        color_variable_kind = "else"
+    if hasattr(color_features, "dtype") or hasattr(color_features, "dtypes"):
+        raise ValueError("`color_features` should not be a numpy array or "
+                         "pandas dataframe.")
+    elif hasattr(color_features, "transform"):
+        color_features_kind = "transformer"
+    elif hasattr(color_features, "fit_transform"):
+        color_features_kind = "fit_transformer"
+    elif callable(color_features):
+        color_features_kind = "callable"
+    elif color_features is None:
+        color_features_kind = "none"
+    else:  # Assume color_features is a selection of columns
+        color_features_kind = "else"
 
-    return color_variable_kind
+    return color_features_kind
 
 
 def _get_node_summary_statistics(
-        data, is_data_dataframe, node_elements, summary_statistic,
-        color_variable
+        color_data, is_color_data_dataframe, node_elements, summary_statistic,
+        color_features
         ):
     """Calculate values of node summary statistics."""
-    color_variable_kind = _infer_color_variable_kind(color_variable, data)
+    color_features_kind = _infer_color_features_kind(color_features)
 
-    if color_variable_kind == "scalars":
-        color_data = color_variable
-    elif color_variable_kind == "transformer":
-        color_data = color_variable.transform(data)
-    elif color_variable_kind == "fit_transformer":
-        color_data = color_variable.fit_transform(data)
-    elif color_variable_kind == "callable":
-        color_data = color_variable(data)
-    elif color_variable_kind == "none":
-        if is_data_dataframe:
-            color_data = data.to_numpy()
+    column_names_dropdown = None
+    if color_features_kind == "transformer":
+        color_data_transformed = color_features.transform(color_data)
+    elif color_features_kind == "fit_transformer":
+        color_data_transformed = color_features.fit_transform(color_data)
+    elif color_features_kind == "callable":
+        color_data_transformed = color_features(color_data)
+    elif color_features_kind == "none":
+        if is_color_data_dataframe:
+            column_names_dropdown = color_data.columns
+            color_data_transformed = color_data.to_numpy()
         else:
-            color_data = data
+            color_data_transformed = color_data
     else:
-        if is_data_dataframe:
-            color_data = data[color_variable].to_numpy()
+        if is_color_data_dataframe:
+            color_data_transformed = color_data[color_features]
+            column_names_dropdown = getattr(color_data_transformed, "columns",
+                                            None)
+            color_data_transformed = color_data_transformed.to_numpy()
         else:
-            color_data = data[:, color_variable]
+            color_data_transformed = color_data[:, color_features]
+            if len(color_data_transformed.shape) > 1:
+                column_names_dropdown = color_features
 
-    return _get_node_summary(color_data, node_elements, summary_statistic)
+    if len(color_data_transformed.shape) > 1:
+        if column_names_dropdown is None:
+            column_names_dropdown = range(color_data_transformed.shape[1])
+
+    color_data_transformed = \
+        color_data_transformed.reshape((len(color_data_transformed), -1))
+
+    return _get_node_summaries(color_data_transformed, node_elements,
+                               summary_statistic), column_names_dropdown
 
 
 def _calculate_graph_data(
-        pipeline, data, is_data_dataframe, layout, layout_dim, color_variable,
-        node_color_statistic, n_sig_figs, node_scale
+        pipeline, data, color_data, is_color_data_dataframe, color_features,
+        node_color_statistic, layout, layout_dim, n_sig_figs, node_scale
         ):
     graph = pipeline.fit_transform(data)
     node_elements = graph.vs["node_elements"]
@@ -237,18 +239,30 @@ def _calculate_graph_data(
     # Determine whether node_color_statistic is an array of node colors
     is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
     if not (is_node_color_statistic_ndarray or callable(node_color_statistic)):
-        raise ValueError(
-            "`node_color_statistic` must be a callable or ndarray."
-            )
+        raise ValueError("`node_color_statistic` must be a callable or an "
+                         "ndarray.")
 
     # Compute the raw values of node summary statistics
     if is_node_color_statistic_ndarray:
-        node_colors_color_variable = node_color_statistic
+        node_colors_color_features = check_array(node_color_statistic,
+                                                 ensure_2d=False)
+        len_colors = len(node_colors_color_features)
+        n_nodes = len(node_elements)
+        if len_colors != n_nodes:
+            raise ValueError(f"`node_color_statistic` must have as many "
+                             f"entries as there are nodes in the Mapper "
+                             f"graph. {len_colors} != {n_nodes} detected.")
+        if len(node_colors_color_features.shape) > 1:
+            column_names_dropdown = range(node_colors_color_features.shape[1])
+        else:
+            node_colors_color_features = \
+                node_colors_color_features.reshape((len_colors, -1))
+            column_names_dropdown = None
     else:
-        node_colors_color_variable = _get_node_summary_statistics(
-            data, is_data_dataframe, node_elements, node_color_statistic,
-            color_variable
-            )
+        node_colors_color_features, column_names_dropdown = \
+            _get_node_summary_statistics(color_data, is_color_data_dataframe,
+                                         node_elements, node_color_statistic,
+                                         color_features)
 
     # Load defaults for node and edge traces
     plot_options = {
@@ -256,12 +270,13 @@ def _calculate_graph_data(
         "edge_trace": deepcopy(PLOT_OPTIONS_EDGE_TRACE_DEFAULTS)
         }
 
-    # Update size and color of nodes
+    # Update size and color of nodes with zeroth column of
+    # `node_colors_color_features`
     node_sizes = _get_node_size(node_elements)
     plot_options["node_trace"]["marker"].update({
         "size": node_sizes,
         "sizeref": _set_node_sizeref(node_sizes, node_scale=node_scale),
-        "color": node_colors_color_variable
+        "color": node_colors_color_features[:, 0]
         })
 
     # Generate hovertext
@@ -269,9 +284,8 @@ def _calculate_graph_data(
     pullback_set_ids = graph.vs["pullback_set_label"]
     partial_cluster_labels = graph.vs["partial_cluster_label"]
     num_node_elements = map(len, graph.vs["node_elements"])
-    node_colors_round = map(
-        partial(_round_to_n_sig_figs, n=n_sig_figs), node_colors_color_variable
-        )
+    node_colors_round = map(partial(_round_to_n_sig_figs, n=n_sig_figs),
+                            node_colors_color_features[:, 0])
     plot_options["node_trace"]["hovertext"] = _get_node_text(
         node_ids, pullback_set_ids, partial_cluster_labels,
         num_node_elements, node_colors_round
@@ -331,7 +345,8 @@ def _calculate_graph_data(
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
-    return edge_trace, node_trace, node_elements, node_colors_color_variable
+    return (edge_trace, node_trace, node_elements, node_colors_color_features,
+            column_names_dropdown)
 
 
 def _hex_to_rgb(value):

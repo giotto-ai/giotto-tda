@@ -10,6 +10,7 @@ import numpy as np
 import plotly.graph_objects as go
 from ipywidgets import widgets, Layout, HTML
 from sklearn.base import clone
+from sklearn.utils.validation import check_array
 
 from .utils._logging import OutputWidgetHandler
 from .utils._visualization import (
@@ -21,10 +22,9 @@ from .utils._visualization import (
 
 
 def plot_static_mapper_graph(
-        pipeline, data, color_data=None, color_variable=None,
-        node_color_statistic=None, color_by_columns_dropdown=False,
-        layout="kamada_kawai", layout_dim=2, clone_pipeline=True, n_sig_figs=3,
-        node_scale=12, plotly_params=None
+        pipeline, data, color_data=None, color_features=None,
+        node_color_statistic=None, layout="kamada_kawai", layout_dim=2,
+        clone_pipeline=True, n_sig_figs=3, node_scale=12, plotly_params=None
         ):
     """Plot Mapper graphs without interactivity on pipeline parameters.
 
@@ -39,7 +39,7 @@ def plot_static_mapper_graph(
     Two clusters from different pullback cover sets can overlap; if they do, an
     edge between the corresponding nodes in the graph may be drawn.
 
-    Nodes are colored according to `color_variable` and `node_color_statistic`
+    Nodes are colored according to `color_features` and `node_color_statistic`
     and are sized according to the number of elements they represent. The
     hovertext on each node displays, in this order:
 
@@ -60,40 +60,38 @@ def plot_static_mapper_graph(
     data : array-like of shape (n_samples, n_features)
         Data used to generate the Mapper graph. Can be a pandas dataframe.
 
-    color_data : array-like of shape (n_samples, n_features), or None, \
-        optional, default: ``None``
+    color_data : array-like of length n_samples, or None, optional, \
+        default: ``None``
         Data to be used to construct node colors in the Mapper graph (according
-        to `color_variable` and `node_color_statistic`). Must have the same
-        length as `data`. ``None`` means that this is the same as `data`.
+        to `color_features` and `node_color_statistic`). Must have the same
+        length as `data`. ``None`` is the same as passing
+        ``numpy.arange(len(data))``.
 
-    color_variable : object or None, optional, default: ``None``
-        Specifies a feature of interest to be used, together with
-        `node_color_statistic`, to determine node colors from `color_data`.
+    color_features : object or None, optional, default: ``None``
+        Specifies one or more feature of interest from `color_data` to be used,
+        together with `node_color_statistic`, to determine node colors. Ignored
+        if `node_color_statistic` is a numpy array.
 
-            1. If a numpy array or pandas dataframe, it must have the same
-               length as `data`.
-            2. ``None`` is equivalent to passing `data`.
-            3. If an object implementing :meth:`transform` or
-               :meth:`fit_transform`, it is applied to `data` to generate the
-               feature of interest.
-            4. If an index or string, or list of indices/strings, it is
+            1. ``None`` is equivalent to passing `color_data`.
+            2. If an object implementing :meth:`transform` or
+               :meth:`fit_transform`, or a callable, it is applied to
+               `color_data` to generate the features of interest.
+            3. If an index or string, or list of indices/strings, it is
                equivalent to selecting a column or subset of columns from
-               `data`.
+               `color_data`.
 
     node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
         (n_nodes, 1), optional, default: ``None``
         If a callable, node colors will be computed as summary statistics from
-        the feature array ``Y`` determined by `color_variable` – specifically,
-        the color of a node representing the entries of `data` whose row
-        indices are in ``I`` will be ``node_color_statistic(Y[I])``. ``None``
-        is equivalent to passing :func:`numpy.mean`. If a numpy array, it must
-        have the same length as the number of nodes in the Mapper graph and its
-        values are used directly as node colors (`color_variable` is ignored).
-
-    color_by_columns_dropdown : bool, optional, default: ``False``
-        If ``True``, a dropdown widget is generated which allows the user to
-        color Mapper nodes according to any column in `color_data` (still using
-        `node_color_statistic`), in addition to `color_variable`.
+        the feature array ``y`` determined by `color_data` and
+        `color_features`. Let ``y`` have ``n`` columns (1d feature arrays are
+        considered as column vectors). Then, for a node representing a list
+        ``I`` of row indices, there will be ``n`` colors, each computed as
+        ``node_color_statistic(y[I, i])`` for ``i`` between ``0`` and ``n``.
+        ``None`` is equivalent to passing :func:`numpy.mean`. If a numpy array,
+        it must have the same length as the number of nodes in the Mapper graph
+        and its values are used directly as node colors (`color_features` is
+        ignored).
 
     layout : None, str or callable, optional, default: ``"kamada-kawai"``
         Layout algorithm for the graph. Can be any accepted value for the
@@ -172,13 +170,26 @@ def plot_static_mapper_graph(
     else:
         _node_color_statistic = node_color_statistic
 
-    # Simple duck typing to determine whether data is likely a pandas dataframe
-    is_data_dataframe = hasattr(data, "columns")
+    if color_data is None:
+        color_data = np.arange(len(data))
 
-    edge_trace, node_trace, node_elements, node_colors_color_variable = \
+    color_data_checked = check_array(color_data, ensure_2d=False, dtype=None)
+
+    # Simple duck typing to determine whether `color_data` is likely a pandas
+    # dataframe
+    is_color_data_dataframe = hasattr(color_data, "columns")
+
+    if len(color_data) != len(data):
+        raise ValueError("`color_data` and `data` must have the same length.")
+    if not is_color_data_dataframe:
+        color_data = color_data_checked.reshape((len(color_data), -1))
+
+    (edge_trace, node_trace, node_elements, node_colors_color_features,
+     column_names_dropdown) = \
         _calculate_graph_data(
-            _pipeline, data, is_data_dataframe, layout, layout_dim,
-            color_variable, _node_color_statistic, n_sig_figs, node_scale
+            _pipeline, data, color_data, is_color_data_dataframe,
+            color_features, _node_color_statistic, layout, layout_dim,
+            n_sig_figs, node_scale
             )
 
     # Define layout options
@@ -218,12 +229,11 @@ def plot_static_mapper_graph(
 
         if compute_hoverlabel_bgcolor:
             colorscale_for_hoverlabel = fig.data[1].marker.colorscale
-            node_colors_color_variable = np.asarray(node_colors_color_variable)
-            min_col = np.min(node_colors_color_variable)
-            max_col = np.max(node_colors_color_variable)
+            min_col = np.min(node_colors_color_features[:, 0])
+            max_col = np.max(node_colors_color_features[:, 0])
             try:
                 hoverlabel_bgcolor = _get_colors_for_vals(
-                    node_colors_color_variable, min_col, max_col,
+                    node_colors_color_features[:, 0], min_col, max_col,
                     colorscale_for_hoverlabel
                     )
             except Exception as e:
@@ -244,35 +254,29 @@ def plot_static_mapper_graph(
                 selector={"name": "node_trace"}
                 )
 
-    # Compute node colors according to data columns only if necessary
-    if color_by_columns_dropdown:
-        hovertext_color_variable = node_trace.hovertext
+    # Produce dropdown menu if `node_colors_color_features` has more than
+    # one column
+    if node_colors_color_features.shape[1] > 1:
+        hovertext_color_features = node_trace.hovertext
         column_color_buttons = _get_column_color_buttons(
-            data, is_data_dataframe, node_elements, node_colors_color_variable,
-            _node_color_statistic, hovertext_color_variable,
-            colorscale_for_hoverlabel, n_sig_figs
+            node_colors_color_features, hovertext_color_features,
+            colorscale_for_hoverlabel, n_sig_figs, column_names_dropdown
             )
-        # Avoid recomputing hoverlabel bgcolor for top button
-        column_color_buttons[0]["args"][0]["hoverlabel.bgcolor"] = \
-            [None, fig.data[1].hoverlabel.bgcolor]
-    else:
-        column_color_buttons = None
 
-    button_height = 1.1
-    fig.update_layout(
-        updatemenus=[
-            go.layout.Updatemenu(buttons=column_color_buttons,
-                                 direction="down",
-                                 pad={"r": 10, "t": 10},
-                                 showactive=True,
-                                 x=0.11,
-                                 xanchor="left",
-                                 y=button_height,
-                                 yanchor="top")
-            ]
-        )
+        button_height = 1.1
+        fig.update_layout(
+            updatemenus=[
+                go.layout.Updatemenu(buttons=column_color_buttons,
+                                     direction="down",
+                                     pad={"r": 10, "t": 10},
+                                     showactive=True,
+                                     x=0.11,
+                                     xanchor="left",
+                                     y=button_height,
+                                     yanchor="top")
+                ]
+            )
 
-    if color_by_columns_dropdown:
         fig.add_annotation(
             go.layout.Annotation(text="Color by:",
                                  x=0,
@@ -296,10 +300,9 @@ def plot_static_mapper_graph(
 
 
 def plot_interactive_mapper_graph(
-        pipeline, data, layout="kamada_kawai", layout_dim=2,
-        color_variable=None, node_color_statistic=None, clone_pipeline=True,
-        color_by_columns_dropdown=False, n_sig_figs=3, node_scale=12,
-        plotly_params=None
+        pipeline, data, color_data=None, color_features=None,
+        node_color_statistic=None, layout="kamada_kawai", layout_dim=2,
+        clone_pipeline=True, n_sig_figs=3, node_scale=12, plotly_params=None
         ):
     """Plot Mapper graphs with interactivity on pipeline parameters.
 
@@ -315,6 +318,36 @@ def plot_interactive_mapper_graph(
     data : array-like of shape (n_samples, n_features)
         Data used to generate the Mapper graph. Can be a pandas dataframe.
 
+    color_data : array-like of length n_samples, or None, optional, \
+        default: ``None``
+        Data to be used to construct node colors in the Mapper graph (according
+        to `color_features` and `node_color_statistic`). Must have the same
+        length as `data`. ``None`` is the same as passing
+        ``numpy.arange(len(data))``.
+
+    color_features : object or None, optional, default: ``None``
+        Specifies one or more feature of interest from `color_data` to be used,
+        together with `node_color_statistic`, to determine node colors. Ignored
+        if `node_color_statistic` is a numpy array.
+
+            1. ``None`` is equivalent to passing `color_data`.
+            2. If an object implementing :meth:`transform` or
+               :meth:`fit_transform`, or a callable, it is applied to
+               `color_data` to generate the features of interest.
+            3. If an index or string, or list of indices/strings, it is
+               equivalent to selecting a column or subset of columns from
+               `color_data`.
+
+    node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
+        (n_nodes, 1), optional, default: ``None``
+        If a callable, node colors will be computed as summary statistics from
+        the feature array ``y`` determined by `color_data` and
+        `color_features`. Let ``y`` have ``n`` columns (1d feature arrays are
+        considered as column vectors). Then, for a node representing a list
+        ``I`` of row indices, there will be ``n`` colors, each computed as
+        ``node_color_statistic(y[I, i])`` for ``i`` between ``0`` and ``n``.
+        ``None`` is equivalent to passing :func:`numpy.mean`.
+
     layout : None, str or callable, optional, default: ``"kamada-kawai"``
         Layout algorithm for the graph. Can be any accepted value for the
         ``layout`` parameter in the :meth:`layout` method of
@@ -322,32 +355,6 @@ def plot_interactive_mapper_graph(
 
     layout_dim : int, default: ``2``
         The number of dimensions for the layout. Can be 2 or 3.
-
-    color_variable : object or None, optional, default: ``None``
-        Specifies a feature of interest to be used, together with
-        `node_color_statistic`, to determine node colors.
-
-            1. If a numpy array or pandas dataframe, it must have the same
-               length as `data`.
-            2. ``None`` is equivalent to passing `data`.
-            3. If an object implementing :meth:`transform` or
-               :meth:`fit_transform`, it is applied to `data` to generate the
-               feature of interest.
-            4. If an index or string, or list of indices/strings, it is
-               equivalent to selecting a column or subset of columns from
-               `data`.
-
-    node_color_statistic : callable or None, optional, default: ``None``
-        If a callable, node colors will be computed as summary statistics from
-        the feature array ``Y`` determined by `color_variable` – specifically,
-        the color of a node representing the entries of `data` whose row
-        indices are in ``I`` will be ``node_color_statistic(Y[I])``. ``None``
-        is equivalent to passing :func:`numpy.mean`.
-
-    color_by_columns_dropdown : bool, optional, default: ``False``
-        If ``True``, a dropdown widget is generated which allows the user to
-        color Mapper nodes according to any column in `data` (still using
-        `node_color_statistic`) in addition to `color_variable`.
 
     clone_pipeline : bool, optional, default: ``True``
         If ``True``, the input `pipeline` is cloned before computing the
@@ -393,7 +400,10 @@ def plot_interactive_mapper_graph(
     # Clone pipeline to avoid side effects from in-place parameter changes
     _pipeline = clone(pipeline) if clone_pipeline else pipeline
 
-    _node_color_statistic = node_color_statistic or np.mean
+    if node_color_statistic is None:
+        _node_color_statistic = np.mean
+    else:
+        _node_color_statistic = node_color_statistic
 
     def get_widgets_per_param(params):
         for key, value in params.items():
@@ -459,18 +469,17 @@ def plot_interactive_mapper_graph(
             logger.info("Updating figure...")
             with fig.batch_update():
                 (edge_trace, node_trace, node_elements,
-                 node_colors_color_variable) = _calculate_graph_data(
-                    _pipeline, data, is_data_dataframe, layout, layout_dim,
-                    color_variable, _node_color_statistic, n_sig_figs,
-                    node_scale
-                    )
+                 node_colors_color_features, column_names_dropdown) = \
+                    _calculate_graph_data(
+                        _pipeline, data, color_data, is_color_data_dataframe,
+                        color_features, _node_color_statistic, layout,
+                        layout_dim, n_sig_figs, node_scale
+                        )
                 if colorscale_for_hoverlabel is not None:
-                    node_colors_color_variable = \
-                        np.asarray(node_colors_color_variable)
-                    min_col = np.min(node_colors_color_variable)
-                    max_col = np.max(node_colors_color_variable)
+                    min_col = np.min(node_colors_color_features[:, 0])
+                    max_col = np.max(node_colors_color_features[:, 0])
                     hoverlabel_bgcolor = _get_colors_for_vals(
-                        node_colors_color_variable, min_col, max_col,
+                        node_colors_color_features[:, 0], min_col, max_col,
                         colorscale_for_hoverlabel
                         )
                     fig.update_traces(hoverlabel_bgcolor=hoverlabel_bgcolor,
@@ -493,36 +502,29 @@ def plot_interactive_mapper_graph(
                     selector={"name": "edge_trace"}
                     )
 
-                # Update color by column buttons
-                if color_by_columns_dropdown:
-                    hovertext_color_variable = node_trace.hovertext
+                # Update color by column buttons if relevant
+                if node_colors_color_features.shape[1] > 1:
+                    hovertext_color_features = node_trace.hovertext
                     column_color_buttons = _get_column_color_buttons(
-                        data, is_data_dataframe, node_elements,
-                        node_colors_color_variable, _node_color_statistic,
-                        hovertext_color_variable, colorscale_for_hoverlabel,
-                        n_sig_figs
+                        node_colors_color_features, hovertext_color_features,
+                        colorscale_for_hoverlabel, n_sig_figs,
+                        column_names_dropdown
                         )
-                    # Avoid recomputing hoverlabel bgcolor for top button
-                    if colorscale_for_hoverlabel is not None:
-                        column_color_buttons[0]["args"][0][
-                            "hoverlabel.bgcolor"] = [None, hoverlabel_bgcolor]
-                else:
-                    column_color_buttons = None
 
-                button_height = 1.1
-                fig.update_layout(
-                    updatemenus=[
-                        go.layout.Updatemenu(
-                            buttons=column_color_buttons,
-                            direction="down",
-                            pad={"r": 10, "t": 10},
-                            showactive=True,
-                            x=0.11,
-                            xanchor="left",
-                            y=button_height,
-                            yanchor="top"
-                            )
-                        ])
+                    button_height = 1.1
+                    fig.update_layout(
+                        updatemenus=[
+                            go.layout.Updatemenu(
+                                buttons=column_color_buttons,
+                                direction="down",
+                                pad={"r": 10, "t": 10},
+                                showactive=True,
+                                x=0.11,
+                                xanchor="left",
+                                y=button_height,
+                                yanchor="top"
+                                )
+                            ])
 
             valid.value = True
         except Exception:
@@ -583,16 +585,14 @@ def plot_interactive_mapper_graph(
 
     # Initialise figure with initial pipeline and config
     fig = plot_static_mapper_graph(
-        _pipeline, data, layout=layout, layout_dim=layout_dim,
-        color_variable=color_variable,
-        node_color_statistic=_node_color_statistic,
-        color_by_columns_dropdown=color_by_columns_dropdown,
-        clone_pipeline=False, n_sig_figs=n_sig_figs, node_scale=node_scale,
-        plotly_params=plotly_params
+        _pipeline, data, color_data=color_data, color_features=color_features,
+        node_color_statistic=_node_color_statistic, layout=layout,
+        layout_dim=layout_dim, clone_pipeline=False, n_sig_figs=n_sig_figs,
+        node_scale=node_scale, plotly_params=plotly_params
         )
 
     # Store variables for later updates
-    is_data_dataframe = hasattr(data, "columns")
+    is_color_data_dataframe = hasattr(color_data, "columns")
 
     colorscale_for_hoverlabel = None
     if layout_dim == 3:
