@@ -271,8 +271,9 @@ def _get_widgets_by_trait(fig, key, val=None):
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("clone_pipeline", [False, True])
+@pytest.mark.parametrize("color_data", [None, X_arr, X_df])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_pipeline_cloned(X, clone_pipeline, layout_dim):
+def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
     """Verify that the pipeline is changed on interaction if and only if
     `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
     # TODO: Monitor development of the ipytest project to convert these into
@@ -297,7 +298,8 @@ def test_pipeline_cloned(X, clone_pipeline, layout_dim):
         contract_nodes=params["contract_nodes"]["initial"],
         min_intersection=params["min_intersection"]["initial"]
         )
-    fig = plot_interactive_mapper_graph(pipe, X, clone_pipeline=clone_pipeline,
+    fig = plot_interactive_mapper_graph(pipe, X, color_data=color_data,
+                                        clone_pipeline=clone_pipeline,
                                         layout_dim=layout_dim)
 
     # Get relevant widgets and change their states, then check final values
