@@ -477,9 +477,6 @@ def plot_interactive_mapper_graph(
         column_names_dropdown, layout_dim, n_sig_figs, plotly_params
         )
 
-    # Store variables for later updates
-    is_color_data_dataframe = hasattr(color_data, "columns")
-
     colorscale_for_hoverlabel = None
     if layout_dim == 3:
         # In plot_static_mapper_graph, hoverlabel bgcolors are set to white if
