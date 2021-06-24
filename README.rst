@@ -109,7 +109,7 @@ making a contribution to ``giotto-tda``, please consult `the relevant page
 Testing
 -------
 
-After installation, you can launch the test suite from outside the
+After developer installation, you can launch the test suite from outside the
 source directory   ::
 
     pytest gtda
