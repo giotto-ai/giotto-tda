@@ -84,8 +84,8 @@ def plot_static_mapper_graph(
         (n_nodes, 1), optional, default: ``None``
         If a callable, node colors will be computed as summary statistics from
         the feature array ``y`` determined by `color_data` and
-        `color_features`. Let ``y`` have ``n`` columns (1d feature arrays are
-        considered as column vectors). Then, for a node representing a list
+        `color_features`. Let ``y`` have ``n`` columns (note: 1d feature arrays
+        are converted to column vectors). Then, for a node representing a list
         ``I`` of row indices, there will be ``n`` colors, each computed as
         ``node_color_statistic(y[I, i])`` for ``i`` between ``0`` and ``n``.
         ``None`` is equivalent to passing :func:`numpy.mean`. If a numpy array,
@@ -342,8 +342,8 @@ def plot_interactive_mapper_graph(
         (n_nodes, 1), optional, default: ``None``
         If a callable, node colors will be computed as summary statistics from
         the feature array ``y`` determined by `color_data` and
-        `color_features`. Let ``y`` have ``n`` columns (1d feature arrays are
-        considered as column vectors). Then, for a node representing a list
+        `color_features`. Let ``y`` have ``n`` columns (note: 1d feature arrays
+        are converted to column vectors). Then, for a node representing a list
         ``I`` of row indices, there will be ``n`` colors, each computed as
         ``node_color_statistic(y[I, i])`` for ``i`` between ``0`` and ``n``.
         ``None`` is equivalent to passing :func:`numpy.mean`.

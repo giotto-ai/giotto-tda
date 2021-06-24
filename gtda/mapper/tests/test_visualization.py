@@ -127,29 +127,29 @@ def test_valid_colorscale(X):
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
-@pytest.mark.parametrize("color_variable", [None, colors])
+@pytest.mark.parametrize("color_data", [None, colors])
 @pytest.mark.parametrize("node_color_statistic", [None, np.max])
-def test_colors_same_2d_3d(X, color_variable, node_color_statistic):
+def test_colors_same_2d_3d(X, color_data, node_color_statistic):
     pipe = make_mapper_pipeline()
     fig_2d = plot_static_mapper_graph(
-        pipe, X, layout_dim=2, color_variable=color_variable,
+        pipe, X, layout_dim=2, color_data=color_data,
         node_color_statistic=node_color_statistic
         )
     fig_3d = plot_static_mapper_graph(
-        pipe, X, layout_dim=3, color_variable=color_variable,
+        pipe, X, layout_dim=3, color_data=color_data,
         node_color_statistic=node_color_statistic
         )
-    assert fig_2d.data[1].marker.color == fig_3d.data[1].marker.color
+    assert np.array_equal(fig_2d.data[1].marker.color,
+                          fig_3d.data[1].marker.color)
 
 
 @pytest.mark.parametrize("X, columns", [(X_arr, range(X_arr.shape[1])),
                                         (X_df, X_df.columns)])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_color_by_column_dropdown(X, columns, layout_dim):
+def test_column_dropdown(X, columns, layout_dim):
     pipe = make_mapper_pipeline()
-    fig = plot_static_mapper_graph(
-        pipe, X, layout_dim=layout_dim, color_by_columns_dropdown=True
-        )
+    fig = plot_static_mapper_graph(pipe, X, color_data=X,
+                                   layout_dim=layout_dim)
     fig_buttons = fig.layout.updatemenus[0].buttons
 
     assert list(fig.data[1].marker.color) == \
@@ -157,10 +157,10 @@ def test_color_by_column_dropdown(X, columns, layout_dim):
 
     for i, col in enumerate(columns):
         fig_col = plot_static_mapper_graph(
-            pipe, X, layout_dim=layout_dim, color_variable=col
+            pipe, X, layout_dim=layout_dim, color_data=X, color_features=col
             )
         assert list(fig_col.data[1].marker.color) == \
-               list(fig_buttons[i + 1].args[0]["marker.color"][1])
+               list(fig_buttons[i].args[0]["marker.color"][1])
 
 
 def _get_size_from_hovertext(s):
@@ -174,8 +174,7 @@ class TestStaticPlot(TestCaseNoTemplate):
         """Verify that what we see in the graph corresponds to
         the number of samples in the graph."""
         pipe = make_mapper_pipeline()
-        fig = plot_static_mapper_graph(pipe, X_arr,
-                                       color_variable=colors,
+        fig = plot_static_mapper_graph(pipe, X_arr, color_data=colors,
                                        clone_pipeline=False)
         node_trace_x = fig.data[1].x
         node_trace_y = fig.data[1].y
@@ -221,9 +220,7 @@ def _get_widgets_by_trait(fig, key, val=None):
 @pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("clone_pipeline", [False, True])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-@pytest.mark.parametrize("color_by_columns_dropdown", [True, False])
-def test_pipeline_cloned(X, clone_pipeline, layout_dim,
-                         color_by_columns_dropdown):
+def test_pipeline_cloned(X, clone_pipeline, layout_dim):
     """Verify that the pipeline is changed on interaction if and only if
     `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
     # TODO: Monitor development of the ipytest project to convert these into
@@ -248,10 +245,8 @@ def test_pipeline_cloned(X, clone_pipeline, layout_dim,
         contract_nodes=params["contract_nodes"]["initial"],
         min_intersection=params["min_intersection"]["initial"]
         )
-    fig = plot_interactive_mapper_graph(
-        pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim,
-        color_by_columns_dropdown=color_by_columns_dropdown
-        )
+    fig = plot_interactive_mapper_graph(pipe, X, clone_pipeline=clone_pipeline,
+                                        layout_dim=layout_dim)
 
     # Get relevant widgets and change their states, then check final values
     for step, values in params.items():
