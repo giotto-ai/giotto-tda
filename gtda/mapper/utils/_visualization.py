@@ -174,10 +174,10 @@ def _infer_color_features_kind(color_features):
     if hasattr(color_features, "dtype") or hasattr(color_features, "dtypes"):
         raise ValueError("`color_features` should not be a numpy array or "
                          "pandas dataframe.")
-    elif hasattr(color_features, "transform"):
-        color_features_kind = "transformer"
     elif hasattr(color_features, "fit_transform"):
         color_features_kind = "fit_transformer"
+    elif hasattr(color_features, "transform"):
+        color_features_kind = "transformer"
     elif callable(color_features):
         color_features_kind = "callable"
     elif color_features is None:
@@ -237,10 +237,10 @@ def _validate_color_kwargs(graph, data, color_data, color_features,
                              "an ndarray for static plots.")
 
     color_features_kind = _infer_color_features_kind(color_features)
-    if color_features_kind == "transformer":
-        color_data_transformed = color_features.transform(color_data)
-    elif color_features_kind == "fit_transformer":
+    if color_features_kind == "fit_transformer":
         color_data_transformed = color_features.fit_transform(color_data)
+    elif color_features_kind == "transformer":
+        color_data_transformed = color_features.transform(color_data)
     elif color_features_kind == "callable":
         color_data_transformed = color_features(color_data)
     elif color_features_kind == "none":
