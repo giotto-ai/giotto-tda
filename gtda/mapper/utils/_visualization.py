@@ -4,6 +4,7 @@
 from copy import deepcopy
 from functools import reduce, partial
 from operator import iconcat
+from warnings import warn
 
 import numpy as np
 import plotly.graph_objs as go
@@ -105,11 +106,11 @@ def _get_node_text(
         ]
 
 
-def _get_node_summaries(color_data_transformed, node_elements,
-                        summary_statistic):
+def _get_node_statistics(color_data_transformed, node_elements,
+                         node_color_statistic):
     n_columns = color_data_transformed.shape[1]
 
-    return np.array([[summary_statistic(color_data_transformed[itr, i])
+    return np.array([[node_color_statistic(color_data_transformed[itr, i])
                       for i in range(n_columns)]
                      for itr in node_elements])
 
@@ -187,14 +188,55 @@ def _infer_color_features_kind(color_features):
     return color_features_kind
 
 
-def _get_node_summary_statistics(
-        color_data, is_color_data_dataframe, node_elements, summary_statistic,
-        color_features
-        ):
-    """Calculate values of node summary statistics."""
-    color_features_kind = _infer_color_features_kind(color_features)
+def _validate_color_kwargs(graph, data, color_data, color_features,
+                           node_color_statistic, interactive=False):
+    if node_color_statistic is None:
+        node_color_statistic = np.mean
+
+    if color_data is None:
+        color_data = np.arange(len(data))
+
+    color_data_checked = check_array(color_data, ensure_2d=False, dtype=None)
+
+    # Simple duck typing to determine whether `color_data` is likely a pandas
+    # dataframe
+    is_color_data_dataframe = hasattr(color_data, "columns")
+
+    if len(color_data) != len(data):
+        raise ValueError("`color_data` and `data` must have the same length.")
+    if not is_color_data_dataframe:
+        color_data = color_data_checked.reshape((len(color_data), -1))
+
+    # Determine whether node_color_statistic is an array of node colors
+    is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
+    is_node_color_statistic_callable = callable(node_color_statistic)
 
     column_names_dropdown = None
+    if interactive:
+        if not is_node_color_statistic_callable:
+            raise ValueError("`node_color_statistic` must be a callable for "
+                             "interactive plots.")
+    else:
+        node_elements = graph.vs["node_elements"]
+        if is_node_color_statistic_ndarray:
+            node_color_statistic = check_array(node_color_statistic,
+                                               ensure_2d=False)
+            len_colors = len(node_color_statistic)
+            n_nodes = len(node_elements)
+            if len_colors != n_nodes:
+                raise ValueError(f"`node_color_statistic` must have as many "
+                                 f"entries as there are nodes in the Mapper "
+                                 f"graph. {len_colors} != {n_nodes} detected.")
+            if len(node_color_statistic.shape) > 1:
+                column_names_dropdown = range(node_color_statistic.shape[1])
+            else:
+                node_color_statistic = \
+                    node_color_statistic.reshape((len_colors, -1))
+        elif not is_node_color_statistic_callable:
+            raise ValueError("`node_color_statistic` must be a callable or "
+                             "an ndarray for static plots.")
+
+    color_features_kind = _infer_color_features_kind(color_features)
     if color_features_kind == "transformer":
         color_data_transformed = color_features.transform(color_data)
     elif color_features_kind == "fit_transformer":
@@ -225,44 +267,22 @@ def _get_node_summary_statistics(
     color_data_transformed = \
         color_data_transformed.reshape((len(color_data_transformed), -1))
 
-    return _get_node_summaries(color_data_transformed, node_elements,
-                               summary_statistic), column_names_dropdown
+    return (color_data_transformed, column_names_dropdown,
+            node_color_statistic)
 
 
 def _calculate_graph_data(
-        pipeline, data, color_data, is_color_data_dataframe, color_features,
-        node_color_statistic, layout, layout_dim, n_sig_figs, node_scale
+        graph, color_data_transformed, node_color_statistic, layout,
+        layout_dim, n_sig_figs, node_scale
         ):
-    graph = pipeline.fit_transform(data)
     node_elements = graph.vs["node_elements"]
 
-    # Determine whether node_color_statistic is an array of node colors
-    is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
-    if not (is_node_color_statistic_ndarray or callable(node_color_statistic)):
-        raise ValueError("`node_color_statistic` must be a callable or an "
-                         "ndarray.")
-
-    # Compute the raw values of node summary statistics
-    if is_node_color_statistic_ndarray:
-        node_colors_color_features = check_array(node_color_statistic,
-                                                 ensure_2d=False)
-        len_colors = len(node_colors_color_features)
-        n_nodes = len(node_elements)
-        if len_colors != n_nodes:
-            raise ValueError(f"`node_color_statistic` must have as many "
-                             f"entries as there are nodes in the Mapper "
-                             f"graph. {len_colors} != {n_nodes} detected.")
-        if len(node_colors_color_features.shape) > 1:
-            column_names_dropdown = range(node_colors_color_features.shape[1])
-        else:
-            node_colors_color_features = \
-                node_colors_color_features.reshape((len_colors, -1))
-            column_names_dropdown = None
+    if not hasattr(node_color_statistic, "dtype"):
+        node_colors_color_features = \
+            _get_node_statistics(color_data_transformed, node_elements,
+                                 node_color_statistic)
     else:
-        node_colors_color_features, column_names_dropdown = \
-            _get_node_summary_statistics(color_data, is_color_data_dataframe,
-                                         node_elements, node_color_statistic,
-                                         color_features)
+        node_colors_color_features = node_color_statistic
 
     # Load defaults for node and edge traces
     plot_options = {
@@ -283,7 +303,7 @@ def _calculate_graph_data(
     node_ids = graph.vs.indices
     pullback_set_ids = graph.vs["pullback_set_label"]
     partial_cluster_labels = graph.vs["partial_cluster_label"]
-    num_node_elements = map(len, graph.vs["node_elements"])
+    num_node_elements = map(len, node_elements)
     node_colors_round = map(partial(_round_to_n_sig_figs, n=n_sig_figs),
                             node_colors_color_features[:, 0])
     plot_options["node_trace"]["hovertext"] = _get_node_text(
@@ -345,8 +365,117 @@ def _calculate_graph_data(
         edge_trace = go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
 
-    return (edge_trace, node_trace, node_elements, node_colors_color_features,
-            column_names_dropdown)
+    return edge_trace, node_trace, node_colors_color_features
+
+
+def _produce_static_figure(edge_trace, node_trace, node_colors_color_features,
+                           column_names_dropdown, layout_dim, n_sig_figs,
+                           plotly_params):
+    # Define layout options
+    layout_options = go.Layout(
+        **PLOT_OPTIONS_LAYOUT_DEFAULTS["common"],
+        **PLOT_OPTIONS_LAYOUT_DEFAULTS[layout_dim]
+        )
+
+    fig = go.FigureWidget(data=[edge_trace, node_trace], layout=layout_options)
+
+    _plotly_params = deepcopy(plotly_params)
+
+    # When laying out the graph in 3D, plotly does not automatically give
+    # the background hoverlabel the same color as the respective marker,
+    # so we do this by hand here.
+    # TODO: Extract logic so as to avoid repetitions in interactive version
+    colorscale_for_hoverlabel = None
+    if layout_dim == 3:
+        compute_hoverlabel_bgcolor = True
+        if _plotly_params:
+            if "node_trace" in _plotly_params:
+                if "hoverlabel_bgcolor" in _plotly_params["node_trace"]:
+                    fig.update_traces(
+                        hoverlabel_bgcolor=_plotly_params["node_trace"].pop(
+                            "hoverlabel_bgcolor"
+                            ),
+                        selector={"name": "node_trace"}
+                        )
+                    compute_hoverlabel_bgcolor = False
+                if "marker_colorscale" in _plotly_params["node_trace"]:
+                    fig.update_traces(
+                        marker_colorscale=_plotly_params["node_trace"].pop(
+                            "marker_colorscale"
+                            ),
+                        selector={"name": "node_trace"}
+                        )
+
+        if compute_hoverlabel_bgcolor:
+            colorscale_for_hoverlabel = fig.data[1].marker.colorscale
+            min_col = np.min(node_colors_color_features[:, 0])
+            max_col = np.max(node_colors_color_features[:, 0])
+            try:
+                hoverlabel_bgcolor = _get_colors_for_vals(
+                    node_colors_color_features[:, 0], min_col, max_col,
+                    colorscale_for_hoverlabel
+                    )
+            except Exception as e:
+                if e.args[0] == "This colorscale is not supported.":
+                    warn("Data-dependent background hoverlabel colors cannot "
+                         "be generated with this choice of colorscale. Please "
+                         "use a standard hex- or RGB-formatted colorscale.",
+                         RuntimeWarning)
+                else:
+                    warn("Something went wrong in generating data-dependent "
+                         "background hoverlabel colors. All background "
+                         "hoverlabel colors will be set to white.",
+                         RuntimeWarning)
+                hoverlabel_bgcolor = "white"
+                colorscale_for_hoverlabel = None
+            fig.update_traces(
+                hoverlabel_bgcolor=hoverlabel_bgcolor,
+                selector={"name": "node_trace"}
+                )
+
+    # Produce dropdown menu if `node_colors_color_features` has more than
+    # one column
+    if node_colors_color_features.shape[1] > 1:
+        hovertext_color_features = node_trace.hovertext
+        column_color_buttons = _get_column_color_buttons(
+            node_colors_color_features, hovertext_color_features,
+            colorscale_for_hoverlabel, n_sig_figs, column_names_dropdown
+            )
+
+        button_height = 1.1
+        fig.update_layout(
+            updatemenus=[
+                go.layout.Updatemenu(buttons=column_color_buttons,
+                                     direction="down",
+                                     pad={"r": 10, "t": 10},
+                                     showactive=True,
+                                     x=0.11,
+                                     xanchor="left",
+                                     y=button_height,
+                                     yanchor="top")
+                ]
+            )
+
+        fig.add_annotation(
+            go.layout.Annotation(text="Color by:",
+                                 x=0,
+                                 xref="paper",
+                                 y=button_height - 0.045,
+                                 yref="paper",
+                                 align="left",
+                                 showarrow=False)
+            )
+
+    # Update traces and layout according to user input
+    if _plotly_params:
+        for key in ["node_trace", "edge_trace"]:
+            fig.update_traces(
+                _plotly_params.pop(key, None),
+                selector={"name": key}
+                )
+        fig.update_layout(_plotly_params.pop("layout", None))
+
+    return fig
 
 
 def _hex_to_rgb(value):
