@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import plotly.io as pio
 import pytest
+from numpy.testing import assert_almost_equal
+from sklearn.decomposition import PCA
 
 from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
     plot_static_mapper_graph, plot_interactive_mapper_graph
@@ -94,6 +96,26 @@ def test_color_data_invalid_length():
 
     with pytest.raises(ValueError):
         plot_static_mapper_graph(pipe, X_arr, color_data=X_arr[:-1])
+
+
+@pytest.mark.parametrize("color_features",
+                         [PCA(n_components=2),
+                          PCA(n_components=2).fit(X_arr).transform])
+def test_color_features_as_estimator_or_callable(color_features):
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_elements = graph.vs["node_elements"]
+
+    pca = PCA(n_components=2)
+    color_data_transformed = pca.fit_transform(X_arr)
+    node_colors_color_features = \
+        np.array([np.mean(color_data_transformed[itr, 0])
+                  for itr in node_elements])
+
+    fig = plot_static_mapper_graph(pipe, X_arr, color_data=X_arr,
+                                   color_features=color_features)
+
+    assert_almost_equal(fig.data[1].marker.color, node_colors_color_features)
 
 
 @pytest.mark.parametrize("color_features", [X_arr, X_df])
