@@ -154,6 +154,13 @@ def test_node_color_statistic_as_ndarray_wrong_length():
                                  node_color_statistic=node_color_statistic)
 
 
+def test_invalid_type_node_color_statistic_static():
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError):
+        plot_interactive_mapper_graph(pipe, X_arr, node_color_statistic="foo")
+
+
 def test_invalid_node_color_statistic_interactive():
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X_arr)
