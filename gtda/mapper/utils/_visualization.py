@@ -534,4 +534,5 @@ def _get_colors_for_vals(vals, vmin, vmax, colorscale, return_hex=True):
 
     if return_hex:
         return list(map(_rbg_to_hex, vals_rgb))
+
     return [f"rgb{tuple(v)}" for v in vals_rgb]

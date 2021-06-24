@@ -89,14 +89,66 @@ def test_unsuitable_colorscale_for_hoverlabel_3d(X):
             )
 
 
-def test_node_color_statistic_as_ndarray():
+def test_color_data_invalid_length():
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr, color_data=X_arr[:-1])
+
+
+@pytest.mark.parametrize("color_features", [X_arr, X_df])
+def test_invalid_color_features_types(color_features):
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr,
+                                 color_features=color_features)
+
+
+@pytest.mark.parametrize("is_2d", [False, True])
+def test_node_color_statistic_as_ndarray(is_2d):
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X_arr)
-    node_color_statistic = np.arange(len(graph.vs))
+    node_color_statistic_col_0 = np.arange(len(graph.vs))
+    if is_2d:
+        node_color_statistic = np.vstack([node_color_statistic_col_0,
+                                          node_color_statistic_col_0]).T
+    else:
+        node_color_statistic = node_color_statistic_col_0
+
     fig = plot_static_mapper_graph(pipe, X_arr,
                                    node_color_statistic=node_color_statistic)
 
-    assert np.array_equal(fig.data[1].marker.color, node_color_statistic)
+    assert np.array_equal(fig.data[1].marker.color, node_color_statistic_col_0)
+
+
+def test_node_color_statistic_as_ndarray_wrong_length():
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_color_statistic = np.arange(len(graph.vs) + 1)
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr,
+                                 node_color_statistic=node_color_statistic)
+
+
+def test_invalid_node_color_statistic_interactive():
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_color_statistic = np.arange(len(graph.vs))
+    with pytest.raises(ValueError):
+        plot_interactive_mapper_graph(
+            pipe, X_arr, node_color_statistic=node_color_statistic
+            )
+
+
+def test_invalid_color_features_as_array_of_indices():
+    pipe = make_mapper_pipeline()
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(
+            pipe, X_arr, color_data=X_arr,
+            color_features=np.arange(X_arr.shape[1])
+            )
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
