@@ -158,7 +158,7 @@ def test_invalid_type_node_color_statistic_static():
     pipe = make_mapper_pipeline()
 
     with pytest.raises(ValueError):
-        plot_interactive_mapper_graph(pipe, X_arr, node_color_statistic="foo")
+        plot_static_mapper_graph(pipe, X_arr, node_color_statistic="foo")
 
 
 def test_invalid_node_color_statistic_interactive():
