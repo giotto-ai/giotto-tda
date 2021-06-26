@@ -28,20 +28,20 @@ X_arr = np.random.randn(N, d)
 X_df = pd.DataFrame(X_arr, columns=["a", "b", "c"])
 colors = np.random.randint(0, 10, N)
 
-viridis_colorscale = ((0.0, '#440154'),
-                      (0.1111111111111111, '#482878'),
-                      (0.2222222222222222, '#3e4989'),
-                      (0.3333333333333333, '#31688e'),
-                      (0.4444444444444444, '#26828e'),
-                      (0.5555555555555556, '#1f9e89'),
-                      (0.6666666666666666, '#35b779'),
-                      (0.7777777777777778, '#6ece58'),
-                      (0.8888888888888888, '#b5de2b'),
-                      (1.0, '#fde725'))
+viridis_colorscale = ((0.0, "#440154"),
+                      (0.1111111111111111, "#482878"),
+                      (0.2222222222222222, "#3e4989"),
+                      (0.3333333333333333, "#31688e"),
+                      (0.4444444444444444, "#26828e"),
+                      (0.5555555555555556, "#1f9e89"),
+                      (0.6666666666666666, "#35b779"),
+                      (0.7777777777777778, "#6ece58"),
+                      (0.8888888888888888, "#b5de2b"),
+                      (1.0, "#fde725"))
 
-hsl_colorscale = ['hsl(19.0, 96.0%, 67.0%)',
-                  'hsl(60.0, 100.0%, 87.0%)',
-                  'hsl(203.0, 51.0%, 71.0%)']
+hsl_colorscale = ["hsl(19.0, 96.0%, 67.0%)",
+                  "hsl(60.0, 100.0%, 87.0%)",
+                  "hsl(203.0, 51.0%, 71.0%)"]
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
@@ -279,7 +279,7 @@ class TestStaticPlot(TestCaseNoTemplate):
                           node_trace.hovertext]
 
         g = pipe.fit_transform(X_arr)
-        node_size_real = [len(node) for node in g.vs['node_elements']]
+        node_size_real = [len(node) for node in g.vs["node_elements"]]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
 
@@ -292,9 +292,10 @@ def _get_widgets_by_trait(fig, key, val=None):
         try:
             b = getattr(v, key) == val if val is not None else getattr(v, key)
             if b:
-                widgets.append(fig.widgets[k])
+                widgets.append(v)
         except (AttributeError, TypeError):
             continue
+
     return widgets
 
 
@@ -338,7 +339,7 @@ def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
                 new_param_value = values["new"][param_name]
                 widgets = _get_widgets_by_trait(fig, "description", param_name)
                 for w in widgets:
-                    w.set_state({'value': new_param_value})
+                    w.set_state({"value": new_param_value})
                 final_param_value_actual = \
                     pipe.get_mapper_params()[f"{step}__{param_name}"]
                 final_param_value_expected = \
@@ -349,7 +350,7 @@ def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
             new_param_value = values["new"]
             widgets = _get_widgets_by_trait(fig, "description", step)
             for w in widgets:
-                w.set_state({'value': new_param_value})
+                w.set_state({"value": new_param_value})
             final_param_value_actual = \
                 pipe.get_mapper_params()[f"{step}"]
             final_param_value_expected = \
