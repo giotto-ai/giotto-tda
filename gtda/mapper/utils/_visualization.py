@@ -154,7 +154,6 @@ def _get_column_color_buttons(
             }
 
         if colorscale_for_hoverlabel is not None:
-            node_colors = np.asarray(node_colors)
             min_col = np.min(node_colors)
             max_col = np.max(node_colors)
             new_button["args"][0]["hoverlabel.bgcolor"] = [
