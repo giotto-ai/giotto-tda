@@ -4,7 +4,7 @@ set -x
 echo "Start manylinux2010 docker build"
 
 # Upgrade pip and setuptools. TODO: Monitor status of pip versions
-PYTHON_PATH=$(eval find "/opt/python/*${python_ver}*" -print)
+PYTHON_PATH=$(eval find "/opt/python/*cp${python_ver}*" -print)
 export PATH="${PYTHON_PATH}/bin:${PATH}"
 pip config set global.progress_bar off
 pip install --upgrade pip setuptools
@@ -20,10 +20,10 @@ ccache -s
 
 # Install boost
 yum install -y wget tar
-wget --no-check-certificate https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz
-tar -zxvf /boost_1_69_0.tar.gz
+wget --no-check-certificate https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz
+tar -zxvf /boost_1_76_0.tar.gz
 mkdir boost
-cd /boost_1_69_0
+cd /boost_1_76_0
 ./bootstrap.sh --prefix=/boost
 ./b2 install -j3 || echo "Parts of boost failed to build. Continuing..."
 cd ..

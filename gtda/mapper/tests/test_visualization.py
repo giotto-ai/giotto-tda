@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import plotly.io as pio
 import pytest
+from numpy.testing import assert_almost_equal
+from sklearn.decomposition import PCA
 
 from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
     plot_static_mapper_graph, plot_interactive_mapper_graph
@@ -26,20 +28,20 @@ X_arr = np.random.randn(N, d)
 X_df = pd.DataFrame(X_arr, columns=["a", "b", "c"])
 colors = np.random.randint(0, 10, N)
 
-viridis_colorscale = ((0.0, '#440154'),
-                      (0.1111111111111111, '#482878'),
-                      (0.2222222222222222, '#3e4989'),
-                      (0.3333333333333333, '#31688e'),
-                      (0.4444444444444444, '#26828e'),
-                      (0.5555555555555556, '#1f9e89'),
-                      (0.6666666666666666, '#35b779'),
-                      (0.7777777777777778, '#6ece58'),
-                      (0.8888888888888888, '#b5de2b'),
-                      (1.0, '#fde725'))
+viridis_colorscale = ((0.0, "#440154"),
+                      (0.1111111111111111, "#482878"),
+                      (0.2222222222222222, "#3e4989"),
+                      (0.3333333333333333, "#31688e"),
+                      (0.4444444444444444, "#26828e"),
+                      (0.5555555555555556, "#1f9e89"),
+                      (0.6666666666666666, "#35b779"),
+                      (0.7777777777777778, "#6ece58"),
+                      (0.8888888888888888, "#b5de2b"),
+                      (1.0, "#fde725"))
 
-hsl_colorscale = ['hsl(19.0, 96.0%, 67.0%)',
-                  'hsl(60.0, 100.0%, 87.0%)',
-                  'hsl(203.0, 51.0%, 71.0%)']
+hsl_colorscale = ["hsl(19.0, 96.0%, 67.0%)",
+                  "hsl(60.0, 100.0%, 87.0%)",
+                  "hsl(203.0, 51.0%, 71.0%)"]
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
@@ -89,14 +91,93 @@ def test_unsuitable_colorscale_for_hoverlabel_3d(X):
             )
 
 
-def test_node_color_statistic_as_ndarray():
+def test_color_data_invalid_length():
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr, color_data=X_arr[:-1])
+
+
+@pytest.mark.parametrize("color_features",
+                         [PCA(n_components=2),
+                          PCA(n_components=2).fit(X_arr).transform])
+def test_color_features_as_estimator_or_callable(color_features):
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X_arr)
-    node_color_statistic = np.arange(len(graph.vs))
+    node_elements = graph.vs["node_elements"]
+
+    pca = PCA(n_components=2)
+    color_data_transformed = pca.fit_transform(X_arr)
+    node_colors_color_features = \
+        np.array([np.mean(color_data_transformed[itr, 0])
+                  for itr in node_elements])
+
+    fig = plot_static_mapper_graph(pipe, X_arr, color_data=X_arr,
+                                   color_features=color_features)
+
+    assert_almost_equal(fig.data[1].marker.color, node_colors_color_features)
+
+
+@pytest.mark.parametrize("color_features", [X_arr, X_df])
+def test_invalid_color_features_types(color_features):
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr,
+                                 color_features=color_features)
+
+
+@pytest.mark.parametrize("is_2d", [False, True])
+def test_node_color_statistic_as_ndarray(is_2d):
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_color_statistic_col_0 = np.arange(len(graph.vs))
+    if is_2d:
+        node_color_statistic = np.vstack([node_color_statistic_col_0,
+                                          node_color_statistic_col_0]).T
+    else:
+        node_color_statistic = node_color_statistic_col_0
+
     fig = plot_static_mapper_graph(pipe, X_arr,
                                    node_color_statistic=node_color_statistic)
 
-    assert np.array_equal(fig.data[1].marker.color, node_color_statistic)
+    assert np.array_equal(fig.data[1].marker.color, node_color_statistic_col_0)
+
+
+def test_node_color_statistic_as_ndarray_wrong_length():
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_color_statistic = np.arange(len(graph.vs) + 1)
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr,
+                                 node_color_statistic=node_color_statistic)
+
+
+def test_invalid_type_node_color_statistic_static():
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(pipe, X_arr, node_color_statistic="foo")
+
+
+def test_invalid_node_color_statistic_interactive():
+    pipe = make_mapper_pipeline()
+    graph = pipe.fit_transform(X_arr)
+    node_color_statistic = np.arange(len(graph.vs))
+    with pytest.raises(ValueError):
+        plot_interactive_mapper_graph(
+            pipe, X_arr, node_color_statistic=node_color_statistic
+            )
+
+
+def test_invalid_color_features_as_array_of_indices():
+    pipe = make_mapper_pipeline()
+    with pytest.raises(ValueError):
+        plot_static_mapper_graph(
+            pipe, X_arr, color_data=X_arr,
+            color_features=np.arange(X_arr.shape[1])
+            )
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
@@ -127,29 +208,29 @@ def test_valid_colorscale(X):
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
-@pytest.mark.parametrize("color_variable", [None, colors])
+@pytest.mark.parametrize("color_data", [None, colors])
 @pytest.mark.parametrize("node_color_statistic", [None, np.max])
-def test_colors_same_2d_3d(X, color_variable, node_color_statistic):
+def test_colors_same_2d_3d(X, color_data, node_color_statistic):
     pipe = make_mapper_pipeline()
     fig_2d = plot_static_mapper_graph(
-        pipe, X, layout_dim=2, color_variable=color_variable,
+        pipe, X, layout_dim=2, color_data=color_data,
         node_color_statistic=node_color_statistic
         )
     fig_3d = plot_static_mapper_graph(
-        pipe, X, layout_dim=3, color_variable=color_variable,
+        pipe, X, layout_dim=3, color_data=color_data,
         node_color_statistic=node_color_statistic
         )
-    assert fig_2d.data[1].marker.color == fig_3d.data[1].marker.color
+    assert np.array_equal(fig_2d.data[1].marker.color,
+                          fig_3d.data[1].marker.color)
 
 
 @pytest.mark.parametrize("X, columns", [(X_arr, range(X_arr.shape[1])),
                                         (X_df, X_df.columns)])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_color_by_column_dropdown(X, columns, layout_dim):
+def test_column_dropdown(X, columns, layout_dim):
     pipe = make_mapper_pipeline()
-    fig = plot_static_mapper_graph(
-        pipe, X, layout_dim=layout_dim, color_by_columns_dropdown=True
-        )
+    fig = plot_static_mapper_graph(pipe, X, color_data=X,
+                                   layout_dim=layout_dim)
     fig_buttons = fig.layout.updatemenus[0].buttons
 
     assert list(fig.data[1].marker.color) == \
@@ -157,10 +238,10 @@ def test_color_by_column_dropdown(X, columns, layout_dim):
 
     for i, col in enumerate(columns):
         fig_col = plot_static_mapper_graph(
-            pipe, X, layout_dim=layout_dim, color_variable=col
+            pipe, X, layout_dim=layout_dim, color_data=X, color_features=col
             )
         assert list(fig_col.data[1].marker.color) == \
-               list(fig_buttons[i + 1].args[0]["marker.color"][1])
+               list(fig_buttons[i].args[0]["marker.color"][1])
 
 
 def _get_size_from_hovertext(s):
@@ -174,8 +255,7 @@ class TestStaticPlot(TestCaseNoTemplate):
         """Verify that what we see in the graph corresponds to
         the number of samples in the graph."""
         pipe = make_mapper_pipeline()
-        fig = plot_static_mapper_graph(pipe, X_arr,
-                                       color_variable=colors,
+        fig = plot_static_mapper_graph(pipe, X_arr, color_data=colors,
                                        clone_pipeline=False)
         node_trace_x = fig.data[1].x
         node_trace_y = fig.data[1].y
@@ -199,7 +279,7 @@ class TestStaticPlot(TestCaseNoTemplate):
                           node_trace.hovertext]
 
         g = pipe.fit_transform(X_arr)
-        node_size_real = [len(node) for node in g.vs['node_elements']]
+        node_size_real = [len(node) for node in g.vs["node_elements"]]
 
         assert sum(node_sizes_vis) == sum(node_size_real)
 
@@ -212,18 +292,18 @@ def _get_widgets_by_trait(fig, key, val=None):
         try:
             b = getattr(v, key) == val if val is not None else getattr(v, key)
             if b:
-                widgets.append(fig.widgets[k])
+                widgets.append(v)
         except (AttributeError, TypeError):
             continue
+
     return widgets
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
 @pytest.mark.parametrize("clone_pipeline", [False, True])
+@pytest.mark.parametrize("color_data", [None, X_arr, X_df])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-@pytest.mark.parametrize("color_by_columns_dropdown", [True, False])
-def test_pipeline_cloned(X, clone_pipeline, layout_dim,
-                         color_by_columns_dropdown):
+def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
     """Verify that the pipeline is changed on interaction if and only if
     `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
     # TODO: Monitor development of the ipytest project to convert these into
@@ -248,10 +328,9 @@ def test_pipeline_cloned(X, clone_pipeline, layout_dim,
         contract_nodes=params["contract_nodes"]["initial"],
         min_intersection=params["min_intersection"]["initial"]
         )
-    fig = plot_interactive_mapper_graph(
-        pipe, X, clone_pipeline=clone_pipeline, layout_dim=layout_dim,
-        color_by_columns_dropdown=color_by_columns_dropdown
-        )
+    fig = plot_interactive_mapper_graph(pipe, X, color_data=color_data,
+                                        clone_pipeline=clone_pipeline,
+                                        layout_dim=layout_dim)
 
     # Get relevant widgets and change their states, then check final values
     for step, values in params.items():
@@ -260,7 +339,7 @@ def test_pipeline_cloned(X, clone_pipeline, layout_dim,
                 new_param_value = values["new"][param_name]
                 widgets = _get_widgets_by_trait(fig, "description", param_name)
                 for w in widgets:
-                    w.set_state({'value': new_param_value})
+                    w.set_state({"value": new_param_value})
                 final_param_value_actual = \
                     pipe.get_mapper_params()[f"{step}__{param_name}"]
                 final_param_value_expected = \
@@ -271,7 +350,7 @@ def test_pipeline_cloned(X, clone_pipeline, layout_dim,
             new_param_value = values["new"]
             widgets = _get_widgets_by_trait(fig, "description", step)
             for w in widgets:
-                w.set_state({'value': new_param_value})
+                w.set_state({"value": new_param_value})
             final_param_value_actual = \
                 pipe.get_mapper_params()[f"{step}"]
             final_param_value_expected = \
