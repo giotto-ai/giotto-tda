@@ -80,6 +80,7 @@ Visualization
 
    mapper.plot_static_mapper_graph
    mapper.plot_interactive_mapper_graph
+   mapper.MapperInteractivePlotter
 
 Utilities
 ---------
