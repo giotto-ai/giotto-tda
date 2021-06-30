@@ -21,12 +21,12 @@ namespace Gudhi {
 namespace cech_complex {
 
 class Cech_complex_interface {
+ public:
   using Simplex_tree =
       Gudhi::Simplex_tree<Gudhi::Simplex_tree_options_fast_persistence>;
   using Filtration_value = Simplex_tree::Filtration_value;
-  using Point_cloud = std::vector<std::array<double, 2>>;
+  using Point_cloud = std::vector<std::vector<double>>;
 
- public:
   Cech_complex_interface(const Point_cloud& points,
                          Filtration_value max_radius) {
     cech_complex_ =
@@ -57,7 +57,7 @@ PYBIND11_MODULE(gtda_cech_complex, m) {
       Gudhi::Simplex_tree<Gudhi::Simplex_tree_options_fast_persistence>;
   py::class_<Gudhi::cech_complex::Cech_complex_interface>(
       m, "Cech_complex_interface")
-      .def(py::init<std::vector<std::array<double, 2>>,
+      .def(py::init<Gudhi::cech_complex::Cech_complex_interface::Point_cloud,
                     Simplex_tree::Filtration_value>(),
            "points"_a, "max_radius"_a)
       .def("create_simplex_tree",

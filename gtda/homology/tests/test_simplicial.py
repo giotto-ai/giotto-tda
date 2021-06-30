@@ -41,6 +41,13 @@ X_circle = np.array([[[1.00399159, -0.00797583],
                       [0.76291108, -0.68774373],
                       [-1.01932365, -0.05793851]]])
 
+# 3d point cloud example -- same as 2d example but z-coord is 0
+X_pc_3d = np.array([[[2., 2.47942554, 0.],
+                    [2.47942554, 2.84147098, 0.],
+                    [2.98935825, 2.79848711, 0.],
+                    [2.79848711, 2.41211849, 0.],
+                    [2.41211849, 1.92484888, 0.]]])
+
 
 def test_vrp_params():
     metric = 'not_defined'
@@ -368,7 +375,7 @@ X_cp_exp = np.array([[[0., 0.31093103, 0.],
                       [0.45954496, 0.45954497, 1.]]])
 
 
-@pytest.mark.parametrize('X', [X_pc, X_pc_list])
+@pytest.mark.parametrize('X', [X_pc, X_pc_list, X_pc_3d])
 def test_cp_transform(X):
     cp = EuclideanCechPersistence()
 
