@@ -200,6 +200,11 @@ def _validate_color_kwargs(graph, data, color_data, color_features,
     # Simple duck typing to determine whether `color_data` is likely a pandas
     # dataframe
     is_color_data_dataframe = hasattr(color_data, "columns")
+    # pandas series are only partially supported
+    if hasattr(color_data, "name"):
+        warn("If `color_data` is a pandas series, it is internally converted "
+             "to a column vector (2d numpy array) before being processed "
+             "according to `color_features`.", UserWarning)
 
     if len(color_data) != len(data):
         raise ValueError("`color_data` and `data` must have the same length.")
@@ -242,6 +247,11 @@ def _validate_color_kwargs(graph, data, color_data, color_features,
         color_data_transformed = color_features.transform(color_data)
     elif color_features_kind == "callable":
         color_data_transformed = color_features(color_data)
+        # If outcome is a pandas dataframe, save column names before converting
+        # to numpy array
+        if hasattr(color_data_transformed, "columns"):
+            column_names_dropdown = color_data_transformed.columns
+            color_data_transformed = color_data_transformed.to_numpy()
     elif color_features_kind == "none":
         if is_color_data_dataframe:
             column_names_dropdown = color_data.columns
