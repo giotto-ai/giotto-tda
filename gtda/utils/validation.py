@@ -138,7 +138,8 @@ def _validate_params(parameters, references, rec_name=None):
         ref_type = _validate_params_single(parameter, reference, name)
         if ref_type:
             ref_of = reference.get('of', None)
-            if ref_of is None:  # if ref_of is None, the elements are not to be validated
+            if ref_of is None:
+                # if ref_of is None, the elements are not to be validated
                 continue
             elif ref_type == dict:
                 _validate_params(parameter, ref_of, rec_name=name)
