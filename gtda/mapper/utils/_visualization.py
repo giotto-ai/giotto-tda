@@ -198,18 +198,14 @@ def _validate_color_kwargs(graph, data, color_data, color_features,
     color_data_checked = check_array(color_data, ensure_2d=False, dtype=None)
 
     # Simple duck typing to determine whether `color_data` is likely a pandas
-    # dataframe
+    # dataframe or pandas series
     is_color_data_dataframe = hasattr(color_data, "columns")
-    # pandas series are only partially supported
-    if hasattr(color_data, "name"):
-        warn("If `color_data` is a pandas series, it is internally converted "
-             "to a column vector (2d numpy array) before being processed "
-             "according to `color_features`.", UserWarning)
+    is_color_data_series = hasattr(color_data, "name")
 
     if len(color_data) != len(data):
         raise ValueError("`color_data` and `data` must have the same length.")
-    if not is_color_data_dataframe:
-        color_data = color_data_checked.reshape((len(color_data), -1))
+    if not (is_color_data_dataframe or is_color_data_series):
+        color_data = color_data_checked
 
     # Determine whether node_color_statistic is an array of node colors
     is_node_color_statistic_ndarray = hasattr(node_color_statistic, "dtype")
@@ -248,22 +244,30 @@ def _validate_color_kwargs(graph, data, color_data, color_features,
     elif color_features_kind == "callable":
         color_data_transformed = color_features(color_data)
         # If outcome is a pandas dataframe, save column names before converting
-        # to numpy array
+        # to numpy array. If a pandas series, just convert to numpy
         if hasattr(color_data_transformed, "columns"):
             column_names_dropdown = color_data_transformed.columns
             color_data_transformed = color_data_transformed.to_numpy()
+        elif hasattr(color_data_transformed, "name"):
+            color_data_transformed = color_data_transformed.to_numpy()
     elif color_features_kind == "none":
-        if is_color_data_dataframe:
-            column_names_dropdown = color_data.columns
-            color_data_transformed = color_data.to_numpy()
-        else:
+        if not (is_color_data_dataframe or is_color_data_series):
             color_data_transformed = color_data
-    else:
+        else:  # Dataframe or series
+            if is_color_data_dataframe:
+                column_names_dropdown = color_data.columns
+            color_data_transformed = color_data.to_numpy()
+    else:  # Case of column or sequence of columns
         if is_color_data_dataframe:
             color_data_transformed = color_data[color_features]
             column_names_dropdown = getattr(color_data_transformed, "columns",
                                             None)
             color_data_transformed = color_data_transformed.to_numpy()
+        elif is_color_data_series:
+            raise ValueError(
+                "If `color_data` is a pandas series, `color_features` can "
+                "only be a scikit-learn transformer, a callable, or None."
+                )
         else:
             color_data_transformed = color_data[:, color_features]
             if len(color_data_transformed.shape) > 1:
