@@ -341,3 +341,89 @@ jobs:
       twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
+
+- job: 'Documentation'
+  pool:
+    vmImage: 'macOS-10.15'
+  strategy:
+    matrix:
+      Python38:
+        python.version: '3.8'
+  variables:
+    EXECUTE: 'true'
+    RUNNOTEBOOKS: TRUE
+    VERSION: azure-test
+    GITDIR: /tmp/gtda-docs
+
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+
+    - script: |
+        set -e
+        brew update
+        brew install boost
+        brew install pandoc
+      displayName: 'Install system dependencies'
+    - script: |
+        set -e
+        python -m pip install --upgrade pip setuptools
+        python -m pip install -e ".[dev,doc,examples]"
+      displayName: 'Install dependencies and dev environment'
+    - script: |
+        set -e
+        python -m pip uninstall -y sphinx-rtd-theme
+        python -m pip install git+https://github.com/wreise/sphinx_rtd_theme.git@aeafa25faef29b615aa496ed01a427b86412d26e
+      displayName: 'Install the custom sphinx_rtd_theme'
+
+    - script: |
+        set -e
+        cd doc/
+        make docs
+      displayName: 'Make the documentation (execute notebooks, build html)'
+      condition:
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        targetPath: doc/build/html
+        artifactName: documentation
+
+    - script: |
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+        displayName: 'Create .ssh/known_hosts'
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+        - task: InstallSSHKey@0
+        inputs:
+        knownHostsEntry: ~/.ssh/known_hosts
+        sshPublicKey: $(KEY_GTDA-DOCS_PUB)
+        sshKeySecureFile: KEY_GTDA-DOCS
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        set -e
+        cd /tmp/
+        git clone git@github.com:giotto-learn/gtda-docs.git
+        cd gtda-docs
+        git config user.email "maintainers@giotto.ai"
+        git config user.name "giotto-maintainers"
+        git checkout -b deploytests
+      displayName:  'Clone the docs and configure the username'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        set -e
+        cd doc/
+        if ($(UPDATE_VERSIONS)); then\
+        	    make update-versions-list;\
+        fi
+        make copy-to-docs-location
+        make gh-commit
+      displayName: 'Add link to the new version in previous docs and publish'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+
+    - script: |
+        cd /tmp/gtda-docs
+        git push -u origin deploytests
+      displayName: 'Push the docs to a new branch'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
