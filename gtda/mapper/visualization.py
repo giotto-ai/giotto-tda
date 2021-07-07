@@ -150,7 +150,8 @@ def plot_static_mapper_graph(
 
     See also
     --------
-    plot_interactive_mapper_graph, gtda.mapper.make_mapper_pipeline
+    MapperInteractivePlotter, plot_interactive_mapper_graph, \
+    gtda.mapper.make_mapper_pipeline
 
     References
     ----------
@@ -270,7 +271,8 @@ def plot_interactive_mapper_graph(
 
     See also
     --------
-    plot_static_mapper_graph, gtda.mapper.pipeline.make_mapper_pipeline
+    MapperInteractivePlotter, plot_static_mapper_graph, \
+    gtda.mapper.pipeline.make_mapper_pipeline
 
     References
     ----------
