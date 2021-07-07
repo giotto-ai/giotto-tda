@@ -19,4 +19,5 @@ Giotto-tda Project Team:
 Former Project Team Members:
 ----------------------------
 
+- Lewis Tunstall lewis.c.tunstall@gmail.com (Maintainer)
 - Philippe Nguyen p.nguyen@l2f.ch (Developer)
