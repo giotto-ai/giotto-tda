@@ -14,6 +14,7 @@ Giotto-tda Project Team:
 ------------------------
 
 - Umberto Lupo umberto.lupo@epfl.ch (Maintainer)
+- Wojciech Reise reisewojtus@gmail.com (Maintainer)
 - Matteo Caorsi m.caorsi@l2f.ch (Project Leader)
 
 Former Project Team Members:
