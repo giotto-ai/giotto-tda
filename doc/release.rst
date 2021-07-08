@@ -24,13 +24,15 @@ Bug Fixes
 Backwards-Incompatible Changes
 ==============================
 
-A major change to the behaviour of the (static and interactive) Mapper plotting functions ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph`` was introduced in `#584 <https://github.com/giotto-ai/giotto-tda/pull/584>`_. The new ``MapperInteractivePlotter`` class (see "Major Features and Improvements" above) also follows this new API. The main changes are as follows:
+- A major change to the behaviour of the (static and interactive) Mapper plotting functions ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph`` was introduced in `#584 <https://github.com/giotto-ai/giotto-tda/pull/584>`_. The new ``MapperInteractivePlotter`` class (see "Major Features and Improvements" above) also follows this new API. The main changes are as follows:
 
-- ``color_by_columns_dropdown``  has been eliminated.
-- ``color_variable`` has been renamed to ``color_features`` (but cannot be an array).
-- An additional keyword argument ``color_data`` has been added to more clearly separate the input ``data`` to the Mapper pipeline from the data to be used for coloring.
-- ``node_color_statistic`` is now applied column by column -- previously it could end up being applied to 2d arrays as a whole.
-- The defaults for color-related arguments lead to index values instead of the mean of the data.
+   - ``color_by_columns_dropdown``  has been eliminated.
+   - ``color_variable`` has been renamed to ``color_features`` (but cannot be an array).
+   - An additional keyword argument ``color_data`` has been added to more clearly separate the input ``data`` to the Mapper pipeline from the data to be used for coloring.
+   - ``node_color_statistic`` is now applied column by column -- previously it could end up being applied to 2d arrays as a whole.
+   - The defaults for color-related arguments lead to index values instead of the mean of the data.
+
+- The default for ``weight_params`` in ``WeightedRipsPersistence`` is now the empty dictionary, and ``None`` is no longer allowed (`#595 <https://github.com/giotto-ai/giotto-tda/pull/595>`_).
 
 Thanks to our Contributors
 ==========================
