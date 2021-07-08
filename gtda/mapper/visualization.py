@@ -124,7 +124,7 @@ def plot_static_mapper_graph(
 
     Returns
     -------
-    fig : :class:`plotly.graph_objects.Figure` object
+    fig : :class:`plotly.graph_objects.FigureWidget` object
         Figure representing the Mapper graph with appropriate node colouring
         and size.
 
@@ -147,6 +147,11 @@ def plot_static_mapper_graph(
     >>> graph = pipeline.fit_transform(data)
     >>> graph.vs[0]["node_elements"]
     array([70])
+
+    Write the figure to a file using Plotly:
+    >>> fname = "current_figure"
+    >>> fig.write_html(fname + ".html")
+    >>> fig.write_image(fname + ".svg")  # Requires psutil
 
     See also
     --------
