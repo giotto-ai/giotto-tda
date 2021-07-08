@@ -409,9 +409,8 @@ def test_pipeline_cloned(clone_pipeline):
         contract_nodes=params["contract_nodes"]["initial"],
         min_intersection=params["min_intersection"]["initial"]
         )
-    with pytest.warns(FutureWarning):
-        fig = plot_interactive_mapper_graph(pipe, X_arr,
-                                            clone_pipeline=clone_pipeline)
+    fig = plot_interactive_mapper_graph(pipe, X_arr,
+                                        clone_pipeline=clone_pipeline)
 
     # Get relevant widgets and change their states, then check final values
     for step, values in params.items():
