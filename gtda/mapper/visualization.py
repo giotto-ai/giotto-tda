@@ -191,7 +191,8 @@ def plot_interactive_mapper_graph(
     """*As of version 0.5.0, we recommend using the object-oriented interface
     provided by :class:`MapperInteractivePlotter` instead of this function.*
 
-    Plot Mapper graphs with interactivity on pipeline parameters.
+    Plot Mapper graphs in a Jupyter session, with interactivity on pipeline
+    parameters.
 
     Extends :func:`~gtda.mapper.visualization.plot_static_mapper_graph` by
     providing functionality to interactively update parameters from the cover,
