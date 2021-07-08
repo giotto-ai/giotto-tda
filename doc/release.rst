@@ -5,6 +5,43 @@ Release Notes
 .. _stable:
 
 *************
+Release 0.5.0
+*************
+
+Major Features and Improvements
+===============================
+
+- An object-oriented API for interactive plotting of Mapper graphs has been added with the ``MapperInteractivePlotter`` (`#586 <https://github.com/giotto-ai/giotto-tda/pull/586>`_). This is intended to supersede ``plot_interactive_mapper`` graph as it allows for inspection of the current state of the objects change by interactivity. See also "Backwards-Incompatible Changes" below.
+- Further citations have been added to the mathematical glossary (`#564 <https://github.com/giotto-ai/giotto-tda/pull/564>`_).
+
+Bug Fixes
+=========
+
+- A bug preventing ``EuclideanCechPersistence`` from working correctly on point clouds in more than 2 dimensions has been fixed (`#588 <https://github.com/giotto-ai/giotto-tda/pull/588>`_).
+- A validation bug preventing ``VietorisRipsPersistence`` and ``WeightedRipsPersistence`` from accepting non-empty dictionaries as ``metric_params`` has been fixed (`#590 <https://github.com/giotto-ai/giotto-tda/pull/590>`_).
+- A bug causing an exception to be raised when ``node_color_statistic`` was passed as a numpy array in ``plot_static_mapper_graph`` has been fixed (`#576 <https://github.com/giotto-ai/giotto-tda/pull/576>`_).
+
+Backwards-Incompatible Changes
+==============================
+
+A major change to the behaviour of the (static and interactive) Mapper plotting functions ``plot_static_mapper_graph`` and ``plot_interactive_mapper_graph`` was introduced in `#584 <https://github.com/giotto-ai/giotto-tda/pull/584>`_. The new ``MapperInteractivePlotter`` class (see "Major Features and Improvements" above) also follows this new API. The main changes are as follows:
+
+- ``color_by_columns_dropdown``  has been eliminated.
+- ``color_variable`` has been renamed to ``color_features`` (but cannot be an array).
+- An additional keyword argument ``color_data`` has been added to more clearly separate the input ``data`` to the Mapper pipeline from the data to be used for coloring.
+- ``node_color_statistic`` is now applied column by column -- previously it could end up being applied to 2d arrays as a whole.
+- The defaults for color-related arguments lead to index values instead of the mean of the data.
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from many people:
+
+Umberto Lupo, Wojciech Reise, Julian Burella Pérez, Sean Law, Anibal Medina-Mardones, and Lewis Tunstall
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of inspiring discussions.
+
+*************
 Release 0.4.0
 *************
 
