@@ -132,8 +132,8 @@ def test_wrp_params():
 
 
 def test_wrp_metric_params():
-    def metric(x, y, parameter):
-        return np.linalg.norm(x-y)
+    def metric(x, y, **kwargs):
+        return np.linalg.norm(x - y)
 
     metric_params = {"parameter": 0.}
     wrp = WeightedRipsPersistence(metric=metric, metric_params=metric_params)
