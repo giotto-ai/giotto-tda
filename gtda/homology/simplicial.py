@@ -616,7 +616,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             self.effective_weight_params_.update({"n_neighbors": 3, "r": 2})
         else:
             key = "general"
-        if self.weight_params is not None:
+        if self.weight_params:
             self.effective_weight_params_.update(self.weight_params)
             validate_params(self.effective_weight_params_,
                             _AVAILABLE_RIPS_WEIGHTS[key])
