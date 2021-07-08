@@ -376,7 +376,8 @@ def _calculate_graph_data(
                 )
             )
         edge_trace = go.Scatter3d(
-            x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"])
+            x=edge_x, y=edge_y, z=edge_z, **plot_options["edge_trace"]
+            )
 
     return edge_trace, node_trace, node_colors_color_features
 

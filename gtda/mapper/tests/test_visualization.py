@@ -11,7 +11,8 @@ from numpy.testing import assert_almost_equal
 from sklearn.decomposition import PCA
 
 from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
-    plot_static_mapper_graph, plot_interactive_mapper_graph
+    plot_static_mapper_graph, plot_interactive_mapper_graph, \
+    MapperInteractivePlotter
 
 
 class TestCaseNoTemplate(TestCase):
@@ -98,9 +99,18 @@ def test_color_data_invalid_length():
         plot_static_mapper_graph(pipe, X_arr, color_data=X_arr[:-1])
 
 
+class DummyPCA:
+    def __init__(self, n_components=2):
+        self.n_components = n_components
+
+    def transform(self, X):
+        return PCA(n_components=self.n_components).fit_transform(X)
+
+
 @pytest.mark.parametrize("color_features",
                          [PCA(n_components=2),
-                          PCA(n_components=2).fit(X_arr).transform])
+                          DummyPCA(n_components=2),
+                          DummyPCA(n_components=2).transform])
 def test_color_features_as_estimator_or_callable(color_features):
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X_arr)
@@ -118,6 +128,14 @@ def test_color_features_as_estimator_or_callable(color_features):
     assert_almost_equal(fig.data[1].marker.color, node_colors_color_features)
 
 
+def test_color_features_as_columns_fails_on_series():
+    pipe = make_mapper_pipeline()
+
+    with pytest.raises(ValueError, match="If `color_data` is a pandas series"):
+        plot_static_mapper_graph(pipe, X_df, color_data=X_df["a"],
+                                 color_features="a")
+
+
 @pytest.mark.parametrize("color_features", [X_arr, X_df])
 def test_invalid_color_features_types(color_features):
     pipe = make_mapper_pipeline()
@@ -125,6 +143,21 @@ def test_invalid_color_features_types(color_features):
     with pytest.raises(ValueError):
         plot_static_mapper_graph(pipe, X_arr,
                                  color_features=color_features)
+
+
+@pytest.mark.parametrize(
+    "color_data, color_features",
+    [(X_df["a"] > 0.1, pd.get_dummies),
+     (X_df["a"], lambda x: x**2),
+     (X_df["a"], None),
+     (X_arr, [0, 1])]
+    )
+def test_valid_color_data_transformed(color_data, color_features):
+    """Test that no errors are thrown when pandas dataframes/series are passed
+    as color_data and/or returned when applying color_features."""
+    pipe = make_mapper_pipeline()
+    plot_static_mapper_graph(pipe, X_arr, color_data=color_data,
+                             color_features=color_features)
 
 
 @pytest.mark.parametrize("is_2d", [False, True])
@@ -300,12 +333,60 @@ def _get_widgets_by_trait(fig, key, val=None):
 
 
 @pytest.mark.parametrize("X", [X_arr, X_df])
-@pytest.mark.parametrize("clone_pipeline", [False, True])
 @pytest.mark.parametrize("color_data", [None, X_arr, X_df])
 @pytest.mark.parametrize("layout_dim", [2, 3])
-def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
+def test_interactive_plotter_attrs(X, color_data, layout_dim):
+    """Simple tests on the attributes stored by MapperInteractivePlotter when
+    plotting."""
+    pipe = make_mapper_pipeline()
+    plotter = MapperInteractivePlotter(pipe, X)
+    plotter.plot(color_data=color_data, layout_dim=layout_dim)
+
+    # 1 Test graph_
+    graph = pipe.fit_transform(X)
+    assert plotter.graph_.isomorphic(graph)
+
+    # 2 Test pipeline_
+    assert str(plotter.pipeline_) == str(pipe)
+
+    # 3 Test color_features_
+    if color_data is not None:
+        color_data_transformed = color_data
+    else:
+        color_data_transformed = np.arange(len(X)).reshape(-1, 1)
+    assert np.array_equal(plotter.color_features_, color_data_transformed)
+
+    # 4 Test node_summaries_
+    assert len(plotter.node_summaries_) == len(graph.vs)
+
+    # 5 Test figure_
+    static_fig = plot_static_mapper_graph(pipe, X, color_data=color_data,
+                                          layout_dim=layout_dim)
+    interactive_fig = plotter.figure_
+
+    edge_trace_attrs = ["hoverinfo", "line", "name", "x", "y"]
+    for attr in edge_trace_attrs:
+        assert np.all(getattr(interactive_fig.data[0], attr) ==
+                      getattr(static_fig.data[0], attr))
+
+    # Excluding marker, which gets treated separately below
+    node_trace_attrs = ["hoverinfo", "hovertext", "mode", "name", "x", "y"]
+    for attr in node_trace_attrs:
+        assert np.all(getattr(interactive_fig.data[1], attr) ==
+                      getattr(static_fig.data[1], attr))
+
+    marker_attrs = ["color", "colorbar", "colorscale", "line", "opacity",
+                    "reversescale", "showscale", "size", "sizemin", "sizemode",
+                    "sizeref"]
+    for attr in marker_attrs:
+        assert np.all(getattr(interactive_fig.data[1].marker, attr) ==
+                      getattr(static_fig.data[1].marker, attr))
+
+
+@pytest.mark.parametrize("clone_pipeline", [False, True])
+def test_pipeline_cloned(clone_pipeline):
     """Verify that the pipeline is changed on interaction if and only if
-    `clone_pipeline` is False (with `layout_dim` set to 2 or 3)."""
+    `clone_pipeline` is False."""
     # TODO: Monitor development of the ipytest project to convert these into
     # true notebook tests integrated with pytest
     params = {
@@ -328,9 +409,9 @@ def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
         contract_nodes=params["contract_nodes"]["initial"],
         min_intersection=params["min_intersection"]["initial"]
         )
-    fig = plot_interactive_mapper_graph(pipe, X, color_data=color_data,
-                                        clone_pipeline=clone_pipeline,
-                                        layout_dim=layout_dim)
+    with pytest.warns(FutureWarning):
+        fig = plot_interactive_mapper_graph(pipe, X_arr,
+                                            clone_pipeline=clone_pipeline)
 
     # Get relevant widgets and change their states, then check final values
     for step, values in params.items():
@@ -356,3 +437,11 @@ def test_pipeline_cloned(X, clone_pipeline, color_data, layout_dim):
             final_param_value_expected = \
                 initial_param_value if clone_pipeline else new_param_value
             assert final_param_value_actual == final_param_value_expected
+
+
+def test_user_hoverlabel_bgcolor_interactive_3d():
+    pipe = make_mapper_pipeline()
+    plotter = MapperInteractivePlotter(pipe, X_arr)
+    plotter.plot(plotly_params={"node_trace": {"hoverlabel_bgcolor": "blue"}})
+
+    assert plotter.figure_.data[1].hoverlabel.bgcolor == "blue"
