@@ -9,7 +9,7 @@ from .pipeline import make_mapper_pipeline
 from .utils.decorators import method_to_transform
 from .utils.pipeline import transformer_from_callable_on_rows
 from .visualization import plot_static_mapper_graph, \
-    plot_interactive_mapper_graph
+    plot_interactive_mapper_graph, MapperInteractivePlotter
 
 __all__ = [
     'Projection',
@@ -24,6 +24,7 @@ __all__ = [
     'make_mapper_pipeline',
     'plot_static_mapper_graph',
     'plot_interactive_mapper_graph',
+    'MapperInteractivePlotter',
     'method_to_transform',
     'transformer_from_callable_on_rows'
     ]
