@@ -300,6 +300,88 @@ def plot_interactive_mapper_graph(
 
 
 class MapperInteractivePlotter:
+    """Plot Mapper graphs in a Jupyter session, with interactivity on pipeline
+    parameters.
+
+    Provides functionality to interactively update parameters from the cover,
+    clustering and graph construction steps defined in `pipeline`.
+    Interactivity is via a widget produced when calling :meth:`plot`. After
+    interacting with the widget, the current state of all outputs which which
+    may have been altered can be retrieved via one of the attributes listed
+    below.
+
+    Parameters
+    ----------
+    pipeline : :class:`~gtda.mapper.pipeline.MapperPipeline` object
+        Mapper pipeline to act on to data.
+
+    data : array-like of shape (n_samples, n_features)
+        Data used to generate the Mapper graph. Can be a pandas dataframe.
+
+    clone_pipeline : bool, optional, default: ``True``
+        If ``True``, the input `pipeline` is cloned before computing the
+        Mapper graph to prevent unexpected side effects from in-place
+        parameter updates.
+
+    Attributes
+    ----------
+    graph_ : :class:`igraph.Graph` object
+        Current state of the graph displayed by the widget.
+
+    pipeline_ : :class:`~gtda.mapper.pipeline.MapperPipeline` object
+        Current state of the Mapper pipeline.
+
+    color_features_ : array-like of shape (n_samples, n_features)
+        Values of the features of interest for each entry in `data`, as
+        produced according to `color_data` and `color_features` when calling
+        :meth:`plot`. Not changed by interacting with the widget.
+
+    node_summaries_ : array-like of shape (n_nodes, n_features)
+        Current values of the summaries computed for each node and used as
+        node colours in the figure. Produced according to
+        `node_color_statistic`, see :meth:`plot`.
+
+    figure_ : :class:`plotly.graph_objects.FigureWidget` object
+        Current figure representing the Mapper graph with appropriate node
+        colouring and size.
+
+    Examples
+    --------
+    Instantiate the plotter object on a pipeline and data configuration, and
+    call :meth:`plot` to display the widget in a Jupyter session:
+
+    >>> import numpy as np
+    >>> np.random.seed(1)
+    >>> from gtda.mapper import make_mapper_pipeline, MapperInteractivePlotter
+    >>> pipeline = make_mapper_pipeline()
+    >>> data = np.random.random((100, 3))
+    >>> plotter = MapperInteractivePlotter(pipeline, data)
+    >>> plotter.plot()
+
+    After interacting with the widget, inspect the composition of a node with
+    "Node ID" displayed as 0 in the hovertext:
+
+    >>> plotter.graph_.vs[0]["node_elements"]
+    array([70])
+
+    Write the current figure to a file using Plotly:
+    >>> fname = "current_figure"
+    >>> plotter.fig_.write_html(fname + ".html")
+    >>> plotter.fig_.write_image(fname + ".svg")  # Requires psutil
+
+    See also
+    --------
+    plot_interactive_mapper_graph, plot_static_mapper_graph, \
+    gtda.mapper.pipeline.make_mapper_pipeline
+
+    References
+    ----------
+    .. [1] `igraph.Graph.layout
+            <https://igraph.org/python/doc/igraph.Graph-class.html#layout>`_
+            documentation.
+
+    """
+
     def __init__(self, pipeline, data, clone_pipeline=True):
         self.pipeline = pipeline
         self.data = data
@@ -308,7 +390,73 @@ class MapperInteractivePlotter:
     def plot(self, color_data=None, color_features=None,
              node_color_statistic=None, layout="kamada_kawai", layout_dim=2,
              n_sig_figs=3, node_scale=12, plotly_params=None):
+        """ Produce the interactive Mapper widget.
 
+        Parameters
+        ----------
+        color_data : array-like of length n_samples, or None, optional, \
+            default: ``None``
+            Data to be used to construct node colors in the Mapper graph
+            (according to `color_features` and `node_color_statistic`). Must
+            have the same length as `data`. ``None`` is the same as passing
+            ``numpy.arange(len(data))``.
+
+        color_features : object or None, optional, default: ``None``
+            Specifies one or more feature of interest from `color_data` to be
+            used, together with `node_color_statistic`, to determine node
+            colors.
+
+                1. ``None`` is equivalent to passing `color_data`.
+                2. If an object implementing :meth:`transform` or
+                   :meth:`fit_transform`, or a callable, it is applied to
+                   `color_data` to generate the features of interest.
+                3. If an index or string, or list of indices/strings, it is
+                   equivalent to selecting a column or subset of columns from
+                   `color_data`.
+
+        node_color_statistic : None or callable, optional, default: ``None``
+            If a callable, node colors will be computed as summary statistics
+            from the feature array ``y`` determined by `color_data` and
+            `color_features`. Let ``y`` have ``n`` columns (note: 1d feature
+            arrays are converted to column vectors). Then, for a node
+            representing a list ``I`` of row indices, there will be ``n``
+            colors, each computed as ``node_color_statistic(y[I, i])`` for
+            ``i`` between ``0`` and ``n``.
+
+        layout : None, str or callable, optional, default: ``"kamada-kawai"``
+            Layout algorithm for the graph. Can be any accepted value for the
+            ``layout`` parameter in the :meth:`layout` method of
+            :class:`igraph.Graph` [1]_.
+
+        layout_dim : int, default: ``2``
+            The number of dimensions for the layout. Can be 2 or 3.
+
+        n_sig_figs : int or None, optional, default: ``3``
+           If not ``None``, number of significant figures to which to round
+           node summary statistics. If ``None``, no rounding is performed.
+
+        node_scale : int or float, optional, default: ``12``
+            Sets the scale factor used to determine the rendered size of the
+            nodes. Increase for larger nodes. Implements a formula in the
+            `Plotly documentation \
+            <plotly.com/python/bubble-charts/#scaling-the-size-of-bubble-charts>`_.
+
+        plotly_params : dict or None, optional, default: ``None``
+            Custom parameters to configure the plotly figure. Allowed keys are
+            ``"node_trace"``, ``"edge_trace"`` and ``"layout"``, and the
+            corresponding values should be dictionaries containing keyword
+            arguments as would be fed to the :meth:`update_traces` and
+            :meth:`update_layout` methods of
+            :class:`plotly.graph_objects.Figure`.
+
+        Returns
+        -------
+        box : :class:`ipywidgets.VBox` object
+            A box containing the following widgets: parameters of the
+            clustering algorithm, parameters for the covering scheme, a Mapper
+            graph arising from those parameters, a validation box, and logs.
+
+        """
         # Clone pipeline to avoid side effects from in-place parameter changes
         if self.clone_pipeline:
             self._pipeline = clone(self.pipeline)
