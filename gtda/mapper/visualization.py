@@ -305,10 +305,9 @@ class MapperInteractivePlotter:
 
     Provides functionality to interactively update parameters from the cover,
     clustering and graph construction steps defined in `pipeline`.
-    Interactivity is via a widget produced when calling :meth:`plot`. After
-    interacting with the widget, the current state of all outputs which which
-    may have been altered can be retrieved via one of the attributes listed
-    below.
+    An interactive widget is produced when calling :meth:`plot`. After
+    interacting with the widget, the current state of all outputs which may
+    have been altered can be retrieved via one of the attributes listed below.
 
     Parameters
     ----------
