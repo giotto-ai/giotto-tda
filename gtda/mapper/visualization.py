@@ -211,8 +211,7 @@ def plot_interactive_mapper_graph(
 
     color_features : object or None, optional, default: ``None``
         Specifies one or more feature of interest from `color_data` to be used,
-        together with `node_color_statistic`, to determine node colors. Ignored
-        if `node_color_statistic` is a numpy array.
+        together with `node_color_statistic`, to determine node colors.
 
             1. ``None`` is equivalent to passing `color_data`.
             2. If an object implementing :meth:`transform` or
@@ -222,8 +221,7 @@ def plot_interactive_mapper_graph(
                equivalent to selecting a column or subset of columns from
                `color_data`.
 
-    node_color_statistic : None, callable, or ndarray of shape (n_nodes,) or \
-        (n_nodes, 1), optional, default: ``None``
+    node_color_statistic : None or callable, optional, default: ``None``
         If a callable, node colors will be computed as summary statistics from
         the feature array ``y`` determined by `color_data` and
         `color_features`. Let ``y`` have ``n`` columns (note: 1d feature arrays
