@@ -16,7 +16,7 @@ from .utils._visualization import (
     _produce_static_figure,
     _get_column_color_buttons,
     _get_colors_for_vals,
-    )
+)
 
 
 def plot_static_mapper_graph(
@@ -188,7 +188,10 @@ def plot_interactive_mapper_graph(
         node_color_statistic=None, layout="kamada_kawai", layout_dim=2,
         clone_pipeline=True, n_sig_figs=3, node_scale=12, plotly_params=None
         ):
-    """Plot Mapper graphs with interactivity on pipeline parameters.
+    """*As of version 0.5.0, we recommend using the object-oriented interface
+    provided by :class:`MapperInteractivePlotter` instead of this function.*
+
+    Plot Mapper graphs with interactivity on pipeline parameters.
 
     Extends :func:`~gtda.mapper.visualization.plot_static_mapper_graph` by
     providing functionality to interactively update parameters from the cover,
