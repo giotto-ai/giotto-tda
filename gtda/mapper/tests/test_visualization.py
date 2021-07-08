@@ -441,6 +441,7 @@ def test_pipeline_cloned(clone_pipeline):
 def test_user_hoverlabel_bgcolor_interactive_3d():
     pipe = make_mapper_pipeline()
     plotter = MapperInteractivePlotter(pipe, X_arr)
-    plotter.plot(plotly_params={"node_trace": {"hoverlabel_bgcolor": "blue"}})
+    plotter.plot(layout_dim=3,
+                 plotly_params={"node_trace": {"hoverlabel_bgcolor": "blue"}})
 
     assert plotter.figure_.data[1].hoverlabel.bgcolor == "blue"
