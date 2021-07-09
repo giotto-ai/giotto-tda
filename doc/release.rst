@@ -8,10 +8,12 @@ Release Notes
 Release 0.5.1
 *************
 
+This release was made shortly after the release of version 0.5.0, to resolve an important bug. Please refer to `the release notes for 0.5.0 <https://giotto-ai.github.io/gtda-docs/0.5.0/release.html#release-0-5-0>`_ to see the major improvements and backwards-incompatible changes to the Mapper subpackage which were introduced there.
+
 Major Features and Improvements
 ===============================
 
-None
+None.
 
 Bug Fixes
 =========
@@ -21,7 +23,7 @@ A bug preventing Mapper pipelines from working with memory caching has been fixe
 Backwards-Incompatible Changes
 ==============================
 
-None
+None.
 
 Thanks to our Contributors
 ==========================
