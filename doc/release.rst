@@ -5,6 +5,34 @@ Release Notes
 .. _stable:
 
 *************
+Release 0.5.1
+*************
+
+Major Features and Improvements
+===============================
+
+None
+
+Bug Fixes
+=========
+
+A bug preventing Mapper pipelines from working with memory caching has been fixed (`#597 <https://github.com/giotto-ai/giotto-tda/pull/597>`_).
+
+Backwards-Incompatible Changes
+==============================
+
+None
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from:
+
+Umberto Lupo
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of inspiring discussions.
+
+*************
 Release 0.5.0
 *************
 
