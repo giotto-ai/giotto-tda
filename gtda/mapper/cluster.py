@@ -16,6 +16,22 @@ from ..utils.intervals import Interval
 from ..utils.validation import validate_params
 
 
+def _sample_weight_computer(rel_indices, sample_weight):
+    return {"sample_weight": sample_weight[rel_indices]}
+
+
+def _empty_dict(*args):
+    return {}
+
+
+def _indices_computer_precomputed(rel_indices):
+    return np.ix_(rel_indices, rel_indices)
+
+
+def _indices_computer_not_precomputed(rel_indices):
+    return rel_indices
+
+
 class ParallelClustering(BaseEstimator):
     """Employ joblib parallelism to cluster different portions of a dataset.
 
@@ -129,16 +145,14 @@ class ParallelClustering(BaseEstimator):
 
         fit_params = signature(self.clusterer.fit).parameters
         if sample_weight is not None and "sample_weight" in fit_params:
-            self._sample_weight_computer = lambda rel_indices, sample_weight: \
-                {"sample_weight": sample_weight[rel_indices]}
+            self._sample_weight_computer = _sample_weight_computer
         else:
-            self._sample_weight_computer = lambda *args: {}
+            self._sample_weight_computer = _empty_dict
 
         if self._precomputed:
-            self._indices_computer = lambda rel_indices: \
-                np.ix_(rel_indices, rel_indices)
+            self._indices_computer = _indices_computer_precomputed
         else:
-            self._indices_computer = lambda rel_indices: rel_indices
+            self._indices_computer = _indices_computer_not_precomputed
 
         # This seems necessary to avoid large overheads when running fit a
         # second time. Probably due to refcounts. NOTE: Only works if done
