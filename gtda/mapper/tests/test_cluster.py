@@ -14,8 +14,8 @@ from hypothesis.strategies import floats, integers, composite
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
-from gtda.mapper import ParallelClustering, FirstHistogramGap, FirstSimpleGap, \
-    make_mapper_pipeline
+from gtda.mapper import ParallelClustering, FirstHistogramGap, \
+    FirstSimpleGap, make_mapper_pipeline
 
 
 def test_parallel_clustering_bad_input():
