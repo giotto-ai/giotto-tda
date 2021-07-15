@@ -1,7 +1,7 @@
 from hypothesis import given, settings
 from hypothesis.strategies import floats, integers, composite, lists
 
-from gtda.local.simplicial import KNeighborsLocalVietorisRips, \
+from gtda.local_homology.simplicial import KNeighborsLocalVietorisRips, \
       RadiusLocalVietorisRips
 
 
