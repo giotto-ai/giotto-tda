@@ -152,11 +152,7 @@ jobs:
 
   # Python and gcc hotfixes following https://github.com/actions/virtual-environments/issues/2322 and https://github.com/actions/virtual-environments/issues/2391
   - script: |
-      set -e
-      brew update
-      rm '/usr/local/bin/2to3'
-      brew unlink gcc@8 && brew unlink gcc@9
-      brew upgrade      
+      set -e      
       brew install boost ccache
     displayName: 'Install system dependencies'
 
