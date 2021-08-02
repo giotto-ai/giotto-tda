@@ -282,7 +282,7 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         if self.size_ <= self.neighborhoud_param[0]:
             warnings.warn('First n_neighbors is too large to be relevant.\
                              Consider reducing it.')
-            self.neighborhoud_param = (self.size_, self.size_)
+            self.neighborhoud_param = (self.size_-1, self.size_)
         if self.size_ < self.neighborhoud_param[1]:
             warnings.warn('Second n_neighbors is too large to be relevant.\
                              Consider reducing it.')
