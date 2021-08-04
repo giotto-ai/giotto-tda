@@ -131,7 +131,7 @@ If you use ``giotto-tda`` in a scientific publication, we would appreciate citat
 
 You can use the following BibTeX entry:
 
-.. code:: RST
+.. code:: bibtex
 
     @misc{tauzin2020giottotda,
           title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
