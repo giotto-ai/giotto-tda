@@ -1,5 +1,5 @@
 :mod:`gtda.local_homology`: Persistent local homology
-=========================================
+=====================================================
 
 .. automodule:: gtda.local_homology
    :no-members:
