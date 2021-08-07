@@ -6,7 +6,7 @@
    :no-inherited-members:
 
 Local simplicial homology
-------------------------------
+-------------------------
 .. currentmodule:: gtda
 
 .. autosummary::
