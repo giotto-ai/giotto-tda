@@ -14,19 +14,21 @@ How do I cite ``giotto-tda``?
 -----------------------------
 We would appreciate citations to the following paper:
 
-   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://arxiv.org/abs/2004.02551>`_, Tauzin *et al*, arXiv:2004.02551, 2020.
+   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://www.jmlr.org/papers/volume22/20-325/20-325.pdf>`_, Tauzin *et al*, J. Mach. Learn. Res. 22 (2021): 39-1.
 
 You can use the following BibTeX entry:
 
 .. code:: RST
 
-    @misc{tauzin2020giottotda,
-          title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
-          author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
-          year={2020},
-          eprint={2004.02551},
-          archivePrefix={arXiv},
-          primaryClass={cs.LG}
+    @article {giotto-tda,
+    AUTHOR = {Tauzin, Guillaume and Lupo, Umberto and Tunstall, Lewis and Burella P\'{e}rez, Julian and Caorsi, Matteo and Medina-Mardones, Anibal M. and Dassatti, Alberto and Hess, Kathryn},
+     TITLE = {giotto-tda: a topological data analysis toolkit for machine learning and data exploration},
+   JOURNAL = {J. Mach. Learn. Res.},
+  FJOURNAL = {Journal of Machine Learning Research (JMLR)},
+    VOLUME = {22},
+      YEAR = {2021},
+     PAGES = pages={39--1},
+      ISSN = {1532-4435}
     }
 
 I cannot install ``giotto-tda``
