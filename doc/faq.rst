@@ -27,7 +27,7 @@ You can use the following BibTeX entry:
   FJOURNAL = {Journal of Machine Learning Research (JMLR)},
     VOLUME = {22},
       YEAR = {2021},
-     PAGES = pages={39--1},
+     PAGES = {39--1},
       ISSN = {1532-4435}
     }
 
