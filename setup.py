@@ -8,7 +8,7 @@ import sys
 import platform
 import subprocess
 
-from distutils.version import LooseVersion
+from pkg_resources.extern.packaging import version
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
@@ -25,11 +25,11 @@ DESCRIPTION = "Toolbox for Machine Learning using Topological Data Analysis."
 with codecs.open("README.rst", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = "text/x-rst"
-MAINTAINER = "Umberto Lupo, Lewis Tunstall"
+MAINTAINER = "Umberto Lupo, Wojciech Reise"
 MAINTAINER_EMAIL = "maintainers@giotto.ai"
 URL = "https://github.com/giotto-ai/giotto-tda"
 LICENSE = "GNU AGPLv3"
-DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.4.0"
+DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.5.1"
 VERSION = __version__  # noqa
 CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Intended Audience :: Developers",
@@ -94,9 +94,9 @@ class CMakeBuild(build_ext):
                 )
 
         if platform.system() == "Windows":
-            cmake_version = LooseVersion(re.search(r"version\s*([\d.]+)",
-                                                   out.decode()).group(1))
-            if cmake_version < "3.1.0":
+            cmake_version = version.parse(re.search(r"version\s*([\d.]+)",
+                                                    out.decode()).group(1))
+            if cmake_version < version.parse("3.1.0"):
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
         self.install_dependencies()

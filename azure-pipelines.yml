@@ -13,7 +13,7 @@ jobs:
 
 - job: 'manylinux2010'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   strategy:
     matrix:
       Python36:
@@ -46,7 +46,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2021.01.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2021.07.27" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -146,17 +146,13 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2021.01.12" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2021.07.27" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
   # Python and gcc hotfixes following https://github.com/actions/virtual-environments/issues/2322 and https://github.com/actions/virtual-environments/issues/2391
   - script: |
-      set -e
-      brew update
-      rm '/usr/local/bin/2to3'
-      brew unlink gcc@8 && brew unlink gcc@9
-      brew upgrade      
+      set -e      
       brew install boost ccache
     displayName: 'Install system dependencies'
 
@@ -268,10 +264,20 @@ jobs:
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
+  # Use the boost_1_72_0-msvc-14.1-64.exe for Windows 2016
+  # Following issue https://github.com/actions/virtual-environments/issues/2667
+  # As of March 2021, it is necessary to download Boost manually
+  # DIR: installation dir, this value need to be forwarded to BOOST_ROOT_PIPELINE
+  - powershell: |
+      $Url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.72.0/boost_1_72_0-msvc-14.2-64.exe"
+      (New-Object System.Net.WebClient).DownloadFile($Url, "$env:TEMP\boost.exe")
+      Start-Process -Wait -FilePath "$env:TEMP\boost.exe" "/SILENT","/SP-","/SUPPRESSMSGBOXES","/DIR=C:\hostedtoolcache\windows\Boost\1.72.0\x86_64"
+    displayName: 'Install boost'
+
   # Set BOOST_ROOT_PIPELINE to the version used in the pipeline
   # See https://github.com/actions/virtual-environments/issues/687#issuecomment-616345933
   - script: |
-      echo "##vso[task.setvariable variable=BOOST_ROOT_PIPELINE]%BOOST_ROOT_1_72_0%"
+      echo "##vso[task.setvariable variable=BOOST_ROOT_PIPELINE]C:\hostedtoolcache\windows\Boost\1.72.0\x86_64"
     displayName: 'Set env variable for boost version'
 
   - script: |
