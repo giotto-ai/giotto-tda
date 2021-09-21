@@ -14,21 +14,21 @@ How do I cite ``giotto-tda``?
 -----------------------------
 We would appreciate citations to the following paper:
 
-   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://www.jmlr.org/papers/volume22/20-325/20-325.pdf>`_, Tauzin *et al*, J. Mach. Learn. Res. 22 (2021): 39-1.
+   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://www.jmlr.org/papers/volume22/20-325/20-325.pdf>`_, Tauzin *et al*, J. Mach. Learn. Res. 22.39 (2021): 1-6.
 
 You can use the following BibTeX entry:
 
 .. code:: RST
 
-    @article {giotto-tda,
-    AUTHOR = {Tauzin, Guillaume and Lupo, Umberto and Tunstall, Lewis and Burella P\'{e}rez, Julian and Caorsi, Matteo and Medina-Mardones, Anibal M. and Dassatti, Alberto and Hess, Kathryn},
-     TITLE = {giotto-tda: a topological data analysis toolkit for machine learning and data exploration},
-   JOURNAL = {J. Mach. Learn. Res.},
-  FJOURNAL = {Journal of Machine Learning Research (JMLR)},
-    VOLUME = {22},
-      YEAR = {2021},
-     PAGES = {39--1},
-      ISSN = {1532-4435}
+    @article{giotto-tda,
+      author  = {Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella P\'{e}rez and Matteo Caorsi and Anibal M. Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+      title   = {giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+      journal = {Journal of Machine Learning Research},
+      year    = {2021},
+      volume  = {22},
+      number  = {39},
+      pages   = {1-6},
+      url     = {http://jmlr.org/papers/v22/20-325.html}
     }
 
 I cannot install ``giotto-tda``
