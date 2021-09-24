@@ -4,15 +4,19 @@
 import numpy as np
 import plotly.io as pio
 import pytest
+from hypothesis import given
+from hypothesis.extra.numpy import arrays
+from hypothesis.strategies import composite, integers, booleans, \
+    lists, permutations, floats
 from numpy.testing import assert_almost_equal
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, coo_matrix
 from scipy.spatial.distance import pdist, squareform
 from scipy.spatial.qhull import QhullError
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, WeightedRipsPersistence, \
     SparseRipsPersistence, WeakAlphaPersistence, EuclideanCechPersistence, \
-    FlagserPersistence
+    FlagserPersistence, LowerStarFlagPersistence
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -120,7 +124,7 @@ def test_vrp_low_infinity_values(X, metric):
 def test_vrp_fit_transform_plot(X, metric, hom_dims):
     VietorisRipsPersistence(metric=metric).fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 def test_wrp_params():
@@ -231,7 +235,7 @@ def test_wrp_infinity_error():
 def test_wrp_fit_transform_plot(X, metric, hom_dims):
     WeightedRipsPersistence(
         metric=metric, weight_params={'n_neighbors': 1}
-        ).fit_transform_plot(X, sample=0, homology_dimensions=hom_dims)
+    ).fit_transform_plot(X, sample=0, homology_dimensions=hom_dims)
 
 
 def test_srp_params():
@@ -354,7 +358,7 @@ def test_wap_low_infinity_values(X):
 def test_wap_fit_transform_plot(X, hom_dims):
     WeakAlphaPersistence().fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 def test_cp_params():
@@ -396,7 +400,7 @@ def test_cp_transform(X):
 def test_cp_fit_transform_plot(X, hom_dims):
     EuclideanCechPersistence().fit_transform_plot(
         X, sample=0, homology_dimensions=hom_dims
-        )
+    )
 
 
 def test_fp_params():
@@ -426,7 +430,7 @@ X_fp_dir_exp = np.array([[[0., 0.30038548, 0.],
                           [0., 0.34546959, 0.],
                           [0., 0.40065941, 0.],
                           [0., 0.43094373, 0.],
-                          [0.5117411,  0.51976681, 1.]]])
+                          [0.5117411, 0.51976681, 1.]]])
 
 
 @pytest.mark.parametrize('X',
@@ -481,4 +485,134 @@ def test_fp_transform_high_hom_dim(delta):
 def test_fp_fit_transform_plot(X, hom_dims):
     FlagserPersistence(directed=False).fit_transform_plot(
         X_dist, sample=0, homology_dimensions=hom_dims
-        )
+    )
+
+
+X_lsp_cp = coo_matrix((np.array([1, 2, -1, 3, -2, 0.5,
+                                 1, 1, 1, 1, 1, 1]),
+                       (np.array([0, 1, 2, 3, 4, 5,
+                                  0, 1, 2, 3, 4, 0]),
+                        np.array([0, 1, 2, 3, 4, 5,
+                                  1, 2, 3, 4, 5, 5])))
+                      )
+
+diag_lsp_cp = np.array([[-2, 3, 0, -1],
+                        [-1, 2, 0, 1],
+                        [2, -1, 1, 1],
+                        [3, -2, 1, -1]], dtype=float)
+
+
+def test_lsp_fit_transform():
+    lp = LowerStarFlagPersistence(extended=True)
+    result = lp.fit_transform([X_lsp_cp])[0]
+    assert_almost_equal(np.sort(result, axis=0),
+                        np.sort(diag_lsp_cp, axis=0))
+
+
+@composite
+def get_lsp_matrix(draw):
+    """Generate a matrix"""
+    n_points = draw(integers(3, 10))
+    diag = draw(arrays(dtype=np.float32,
+                       elements=integers(min_value=1, max_value=int(1e2)),
+                       shape=(n_points,), unique=True))
+    n_edges = draw(integers(2, int(n_points*(n_points-1)/2)))
+    list_vertices = lists(integers(min_value=0, max_value=n_points-1),
+                          min_size=n_edges, max_size=n_edges)
+    edges = draw(lists(list_vertices, min_size=2, max_size=2,
+                       unique_by=tuple(lambda x: x[k]
+                                       for k in range(n_edges))))
+
+    edges = np.array(edges)
+    c = draw(floats(min_value=-10, max_value=10, allow_nan=False,
+                    allow_infinity=False, width=32))
+    X = coo_matrix((np.concatenate([diag, np.ones(n_edges)]),
+                    (np.concatenate([np.arange(n_points), edges[0]]),
+                     np.concatenate([np.arange(n_points), edges[1]]))))
+    X2 = coo_matrix((np.concatenate([diag + c, np.ones(n_edges)]),
+                    (np.concatenate([np.arange(n_points), edges[0]]),
+                     np.concatenate([np.arange(n_points), edges[1]]))))
+    return X.toarray(), X2.toarray(), c
+
+
+def filter_true_zero_persistence(r, is_extended=True):
+    """Filter out the rows of a persistence diagram, where the points are
+    truly of 0 persistence."""
+    is_close = np.isclose(r[:, 0] - r[:, 1], 0)
+    if is_extended:
+        is_close_and_same_sweep = np.logical_and(np.isclose(
+            r[:, 0] - r[:, 1], 0), r[:, 3] == 1.)
+        mask = is_close_and_same_sweep
+    else:
+        mask = is_close
+    return r[np.where(np.logical_not(mask))]
+
+
+@given(Xs=get_lsp_matrix(), is_extended=booleans())
+def test_lsp_transform_equivariance(Xs, is_extended):
+    X, X2, c = Xs
+    X, X2 = coo_matrix(X), coo_matrix(X2)
+    hom_dims = (0, 1)
+    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims,
+                                  extended=is_extended)
+    result, result_m = [filter_true_zero_persistence(r,
+                                                     is_extended=is_extended)
+                        for r in lp.fit_transform([X, X2])]
+
+    result_m[:, 0:2] -= c
+    assert_almost_equal(np.sort(result, axis=0),
+                        np.sort(result_m, axis=0), decimal=3)
+
+
+@composite
+def get_sparse_matrix(draw):
+    n_points = draw(integers(3, 50))
+    diag = draw(arrays(dtype=np.float32,
+                       elements=integers(min_value=1, max_value=int(1e2)),
+                       shape=(n_points,), unique=True))
+    sign = 2*int(draw(booleans())) - 1
+    n_edges = n_points
+    rows = np.arange(n_points)
+    cols = draw(permutations(rows))
+
+    X = coo_matrix((np.concatenate([sign*diag, np.ones(n_edges)]),
+                    (np.concatenate([np.arange(n_points), rows]),
+                     np.concatenate([np.arange(n_points), cols]))))
+    return X.toarray()
+
+
+@given(X=get_sparse_matrix())
+def test_lsp_transform_symmetry(X):
+    X = coo_matrix(X)
+    hom_dims = (0, 1)
+    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
+    result, result_m = lp.fit_transform([X])[0], lp.fit_transform([-X])[0]
+    result, result_m = [filter_true_zero_persistence(r)
+                        for r in [result, result_m]]
+    same_sweep, same_sweep_m = [r[np.where(r[:, 3] == 1)]
+                                for r in [result, result_m]]
+    max_dim = max(hom_dims)
+    for dim in range(max_dim):
+        dual_dim = max_dim - dim - 1
+        primary, dual = [s[np.where(s[:, 2] == d)]
+                         for s, d in zip([same_sweep, same_sweep_m],
+                                         [dim, dual_dim])]
+        assert_almost_equal(np.sort(primary[:, [0, 1]], axis=0),
+                            np.sort(- dual[:, [1, 0]], axis=0), decimal=3)
+
+
+@given(X=get_sparse_matrix())
+def test_lsp_transform_duality(X):
+    X = coo_matrix(X)
+    hom_dims = (0, 1)
+    lp = LowerStarFlagPersistence(homology_dimensions=hom_dims, extended=True)
+    result = lp.fit_transform([X])[0]
+    result = filter_true_zero_persistence(result)
+    same_sweep = result[np.where(result[:, 3] == 1)]
+    max_dim = max(hom_dims)
+    for dim in range(max_dim):
+        dual_dim = max_dim - dim
+        primary, dual = [same_sweep[np.where(same_sweep[:, 2] == d)]
+                         for d in [dim, dual_dim]]
+        assert_almost_equal(np.sort(primary[:, [0, 1]], axis=0),
+                            np.sort(dual[:, [1, 0]], axis=0), decimal=3)

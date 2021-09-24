@@ -18,6 +18,7 @@ Undirected simplicial homology
    homology.SparseRipsPersistence
    homology.WeakAlphaPersistence
    homology.EuclideanCechPersistence
+   homology.LowerStarFlagPersistence
 
 Directed simplicial homology
 ----------------------------
