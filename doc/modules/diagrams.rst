@@ -49,7 +49,8 @@ Features
    :toctree: generated/diagrams/features
    :template: class.rst
 
+   diagrams.NumberOfPoints
    diagrams.Amplitude
    diagrams.PersistenceEntropy
-   diagrams.NumberOfPoints
+   diagrams.TopologicalVector
    diagrams.ComplexPolynomial

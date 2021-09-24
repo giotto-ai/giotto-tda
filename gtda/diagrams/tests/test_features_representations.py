@@ -11,8 +11,8 @@ from numpy.testing import assert_almost_equal
 from sklearn.exceptions import NotFittedError
 
 from gtda.diagrams import PersistenceEntropy, NumberOfPoints, \
-    ComplexPolynomial, BettiCurve, PersistenceLandscape, HeatKernel, \
-    PersistenceImage, Silhouette
+    ComplexPolynomial, TopologicalVector, BettiCurve, PersistenceLandscape, \
+    HeatKernel, PersistenceImage, Silhouette
 
 pio.renderers.default = 'plotly_mimetype'
 
@@ -26,9 +26,10 @@ layout_params = {"title": "New title"}
 
 @pytest.mark.parametrize('transformer',
                          [PersistenceEntropy(), NumberOfPoints(),
-                          ComplexPolynomial(), BettiCurve(),
-                          PersistenceLandscape(), HeatKernel(),
-                          PersistenceImage(), Silhouette()])
+                          ComplexPolynomial(), TopologicalVector(),
+                          BettiCurve(), PersistenceLandscape(),
+                          HeatKernel(), PersistenceImage(),
+                          Silhouette()])
 def test_not_fitted(transformer):
     with pytest.raises(NotFittedError):
         transformer.transform(X)
@@ -93,10 +94,18 @@ def test_nop_transform(n_jobs):
     assert_almost_equal(nop.fit_transform(X), diagram_res)
 
 
-@pytest.mark.parametrize('n_coefficients', [2, [2, 2]])
+def test_cp_invalid_n_coefficients():
+    cp = ComplexPolynomial(n_coefficients=[0, 1, 2])
+    with pytest.raises(ValueError):
+        cp.fit(X)
+
+
+@pytest.mark.parametrize('n_coefficients', [2, [2, 2], None])
 def test_cp_transform(n_coefficients):
     cp = ComplexPolynomial(n_coefficients=n_coefficients, polynomial_type='R')
     diagram_res = np.array([[-2., -3., -4., 2., -6., -28., -12., 36.]])
+    if n_coefficients is None:
+        diagram_res = np.insert(diagram_res[0], [2, 4], 0)[None, :]
     assert_almost_equal(cp.fit_transform(X), diagram_res)
 
     cp.set_params(polynomial_type='S')
@@ -106,6 +115,8 @@ def test_cp_transform(n_coefficients):
           -2 * (np.sqrt(2/13) + 1 / np.sqrt(5)), -np.sqrt(8 / (13 * 5)) * 7,
           -3 * (np.sqrt(2/13) + 2 / np.sqrt(5)), np.sqrt(8 / (13 * 5)) * 9]]
         )
+    if n_coefficients is None:
+        diagram_res = np.insert(diagram_res[0], [2, 4], 0)[None, :]
     assert_almost_equal(cp.fit_transform(X), diagram_res)
 
     cp.set_params(polynomial_type='T')
@@ -123,7 +134,17 @@ def test_cp_transform(n_coefficients):
           -(u_11 + 2 * u_12),  2 * (u_11 * u_12 - v_11 * v_12),
           -(v_11 + 2 * v_12), 2 * (u_11 * v_12 + u_12 * v_11)]]
         )
+    if n_coefficients is None:
+        diagram_res = np.insert(diagram_res[0], [2, 4], 0)[None, :]
     assert_almost_equal(cp.fit_transform(X), diagram_res)
+
+
+@pytest.mark.parametrize('n_jobs', [1, 2, -1])
+def test_tv_transform(n_jobs):
+    tv = TopologicalVector(n_distances=3, n_jobs=n_jobs)
+    diagram_res = np.array([[0.5, 0., 0., 2, 0., 0.]])
+
+    assert_almost_equal(tv.fit_transform(X), diagram_res)
 
 
 @pytest.mark.parametrize('n_bins', list(range(10, 51, 10)))

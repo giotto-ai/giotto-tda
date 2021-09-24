@@ -2,11 +2,13 @@
 # License: GNU AGPLv3
 
 from numbers import Real
+from types import FunctionType
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
 from scipy.stats import entropy
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.neighbors import DistanceMetric
 from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
@@ -46,7 +48,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         When ``True``, the persistence entropy of each diagram is normalized by
         the logarithm of the sum of lifetimes of all points in the diagram.
         Can aid comparison between diagrams in an input collection when these
-        have different numbers of (non-trivial) points. [1]_
+        have different numbers of (non-trivial) points. See [1]_.
 
     nan_fill_value : float or None, optional, default: ``-1.``
         If a float, (normalized) persistence entropies initially computed as
@@ -65,8 +67,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    NumberOfPoints, Amplitude, BettiCurve, PersistenceLandscape, HeatKernel, \
-    Silhouette, PersistenceImage
+    NumberOfPoints, Amplitude, TopologicalVector, ComplexPolynomial
 
     References
     ----------
@@ -270,8 +271,8 @@ class Amplitude(BaseEstimator, TransformerMixin):
 
     See also
     --------
-    NumberOfPoints, PersistenceEntropy, PairwiseDistance, Scaler, Filtering, \
-    BettiCurve, PersistenceLandscape, HeatKernel, Silhouette, PersistenceImage
+    NumberOfPoints, PersistenceEntropy, TopologicalVector, ComplexPolynomial, \
+    PairwiseDistance, Scaler, Filtering
 
     Notes
     -----
@@ -416,13 +417,12 @@ class NumberOfPoints(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
     See also
     --------
-    PersistenceEntropy, Amplitude, BettiCurve, PersistenceLandscape,
-    HeatKernel, Silhouette, PersistenceImage
+    Amplitude, PersistenceEntropy, TopologicalVector, ComplexPolynomial
 
     """
 
@@ -551,14 +551,14 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
     polynomial_type : ``'R'`` | ``'S'`` | ``'T'``, optional, default: ``'R'``
         Type of complex polynomial to compute.
 
-    n_coefficients : list, int or None, optional, default: ``10``
+    n_coefficients : list, tuple, int or None, optional, default: ``10``
         Number of complex coefficients per homology dimension. If an int then
         the number of coefficients will be equal to that value for each
         homology dimension. If ``None`` then, for each homology dimension in
         the collection of persistence diagrams seen in :meth:`fit`, the number
-        of complex coefficients is defined to be the largest number of
-        off-diagonal points seen among all subdiagrams in that homology
-        dimension, minus one.
+        of complex coefficients is defined to be the (constant, see
+        **Important note**) number of points in each subdiagram in that
+        homology dimension.
 
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
@@ -567,16 +567,16 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     Attributes
     ----------
-    homology_dimensions_ : list
+    homology_dimensions_ : tuple
         Homology dimensions seen in :meth:`fit`, sorted in ascending order.
 
-    n_coefficients_ : list
+    n_coefficients_ : tuple
         Effective number of complex coefficients per homology dimension. Set in
         :meth:`fit`.
 
     See also
     --------
-    Amplitude, PersistenceEntropy
+    NumberOfPoints, Amplitude, PersistenceEntropy, TopologicalVector
 
     References
     ----------
@@ -587,7 +587,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {
-        'n_coefficients': {'type': (int, type(None), list),
+        'n_coefficients': {'type': (int, type(None), list, tuple),
                            'in': Interval(1, np.inf, closed='left'),
                            'of': {'type': int,
                                   'in': Interval(1, np.inf, closed='left')}},
@@ -627,9 +627,9 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        X = check_diagrams(X)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
-        X = check_diagrams(X)
 
         # Find the unique homology dimensions in the 3D array X passed to `fit`
         # assuming that they can all be found in its zero-th entry
@@ -642,19 +642,20 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         _homology_dimensions_counts = dict(zip(homology_dimensions_fit,
                                                counts))
         if self.n_coefficients is None:
-            self.n_coefficients_ = [_homology_dimensions_counts[dim]
-                                    for dim in self.homology_dimensions_]
-        elif type(self.n_coefficients) == list:
+            self.n_coefficients_ = \
+                tuple([_homology_dimensions_counts[dim]
+                       for dim in self.homology_dimensions_])
+        elif type(self.n_coefficients) in (list, tuple):
             if len(self.n_coefficients) != _n_homology_dimensions:
                 raise ValueError(
-                    f'`n_coefficients` has been passed as a list of length '
-                    f'{len(self.n_coefficients)} while diagrams in `X` have '
-                    f'{_n_homology_dimensions} homology dimensions.'
+                    f'`n_coefficients` has length {len(self.n_coefficients)} '
+                    f'while diagrams in `X` have {_n_homology_dimensions} '
+                    f'homology dimensions.'
                     )
             self.n_coefficients_ = self.n_coefficients
         else:
             self.n_coefficients_ = \
-                [self.n_coefficients] * _n_homology_dimensions
+                tuple([self.n_coefficients] * _n_homology_dimensions)
 
         self._polynomial_function = \
             _implemented_polynomial_recipes[self.polynomial_type]
@@ -662,7 +663,7 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
         return self
 
     def _complex_polynomial(self, X, n_coefficients):
-        Xt = np.zeros(2 * n_coefficients,)
+        Xt = np.zeros(2 * n_coefficients)
         X = X[X[:, 0] != X[:, 1]]
 
         roots = self._polynomial_function(X)
@@ -696,20 +697,215 @@ class ComplexPolynomial(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        Xt : ndarray of shape (n_samples, n_homology_dimensions * 2 \
-            * n_coefficients_)
+        Xt : ndarray of shape (n_samples, n_features_new)
             Polynomial coefficients: real and imaginary parts of the complex
             polynomials obtained in each homology dimension from each diagram
-            in `X`.
+            in `X`. ``n_features_new`` is equal to twice the sum of all entries
+            in :attr:`n_coefficients_`.
 
         """
         check_is_fitted(self)
-        Xt = check_diagrams(X, copy=True)
+        Xt = check_diagrams(X)
 
         Xt = Parallel(n_jobs=self.n_jobs)(
             delayed(self._complex_polynomial)(
-                _subdiagrams(Xt[[s]], [dim], remove_dim=True)[0],
-                self.n_coefficients_[d])
+                _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0],
+                self.n_coefficients_[d]
+                )
+            for s in range(len(X))
+            for d, dim in enumerate(self.homology_dimensions_)
+            )
+        Xt = np.concatenate(Xt).reshape(len(X), -1)
+
+        return Xt
+
+
+@adapt_fit_transform_docs
+class TopologicalVector(BaseEstimator, TransformerMixin):
+    """Topological vectors from persistence diagrams.
+
+    The topological vector associated to a persistence diagram is the sorted
+    vector of a slight modification of the pairwise distances between the
+    points in the persistence diagram. See [1]_.
+
+    **Important note**:
+
+        - Input collections of persistence diagrams for this transformer must
+          satisfy certain requirements, see e.g. :meth:`fit`.
+
+    Parameters
+    ----------
+    n_distances : list, tuple, int or None, optional, default: ``10``
+        Number of distances to keep per homology dimension. If an int then the
+        number of distances will be equal to that value for each homology
+        dimension. If ``None`` then, for each homology dimension in the
+        collection of persistence diagrams seen in :meth:`fit`, the number of
+        distances is defined to be the (constant, see **Important note**)
+        number of points in each subdiagram in that homology dimension.
+
+    metric : string or callable, optional, default: ``'chebyshev'``
+        The distance metric to use. See the documentation of
+        :class:`sklearn.neighbors.DistanceMetric` for a list of available
+        metrics. The default ``'chebyshev'`` is as proposed in [1]_.
+
+    metric_params : dict or None, optional, default: ``{}``
+        Additional keyword arguments for the metric function.
+
+    n_jobs : int or None, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
+
+    Attributes
+    ----------
+    homology_dimensions_ : tuple
+        Homology dimensions seen in :meth:`fit`, sorted in ascending order.
+
+    n_distances_ : tuple
+        Effective number of distances per homology dimension. Set in
+        :meth:`fit`.
+
+    See also
+    --------
+    NumberOfPoints, Amplitude, PersistenceEntropy, ComplexPolynomial, \
+    PairwiseDistance
+
+    References
+    ----------
+    .. [1] M. Carrière, S. Y. Oudot, and M. Ovsjanikov, "Stable Topological
+           Signatures for Points on 3D Shapes"; *Computer Graphics Forum*
+           **34** (5), 2015; `DOI: 10.1111:cgf.12692`2015
+           <https://doi.org/10.1111:cgf.12692`2015>`_.
+
+    """
+
+    _hyperparameters = {
+        'n_distances': {'type': (int, type(None), list, tuple),
+                        'in': Interval(1, np.inf, closed='left'),
+                        'of': {'type': int,
+                               'in': Interval(1, np.inf, closed='left')}},
+        'metric': {'type': (str, FunctionType)},
+        'metric_params': {'type': dict}
+        }
+
+    def __init__(self, n_distances=10, metric='chebyshev', metric_params={},
+                 n_jobs=None):
+        self.n_distances = n_distances
+        self.metric = metric
+        self.metric_params = metric_params
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        """Store all observed homology dimensions in
+        :attr:`homology_dimensions_` and compute :attr:`n_distances_`. Then,
+        return the estimator.
+
+        This method is here to implement the usual scikit-learn API and hence
+        work in pipelines.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        X = check_diagrams(X)
+        validate_params(
+            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+
+        # Find the unique homology dimensions in the 3D array X passed to `fit`
+        # assuming that they can all be found in its zero-th entry
+        homology_dimensions_fit, counts = np.unique(X[0, :, 2],
+                                                    return_counts=True)
+        self.homology_dimensions_ = \
+            _homology_dimensions_to_sorted_ints(homology_dimensions_fit)
+
+        _n_homology_dimensions = len(self.homology_dimensions_)
+        _homology_dimensions_counts = dict(zip(homology_dimensions_fit,
+                                               counts))
+
+        if self.n_distances is None:
+            self.n_distances_ = \
+                tuple([_homology_dimensions_counts[dim]
+                       for dim in self.homology_dimensions_])
+        elif type(self.n_distances) in [list, tuple]:
+            if len(self.n_distances) != _n_homology_dimensions:
+                raise ValueError(
+                    f'`n_distances` has length {len(self.n_distances)} '
+                    f'while diagrams in `X` have {_n_homology_dimensions} '
+                    f'homology dimensions.'
+                    )
+            self.n_distances_ = self.n_distances
+        else:
+            self.n_distances_ = \
+                tuple([self.n_distances] * self.homology_dimensions_)
+
+        self._distance_function = \
+            DistanceMetric.get_metric(self.metric, **self.metric_params)
+
+        return self
+
+    def _topological_vector(self, Xd, n_distances):
+        Xv = np.zeros(n_distances)
+        distances = self._distance_function.pairwise(Xd)
+
+        min_persistence = 0.5 * (Xd[:, 1] - Xd[:, 0])
+        vector = np.flip(np.sort(
+            np.triu(np.minimum(distances, min_persistence)), axis=None), 0
+            )
+
+        dimension = min(len(vector), n_distances)
+        Xv[:dimension] = vector[:dimension]
+
+        return Xv
+
+    def transform(self, X, y=None):
+        """Compute the topological vectors of diagrams in `X`.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features, 3)
+            Input data. Array of persistence diagrams, each a collection of
+            triples [b, d, q] representing persistent topological features
+            through their birth (b), death (d) and homology dimension (q).
+            It is important that, for each possible homology dimension, the
+            number of triples for which q equals that homology dimension is
+            constants across the entries of `X`.
+
+        y : None
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+
+        Xt : ndarray of shape (n_samples, n_features_new)
+            Output data. Topological vectors of the diagrams in `X`.
+            ``n_features_new`` is equal to the sum of all entries in
+            :attr:`n_distances_`.
+
+        """
+        check_is_fitted(self)
+        Xt = check_diagrams(X)
+
+        Xt = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._topological_vector)(
+                _subdiagrams(Xt[s:s + 1], [dim], remove_dim=True)[0],
+                self.n_distances_[d]
+            )
             for s in range(len(X))
             for d, dim in enumerate(self.homology_dimensions_)
             )
