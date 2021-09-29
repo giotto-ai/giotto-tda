@@ -27,7 +27,7 @@ class LocalVietorisRipsBase(BaseEstimator,
     for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips."""
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 neighborhoud_param=(1, 2), n_jobs=1):
+                 neighborhoud_param=(1, 2), n_jobs=None):
         """
         Initializes the base class by setting the parameters, initializes the
         object used for computing persistence homology, and checking that the
