@@ -27,11 +27,9 @@ class LocalVietorisRipsBase(BaseEstimator,
     for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips."""
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 neighborhoud_param=(1, 2), n_jobs=None):
+                 neighborhood_param=(1, 2), n_jobs=None):
         """
-        Initializes the base class by setting the parameters, initializes the
-        object used for computing persistence homology, and checking that the
-        parameters were initialized correctly."""
+        Initializes the base class by setting the basic parameters."""
 
         # metric for the point cloud
         self.metric = metric
@@ -39,9 +37,22 @@ class LocalVietorisRipsBase(BaseEstimator,
         # topological dimension of features to be computed
         self.homology_dimensions = homology_dimensions
 
+        # tuple of parameters defining 'neighborhoods' of points. These
+        # parameters are input in the Transformer objects determining what
+        # points lie in the 'neighborhoods' of each points. The points outside
+        # the 'neighborhood' defined by the largest entry are discarded, and
+        # the points between the smaller and largest 'neighborhoods' are 'coned
+        # off'. See more in the corresponding fit methods.
+        self.neighborhood_param = neighborhood_param
+
         self.n_jobs = n_jobs
 
-        # Object is used to compute persistence diagrams
+    def fit(self, X, y=None):
+        """
+        Initializes the object used for computing persistence homology,
+        checks that the parameters were initialized correctly."""
+
+        # object used to compute persistence diagrams
         self.homology = VietorisRipsPersistence(
             metric='precomputed',
             collapse_edges=True,
@@ -49,29 +60,19 @@ class LocalVietorisRipsBase(BaseEstimator,
             n_jobs=self.n_jobs
             )
 
-        # tuple of parameters defining 'neighborhouds' of points. These
-        # parameters are input in the Transformer objects determining what
-        # points lie in the 'neighborhouds' of each points. The points outside
-        # the 'neighborhoud' defined by the largest entry are discarded, and
-        # the points between the smaller and largest 'neighborhouds' are 'coned
-        # off'. See more in the corresponding fit methods.
-        self.neighborhoud_param = neighborhoud_param
-
-        # make sure the neighborhoud_param has been set correctly.
-        if self.neighborhoud_param[0] > self.neighborhoud_param[1]:
-            warnings.warn('First neighborhood_param should be smaller than second. '
-                          'The values are permuted')
-            self.neighborhoud_param = (self.neighborhoud_param[1],
-                                       self.neighborhoud_param[0])
-        if self.neighborhoud_param[1] == 0:
-            warnings.warn('Second neighborhoud_param has to be strictly greater than 0.\
-                Second radius set to 1.')
+        # make sure the neighborhood_param has been set correctly.
+        if self.neighborhood_param[0] > self.neighborhood_param[1]:
+            warnings.warn('First neighborhood_param is larger than second. '
+                          'The values are permuted. ')
+            self.neighborhood_param = (self.neighborhood_param[1],
+                                       self.neighborhood_param[0])
+        if self.neighborhood_param[1] == 0:
+            warnings.warn('Second neighborhood_param has less than 0. '
+                          'Second radius set to 1. ')
             self.radii = (self.radii[0], 1)
-        if self.neighborhoud_param[0] == self.neighborhoud_param[1]:
-            warnings.warn('For meaningfull features, the first neighborhoud_param should\
-                be strictly smaller than second.')
-
-    def fit(self, X, y=None):
+        if self.neighborhood_param[0] == self.neighborhood_param[1]:
+            warnings.warn('For meaningfull features, first neighborhood_param '
+                          'should be strictly smaller than second. ')
         return self
 
     def transform(self, X):
@@ -82,8 +83,8 @@ class LocalVietorisRipsBase(BaseEstimator,
             - First compute the nearest neighbors in the point cloud that
             was fitted on, for both values in n_neighbors.
             - For each point, compute the relevant points (corresponding to
-            the larger neighborhoud_param value), the close points
-            (corresponding to the smaller neighborhoud_param value), and the
+            the larger neighborhood_param value), the close points
+            (corresponding to the smaller neighborhood_param value), and the
             annulus to cone off (relevant points, but not close points).
             Compute the distance matrix of the relevant points, and add an
             additional row and column corresponding to the coning off point.
@@ -112,18 +113,18 @@ class LocalVietorisRipsBase(BaseEstimator,
         """
 
         check_is_fitted(self)
-        check_array(X, accept_sparse=False)
+        Xt = check_array(X, accept_sparse=False)
 
         # sparse binary matrices where rows indicate the indices of points
         # which are nearest neighbors to the row's index point.
-        Xt_close = self.close_neighbors_.transform(X)
-        Xt_relevant = self.relevant_neighbors_.transform(X)
+        Xt_close = self.close_neighbors_.transform(Xt)
+        Xt_relevant = self.relevant_neighbors_.transform(Xt)
 
         coned_mats = []
-        for i in range(len(X)):
+        for i in range(len(Xt)):
             # get indices of points close to point at index i
             close_indices = Xt_close.getrow(i).indices
-            # get indices of points in second 'neighborhoud'
+            # get indices of points in second 'neighborhood'
             relevant_indices = Xt_relevant.getrow(i).indices
             annulus_indices = list(set(relevant_indices) - set(close_indices))
             # Order them such that the last ones are the ones to cone off
@@ -248,7 +249,7 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         self.n_neighbors = n_neighbors
         super().__init__(metric=metric,
                          homology_dimensions=homology_dimensions,
-                         neighborhoud_param=self.n_neighbors,
+                         neighborhood_param=self.n_neighbors,
                          n_jobs=n_jobs)
 
     def fit(self, X, y=None):
@@ -274,31 +275,34 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         self : object
 
         """
+
+        super().fit(X)
+
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         check_array(X, accept_sparse=False)
 
         # make sure that the parameters are set correctly
         self.size_ = len(X)
-        if self.size_ <= self.neighborhoud_param[0]:
-            warnings.warn('First n_neighbors is too large to be relevant.\
-                             Consider reducing it.')
-            self.neighborhoud_param = (self.size_-1, self.size_)
-        if self.size_ < self.neighborhoud_param[1]:
-            warnings.warn('Second n_neighbors is too large to be relevant.\
-                             Consider reducing it.')
-            self.neighborhoud_param = (self.neighborhoud_param[0], self.size_)
+        if self.size_ <= self.neighborhood_param[0]:
+            warnings.warn('First n_neighbors is too large to be relevant. '
+                          'Consider reducing it.')
+            self.neighborhood_param = (self.size_-1, self.size_)
+        if self.size_ < self.neighborhood_param[1]:
+            warnings.warn('Second n_neighbors is too large to be relevant. '
+                          'Consider reducing it. ')
+            self.neighborhood_param = (self.neighborhood_param[0], self.size_)
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = KNeighborsTransformer(
                                     mode='connectivity',
-                                    n_neighbors=self.neighborhoud_param[0],
+                                    n_neighbors=self.neighborhood_param[0],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
         self.relevant_neighbors_ = KNeighborsTransformer(
                                     mode='connectivity',
-                                    n_neighbors=self.neighborhoud_param[1],
+                                    n_neighbors=self.neighborhood_param[1],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
@@ -364,7 +368,7 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         self.radii = radii
         super().__init__(metric=metric,
                          homology_dimensions=homology_dimensions,
-                         neighborhoud_param=self.radii,
+                         neighborhood_param=self.radii,
                          n_jobs=n_jobs)
 
     def fit(self, X, y=None):
@@ -390,6 +394,9 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         self : object
 
         """
+
+        super().fit(X)
+
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
         check_array(X, accept_sparse=False)
@@ -397,13 +404,13 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = RadiusNeighborsTransformer(
                                     mode='connectivity',
-                                    radius=self.neighborhoud_param[0],
+                                    radius=self.neighborhood_param[0],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
         self.relevant_neighbors_ = RadiusNeighborsTransformer(
                                     mode='connectivity',
-                                    radius=self.neighborhoud_param[1],
+                                    radius=self.neighborhood_param[1],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
