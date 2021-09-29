@@ -59,8 +59,8 @@ class LocalVietorisRipsBase(BaseEstimator,
 
         # make sure the neighborhoud_param has been set correctly.
         if self.neighborhoud_param[0] > self.neighborhoud_param[1]:
-            warnings.warn('First neighborhoud_param should be smaller than second.\
-                The values are permuted')
+            warnings.warn('First neighborhood_param should be smaller than second. '
+                          'The values are permuted')
             self.neighborhoud_param = (self.neighborhoud_param[1],
                                        self.neighborhoud_param[0])
         if self.neighborhoud_param[1] == 0:
