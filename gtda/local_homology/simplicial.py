@@ -43,10 +43,11 @@ class LocalVietorisRipsBase(BaseEstimator,
 
         # Object is used to compute persistence diagrams
         self.homology = VietorisRipsPersistence(
-                            metric='precomputed',
-                            collapse_edges=True,
-                            homology_dimensions=self.homology_dimensions,
-                            n_jobs=self.n_jobs)
+            metric='precomputed',
+            collapse_edges=True,
+            homology_dimensions=self.homology_dimensions,
+            n_jobs=self.n_jobs
+            )
 
         # tuple of parameters defining 'neighborhouds' of points. These
         # parameters are input in the Transformer objects determining what
