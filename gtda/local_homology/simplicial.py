@@ -27,7 +27,8 @@ class LocalVietorisRipsBase(BaseEstimator,
     for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips."""
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 neighborhood_param=(1, 2), n_jobs=None):
+                 neighborhood_param=(1, 2), collapse_edges=False,
+                 n_jobs=None):
         """
         Initializes the base class by setting the basic parameters."""
 
@@ -45,6 +46,9 @@ class LocalVietorisRipsBase(BaseEstimator,
         # off'. See more in the corresponding fit methods.
         self.neighborhood_param = neighborhood_param
 
+        # parameter to feed into the homology transformer
+        self.collapse_edges = collapse_edges
+
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
@@ -55,7 +59,7 @@ class LocalVietorisRipsBase(BaseEstimator,
         # object used to compute persistence diagrams
         self.homology = VietorisRipsPersistence(
             metric='precomputed',
-            collapse_edges=True,
+            collapse_edges=self.collapse_edges,
             homology_dimensions=self.homology_dimensions,
             n_jobs=self.n_jobs
             )
