@@ -62,6 +62,7 @@ def test_KNeighborsLocalVietoris(point_cloud, point_cloud2, dims,
     lh_kn = KNeighborsLocalVietorisRips(metric='euclidean',
                                         n_neighbors=n_neighbors,
                                         homology_dimensions=dims,
+                                        collapse_edges=True,
                                         n_jobs=-1)
     lh_kn.fit_transform(X)
 
@@ -87,6 +88,7 @@ def test_RadiusLocalVietoris(point_cloud, point_cloud2, dims, radii):
     lh_rad = RadiusLocalVietorisRips(metric='euclidean',
                                      radii=radii,
                                      homology_dimensions=dims,
+                                     collapse_edges=True,
                                      n_jobs=-1)
     lh_rad.fit(X)
     lh_rad.transform(X)
@@ -101,6 +103,7 @@ def test_RadiusLocalVietoris(point_cloud, point_cloud2, dims, radii):
     lh_rad = RadiusLocalVietorisRips(metric='euclidean',
                                      radii=radii,
                                      homology_dimensions=dims,
+                                     collapse_edges=True,
                                      n_jobs=-1)
     lh_rad.fit(X)
     lh_rad.transform(Y)

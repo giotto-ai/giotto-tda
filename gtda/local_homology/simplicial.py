@@ -27,10 +27,11 @@ class LocalVietorisRipsBase(BaseEstimator,
     for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips."""
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 neighborhood_param=(1, 2), collapse_edges=False,
+                 neighborhood_params=(1, 2), collapse_edges=False,
                  n_jobs=None):
         """
-        Initializes the base class by setting the basic parameters."""
+        Initializes the base class by setting the basic parameters.
+        For more specific description, see specific children classes."""
 
         # metric for the point cloud
         self.metric = metric
@@ -44,7 +45,7 @@ class LocalVietorisRipsBase(BaseEstimator,
         # the 'neighborhood' defined by the largest entry are discarded, and
         # the points between the smaller and largest 'neighborhoods' are 'coned
         # off'. See more in the corresponding fit methods.
-        self.neighborhood_param = neighborhood_param
+        self.neighborhood_params = neighborhood_params
 
         # parameter to feed into the homology transformer
         self.collapse_edges = collapse_edges
@@ -64,18 +65,18 @@ class LocalVietorisRipsBase(BaseEstimator,
             n_jobs=self.n_jobs
             )
 
-        # make sure the neighborhood_param has been set correctly.
-        if self.neighborhood_param[0] > self.neighborhood_param[1]:
-            warnings.warn('First neighborhood_param is larger than second. '
+        # make sure the neighborhood_params has been set correctly.
+        if self.neighborhood_params[0] > self.neighborhood_params[1]:
+            warnings.warn('First neighborhood_params is larger than second. '
                           'The values are permuted. ')
-            self.neighborhood_param = (self.neighborhood_param[1],
-                                       self.neighborhood_param[0])
-        if self.neighborhood_param[1] == 0:
-            warnings.warn('Second neighborhood_param has less than 0. '
+            self.neighborhood_params = (self.neighborhood_params[1],
+                                       self.neighborhood_params[0])
+        if self.neighborhood_params[1] == 0:
+            warnings.warn('Second neighborhood_params has less than 0. '
                           'Second radius set to 1. ')
             self.radii = (self.radii[0], 1)
-        if self.neighborhood_param[0] == self.neighborhood_param[1]:
-            warnings.warn('For meaningfull features, first neighborhood_param '
+        if self.neighborhood_params[0] == self.neighborhood_params[1]:
+            warnings.warn('For meaningfull features, first neighborhood_params '
                           'should be strictly smaller than second. ')
         return self
 
@@ -87,8 +88,8 @@ class LocalVietorisRipsBase(BaseEstimator,
             - First compute the nearest neighbors in the point cloud that
             was fitted on, for both values in n_neighbors.
             - For each point, compute the relevant points (corresponding to
-            the larger neighborhood_param value), the close points
-            (corresponding to the smaller neighborhood_param value), and the
+            the larger neighborhood_params value), the close points
+            (corresponding to the smaller neighborhood_params value), and the
             annulus to cone off (relevant points, but not close points).
             Compute the distance matrix of the relevant points, and add an
             additional row and column corresponding to the coning off point.
@@ -230,10 +231,26 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     homology_dimensions: tuple, optional, default: ``(1, 2)``. Dimensions
         (non-negative integers) of the topological features to be detected.
 
+    collapse_edges : bool, optional, default: ``False``
+        Whether to run the edge collapse algorithm in [1]_ prior to the
+        persistent homology computation (see the Notes). Can reduce the runtime
+        dramatically when the data or the maximum homology dimensions are
+        large.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    References
+    ----------
+
+    .. [1] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
+           Flag Complexes"; in *36th International Symposium on Computational
+           Geometry (SoCG 2020)*, pp. 19:1–19:15,
+           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19
+           <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
     """
 
     _hyperparameters = {
@@ -245,15 +262,17 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         'homology_dimensions': {
             'type': (tuple, list),
             'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
-            }
+            },
+        'collapse_edges': {'type': bool}
         }
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 n_neighbors=(1, 2), n_jobs=1):
+                 n_neighbors=(1, 2), collapse_edges=False, n_jobs=1):
         self.n_neighbors = n_neighbors
         super().__init__(metric=metric,
                          homology_dimensions=homology_dimensions,
-                         neighborhood_param=self.n_neighbors,
+                         neighborhood_params=self.n_neighbors,
+                         collapse_edges=collapse_edges,
                          n_jobs=n_jobs)
 
     def fit(self, X, y=None):
@@ -288,25 +307,25 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
 
         # make sure that the parameters are set correctly
         self.size_ = len(X)
-        if self.size_ <= self.neighborhood_param[0]:
+        if self.size_ <= self.neighborhood_params[0]:
             warnings.warn('First n_neighbors is too large to be relevant. '
                           'Consider reducing it.')
-            self.neighborhood_param = (self.size_-1, self.size_)
-        if self.size_ < self.neighborhood_param[1]:
+            self.neighborhood_params = (self.size_-1, self.size_)
+        if self.size_ < self.neighborhood_params[1]:
             warnings.warn('Second n_neighbors is too large to be relevant. '
                           'Consider reducing it. ')
-            self.neighborhood_param = (self.neighborhood_param[0], self.size_)
+            self.neighborhood_params = (self.neighborhood_params[0], self.size_)
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = KNeighborsTransformer(
                                     mode='connectivity',
-                                    n_neighbors=self.neighborhood_param[0],
+                                    n_neighbors=self.neighborhood_params[0],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
         self.relevant_neighbors_ = KNeighborsTransformer(
                                     mode='connectivity',
-                                    n_neighbors=self.neighborhood_param[1],
+                                    n_neighbors=self.neighborhood_params[1],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
@@ -350,10 +369,26 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     homology_dimensions: tuple, optional, default: ``(1, 2)``. Dimensions
         (non-negative integers) of the topological features to be detected.
 
+    collapse_edges : bool, optional, default: ``False``
+        Whether to run the edge collapse algorithm in [1]_ prior to the
+        persistent homology computation (see the Notes). Can reduce the runtime
+        dramatically when the data or the maximum homology dimensions are
+        large.
+
     n_jobs : int or None, optional, default: ``None``
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
+    References
+    ----------
+
+    .. [1] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
+           Flag Complexes"; in *36th International Symposium on Computational
+           Geometry (SoCG 2020)*, pp. 19:1–19:15,
+           Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
+           `DOI: 10.4230/LIPIcs.SoCG.2020.19
+           <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
     """
 
     _hyperparameters = {
@@ -364,15 +399,17 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         'homology_dimensions': {
             'type': (tuple, list),
             'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
-            }
+            },
+        'collapse_edges': {'type': bool}
         }
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 radii=(1, 2), n_jobs=1):
+                 radii=(1, 2), collapse_edges=False, n_jobs=1):
         self.radii = radii
         super().__init__(metric=metric,
                          homology_dimensions=homology_dimensions,
-                         neighborhood_param=self.radii,
+                         neighborhood_params=self.radii,
+                         collapse_edges=collapse_edges,
                          n_jobs=n_jobs)
 
     def fit(self, X, y=None):
@@ -408,13 +445,13 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = RadiusNeighborsTransformer(
                                     mode='connectivity',
-                                    radius=self.neighborhood_param[0],
+                                    radius=self.neighborhood_params[0],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
         self.relevant_neighbors_ = RadiusNeighborsTransformer(
                                     mode='connectivity',
-                                    radius=self.neighborhood_param[1],
+                                    radius=self.neighborhood_params[1],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
