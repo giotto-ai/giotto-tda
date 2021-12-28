@@ -127,10 +127,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `giotto-ph <https://github.com/giotto-ai/giotto-ph>`_ [1]_ is used as a C++
-    backend for computing Vietoris–Rips persistent homology.
-
-    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in [2]_.
+    backend for computing Vietoris–Rips persistent homology and edge collapses.
 
     References
     ----------
@@ -490,10 +487,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     `giotto-ph <https://github.com/giotto-ai/giotto-ph>`_ [1]_ is used as a C++
-    backend for computing Vietoris–Rips persistent homology.
-
-    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in [2]_.
+    backend for computing Vietoris–Rips persistent homology and edge collapses.
 
     References
     ----------
