@@ -1,6 +1,3 @@
-[submodule "gtda/externals/ripser"]
-	path = gtda/externals/ripser
-	url = https://github.com/scikit-tda/ripser.py.git
 [submodule "gtda/externals/gudhi-devel"]
 	path = gtda/externals/gudhi-devel
 	url = https://github.com/giotto-ai/gudhi-devel
@@ -14,6 +11,3 @@
 [submodule "gtda/externals/pybind11"]
 	path = gtda/externals/pybind11
 	url = https://github.com/pybind/pybind11
-[submodule "gtda/externals/robinhood"]
-	path = gtda/externals/robinhood
-	url = https://github.com/martinus/robin-hood-hashing
