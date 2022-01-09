@@ -82,7 +82,7 @@ jobs:
       - name: Build ${{ github.event.repository.name }} on Linux and MacOs
         if: ${{ runner.os != 'Windows' }}
         run: |
-          python -m pip install -e . ".[dev]"
+          python -m pip install -e ".[dev]"
         env:
           CC: "ccache gcc"
           CXX: "ccache g++"
