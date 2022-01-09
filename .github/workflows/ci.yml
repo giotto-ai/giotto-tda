@@ -103,7 +103,7 @@ jobs:
       - name: Build ${{ github.event.repository.name }} on Windows
         if: ${{ runner.os == 'Windows' }}
         run: |
-          python -m pip install -e . ".[dev]"
+          python -m pip install -e ".[dev]"
 
       - name: Test package with pytest
         run: |
