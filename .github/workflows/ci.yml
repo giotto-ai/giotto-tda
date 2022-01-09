@@ -97,12 +97,15 @@ jobs:
           python -m pip install -e . ".[dev]"
 
       - name: Test package with pytest
-        uses: actions/upload-artifact@v2
         run: |
           python -m pip install pandas pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
           mkdir coverage
           cd coverage
           pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
+          cd ..
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-coverage
           path: coverage/
