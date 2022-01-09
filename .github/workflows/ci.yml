@@ -79,6 +79,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools
 
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.1.0
+        id: install-boost
+        with:
+          # REQUIRED: Specify the required boost version
+          # A list of supported versions can be found here:
+          # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
+          boost_version: 1.76.0
+
       - name: Build ${{ github.event.repository.name }} on Linux and MacOs
         if: ${{ runner.os != 'Windows' }}
         run: |
