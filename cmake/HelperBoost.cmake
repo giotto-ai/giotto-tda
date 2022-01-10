@@ -1,7 +1,7 @@
 # Add to BOOST_ROOT variable a custom path to 
 # ease installation of giotto-tda on Windows platforms
 # The custom path will be at `C:\\local\`
-if(WIN32 AND $ENV{BOOST_ROOT} STREQUAL "")
+if(WIN32)
     list(APPEND BOOST_ROOT "C:/local")
     list(APPEND BOOST_ROOT "") # Add custom path to your boost installation
 endif()
