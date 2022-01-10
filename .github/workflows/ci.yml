@@ -115,6 +115,7 @@ jobs:
           cd coverage
           pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
           cd ..
+        continue-on-error: true
 
       - name: Upload coverage
         uses: actions/upload-artifact@v2
