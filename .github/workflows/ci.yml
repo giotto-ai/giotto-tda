@@ -137,7 +137,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         uses: py-actions/flake8@v2
         with:
-          exclude: "boost gtda/externals doc examples"
+          exclude: "boost,gtda/externals,doc,examples"
 
       - name: Test jupyter notebooks with papermill
         run: |
