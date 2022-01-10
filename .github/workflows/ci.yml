@@ -83,9 +83,6 @@ jobs:
         uses: MarkusJx/install-boost@v2.1.0
         id: install-boost
         with:
-          # REQUIRED: Specify the required boost version
-          # A list of supported versions can be found here:
-          # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
           boost_version: 1.76.0
 
       - name: Build ${{ github.event.repository.name }} on Linux and MacOs
@@ -110,27 +107,23 @@ jobs:
 
       - name: Install test tools
         run: |
-          python -m pip install pandas pytest pytest-cov pytest-benchmark hypothesis flake8
+          python -m pip install pandas pytest pytest-cov pytest-benchmark hypothesis
 
       - name: Test package with pytest on Linux and Windows
         if: ${{ runner.os == 'Linux' || runner.os == 'Windows' }}
         run: |
           pytest --pyargs gtda --no-cov
 
-      - name: Test package with pytest and flake8 on Mac with upload
+      - name: Test package with pytest Mac with coverage
         if: ${{ runner.os == 'macOS' }}
         run: |
-          mkdir coverage
           pytest gtda --cov --cov-report xml:coverage.xml
-          flake8 --exclude=boost
 
-      - name: Upload coverage for Mac
+      - name: flake8 Lint on MacOS
         if: ${{ runner.os == 'macOS' }}
-        uses: actions/upload-artifact@v2
+        uses: py-actions/flake8@v2
         with:
-          name: ${{ runner.os }}-coverage
-          path: coverage.xml
-          if-no-files-found: warn
+          exclude: "boost"
 
       - name: Test jupyter notebooks with papermill
         run: |
@@ -142,3 +135,12 @@ jobs:
             papermill --start_timeout 2000 $n -
           done
         continue-on-error: true
+
+      - name: Upload coverage for Mac
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ runner.os }}-coverage
+          path: coverage.xml
+          if-no-files-found: warn
+
