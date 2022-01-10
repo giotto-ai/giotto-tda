@@ -73,7 +73,7 @@ jobs:
         with:
           path: ${{ matrix.path_ccache }}
             # TODO: When updating c++ backend, use new date (yy-mm-dd)
-          key: ${{ runner.os }}-ccache-${{ matrix.python-version }}-21-11-08
+          key: ${{ runner.os }}-ccache-${{ matrix.python-version }}-22-01-11
 
       - name: Upgrade pip and setuptools
         run: |
@@ -122,7 +122,7 @@ jobs:
         run: |
           mkdir coverage
           pytest gtda --cov --cov-report xml:coverage.xml
-          flake8
+          flake8 --exclude=boost
 
       - name: Upload coverage for Mac
         if: ${{ runner.os == 'macOS' }}
