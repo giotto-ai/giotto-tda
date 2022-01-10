@@ -1,6 +1,6 @@
 name: Build package on different Os and Python versions
 
-on : [push, pull_request]
+on : [pull_request]
 
 jobs:
 
