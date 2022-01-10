@@ -7,7 +7,7 @@ jobs:
   build_package:
     name: Build ${{ github.event.repository.name }} on ${{ matrix.os }} for Python-${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
