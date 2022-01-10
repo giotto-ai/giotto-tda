@@ -1,5 +1,6 @@
 name: Build Wheels
 
+<<<<<<< HEAD
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
 on :
   workflow_dispatch:
@@ -9,6 +10,9 @@ on :
         type: boolean
         required: true
         default: false
+=======
+on : push
+>>>>>>> 902f1fd ([CI] Add wheels generations workflow)
 
 jobs:
 
@@ -19,6 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+<<<<<<< HEAD
         include:
           - os: ubuntu-latest
             boost_install_dir: /home/runner/work
@@ -28,10 +33,13 @@ jobs:
             boost_install_dir: D:\
     env:
       BOOST_VERSION: 1.76.0
+=======
+>>>>>>> 902f1fd ([CI] Add wheels generations workflow)
 
     steps:
       - uses: actions/checkout@v2
 
+<<<<<<< HEAD
       - name: Change name to giotto-tda-nightly
         if: ${{ github.event.inputs.nightlyRelease == true }}
         run: |
@@ -90,6 +98,26 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           # Should generate universal2 wheels for CP3.8 -- CP3.10
           CIBW_ARCHS_MACOS: x86_64 universal2
+=======
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.1.0
+        id: install-boost
+        with:
+          boost_version: 1.76.0
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.2.2
+        env:
+          # Specify which Python versions to build wheels
+          # https://cibuildwheel.readthedocs.io/en/stable/options/#build-skip
+          CIBW_BUILD: "cp36-* cp37-* cp38-* cp39-*"
+          # Skip 32 bit architectures, musllinux, and i686
+          CIBW_SKIP: "*-win32 *-musllinux_x86_64 *_i686"
+          CIBW_BEFORE_BUILD: python -m pip install cmake
+          CIBW_TEST_COMMAND: python -m pytest {package}/gph/python/test
+          CIBW_TEST_REQUIRES: pytest hypothesis pandas pytest-cov pytest-benchmark
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+>>>>>>> 902f1fd ([CI] Add wheels generations workflow)
 
       - uses: actions/upload-artifact@v2
         name: Upload wheels
