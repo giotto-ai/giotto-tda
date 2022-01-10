@@ -123,6 +123,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         uses: py-actions/flake8@v2
         with:
+          args: "--config setup.cfg"
           exclude: "boost"
 
       - name: Test jupyter notebooks with papermill
