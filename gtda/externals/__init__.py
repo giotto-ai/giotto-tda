@@ -17,5 +17,6 @@ __all__ = [
     'PeriodicCubicalComplex',
     'SimplexTree',
     'WitnessComplex',
-    'StrongWitnessComplex'
+    'StrongWitnessComplex',
+    'modules'
     ]
