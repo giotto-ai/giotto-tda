@@ -3,6 +3,48 @@ from ..modules.gtda_sparse_rips_complex \
 from . import SimplexTree
 
 
+# RipsComplex python interface
+class RipsComplex:
+    """The data structure is a one skeleton graph, or Rips graph, containing
+    edges when the edge length is less or equal to a given threshold. Edge
+    length is computed from a user given point cloud with a given distance
+    function, or a distance matrix.
+    """
+    def __init__(self, points=None, distance_matrix=None,
+                 max_edge_length=float('inf')):
+        """RipsComplex constructor.
+        :param max_edge_length: Rips value.
+        :type max_edge_length: float
+        :param points: A list of points in d-Dimension.
+        :type points: list of list of double
+        Or
+        :param distance_matrix: A distance matrix (full square or lower
+            triangular).
+        :type points: list of list of double
+        """
+        self.thisref = Rips_complex_interface()
+
+        if distance_matrix is not None:
+            self.thisref.init_matrix(distance_matrix, max_edge_length)
+        else:
+            if points is None:
+                # Empty Rips construction
+                points = []
+            self.thisref.init_points(points, max_edge_length)
+
+    def create_simplex_tree(self, max_dimension=1):
+        """
+        :param max_dimension: graph expansion for rips until this given maximal
+            dimension.
+        :type max_dimension: int
+        :returns: A simplex tree created from the Delaunay Triangulation.
+        :rtype: SimplexTree
+        """
+        simplex_tree = SimplexTree()
+        self.thisref.create_simplex_tree(simplex_tree.thisptr, max_dimension)
+        return simplex_tree
+
+
 # SparseRipsComplex python interface
 class SparseRipsComplex:
     """The data structure is a one skeleton graph, or Rips graph, containing
