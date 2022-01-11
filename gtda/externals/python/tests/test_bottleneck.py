@@ -1,4 +1,4 @@
-from ...modules.gtda_bottleneck import bottleneck_distance
+from gtda.externals.modules.gtda_bottleneck import bottleneck_distance
 
 
 def test_trivial_empty_diagram():

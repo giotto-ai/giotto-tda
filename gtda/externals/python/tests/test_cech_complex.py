@@ -1,4 +1,4 @@
-from .. import CechComplex
+from gtda.externals import CechComplex
 
 
 def test_minimal_cech():
