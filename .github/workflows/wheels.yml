@@ -21,7 +21,6 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     env:
       BOOST_VERSION: 1.76.0
-      boost_install_dir: ${{ GITHUB_WORKSPACE }}
 
     steps:
       - uses: actions/checkout@v2
@@ -37,7 +36,7 @@ jobs:
 
       - name: Create directories boost
         run: |
-          cd ${{ env.boost_install_dir }}
+          cd ${{ GITHUB_WORKSPACE }}
           mkdir -p boost/boost
           cd -
 
@@ -50,7 +49,7 @@ jobs:
         id: cache-boost
         with:
           # Set the default path as the path to cache
-          path: ${{ env.boost_install_dir }}/boost/boost
+          path: ${{ GITHUB_WORKSPACE }}/boost/boost
             # Use the version as the key to only cache the correct version
           key: 1-boost-${{env.BOOST_VERSION}}
 
@@ -60,7 +59,7 @@ jobs:
         if: steps.cache-boost.outputs.cache-hit != 'true'
         with:
           boost_version: ${{env.BOOST_VERSION}}
-          boost_install_dir: ${{ env.boost_install_dir }}
+          boost_install_dir: ${{ GITHUB_WORKSPACE }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.9.0
