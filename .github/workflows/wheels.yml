@@ -42,6 +42,7 @@ jobs:
         shell: bash
 
       - name: Create directories boost
+        if: ${{ runner.os == 'Windows' || runner.os == 'macOS' }}
         run: |
           cd ${{ matrix.boost_install_dir }}
           mkdir -p boost/boost
