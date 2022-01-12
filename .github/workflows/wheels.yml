@@ -21,11 +21,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            boost_install_dir: /home/runner/work/
+            boost_install_dir: /home/runner/work
           - os: macos-latest
-            boost_install_dir: /Users/runner/work/
+            boost_install_dir: /Users/runner/work
           - os: windows-latest
-            boost_install_dir: D:\
+            boost_install_dir: D:
     env:
       BOOST_VERSION: 1.76.0
 
@@ -83,7 +83,7 @@ jobs:
           # nbformat is needed by plotly: https://github.com/plotly/plotly.py/issues/2159
           CIBW_TEST_REQUIRES: pytest hypothesis pandas nbformat
           CIBW_ENVIRONMENT_WINDOWS: BOOST_ROOT='${{ matrix.boost_install_dir }}boost\boost'
-          CIBW_ENVIRONMENT_MACOS: BOOST_ROOT='${{ matrix.boost_install_dir }}/boost'
+======IBW_ENVIRONMENT_MACOS: BOOST_ROOT='${{ matrix.boost_install_dir }}/boost'
           CIBW_ENVIRONMENT_LINUX: BOOST_ROOT=/host${{ matrix.boost_install_dir }}/boost
           CIBW_ENVIRONMENT_PASS_LINUX: BOOST_ROOT
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -vv -w {dest_dir} {wheel}"
