@@ -21,11 +21,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            boost_install_dir: ${GITHUB_WORKSPACE}
+            boost_install_dir: ${{ GITHUB_WORKSPACE }}
           - os: macos-latest
-            boost_install_dir: ${GITHUB_WORKSPACE}
+            boost_install_dir: ${{ GITHUB_WORKSPACE }}
           - os: windows-latest
-            boost_install_dir: ${GITHUB_WORKSPACE}
+            boost_install_dir: ${{ GITHUB_WORKSPACE }}
     env:
       BOOST_VERSION: 1.76.0
 
