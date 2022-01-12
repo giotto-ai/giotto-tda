@@ -21,11 +21,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            boost_install_dir: ${{ github.workspace }}
+            boost_install_dir: /home/runner/work/
           - os: macos-latest
-            boost_install_dir: ${{ github.workspace }}
+            boost_install_dir: /Users/runner/work/
           - os: windows-latest
-            boost_install_dir: ${{ github.workspace }}
+            boost_install_dir: D:\
     env:
       BOOST_VERSION: 1.76.0
 
