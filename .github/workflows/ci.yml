@@ -158,7 +158,7 @@ jobs:
           for FILENAME in $FILES_WITHOUT_EXT
           do
             SAVE_FILE=$PAPERMILL_DIR/$FILENAME.txt
-            papermill --execution-timeout matrix.papermill_timeout $FILENAME.ipynb $SAVE_FILE
+            papermill --execution-timeout ${{ matrix.papermill_timeout }} $FILENAME.ipynb $SAVE_FILE
           done
         shell: bash
 
