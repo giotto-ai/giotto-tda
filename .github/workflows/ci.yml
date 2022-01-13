@@ -144,11 +144,19 @@ jobs:
           python -m pip install openml matplotlib
           python -m pip install papermill
           cd examples
-          for n in *.ipynb
+          # Get all .ipynb notebook but discard the MNIST_classification
+          # Because it is too long
+          # This command also removes the .pynb extension
+          FILES_WITHOUT_EXT=`find . ! -name '*MNIST_classification*' -iname '*.ipynb' -exec bash -c 'printf "%s\n" "${@%.*}"' _ {} +`
+          PAPERMILL_DIR=papermill_results
+
+          mkdir -p $PAPERMILL_DIR
+
+          for FILENAME in $FILES_WITHOUT_EXT
           do
-            papermill --start_timeout 2000 $n -
+            SAVE_FILE=$PAPERMILL_DIR/$FILENAME.txt
+            papermill --execution-timeout 60 $FILENAME.ipynb $SAVE_FILE
           done
-        continue-on-error: true
 
       ######################
       #  Upload Artifacts  #
