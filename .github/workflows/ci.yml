@@ -21,12 +21,12 @@ jobs:
             path_ccache: /home/runner/cache/ccache
           - os: macos-latest
             path: ~/Library/Caches/pip
-            papermill_timeout: 120
+            papermill_timeout: 240
               # ccache requires absolute path
             path_ccache: /Users/runner/Library/Caches/ccache
           - os: windows-latest
             path: ~\AppData\Local\pip\Cache
-            papermill_timeout: 240
+            papermill_timeout: 300
               # FIXME: ccache is currently not available on Windows
             # path_ccache: ~\AppData\Local\ccache\Cache
 
