@@ -2,7 +2,7 @@ name: Build package on different Os and Python versions
 
 on :
   pull_request:
-  workflow:
+  workflow_dispatch:
     inputs:
       testNotebooks:
         description: 'Enable notebook verification step'
