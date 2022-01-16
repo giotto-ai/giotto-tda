@@ -115,6 +115,7 @@ jobs:
       - name: Build ${{ github.event.repository.name }} on Linux and MacOs
         if: ${{ runner.os != 'Windows' }}
         run: |
+          echo $BOOST_ROOT
           python -m pip install -e ".[dev]"
         env:
           CC: "ccache gcc"
