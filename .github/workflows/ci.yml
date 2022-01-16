@@ -46,15 +46,6 @@ jobs:
           path: ${{ matrix.path }}
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Change name to giotto-tda-nightly
-        if: false
-        run: |
-          set -e
-          sed -i "s/'giotto-tda'/'giotto-tda-nightly'/1" setup.py
-          sed -i 's/"giotto-tda"/"giotto-tda-nightly"/1' setup.py
-          sed -i "s/__version__.*/__version__ = '$(Build.BuildNumber)'/1" gtda/_version.py
-        shell: bash
-
         ###################
         #  Caching stuff  #
         ###################
