@@ -23,7 +23,22 @@ CI for Pull Request
 
 Pull requests
 -------------
- TODO
+
+On pull request the CI will be automatically triggered for each new push of commits that are done in the PR. This workflow can also be manually triggered for testing the notebooks. By default the test are disable because, notebook verification with ``papermill`` is time consuming.
+
+The workflow to build and validate the new PR is relatively big, it is decomposed in sections:
+
+* Setting up repository and the Python version
+* Setting up and retrieving when available data in caches
+* Install requirements and build ``giotto-tda`` library
+* Install test requirements and test the compiled library
+* Upload artifacts
+
+There are some steps that are performed only on certain platforms, the relevant ones are:
+
+* On windows, caching the boost library is disable, see ``ìnstall-boost section in Wheels generation``.
+* Building the library for Linux and Mac is done on a different step, because they use ``ccache`` for caching intermediate files. It is not available on Windows.
+* We generate coverage report and test with ``flake8`` on Mac.
 
 CI for generating the wheels
 ============================
