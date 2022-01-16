@@ -70,7 +70,7 @@ jobs:
         id: cache-boost
         with:
           # Set the default path as the path to cache
-          path: ${{env.GITHUB_WORKSPACE}}/boost/boost
+          path: ${ env.GITHUB_WORKSPACE }/boost/boost
             # Use the version as the key to only cache the correct version
           key: boost-${{env.BOOST_VERSION}}
 
@@ -123,7 +123,7 @@ jobs:
           CCACHE_DIR: ${{ matrix.path_ccache }}
           CCACHE_COMPRESS: 1
           CCACHE_MAXSIZE: 4G
-          BOOST_ROOT: ${{env.GITHUB_WORKSPACE}}/boost/boost
+          BOOST_ROOT: ${ env.GITHUB_WORKSPACE }/boost/boost
 
       # Windows does not support ccache with visual studio compiler
       - name: Build ${{ github.event.repository.name }} on Windows
