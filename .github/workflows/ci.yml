@@ -122,7 +122,7 @@ jobs:
           CCACHE_DIR: ${{ matrix.path_ccache }}
           CCACHE_COMPRESS: 1
           CCACHE_MAXSIZE: 4G
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          BOOST_ROOT: ${{env.GITHUB_WORKSPACE}}/boost/boost
 
       # Windows does not support ccache with visual studio compiler
       - name: Build ${{ github.event.repository.name }} on Windows
