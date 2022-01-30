@@ -21,18 +21,17 @@ from gtda.utils._docs import adapt_fit_transform_docs
 class LocalVietorisRipsBase(BaseEstimator,
                             TransformerMixin,
                             PlotterMixin):
-    """
-    Base class for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips.
+    """Base class for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips.
     LocalVietorisRipsBase is not meant to be used. Please see documentation
-    for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips."""
+    for KNeighboursLocalVietorisRips and RadiusLocalVietorisRips.
+
+    """
 
     def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
                  neighborhood_params=(1, 2), collapse_edges=False,
                  n_jobs=None):
-        """
-        Initializes the base class by setting the basic parameters.
+        """Initializes the base class by setting the basic parameters.
         For more specific description, see specific children classes."""
-
         # metric for the point cloud
         self.metric = metric
 
@@ -53,10 +52,10 @@ class LocalVietorisRipsBase(BaseEstimator,
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """
-        Initializes the object used for computing persistence homology,
-        checks that the parameters were initialized correctly."""
+        """Initializes the object used for computing persistence homology,
+        checks that the parameters were initialized correctly.
 
+        """
         # object used to compute persistence diagrams
         self.homology = VietorisRipsPersistence(
             metric='precomputed',
@@ -64,7 +63,6 @@ class LocalVietorisRipsBase(BaseEstimator,
             homology_dimensions=self.homology_dimensions,
             n_jobs=self.n_jobs
             )
-
         # make sure the neighborhood_params has been set correctly.
         if self.neighborhood_params[0] > self.neighborhood_params[1]:
             warnings.warn('First neighborhood_params is larger than second. '
@@ -80,9 +78,8 @@ class LocalVietorisRipsBase(BaseEstimator,
                           'should be strictly smaller than second. ')
         return self
 
-    def transform(self, X):
-        """
-        Computes the local persistence diagrams at each element of X, and
+    def transform(self, X, y=None):
+        """Computes the local persistence diagrams at each element of X, and
         returns a list of persistence diagrams, indexed as the points of X.
         This is done in several steps:
             - First compute the nearest neighbors in the point cloud that
@@ -97,11 +94,9 @@ class LocalVietorisRipsBase(BaseEstimator,
 
         Parameters
         ----------
-
         X : ndarray of shape (n_points, dimension)
              Input data representing  point cloud:
              an array of shape ``(n_points, n_dimensions)``.
-
 
         y : None
             There is no need for a target in a transformer, yet the pipeline
@@ -116,7 +111,6 @@ class LocalVietorisRipsBase(BaseEstimator,
             :math:`q` across all samples in `X`.
 
         """
-
         check_is_fitted(self)
         Xt = check_array(X, accept_sparse=False)
 
@@ -251,6 +245,7 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
            Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
            `DOI: 10.4230/LIPIcs.SoCG.2020.19
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+
     """
 
     _hyperparameters = {
@@ -276,15 +271,13 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
                          n_jobs=n_jobs)
 
     def fit(self, X, y=None):
-        """
-        Initiates and fits the transformers that efficiently computes the
+        """Initiates and fits the transformers that efficiently computes the
         nearest neighbors of given points.
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-
         X : ndarray of shape (n_points, dimension)
             Input data representing  point cloud. Can be either
             a point cloud: an array of shape ``(n_points, n_dimensions)``.
@@ -298,7 +291,6 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         self : object
 
         """
-
         super().fit(X)
 
         validate_params(
@@ -336,9 +328,8 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
 
 @adapt_fit_transform_docs
 class RadiusLocalVietorisRips(LocalVietorisRipsBase):
-    """
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Eclidean space, or an abstract :ref:`metric space
+    """Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    Euclidean space, or an abstract :ref:`metric space
     <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
     information about the local topology around each point is summarized
     in a list of persistence diagrams. This is done by first isolating
@@ -382,13 +373,13 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
 
     References
     ----------
-
     .. [1] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
            Flag Complexes"; in *36th International Symposium on Computational
            Geometry (SoCG 2020)*, pp. 19:1–19:15,
            Schloss Dagstuhl-Leibniz–Zentrum für Informatik, 2020;
            `DOI: 10.4230/LIPIcs.SoCG.2020.19
            <https://doi.org/10.4230/LIPIcs.SoCG.2020.19>`_.
+
     """
 
     _hyperparameters = {
@@ -413,15 +404,13 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
                          n_jobs=n_jobs)
 
     def fit(self, X, y=None):
-        """
-        Initiates and fits the transformers that efficiently computes the
+        """Initiates and fits the transformers that efficiently computes the
         nearest neighbors of given points.
         This method is here to implement the usual scikit-learn API and hence
         work in pipelines.
 
         Parameters
         ----------
-
         X : ndarray of shape (n_points, dimension)
             Input data representing  point cloud. Can be either
             a point cloud: an array of shape ``(n_points, n_dimensions)``.
@@ -435,7 +424,6 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         self : object
 
         """
-
         super().fit(X)
 
         validate_params(
