@@ -127,19 +127,21 @@ Citing giotto-tda
 
 If you use ``giotto-tda`` in a scientific publication, we would appreciate citations to the following paper:
 
-   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://arxiv.org/abs/2004.02551>`_, Tauzin *et al*, arXiv:2004.02551, 2020.
+   `giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration <https://www.jmlr.org/papers/volume22/20-325/20-325.pdf>`_, Tauzin *et al*, J. Mach. Learn. Res. 22.39 (2021): 1-6.
 
 You can use the following BibTeX entry:
 
-.. code:: RST
+.. code:: bibtex
 
-    @misc{tauzin2020giottotda,
-          title={giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
-          author={Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella Pérez and Matteo Caorsi and Anibal Medina-Mardones and Alberto Dassatti and Kathryn Hess},
-          year={2020},
-          eprint={2004.02551},
-          archivePrefix={arXiv},
-          primaryClass={cs.LG}
+    @article{giotto-tda,
+      author  = {Guillaume Tauzin and Umberto Lupo and Lewis Tunstall and Julian Burella P\'{e}rez and Matteo Caorsi and Anibal M. Medina-Mardones and Alberto Dassatti and Kathryn Hess},
+      title   = {giotto-tda: A Topological Data Analysis Toolkit for Machine Learning and Data Exploration},
+      journal = {Journal of Machine Learning Research},
+      year    = {2021},
+      volume  = {22},
+      number  = {39},
+      pages   = {1-6},
+      url     = {http://jmlr.org/papers/v22/20-325.html}
     }
 
 Community

@@ -25,11 +25,11 @@ DESCRIPTION = "Toolbox for Machine Learning using Topological Data Analysis."
 with codecs.open("README.rst", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = "text/x-rst"
-MAINTAINER = "Umberto Lupo, Lewis Tunstall"
+MAINTAINER = "Umberto Lupo, Wojciech Reise"
 MAINTAINER_EMAIL = "maintainers@giotto.ai"
 URL = "https://github.com/giotto-ai/giotto-tda"
 LICENSE = "GNU AGPLv3"
-DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.4.0"
+DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-tda/tarball/v0.5.1"
 VERSION = __version__  # noqa
 CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Intended Audience :: Developers",

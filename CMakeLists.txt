@@ -9,59 +9,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(OpenMP)
 
-set(RIPSER_SRC_DIR "gtda/externals/ripser")
 set(GUDHI_SRC_DIR "gtda/externals/gudhi-devel/src")
 set(HERA_DIR "gtda/externals/hera")
 set(EIGEN_DIR "gtda/externals/eigen")
-set(ROBINHOOD_DIR "gtda/externals/robinhood")
-
-#######################################################################
-#                               Ripser                                #
-#######################################################################
-
-pybind11_add_module(gtda_ripser MODULE "${BINDINGS_DIR}/ripser_bindings.cpp")
-set_property(TARGET gtda_ripser PROPERTY CXX_STANDARD 14)
-
-if(OpenMP_FOUND)
-  target_link_libraries(gtda_ripser PRIVATE OpenMP::OpenMP_CXX)
-endif()
-
-target_compile_definitions(gtda_ripser PRIVATE ASSEMBLE_REDUCTION_MATRIX=1)
-target_include_directories(gtda_ripser PRIVATE "${RIPSER_SRC_DIR}/ripser")
-target_compile_definitions(gtda_ripser PRIVATE USE_ROBINHOOD_HASHMAP=1)
-target_include_directories(gtda_ripser PRIVATE "${ROBINHOOD_DIR}/src/include")
-
-if(MSVC)
-    target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)
-    target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
-else()
-    target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:RELEASE>: -O3>)
-    target_compile_options(gtda_ripser PUBLIC $<$<CONFIG:DEBUG>: -O2 -ggdb -D_GLIBCXX_DEBUG>)
-endif()
-
-#######################################################################
-#                     Ripser - Coefficient enable                     #
-#######################################################################
-
-pybind11_add_module(gtda_ripser_coeff MODULE "${BINDINGS_DIR}/ripser_bindings.cpp")
-set_property(TARGET gtda_ripser_coeff PROPERTY CXX_STANDARD 14)
-
-if(OpenMP_FOUND)
-  target_link_libraries(gtda_ripser_coeff PRIVATE OpenMP::OpenMP_CXX)
-endif()
-
-target_compile_definitions(gtda_ripser_coeff PRIVATE USE_COEFFICIENTS=1 ASSEMBLE_REDUCTION_MATRIX=1)
-target_include_directories(gtda_ripser_coeff PRIVATE "${RIPSER_SRC_DIR}/ripser")
-target_compile_definitions(gtda_ripser_coeff PRIVATE USE_ROBINHOOD_HASHMAP=1)
-target_include_directories(gtda_ripser_coeff PRIVATE "${ROBINHOOD_DIR}/src/include")
-
-if(MSVC)
-    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: /Wall /O2>)
-    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
-else()
-    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:RELEASE>: -O3>)
-    target_compile_options(gtda_ripser_coeff PUBLIC $<$<CONFIG:DEBUG>: -O2 -ggdb -D_GLIBCXX_DEBUG>)
-endif()
 
 #######################################################################
 #                             Wasserstein                             #
@@ -337,30 +287,4 @@ if(MSVC)
 else()
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math>)
     target_compile_options(gtda_cech_complex PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
-endif()
-
-#######################################################################
-#                              Collapser                              #
-#######################################################################
-
-pybind11_add_module(gtda_collapser MODULE "${BINDINGS_DIR}/collapser_bindings.cpp")
-set_property(TARGET gtda_collapser PROPERTY CXX_STANDARD 14)
-
-if(OpenMP_FOUND)
-    target_link_libraries(gtda_collapser PRIVATE OpenMP::OpenMP_CXX)
-endif()
-
-target_link_libraries(gtda_collapser LINK_PUBLIC ${Boost_LIBRARIES})
-target_compile_definitions(gtda_collapser PRIVATE BOOST_RESULT_OF_USE_DECLTYPE=1 BOOST_ALL_NO_LIB=1 BOOST_SYSTEM_NO_DEPRECATED=1)
-
-target_include_directories(gtda_collapser PRIVATE "${GUDHI_SRC_DIR}/common/include")
-target_include_directories(gtda_collapser PRIVATE "${GUDHI_SRC_DIR}/Collapse/include")
-target_include_directories(gtda_collapser PRIVATE "${EIGEN_DIR}")
-
-if(MSVC)
-    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:RELEASE>: /O2 /Wall /fp:strict>)
-    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:DEBUG>:/O1 /DEBUG:FULL /Zi /Zo>)
-else()
-    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:RELEASE>: -Ofast -shared -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -frounding-math>)
-    target_compile_options(gtda_collapser PUBLIC $<$<CONFIG:DEBUG>:-O2 -ggdb -D_GLIBCXX_DEBUG>)
 endif()

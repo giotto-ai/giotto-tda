@@ -5,6 +5,7 @@ from numbers import Real, Integral
 from types import FunctionType
 
 import numpy as np
+from gph import ripser_parallel as ripser
 from joblib import Parallel, delayed
 from pyflagser import flagser_weighted
 from scipy.sparse import coo_matrix
@@ -15,7 +16,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._utils import _postprocess_diagrams
 from ..base import PlotterMixin
-from ..externals.python import ripser, SparseRipsComplex, CechComplex
+from ..externals.python import SparseRipsComplex, CechComplex
 from ..plotting import plot_diagram
 from ..utils._docs import adapt_fit_transform_docs
 from ..utils.intervals import Interval
@@ -125,19 +126,15 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
-    for computing Vietoris–Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
-    <https://github.com/scikit-tda/ripser.py>`_ package.
-
-    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in [2]_.
+    `giotto-ph <https://github.com/giotto-ai/giotto-ph>`_ [1]_ is used as a C++
+    backend for computing Vietoris–Rips persistent homology and edge collapses.
 
     References
     ----------
-    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
-           persistence barcodes", 2019; `arXiv:1908.02518
-           <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] J. Burella Pérez et al, "giotto-ph: A Python Library for
+           High-Performance Computation of Persistent Homology of Vietoris–Rips
+           Filtrations", 2021; `arXiv:2107.05412
+           <https://arxiv.org/abs/2107.05412>`_.
 
     .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
            Flag Complexes"; in *36th International Symposium on Computational
@@ -432,7 +429,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         is a parameter (see `weight_params`). If a callable, it must return
         non-negative 1D arrays.
 
-    weight_params : dict, optional, default: ``None``
+    weight_params : dict, optional, default: ``{}``
         Additional parameters for the weighted filtration. ``"p"`` determines
         the power to be used in computing edge weights from vertex weights. It
         can be one of ``1``, ``2`` or ``np.inf`` and defaults to ``1``. If
@@ -489,19 +486,15 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
     Notes
     -----
-    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
-    for computing Vietoris–Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
-    <https://github.com/scikit-tda/ripser.py>`_ package.
-
-    `GUDHI <https://github.com/GUDHI/gudhi-devel>`_ is used as a C++ backend
-    for the edge collapse algorithm described in [2]_.
+    `giotto-ph <https://github.com/giotto-ai/giotto-ph>`_ [1]_ is used as a C++
+    backend for computing Vietoris–Rips persistent homology and edge collapses.
 
     References
     ----------
-    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
-           persistence barcodes", 2019; `arXiv:1908.02518
-           <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] J. Burella Pérez et al, "giotto-ph: A Python Library for
+           High-Performance Computation of Persistent Homology of Vietoris–Rips
+           Filtrations", 2021; `arXiv:2107.05412
+           <https://arxiv.org/abs/2107.05412>`_.
 
     .. [2] J.-D. Boissonnat and S. Pritam, "Edge Collapse and Persistence of
            Flag Complexes"; in *36th International Symposium on Computational
@@ -525,7 +518,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
         "weights": {"type": (str, FunctionType)},
-        "weight_params": {"type": (dict, type(None))},
+        "weight_params": {"type": dict},
         "collapse_edges": {"type": bool},
         "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
         "max_edge_weight": {"type": Real},
@@ -534,7 +527,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         }
 
     def __init__(self, metric="euclidean", metric_params={},
-                 homology_dimensions=(0, 1), weights="DTM", weight_params=None,
+                 homology_dimensions=(0, 1), weights="DTM", weight_params={},
                  collapse_edges=False, coeff=2, max_edge_weight=np.inf,
                  infinity_values=None, reduced_homology=True, n_jobs=None):
         self.metric = metric
@@ -616,7 +609,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             self.effective_weight_params_.update({"n_neighbors": 3, "r": 2})
         else:
             key = "general"
-        if self.weight_params is not None:
+        if self.weight_params:
             self.effective_weight_params_.update(self.weight_params)
             validate_params(self.effective_weight_params_,
                             _AVAILABLE_RIPS_WEIGHTS[key])
@@ -1079,16 +1072,15 @@ class WeakAlphaPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     Notes
     -----
     Delaunay triangulation are computed by :class:`scipy.spatial.Delaunay`.
-    `Ripser <https://github.com/Ripser/ripser>`_ [1]_ is used as a C++ backend
-    for computing Vietoris–Rips persistent homology. Python bindings were
-    modified for performance from the `ripser.py
-    <https://github.com/scikit-tda/ripser.py>`_ package.
+    `giotto-ph <https://github.com/giotto-ai/giotto-ph>`_ [1]_ is used as a C++
+    backend for computing Vietoris–Rips persistent homology.
 
     References
     ----------
-    .. [1] U. Bauer, "Ripser: efficient computation of Vietoris–Rips
-           persistence barcodes", 2019; `arXiv:1908.02518
-           <https://arxiv.org/abs/1908.02518>`_.
+    .. [1] J. Burella Pérez et al, "giotto-ph: A Python Library for
+           High-Performance Computation of Persistent Homology of Vietoris–Rips
+           Filtrations", 2021; `arXiv:2107.05412
+           <https://arxiv.org/abs/2107.05412>`_.
 
     """
 

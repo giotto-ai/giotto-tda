@@ -56,7 +56,8 @@ if __name__ == '__main__':
     import os
     from glob import glob
     path = sys.argv[1]
-    file_names = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*.html'))]
+    file_names = [y for x in os.walk(path)
+                  for y in glob(os.path.join(x[0], '*.html'))]
     print(file_names)
 
     with open('versions', 'r') as f:
