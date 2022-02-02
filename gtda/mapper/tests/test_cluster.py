@@ -2,6 +2,9 @@
 for ParallelClustering."""
 # License: GNU AGPLv3
 
+from shutil import rmtree
+from tempfile import mkdtemp
+
 import numpy as np
 import pytest
 import sklearn as sk
@@ -11,7 +14,8 @@ from hypothesis.strategies import floats, integers, composite
 from numpy.testing import assert_almost_equal
 from scipy.spatial import distance_matrix
 
-from gtda.mapper import ParallelClustering, FirstHistogramGap, FirstSimpleGap
+from gtda.mapper import ParallelClustering, FirstHistogramGap, \
+    FirstSimpleGap, make_mapper_pipeline
 
 
 def test_parallel_clustering_bad_input():
@@ -233,3 +237,12 @@ def test_precomputed_distances(inp):
 
     assert get_partition_from_preds(preds) == \
            get_partition_from_preds(preds_mat)
+
+
+def test_mapper_pipeline_picklable():
+    # Regression test for issue #596
+    X = np.random.random((100, 2))
+    cachedir = mkdtemp()
+    pipe = make_mapper_pipeline(memory=cachedir)
+    pipe.fit_transform(X)
+    rmtree(cachedir)

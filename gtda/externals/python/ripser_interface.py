@@ -19,7 +19,7 @@ SOFTWARE.
 """
 
 import gc
-from warnings import warn, catch_warnings, simplefilter
+from warnings import catch_warnings, simplefilter
 
 import numpy as np
 from scipy.sparse import issparse, csr_matrix
