@@ -22,157 +22,157 @@ pdfpagelabels]{hyperref}
 \makeatother
 
 \begin{document}
-	
+
 	\title{Theory Glossary}
 	\maketitle
-	
+
 	\tableofcontents
-	
+
 	\section{Symbols}
-	
+
 	\begin{tabular}{ l l}
 		$\Bbbk$ & An arbitrary field. \\
 		$\mathbb R$ & The field of real numbers. \\
 		$\overline{\mathbb R}$ & The two point compactification $[-\infty, +\infty]$ of the real numbers. \\
 		$\mathbb N$ & The counting numbers $0,1,2, \ldots$ as a subset of $\mathbb R$. \\
 		$\mathbb R^d$ & The vector space of $d$-tuples of real numbers. \\
-		$\Delta$ & The 
+		$\Delta$ & The
 		%\hyperref[multiset]{multiset}
 		multiset $ \lbrace (s, s) \mid s \in \mathbb{R} \rbrace $ with multiplicity $ ( s,s ) \mapsto +\infty$.
 	\end{tabular}
-	
+
 	\section{Analysis}
-	
-	\subsection*{Metric space} \label{metric_space}	
-	A set $X$ with a function	
-	\begin{equation*}	
-	d : X \times X \to \mathbb R	
-	\end{equation*}	
+
+	\subsection*{Metric space} \label{metric_space}
+	A set $X$ with a function
+	\begin{equation*}
+	d : X \times X \to \mathbb R
+	\end{equation*}
 	is said to be a \textit{metric space} if the values of $d$ are all non-negative and for all $x,y,z \in X$
-	\begin{equation*}	
-	d(x,y) = 0\ \Leftrightarrow\ x = y	
-	\end{equation*}	
-	\begin{equation*}	
-	d(x,y) = d(y,x)	
-	\end{equation*}	
-	\begin{equation*}	
-	d(x,z) \leq d(x,y) + d(y, z).	
-	\end{equation*}	
-	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.
-	
-	\subsection*{Normed space} \label{normed_space}
-	A vector space $V$ together with a function	
-	\begin{equation*}	
-	||-|| : V \to \mathbb R	
-	\end{equation*}	
-	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$	
-	\begin{equation*}	
-	||u|| = 0\ \Leftrightarrow\ u = 0
-	\end{equation*}	
-	\begin{equation*}	
-	||a u || = |a|\, ||u||	
-	\end{equation*}	
-	\begin{equation*}	
-	||u + v|| \leq ||u|| + ||v||.
-	\end{equation*}	
-	The function $||-||$ is referred to as the \textit{norm}.
-	
-	A normed space is naturally a
-	%\hyperref[metric_space]{metric space}
-	metric space with distance function	
-	\begin{equation*}	
-	d(u,v) = ||u-v||.	
-	\end{equation*}
-	
-	\subsection*{Inner product space} \label{inner_product_space}	
-	
-	A vector space $V$ together with a function
-	\begin{equation*}	
-	\langle -, - \rangle : V \times V \to \mathbb R	
-	\end{equation*}
-	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
-	\begin{equation*}	
-	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0 	
-	\end{equation*}	
-	\begin{equation*}	
-	\langle u, v\rangle = \langle v, u\rangle	
+	\begin{equation*}
+	d(x,y) = 0\ \Leftrightarrow\ x = y
 	\end{equation*}
 	\begin{equation*}
-	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.	
-	\end{equation*}	
+	d(x,y) = d(y,x)
+	\end{equation*}
+	\begin{equation*}
+	d(x,z) \leq d(x,y) + d(y, z).
+	\end{equation*}
+	In this case the $d$ is referred to as the \textit{metric} or the \textit{distance function}.
+
+	\subsection*{Normed space} \label{normed_space}
+	A vector space $V$ together with a function
+	\begin{equation*}
+	||-|| : V \to \mathbb R
+	\end{equation*}
+	is said to be an \textit{normed space} if the values of $||-||$ are all non-negative and for all $u,v \in V$ and $a \in \mathbb R$
+	\begin{equation*}
+	||u|| = 0\ \Leftrightarrow\ u = 0
+	\end{equation*}
+	\begin{equation*}
+	||a u || = |a|\, ||u||
+	\end{equation*}
+	\begin{equation*}
+	||u + v|| \leq ||u|| + ||v||.
+	\end{equation*}
+	The function $||-||$ is referred to as the \textit{norm}.
+
+	A normed space is naturally a
+	%\hyperref[metric_space]{metric space}
+	metric space with distance function
+	\begin{equation*}
+	d(u,v) = ||u-v||.
+	\end{equation*}
+
+	\subsection*{Inner product space} \label{inner_product_space}
+
+	A vector space $V$ together with a function
+	\begin{equation*}
+	\langle -, - \rangle : V \times V \to \mathbb R
+	\end{equation*}
+	is said to be an \textit{inner product space} if for all $u,v,w \in V$ and $a \in \mathbb R$
+	\begin{equation*}
+	u \neq 0\ \Rightarrow\ \langle u, u \rangle > 0
+	\end{equation*}
+	\begin{equation*}
+	\langle u, v\rangle = \langle v, u\rangle
+	\end{equation*}
+	\begin{equation*}
+	\langle au+v, w \rangle = a\langle u, w \rangle + \langle v, w \rangle.
+	\end{equation*}
 	The function $\langle -, - \rangle$ is referred to as the \textit{inner product}.
-	
-	An inner product space is naturally a normed space with	
-	\begin{equation*}	
+
+	An inner product space is naturally a normed space with
+	\begin{equation*}
 	||u|| = \sqrt{\langle u, u \rangle}.
 	\end{equation*}
-	
-	\subsection*{Vectorization, amplitude and kernel} \label{vectorization_amplitude_and_kernel}	
-	
+
+	\subsection*{Vectorization, amplitude and kernel} \label{vectorization_amplitude_and_kernel}
+
 	Let $X$ be a set, for example, the set of all
 	%\hyperref[persistence_diagram]{persistence diagrams}
-	persistence diagrams. A \textit{vectorization} for $X$ is a function	
-	\begin{equation*}	
-	\phi : X \to V	
-	\end{equation*}	
-	where $V$ is a vector space. 
-	
-	An \textit{amplitude} on $X$ is a function	
-	\begin{equation*}	
-	A : X \to \mathbb R	
-	\end{equation*}	
+	persistence diagrams. A \textit{vectorization} for $X$ is a function
+	\begin{equation*}
+	\phi : X \to V
+	\end{equation*}
+	where $V$ is a vector space.
+
+	An \textit{amplitude} on $X$ is a function
+	\begin{equation*}
+	A : X \to \mathbb R
+	\end{equation*}
 	for which there exists a vectorization $\phi : X \to V$ with $V$ a
 	%\hyperref[normed_space]{normed space}
-	normed space such that	
-	\begin{equation*}	
-	A(x) = ||\phi(x)||	
-	\end{equation*}	
+	normed space such that
+	\begin{equation*}
+	A(x) = ||\phi(x)||
+	\end{equation*}
 	for all $x \in X$.
-	
-	A \textit{kernel} on the set $X$ is a function	
-	\begin{equation*}	
-	k : X \times X \to \mathbb R	
-	\end{equation*}	
+
+	A \textit{kernel} on the set $X$ is a function
+	\begin{equation*}
+	k : X \times X \to \mathbb R
+	\end{equation*}
 	for which there exists a vectorization $\phi : X \to V$ with $V$ an
 	%\hyperref[inner_product_and_norm]{inner product space}
-	inner product space such that	
-	\begin{equation*}	
-	k(x,y) = \langle \phi(x), \phi(y) \rangle	
-	\end{equation*}	
+	inner product space such that
+	\begin{equation*}
+	k(x,y) = \langle \phi(x), \phi(y) \rangle
+	\end{equation*}
 	for each $x,y \in X$.
-	
+
 	\subsection*{Euclidean distance and $l^p$-norms} \label{euclidean_distance_and_norm}
-	
-	The vector space $\mathbb R^n$ is an 
+
+	The vector space $\mathbb R^n$ is an
 	% \hyperref[inner_product_space]{inner product space}
-	inner product space with inner product 
+	inner product space with inner product
 	\begin{equation*}
 	\langle x, y \rangle = (x_1-y_1)^2 + \cdots + (x_n-y_n)^2.
 	\end{equation*}
 	This inner product is referred to as \textit{dot product} and the associated norm and distance function are respectively named \textit{Euclidean norm} and \textit{Euclidean distance}.
-	
-	For any $p \in (0,\infty]$ the pair $\mathbb R^n, ||-||_p$ with 
+
+	For any $p \in (0,\infty]$ the pair $\mathbb R^n, ||-||_p$ with
 	\begin{equation*}
 	||x||_p = (x_1^p + \cdots + x_n^p)^{1/p}
 	\end{equation*}
-	if $p$ is finite and 
+	if $p$ is finite and
 	\begin{equation*}
 	||x||_{\infty} = max\{x_i\ |\ i = 1,\dots,n\}
 	\end{equation*}
 	is a normed spaced and its norm is referred to as the $l^p$\textit{-norm}.
-	
+
 	\subsection*{Distance matrices and point clouds} \label{distance_matrices_and_point_clouds}
-	
+
 	Let $(X, d)$ be a finite
 	% \hyperref[metric_space]{metric space}
 	metric space. A \textit{distance matrix} associated to it is obtained by choosing a total order on $X = {x_1 < \cdots < x_m}$ and setting the $(i,j)$-entry to be equal to $d(x_i, x_j)$.
-	
+
 	A \textit{point cloud} is a finite subset of $\mathbb{R}^n$ (for some $n$) together with the metric induced from the
 	% \hyperref[euclidean_distance_and_norm]{Eucliden distance}
 	Euclidean distance.
 
 	\subsection*{$L^p$-norms} \label{functional_lp}
-	
+
 	Let $U \subseteq \mathbb R^n$ and $C(U, \mathbb R)$ be the set of continuous real-valued functions on $U$. A function $f \in C(U, \mathbb R)$ is said to be $p$\textit{-integrable} if
 	\begin{equation*}
 	\int_U |f(x)|^p dx
@@ -184,20 +184,20 @@ pdfpagelabels]{hyperref}
 	is a
 	% \hyperref[normed_space]{normed space}
 	normed space and $||-||_p$ is referred to as the $L^p$\textit{-norm}.
-	
+
 	The only $L^p$-norm that is induced from an inner product is $L^2$, and the inner product is given by
 	\begin{equation*}
 	\langle f, g \rangle = \left(\int_U |f(x)-g(x)|^2 dx\right)^{1/2}.
 	\end{equation*}
 	\section{Homology}
-	
+
 	\subsection*{Cubical complex} \label{cubical_complex}
-	
+
 	An \textit{elementary interval} $I_a$ is a subset of $\mathbb{R}$ of the form $[a, a+1]$ or $[a,a] = \{a\}$ for some $a \in \mathbb{R}$. These two types are called respectively \textit{non-degenerate} and \textit{degenerate}. To a non-degenerate elementary interval we assign two degenerate elementary intervals
 	\begin{equation*}
 	d^+ I_a = \lbrack a+1, a+1 \rbrack \qquad \text{and} \qquad d^- I_a = \lbrack a, a \rbrack.
 	\end{equation*}
-	An \textit{elementary cube} is a subset of the form 
+	An \textit{elementary cube} is a subset of the form
 	\begin{equation*}
 	I_{a_1} \times \cdots \times I_{a_N} \subset \mathbb{R}^N
 	\end{equation*}
@@ -209,13 +209,13 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	d_i^\pm I^N = I_{a_1} \times \cdots \times d^\pm I_{a_{k_i}} \times \cdots \times I_{a_{N}}.
 	\end{equation*}
-	
+
 	A \textit{cubical complex} is a finite set of elementary cubes of $\mathbb{R}^N$, and a \textit{subcomplex} of $X$ is a cubical complex whose elementary cubes are also in $X$.
-	
+
 	\paragraph{\\ Reference:} \cite{mischaikow04computational}
-	
+
 	\subsection*{Simplicial complex} \label{simplicial_complex}
-	
+
 	A set $\{v_0, \dots, v_n\} \subset \mathbb{R}^N$ is said to be \textit{geometrically independent} if the vectors $\{v_0-v_1, \dots, v_0-v_n\}$ are linearly independent. In this case, we refer to their convex closure as a \textit{simplex}, explicitly
 	\begin{equation*}
 	\lbrack v_0, \dots , v_n \rbrack = \left\{ \sum c_i (v_0 - v_i)\ \big|\ c_1+\dots+c_n = 1,\ c_i \geq 0 \right\}
@@ -225,123 +225,123 @@ pdfpagelabels]{hyperref}
 	d_i[v_0, \ldots, v_n] = [v_0, \dots, \widehat{v}_i, \dots, v_n]
 	\end{equation*}
 	where $\widehat{v}_i$ denotes the absence of $v_i$ from the set.
-	
-	A \textit{simplicial complex} $X$ is a finite union of simplices in $\mathbb{R}^N$ satisfying that every face of a simplex in $X$ is in $X$ and that the non-empty intersection of two simplices in $X$ is a face of each. Every simplicial complex defines an 
+
+	A \textit{simplicial complex} $X$ is a finite union of simplices in $\mathbb{R}^N$ satisfying that every face of a simplex in $X$ is in $X$ and that the non-empty intersection of two simplices in $X$ is a face of each. Every simplicial complex defines an
 	% \hyperref[abstract_simplicial_complex]{abstract simplicial complex}
 	abstract simplicial complex.
-	
+
 	\subsection*{Abstract simplicial complex} \label{abstract_simplicial_complex}
-	
-	An \textit{abstract simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being subsets of $V$ such that: 
+
+	An \textit{abstract simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being subsets of $V$ such that:
 	\begin{enumerate}
 		\item for every $v$ in $V$, the singleton $\{v\}$ is in $X$ and
-		\item if $x$ is in $X$ and $y$ is a subset of $x$, then $y$ is in $X$. 
+		\item if $x$ is in $X$ and $y$ is a subset of $x$, then $y$ is in $X$.
 	\end{enumerate}
 	We abuse notation and denote the pair $(V, X)$ simply by $X$.
-	
+
 	The elements of $X$ are called \textit{simplices} and the \textit{dimension} of a simplex $x$ is defined by $|x| = \# x - 1$ where $\# x$ denotes the cardinality of $x$. Simplices of dimension $d$ are called $d$-simplices. We abuse terminology and refer to the elements of $V$ and to their associated $0$-simplices both as \textit{vertices}.
-	
+
 	A \textit{simplicial map} between simplicial complexes is a function between their vertices such that the image of any simplex via the induced map is a simplex.
-	
+
 	A simplicial complex $X$ is a \textit{subcomplex} of a simplicial complex $Y$ if every simplex of $X$ is a simplex of $Y$.
-	
+
 	Given a finite abstract simplicial complex $X = (V, X)$ we can choose a bijection from $V$ to a geometrically independent subset of $\mathbb R^N$ and associate a
 	%\hyperref[simplicial_complex]{simplicial complex}
 	simplicial complex
 	to $X$ called its \textit{geometric realization}.
-	
+
 	\subsection*{Ordered simplicial complex}
 	\label{ordered_simplical_complex}
-	
-	An \textit{ordered simplicial complex} is an 
+
+	An \textit{ordered simplicial complex} is an
 	% \hyperref[abstract_simplicial_complex]{abstract simplicial complex}
 	abstract simplicial complex where the set of vertices is equipped with a partial order such that the restriction of this partial order to any simplex is a total order. We denote an $n$-simplex using its ordered vertices by $\lbrack v_0, \dots, v_n \rbrack$.
-	
+
 	A \textit{simplicial map} between ordered simplicial complexes is a simplicial map $f$ between their underlying simplicial complexes preserving the order, i.e., $v \leq w$ implies $f(v) \leq f(w)$.
-	
+
 	\subsection*{Directed simplicial complex} \label{directed_simplicial_complex}
-	
-	A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that: 
+
+	A \textit{directed simplicial complex} is a pair of sets $(V, X)$ with the elements of $X$ being tuples of elements of $V$, i.e., elements in $\bigcup_{n\geq1} V^{\times n}$ such that:
 	\begin{enumerate}
 		\item for every $v$ in $V$, the tuple $v$ is in $X$
-		\item if $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$. 
+		\item if $x$ is in $X$ and $y$ is a subtuple of $x$, then $y$ is in $X$.
 	\end{enumerate}
-	
+
 	With appropriate modifications the same terminology and notation introduced for
 	%\hyperref[ordered_simplical_complex]{ordered simplicial complex}
 	ordered simplicial complex applies to directed simplicial complex.
-	
+
 	\subsection*{Chain complex} \label{chain_complex}
-	
+
 	A \textit{chain complex} of is a pair $(C_*, \partial)$ where
 	\begin{equation*}
 	C_* = \bigoplus_{n \in \mathbb Z} C_n \quad \mathrm{and} \quad \partial = \bigoplus_{n \in \mathbb Z} \partial_n
 	\end{equation*}
 	with $C_n$ a $\Bbbk$-vector space and $\partial_n : C_{n+1} \to C_n$ is a $\Bbbk$-linear map such that $\partial_{n+1} \partial_n = 0$. We refer to $\partial$ as the \textit{boundary map} of the chain complex.
-	
-	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of 
+
+	The elements of $C$ are called \textit{chains} and if $c \in C_n$ we say its \textit{degree} is $n$ or simply that it is an $n$-chain. Elements in the kernel of $\partial$ are called \textit{cycles}, and elements in the image of $\partial$ are called \textit{boundaries}. Notice that every boundary is a cycle. This fact is central to the definition of
 	% \hyperref[homology_and_cohomology]{homology}
 	homology.
-	
+
 	A \textit{chain map} is a $\Bbbk$-linear map $f : C \to C'$ between chain complexes such that $f(C_n) \subseteq C'_n$ and $\partial f = f \partial$.
-	
+
 	Given a chain complex $(C_*, \partial)$, its linear dual $C^*$ is also a chain complex with $C^{-n} = \mathrm{Hom_\Bbbk}(C_n, \Bbbk)$ and boundary map $\delta$ defined by $\delta(\alpha)(c) = \alpha(\partial c)$ for any $\alpha \in C^*$ and $c \in C_*$.
-	
+
 	\subsection*{Homology and cohomology} \label{homology_and_cohomology}
-	
-	Let $(C_*, \partial)$ be a 
+
+	Let $(C_*, \partial)$ be a
 	% \hyperref[chain_complex]{chain complex}
 	chain complex. Its $n$\textit{-th homology group} is the quotient of the subspace of $n$-cycles by the subspace of $n$-boundaries, that is, $H_n(C_*) = \mathrm{ker}(\partial_n)/ \mathrm{im}(\partial_{n+1})$. The \textit{homology} of $(C, \partial)$ is defined by $H_*(C) = \bigoplus_{n \in \mathbb Z} H_n(C)$.
-	
+
 	When the chain complex under consideration is the linear dual of a chain complex we sometimes refer to its homology as the \textit{cohomology} of the predual complex and write $H^n$ for $H_{-n}$.
-	
+
 	A chain map $f : C \to C'$ induces a map between the associated homologies.
-	
+
 	\subsection*{Simplicial chains and simplicial homology} \label{simplicial_chains_and_simplicial_homology}
-	
+
 	Let $X$ be an ordered or directed simplicial complex and denote the subset of $n$-simplices by $X_n$. Define its \textit{simplicial chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n(x) = \sum_{i=0}^{n} (-1)^i d_ix
 	\end{equation*}
-	and its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} as the 
+	and its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} as the
 	% \hyperref[homology_and_cohomology]{homology and cohomology}
 	homology and cohomology of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
-	
-	A 
-	% \hyperref[abstract_simplicial_complex]{simplicial map} 
-	simplicial map induces a 
+
+	A
+	% \hyperref[abstract_simplicial_complex]{simplicial map}
+	simplicial map induces a
 	% \hyperref[chain_complex]{chain map}
 	chain map between the associated simplicial chain complexes and, therefore, between the associated simplicial (co)homologies.
-	
+
 	\subsection*{Cubical chains and cubical homology} \label{cubical_chains_and_cubical_homology}
-	
-	Let $X$ be a cubical complex and denote the subset of $n$-cubes by $X_n$. Define the \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by 
+
+	Let $X$ be a cubical complex and denote the subset of $n$-cubes by $X_n$. Define the \textit{cubical chain complex with} $\Bbbk$\textit{-coefficients} $C_*(X; \Bbbk)$ by
 	\begin{equation*}
 	C_n(X; \Bbbk) = \Bbbk\{X_n\}, \qquad \partial_n x = \sum_{i = 1}^{n} (-1)^{i-1}(d^+_i x - d^-_i x)
 	\end{equation*}
 	where $x = I_1 \times \cdots \times I_N$ and $s(i)$ is the dimension of $I_1 \times \cdots \times I_i$.
-	Its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} is the 
+	Its \textit{homology and cohomology with} $\Bbbk$\textit{-coefficients} is the
 	% \hyperref[homology_and_cohomology]{homology and cohomology}
 	homology and cohomology of this chain complex. We use the notation $H_*(X; \Bbbk)$ and $H^*(X; \Bbbk)$ for these.
-	
+
 	\section{Persistence}
-	
+
 	\subsection*{Filtered complex} \label{filtered_complex}
-	
+
 	A \textit{filtered complex} is a collection of simplicial or cubical complexes $\{X_s\}_{s \in \mathbb R}$ such that $X_s$ is a subcomplex of $X_t$ for each $s \leq t$.
-	
+
 	\subsection*{Cellwise filtration} \label{cellwise_filtration}
-	
-	A \textit{cellwise filtration} is a simplicial or cubical complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$. A cellwise filtration can be naturally thought of as a 
+
+	A \textit{cellwise filtration} is a simplicial or cubical complex $X$ together with a total order $\leq$ on its simplices or elementary cubes such that for each $y \in X$ the set $\{x \in X\ :\ x \leq y\}$ is a subcomplex of $X$. A cellwise filtration can be naturally thought of as a
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex.
-	
+
 	\subsection*{Clique and flag complexes} \label{clique_and_flag_complexes}
-	
-	Let $G$ be a $1$-dimensional abstract (resp. directed) simplicial complex. The abstract (resp. directed) simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ \big(resp. $(v_0, \dots, v_n)$\big) is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\}$ \big(resp. $(v_i, v_j)$\big) is in $G$ for each pair of vertices $v_i, v_j$. 
-	
+
+	Let $G$ be a $1$-dimensional abstract (resp. directed) simplicial complex. The abstract (resp. directed) simplicial complex $\langle G \rangle$ has the same set of vertices as $G$ and $\{v_0, \dots, v_n\}$ \big(resp. $(v_0, \dots, v_n)$\big) is a simplex in $\langle G \rangle$ if an only if $\{v_i, v_j\}$ \big(resp. $(v_i, v_j)$\big) is in $G$ for each pair of vertices $v_i, v_j$.
+
 	An abstract (resp. directed) simplicial complex $X$ is a \textit{clique (resp.\ flag) complex} if $X = \langle G \rangle$ for some $G$.
-	
+
 	Given a function
 	\begin{equation*}
 	w : G \to \mathbb R \cup \{\infty\}
@@ -350,7 +350,7 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	w : \langle G \rangle \to \mathbb R \cup \{\infty\}
 	\end{equation*}
-	defined respectively by 
+	defined respectively by
 	\begin{align*}
 	w\{v_0, \dots, v_n\} & = \max\{ w\{v_i, v_j\}\ |\ i \neq j\} \\
 	w(v_0, \dots, v_n) & = \max\{ w(v_i, v_j)\ |\ i < j\}
@@ -360,34 +360,34 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	\langle G \rangle_s = \{\sigma \in \langle G \rangle\ |\ w(\sigma) \leq s\}.
 	\end{equation*}
-	
+
 	A filtered complex $\{X_s\}_{s \in \mathbb R}$ is a \textit{filtered clique (resp.\ flag) complex} if $X_s = \langle G \rangle_s$ for some $(G,w)$.
-	
+
 	\subsection*{Persistence module} \label{persistence_module}
-	
+
 	A \textit{persistence module} is a collection containing a $\Bbbk$-vector spaces $V(s)$ for each real number $s$ together with $\Bbbk$-linear maps $f_{st} : V(s) \to V(t)$, referred to as \textit{structure maps}, for each pair $s \leq t$, satisfying	naturality, i.e., if $r \leq s \leq t$, then $f_{rt} = f_{st} \circ f_{rs}$ and tameness, i.e., all but finitely many structure maps are isomorphisms.
-	
+
 	A \textit{morphism of persistence modules} $F : V \to W$ is a collection of linear maps $F(s) : V(s) \to W(s)$ such that $F(t) \circ f_{st} = f_{st} \circ F(s)$ for each par of reals $s \leq t$.	We say that $F$ is an \textit{isomorphisms} if each $F(s)$ is.
-	
+
 	\subsection*{Persistent simplicial (co)homology} \label{persistent_simplicial_(co)homology}
-	
-	Let $\{X(s)\}_{s \in \mathbb R} $ be a set of ordered or directed simplicial complexes together with simplicial maps $f_{st} : X(s) \to X(t)$ for each pair $s \leq t$, such that 
+
+	Let $\{X(s)\}_{s \in \mathbb R} $ be a set of ordered or directed simplicial complexes together with simplicial maps $f_{st} : X(s) \to X(t)$ for each pair $s \leq t$, such that
 	\begin{equation*}
 	r \leq s \leq t\ \quad\text{implies} \quad f_{rt} = f_{st} \circ f_{rs}
 	\end{equation*}
-	for example, a 
+	for example, a
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex. Its \textit{persistent simplicial homology with} $\Bbbk$\textit{-coefficients} is the persistence module
 	\begin{equation*}
 	H_*(X(s); \Bbbk)
 	\end{equation*}
-	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st}.$ In general, the collection constructed this way needs not satisfy the tameness condition of a 
+	with structure maps $H_*(f_{st}) : H_*(X(s); \Bbbk) \to H_*(X(t); \Bbbk)$ induced form the maps $f_{st}.$ In general, the collection constructed this way needs not satisfy the tameness condition of a
 	% \hyperref[persistence_module]{persistence module}
 	persistence module, but we restrict attention to the cases where it does. Its \textit{persistence simplicial cohomology with} $\Bbbk$\textit{-coefficients} is defined analogously.
-	
+
 	\subsection*{Vietoris-Rips complex and Vietoris-Rips persistence} \label{vietoris-rips_complex_and_vietoris-rips_persistence}
-	
-	Let $(X, d)$ be a 
+
+	Let $(X, d)$ be a
 	% \hyperref[distance_matrices_and_point_clouds]{finite metric space}
 	finite metric space. Define the Vietoris-Rips complex of $X$ as the
 	% \hyperref[filtered_complex]{filtered complex}
@@ -395,69 +395,69 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	VR_s(X) = \Big\{ \lbrack v_0,\dots,v_n \rbrack \ \Big|\ \forall i,j\ \,d(v_i, v_j) \leq s \Big\}.
 	\end{equation*}
-	The \textit{Vietoris-Rips persistence} of $(X, d)$ is the 
+	The \textit{Vietoris-Rips persistence} of $(X, d)$ is the
 	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homology}
 	persistent simplicial (co)homology of $VR_s(X)$.
-	
+
 	A more general version is obtained by replacing the distance function with an arbitrary function
 	\begin{equation*}
 	w : X \times X \to \mathbb R \cup \{\infty\}
 	\end{equation*}
-	and defining $VR_s(X)$ as the 
+	and defining $VR_s(X)$ as the
 	% \hyperref[clique_and_flag_complexes]{filtered clique complex}
 	filtered clique complex associated to $(X \times X ,w)$.
-	
+
 	\subsection*{\v{C}ech complex and \v{C}ech persistence} \label{cech_complex_and_cech_persistence}
-	
-	Let $(X, d)$ be a 
+
+	Let $(X, d)$ be a
 	% \hyperref[distance_matrices_and_point_clouds]{point cloud}
-	point cloud. Define the \v{C}ech complex of $X$ as the 
+	point cloud. Define the \v{C}ech complex of $X$ as the
 	% \hyperref[filtered_complex]{filtered complex}
 	filtered complex $\check{C}_s(X)$ that is empty if $s<0$ and, if $s \geq 0$, contains a subset of $X$ as a simplex if the balls of radius $s$ with centers in the subset have a non-empty intersection, explicitly
 	\begin{equation*}
 	\check{C}_s(X) = \Big\{ \lbrack v_0,\dots,v_n \rbrack \ \Big|\ \bigcap_{i=0}^n B_s(x_i) \neq \emptyset \Big\}.
 	\end{equation*}
-	The \textit{\v Cech persistence (co)homology} of $(X,d)$ is the 
+	The \textit{\v Cech persistence (co)homology} of $(X,d)$ is the
 	% \hyperref[persistent_simplicial_(co)homology]{persistent simplicial (co)homology}
 	persistent simplicial (co)homology of $\check{C}_s(X)$.
-	
+
 	\subsection*{Multiset} \label{multiset}
-	
+
 	A \textit{multiset} is a pair $(S, \phi)$ where $S$ is a set and $\phi : S \to \mathbb N \cup \{+\infty\}$ is a function attaining positive values. For $s \in S$ we refer to $\phi(s)$ as its \textit{multiplicity}. The \textit{union} of two multisets $(S_1, \phi_1), (S_2, \phi_2)$ is the multiset $(S_1 \cup S_2, \phi_1 \cup \phi_2)$ with
 	\begin{equation*}
-	(\phi_1 \cup \phi_2)(s) = 
+	(\phi_1 \cup \phi_2)(s) =
 	\begin{cases}
 	\phi_1(s) & s \in S_1, s \not\in S_2 \\
 	\phi_2(s) & s \in S_2, s \not\in S_1 \\
 	\phi_1(s) + \phi_2(s) & s \in S_1, s \in S_2. \\
 	\end{cases}
 	\end{equation*}
-	
+
 	\subsection*{Persistence diagram} \label{persistence_diagram}
-	
+
 	A \textit{persistence diagram} is a
-	%\hyperref[multiset]{multiset} 
+	%\hyperref[multiset]{multiset}
 	multiset of points in
 	\begin{equation*}
 	\mathbb R \times \big( \mathbb{R} \cup \{+\infty\} \big).
-	\end{equation*}	
-	Given a 
+	\end{equation*}
+	Given a
 	% \hyperref[persistence_module]{persistence module}
 	persistence module, its associated persistence diagram is determined by the following condition: for each pair $s,t$ the number counted with multiplicity of points $(b,d)$ in the multiset, satisfying $b \leq s \leq t < d$ is equal to the rank of $f_{st}.$
-	
+
 	A well known result establishes that there exists an isomorphism between two persistence module if and only if their persistence diagrams are equal.
-	
+
 	\paragraph{\\ Reference:} \cite{zomorodian2005computing}
 	\paragraph{\\ Earlier work:} \cite{morse1927rank, gabriel72decomposition, frosini1990shapes, barannikov1994morse, robins1999approximations, edelsbrunner2002simplification}
-	
+
 	\subsection*{Wasserstein and bottleneck distance}	\label{wasserstein_and_bottleneck_distance}
-	
+
 	The $p$\textit{-Wasserstein distance} between two persistence diagrams $D_1$ and $D_2$ is the infimum over all bijections $\gamma: D_1 \cup \Delta \to D_2 \cup \Delta$ of
 	\begin{equation*}
 	\Big(\sum_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_\infty^p \Big)^{1/p}
 	\end{equation*}
-	where $||-||_\infty$ is defined for $(x,y) \in \mathbb R^2$ by $\max\{|x|, |y|\}$. 
-	
+	where $||-||_\infty$ is defined for $(x,y) \in \mathbb R^2$ by $\max\{|x|, |y|\}$.
+
 	The limit $p \to \infty$ defines the \textit{bottleneck distance}. More explicitly, it is the infimum over the same set of bijections of the value
 	\begin{equation*}
 	\sup_{x \in D_1 \cup \Delta} ||x - \gamma(x)||_{\infty}.
@@ -466,37 +466,37 @@ pdfpagelabels]{hyperref}
 	The set of persistence diagrams together with any of the distances above is a
 	%\hyperref[metric_space]{metric space}.
 	metric space.
-	
+
 	\paragraph{\\ Reference:} \cite{kerber2017geometry}
-	
-	\subsection*{Persistence landscape} \label{persistence_landscape}	
-	
-	Let $\{(b_i, d_i)\}_{i \in I}$ be a 
+
+	\subsection*{Persistence landscape} \label{persistence_landscape}
+
+	Let $\{(b_i, d_i)\}_{i \in I}$ be a
 	%\hyperref[persistence_diagram]{persistence diagram}
-	persistence diagram. Its \textit{persistence landscape} is the set $\{\lambda_k\}_{k \in \mathbb N}$ of functions	
-	\begin{equation*}	
-	\lambda_k : \mathbb R \to \overline{\mathbb R}	
-	\end{equation*}	
-	defined by letting $\lambda_k(t)$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where	
-	\begin{equation*}	
-	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
-	\end{equation*}	
+	persistence diagram. Its \textit{persistence landscape} is the set $\{\lambda_k\}_{k \in \mathbb N}$ of functions
+	\begin{equation*}
+	\lambda_k : \mathbb R \to \overline{\mathbb R}
+	\end{equation*}
+	defined by letting $\lambda_k(t)$ be the $k$-th largest value of the set $\{\Lambda_i(t)\}_ {i \in I}$ where
+	\begin{equation*}
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
+	\end{equation*}
 	and $c_+ := \max(c,0)$. The function $\lambda_k$ is referred to as the $k$-\textit{layer of the persistence landscape}.
-	
+
 	We describe the graph of each $\lambda_k$ intuitively. For each $i \in I$, draw an isosceles triangle with base the interval $(b_i, d_i)$ on the horizontal $t$-axis, and sides with slope 1 and $-1$. This subdivides the plane into a number of polygonal regions. Label each of these regions by the number of triangles containing it. If $P_k$ is the union of the polygonal regions with values at least $k$, then the graph of $\lambda_k$ is the upper contour of $P_k$, with $\lambda_k(a) = 0$ if the vertical line $t=a$ does not intersect $P_k$.
-	
+
 	The persistence landscape construction defines a
 	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
 	vectorization of the set of persistence diagrams with target the vector space of real-valued function on $\mathbb N \times \mathbb R$. For any $p = 1,\dots,\infty$ we can restrict attention to persistence diagrams $D$ whose associated persistence landscape $\lambda$ is
 	%\hyperref[lp_norm]{$p$-integrable}
-	$p$-integrable, that is to say,	
-	\begin{equation} \label{equation:persistence_landscape_norm}	
-	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}	
-	\end{equation}	
+	$p$-integrable, that is to say,
+	\begin{equation} \label{equation:persistence_landscape_norm}
+	||\lambda||_p = \left( \sum_{i \in \mathbb N} ||\lambda_i||^p_p \right)^{1/p}
+	\end{equation}
 	where
-	\begin{equation*}	
-	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}	
-	\end{equation*}	
+	\begin{equation*}
+	||\lambda_i||_p = \left( \int_{\mathbb R} \lambda_i^p(x)\, dx \right)^{1/p}
+	\end{equation*}
 	is finite. In this case we refer to \eqref{equation:persistence_landscape_norm} as the $p$-\textit{landscape norm} of $D$ and, for $p = 2$, define the value of the \textit{landscape kernel} on two persistence diagrams $D$ and $E$ as
 	\begin{equation*}
 	\langle \lambda, \mu \rangle = \left(\sum_{i \in \mathbb N} \int_{\mathbb R} |\lambda_i(x) - \mu_i(x)|^2\, dx\right)^{1/2}
@@ -504,27 +504,27 @@ pdfpagelabels]{hyperref}
 	where $\lambda$ and $\mu$ are their associated persistence landscapes.
 
 	\paragraph{\\ References:} \cite{bubenik2015statistical}
-	
+
 	\subsection*{Weighted silhouette} \label{weighted_silhouette}
-	
+
 	Let $D = \{(b_i, d_i)\}_{i \in I}$ be a
 	%\hyperref[persistence_diagram]{persistence diagram}
 	persistence diagram and $w = \{w_i\}_{i \in I}$ a set of positive real numbers. The \textit{silhouette of} $D$ \textit{weighted by} $w$ is the function $\phi : \mathbb R \to \mathbb R$ defined by
-	\begin{equation*}	
-	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},	
-	\end{equation*}	
-	where	
 	\begin{equation*}
-	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+	
-	\end{equation*}	
+	\phi(t) = \frac{\sum_{i \in I}w_i \Lambda_i(t)}{\sum_{i \in I}w_i},
+	\end{equation*}
+	where
+	\begin{equation*}
+	\Lambda_i(t) = \left[ \min \{t-b_i, d_i-t\}\right]_+
+	\end{equation*}
 	and $c_+ := \max(c,0)$. When $w_i = \vert d_i - b_i \vert^p$ for $0 < p \leq \infty$ we refer to $\phi$ as the $p$-\textit{power-weighted silhouette} of $D$. The silhouette construction defines a
 	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
 	vectorization of the set of persistence diagrams with target the vector space of continuous real-valued functions on $\mathbb R$.
-	
+
 	\paragraph{\\ References:} \cite{chazal2014stochastic}
-	
+
 	\subsection*{Heat vectorizations} \label{heat_vectorization}
-	
+
 	Considering the points in a persistence diagram as the support of Dirac deltas one can construct, for any $t > 0$,
 	%\hyperref[vectorization_amplitude_and_kernel]{vectorization}
 	two vectorizations of the set of persistence diagrams to the set of continuous real-valued function on the first quadrant $\mathbb{R}^2_{>0}$. The \textit{symmetry heat vectorization} is constructed for every persistence diagram $D$ by solving the heat equation
@@ -534,19 +534,19 @@ pdfpagelabels]{hyperref}
 	u &= \sum_{p \in D} \delta_p && \text{on } \Omega \times {0} \nonumber
 	\end{align}
 	where $\Omega = \{(x_1, x_2) \in \mathbb R^2\ |\ x_1 \leq x_2\}$, then solving the same equation after precomposing the data of \eqref{equation: heat equation} with the change of coordinates $(x_1, x_2) \mapsto (x_2, x_1)$, and defining the image of $D$ to be the difference between these two solutions at the chosen time $t$.
-	
+
 	Similarly, the \textit{rotation heat vectorization} is defined by sending $D$ to the solution, evaluated at time $t$, of the equation obtained by precomposing the data of \eqref{equation: heat equation} with the change of coordinates $(x_1, x_2) \mapsto (x_1, x_2-x_1)$.
-	
+
 	We recall that the solution to the heat equation with initial condition given by a Dirac delta supported at $p \in \mathbb R^2$ is
 	\begin{equation*}
 	\frac{1}{4 \pi t} \exp\left(-\frac{||p-x||^2}{4t}\right)
-	\end{equation*} 
+	\end{equation*}
 	and, to highlight the connection with normally distributed random variables, it is customary to use the the change of variable $\sigma = \sqrt{2t}$.
-	
+
 	\paragraph{\\ References:} \cite{reininghaus2015stable,adams2017persistence}
-	
+
 	\subsection*{Persistence entropy} \label{persistence_entropy}
-	
+
 	Intuitively, this is a measure of the entropy of the points in a
 	% \hyperref[persistence_diagram]{persistence diagram}
 	persistence diagram. Precisely, let $D = \{(b_i, d_i)\}_{i \in I}$ be a persistence diagram with each $d_i < +\infty$. The \textit{persistence entropy} of $D$ is defined by
@@ -555,25 +555,25 @@ pdfpagelabels]{hyperref}
 	\end{equation*}
 	where
 	\begin{equation*}
-	p_i = \frac{(d_i - b_i)}{L_D} \qquad \text{and} \qquad L_D = \sum_{i \in I} (d_i - b_i) . 
+	p_i = \frac{(d_i - b_i)}{L_D} \qquad \text{and} \qquad L_D = \sum_{i \in I} (d_i - b_i) .
 	\end{equation*}
-	
-	\paragraph{\\ References:} \cite{rucco2016characterisation}
-	
+
+	\paragraph{\\ References:} \cite{chintakunta2015entropy, rucco2016characterisation, atienza2020entropy}
+
 	\subsection*{Betti curve} \label{betti_curve}
-	
-	Let $D$ be a 
+
+	Let $D$ be a
 	% \hyperref[persistence_diagram]{persistence diagram}
 	persistence diagram. Its \textit{Betti curve} is the function $\beta_D : \mathbb R \to \mathbb N$ whose value on $s \in \mathbb R$ is the number, counted with multiplicity, of points $(b_i,d_i)$ in $D$ such that $b_i \leq s <d_i$.
-	
+
 	The name is inspired from the case when the persistence diagram comes from persistent homology.
-	
+
 	\section{Time series}
-	
+
 	\subsection*{Time series} \label{time_series}
-	
-	A \textit{time series} is a sequence $\{y_i\}_{i = 0}^n$ of real numbers. 
-	
+
+	A \textit{time series} is a sequence $\{y_i\}_{i = 0}^n$ of real numbers.
+
 	A common construction of a times series $\{x_i\}_{i = 0}^n$ is given by choosing $x_0$ arbitrarily as well as a step parameter $h$ and setting
 	\begin{equation*}
 	x_i = x_0 + h\cdot i.
@@ -583,25 +583,25 @@ pdfpagelabels]{hyperref}
 	f : U \subseteq \mathbb R \to \mathbb R
 	\end{equation*}
 	we obtain a new time series $\{f(x_i)\}_{i = 0}^n$.
-	
-	Generalizing the previous construction we can define a time series from a function 
+
+	Generalizing the previous construction we can define a time series from a function
 	\begin{equation*}
 	\varphi : U \times M \to M, \qquad U \subseteq \mathbb R, \qquad M \subseteq \mathbb R^d
-	\end{equation*} 
+	\end{equation*}
 	using a function $f : M \to \mathbb R$ as follows: let $\{t_i\}_{i=0}^n$ be a time series taking values in $U$, then
 	\begin{equation*}
 	\{f(\varphi(t_i, m))\}_{i=0}^n
 	\end{equation*}
 	for an arbitrarily chosen $m \in M$.
-	
+
 	\subsection*{Takens embedding}	\label{takens_embedding}
-	
-	Let $M \subset \mathbb R^d$ be a 
+
+	Let $M \subset \mathbb R^d$ be a
 	%\hyperref[manifold]{compact manifold}
 	compact manifold of dimension $n$. Let
 	\begin{equation*}
 	\varphi : \mathbb R \times M \to M
-	\end{equation*} 
+	\end{equation*}
 	and
 	\begin{equation*}
 	f : M \to \mathbb R
@@ -614,40 +614,32 @@ pdfpagelabels]{hyperref}
 	\begin{equation*}
 	x \mapsto\big( f(x), f(x_1), f(x_2), \dots, f(x_{2n}) \big)
 	\end{equation*}
-	where 
+	where
 	\begin{equation*}
 	x_i = \varphi(i \cdot \tau, x)
 	\end{equation*}
 	is an injective map with full rank.
-	
+
 	\paragraph{\\ Reference:} \cite{takens1981detecting}
-	
+
 	\subsection*{Manifold} \label{manifold}
-	
-	Intuitively, a manifold of dimension $n$ is a space locally equivalent to $\mathbb R^n$. Formally, a subset $M$ of $\mathbb R^d$ is an $n$-dimensional manifold if for each $x \in M$ there exists an open ball $B(x) = \{ y \in M\,;\ d(x,y) < \epsilon\}$ and a smooth function with smooth inverse 
+
+	Intuitively, a manifold of dimension $n$ is a space locally equivalent to $\mathbb R^n$. Formally, a subset $M$ of $\mathbb R^d$ is an $n$-dimensional manifold if for each $x \in M$ there exists an open ball $B(x) = \{ y \in M\,;\ d(x,y) < \epsilon\}$ and a smooth function with smooth inverse
 	\begin{equation*}
 	\phi_x : B(x) \to \{v \in \mathbb R^n\,;\ ||v||<1\}.
 	\end{equation*}
-	
+
 	\paragraph{\\ References:} \cite{milnor1997topology,guillemin2010differential}
-	
-	\subsection*{Compact subset}	\label{compact_subset}
+
+	\subsection*{Compact subset} \label{compact_subset}
 	A subset $K$ of a metric space $(X,d)$ is said to be \textit{bounded} if there exist a real number $D$ such that for each pair of elements in $K$ the distance between them is less than $D$. It is said to be \textit{complete} if for any $x \in X$ it is the case that $x \in K$ if for any $\epsilon > 0$ the intersection between $K$ and $\{y \,;\ d(x,y) < \epsilon \}$ is not empty. It is said to be \textit{compact} if it is both bounded and complete.
-	
-	\section{Bibliography}
-	
-	\nocite{morse1927rank}
+
 	\nocite{vietoris1927hoheren}
-	\nocite{gabriel72decomposition}
 	\nocite{verri1993use}
-	\nocite{barannikov1994morse}
-	\nocite{robins1999approximations}
-	\nocite{edelsbrunner2002simplification}
 	\nocite{lee2003nonlinear}
-	\nocite{zomorodian2005computing}
 	\nocite{cohen-steiner2007stability}
-	
-	\bibliography{bibliography}{}
+
+	\bibliography{bibliography}
 	\bibliographystyle{alpha}
-	
+
 \end{document}
