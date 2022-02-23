@@ -23,13 +23,13 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
     """:ref:`Persistence entropies <persistence_entropy>` of persistence
     diagrams.
 
-    Given a persistence diagram consisting of birth-death-dimension triples
-    [b, d, q], subdiagrams corresponding to distinct homology dimensions are
-    considered separately, and their respective persistence entropies are
-    calculated as the (base 2) Shannon entropies of the collections of
-    differences d - b ("lifetimes"), normalized by the sum of all such
-    differences. Optionally, these entropies can be normalized according to a
-    simple heuristic, see `normalize`.
+    Based on ideas in [1]_. Given a persistence diagram consisting of
+    birth-death-dimension triples [b, d, q], subdiagrams corresponding to
+    distinct homology dimensions are considered separately, and their
+    respective persistence entropies are calculated as the (base 2) Shannon
+    entropies of the collections of differences d - b ("lifetimes"), normalized
+    by the sum of all such differences. Optionally, these entropies can be
+    normalized according to a simple heuristic, see `normalize`.
 
     **Important notes**:
 
@@ -46,7 +46,7 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
         When ``True``, the persistence entropy of each diagram is normalized by
         the logarithm of the sum of lifetimes of all points in the diagram.
         Can aid comparison between diagrams in an input collection when these
-        have different numbers of (non-trivial) points. [1]_
+        have different numbers of (non-trivial) points. See [2]_.
 
     nan_fill_value : float or None, optional, default: ``-1.``
         If a float, (normalized) persistence entropies initially computed as
@@ -70,7 +70,12 @@ class PersistenceEntropy(BaseEstimator, TransformerMixin):
 
     References
     ----------
-    .. [1] A. Myers, E. Munch, and F. A. Khasawneh, "Persistent Homology of
+    .. [1] H. Chintakunta et al, "An entropy-based persistence barcode";
+           *Pattern Recognition* **48**, 2, 2015;
+           `DOI: 10.1016/j.patcog.2014.06.023
+           <https://doi.org/10.1016/j.patcog.2014.06.023>`_.
+
+    .. [2] A. Myers, E. Munch, and F. A. Khasawneh, "Persistent Homology of
            Complex Networks for Dynamic State Detection"; *Phys. Rev. E*
            **100**, 022314, 2019; `DOI: 10.1103/PhysRevE.100.022314
            <https://doi.org/10.1103/PhysRevE.100.022314>`_.
