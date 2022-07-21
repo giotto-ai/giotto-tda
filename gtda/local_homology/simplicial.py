@@ -195,13 +195,14 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     """Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
     Eclidean space, or an abstract :ref:`metric space
     <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
-    information about the local topology around each point is summarized
-    in a list of persistence diagrams. This is done by first isolating
-    appropriate neighborhoods around each point, using a nearest neighbor
-    transformer then "coning off" an annulus around each point, and computing
-    the correponding associated persistence diagram. The output can then be
-    used to explore the point cloud, or fead into a vectorizer to obtain
-    features.
+    information about the local topology around each point is summarized in a
+    collection of persistence diagrams.
+
+    This is done by first isolating appropriate neighborhoods around each point
+    using a nearest neighbor transformer, then "coning off" points in an annulus
+    around each point, and finally computing the corresponding associated
+    persistence diagram. The output can then be used to explore the point cloud,
+    or fed into a vectorizer to obtain features.
 
     Parameters
     ----------
@@ -330,15 +331,16 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
 @adapt_fit_transform_docs
 class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     """Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Euclidean space, or an abstract :ref:`metric space
+    Eclidean space, or an abstract :ref:`metric space
     <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
-    information about the local topology around each point is summarized
-    in a list of persistence diagrams. This is done by first isolating
-    appropriate neighborhoods around each point, using a nearest neighbor
-    transformer then "coning off" points in an annulus around each point,
-    and computing correponding associated persistence diagram. The output
-    can then be used to explore the point cloud, or fead into a vectorizer
-    to obtain features.
+    information about the local topology around each point is summarized in a
+    collection of persistence diagrams.
+
+    This is done by first isolating appropriate neighborhoods around each point
+    using a radius neighbor transformer, then "coning off" points in an annulus
+    around each point, and finally computing the corresponding associated
+    persistence diagram. The output can then be used to explore the point cloud,
+    or fed into a vectorizer to obtain features.
 
     Parameters
     ----------
