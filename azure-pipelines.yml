@@ -16,11 +16,6 @@ jobs:
     vmImage: 'ubuntu-latest'
   strategy:
     matrix:
-      Python36:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '36'
-        python.version: '3.6'
       Python37:
         arch: x86_64
         plat: manylinux2010_x86_64
@@ -118,8 +113,6 @@ jobs:
     vmImage: 'macOS-10.15'
   strategy:
     matrix:
-      Python36:
-        python.version: '3.6'
       Python37:
         python.version: '3.7'
       Python38:
@@ -239,9 +232,6 @@ jobs:
     vmImage: 'vs2017-win2016'
   strategy:
     matrix:
-      Python36:
-        python_ver: '36'
-        python.version: '3.6'
       Python37:
         python_ver: '37'
         python.version: '3.7'
