@@ -27,7 +27,7 @@ class LocalVietorisRipsBase(BaseEstimator,
 
     """
 
-    def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
+    def __init__(self, metric="euclidean", homology_dimensions=(1, 2),
                  neighborhood_params=(1, 2), collapse_edges=False,
                  n_jobs=None):
         """Initializes the base class by setting the basic parameters.
@@ -38,12 +38,12 @@ class LocalVietorisRipsBase(BaseEstimator,
         # topological dimension of features to be computed
         self.homology_dimensions = homology_dimensions
 
-        # tuple of parameters defining 'neighborhoods' of points. These
+        # Tuple of parameters defining "neighborhoods" of points. These
         # parameters are input in the Transformer objects determining what
-        # points lie in the 'neighborhoods' of each points. The points outside
-        # the 'neighborhood' defined by the largest entry are discarded, and
-        # the points between the smaller and largest 'neighborhoods' are 'coned
-        # off'. See more in the corresponding fit methods.
+        # points lie in the "neighborhoods" of each points. The points outside
+        # the "neighborhood" defined by the largest entry are discarded, and
+        # the points between the smaller and largest "neighborhoods" are "coned
+        # off". See more in the corresponding fit methods.
         self.neighborhood_params = neighborhood_params
 
         # parameter to feed into the homology transformer
@@ -58,24 +58,24 @@ class LocalVietorisRipsBase(BaseEstimator,
         """
         # object used to compute persistence diagrams
         self.homology = VietorisRipsPersistence(
-            metric='precomputed',
+            metric="precomputed",
             collapse_edges=self.collapse_edges,
             homology_dimensions=self.homology_dimensions,
             n_jobs=self.n_jobs
             )
         # make sure the neighborhood_params has been set correctly.
         if self.neighborhood_params[0] > self.neighborhood_params[1]:
-            warnings.warn('First neighborhood_params is larger than second. '
-                          'The values are permuted. ')
+            warnings.warn("First neighborhood_params is larger than second. "
+                          "The values are permuted. ")
             self.neighborhood_params = (self.neighborhood_params[1],
                                        self.neighborhood_params[0])
         if self.neighborhood_params[1] == 0:
-            warnings.warn('Second neighborhood_params has less than 0. '
-                          'Second radius set to 1. ')
+            warnings.warn("Second neighborhood_params has less than 0. "
+                          "Second radius set to 1. ")
             self.radii = (self.radii[0], 1)
         if self.neighborhood_params[0] == self.neighborhood_params[1]:
-            warnings.warn('For meaningfull features, first neighborhood_params '
-                          'should be strictly smaller than second. ')
+            warnings.warn("For meaningfull features, first neighborhood_params "
+                          "should be strictly smaller than second. ")
         return self
 
     def transform(self, X, y=None):
@@ -123,7 +123,7 @@ class LocalVietorisRipsBase(BaseEstimator,
         for i in range(len(Xt)):
             # get indices of points close to point at index i
             close_indices = Xt_close.getrow(i).indices
-            # get indices of points in second 'neighborhood'
+            # get indices of points in second "neighborhood"
             relevant_indices = Xt_relevant.getrow(i).indices
             annulus_indices = list(set(relevant_indices) - set(close_indices))
             # Order them such that the last ones are the ones to cone off
@@ -192,28 +192,27 @@ class LocalVietorisRipsBase(BaseEstimator,
 
 @adapt_fit_transform_docs
 class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
-    """
-    Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
+    """Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
     Eclidean space, or an abstract :ref:`metric space
     <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
     information about the local topology around each point is summarized
     in a list of persistence diagrams. This is done by first isolating
     appropriate neighborhoods around each point, using a nearest neighbor
-    transformer then 'coning' off an annulus around each point, and computing
+    transformer then "coning off" an annulus around each point, and computing
     the correponding associated persistence diagram. The output can then be
     used to explore the point cloud, or fead into a vectorizer to obtain
     features.
 
     Parameters
     ----------
-    metric : string or callable, optional, default: ``'euclidean'``
+    metric : string or callable, optional, default: ``"euclidean"``
         Input data is to be interpreted as a point cloud (i.e. feature arrays),
         and `metric`determines a rule with which to calculate distances between
         pairs of points (i.e. row vectors). If `metric` is a string, it must be
         one of the options allowed by :func:`scipy.spatial.distance.pdist`
         for its metric parameter, or a metric listed in
         :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
-        ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If `metric` is a
+        ``"euclidean"``, ``"manhattan"`` or ``"cosine"``. If `metric` is a
         callable, it should take pairs of vectors (1D arrays) as input and, for
         each two vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
@@ -249,20 +248,20 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     """
 
     _hyperparameters = {
-        'metric': {'type': (str, FunctionType)},
-        'n_neighbors': {'type': (tuple, list),
-                        'of': {type: int,
-                               'in': Interval(1, np.inf, closed='left')}
+        "metric": {"type": (str, FunctionType)},
+        "n_neighbors": {"type": (tuple, list),
+                        "of": {type: int,
+                               "in": Interval(1, np.inf, closed="left")}
                         },
-        'homology_dimensions': {
-            'type': (tuple, list),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "homology_dimensions": {
+            "type": (tuple, list),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'collapse_edges': {'type': bool}
+        "collapse_edges": {"type": bool}
         }
 
-    def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 n_neighbors=(1, 2), collapse_edges=False, n_jobs=1):
+    def __init__(self, metric="euclidean", homology_dimensions=(1, 2),
+                 n_neighbors=(1, 2), collapse_edges=False, n_jobs=None):
         self.n_neighbors = n_neighbors
         super().__init__(metric=metric,
                          homology_dimensions=homology_dimensions,
@@ -294,29 +293,29 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         super().fit(X)
 
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
         check_array(X, accept_sparse=False)
 
         # make sure that the parameters are set correctly
         self.size_ = len(X)
         if self.size_ <= self.neighborhood_params[0]:
-            warnings.warn('First n_neighbors is too large to be relevant. '
-                          'Consider reducing it.')
+            warnings.warn("First n_neighbors is too large to be relevant. "
+                          "Consider reducing it.")
             self.neighborhood_params = (self.size_-1, self.size_)
         if self.size_ < self.neighborhood_params[1]:
-            warnings.warn('Second n_neighbors is too large to be relevant. '
-                          'Consider reducing it. ')
+            warnings.warn("Second n_neighbors is too large to be relevant. "
+                          "Consider reducing it. ")
             self.neighborhood_params = (self.neighborhood_params[0], self.size_)
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = KNeighborsTransformer(
-                                    mode='connectivity',
+                                    mode="connectivity",
                                     n_neighbors=self.neighborhood_params[0],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
         self.relevant_neighbors_ = KNeighborsTransformer(
-                                    mode='connectivity',
+                                    mode="connectivity",
                                     n_neighbors=self.neighborhood_params[1],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
@@ -334,21 +333,21 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     information about the local topology around each point is summarized
     in a list of persistence diagrams. This is done by first isolating
     appropriate neighborhoods around each point, using a nearest neighbor
-    transformer then 'coning' off points in an annulus around each point,
+    transformer then "coning off" points in an annulus around each point,
     and computing correponding associated persistence diagram. The output
     can then be used to explore the point cloud, or fead into a vectorizer
     to obtain features.
 
     Parameters
     ----------
-    metric : string or callable, optional, default: ``'euclidean'``
+    metric : string or callable, optional, default: ``"euclidean"``
         Input data is to be interpreted as a point cloud (i.e. feature arrays),
         and `metric`determines a rule with which to calculate distances between
         pairs of points (i.e. row vectors). If `metric` is a string, it must be
         one of the options allowed by :func:`scipy.spatial.distance.pdist` for
         its `metric` parameter, or a metric listed in
         :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including
-        ``'euclidean'``, ``'manhattan'`` or ``'cosine'``. If `metric` is a
+        ``"euclidean"``, ``"manhattan"`` or ``"cosine"``. If `metric` is a
         callable, it should take pairs of vectors (1D arrays) as input and, for
         each two vectors in a pair, it should return a scalar indicating the
         distance/dissimilarity between them.
@@ -383,19 +382,19 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     """
 
     _hyperparameters = {
-        'metric': {'type': (str, FunctionType)},
-        'radii': {'type': (tuple, list),
-                  'of': {type: Real, 'in': Interval(0, np.inf, closed='left')}
+        "metric": {"type": (str, FunctionType)},
+        "radii": {"type": (tuple, list),
+                  "of": {type: Real, "in": Interval(0, np.inf, closed="left")}
                   },
-        'homology_dimensions': {
-            'type': (tuple, list),
-            'of': {'type': int, 'in': Interval(0, np.inf, closed='left')}
+        "homology_dimensions": {
+            "type": (tuple, list),
+            "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        'collapse_edges': {'type': bool}
+        "collapse_edges": {"type": bool}
         }
 
-    def __init__(self, metric='euclidean', homology_dimensions=(1, 2),
-                 radii=(1, 2), collapse_edges=False, n_jobs=1):
+    def __init__(self, metric="euclidean", homology_dimensions=(1, 2),
+                 radii=(1, 2), collapse_edges=False, n_jobs=None):
         self.radii = radii
         super().__init__(metric=metric,
                          homology_dimensions=homology_dimensions,
@@ -427,18 +426,18 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
         super().fit(X)
 
         validate_params(
-            self.get_params(), self._hyperparameters, exclude=['n_jobs'])
+            self.get_params(), self._hyperparameters, exclude=["n_jobs"])
         check_array(X, accept_sparse=False)
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = RadiusNeighborsTransformer(
-                                    mode='connectivity',
+                                    mode="connectivity",
                                     radius=self.neighborhood_params[0],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
 
         self.relevant_neighbors_ = RadiusNeighborsTransformer(
-                                    mode='connectivity',
+                                    mode="connectivity",
                                     radius=self.neighborhood_params[1],
                                     metric=self.metric,
                                     n_jobs=self.n_jobs)
