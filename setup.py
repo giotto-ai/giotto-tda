@@ -67,7 +67,8 @@ EXTRAS_REQUIRE = {"tests": ["pandas",
                                "pandas",
                                "openml",
                                "matplotlib",
-                               "gensim"]}
+                               "gensim",
+                               "umap-learn"]}
 
 
 def combine_requirements(base_keys):
