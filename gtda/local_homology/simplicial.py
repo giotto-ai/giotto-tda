@@ -309,16 +309,18 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = KNeighborsTransformer(
-                                    mode="connectivity",
-                                    n_neighbors=self.neighborhood_params[0],
-                                    metric=self.metric,
-                                    n_jobs=self.n_jobs)
+            mode="connectivity",
+            n_neighbors=self.neighborhood_params[0],
+            metric=self.metric,
+            n_jobs=self.n_jobs
+            )
 
         self.relevant_neighbors_ = KNeighborsTransformer(
-                                    mode="connectivity",
-                                    n_neighbors=self.neighborhood_params[1],
-                                    metric=self.metric,
-                                    n_jobs=self.n_jobs)
+            mode="connectivity",
+            n_neighbors=self.neighborhood_params[1],
+            metric=self.metric,
+            n_jobs=self.n_jobs
+            )
 
         self.close_neighbors_.fit(X)
         self.relevant_neighbors_.fit(X)
@@ -431,16 +433,18 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = RadiusNeighborsTransformer(
-                                    mode="connectivity",
-                                    radius=self.neighborhood_params[0],
-                                    metric=self.metric,
-                                    n_jobs=self.n_jobs)
+            mode="connectivity",
+            radius=self.neighborhood_params[0],
+            metric=self.metric,
+            n_jobs=self.n_jobs
+            )
 
         self.relevant_neighbors_ = RadiusNeighborsTransformer(
-                                    mode="connectivity",
-                                    radius=self.neighborhood_params[1],
-                                    metric=self.metric,
-                                    n_jobs=self.n_jobs)
+            mode="connectivity",
+            radius=self.neighborhood_params[1],
+            metric=self.metric,
+            n_jobs=self.n_jobs
+            )
 
         self.close_neighbors_.fit(X)
         self.relevant_neighbors_.fit(X)
