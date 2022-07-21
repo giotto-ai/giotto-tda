@@ -193,7 +193,7 @@ class LocalVietorisRipsBase(BaseEstimator,
 @adapt_fit_transform_docs
 class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     """Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Eclidean space, or an abstract :ref:`metric space
+    Euclidean space, or an abstract :ref:`metric space
     <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
     information about the local topology around each point is summarized in a
     collection of persistence diagrams.
@@ -331,7 +331,7 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
 @adapt_fit_transform_docs
 class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     """Given a :ref:`point cloud <finite_metric_spaces_and_point_clouds>` in
-    Eclidean space, or an abstract :ref:`metric space
+    Euclidean space, or an abstract :ref:`metric space
     <finite_metric_spaces_and_point_clouds>` encoded by a distance matrix,
     information about the local topology around each point is summarized in a
     collection of persistence diagrams.
