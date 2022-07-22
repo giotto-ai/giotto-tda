@@ -108,9 +108,9 @@ jobs:
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'macOS1015'
+- job: 'macOS11'
   pool:
-    vmImage: 'macOS-10.15'
+    vmImage: 'macOS-11'
   strategy:
     matrix:
       Python37:
