@@ -227,9 +227,9 @@ jobs:
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'win2016'
+- job: 'windows'
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   strategy:
     matrix:
       Python37:
@@ -254,7 +254,7 @@ jobs:
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
-  # Use the boost_1_72_0-msvc-14.1-64.exe for Windows 2016
+  # Use the boost_1_72_0-msvc-14.1-64.exe for windows-latest
   # Following issue https://github.com/actions/virtual-environments/issues/2667
   # As of March 2021, it is necessary to download Boost manually
   # DIR: installation dir, this value need to be forwarded to BOOST_ROOT_PIPELINE
