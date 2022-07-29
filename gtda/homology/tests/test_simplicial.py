@@ -8,9 +8,9 @@ from numpy.testing import assert_almost_equal
 from scipy.sparse import csr_matrix
 from scipy.spatial.distance import pdist, squareform
 try:
-    from scipy.spatial import QHullError
+    from scipy.spatial import QhullError
 except ImportError:
-    from scipy.spatial.qhull import QHullError
+    from scipy.spatial.qhull import QhullError
 from sklearn.exceptions import NotFittedError
 
 from gtda.homology import VietorisRipsPersistence, WeightedRipsPersistence, \
