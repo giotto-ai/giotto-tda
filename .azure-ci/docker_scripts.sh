@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 set -x
-echo "Start manylinux2010 docker build"
+echo "Start manylinux2014 docker build"
 
 # Upgrade pip and setuptools. TODO: Monitor status of pip versions
 PYTHON_PATH=$(eval find "/opt/python/*cp${python_ver}*" -print)
@@ -52,5 +52,5 @@ python setup.py bdist_wheel
 # Repair wheels with auditwheel
 pip install auditwheel
 auditwheel repair dist/*whl -w dist/
-# remove wheels that are not manylinux2010
+# remove wheels that are not manylinux2014
 rm -rf dist/*-linux*.whl

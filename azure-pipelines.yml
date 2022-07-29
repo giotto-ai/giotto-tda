@@ -11,24 +11,24 @@ pr:
 
 jobs:
 
-- job: 'manylinux2010'
+- job: 'manylinux2014'
   pool:
     vmImage: 'ubuntu-latest'
   strategy:
     matrix:
       Python37:
         arch: x86_64
-        plat: manylinux2010_x86_64
+        plat: manylinux2014_x86_64
         python_ver: '37'
         python.version: '3.7'
       Python38:
         arch: x86_64
-        plat: manylinux2010_x86_64
+        plat: manylinux2014_x86_64
         python_ver: '38'
         python.version: '3.8'
       Python39:
         arch: x86_64
-        plat: manylinux2010_x86_64
+        plat: manylinux2014_x86_64
         python_ver: '39'
         python.version: '3.9'
   variables:
@@ -55,7 +55,7 @@ jobs:
 
   - task: Bash@3
     inputs:
-      filePath: .azure-ci/build_manylinux2010.sh
+      filePath: .azure-ci/build_manylinux2014.sh
     env:
       python_ver: $(python_ver)
       CCACHE_DIR: $(CCACHE_DIR)
@@ -64,7 +64,7 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip
-      python -m pip install dist/*manylinux2010*.whl
+      python -m pip install dist/*manylinux2014*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -103,7 +103,7 @@ jobs:
   - bash: |
       set -e
       python -m pip install twine
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2014*.whl
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
