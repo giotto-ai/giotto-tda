@@ -11,29 +11,24 @@ pr:
 
 jobs:
 
-- job: 'manylinux2010'
+- job: 'manylinux2014'
   pool:
     vmImage: 'ubuntu-latest'
   strategy:
     matrix:
-      Python36:
-        arch: x86_64
-        plat: manylinux2010_x86_64
-        python_ver: '36'
-        python.version: '3.6'
       Python37:
         arch: x86_64
-        plat: manylinux2010_x86_64
+        plat: manylinux2014_x86_64
         python_ver: '37'
         python.version: '3.7'
       Python38:
         arch: x86_64
-        plat: manylinux2010_x86_64
+        plat: manylinux2014_x86_64
         python_ver: '38'
         python.version: '3.8'
       Python39:
         arch: x86_64
-        plat: manylinux2010_x86_64
+        plat: manylinux2014_x86_64
         python_ver: '39'
         python.version: '3.9'
   variables:
@@ -46,7 +41,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2021.12.29" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2022.7.29" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -60,7 +55,7 @@ jobs:
 
   - task: Bash@3
     inputs:
-      filePath: .azure-ci/build_manylinux2010.sh
+      filePath: .azure-ci/build_manylinux2014.sh
     env:
       python_ver: $(python_ver)
       CCACHE_DIR: $(CCACHE_DIR)
@@ -69,7 +64,7 @@ jobs:
   - script: |
       set -e
       python -m pip install --upgrade pip
-      python -m pip install dist/*manylinux2010*.whl
+      python -m pip install dist/*manylinux2014*.whl
     displayName: 'Install the wheels'
 
   - script: |
@@ -108,18 +103,16 @@ jobs:
   - bash: |
       set -e
       python -m pip install twine
-      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2010*.whl
+      twine upload -u giotto-learn -p $(pypi_psw) --skip-existing dist/*manylinux2014*.whl
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'macOS1015'
+- job: 'macOS11'
   pool:
-    vmImage: 'macOS-10.15'
+    vmImage: 'macOS-11'
   strategy:
     matrix:
-      Python36:
-        python.version: '3.6'
       Python37:
         python.version: '3.7'
       Python38:
@@ -146,7 +139,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2021.12.29" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2022.7.29" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -234,14 +227,11 @@ jobs:
     displayName: 'Upload nightly wheels to PyPI'
 
 
-- job: 'win2016'
+- job: 'windows'
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   strategy:
     matrix:
-      Python36:
-        python_ver: '36'
-        python.version: '3.6'
       Python37:
         python_ver: '37'
         python.version: '3.7'
@@ -264,7 +254,7 @@ jobs:
     condition: eq(variables.nightlyRelease, true)
     displayName: 'Change name to giotto-tda-nightly'
 
-  # Use the boost_1_72_0-msvc-14.1-64.exe for Windows 2016
+  # Use the boost_1_72_0-msvc-14.1-64.exe for windows-latest
   # Following issue https://github.com/actions/virtual-environments/issues/2667
   # As of March 2021, it is necessary to download Boost manually
   # DIR: installation dir, this value need to be forwarded to BOOST_ROOT_PIPELINE
