@@ -11,6 +11,7 @@ from sklearn.datasets import make_circles
 
 from gtda.mapper import Projection, OneDimensionalCover, make_mapper_pipeline
 
+
 @composite
 def get_mapper_input(draw):
     X = draw(arrays(
@@ -22,7 +23,10 @@ def get_mapper_input(draw):
         shape=array_shapes(min_dims=2, max_dims=2, min_side=8, max_side=12)))
     return X
 
-hypothesis_settings = dict(deadline=5000, suppress_health_check=(HealthCheck.data_too_large,))
+
+hypothesis_settings = dict(
+    deadline=5000, suppress_health_check=(HealthCheck.data_too_large,)
+)
 
 
 @settings(**hypothesis_settings)
