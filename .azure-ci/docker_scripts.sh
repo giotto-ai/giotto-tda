@@ -41,6 +41,7 @@ pip install wheel
 pip install -e ".[dev]"
 
 # Test dev install with pytest
+CI=1 # makes hypothesis print falsifying examples
 pytest gtda --no-cov --no-coverage-upload
 
 # Uninstall giotto-tda/giotto-tda-nightly dev
