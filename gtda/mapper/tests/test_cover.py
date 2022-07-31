@@ -94,8 +94,8 @@ def test_equal_interval_length(filter_values, n_intervals, overlap_frac):
         )
 
     # rounding precision
-    assert len(set(np.round(upper_limits - lower_limits,
-                            decimals=2).tolist())) == 1
+    lengths = upper_limits - lower_limits
+    assert np.isclose(np.max(lengths), np.min(lengths), atol=0.5, rtol=1e-8)
 
 
 @composite
