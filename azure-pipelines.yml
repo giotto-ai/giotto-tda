@@ -174,9 +174,11 @@ jobs:
       python -m pip uninstall -y giotto-tda-nightly
     displayName: 'Uninstall giotto-tda/giotto-tda-nightly'
 
+  # Includes workaround for macOS 11 compatibility issue, see https://github.com/apple/tensorflow_macos/issues/46
   - script: |
       set -e
       python setup.py bdist_wheel
+      for f in dist/*.whl; do mv "$f" "${f/_11_0_/_10_16_}"; done
     displayName: 'Build the wheels'
 
   - script: python -m pip install dist/*.whl
