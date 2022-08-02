@@ -289,6 +289,7 @@ def test_hk_shape(n_jobs, pts, dims):
 
 
 @given(pts_gen, dims_gen)
+@settings(deadline=None)
 def test_hk_positive(pts, dims):
     """We expect the points above the PD-diagonal to be non-negative (up to a
     numerical error)"""
