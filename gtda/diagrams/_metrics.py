@@ -96,7 +96,7 @@ def heats(diagrams, sampling, step_size, sigma):
     diagrams[diagrams > last_sampling] = last_sampling
 
     # Calculate the value of `sigma` in pixel units, threshold for numerical
-    # reasons if it's large big.
+    # reasons if it's too large.
     sigma_pixel = sigma / step_size
     sigma_pixel = min(sigma_pixel, 10**5 * len(sampling))
 
