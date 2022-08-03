@@ -30,8 +30,6 @@ hypothesis_settings = dict(
 @given(X=mapper_input)
 def test_node_intersection(X):
     # TODO: Replace pipe and graph by Nerve transformer
-    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
-    # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X)
 
@@ -50,8 +48,6 @@ def test_node_intersection(X):
 @given(X=mapper_input)
 def test_edge_elements(X):
     # TODO: Replace pipe and graph by Nerve transformer
-    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
-    # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline()
     pipe_edge_elems = make_mapper_pipeline(store_edge_elements=True)
 
@@ -98,8 +94,6 @@ def test_edge_elements(X):
 @given(X=mapper_input)
 def test_min_intersection(X, min_intersection):
     # TODO: Replace pipe and graph by Nerve transformer
-    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
-    # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline(min_intersection=min_intersection)
     graph = pipe.fit_transform(X)
 
