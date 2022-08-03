@@ -3,7 +3,7 @@
 
 import numpy as np
 import pytest
-from hypothesis import given, settings
+from hypothesis import given, settings, HealthCheck
 from hypothesis.extra.numpy import arrays, array_shapes
 from hypothesis.strategies import floats
 from sklearn.cluster import DBSCAN
@@ -12,17 +12,24 @@ from sklearn.datasets import make_circles
 from gtda.mapper import Projection, OneDimensionalCover, make_mapper_pipeline
 
 
-@settings(deadline=5000)
-@given(X=arrays(dtype=float, unique=True,
-                elements=floats(allow_nan=False,
-                                allow_infinity=False,
-                                min_value=-1e6,
-                                max_value=1e6),
-                shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
+mapper_input = arrays(
+    dtype=float, unique=True, elements=floats(
+        allow_nan=False, allow_infinity=False,
+        min_value=-1e6, max_value=1e6
+    ),
+    shape=array_shapes(min_dims=2, max_dims=2, min_side=8, max_side=12)
+)
+
+
+hypothesis_settings = dict(
+    deadline=5000, suppress_health_check=(HealthCheck.data_too_large,)
+)
+
+
+@settings(**hypothesis_settings)
+@given(X=mapper_input)
 def test_node_intersection(X):
     # TODO: Replace pipe and graph by Nerve transformer
-    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
-    # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline()
     graph = pipe.fit_transform(X)
 
@@ -37,17 +44,10 @@ def test_node_intersection(X):
     assert not any(disjoint_nodes)
 
 
-@settings(deadline=5000)
-@given(X=arrays(dtype=float, unique=True,
-                elements=floats(allow_nan=False,
-                                allow_infinity=False,
-                                min_value=-1e6,
-                                max_value=1e6),
-                shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
+@settings(**hypothesis_settings)
+@given(X=mapper_input)
 def test_edge_elements(X):
     # TODO: Replace pipe and graph by Nerve transformer
-    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
-    # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline()
     pipe_edge_elems = make_mapper_pipeline(store_edge_elements=True)
 
@@ -89,18 +89,11 @@ def test_edge_elements(X):
     assert flag
 
 
-@settings(deadline=5000)
-@pytest.mark.parametrize("min_intersection", [1, 2, 3, 10])
-@given(X=arrays(dtype=float, unique=True,
-                elements=floats(allow_nan=False,
-                                allow_infinity=False,
-                                min_value=-1e6,
-                                max_value=1e6),
-                shape=array_shapes(min_dims=2, max_dims=2, min_side=11)))
+@settings(**hypothesis_settings)
+@pytest.mark.parametrize("min_intersection", [1, 3, 5])
+@given(X=mapper_input)
 def test_min_intersection(X, min_intersection):
     # TODO: Replace pipe and graph by Nerve transformer
-    # TODO: Improve the Hypothesis strategy to avoid needing to hardcode the
-    # min_side to be greater than n_intervals (10 by default).
     pipe = make_mapper_pipeline(min_intersection=min_intersection)
     graph = pipe.fit_transform(X)
 

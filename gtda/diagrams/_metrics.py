@@ -95,8 +95,10 @@ def heats(diagrams, sampling, step_size, sigma):
     diagrams[diagrams < first_sampling] = first_sampling
     diagrams[diagrams > last_sampling] = last_sampling
 
-    # Calculate the value of `sigma` in pixel units
+    # Calculate the value of `sigma` in pixel units, threshold for numerical
+    # reasons if it's too large.
     sigma_pixel = sigma / step_size
+    sigma_pixel = min(sigma_pixel, 10**5 * len(sampling))
 
     for i, diagram in enumerate(diagrams):
         nontrivial_points_idx = np.flatnonzero(diagram[:, 1] != diagram[:, 0])
