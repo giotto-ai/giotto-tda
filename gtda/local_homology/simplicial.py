@@ -70,7 +70,7 @@ class LocalVietorisRipsBase(BaseEstimator,
             self.neighborhood_params = (self.neighborhood_params[1],
                                         self.neighborhood_params[0])
         if self.neighborhood_params[1] == 0:
-            warnings.warn("Second `neighborhood_params` has less than 0. "
+            warnings.warn("Second `neighborhood_params` is less than 0. "
                           "Second radius set to 1. ")
             self.radii = (self.radii[0], 1)
         if self.neighborhood_params[0] == self.neighborhood_params[1]:
