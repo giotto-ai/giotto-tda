@@ -331,7 +331,7 @@ def _get_widgets_by_trait(fig, key, val=None):
     """Returns a list of widgets containing attribute `key` which currently
     evaluates to the value `val`."""
     widgets = []
-    for k, v in fig.getattr(widgets_attr).items():
+    for k, v in getattr(fig, widgets_attr).items():
         try:
             b = getattr(v, key) == val if val is not None else getattr(v, key)
             if b:
