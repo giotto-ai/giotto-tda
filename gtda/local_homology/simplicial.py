@@ -65,17 +65,18 @@ class LocalVietorisRipsBase(BaseEstimator,
             )
         # make sure the neighborhood_params has been set correctly.
         if self.neighborhood_params[0] > self.neighborhood_params[1]:
-            warnings.warn("First neighborhood_params is larger than second. "
+            warnings.warn("First `neighborhood_params` is larger than second. "
                           "The values are permuted. ")
             self.neighborhood_params = (self.neighborhood_params[1],
-                                       self.neighborhood_params[0])
+                                        self.neighborhood_params[0])
         if self.neighborhood_params[1] == 0:
-            warnings.warn("Second neighborhood_params has less than 0. "
+            warnings.warn("Second `neighborhood_params` has less than 0. "
                           "Second radius set to 1. ")
             self.radii = (self.radii[0], 1)
         if self.neighborhood_params[0] == self.neighborhood_params[1]:
-            warnings.warn("For meaningfull features, first neighborhood_params "
-                          "should be strictly smaller than second. ")
+            warnings.warn("For meaningful features, first "
+                          "`neighborhood_params` should be strictly smaller "
+                          "than second.")
         return self
 
     def transform(self, X, y=None):
@@ -304,8 +305,8 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
                           "Consider reducing it.")
             self.neighborhood_params = (self.size_-1, self.size_)
         if self.size_ < self.neighborhood_params[1]:
-            warnings.warn("Second n_neighbors is too large to be relevant. "
-                          "Consider reducing it. ")
+            warnings.warn("Second `n_neighbors` is too large to be "
+                          "relevant. Consider reducing it. ")
             self.neighborhood_params = (self.neighborhood_params[0], self.size_)
 
         # Objects used for finding nearest neighbors
@@ -339,8 +340,8 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     This is done by first isolating appropriate neighborhoods around each point
     using a radius neighbor transformer, then "coning off" points in an annulus
     around each point, and finally computing the corresponding associated
-    persistence diagram. The output can then be used to explore the point cloud,
-    or fed into a vectorizer to obtain features.
+    persistence diagram. The output can then be used to explore the point 
+    cloud, or fed into a vectorizer to obtain features.
 
     Parameters
     ----------
