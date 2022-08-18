@@ -15,3 +15,4 @@ Where component authors are known, add them here.
 | Roman Yurchak, roman.yurchak@symerio.com
 | Nick Sale, nicholas.j.sale@gmail.com
 | Rayna Andreeva, r.andreeva@sms.ed.ac.uk
+| Jacob Bamberger, jacob.bamberger@epfl.ch
