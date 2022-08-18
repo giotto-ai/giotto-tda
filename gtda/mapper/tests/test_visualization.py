@@ -1,12 +1,12 @@
 """Testing for Mapper plotting functions."""
 # License: GNU AGPLv3
 
-from packaging import version
-import importlib
-ipywidgets_vers = importlib.metadata.version("ipywidgets")
+from packaging.version import parse
+from importlib.metadata import version
+ipywidgets_vers = version("ipywidgets")
 # Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
 # (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
-if version.parse(ipywidgets_vers) < version.parse("8.0.0"):
+if parse(ipywidgets_vers) < parse("8.0.0"):
     widgets_attr = "widgets"
 else:
     widgets_attr = "_active_widgets"
