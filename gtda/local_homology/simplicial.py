@@ -200,8 +200,8 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     collection of persistence diagrams.
 
     This is done by first isolating appropriate neighborhoods around each point
-    using a nearest neighbor transformer, then "coning off" points in an 
-    annulus around each point, and finally computing the corresponding 
+    using a nearest neighbor transformer, then "coning off" points in an
+    annulus around each point, and finally computing the corresponding
     associated persistence diagram. The output can then be used to explore the
     point cloud, or fed into a vectorizer to obtain features.
 
