@@ -78,7 +78,7 @@ jobs:
 
   - script: |
       set -e
-      python -m pip install openml matplotlib
+      python -m pip install openml matplotlib umap-learn gensim
       python -m pip install papermill
       cd examples
       for n in *.ipynb
