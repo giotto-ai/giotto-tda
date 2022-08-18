@@ -1,10 +1,13 @@
 """Testing for Mapper plotting functions."""
 # License: GNU AGPLv3
 
+from packaging.version import parse
+
 from unittest import TestCase
 
 import numpy as np
 import pandas as pd
+import ipywidgets
 import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
@@ -13,6 +16,15 @@ from sklearn.decomposition import PCA
 from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
     plot_static_mapper_graph, plot_interactive_mapper_graph, \
     MapperInteractivePlotter
+
+
+ipywidgets_vers = ipywidgets.__version__
+# Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
+# (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
+if parse(ipywidgets_vers) < parse("8.0.0"):
+    widgets_attr = "widgets"
+else:
+    widgets_attr = "_active_widgets"
 
 
 class TestCaseNoTemplate(TestCase):
@@ -321,7 +333,7 @@ def _get_widgets_by_trait(fig, key, val=None):
     """Returns a list of widgets containing attribute `key` which currently
     evaluates to the value `val`."""
     widgets = []
-    for k, v in fig.widgets.items():
+    for k, v in getattr(fig, widgets_attr).items():
         try:
             b = getattr(v, key) == val if val is not None else getattr(v, key)
             if b:
