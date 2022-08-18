@@ -200,10 +200,10 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     collection of persistence diagrams.
 
     This is done by first isolating appropriate neighborhoods around each point
-    using a nearest neighbor transformer, then "coning off" points in an annulus
-    around each point, and finally computing the corresponding associated
-    persistence diagram. The output can then be used to explore the point cloud,
-    or fed into a vectorizer to obtain features.
+    using a nearest neighbor transformer, then "coning off" points in an 
+    annulus around each point, and finally computing the corresponding 
+    associated persistence diagram. The output can then be used to explore the
+    point cloud, or fed into a vectorizer to obtain features.
 
     Parameters
     ----------
@@ -307,7 +307,8 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
         if self.size_ < self.neighborhood_params[1]:
             warnings.warn("Second `n_neighbors` is too large to be "
                           "relevant. Consider reducing it. ")
-            self.neighborhood_params = (self.neighborhood_params[0], self.size_)
+            self.neighborhood_params = (self.neighborhood_params[0],
+                                        self.size_)
 
         # Objects used for finding nearest neighbors
         self.close_neighbors_ = KNeighborsTransformer(
@@ -340,7 +341,7 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     This is done by first isolating appropriate neighborhoods around each point
     using a radius neighbor transformer, then "coning off" points in an annulus
     around each point, and finally computing the corresponding associated
-    persistence diagram. The output can then be used to explore the point 
+    persistence diagram. The output can then be used to explore the point
     cloud, or fed into a vectorizer to obtain features.
 
     Parameters
