@@ -1,6 +1,16 @@
 """Testing for Mapper plotting functions."""
 # License: GNU AGPLv3
 
+from packaging import version
+from importlib import metadata
+ipywidgets_vers = metadata.version("ipywidgets")
+# Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
+# (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
+if version.parse(ipywidgets_vers) < version.parse("8.0.0"):
+    widgets_attr = "widgets"
+else:
+    widgets_attr = "_active_widgets"
+
 from unittest import TestCase
 
 import numpy as np
@@ -321,7 +331,7 @@ def _get_widgets_by_trait(fig, key, val=None):
     """Returns a list of widgets containing attribute `key` which currently
     evaluates to the value `val`."""
     widgets = []
-    for k, v in fig.widgets.items():
+    for k, v in fig.getattr(widgets_attr).items():
         try:
             b = getattr(v, key) == val if val is not None else getattr(v, key)
             if b:
