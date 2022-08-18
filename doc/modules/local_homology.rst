@@ -13,5 +13,5 @@ Local simplicial homology
    :toctree: generated/local_homology/
    :template: class.rst
 
-   homology.KNeighborsLocalVietorisRips
-   homology.RadiusLocalVietorisRips
+   local_homology.KNeighborsLocalVietorisRips
+   local_homology.RadiusLocalVietorisRips
