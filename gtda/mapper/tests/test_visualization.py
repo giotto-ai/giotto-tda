@@ -2,8 +2,8 @@
 # License: GNU AGPLv3
 
 from packaging import version
-from importlib import metadata
-ipywidgets_vers = metadata.version("ipywidgets")
+import importlib
+ipywidgets_vers = importlib.metadata.version("ipywidgets")
 # Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
 # (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
 if version.parse(ipywidgets_vers) < version.parse("8.0.0"):
