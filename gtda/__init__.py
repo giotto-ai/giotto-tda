@@ -13,5 +13,6 @@ __all__ = [
     'externals',
     'utils',
     'metaestimators',
+    'local_homology',
     '__version__'
     ]

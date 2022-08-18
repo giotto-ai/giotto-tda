@@ -14,6 +14,7 @@ by Lewis Tunstall provides a friendly introduction to the philosophy of ``giotto
    topology_time_series
    time_series_forecasting
    persistent_homology_graphs
+   local_homology
 
 ..
    include:: vietoris_rips_quickstart.rst
