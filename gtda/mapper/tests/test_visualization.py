@@ -3,13 +3,6 @@
 
 from packaging.version import parse
 from importlib.metadata import version
-ipywidgets_vers = version("ipywidgets")
-# Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
-# (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
-if parse(ipywidgets_vers) < parse("8.0.0"):
-    widgets_attr = "widgets"
-else:
-    widgets_attr = "_active_widgets"
 
 from unittest import TestCase
 
@@ -23,6 +16,15 @@ from sklearn.decomposition import PCA
 from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
     plot_static_mapper_graph, plot_interactive_mapper_graph, \
     MapperInteractivePlotter
+
+
+ipywidgets_vers = version("ipywidgets")
+# Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
+# (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
+if parse(ipywidgets_vers) < parse("8.0.0"):
+    widgets_attr = "widgets"
+else:
+    widgets_attr = "_active_widgets"
 
 
 class TestCaseNoTemplate(TestCase):
