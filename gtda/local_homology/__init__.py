@@ -3,7 +3,7 @@ to generate local persistence diagrams."""
 
 
 from .simplicial import KNeighborsLocalVietorisRips, \
-    RadiusLocalVietorisRips 
+    RadiusLocalVietorisRips
 
 __all__ = [
     'KNeighborsLocalVietorisRips',
