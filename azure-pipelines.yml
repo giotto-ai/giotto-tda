@@ -69,7 +69,7 @@ jobs:
 
   - script: |
       set -e
-      python -m pip install pandas pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
+      python -m pip install pandas pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis nbformat
       mkdir tmp_test_cov
       cd tmp_test_cov
       pytest --pyargs gtda --ignore-glob='*externals*' --no-cov --no-coverage-upload
