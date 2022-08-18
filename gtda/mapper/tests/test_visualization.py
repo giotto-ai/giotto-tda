@@ -2,12 +2,12 @@
 # License: GNU AGPLv3
 
 from packaging.version import parse
-from importlib.metadata import version
 
 from unittest import TestCase
 
 import numpy as np
 import pandas as pd
+import ipywidgets
 import plotly.io as pio
 import pytest
 from numpy.testing import assert_almost_equal
@@ -18,7 +18,7 @@ from gtda.mapper import FirstSimpleGap, CubicalCover, make_mapper_pipeline, \
     MapperInteractivePlotter
 
 
-ipywidgets_vers = version("ipywidgets")
+ipywidgets_vers = ipywidgets.__version__
 # Needed as the "widgets" attribute was privatised in ipywidgets 8.0.0
 # (see https://github.com/jupyter-widgets/ipywidgets/pull/3122/files)
 if parse(ipywidgets_vers) < parse("8.0.0"):
