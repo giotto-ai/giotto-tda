@@ -25,9 +25,8 @@ def gen_dimensions(draw):
 def gen_epsilon(draw):
     """ Generates radii as floats. """
     epsilon1 = draw(floats(min_value=0, max_value=1))
-    epsilon2 = draw(floats(  # 'max' below to avoid warning
-                           min_value=max(epsilon1+0.001, 0.001),
-                           max_value=1+0.002))
+    epsilon2 = draw(floats(min_value=max(epsilon1 + 1e-3, 1e-3),  # max to avoid warning
+                           max_value=1 + 2e-3))
     return (epsilon1, epsilon2)
 
 
