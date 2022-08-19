@@ -75,7 +75,7 @@ jobs:
   - script: |
       set -e
       python -m pip install pandas pytest pytest-cov pytest-azurepipelines pytest-benchmark hypothesis
-  # nbformat is needed by plotly: https://github.com/plotly/plotly.py/issues/2159
+   # nbformat is needed by plotly: https://github.com/plotly/plotly.py/issues/2159
       python -m pip install nbformat
       mkdir tmp_test_cov
       cd tmp_test_cov
