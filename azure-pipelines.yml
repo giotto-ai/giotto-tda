@@ -163,6 +163,11 @@ jobs:
       python -m pip install --upgrade pip setuptools
       python -m pip install wheel
       source .azure-ci/setup_ccache.sh
+      cd ..
+      git clone git@github.com/giotto-ai/pyflagser.git
+      cd pyflagser
+      python -m pip install -e .
+      cd ../giotto-tda
       python -m pip install -e ".[dev]"
       ccache -s
     displayName: 'Install dependencies and dev environment'
@@ -286,6 +291,11 @@ jobs:
   - script: |
       python -m pip install --upgrade pip setuptools
       python -m pip install wheel
+      cd ..
+      git clone git@github.com/giotto-ai/pyflagser.git
+      cd pyflagser
+      python -m pip install -e .
+      cd ../giotto-tda
       python -m pip install -e ".[dev]"
     displayName: 'Install dev environment'
 

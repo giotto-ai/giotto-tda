@@ -35,7 +35,11 @@ export BOOST_ROOT=/boost
 export Boost_INCLUDE_DIR=/boost/include
 
 # Install dev environment
+git clone git@github.com/giotto-ai/pyflagser.git
 git config --global --add safe.directory /io
+git config --global --add safe.directory pyflagser
+cd pyflagser
+pip install -e .
 cd /io
 pip install wheel
 pip install -e ".[dev]"
