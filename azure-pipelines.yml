@@ -164,7 +164,7 @@ jobs:
       python -m pip install wheel
       source .azure-ci/setup_ccache.sh
       cd ..
-      git clone git@github.com/giotto-ai/pyflagser.git
+      git clone git@github.com:giotto-ai/pyflagser.git
       cd pyflagser
       python -m pip install -e .
       cd ../giotto-tda
@@ -292,7 +292,7 @@ jobs:
       python -m pip install --upgrade pip setuptools
       python -m pip install wheel
       cd ..
-      git clone git@github.com/giotto-ai/pyflagser.git
+      git clone git@github.com:giotto-ai/pyflagser.git
       cd pyflagser
       python -m pip install -e .
       cd ../giotto-tda
