@@ -31,6 +31,11 @@ jobs:
         plat: manylinux2014_x86_64
         python_ver: '39'
         python.version: '3.9'
+      Python310:
+        arch: x86_64
+        plat: manylinux2014_x86_64
+        python_ver: '310'
+        python.version: '3.10'
   variables:
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
@@ -41,7 +46,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-wheels-v2022.7.29" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-wheels-v2022.8.25" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -121,6 +126,8 @@ jobs:
         python.version: '3.8'
       Python39:
         python.version: '3.9'
+      Python310:
+        python.version: '3.10'
   variables:
     CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
@@ -141,7 +148,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: '"ccache-v2022.7.29" | $(Agent.OS) | "$(python.version)"'
+      key: '"ccache-v2022.8.25" | $(Agent.OS) | "$(python.version)"'
       path: $(CCACHE_DIR)
     displayName: ccache
 
@@ -244,6 +251,8 @@ jobs:
         python.version: '3.8'
       Python39:
         python.version: '3.9'
+      Python310:
+        python.version: '3.10'
 
   steps:
   - task: UsePythonVersion@0
