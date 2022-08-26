@@ -1,7 +1,14 @@
 name: Build Wheels
 
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
-on : [push, pull_request]
+on :
+  workflow_dispatch:
+    inputs:
+      nightlyRelease:
+        description: 'Generates wheels for the nightly release'
+        type: boolean
+        required: true
+        default: false
 
 jobs:
 
