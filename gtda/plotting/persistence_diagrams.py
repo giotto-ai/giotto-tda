@@ -40,8 +40,13 @@ def plot_diagram(diagram, homology_dimensions=None, plotly_params=None):
     diagram_no_dims = diagram[:, :2]
     posinfinite_mask = np.isposinf(diagram_no_dims)
     neginfinite_mask = np.isneginf(diagram_no_dims)
-    max_val = np.max(np.where(posinfinite_mask, -np.inf, diagram_no_dims))
-    min_val = np.min(np.where(neginfinite_mask, np.inf, diagram_no_dims))
+    if diagram_no_dims.size:
+        max_val = np.max(np.where(posinfinite_mask, -np.inf, diagram_no_dims))
+        min_val = np.min(np.where(neginfinite_mask, np.inf, diagram_no_dims))
+    else:
+        # Dummy values if diagram is empty
+        max_val = 1
+        min_val = 0
     parameter_range = max_val - min_val
     extra_space_factor = 0.02
     has_posinfinite_death = np.any(posinfinite_mask[:, 1])
