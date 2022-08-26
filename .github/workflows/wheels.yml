@@ -80,7 +80,8 @@ jobs:
           CIBW_BEFORE_BUILD_LINUX: python -m pip install cmake && python -m pip install --upgrade pip setuptools
           CIBW_BEFORE_BUILD_MACOS: python -m pip install cmake && python -m pip install --upgrade pip setuptools
           CIBW_TEST_COMMAND: python -m pytest --pyargs gtda
-          CIBW_TEST_REQUIRES: pytest hypothesis pandas
+          # nbformat is needed by plotly: https://github.com/plotly/plotly.py/issues/2159
+          CIBW_TEST_REQUIRES: pytest hypothesis pandas nbformat
           CIBW_ENVIRONMENT_WINDOWS: BOOST_ROOT='${{ matrix.boost_install_dir }}boost\boost'
           CIBW_ENVIRONMENT_MACOS: BOOST_ROOT='${{ matrix.boost_install_dir }}/boost'
           CIBW_ENVIRONMENT_LINUX: BOOST_ROOT=/host${{ matrix.boost_install_dir }}/boost
