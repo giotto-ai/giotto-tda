@@ -6,8 +6,7 @@ Contributing
 
 This page contains a summary of what one needs to do to contribute.
 
-..
-   toctree::
+.. toctree::
    :maxdepth: 2
    :hidden:
 
