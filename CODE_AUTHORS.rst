@@ -7,7 +7,7 @@ Where component authors are known, add them here.
 | Lewis Tunstall, lewis.c.tunstall@gmail.com
 | Matteo Caorsi, m.caorsi@l2f.ch
 | Philippe Nguyen, p.nguyen@l2f.ch
-| Julian Burella Pérez, julian.burellaperez@heig-vd.ch
+| Julián Burella Pérez, julian.burellaperez@heig-vd.ch
 | Alessio Ghiraldello, amg28@protonmail.com
 | Adélie Garin, adelie.garin@epfl.ch
 | Anibal Medina-Mardones, anibal.medinamardones@epfl.ch

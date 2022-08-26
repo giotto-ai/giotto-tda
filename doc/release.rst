@@ -5,6 +5,41 @@ Release Notes
 .. _stable:
 
 *************
+Release 0.6.0
+*************
+
+This is a major release including a new local homology subpackage, a new backend for computing Vietoris–Rips barcodes, wheels for Python 3.10 and Apple Silicon systems, and end of support for Python 3.6.
+
+Major Features and Improvements
+===============================
+
+- A new ``local_homology`` subpackage containing ``scikit-learn``–compatible transformers for the extraction of local homology features has been added (`#602 <https://github.com/giotto-ai/giotto-tda/pull/602>`_). A `tutorial <https://giotto-ai.github.io/gtda-docs/0.6.0/notebooks/local_homology.html>`_ and an `example <https://giotto-ai.github.io/gtda-docs/0.6.0/notebooks/local_hom_NLP_disambiguation.html>`_ notebooks explain it.
+- Wheels for Python 3.10 are now available (`#644 <https://github.com/giotto-ai/giotto-tda/pull/644>`_ and `#646 <https://github.com/giotto-ai/giotto-tda/pull/646>`_).
+- Wheels for Apple Silicon systems are now available for Python versions 3.8, 3.9 and 3.10 (`#646 <https://github.com/giotto-ai/giotto-tda/pull/646>`_).
+- ``giotto-ph`` is now the backend for the computation of Vietoris–Rips barcodes, replacing ``ripser.py`` (`#614 <https://github.com/giotto-ai/giotto-tda/pull/614>`_).
+- The documentation has been improved (`#609 <https://github.com/giotto-ai/giotto-tda/pull/609>`_).
+
+Bug Fixes
+=========
+
+- A bug involving tests for the ``mapper`` subpackage has been fixed (`#638 <https://github.com/giotto-ai/giotto-tda/pull/638>`_).
+
+Backwards-Incompatible Changes
+==============================
+
+- Python 3.6 is no longer supported, and the manylinux standard has been bumped from ``manylinux2010`` to ``manylinux2014`` (`#644 <https://github.com/giotto-ai/giotto-tda/pull/644>`_ and `#646 <https://github.com/giotto-ai/giotto-tda/pull/646>`_).
+- The ``python-igraph`` requirement has been replaced with ``igraph >= 0.9.8`` (`#616 <https://github.com/giotto-ai/giotto-tda/pull/616>`_).
+
+Thanks to our Contributors
+==========================
+
+This release contains contributions from:
+
+Umberto Lupo, Jacob Bamberger, Wojciech Reise, Julián Burella Pérez, and Anibal Medina-Mardones
+
+We are also grateful to all who filed issues or helped resolve them, asked and answered questions, and were part of inspiring discussions.
+
+*************
 Release 0.5.1
 *************
 
