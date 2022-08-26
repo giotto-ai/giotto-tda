@@ -48,7 +48,7 @@ jobs:
           cd -
 
       - name: Cache boost ${{env.BOOST_VERSION}} in ${{ matrix.boost_install_dir }}
-        # FIXME For an unknow reason on windows runner, when the cache is hit
+        # FIXME For an unknown reason on windows runner, when the cache is hit
         # The compilation fails because it doesn't find some headers
         # I don't know if the cache is corrupted, for the moment hard to debug
         if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
