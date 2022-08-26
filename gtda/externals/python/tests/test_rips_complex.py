@@ -1,14 +1,13 @@
 from .. import RipsComplex, SparseRipsComplex
 
-""" Test comes from
+"""Test comes from
 https://github.com/GUDHI/gudhi-devel/blob/master/src/python/test/test_rips_complex.py
-
 """
 
 
 def test_empty_rips():
     rips_complex = RipsComplex()
-    del(rips_complex)
+    del rips_complex
 
 
 def test_sparse_filtered_rips_from_points():
