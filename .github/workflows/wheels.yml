@@ -61,7 +61,7 @@ jobs:
           key: 1-boost-${{env.BOOST_VERSION}}
 
       - name: Install boost ${{env.BOOST_VERSION}}
-        uses: MarkusJx/install-boost@v2.1.0
+        uses: MarkusJx/install-boost@v2.3.1
         id: install-boost
         if: steps.cache-boost.outputs.cache-hit != 'true'
         with:
