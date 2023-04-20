@@ -11,17 +11,21 @@ from gtda.utils.intervals import Interval
 def sphere_sampling(n=1000, r=1, noise=0):
     """Uniformly and randomly samples points from a round
     sphere centered at the origin of 3-space.
+    
     Parameters
     ----------
     n : int or None, optional, default: 1000
         The number of points to be sampled.
+
     r : float or None, optional, default: 1
         The radius of the sphere to be sampled from.
         Must be a positive number.
+
     noise : float or None, optional, default: 0
         The noise of the sampling, which is introduced by
         adding Gaussian noise around each data point.
         Must be a non-negative number.
+
     Returns
     -------
     points : ndarray of shape (n, 3).
@@ -59,23 +63,28 @@ def torus_sampling(n=1000, R=3, r=1, noise=None):
     """Uniformly and randomly samples points from a torus
     centered at the origin of 3-space and lying in it
     horizontally.
+
     Parameters
     ----------
     n : int or None, optional, default: 1000
         The number of points to be sampled.
+
     R : float or None, optional, default: 3
         The inner radius of the torus to be sampled from,
         that is, the radius of the circle along which the
         ``tube`` follows.
         Must be a positive number.
+
     r : float or None, optional, default: 1
         The outer radius of the torus to be sampled from,
         that is, the radius of the ``tube``.
         Must be a positive number.
+
     noise : float or None, optional, default: 0
         The noise of the sampling, which is introduced by
         adding Gaussian noise around each data point.
         Must be a non-negative number.
+
     Returns
     -------
     points : ndarray of shape (n, 3).
@@ -121,17 +130,21 @@ def circle_sampling(n=1000, r=1, noise=None):
     """Uniformly and randomly samples points from a circle
     centered at the origin of 3-space and lying in it
     horizontally.
+
     Parameters
     ----------
     n : int or None, optional, default: 1000
         The number of points to be sampled.
+
     r : float or None, optional, default: 1
         The radius of the circle to be sampled from.
         Must be a positive number.
+
     noise : float or None, optional, default: 0
         The noise of the sampling, which is introduced by
         adding Gaussian noise around each data point.
         Must be a non-negative number.
+
     Returns
     -------
     points : ndarray of shape (n, 3).
@@ -161,3 +174,4 @@ def circle_sampling(n=1000, r=1, noise=None):
             pt = pt + noise * np.random.randn(3)
         points[i] = pt
     return points
+
