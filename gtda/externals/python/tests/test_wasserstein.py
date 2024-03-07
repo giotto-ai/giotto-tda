@@ -1,7 +1,8 @@
 import math
 import pytest
 
-from ...modules.gtda_wasserstein import wasserstein_distance, hera_get_infinity
+from gtda.externals.modules.gtda_wasserstein import wasserstein_distance, \
+    hera_get_infinity
 
 
 def test_trivial_empty_diagram():

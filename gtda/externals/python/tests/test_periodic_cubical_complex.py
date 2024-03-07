@@ -1,4 +1,4 @@
-from .. import PeriodicCubicalComplex
+from gtda.externals import PeriodicCubicalComplex
 
 
 def test_empty_constructor():

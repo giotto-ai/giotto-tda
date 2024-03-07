@@ -1,0 +1,193 @@
+name: Build package on different Os and Python versions
+
+on :
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      testNotebooks:
+        description: 'Enable notebook verification step'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+
+  build_package:
+    name: Build ${{ github.event.repository.name }} on ${{ matrix.os }} for Python-${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9, '3.10']
+        include:
+          - os: ubuntu-latest
+            path: ~/.cache/pip
+            papermill_timeout: 120
+              # ccache requires absolute path
+            path_ccache: /home/runner/cache/ccache
+          - os: macos-latest
+            path: ~/Library/Caches/pip
+            papermill_timeout: 240
+              # ccache requires absolute path
+            path_ccache: /Users/runner/Library/Caches/ccache
+          - os: windows-latest
+            path: ~\AppData\Local\pip\Cache
+            papermill_timeout: 300
+              # FIXME: ccache is currently not available on Windows
+            # path_ccache: ~\AppData\Local\ccache\Cache
+    env:
+      BOOST_VERSION: 1.76.0
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        name: Install Python-${{ matrix.python-version }} 
+        with:
+          python-version: ${{ matrix.python-version }}
+
+        ###################
+        #  Caching stuff  #
+        ###################
+
+      - name: Activating Python cache
+        uses: actions/cache@v2
+        id: cache_python
+        continue-on-error: true
+        with:
+          path: ${{ matrix.path }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Cache boost ${{env.BOOST_VERSION}}
+        # FIXME For an unknow reason on windows runner, when the cache is hit
+        # The compilation fails because it doesn't find some headers
+        # I don't know if the cache is corrupted, for the moment hard to debug
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        uses: actions/cache@v2
+        id: cache-boost
+        with:
+          # Set the default path as the path to cache
+          path: ${{ github.workspace }}/boost/boost
+            # Use the version as the key to only cache the correct version
+          key: boost-${{env.BOOST_VERSION}}
+
+        # FIXME: This is quite costly but at the moment I don't have an alternative
+      - name: Install ccache for Linux and Mac
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt -y install ccache
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install ccache
+          fi
+        shell: bash
+
+      # Windows does not support ccache with visual studio compiler
+      - name: ccache cache files
+        if: ${{ runner.os != 'Windows' }}
+        uses: actions/cache@v2
+        id: cache_ccache
+        continue-on-error: true
+        with:
+          path: ${{ matrix.path_ccache }}
+            # TODO: When updating c++ backend, use new date (yy-mm-dd)
+          key: ${{ runner.os }}-ccache-${{ matrix.python-version }}-22-01-11
+
+      - name: Upgrade pip and setuptools
+        run: |
+          python -m pip install --upgrade pip setuptools
+
+      - name: Install boost ${{env.BOOST_VERSION}}
+        uses: MarkusJx/install-boost@v2.1.0
+        id: install-boost
+        if: steps.cache-boost.outputs.cache-hit != 'true'
+        with:
+          boost_version: ${{env.BOOST_VERSION}}
+
+
+      ######################
+      #  Building package  #
+      ######################
+      
+      - name: Build ${{ github.event.repository.name }} on Linux and MacOs
+        if: ${{ runner.os != 'Windows' }}
+        run: |
+          echo $BOOST_ROOT
+          python -m pip install -e ".[dev]"
+        env:
+          CC: "ccache gcc"
+          CXX: "ccache g++"
+          CCACHE_DIR: ${{ matrix.path_ccache }}
+          CCACHE_COMPRESS: 1
+          CCACHE_MAXSIZE: 4G
+          BOOST_ROOT: ${{ github.workspace }}/boost/boost
+
+      # Windows does not support ccache with visual studio compiler
+      - name: Build ${{ github.event.repository.name }} on Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          python -m pip install -e ".[dev]"
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+
+      - name: Install test tools
+        run: |
+          python -m pip install pandas pytest pytest-cov pytest-benchmark hypothesis
+
+
+      #############
+      #  Testing  #
+      #############
+      
+      - name: Test package with pytest on Linux and Windows
+        if: ${{ runner.os == 'Linux' || runner.os == 'Windows' }}
+        run: |
+          pytest --pyargs gtda --no-cov
+
+      - name: Test package with pytest Mac with coverage
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          pytest gtda --cov --cov-report xml:coverage.xml
+
+      # FIXME: It does not use config.cfg, I don't know why ...
+      - name: flake8 Lint on MacOS
+        if: ${{ runner.os == 'macOS' }}
+        uses: py-actions/flake8@v2
+        with:
+          exclude: "boost,gtda/externals,doc,examples"
+
+      - name: Test jupyter notebooks with papermill
+        if: ${{ github.event.inputs.testNotebooks == true }}
+        run: |
+          python -m pip install openml matplotlib
+          python -m pip install papermill
+          cd examples
+          # Get all .ipynb notebook but discard the MNIST_classification
+          # Because it is too long
+          # This command also removes the .pynb extension
+          FILES_WITHOUT_EXT=`find . ! -name '*MNIST_classification*' -iname '*.ipynb' -exec bash -c 'printf "%s\n" "${@%.*}"' _ {} +`
+          PAPERMILL_DIR=papermill_results
+
+          mkdir -p $PAPERMILL_DIR
+
+          for FILENAME in $FILES_WITHOUT_EXT
+          do
+            SAVE_FILE=$PAPERMILL_DIR/$FILENAME.txt
+            papermill --execution-timeout ${{ matrix.papermill_timeout }} $FILENAME.ipynb $SAVE_FILE
+          done
+        shell: bash
+
+      ######################
+      #  Upload Artifacts  #
+      ######################
+      
+      - name: Upload coverage for Mac
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ runner.os }}-coverage
+          path: coverage.xml
+          if-no-files-found: warn
+

@@ -11,7 +11,7 @@ This page contains a summary of what one needs to do to contribute.
    :hidden:
 
    guidelines
-   readme_docs
+   ci
 
 **********
 Guidelines

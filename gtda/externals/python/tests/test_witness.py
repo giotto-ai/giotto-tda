@@ -1,4 +1,4 @@
-from .. import WitnessComplex, StrongWitnessComplex
+from gtda.externals import WitnessComplex, StrongWitnessComplex
 
 """ Test comes from
 https://github.com/GUDHI/gudhi-devel/blob/master/src/python/test/test_witness_complex.py
