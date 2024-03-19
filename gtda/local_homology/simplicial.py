@@ -1,5 +1,5 @@
 from numbers import Real
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 import warnings
@@ -250,7 +250,7 @@ class KNeighborsLocalVietorisRips(LocalVietorisRipsBase):
     """
 
     _hyperparameters = {
-        "metric": {"type": (str, FunctionType)},
+        "metric": {"type": (str, Callable)},
         "n_neighbors": {"type": (tuple, list),
                         "of": {type: int,
                                "in": Interval(1, np.inf, closed="left")}
@@ -388,7 +388,7 @@ class RadiusLocalVietorisRips(LocalVietorisRipsBase):
     """
 
     _hyperparameters = {
-        "metric": {"type": (str, FunctionType)},
+        "metric": {"type": (str, Callable)},
         "radii": {"type": (tuple, list),
                   "of": {type: Real, "in": Interval(0, np.inf, closed="left")}
                   },

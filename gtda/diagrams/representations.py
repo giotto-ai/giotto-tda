@@ -1,7 +1,7 @@
 """Vector representations of persistence diagrams."""
 # License: GNU AGPLv3
 
-import types
+from typing import Callable
 from numbers import Real
 
 import numpy as np
@@ -813,7 +813,7 @@ class PersistenceImage(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         "n_bins": {"type": int, "in": Interval(1, np.inf, closed="left")},
         "sigma": {"type": Real, "in": Interval(0, np.inf, closed="neither")},
-        "weight_function": {"type": (types.FunctionType, type(None))}
+        "weight_function": {"type": (Callable, type(None))}
         }
 
     def __init__(self, sigma=0.1, n_bins=100, weight_function=None,

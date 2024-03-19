@@ -1,7 +1,7 @@
 """Construct transition graphs from dynamical systems."""
 # License: GNU AGPLv3
 
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -106,7 +106,7 @@ class TransitionGraph(BaseEstimator, TransformerMixin):
 
     """
 
-    _hyperparameters = {'func': {'type': (FunctionType, type(None))},
+    _hyperparameters = {'func': {'type': (Callable, type(None))},
                         'func_params': {'type': (dict, type(None))}}
 
     def __init__(self, func=np.argsort, func_params=None, n_jobs=None):

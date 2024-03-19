@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 from copy import deepcopy
-from types import FunctionType
+from typing import Callable
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -79,9 +79,9 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
 
     """
     _hyperparameters = {
-        "function": {"type": (str, FunctionType, list, tuple),
+        "function": {"type": (str, Callable, list, tuple),
                      "in": tuple(_AVAILABLE_FUNCTIONS.keys()),
-                     "of": {"type": (str, FunctionType, type(None)),
+                     "of": {"type": (str, Callable, type(None)),
                             "in": tuple(_AVAILABLE_FUNCTIONS.keys())}},
         "function_params": {"type": (dict, type(None), list, tuple)},
         }
@@ -99,7 +99,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
         try:
             validate_params(params, _hyperparameters, exclude=["n_jobs"])
         # Another go if we fail because function is a list/tuple containing
-        # instances of FunctionType and the "in" key checks fail
+        # callables and the "in" key checks fail
         except ValueError as ve:
             end_string = f"which is not in " \
                          f"{tuple(_AVAILABLE_FUNCTIONS.keys())}."
@@ -117,7 +117,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
             raise TypeError("If `function` is a list/tuple then "
                             "`function_params` must be a list/tuple of dict, "
                             "or None.")
-        elif isinstance(self.function, (str, FunctionType)) \
+        elif isinstance(self.function, (str, Callable)) \
                 and isinstance(self.function_params, (list, tuple)):
             raise TypeError("If `function` is a string or a callable "
                             "function then `function_params` must be a dict "
@@ -162,7 +162,7 @@ class StandardFeatures(BaseEstimator, TransformerMixin):
                                 _AVAILABLE_FUNCTIONS[self.function])
                 self.effective_function_params_ = self.function_params.copy()
 
-        elif isinstance(self.function, FunctionType):
+        elif isinstance(self.function, Callable):
             self.effective_function_ = \
                 tuple([self.function] * self.n_channels_)
 
