@@ -3,7 +3,7 @@
 
 import itertools
 from numbers import Real
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -92,7 +92,7 @@ class ConsistentRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'metric': {'type': (str, FunctionType)},
+        'metric': {'type': (str, Callable)},
         'metric_params': {'type': (dict, type(None))},
         'neighbor_rank': {'type': int,
                           'in': Interval(1, np.inf, closed='left')}
@@ -293,7 +293,7 @@ class ConsecutiveRescaling(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        'metric': {'type': (str, FunctionType)},
+        'metric': {'type': (str, Callable)},
         'metric_params': {'type': (dict, type(None))},
         'factor': {'type': Real, 'in': Interval(0, np.inf, closed='both')}
         }

@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -67,7 +67,7 @@ class Labeller(BaseEstimator, TransformerResamplerMixin):
 
     _hyperparameters = {
         'size': {'type': int, 'in': Interval(1, np.inf, closed='left')},
-        'func': {'type': FunctionType},
+        'func': {'type': Callable},
         'func_params': {'type': (dict, type(None))},
         'percentiles': {
             'type': (list, type(None)),

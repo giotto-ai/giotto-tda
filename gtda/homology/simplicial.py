@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real, Integral
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 from gph import ripser_parallel as ripser
@@ -146,7 +146,7 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        "metric": {"type": (str, FunctionType)},
+        "metric": {"type": (str, Callable)},
         "metric_params": {"type": dict},
         "homology_dimensions": {
             "type": (list, tuple),
@@ -511,13 +511,13 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        "metric": {"type": (str, FunctionType)},
+        "metric": {"type": (str, Callable)},
         "metric_params": {"type": dict},
         "homology_dimensions": {
             "type": (list, tuple),
             "of": {"type": int, "in": Interval(0, np.inf, closed="left")}
             },
-        "weights": {"type": (str, FunctionType)},
+        "weights": {"type": (str, Callable)},
         "weight_params": {"type": dict},
         "collapse_edges": {"type": bool},
         "coeff": {"type": int, "in": Interval(2, np.inf, closed="left")},
@@ -543,7 +543,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self.n_jobs = n_jobs
 
     def _ripser_diagram(self, X):
-        if isinstance(self.weights, FunctionType):
+        if isinstance(self.weights, Callable):
             weights = self.weights(X)
         else:
             weights = self.weights
@@ -828,7 +828,7 @@ class SparseRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
     """
 
     _hyperparameters = {
-        "metric": {"type": (str, FunctionType)},
+        "metric": {"type": (str, Callable)},
         "homology_dimensions": {
             "type": (list, tuple),
             "of": {"type": int, "in": Interval(0, np.inf, closed="left")}

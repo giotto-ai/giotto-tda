@@ -1,7 +1,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 from joblib import Parallel, delayed, effective_n_jobs
@@ -41,7 +41,7 @@ _AVAILABLE_METRICS = {
         'p': {'type': Real, 'in': Interval(1, np.inf, closed='both')},
         'n_bins': {'type': int, 'in': Interval(1, np.inf, closed='left')},
         'sigma': {'type': Real, 'in': Interval(0, np.inf, closed='neither')},
-        'weight_function': {'type': (FunctionType, type(None))}
+        'weight_function': {'type': (Callable, type(None))}
         },
     'silhouette': {
         'power': {'type': Real, 'in': Interval(0, np.inf, closed='right')},

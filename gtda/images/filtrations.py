@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real, Integral
-from types import FunctionType
+from typing import Callable
 import itertools
 
 import numpy as np
@@ -306,7 +306,7 @@ class RadialFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'center': {'type': (np.ndarray, type(None)), 'of': {'type': Integral}},
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
-        'metric': {'type': (str, FunctionType)},
+        'metric': {'type': (str, Callable)},
         'metric_params': {'type': dict}
         }
 
@@ -1109,7 +1109,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
 
     _hyperparameters = {
         'radius': {'type': Real, 'in': Interval(0, np.inf, closed='right')},
-        'metric': {'type': (str, FunctionType)},
+        'metric': {'type': (str, Callable)},
         'metric_params': {'type': dict},
         }
 
