@@ -2,7 +2,7 @@
 # License: GNU AGPLv3
 
 from numbers import Real
-from types import FunctionType
+from typing import Callable
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -195,7 +195,7 @@ class Scaler(BaseEstimator, TransformerMixin, PlotterMixin):
     _hyperparameters = {
         'metric': {'type': str, 'in': _AVAILABLE_AMPLITUDE_METRICS.keys()},
         'metric_params': {'type': (dict, type(None))},
-        'function': {'type': (FunctionType, type(None))}
+        'function': {'type': (Callable, type(None))}
         }
 
     def __init__(self, metric='bottleneck', metric_params=None,
