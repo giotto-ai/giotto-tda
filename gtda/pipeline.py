@@ -4,7 +4,7 @@ Pipelines that include TransformerResamplers."""
 
 from sklearn import pipeline
 from sklearn.base import clone
-from sklearn.utils.metaestimators import if_delegate_has_method
+from sklearn.utils.metaestimators import available_if
 from sklearn.utils.validation import check_memory
 
 __all__ = ['Pipeline', 'make_pipeline']
@@ -94,6 +94,12 @@ class Pipeline(pipeline.Pipeline):
     >>> print(X_train_final.shape, y_train_final.shape)
     (389, 2) (389,)
     """
+
+    def _final_estimator_has(attr):
+        def check(self):
+            return hasattr(self._final_estimator, attr)
+
+        return check
 
     def _fit(self, X, y=None, **fit_params):
         self.steps = list(self.steps)
@@ -251,7 +257,7 @@ class Pipeline(pipeline.Pipeline):
         elif hasattr(last_step, 'fit_transform'):
             return last_step.fit_transform(Xt, yr, **fit_params), yr
 
-    @if_delegate_has_method(delegate='_final_estimator')
+    @available_if(_final_estimator_has('fit_predict'))
     def fit_predict(self, X, y=None, **fit_params):
         """Applies fit_predict of last step in pipeline after transforms.
 
@@ -407,7 +413,7 @@ class Pipeline(pipeline.Pipeline):
             Xt = transform.inverse_transform(Xt, yr)
         return Xt
 
-    @if_delegate_has_method(delegate='_final_estimator')
+    @available_if(_final_estimator_has('score'))
     def score(self, X, y=None, sample_weight=None):
         """Apply transformers/samplers, and score with the final estimator
 
