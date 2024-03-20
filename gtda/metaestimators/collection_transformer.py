@@ -9,7 +9,7 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.base import clone
-from sklearn.utils.metaestimators import if_delegate_has_method
+from sklearn.utils.metaestimators import available_if
 
 from gtda.utils import check_collection
 
@@ -102,6 +102,12 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
                  "sklearn.base.BaseEstimator. This will lead to limited "
                  "functionality in a scikit-learn context.", UserWarning)
 
+    def _transformer_has(attr):
+        def check(self):
+            return hasattr(self.transformer, attr)
+ 
+        return check
+
     def fit(self, X, y=None):
         """Do nothing and return the estimator unchanged.
 
@@ -129,7 +135,7 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
         self._is_fitted = True
         return self
 
-    @if_delegate_has_method(delegate="transformer")
+    @available_if(_transformer_has("fit_transform"))
     def fit_transform(self, X, y=None):
         """Fit-transform a clone of `transformer` to each element in the
         collection `X`.
