@@ -178,7 +178,8 @@ class VietorisRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
             X, maxdim=self._max_homology_dimension,
             thresh=self.max_edge_length, coeff=self.coeff, metric=self.metric,
             metric_params=self.metric_params,
-            collapse_edges=self.collapse_edges
+            collapse_edges=self.collapse_edges,
+            n_threads=self.n_jobs
             )["dgms"]
 
         return Xdgms
