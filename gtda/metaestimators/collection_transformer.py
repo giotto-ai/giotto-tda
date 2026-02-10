@@ -129,7 +129,7 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
 
         """
         check_collection(X, accept_sparse=True, accept_large_sparse=True,
-                         force_all_finite=False)
+                         ensure_all_finite=False)
         self._validate_transformer()
 
         self._is_fitted = True
@@ -157,7 +157,7 @@ class CollectionTransformer(BaseEstimator, TransformerMixin):
 
         """
         Xt = check_collection(X, accept_sparse=True, accept_large_sparse=True,
-                              force_all_finite=False)
+                              ensure_all_finite=False)
         self._validate_transformer()
 
         Xt = Parallel(n_jobs=self.n_jobs, prefer=self.parallel_backend_prefer,

@@ -149,7 +149,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
         self : object
 
         """
-        X = check_collection(X, force_all_finite=False)
+        X = check_collection(X, ensure_all_finite=False)
         validate_params(
             self.get_params(), self._hyperparameters, exclude=['n_jobs'])
 
@@ -210,7 +210,7 @@ class CubicalPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        Xt = check_collection(X, force_all_finite=False)
+        Xt = check_collection(X, ensure_all_finite=False)
 
         Xt = Parallel(n_jobs=self.n_jobs)(delayed(self._gudhi_diagram)(x)
                                           for x in Xt)

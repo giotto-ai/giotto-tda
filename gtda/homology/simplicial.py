@@ -615,7 +615,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
                             _AVAILABLE_RIPS_WEIGHTS[key])
 
         self._is_precomputed = self.metric == "precomputed"
-        check_point_clouds(X, accept_sparse=True, force_all_finite=True,
+        check_point_clouds(X, accept_sparse=True, ensure_all_finite=True,
                            distance_matrices=self._is_precomputed)
 
         if self.infinity_values is None:
@@ -681,7 +681,7 @@ class WeightedRipsPersistence(BaseEstimator, TransformerMixin, PlotterMixin):
 
         """
         check_is_fitted(self)
-        X = check_point_clouds(X, accept_sparse=True, force_all_finite=True,
+        X = check_point_clouds(X, accept_sparse=True, ensure_all_finite=True,
                                distance_matrices=self._is_precomputed)
 
         Xt = Parallel(n_jobs=self.n_jobs)(

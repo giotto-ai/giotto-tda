@@ -246,8 +246,8 @@ def test_check_point_clouds_regular_inf():
 
     check_point_clouds(ex.X, distance_matrices=True)
     check_point_clouds(ex.X_list, distance_matrices=True)
-    check_point_clouds(ex.X_rectang, force_all_finite=False)
-    check_point_clouds(ex.X_list_rectang, force_all_finite=False)
+    check_point_clouds(ex.X_rectang, ensure_all_finite=False)
+    check_point_clouds(ex.X_list_rectang, ensure_all_finite=False)
 
 
 def test_check_point_clouds_value_err_inf():
@@ -267,14 +267,16 @@ def test_check_point_clouds_value_err_inf():
     with pytest.raises(ValueError):
         check_point_clouds(ex.X_list_rectang)
 
-    # Check that we error if we explicitly set force_all_finite to True
+    # Check that we error if we explicitly set ensure_all_finite to True
     # 1) Array input
     with pytest.raises(ValueError):
-        check_point_clouds(ex.X, distance_matrices=True, force_all_finite=True)
+        check_point_clouds(
+            ex.X, distance_matrices=True, ensure_all_finite=True
+        )
     # 2) List input
     with pytest.raises(ValueError):
         check_point_clouds(
-            ex.X_list, distance_matrices=True, force_all_finite=True)
+            ex.X_list, distance_matrices=True, ensure_all_finite=True)
 
 
 def test_check_point_clouds_regular_nan():
@@ -286,15 +288,15 @@ def test_check_point_clouds_regular_nan():
         insert_nan()
 
     check_point_clouds(ex.X, distance_matrices=True,
-                       force_all_finite='allow-nan')
+                       ensure_all_finite='allow-nan')
     check_point_clouds(
-        ex.X_list, distance_matrices=True, force_all_finite='allow-nan')
-    check_point_clouds(ex.X_rectang, force_all_finite='allow-nan')
-    check_point_clouds(ex.X_list_rectang, force_all_finite='allow-nan')
+        ex.X_list, distance_matrices=True, ensure_all_finite='allow-nan')
+    check_point_clouds(ex.X_rectang, ensure_all_finite='allow-nan')
+    check_point_clouds(ex.X_list_rectang, ensure_all_finite='allow-nan')
 
 
-@pytest.mark.parametrize("force_all_finite", [True, False])
-def test_check_point_clouds_value_err_nan(force_all_finite):
+@pytest.mark.parametrize("ensure_all_finite", [True, False])
+def test_check_point_clouds_value_err_nan(ensure_all_finite):
     """Cases in which part of the input is NaN and we throw a
     ValueError."""
 
@@ -302,20 +304,20 @@ def test_check_point_clouds_value_err_nan(force_all_finite):
         n_samples, n_1, n_2, n_samples_extra, n_1_extra, n_2_extra).\
         insert_nan()
 
-    # Check that we error when force_all_finite is True or False
+    # Check that we error when ensure_all_finite is True or False
     # 1) Array input
     with pytest.raises(ValueError):
         check_point_clouds(
-            ex.X, distance_matrices=True, force_all_finite=force_all_finite)
+            ex.X, distance_matrices=True, ensure_all_finite=ensure_all_finite)
     with pytest.raises(ValueError):
-        check_point_clouds(ex.X_rectang, force_all_finite=force_all_finite)
+        check_point_clouds(ex.X_rectang, ensure_all_finite=ensure_all_finite)
     # 2) List input
     with pytest.raises(ValueError):
         check_point_clouds(ex.X_list, distance_matrices=True,
-                           force_all_finite=force_all_finite)
+                           ensure_all_finite=ensure_all_finite)
     with pytest.raises(ValueError):
         check_point_clouds(
-            ex.X_list_rectang, force_all_finite=force_all_finite)
+            ex.X_list_rectang, ensure_all_finite=ensure_all_finite)
 
 
 def test_check_collection_ragged_array():

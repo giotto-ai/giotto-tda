@@ -13,14 +13,14 @@ from sklearn.utils.validation import check_array
 
 def _check_array_mod(X, **kwargs):
     """Modified version of :func:`sklearn.utils.validation.check_array. When
-    keyword parameter `force_all_finite` is set to False, NaNs are not
+    keyword parameter `ensure_all_finite` is set to False, NaNs are not
     accepted but infinity is."""
-    if not kwargs.get('force_all_finite', True):
+    if not kwargs.get('ensure_all_finite', True):
         Xnew = check_array(X, **kwargs)
         if np.isnan(Xnew if not issparse(Xnew) else Xnew.data).any():
             raise ValueError("Input contains NaNs. Only finite values and "
                              "infinity are allowed when parameter "
-                             "`force_all_finite` is False.")
+                             "`ensure_all_finite` is False.")
         return Xnew
     return check_array(X, **kwargs)
 
@@ -48,7 +48,7 @@ def check_diagrams(X, copy=False):
 
     """
     X_array = _check_array_mod(X, ensure_2d=False, allow_nd=True,
-                               force_all_finite=False, copy=copy)
+                               ensure_all_finite=False, copy=copy)
     if X_array.ndim != 3:
         raise ValueError(
             f"Input should be a 3D ndarray, the shape is {X_array.shape}."
@@ -224,8 +224,8 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
         Keyword arguments accepted by
         :func:`sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) if not passed
-        explicitly, `force_all_finite` is set to be the boolean negation of
-        `distance_matrices`; 3) when `force_all_finite` is set to ``False``,
+        explicitly, `ensure_all_finite` is set to be the boolean negation of
+        `distance_matrices`; 3) when `ensure_all_finite` is set to ``False``,
         NaN inputs are not allowed; 4) `accept_sparse` and
         `accept_large_sparse` are only meaningful in the case of lists of 2D
         arrays, in which case they are passed to individual instances of
@@ -238,7 +238,7 @@ def check_point_clouds(X, distance_matrices=False, **kwargs):
         The converted and validated object.
 
     """
-    kwargs_ = {'force_all_finite': not distance_matrices}
+    kwargs_ = {'ensure_all_finite': not distance_matrices}
     kwargs_.update(kwargs)
     kwargs_.pop('allow_nd', None)
     kwargs_.pop('ensure_2d', None)
@@ -321,7 +321,7 @@ def check_collection(X, **kwargs):
         Keyword arguments accepted by
         :func:`sklearn.utils.validation.check_array`, with the following
         caveats: 1) `ensure_2d` and `allow_nd` are ignored; 2) when
-        `force_all_finite` is set to ``False``, NaN inputs are not allowed.
+        `ensure_all_finite` is set to ``False``, NaN inputs are not allowed.
 
     Returns
     -------
