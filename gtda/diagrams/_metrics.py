@@ -152,7 +152,7 @@ def persistence_images(diagrams, sampling, step_size, sigma, weights):
         gaussian_filter(image, sigma_pixel, mode="constant", output=image)
 
     persistence_images_ = np.rot90(persistence_images_, k=1, axes=(1, 2))
-    persistence_images_ /= np.product(step_size)
+    persistence_images_ /= np.prod(step_size)
     return persistence_images_
 
 
@@ -257,7 +257,7 @@ def persistence_image_distances(
     # (the first for birth and the second for persistence), and `step_size` is
     # a 2d array
     weights = weight_function(sampling[:, 1])
-    step_sizes_factor = np.product(step_size) ** (1 / p)
+    step_sizes_factor = np.prod(step_size) ** (1 / p)
     # WARNING: `persistence_images` modifies `diagrams` in place
     are_arrays_equal = np.array_equal(diagrams_1, diagrams_2)
     persistence_images_1 = \
@@ -385,7 +385,7 @@ def persistence_image_amplitudes(
     # (the first for birth and the second for persistence), and `step_size` is
     # a 2d array
     weights = weight_function(sampling[:, 1])
-    step_sizes_factor = np.product(step_size) ** (1 / p)
+    step_sizes_factor = np.prod(step_size) ** (1 / p)
     # WARNING: `persistence_images` modifies `diagrams` in place
     persistence_images_ = persistence_images(
         diagrams, sampling, step_size, sigma, weights

@@ -2,13 +2,12 @@
 """Toolbox for Machine Learning using Topological Data Analysis."""
 
 import os
-import codecs
 import re
 import sys
 import platform
 import subprocess
 
-from pkg_resources.extern.packaging import version
+from packaging import version
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
@@ -22,7 +21,7 @@ with open("requirements.txt") as f:
 
 DISTNAME = "giotto-tda"
 DESCRIPTION = "Toolbox for Machine Learning using Topological Data Analysis."
-with codecs.open("README.rst", encoding="utf-8-sig") as f:
+with open("README.rst", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_TYPE = "text/x-rst"
 MAINTAINER = "Umberto Lupo, Wojciech Reise"
@@ -47,7 +46,9 @@ CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Programming Language :: Python :: 3.9",
                "Programming Language :: Python :: 3.10",
                "Programming Language :: Python :: 3.11",
-               "Programming Language :: Python :: 3.12"]
+               "Programming Language :: Python :: 3.12",
+               "Programming Language :: Python :: 3.13",
+               "Programming Language :: Python :: 3.14"]
 KEYWORDS = "machine learning, topological data analysis, persistent " \
            "homology, persistence diagrams, Mapper"
 INSTALL_REQUIRES = requirements
@@ -57,6 +58,7 @@ EXTRAS_REQUIRE = {"tests": ["pandas",
                             "pytest-azurepipelines",
                             "pytest-benchmark",
                             "jupyter_contrib_nbextensions",
+                            "nbformat",
                             "flake8",
                             "hypothesis"],
                   "doc": ["openml",

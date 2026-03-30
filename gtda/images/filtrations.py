@@ -1166,7 +1166,7 @@ class DensityFiltration(BaseEstimator, TransformerMixin, PlotterMixin):
         self._size = int(np.ceil(
             pairwise_distances([[0]], [[self.radius]], metric=self.metric,
                                **self.metric_params)
-            ))
+            ).item())
         # The mask is always 3D but not the iterator.
         self.mask_ = np.ones(tuple(2 * self._size + 1 for _ in range(3)),
                              dtype=bool)
