@@ -43,8 +43,9 @@ def _parallel_featurization(Xt, function, function_params, n_jobs):
             for i, j in index_pairs
             )
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore",
-                                  category=np.VisibleDeprecationWarning)
+            _np_ragged_warning = getattr(
+                np, 'VisibleDeprecationWarning', DeprecationWarning)
+            warnings.simplefilter("ignore", category=_np_ragged_warning)
             Xt = np.array(Xt)
         if Xt.dtype == np.dtype('object'):
             Xt = np.concatenate(list(map(np.ravel, Xt)))

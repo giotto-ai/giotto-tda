@@ -133,7 +133,7 @@ def test_filter_values_covered_by_interval_union(filter_values, n_intervals):
     intervals = [filter_values[interval_masks[:, i]]
                  for i in range(interval_masks.shape[1])]
     intervals_union = reduce(np.union1d, intervals)
-    filter_values_union = filter_values[np.in1d(filter_values,
+    filter_values_union = filter_values[np.isin(filter_values,
                                                 intervals_union)]
     assert_almost_equal(filter_values_union, filter_values)
 

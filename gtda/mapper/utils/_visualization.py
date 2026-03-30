@@ -24,7 +24,7 @@ PLOT_OPTIONS_NODE_TRACE_DEFAULTS = {
         "sizemin": 4,
         "colorbar": {
             "thickness": 15, "title": "", "xanchor": "left",
-            "titleside": "right"
+            "title_side": "right"
             }
         }
     }

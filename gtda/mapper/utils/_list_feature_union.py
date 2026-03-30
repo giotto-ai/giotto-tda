@@ -1,6 +1,7 @@
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.pipeline import FeatureUnion, _fit_transform_one, _transform_one
+from sklearn.utils import Bunch
 
 
 class ListFeatureUnion(FeatureUnion):
@@ -18,7 +19,11 @@ class ListFeatureUnion(FeatureUnion):
             List of results of transformers.
 
         """
-        results = self._parallel_func(X, y, fit_params, _fit_transform_one)
+        routed_params = Bunch()
+        for name, obj in self.transformer_list:
+            routed_params[name] = Bunch(fit_transform=fit_params)
+        results = self._parallel_func(
+            X, y, _fit_transform_one, routed_params)
         if not results:
             # All transformers are None
             return np.zeros((X.shape[0], 0))
